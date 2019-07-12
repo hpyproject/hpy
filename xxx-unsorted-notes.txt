@@ -1,0 +1,32 @@
+Goal: better C API for CPython and 1st-class citizen on PyPy
+
+- everything should be opaque by default
+
+  - should we have an API to "query" if an object supports a certain low-level layout? E.g list-of-integer
+
+  - should we have an API to e.g. ask "give me the nth C-level long in the
+    list? And then rely on the compiler to turn this into an efficient loop:
+    long PyObject_GetLongItem(PyHandle h, long index) ?
+
+
+- we need PyObject_GetItem(handle) and PyObject_GetItem(int_index)
+
+- PyHandle PyObject_GetMappingProtocol(PyHandle o): ask a python object if it
+  has the "mapping" interface; then you can close it when you are done with it
+  and e.g. PyPy can release when it's no longer needed
+
+- should we write a tool to convert from the old API to the new API?
+
+- how we do deploy it? Should we have a single PyHandle.h file which is enough
+  to include? Or do like numpy.get_include_dirs()?
+
+  - we need to do what cffi does (and ship our version on PyPy)
+
+  - cython might need/want to ship its own vendored version of PyHandle
+
+- we need a versioning system which is possible to query at runtime? (to check
+  that it was compiled with the "correct/expected" PyHandle version
+
+- what to do with existing code which actively check whether the refcount is 1? E.g. PyString_Resize?
+
+- fast c-to-c calls: should we use argument clinic or something similar?

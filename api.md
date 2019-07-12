@@ -139,3 +139,15 @@ static inline void HPy_Close(HPyContext ctx, HPy x)
     _put_back_handle_into_free_list(x._i);
 }
 ```
+
+
+General design guidelines
+-------------------------
+
+* we don't want returned borrowed references.  When a function returns a
+  HPy, it means that you HAVE to close it
+
+* everything should be opaque by default; we don't expose the internal layout
+  of objects.  For example, `PyList_GET_ITEM()` is a macro that reads the internals
+  of lists.  Also, currently, the exact layout of type objects (`PyTypeObject`) is
+  part of the API; we want something similar to `PyType_FromSpec()`.
