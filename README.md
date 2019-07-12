@@ -73,4 +73,6 @@ Why should I care about this stuff?
     evolution of the language itself: this project makes it possible to make
     experiments which might be "officially" adopted in the future
 
-    
+See also [Python Performance: Past, Present,
+Future](https://github.com/vstinner/talks/raw/master/2019-EuroPython/python_performance.pdf)
+by Victor Stinner.
