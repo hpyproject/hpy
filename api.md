@@ -30,8 +30,8 @@ For example, this kind of code:
 would become this:
 
 ```C
-    HPy v = HPy_Something();
-    HPy w = HPy_Dup(v);   /* note that 'v != w' now! */
+    HPy v = HPy_Something(ctx);
+    HPy w = HPy_Dup(ctx, v);   /* note that 'v != w' now! */
     mystruct->field = w;
     return v;
 ```
@@ -49,12 +49,16 @@ Be careful that this:
 needs to be turned into:
 
 ```C
-    v = HPy_Something();
-    w = HPy_Dup(v);
+    v = HPy_Something(ctx);
+    w = HPy_Dup(ctx, v);
     ...
-    HPy_Close(w);   /* we need to close 'w' and 'v', not twice 'v' */
-    HPy_Close(v);
+    HPy_Close(ctx, w);   /* we need to close 'w' and 'v', not twice 'v' */
+    HPy_Close(ctx, v);
 ```
+
+The `ctx` is an opaque "context" argument that stands for the current
+interpreter.  Putting it from day 1 allows for future extensions (see below).
+This is vaguely modeled on the JNI (Java Native Interface).
 
 
 Fast implementation on CPython
@@ -66,20 +70,20 @@ compiler removes all the overhead:
 ```C
 typedef struct { PyObject *_o; } HPy;
 
-static inline HPy HPy_IntFromLong(long value)
+static inline HPy HPy_IntFromLong(HPyContext ctx, long value)
 {
     HPy result;
     result._o = PyInt_FromLong(value);
     return result;
 }
 
-static inline HPy HPy_Dup(HPy x)
+static inline HPy HPy_Dup(HPyContext ctx, HPy x)
 {
     Py_INCREF(x->_o);
     return x;
 }
 
-static inline void HPy_Close(HPy x)
+static inline void HPy_Close(HPyContext ctx, HPy x)
 {
     Py_DECREF(x->_o);
 }
@@ -113,7 +117,7 @@ typedef struct { int _i; } HPy;
  */
 internal_gc_object_t[] _open_handles;
 
-static inline HPy HPy_IntFromLong(long value)
+static inline HPy HPy_IntFromLong(HPyContext ctx, long value)
 {
     HPy result;
     result._i = _get_handle_from_free_list();
@@ -121,7 +125,7 @@ static inline HPy HPy_IntFromLong(long value)
     return result;
 }
 
-static inline HPy HPy_Dup(HPy x)
+static inline HPy HPy_Dup(HPyContext ctx, HPy x)
 {
     HPy result;
     result._i = _get_handle_from_free_list();
@@ -129,7 +133,7 @@ static inline HPy HPy_Dup(HPy x)
     return result;
 }
 
-static inline void HPy_Close(HPy x)
+static inline void HPy_Close(HPyContext ctx, HPy x)
 {
     _open_handles[x._i] = NULL;
     _put_back_handle_into_free_list(x._i);
