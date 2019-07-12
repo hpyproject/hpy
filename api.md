@@ -1,17 +1,17 @@
 The PyHandle API
 ===================
 
-Idea: instead of using the type `PyObject *`, we use `PyHandle`.  It is a
+Idea: instead of using the type `PyObject *`, we use `HPy`.  It is a
 "handle" to an object.  It works like Windows HANDLE or like Unix file
 descriptors: it is similar to a pointer, but opaque; and most importantly two
 different handles can refer to the same object (i.e. you can't use `==` to
 compare them).  A possible implementation would be:
 
 ```C
-typedef struct { void *_internal; } PyHandle;
+typedef struct { void *_internal; } HPy;
 ```
 
-After you call some API and get a PyHandle, you usually need to release it;
+After you call some API and get a HPy, you usually need to release it;
 to do that, instead of calling `Py_DECREF()`, you call `HPy_Close()`
 (all names subject to change).  Replacing `Py_INCREF()` is less mechanical:
 you need to call `y = HPy_Dup(x);`, after which you get a new handle
@@ -30,8 +30,8 @@ For example, this kind of code:
 would become this:
 
 ```C
-    PyHandle v = HPy_Something();
-    PyHandle w = HPy_Dup(v);   /* note that 'v != w' now! */
+    HPy v = HPy_Something();
+    HPy w = HPy_Dup(v);   /* note that 'v != w' now! */
     mystruct->field = w;
     return v;
 ```
@@ -60,22 +60,22 @@ On CPython, the internal implementation is straightforward, and the C
 compiler removes all the overhead:
 
 ```C
-typedef struct { PyObject *_o; } PyHandle;
+typedef struct { PyObject *_o; } HPy;
 
-static inline PyHandle HPy_IntFromLong(long value)
+static inline HPy HPy_IntFromLong(long value)
 {
-    PyHandle result;
+    HPy result;
     result._o = PyInt_FromLong(value);
     return result;
 }
 
-static inline PyHandle HPy_Dup(PyHandle x)
+static inline HPy HPy_Dup(HPy x)
 {
     Py_INCREF(x->_o);
     return x;
 }
 
-static inline void HPy_Close(PyHandle x)
+static inline void HPy_Close(HPy x)
 {
     Py_DECREF(x->_o);
 }
@@ -86,7 +86,7 @@ without reference counts, for example like this (this is much more
 efficient than what PyPy currently needs to do):
 
 ```C
-typedef struct { int _i; } PyHandle;
+typedef struct { int _i; } HPy;
 
 /* Array of all open handles---this is _not_ all objects!
  * The GC knows that it needs to look inside this array for objects
@@ -94,23 +94,23 @@ typedef struct { int _i; } PyHandle;
  */
 internal_gc_object_t[] _open_handles;
 
-static inline PyHandle HPy_IntFromLong(long value)
+static inline HPy HPy_IntFromLong(long value)
 {
-    PyHandle result;
+    HPy result;
     result._i = _get_handle_from_free_list();
     _open_handles[result._i] = make_integer_obj(value);
     return result;
 }
 
-static inline PyHandle HPy_Dup(PyHandle x)
+static inline HPy HPy_Dup(HPy x)
 {
-    PyHandle result;
+    HPy result;
     result._i = _get_handle_from_free_list();
     _open_handles[result._i] = _open_handles[x._i];
     return result;
 }
 
-static inline void HPy_Close(PyHandle x)
+static inline void HPy_Close(HPy x)
 {
     _open_handles[x._i] = NULL;
     _put_back_handle_into_free_list(x._i);
