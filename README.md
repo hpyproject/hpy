@@ -22,6 +22,10 @@ More specifically, the goals include (but are not necessarily limited to):
     existing C extensions piece by piece and to use the old and the new API
     side-by-side during the transition
 
+  - to provide better debugging experience: in debug mode, you could get
+    precise notification about which handles are kept open for too long
+    or used after being closed.
+
   - to be more friendly for other implementations: in particular, we do not
     want reference counting to be part of the API: we want a more generic way
     of managing resources which is possible to implement with different

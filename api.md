@@ -56,6 +56,10 @@ needs to be turned into:
     HPy_Close(v);
 ```
 
+
+Fast implementation on CPython
+------------------------------
+
 On CPython, the internal implementation is straightforward, and the C
 compiler removes all the overhead:
 
@@ -80,6 +84,21 @@ static inline void HPy_Close(HPy x)
     Py_DECREF(x->_o);
 }
 ```
+
+
+Debug-mode implementation on CPython
+------------------------------------
+
+Since the semantics are slightly different than `Py_INCREF` and `Py_DECREF`, it
+is a good idea to provide a debug build mode that actively checks that handles
+are closed properly and not used after being closed.  This would be slower but
+provide a better debugging experience---for example, handles could record the C
+backtrace of where they come from, which would allow very precise error
+messages.  (In this mode, handles would not be simply `PyObject *`.)
+
+
+Implementation on PyPy
+----------------------
 
 On a garbage-collected VM like PyPy, it can instead be implemented
 without reference counts, for example like this (this is much more
