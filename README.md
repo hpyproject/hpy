@@ -63,14 +63,13 @@ More concrete goals
 Why should I care about this stuff?
 ------------------------------------
 
+  - the existing C API is becoming a problem for CPython and for the
+    evolution of the language itself: this project makes it possible to make
+    experiments which might be "officially" adopted in the future
+
   - for PyPy, it will give obvious speed benefits: for example, data
     scientists will be able to get the benefit of fast C libraries *and* fast
     Python code at the same time, something which is hard to achieve now
 
-  - for CPython, it will be arguably easier to learn and understand
-
-  - moreover, the existing C API is becoming a problem for CPython and for the
-    evolution of the language itself: this project makes it possible to make
-    experiments which might be "officially" adopted in the future
-
-    
+  - arguably, it will be easier to learn and understand than the massive
+    CPython C API
