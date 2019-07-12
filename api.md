@@ -12,9 +12,9 @@ typedef struct { void *_internal; } PyHandle;
 ```
 
 After you call some API and get a PyHandle, you usually need to release it;
-to do that, instead of calling `Py_DECREF()`, you call `PyHandle_Close()`
+to do that, instead of calling `Py_DECREF()`, you call `HPy_Close()`
 (all names subject to change).  Replacing `Py_INCREF()` is less mechanical:
-you need to call `y = PyHandle_Dup(x);`, after which you get a new handle
+you need to call `y = HPy_Dup(x);`, after which you get a new handle
 `y` which is now independent of `x`, and both of them need to be closed
 at some point in the future.
 
@@ -30,8 +30,8 @@ For example, this kind of code:
 would become this:
 
 ```C
-    PyHandle v = PyHandle_Something();
-    PyHandle w = PyHandle_Dup(v);   /* note that 'v != w' now! */
+    PyHandle v = HPy_Something();
+    PyHandle w = HPy_Dup(v);   /* note that 'v != w' now! */
     mystruct->field = w;
     return v;
 ```
@@ -49,11 +49,11 @@ Be careful that this:
 needs to be turned into:
 
 ```C
-    v = PyHandle_Something();
-    w = PyHandle_Dup(v);
+    v = HPy_Something();
+    w = HPy_Dup(v);
     ...
-    PyHandle_Close(w);   /* we need to close 'w' and 'v', not twice 'v' */
-    PyHandle_Close(v);
+    HPy_Close(w);   /* we need to close 'w' and 'v', not twice 'v' */
+    HPy_Close(v);
 ```
 
 On CPython, the internal implementation is straightforward, and the C
@@ -62,20 +62,20 @@ compiler removes all the overhead:
 ```C
 typedef struct { PyObject *_o; } PyHandle;
 
-static inline PyHandle PyHandle_IntFromLong(long value)
+static inline PyHandle HPy_IntFromLong(long value)
 {
     PyHandle result;
     result._o = PyInt_FromLong(value);
     return result;
 }
 
-static inline PyHandle PyHandle_Dup(PyHandle x)
+static inline PyHandle HPy_Dup(PyHandle x)
 {
     Py_INCREF(x->_o);
     return x;
 }
 
-static inline void PyHandle_Close(PyHandle x)
+static inline void HPy_Close(PyHandle x)
 {
     Py_DECREF(x->_o);
 }
@@ -94,7 +94,7 @@ typedef struct { int _i; } PyHandle;
  */
 internal_gc_object_t[] _open_handles;
 
-static inline PyHandle PyHandle_IntFromLong(long value)
+static inline PyHandle HPy_IntFromLong(long value)
 {
     PyHandle result;
     result._i = _get_handle_from_free_list();
@@ -102,7 +102,7 @@ static inline PyHandle PyHandle_IntFromLong(long value)
     return result;
 }
 
-static inline PyHandle PyHandle_Dup(PyHandle x)
+static inline PyHandle HPy_Dup(PyHandle x)
 {
     PyHandle result;
     result._i = _get_handle_from_free_list();
@@ -110,7 +110,7 @@ static inline PyHandle PyHandle_Dup(PyHandle x)
     return result;
 }
 
-static inline void PyHandle_Close(PyHandle x)
+static inline void HPy_Close(PyHandle x)
 {
     _open_handles[x._i] = NULL;
     _put_back_handle_into_free_list(x._i);
