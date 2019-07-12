@@ -73,3 +73,7 @@ Why should I care about this stuff?
 
   - arguably, it will be easier to learn and understand than the massive
     CPython C API
+
+See also [Python Performance: Past, Present,
+Future](https://github.com/vstinner/talks/raw/master/2019-EuroPython/python_performance.pdf)
+by Victor Stinner.
