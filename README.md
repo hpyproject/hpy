@@ -63,7 +63,9 @@ More concrete goals
 Why should I care about this stuff?
 ------------------------------------
 
-  - for PyPy, it will give obvious speed benefits
+  - for PyPy, it will give obvious speed benefits: for example, data
+    scientists will be able to get the benefit of fast C libraries *and* fast
+    Python code at the same time, something which is hard to achieve now
 
   - for CPython, it will be arguably easier to learn and understand
 
