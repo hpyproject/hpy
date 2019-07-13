@@ -178,19 +178,19 @@ Considering the iteration protocol, which would look as follows::
     if (HPy_AsSequence(ctx, obj, &seq) < 0) goto not_a_sequence;
 
     Py_ssize_t len;
-    if (HPy_Sequence_Len(ctx, x, obj, &len) < 0) goto error_no_length;
+    if (HPy_Sequence_Len(ctx, seq, obj, &len) < 0) goto error_no_length;
     for(int i=0; i<len; i++) {
-        /* HPy_Sequence_GetItem will check a flag on x to see if it can use a
+        /* HPy_Sequence_GetItem will check a flag on seq to see if it can use a
            fast-path of direct indexing or it needs to go through a generic
            fallback. And the C compiler will hoist the check out of the loop,
            hopefully */
         HPy item;
-        if (HPy_Sequence_GetItem(ctx, x, obj, i, &item) < 0)
+        if (HPy_Sequence_GetItem(ctx, seq, obj, i, &item) < 0)
             goto error_on_item_access;  /* like PyList_GET_ITEM */
         /* process 'item' */
         HPy_Close(ctx, item);
     }
-    HPySequenceClose(ctx, x, obj);
+    HPySequenceClose(ctx, seq, obj);
 
     not_a_sequence:
     HPy iterator;
@@ -216,10 +216,10 @@ Optimised variant when a sequence of C long integers is expected::
     if (HPy_AsSequence_long(ctx, obj, &seq) < 0) goto not_a_long_sequence;
 
     Py_ssize_t len;
-    if (HPy_Sequence_Len_long(ctx, x, obj, &len) < 0) goto error_no_length;
+    if (HPy_Sequence_Len_long(ctx, seq, obj, &len) < 0) goto error_no_length;
     for(int i=0; i<len; i++) {
         long item;
-        if (HPy_Sequence_GetItem_long(ctx, x, obj, i, &item) < 0)
+        if (HPy_Sequence_GetItem_long(ctx, seq, obj, i, &item) < 0)
             goto error_on_item_access;
     }
-    HPySequenceClose_long(ctx, x, obj);
+    HPySequenceClose_long(ctx, seq, obj);
