@@ -33,7 +33,7 @@ would become this:
 ```C
     HPy v, w;
     if (HPy_Something(ctx, &v) < 0) return HPY_ERROR;
-    if (HPy_Dup(ctx, v, &w) < 0) { HPy_Close(v); return HPY_ERROR; }
+    if (HPy_Dup(ctx, v, &w) < 0) { HPy_Close(ctx, v); return HPY_ERROR; }
     /* note that 'v != w' now! */
     mystruct->field = w;
     return v;
@@ -62,6 +62,10 @@ needs to be turned into:
 The `ctx` is an opaque "context" argument that stands for the current
 interpreter.  Putting it from day 1 allows for future extensions (see below).
 This is vaguely modeled on the JNI (Java Native Interface).
+
+`HPy_Close()` can't fail, like `Py_DECREF()` can't fail.  Debug-mode
+implementations could still check that you're not e.g. closing the same handle
+twice, but if you do they can dump the error to stderr and `abort()`.
 
 
 Fast implementation on CPython
