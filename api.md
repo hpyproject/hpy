@@ -31,12 +31,14 @@ For example, this kind of code:
 would become this:
 
 ```C
-    HPy v, w;
-    if (HPy_Something(ctx, &v) < 0) return HPY_ERROR;
-    if (HPy_Dup(ctx, v, &w) < 0) { HPy_Close(ctx, v); return HPY_ERROR; }
+    HPy v = HPy_Something(ctx);
+    if (HPy_IsError(v)) return HPy_ERROR;
+    HPy w = HPy_Dup(ctx, v);
+    if (HPy_IsError(w)) { HPy_Close(ctx, v); return HPy_ERROR; }
     /* note that 'v != w' now! */
     mystruct->field = w;
     return v;
+}
 ```
 
 Be careful that this:
@@ -52,8 +54,8 @@ Be careful that this:
 needs to be turned into:
 
 ```C
-    if (HPy_Something(ctx, &v) < 0) ...;
-    if (HPy_Dup(ctx, v, &w) < 0) ...;
+    HPy v = HPy_Something(ctx);
+    HPy w = HPy_Dup(ctx, v);
     ...
     HPy_Close(ctx, w);   /* we need to close 'w' and 'v', not twice 'v' */
     HPy_Close(ctx, v);
@@ -173,40 +175,36 @@ Design goals:
 
 Considering the iteration protocol, which would look as follows::
 
-    HPySequence seq;
     /* If the object is not a sequence, we might want to fall back to generic iteration. */
-    if (HPy_AsSequence(ctx, obj, &seq) < 0) goto not_a_sequence;
+    HPySequence seq = HPy_AsSequence(ctx, obj);
+    if (HPy_Sequence_IsError(seq)) goto not_a_sequence;
+    HPy_Close(ctx, obj);   /* we'll be using only 'seq' in the sequel */
 
-    Py_ssize_t len;
-    if (HPy_Sequence_Len(ctx, seq, obj, &len) < 0) goto error_no_length;
+    Py_ssize_t len = HPy_Sequence_Len(ctx, seq);
     for(int i=0; i<len; i++) {
         /* HPy_Sequence_GetItem will check a flag on seq to see if it can use a
            fast-path of direct indexing or it needs to go through a generic
            fallback. And the C compiler will hoist the check out of the loop,
            hopefully */
-        HPy item;
-        if (HPy_Sequence_GetItem(ctx, seq, obj, i, &item) < 0)
-            goto error_on_item_access;  /* like PyList_GET_ITEM */
+        HPy item = HPy_Sequence_GetItem(ctx, seq, i);  /* like PyList_GET_ITEM */
         /* process 'item' */
         HPy_Close(ctx, item);
     }
-    HPySequenceClose(ctx, seq, obj);
+    HPySequenceClose(ctx, seq);
 
     not_a_sequence:
-    HPy iterator;
-    /* if (HPy_CallSpecialMethodNoArgs(ctx, obj, __iter__, &iterator) < 0) */
-    if (HPy_GetIter(ctx, obj, &iterator) < 0)
-        goto error_not_iterable;
-    int error;
+    /* iterator = HPy_CallSpecialMethodNoArgs(ctx, obj, __iter__) */
+    HPy iterator = HPy_GetIter(ctx, obj);
+    HPy_Close(ctx, obj);   /* we have 'iterator' */
 
-    HPy item;
-    /* while ((error = HPy_CallSpecialMethodNoArgs(ctx, iterator, __next__, &item)) == 0) */
-    while ((error = HPy_IterNext(ctx, iterator, &item)) == 1) {
+    while (true) {
+        HPy item = HPy_IterNext(ctx, iterator);
+        if (HPy_IsError(item)) goto oops;
+        if (HPy_IsIterStop(item)) break;
         /* process 'item' */
         HPy_Close(ctx, item);
     }
     HPy_Close(ctx, iterator);
-    if (error == -1) goto error_next_failed;
 
 
 Optimised variant when a sequence of C long integers is expected::
@@ -214,12 +212,13 @@ Optimised variant when a sequence of C long integers is expected::
     HPySequence_long seq;
     /* This is allowed to fail and you should be ready to handle the fallback. */
     if (HPy_AsSequence_long(ctx, obj, &seq) < 0) goto not_a_long_sequence;
+    HPy_Close(ctx, obj);
 
     Py_ssize_t len;
-    if (HPy_Sequence_Len_long(ctx, seq, obj, &len) < 0) goto error_no_length;
+    if (HPy_Sequence_Len_long(ctx, seq, &len) < 0) goto error_no_length;
     for(int i=0; i<len; i++) {
         long item;
-        if (HPy_Sequence_GetItem_long(ctx, seq, obj, i, &item) < 0)
+        if (HPy_Sequence_GetItem_long(ctx, seq, i, &item) < 0)
             goto error_on_item_access;
     }
-    HPySequenceClose_long(ctx, seq, obj);
+    HPySequenceClose_long(ctx, seq);
