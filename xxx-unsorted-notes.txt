@@ -57,3 +57,36 @@ for(int i=0; i<len; i++) {
     HPy item = HPy_Sequence_GetItem(x, obj, i);  /* PyList_GET_ITEM */
  }
 HPySequenceClose(x, obj);
+
+
+
+Protocols in Python that we might want to support
+-------------------------------------------------
+
+* attribute access (get/set/del)
+  * name object lookup
+* item access (get/set/del)
+  * object items and indices
+  * C integer indexing (PyObject_GetItem()/PySequence_GetItem())
+  * C item values (…GetItem_long())
+* iteration (iter/next)
+  * object iterator
+  * sequence iteration
+  * low-level data iterator (int/long) – (optional)
+* sequence (iter + length + index access)
+  * object items
+  * low-level data sequence (int/long) – (optional)
+  * low-level data array (int/long)
+* mapping (iter + length + item access + key/value iter)
+  * object lookup
+  * C number lookup (int/long/…) -> sequence index access
+* comparisons (<, <=, ==, !=, >=, >)
+  * rich comparisons
+  * boolean comparisons (0/1)
+* call (call/vectorcall/method/special-method)
+  * e.g. PyCall_SpecialMethodOneArg(obj, __add__, arg) -> call specific macro
+  * …
+* context manager (enter/exit)
+  * -> call special method
+* async (await/aiter/anext)
+  * -> call special method
