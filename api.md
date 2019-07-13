@@ -161,4 +161,61 @@ One of the goal is to remove the abstraction overhead when possible.  For
 example, consider the case of iterating over a sequence (list, tuple,
 array.array, etc.) that happens to contain integers.
 
+Design goals:
 
+- Expose internal data representations, which might be more efficient than objects.
+- Make the direct access to native data structures explicit to allow implementors to adapt without being bound to internal details.
+- Keep the API similar for both simple object access and optimised data structures.
+
+Considering the iteration protocol, which would look as follows::
+
+    HPySequence seq;
+    /* If the object is not a sequence, we might want to fall back to generic iteration. */
+    if (HPy_AsSequence(ctx, obj, &seq) < 0) goto not_a_sequence;
+
+    Py_ssize_t len;
+    if (HPy_Sequence_Len(ctx, x, obj, &len) < 0) goto error_no_length;
+    for(int i=0; i<len; i++) {
+        /* HPy_Sequence_GetItem will check a flag on x to see if it can use a
+           fast-path of direct indexing or it needs to go through a generic
+           fallback. And the C compiler will hoist the check out of the loop,
+           hopefully */
+        HPy item;
+        if (HPy_Sequence_GetItem(ctx, x, obj, i, &item) < 0)
+            goto error_on_item_access;  /* like PyList_GET_ITEM */
+        /* process 'item' */
+        HPy_Close(ctx, item);
+    }
+    HPySequenceClose(ctx, x, obj);
+
+    not_a_sequence:
+    HPy iterator;
+    /* if (HPy_CallSpecialMethodNoArgs(ctx, obj, __iter__, &iterator) < 0) */
+    if (HPy_GetIter(ctx, obj, &iterator) < 0)
+        goto error_not_iterable;
+    int error;
+
+    HPy item;
+    /* while ((error = HPy_CallSpecialMethodNoArgs(ctx, iterator, __next__, &item)) == 0) */
+    while ((error = HPy_IterNext(ctx, iterator, &item)) == 1) {
+        /* process 'item' */
+        HPy_Close(ctx, item);
+    }
+    HPy_Close(ctx, iterator);
+    if (error == -1) goto error_next_failed;
+
+
+Optimised variant when a sequence of C long integers is expected::
+
+    HPySequence_long seq;
+    /* This is allowed to fail and you should be ready to handle the fallback. */
+    if (HPy_AsSequence_long(ctx, obj, &seq) < 0) goto not_a_long_sequence;
+
+    Py_ssize_t len;
+    if (HPy_Sequence_Len_long(ctx, x, obj, &len) < 0) goto error_no_length;
+    for(int i=0; i<len; i++) {
+        long item;
+        if (HPy_Sequence_GetItem_long(ctx, x, obj, i, &item) < 0)
+            goto error_on_item_access;
+    }
+    HPySequenceClose_long(ctx, x, obj);
