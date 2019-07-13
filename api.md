@@ -22,6 +22,7 @@ For example, this kind of code:
 
 ```C
     PyObject *v = PyObject_Something();
+    if (v == NULL) return NULL;
     Py_INCREF(v);
     mystruct->field = v;
     return v;
@@ -30,8 +31,10 @@ For example, this kind of code:
 would become this:
 
 ```C
-    HPy v = HPy_Something(ctx);
-    HPy w = HPy_Dup(ctx, v);   /* note that 'v != w' now! */
+    HPy v, w;
+    if (HPy_Something(ctx, &v) < 0) return HPY_ERROR;
+    if (HPy_Dup(ctx, v, &w) < 0) { HPy_Close(v); return HPY_ERROR; }
+    /* note that 'v != w' now! */
     mystruct->field = w;
     return v;
 ```
@@ -49,8 +52,8 @@ Be careful that this:
 needs to be turned into:
 
 ```C
-    v = HPy_Something(ctx);
-    w = HPy_Dup(ctx, v);
+    if (HPy_Something(ctx, &v) < 0) ...;
+    if (HPy_Dup(ctx, v, &w) < 0) ...;
     ...
     HPy_Close(ctx, w);   /* we need to close 'w' and 'v', not twice 'v' */
     HPy_Close(ctx, v);
@@ -70,22 +73,22 @@ compiler removes all the overhead:
 ```C
 typedef struct { PyObject *_o; } HPy;
 
-static inline HPy HPy_IntFromLong(HPyContext ctx, long value)
+static inline int HPy_IntFromLong(HPyContext ctx, long value, HPy *result)
 {
-    HPy result;
-    result._o = PyInt_FromLong(value);
-    return result;
+    result->_o = PyInt_FromLong(value);
+    return result->_o != NULL ? 0 : -1;
 }
 
-static inline HPy HPy_Dup(HPyContext ctx, HPy x)
+static inline int HPy_Dup(HPyContext ctx, HPy x, HPy *result)
 {
-    Py_INCREF(x->_o);
-    return x;
+    Py_INCREF(x._o);
+    result->_o = x._o;
+    return 0;
 }
 
 static inline void HPy_Close(HPyContext ctx, HPy x)
 {
-    Py_DECREF(x->_o);
+    Py_DECREF(x._o);
 }
 ```
 
@@ -117,20 +120,18 @@ typedef struct { int _i; } HPy;
  */
 internal_gc_object_t[] _open_handles;
 
-static inline HPy HPy_IntFromLong(HPyContext ctx, long value)
+static inline int HPy_IntFromLong(HPyContext ctx, long value, HPy *result)
 {
-    HPy result;
-    result._i = _get_handle_from_free_list();
-    _open_handles[result._i] = make_integer_obj(value);
-    return result;
+    result->_i = _get_handle_from_free_list();
+    _open_handles[result->_i] = make_integer_obj(value);
+    return 0;   /* or -1 if we're running out of memory */
 }
 
-static inline HPy HPy_Dup(HPyContext ctx, HPy x)
+static inline int HPy_Dup(HPyContext ctx, HPy x, HPy *result)
 {
-    HPy result;
-    result._i = _get_handle_from_free_list();
-    _open_handles[result._i] = _open_handles[x._i];
-    return result;
+    result->_i = _get_handle_from_free_list();
+    _open_handles[result->_i] = _open_handles[x._i];
+    return 0;
 }
 
 static inline void HPy_Close(HPyContext ctx, HPy x)
