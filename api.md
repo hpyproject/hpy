@@ -151,3 +151,13 @@ General design guidelines
   of objects.  For example, `PyList_GET_ITEM()` is a macro that reads the internals
   of lists.  Also, currently, the exact layout of type objects (`PyTypeObject`) is
   part of the API; we want something similar to `PyType_FromSpec()`.
+
+
+Specialized protocols
+---------------------
+
+One of the goal is to remove the abstraction overhead when possible.  For
+example, consider the case of iterating over a sequence (list, tuple,
+array.array, etc.) that happens to contain integers.
+
+
