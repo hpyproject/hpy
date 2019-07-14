@@ -209,16 +209,14 @@ Considering the iteration protocol, which would look as follows::
 
 Optimised variant when a sequence of C long integers is expected::
 
-    HPySequence_long seq;
     /* This is allowed to fail and you should be ready to handle the fallback. */
-    if (HPy_AsSequence_long(ctx, obj, &seq) < 0) goto not_a_long_sequence;
+    HPySequence_long seq = HPy_AsSequence_long(ctx, obj);
+    if (HPy_Sequence_IsError_long(seq)) goto not_a_long_sequence;
     HPy_Close(ctx, obj);
 
-    Py_ssize_t len;
-    if (HPy_Sequence_Len_long(ctx, seq, &len) < 0) goto error_no_length;
+    Py_ssize_t len = HPy_Sequence_Len_long(ctx, seq);
     for(int i=0; i<len; i++) {
-        long item;
-        if (HPy_Sequence_GetItem_long(ctx, seq, i, &item) < 0)
-            goto error_on_item_access;
+        long item = HPy_Sequence_GetItem_long(ctx, seq, i);
+        /* process 'item' */
     }
     HPySequenceClose_long(ctx, seq);
