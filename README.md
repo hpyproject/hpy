@@ -75,6 +75,12 @@ Why should I care about this stuff?
     scientists will be able to get the benefit of fast C libraries *and* fast
     Python code at the same time, something which is hard to achieve now
 
+  - the current implementation is too tied to CPython and proved to be a
+    problem for almost all the other alternative implementations. Having an
+    API which is designed to work well on two different implementations will
+    make the job much easier for future ones: going from 2 to N is much easier
+    than going from 1 to 2
+
   - arguably, it will be easier to learn and understand than the massive
     CPython C API
 
