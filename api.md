@@ -62,8 +62,10 @@ needs to be turned into:
 ```
 
 The `ctx` is an opaque "context" argument that stands for the current
-interpreter.  Putting it from day 1 allows for future extensions (see below).
-This is vaguely modeled on the JNI (Java Native Interface).
+interpreter.  Putting it from day 1 allows for future extensions: for example,
+it could be used to make ABI-compatiblity among different implementations
+easier and/or for subinterpreters support.  This is vaguely modeled on the JNI
+(Java Native Interface).
 
 `HPy_Close()` can't fail, like `Py_DECREF()` can't fail.  Debug-mode
 implementations could still check that you're not e.g. closing the same handle
