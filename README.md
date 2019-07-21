@@ -1,4 +1,4 @@
-PyHandle: a better API for Python
+HPy: a better API for Python
 ==================================
 
 The goal of the project is to design a better API for extending Python
@@ -87,3 +87,11 @@ Why should I care about this stuff?
 See also [Python Performance: Past, Present,
 Future](https://github.com/vstinner/talks/raw/master/2019-EuroPython/python_performance.pdf)
 by Victor Stinner.
+
+
+What does `HPy` means?
+-----------------------
+
+The "H" in `HPy` stands for "handle": one of the key idea of the new API is to
+use fully opaque handles to represent and pass around Python objects.
+
