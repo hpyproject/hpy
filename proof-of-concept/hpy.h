@@ -24,11 +24,13 @@ static inline HPy _HPyFromPy(HPyContext ctx, PyObject *obj) {
 typedef PyModuleDef HPyModuleDef;
 #define HPyModuleDef_HEAD_INIT PyModuleDef_HEAD_INIT
 
-
-
 static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
     return _HPyFromPy(ctx, PyModule_Create(mdef));
 }
+
+/* methodobject.h */
+typedef PyMethodDef HPyMethodDef;
+
 
 #define HPY_MODINIT_FUNC(NAME)                                          \
     static HPy _init ## NAME(HPyContext);                               \

@@ -6,7 +6,7 @@ static PyObject* do_nothing(PyObject* self, PyObject* args)
     Py_RETURN_NONE;
 }
 
-static PyMethodDef PofMethods[] = {
+static HPyMethodDef PofMethods[] = {
     {"do_nothing", do_nothing, METH_NOARGS, ""},
     {NULL, NULL, 0, NULL}
 };
