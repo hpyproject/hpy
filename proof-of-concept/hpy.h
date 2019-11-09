@@ -11,6 +11,15 @@
 
 typedef PyObject *HPy;
 typedef long HPyContext;
+typedef PyModuleDef HPyModuleDef;
+
+static inline HPy _HPyFromPy(HPyContext ctx, PyObject *obj) {
+    return obj;
+}
+
+static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
+    return _HPyFromPy(ctx, PyModule_Create(mdef));
+}
 
 #define HPY_MODINIT_FUNC(NAME)                                          \
     static HPy _init ## NAME(HPyContext);                               \
@@ -21,4 +30,6 @@ typedef long HPyContext;
         return _init ## NAME(ctx);                                      \
     }                                                                   \
     static HPy _init ## NAME
+
+
 #endif /* !HPy_H */

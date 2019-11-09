@@ -22,8 +22,8 @@ static struct PyModuleDef moduledef = {
 
 HPY_MODINIT_FUNC(pof)(HPyContext ctx)
 {
-    PyObject* m;
-    m = PyModule_Create(&moduledef);
+    HPy m;
+    m = HPyModule_Create(ctx, &moduledef);
     if (m == NULL)
         return NULL;
     return m;
