@@ -34,15 +34,12 @@ static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
     return _HPyFromPy(ctx, PyModule_Create(mdef));
 }
 
-#define HPY_MODINIT_FUNC(NAME)                                          \
-    static HPy _init ## NAME(HPyContext);                               \
-    PyMODINIT_FUNC                                                      \
-    PyInit_ ## NAME (void)                                              \
-    {                                                                   \
-        return _init ## NAME(_HPyGetContext());                         \
-    }                                                                   \
-    static HPy _init ## NAME
-
+#define HPY_DECLARE_MODINIT(MODNAME, FUNC)          \
+    PyMODINIT_FUNC                                  \
+    PyInit_##MODNAME(void)                          \
+    {                                               \
+        return FUNC(_HPyGetContext());              \
+    }
 
 /* methodobject.h */
 typedef PyMethodDef HPyMethodDef;
