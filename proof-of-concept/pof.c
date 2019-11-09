@@ -1,13 +1,14 @@
 #include "hpy.h"
 
-
-static PyObject* do_nothing(PyObject* self, PyObject* args)
+static HPy do_nothing(HPyContext ctx, HPy self, HPy args)
 {
-    Py_RETURN_NONE;
+    HPy_RETURN_NONE;
 }
+HPY_FUNCTION(do_nothing)
+
 
 static HPyMethodDef PofMethods[] = {
-    {"do_nothing", do_nothing, METH_NOARGS, ""},
+    {"do_nothing", _do_nothing, METH_NOARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
