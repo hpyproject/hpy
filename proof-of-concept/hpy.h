@@ -34,7 +34,7 @@ static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
     return _HPyFromPy(ctx, PyModule_Create(mdef));
 }
 
-#define HPY_DECLARE_MODINIT(MODNAME, FUNC)          \
+#define HPy_DECLARE_MODINIT(MODNAME, FUNC)          \
     PyMODINIT_FUNC                                  \
     PyInit_##MODNAME(void)                          \
     {                                               \
@@ -49,7 +49,7 @@ typedef PyMethodDef HPyMethodDef;
 
 /* XXX: this is a bit undesirable because it introduces an indirection and an
    extra function call. Unsure how to solve it, though. */
-#define HPY_FUNCTION(NAME)                                        \
+#define HPy_FUNCTION(NAME)                                        \
     static PyObject* _##NAME(PyObject *self, PyObject *args)      \
     {                                                             \
         return NAME(_HPyGetContext(), self, args);                \

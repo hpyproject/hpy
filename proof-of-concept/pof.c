@@ -4,7 +4,7 @@ static HPy do_nothing(HPyContext ctx, HPy self, HPy args)
 {
     HPy_RETURN_NONE;
 }
-HPY_FUNCTION(do_nothing)
+HPy_FUNCTION(do_nothing)
 
 
 static HPyMethodDef PofMethods[] = {
@@ -29,4 +29,4 @@ static HPy _initpof(HPyContext ctx)
         return NULL;
     return m;
 }
-HPY_DECLARE_MODINIT(pof, _initpof)
+HPy_DECLARE_MODINIT(pof, _initpof)
