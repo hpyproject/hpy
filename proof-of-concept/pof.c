@@ -1,5 +1,5 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include "hpy.h"
+
 
 static PyObject* do_nothing(PyObject* self, PyObject* args)
 {
@@ -19,8 +19,8 @@ static struct PyModuleDef moduledef = {
     PofMethods                  /* m_methods */
 };
 
-PyMODINIT_FUNC
-PyInit_pof(void)
+
+HPY_MODINIT_FUNC(pof)(HPyContext ctx)
 {
     PyObject* m;
     m = PyModule_Create(&moduledef);
