@@ -11,8 +11,8 @@ static PyMethodDef PofMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-static struct PyModuleDef moduledef = {
-    PyModuleDef_HEAD_INIT,
+static HPyModuleDef moduledef = {
+    HPyModuleDef_HEAD_INIT,
     "pof",                      /* m_name */
     "HPy Proof of Concept",     /* m_doc */
     -1,                         /* m_size */

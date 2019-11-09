@@ -1,6 +1,10 @@
 #ifndef HPy_H
 #define HPy_H
 
+/* XXX: it would be nice if we could include hpy.h WITHOUT bringing in all the
+   stuff from Python.h, to make sure that people don't use the CPython API by
+   mistake. How to achieve it, though? */
+
 /* XXX: should we:
  *    - enforce PY_SSIZE_T_CLEAN in hpy
  *    - make it optional
@@ -11,11 +15,16 @@
 
 typedef PyObject *HPy;
 typedef long HPyContext;
-typedef PyModuleDef HPyModuleDef;
 
 static inline HPy _HPyFromPy(HPyContext ctx, PyObject *obj) {
     return obj;
 }
+
+/* moduleobject.h */
+typedef PyModuleDef HPyModuleDef;
+#define HPyModuleDef_HEAD_INIT PyModuleDef_HEAD_INIT
+
+
 
 static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
     return _HPyFromPy(ctx, PyModule_Create(mdef));
