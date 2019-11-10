@@ -8,7 +8,7 @@ HPy_FUNCTION(do_nothing)
 
 
 static HPyMethodDef PofMethods[] = {
-    {"do_nothing", _do_nothing, METH_NOARGS, ""},
+    HPy_METHOD_DEF("do_nothing", do_nothing, METH_NOARGS, ""),
     {NULL, NULL, 0, NULL}
 };
 
