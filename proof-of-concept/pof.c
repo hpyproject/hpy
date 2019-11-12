@@ -21,7 +21,8 @@ static HPyModuleDef moduledef = {
 };
 
 
-static HPy _initpof(HPyContext ctx)
+HPy_MODINIT(pof)
+static HPy HPyInit_pof(HPyContext ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);
@@ -29,4 +30,3 @@ static HPy _initpof(HPyContext ctx)
         return NULL;
     return m;
 }
-HPy_DECLARE_MODINIT(pof, _initpof)
