@@ -1,14 +1,14 @@
 #include "hpy.h"
 
-static HPy do_nothing(HPyContext ctx, HPy self, HPy args)
+HPy_FUNCTION(do_nothing)
+static HPy do_nothing_impl(HPyContext ctx, HPy self, HPy args)
 {
     HPy_RETURN_NONE;
 }
-HPy_FUNCTION(do_nothing)
 
 
 static HPyMethodDef PofMethods[] = {
-    HPy_METHOD_DEF("do_nothing", do_nothing, METH_NOARGS, ""),
+    {"do_nothing", do_nothing, METH_NOARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
