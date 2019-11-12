@@ -14,10 +14,10 @@ static HPyMethodDef PofMethods[] = {
 
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
-    "pof",                      /* m_name */
-    "HPy Proof of Concept",     /* m_doc */
-    -1,                         /* m_size */
-    PofMethods                  /* m_methods */
+    .m_name = "pof",
+    .m_doc = "HPy Proof of Concept",
+    .m_size = -1,
+    .m_methods = PofMethods
 };
 
 
