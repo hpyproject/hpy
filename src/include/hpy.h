@@ -13,10 +13,18 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#ifdef __GNUC__
+#define HPyAPI_FUNC(restype)  __attribute__((unused)) static inline restype
+#else
+#define HPyAPI_FUNC(restype)  static inline restype
+#endif
+
+
 typedef struct { PyObject *_o; } HPy;
 typedef long HPyContext;
 
-static inline HPyContext _HPyGetContext(void) {
+HPyAPI_FUNC(HPyContext)
+_HPyGetContext(void) {
     return 42;
 }
 
@@ -36,7 +44,8 @@ static inline HPyContext _HPyGetContext(void) {
 typedef PyModuleDef HPyModuleDef;
 #define HPyModuleDef_HEAD_INIT PyModuleDef_HEAD_INIT
 
-static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
+HPyAPI_FUNC(HPy)
+HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
     return _py2h(PyModule_Create(mdef));
 }
 
@@ -64,7 +73,8 @@ typedef PyMethodDef HPyMethodDef;
     }
 
 
-static int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...)
+HPyAPI_FUNC(int)
+HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...)
 {
     va_list vl;
     va_start(vl, fmt);
@@ -75,7 +85,8 @@ static int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...)
 }
 
 
-static HPy HPyLong_FromLong(HPyContext ctx, long v)
+HPyAPI_FUNC(HPy)
+HPyLong_FromLong(HPyContext ctx, long v)
 {
     return _py2h(PyLong_FromLong(v));
 }
