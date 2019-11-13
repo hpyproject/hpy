@@ -43,8 +43,14 @@ _HPyGetContext(void) {
 HPyAPI_FUNC(HPy)
 HPy_Dup(HPyContext ctx, HPy handle)
 {
-    Py_INCREF(_h2py(handle));
+    Py_XINCREF(_h2py(handle));
     return handle;
+}
+
+HPyAPI_FUNC(void)
+HPy_Close(HPyContext ctx, HPy handle)
+{
+    Py_XDECREF(_h2py(handle));
 }
 
 /* moduleobject.h */
@@ -96,6 +102,12 @@ HPyAPI_FUNC(HPy)
 HPyLong_FromLong(HPyContext ctx, long v)
 {
     return _py2h(PyLong_FromLong(v));
+}
+
+HPyAPI_FUNC(HPy)
+HPyNumber_Add(HPyContext ctx, HPy x, HPy y)
+{
+    return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
 }
 
 

@@ -50,3 +50,20 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.test_f(30, 12) == 42
+
+    def test_close(self):
+        mod = self.make_module("""
+            @EXPORT test_f METH_O
+            HPy_FUNCTION(test_f)
+            HPy test_f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy one = HPyLong_FromLong(ctx, 1);
+                if (HPy_IsNull(one))
+                    return HPy_NULL;
+                HPy res = HPyNumber_Add(ctx, arg, one);
+                HPy_Close(ctx, one);
+                return res;
+            }
+            @INIT
+        """)
+        assert mod.test_f(41.5) == 42.5
