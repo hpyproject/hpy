@@ -20,9 +20,13 @@ static inline HPyContext _HPyGetContext(void) {
     return 42;
 }
 
-static inline HPy _HPyFromPy(HPyContext ctx, PyObject *obj) {
-    return obj;
-}
+/* For internal usage only. These will be #undef at the end of this header.
+   If you need to convert HPy to PyObject* and vice-versa, you should use the
+   official way to do it (not implemented yet :)
+*/
+#define h2py(x) (x)
+#define py2h(o) (o)
+
 
 #define HPy_RETURN_NONE Py_RETURN_NONE
 
@@ -31,7 +35,7 @@ typedef PyModuleDef HPyModuleDef;
 #define HPyModuleDef_HEAD_INIT PyModuleDef_HEAD_INIT
 
 static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
-    return _HPyFromPy(ctx, PyModule_Create(mdef));
+    return py2h(PyModule_Create(mdef));
 }
 
 #define HPy_MODINIT(modname)                        \
@@ -56,5 +60,25 @@ typedef PyMethodDef HPyMethodDef;
     {                                                                   \
         return NAME##_impl(_HPyGetContext(), self, args);               \
     }
+
+
+static int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...)
+{
+    va_list vl;
+    va_start(vl, fmt);
+    int res = PyArg_VaParse(h2py(args), fmt, vl);
+    va_end(vl);
+    return res;
+}
+
+
+static HPy HPyLong_FromLong(HPyContext ctx, long v)
+{
+    return py2h(PyLong_FromLong(v));
+}
+
+
+#undef h2py
+#undef py2h
 
 #endif /* !HPy_H */
