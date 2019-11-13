@@ -23,6 +23,19 @@ class TestBasic(HPyTest):
         """)
         assert mod.test_noop() is None
 
+    def test_identity_function(self):
+        mod = self.make_module("""
+            @EXPORT test_f METH_O
+            HPy_FUNCTION(test_f)
+            HPy test_f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Dup(ctx, arg);
+            }
+            @INIT
+        """)
+        x = object()
+        assert mod.test_f(x) is x
+
     def test_int_add(self):
         mod = self.make_module("""
             @EXPORT test_f METH_VARARGS
