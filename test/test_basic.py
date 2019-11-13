@@ -14,7 +14,7 @@ class TestBasic(HPyTest):
     def test_noop_function(self):
         mod = self.make_module("""
             HPy_FUNCTION(test_noop)
-            HPy test_noop_impl(HPyContext ctx, HPy self, HPy args)
+            static HPy test_noop_impl(HPyContext ctx, HPy self, HPy args)
             {
                 HPy_RETURN_NONE;
             }
@@ -26,7 +26,7 @@ class TestBasic(HPyTest):
     def test_identity_function(self):
         mod = self.make_module("""
             HPy_FUNCTION(test_f)
-            HPy test_f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy test_f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, arg);
             }
@@ -39,7 +39,7 @@ class TestBasic(HPyTest):
     def test_int_add(self):
         mod = self.make_module("""
             HPy_FUNCTION(test_f)
-            HPy test_f_impl(HPyContext ctx, HPy self, HPy args)
+            static HPy test_f_impl(HPyContext ctx, HPy self, HPy args)
             {
                 long a, b;
                 if (!HPyArg_ParseTuple(ctx, args, "ll", &a, &b))
@@ -54,7 +54,7 @@ class TestBasic(HPyTest):
     def test_close(self):
         mod = self.make_module("""
             HPy_FUNCTION(test_f)
-            HPy test_f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy test_f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy one = HPyLong_FromLong(ctx, 1);
                 if (HPy_IsNull(one))
@@ -71,7 +71,7 @@ class TestBasic(HPyTest):
     def test_string(self):
         mod = self.make_module("""
             HPy_FUNCTION(test_f)
-            HPy test_f_impl(HPyContext ctx, HPy self, HPy args)
+            static HPy test_f_impl(HPyContext ctx, HPy self, HPy args)
             {
                 return HPyUnicode_FromString(ctx, "foobar");
             }

@@ -24,7 +24,7 @@ static HPyModuleDef moduledef = {
 };
 
 HPy_MODINIT(mytest)
-static HPy HPyInit_mytest(HPyContext ctx)
+static HPy init_mytest_impl(HPyContext ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);
@@ -75,13 +75,10 @@ class HPyTest:
         filename = self.tmpdir.join('mytest.c')
         filename.write(source)
         #
-        define_macros = []
-        if self.abimode == 'universal':
-            define_macros.append(('HPY_UNIVERSAL_ABI', None))
         ext = get_extension(str(filename), 'mytest', include_dirs=[INCLUDE_DIR],
-                            define_macros=define_macros,
                             extra_compile_args=['-Wfatal-errors'])
-        so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=1)
+        so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=1,
+                                universal_mode=(self.abimode == 'universal'))
         #
         spec = importlib.util.spec_from_file_location('mytest', so_filename)
         module = importlib.util.module_from_spec(spec)
@@ -99,12 +96,14 @@ def get_extension(srcfilename, modname, sources=(), **kwds):
         allsources.append(os.path.normpath(src))
     return Extension(name=modname, sources=allsources, **kwds)
 
-def c_compile(tmpdir, ext, compiler_verbose=0, debug=None):
+def c_compile(tmpdir, ext, compiler_verbose=0, debug=None,
+              universal_mode=False):
     """Compile a C extension module using distutils."""
 
     saved_environ = os.environ.copy()
     try:
-        outputfilename = _build(tmpdir, ext, compiler_verbose, debug)
+        outputfilename = _build(tmpdir, ext, compiler_verbose, debug,
+                                universal_mode)
         outputfilename = os.path.abspath(outputfilename)
     finally:
         # workaround for a distutils bugs where some env vars can
@@ -114,7 +113,7 @@ def c_compile(tmpdir, ext, compiler_verbose=0, debug=None):
                 os.environ[key] = value
     return outputfilename
 
-def _build(tmpdir, ext, compiler_verbose=0, debug=None):
+def _build(tmpdir, ext, compiler_verbose=0, debug=None, universal_mode=False):
     # XXX compact but horrible :-(
     from distutils.core import Distribution
     import distutils.errors, distutils.log
@@ -132,10 +131,34 @@ def _build(tmpdir, ext, compiler_verbose=0, debug=None):
     old_level = distutils.log.set_threshold(0) or 0
     try:
         distutils.log.set_verbosity(compiler_verbose)
-        dist.run_command('build_ext')
-        cmd_obj = dist.get_command_obj('build_ext')
-        [soname] = cmd_obj.get_outputs()
+        if universal_mode:
+            soname = _build_universal(tmpdir, ext)
+        else:
+            dist.run_command('build_ext')
+            cmd_obj = dist.get_command_obj('build_ext')
+            [soname] = cmd_obj.get_outputs()
     finally:
         distutils.log.set_threshold(old_level)
     #
     return soname
+
+def _build_universal(tmpdir, ext):
+    from distutils.ccompiler import new_compiler, get_default_compiler
+    from distutils.sysconfig import customize_compiler
+
+    compiler = new_compiler(get_default_compiler())
+    customize_compiler(compiler)
+
+    objects = compiler.compile(ext.sources,
+                               output_dir=tmpdir,
+                               macros=[('HPY_UNIVERSAL_ABI', None)],
+                               include_dirs=ext.include_dirs)
+
+    filename = ext.name + '.hpy.so'
+    compiler.link(compiler.SHARED_LIBRARY,
+                  objects,
+                  filename,
+                  tmpdir
+                  # export_symbols=...
+                  )
+    return os.path.join(tmpdir, filename)

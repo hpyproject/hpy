@@ -32,7 +32,12 @@ typedef struct {
     HPyMethodDef *m_methods;
 } HPyModuleDef;
 
-#define HPy_MODINIT(name)
+#define HPy_MODINIT(modname)                                   \
+    static HPy init_##modname##_impl(HPyContext ctx);          \
+    HPy HPyInit_##modname(HPyContext ctx)                      \
+    {                                                          \
+        return init_##modname##_impl(ctx);                     \
+    }
 
 struct _HPyContext {
     int version;

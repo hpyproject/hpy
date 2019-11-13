@@ -65,12 +65,12 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
     return _py2h(PyModule_Create(mdef));
 }
 
-#define HPy_MODINIT(modname)                               \
-    static HPy HPyInit_##modname(HPyContext ctx);          \
-    PyMODINIT_FUNC                                         \
-    PyInit_##modname(void)                                 \
-    {                                                      \
-        return _h2py(HPyInit_##modname(_HPyGetContext())); \
+#define HPy_MODINIT(modname)                                   \
+    static HPy init_##modname##_impl(HPyContext ctx);          \
+    PyMODINIT_FUNC                                             \
+    PyInit_##modname(void)                                     \
+    {                                                          \
+        return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
 /* methodobject.h */
@@ -79,8 +79,6 @@ typedef PyMethodDef HPyMethodDef;
 
 /* function declaration */
 
-/* XXX: this is a bit undesirable because it introduces an indirection and an
-   extra function call. Unsure how to solve it, though. */
 #define HPy_FUNCTION(NAME)                                              \
     static HPy NAME##_impl(HPyContext, HPy, HPy);                       \
     static PyObject* NAME(PyObject *self, PyObject *args)               \
