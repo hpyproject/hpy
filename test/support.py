@@ -61,17 +61,27 @@ def expand_template(source_template):
 @pytest.mark.usefixtures('initargs')
 class HPyTest:
 
+    @pytest.fixture(params=['universal', 'cpython'])
+    def abimode(self, request):
+        return request.param
+
     @pytest.fixture()
-    def initargs(self, tmpdir):
+    def initargs(self, tmpdir, abimode):
         self.tmpdir = tmpdir
+        self.abimode = abimode
 
     def make_module(self, source_template):
         source = expand_template(source_template)
         filename = self.tmpdir.join('mytest.c')
         filename.write(source)
         #
-        ext = get_extension(str(filename), 'mytest', include_dirs=[INCLUDE_DIR])
-        so_filename = c_compile(str(self.tmpdir), ext)
+        define_macros = []
+        if self.abimode == 'universal':
+            define_macros.append(('HPY_UNIVERSAL_ABI', None))
+        ext = get_extension(str(filename), 'mytest', include_dirs=[INCLUDE_DIR],
+                            define_macros=define_macros,
+                            extra_compile_args=['-Wfatal-errors'])
+        so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=1)
         #
         spec = importlib.util.spec_from_file_location('mytest', so_filename)
         module = importlib.util.module_from_spec(spec)
