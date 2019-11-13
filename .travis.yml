@@ -1,4 +1,6 @@
 language: python
 
+script : true
+
 notifications:
     irc:
