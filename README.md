@@ -1,6 +1,8 @@
 HPy: a better API for Python
 ==================================
 
+[![Build Status](https://dev.azure.com/pyhandle/hpy/_apis/build/status/pyhandle.hpy?branchName=master)](https://dev.azure.com/pyhandle/hpy/_build/latest?definitionId=1&branchName=master)
+
 The goal of the project is to design a better API for extending Python
 in C. The current API is specific to the current implementation of CPython: it
 exposes a lot of internal details which makes it hard:
