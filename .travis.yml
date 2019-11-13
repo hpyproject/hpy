@@ -3,4 +3,4 @@ language: python
 script : true
 
 notifications:
-    irc:
+    irc: "chat.freenode.net#hpy"
