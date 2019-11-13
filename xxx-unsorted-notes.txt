@@ -33,7 +33,6 @@ Goal: better C API for CPython and 1st-class citizen on PyPy
 
 
 
-
 Protocol sketch
 ----------------
 
