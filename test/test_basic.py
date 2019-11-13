@@ -67,3 +67,15 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.test_f(41.5) == 42.5
+
+    def test_string(self):
+        mod = self.make_module("""
+            @EXPORT test_f METH_NOARGS
+            HPy_FUNCTION(test_f)
+            HPy test_f_impl(HPyContext ctx, HPy self, HPy args)
+            {
+                return HPyUnicode_FromString(ctx, "foobar");
+            }
+            @INIT
+        """)
+        assert mod.test_f() == "foobar"

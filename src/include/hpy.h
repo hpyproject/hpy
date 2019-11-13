@@ -110,5 +110,11 @@ HPyNumber_Add(HPyContext ctx, HPy x, HPy y)
     return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
 }
 
+HPyAPI_FUNC(HPy)
+HPyUnicode_FromString(HPyContext ctx, const char *utf8)
+{
+    return _py2h(PyUnicode_FromString(utf8));
+}
+
 
 #endif /* !HPy_H */
