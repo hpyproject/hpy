@@ -11,7 +11,7 @@ static HPy add_ints_impl(HPyContext ctx, HPy self, HPy args)
 {
     long a, b;
     if (!HPyArg_ParseTuple(ctx, args, "ll", &a, &b))
-        return NULL;
+        return HPy_NULL;
     return HPyLong_FromLong(ctx, a+b);
 }
 
@@ -36,7 +36,7 @@ static HPy HPyInit_pof(HPyContext ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);
-    if (m == NULL)
-        return NULL;
+    if (HPy_IsNull(m))
+        return HPy_NULL;
     return m;
 }
