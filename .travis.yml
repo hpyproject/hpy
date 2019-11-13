@@ -4,3 +4,7 @@ script : true
 
 notifications:
     irc: "chat.freenode.net#hpy"
+    template:
+      - "[%{repository_slug}@%{branch}]: %{author} pushed %{commit}"
+      - "Changes: %{compare_url}"
+      - "%{commit_message}"
