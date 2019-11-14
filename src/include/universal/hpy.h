@@ -42,9 +42,11 @@ typedef struct {
 } HPyModuleDef;
 
 #define HPy_MODINIT(modname)                                   \
+    HPyContext _ctx_for_trampolines;                           \
     static HPy init_##modname##_impl(HPyContext ctx);          \
     HPy HPyInit_##modname(HPyContext ctx)                      \
     {                                                          \
+        _ctx_for_trampolines = ctx;                            \
         return init_##modname##_impl(ctx);                     \
     }
 
@@ -52,7 +54,11 @@ struct _HPyContext_s {
     int version;
     HPy (*module_Create)(HPyContext ctx, HPyModuleDef *def);
     HPy (*none_Get)(HPyContext ctx);
+    struct _object *(*callRealFunctionFromTrampoline)(HPyContext ctx,
+              struct _object *self, struct _object *args, HPyCFunction func);
 };
+
+extern HPyContext _ctx_for_trampolines;
 
 static inline HPy
 HPyModule_Create(HPyContext ctx, HPyModuleDef *def)
@@ -67,16 +73,13 @@ HPyNone_Get(HPyContext ctx)
     return ctx->none_Get(ctx);
 }
 
-struct _object *
-_HPy_CallRealFunctionFromTrampoline(struct _object *self, struct _object *args,
-                                    HPyCFunction func);
-
 #define HPy_FUNCTION(fnname)                                                   \
     static HPy fnname##_impl(HPyContext ctx, HPy self, HPy args);              \
     static struct _object *                                                    \
     fnname##_trampoline(struct _object *self, struct _object *args)            \
     {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(self, args, fnname##_impl); \
+        return _ctx_for_trampolines->callRealFunctionFromTrampoline(           \
+            _ctx_for_trampolines, self, args, fnname##_impl);                  \
     }                                                                          \
     static const struct _HPyMethodPair_s fnname##_struct = {                   \
         .trampoline = fnname##_trampoline,                                     \

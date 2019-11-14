@@ -28,8 +28,7 @@ static PyObject *load(PyObject *self, PyObject *soname_obj)
         const char *error = dlerror();
         if (error == NULL)
             error = "unknown dlopen() error";
-        PyObject *error_ob = PyUnicode_FromString(error);
-        PyErr_SetObject(PyExc_RuntimeError, error_ob);
+        PyErr_Format(PyExc_RuntimeError, "dlopen: %s", error);
         return NULL;
     }
 
@@ -38,8 +37,7 @@ static PyObject *load(PyObject *self, PyObject *soname_obj)
         const char *error = dlerror();
         if (error == NULL)
             error = "unknown dlsym() error";
-        PyObject *error_ob = PyUnicode_FromString(error);
-        PyErr_SetObject(PyExc_RuntimeError, error_ob);
+        PyErr_Format(PyExc_RuntimeError, "dlsym: %s", error);
         return NULL;
     }
 
