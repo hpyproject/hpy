@@ -94,11 +94,27 @@ None_Get(HPyContext ctx)
 }
 
 
-struct _object *
+static struct _object *
 CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
                                struct _object *args, HPyCFunction func)
 {
     return _h2py(func(ctx, _py2h(self), _py2h(args)));
+}
+
+
+static HPy
+FromPyObject(HPyContext ctx, struct _object *obj)
+{
+    Py_INCREF(obj);
+    return _py2h(obj);
+}
+
+static struct _object *
+AsPyObject(HPyContext ctx, HPy h)
+{
+    PyObject *obj = _h2py(h);
+    Py_INCREF(obj);
+    return obj;
 }
 
 
@@ -107,4 +123,6 @@ struct _HPyContext_s global_ctx = {
     .module_Create = &Module_Create,
     .none_Get = &None_Get,
     .callRealFunctionFromTrampoline = &CallRealFunctionFromTrampoline,
+    .fromPyObject = &FromPyObject,
+    .asPyObject = &AsPyObject,
 };

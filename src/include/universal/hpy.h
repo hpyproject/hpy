@@ -53,6 +53,8 @@ struct _HPyContext_s {
     HPy (*none_Get)(HPyContext ctx);
     struct _object *(*callRealFunctionFromTrampoline)(HPyContext ctx,
               struct _object *self, struct _object *args, HPyCFunction func);
+    HPy (*fromPyObject)(HPyContext ctx, struct _object *obj);
+    struct _object *(*asPyObject)(HPyContext ctx, HPy h);
 };
 
 extern HPyContext _ctx_for_trampolines;
@@ -69,6 +71,19 @@ HPyNone_Get(HPyContext ctx)
 {
     return ctx->none_Get(ctx);
 }
+
+static inline HPy
+HPy_FromPyObject(HPyContext ctx, struct _object *obj)
+{
+    return ctx->fromPyObject(ctx, obj);
+}
+
+static inline struct _object *
+HPy_AsPyObject(HPyContext ctx, HPy h)
+{
+    return ctx->asPyObject(ctx, h);
+}
+
 
 #define HPy_FUNCTION(fnname)                                                   \
     static HPy fnname##_impl(HPyContext ctx, HPy self, HPy args);              \

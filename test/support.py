@@ -140,7 +140,9 @@ def _build(tmpdir, ext, compiler_verbose=0, debug=None, universal_mode=False):
     try:
         distutils.log.set_verbosity(compiler_verbose)
         if universal_mode:
-            soname = _build_universal(tmpdir, ext)
+            cmd_obj = dist.get_command_obj('build_ext')
+            cmd_obj.finalize_options()
+            soname = _build_universal(tmpdir, ext, cmd_obj.include_dirs)
         else:
             dist.run_command('build_ext')
             cmd_obj = dist.get_command_obj('build_ext')
@@ -150,17 +152,18 @@ def _build(tmpdir, ext, compiler_verbose=0, debug=None, universal_mode=False):
     #
     return soname
 
-def _build_universal(tmpdir, ext):
+def _build_universal(tmpdir, ext, cpython_include_dirs):
     from distutils.ccompiler import new_compiler, get_default_compiler
     from distutils.sysconfig import customize_compiler
 
     compiler = new_compiler(get_default_compiler())
     customize_compiler(compiler)
 
+    include_dirs = ext.include_dirs + cpython_include_dirs
     objects = compiler.compile(ext.sources,
                                output_dir=tmpdir,
                                macros=[('HPY_UNIVERSAL_ABI', None)],
-                               include_dirs=ext.include_dirs)
+                               include_dirs=include_dirs)
 
     filename = ext.name + '.hpy.so'
     compiler.link(compiler.SHARED_LIBRARY,
