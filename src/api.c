@@ -24,6 +24,39 @@ _h2py(HPy h)
     return objects[i];
 }
 
+// this malloc a result which will never be freed. Too bad
+static PyMethodDef *
+create_method_defs(HPyModuleDef *hpydef)
+{
+    // count the methods
+    Py_ssize_t count;
+    if (hpydef->m_methods == NULL) {
+        count = 0;
+    }
+    else {
+        count = 0;
+        while (hpydef->m_methods[count].ml_name != NULL)
+            count++;
+    }
+
+    // allocate&fill the result
+    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (count+1));
+    if (result == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    for(int i=0; i<count; i++) {
+        HPyMethodDef *src = &hpydef->m_methods[i];
+        PyMethodDef *dst = &result[i];
+        dst->ml_name = src->ml_name;
+        dst->ml_meth = src->ml_meth->trampoline;
+        dst->ml_flags = src->ml_flags;
+        dst->ml_doc = src->ml_doc;
+    }
+    result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
+    return result;
+}
+
 
 static HPy
 Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
@@ -42,7 +75,9 @@ Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
     def->m_name = hpydef->m_name;
     def->m_doc = hpydef->m_doc;
     def->m_size = hpydef->m_size;
-    def->m_methods = NULL; // XXX
+    def->m_methods = create_method_defs(hpydef);
+    if (def->m_methods == NULL)
+        return HPy_NULL;
     PyObject *result = PyModule_Create(def);
     return _py2h(result);
 }
