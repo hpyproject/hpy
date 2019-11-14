@@ -24,6 +24,14 @@ _h2py(HPy h)
     return objects[i];
 }
 
+void
+_hclose(HPy h)
+{
+    Py_ssize_t i = (Py_ssize_t)h._o;
+    Py_XDECREF(objects[i]);
+    objects[i] = NULL;
+}
+
 // this malloc a result which will never be freed. Too bad
 static PyMethodDef *
 create_method_defs(HPyModuleDef *hpydef)
@@ -117,6 +125,26 @@ AsPyObject(HPyContext ctx, HPy h)
     return obj;
 }
 
+static void
+Close(HPyContext ctx, HPy h)
+{
+    _hclose(h);
+}
+
+static HPy
+Dup(HPyContext ctx, HPy h)
+{
+    PyObject *obj = _h2py(h);
+    Py_XINCREF(obj);
+    return _py2h(obj);
+}
+
+static HPy
+Long_FromLong(HPyContext ctx, long value)
+{
+    return _py2h(PyLong_FromLong(value));
+}
+
 
 struct _HPyContext_s global_ctx = {
     .version = 1,
@@ -125,4 +153,7 @@ struct _HPyContext_s global_ctx = {
     .callRealFunctionFromTrampoline = &CallRealFunctionFromTrampoline,
     .fromPyObject = &FromPyObject,
     .asPyObject = &AsPyObject,
+    .dup = &Dup,
+    .close = &Close,
+    .long_FromLong = &Long_FromLong,
 };

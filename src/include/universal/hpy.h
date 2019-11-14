@@ -55,6 +55,9 @@ struct _HPyContext_s {
               struct _object *self, struct _object *args, HPyCFunction func);
     HPy (*fromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*asPyObject)(HPyContext ctx, HPy h);
+    HPy (*dup)(HPyContext, HPy h);
+    void (*close)(HPyContext, HPy h);
+    HPy (*long_FromLong)(HPyContext, long value);
 };
 
 extern HPyContext _ctx_for_trampolines;
@@ -82,6 +85,24 @@ static inline struct _object *
 HPy_AsPyObject(HPyContext ctx, HPy h)
 {
     return ctx->asPyObject(ctx, h);
+}
+
+static inline HPy
+HPy_Dup(HPyContext ctx, HPy h)
+{
+    return ctx->dup(ctx, h);
+}
+
+static inline void
+HPy_Close(HPyContext ctx, HPy h)
+{
+    ctx->close(ctx, h);
+}
+
+static inline HPy
+HPyLong_FromLong(HPyContext ctx, long value)
+{
+    return ctx->long_FromLong(ctx, value);
 }
 
 
