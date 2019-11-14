@@ -123,5 +123,20 @@ HPyUnicode_FromString(HPyContext ctx, const char *utf8)
     return _py2h(PyUnicode_FromString(utf8));
 }
 
+HPyAPI_FUNC(HPy)
+HPy_FromPyObject(HPyContext ctx, PyObject *obj)
+{
+    Py_XINCREF(obj);
+    return _py2h(obj);
+}
+
+HPyAPI_FUNC(PyObject *)
+HPy_AsPyObject(HPyContext ctx, HPy h)
+{
+    PyObject *result = _h2py(h);
+    Py_XINCREF(result);
+    return result;
+}
+
 
 #endif /* !HPy_CPYTHON_H */
