@@ -61,7 +61,7 @@ def expand_template(source_template):
 @pytest.mark.usefixtures('initargs')
 class HPyTest:
 
-    @pytest.fixture(params=['universal', 'cpython'])
+    @pytest.fixture(params=['cpython', 'universal'])
     def abimode(self, request):
         return request.param
 

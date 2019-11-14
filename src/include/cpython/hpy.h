@@ -41,7 +41,13 @@ _HPyGetContext(void) {
 
 #define HPy_NULL ((HPy){NULL})
 #define HPy_IsNull(x) ((x)._o == NULL)
-#define HPy_RETURN_NONE return Py_INCREF(Py_None), _py2h(Py_None)
+
+HPyAPI_FUNC(HPy)
+HPyNone_Get(HPyContext ctx)
+{
+    Py_INCREF(Py_None);
+    return _py2h(Py_None);
+}
 
 HPyAPI_FUNC(HPy)
 HPy_Dup(HPyContext ctx, HPy handle)

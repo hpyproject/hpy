@@ -26,7 +26,7 @@ _h2py(HPy h)
 
 
 static HPy
-ModuleCreate(HPyContext ctx, HPyModuleDef *hpydef)
+Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 {
     // create a new PyModuleDef
 
@@ -47,9 +47,17 @@ ModuleCreate(HPyContext ctx, HPyModuleDef *hpydef)
     return _py2h(result);
 }
 
+static HPy
+None_Get(HPyContext ctx)
+{
+    Py_INCREF(Py_None);
+    return _py2h(Py_None);
+}
+
 
 struct _HPyContext_s global_ctx = {
     .version = 1,
-    .module_Create = &ModuleCreate
+    .module_Create = &Module_Create,
+    .none_Get = &None_Get,
 };
 

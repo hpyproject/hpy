@@ -16,7 +16,7 @@ class TestBasic(HPyTest):
             HPy_FUNCTION(test_noop)
             static HPy test_noop_impl(HPyContext ctx, HPy self, HPy args)
             {
-                HPy_RETURN_NONE;
+                return HPyNone_Get(ctx);
             }
             @EXPORT test_noop METH_NOARGS
             @INIT

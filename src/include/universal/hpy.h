@@ -9,13 +9,22 @@ typedef struct { void *_o; } HPy;
 
 typedef struct _HPyContext_s *HPyContext;
 typedef HPy (*HPyCFunction)(HPyContext, HPy self, HPy args);
+struct _object;  /* that's PyObject inside CPython */
+typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
+                                             struct _object *args);
 
 #define HPy_NULL ((HPy){NULL})
 #define HPy_IsNull(x) ((x)._o == NULL)
 
+struct _HPyMethodPair_s
+{
+    _HPy_CPyCFunction trampoline;
+    HPyCFunction func;
+};
+
 typedef struct {
     const char   *ml_name;   /* The name of the built-in function/method */
-    void         *ml_meth;   /* The C function that implements it */
+    const struct _HPyMethodPair_s *ml_meth;   /* see HPy_FUNCTION() */
     int          ml_flags;   /* Combination of METH_xxx flags, which mostly
                                 describe the args expected by the C func */
     const char   *ml_doc;    /* The __doc__ attribute, or NULL */
@@ -42,6 +51,7 @@ typedef struct {
 struct _HPyContext_s {
     int version;
     HPy (*module_Create)(HPyContext ctx, HPyModuleDef *def);
+    HPy (*none_Get)(HPyContext ctx);
 };
 
 static inline HPy
@@ -50,6 +60,35 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *def)
     // XXX: think about versioning
     return ctx->module_Create(ctx, def);
 }
+
+static inline HPy
+HPyNone_Get(HPyContext ctx)
+{
+    return ctx->none_Get(ctx);
+}
+
+struct _object *
+_HPy_CallRealFunctionFromTrampoline(struct _object *self, struct _object *args,
+                                    HPyCFunction func);
+
+#define HPy_FUNCTION(fnname)                                                   \
+    static HPy fnname##_impl(HPyContext ctx, HPy self, HPy args);              \
+    static struct _object *                                                    \
+    fnname##_trampoline(struct _object *self, struct _object *args)            \
+    {                                                                          \
+        return _HPy_CallRealFunctionFromTrampoline(self, args, fnname##_impl); \
+    }                                                                          \
+    static const struct _HPyMethodPair_s fnname##_struct = {                   \
+        .trampoline = fnname##_trampoline,                                     \
+        .func = fnname##_impl                                                  \
+    };                                                                         \
+    static const struct _HPyMethodPair_s *const fnname = &fnname##_struct;
+
+#define METH_VARARGS  0x0001
+#define METH_KEYWORDS 0x0002
+/* METH_NOARGS and METH_O must not be combined with the flags above. */
+#define METH_NOARGS   0x0004
+#define METH_O        0x0008
 
 
 #endif /* HPy_UNIVERSAL_H */
