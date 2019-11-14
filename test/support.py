@@ -71,20 +71,25 @@ class HPyTest:
         self.abimode = abimode
 
     def make_module(self, source_template):
+        universal_mode = self.abimode == 'universal'
         source = expand_template(source_template)
         filename = self.tmpdir.join('mytest.c')
         filename.write(source)
         #
         ext = get_extension(str(filename), 'mytest', include_dirs=[INCLUDE_DIR],
                             extra_compile_args=['-Wfatal-errors'])
-        so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=1,
-                                universal_mode=(self.abimode == 'universal'))
+        so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
+                                universal_mode=universal_mode)
         #
-        spec = importlib.util.spec_from_file_location('mytest', so_filename)
-        module = importlib.util.module_from_spec(spec)
-        sys.modules['mytest'] = module
-        spec.loader.exec_module(module)
-        return module
+        if universal_mode:
+            import hpy
+            return hpy.load(so_filename)
+        else:
+            spec = importlib.util.spec_from_file_location('mytest', so_filename)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules['mytest'] = module
+            spec.loader.exec_module(module)
+            return module
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py

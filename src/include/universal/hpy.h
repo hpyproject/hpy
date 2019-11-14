@@ -7,7 +7,7 @@
 typedef intptr_t HPy_ssize_t;
 typedef struct { void *_o; } HPy;
 
-typedef struct _HPyContext *HPyContext;
+typedef struct _HPyContext_s *HPyContext;
 typedef HPy (*HPyCFunction)(HPyContext, HPy self, HPy args);
 
 #define HPy_NULL ((HPy){NULL})
@@ -15,7 +15,7 @@ typedef HPy (*HPyCFunction)(HPyContext, HPy self, HPy args);
 
 typedef struct {
     const char   *ml_name;   /* The name of the built-in function/method */
-    HPyCFunction ml_meth;    /* The C function that implements it */
+    void         *ml_meth;   /* The C function that implements it */
     int          ml_flags;   /* Combination of METH_xxx flags, which mostly
                                 describe the args expected by the C func */
     const char   *ml_doc;    /* The __doc__ attribute, or NULL */
@@ -39,7 +39,7 @@ typedef struct {
         return init_##modname##_impl(ctx);                     \
     }
 
-struct _HPyContext {
+struct _HPyContext_s {
     int version;
     HPy (*module_Create)(HPyContext ctx, HPyModuleDef *def);
 };
@@ -50,7 +50,6 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *def)
     // XXX: think about versioning
     return ctx->module_Create(ctx, def);
 }
-
 
 
 #endif /* HPy_UNIVERSAL_H */
