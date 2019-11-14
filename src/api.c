@@ -49,9 +49,13 @@ create_method_defs(HPyModuleDef *hpydef)
         HPyMethodDef *src = &hpydef->m_methods[i];
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->ml_name;
-        dst->ml_meth = src->ml_meth->trampoline;
         dst->ml_flags = src->ml_flags;
         dst->ml_doc = src->ml_doc;
+
+        HPyCFunction impl_func;
+        PyCFunction trampoline_func;
+        src->ml_meth(&impl_func, &trampoline_func);
+        dst->ml_meth = trampoline_func;
     }
     result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;

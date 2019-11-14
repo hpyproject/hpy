@@ -16,15 +16,12 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 #define HPy_NULL ((HPy){NULL})
 #define HPy_IsNull(x) ((x)._o == NULL)
 
-struct _HPyMethodPair_s
-{
-    _HPy_CPyCFunction trampoline;
-    HPyCFunction func;
-};
+typedef void (*_HPyMethodPairFunc)(HPyCFunction *out_func,
+                                   _HPy_CPyCFunction *out_trampoline);
 
 typedef struct {
     const char   *ml_name;   /* The name of the built-in function/method */
-    const struct _HPyMethodPair_s *ml_meth;   /* see HPy_FUNCTION() */
+    _HPyMethodPairFunc ml_meth;   /* see HPy_FUNCTION() */
     int          ml_flags;   /* Combination of METH_xxx flags, which mostly
                                 describe the args expected by the C func */
     const char   *ml_doc;    /* The __doc__ attribute, or NULL */
@@ -81,11 +78,12 @@ HPyNone_Get(HPyContext ctx)
         return _ctx_for_trampolines->callRealFunctionFromTrampoline(           \
             _ctx_for_trampolines, self, args, fnname##_impl);                  \
     }                                                                          \
-    static const struct _HPyMethodPair_s fnname##_struct = {                   \
-        .trampoline = fnname##_trampoline,                                     \
-        .func = fnname##_impl                                                  \
-    };                                                                         \
-    static const struct _HPyMethodPair_s *const fnname = &fnname##_struct;
+    static void                                                                \
+    fnname(HPyCFunction *out_func, _HPy_CPyCFunction *out_trampoline)          \
+    {                                                                          \
+        *out_func = fnname##_impl;                                             \
+        *out_trampoline = fnname##_trampoline;                                 \
+    }
 
 #define METH_VARARGS  0x0001
 #define METH_KEYWORDS 0x0002
