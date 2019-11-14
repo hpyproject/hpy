@@ -3,7 +3,7 @@
 HPy_FUNCTION(do_nothing)
 static HPy do_nothing_impl(HPyContext ctx, HPy self, HPy args)
 {
-    HPy_RETURN_NONE;
+    return HPyNone_Get(ctx);
 }
 
 HPy_FUNCTION(add_ints)
@@ -32,7 +32,7 @@ static HPyModuleDef moduledef = {
 
 
 HPy_MODINIT(pof)
-static HPy HPyInit_pof(HPyContext ctx)
+static HPy init_pof_impl(HPyContext ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);
