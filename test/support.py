@@ -58,15 +58,8 @@ def expand_template(source_template):
 
 
 
-@pytest.mark.usefixtures('initargs')
-class HPyTest:
-
-    @pytest.fixture(params=['cpython', 'universal'])
-    def abimode(self, request):
-        return request.param
-
-    @pytest.fixture()
-    def initargs(self, tmpdir, abimode):
+class ExtensionCompiler:
+    def __init__(self, tmpdir, abimode):
         self.tmpdir = tmpdir
         self.abimode = abimode
 
@@ -90,6 +83,16 @@ class HPyTest:
             sys.modules['mytest'] = module
             spec.loader.exec_module(module)
             return module
+
+
+@pytest.mark.usefixtures('initargs')
+class HPyTest:
+    @pytest.fixture()
+    def initargs(self, compiler):
+        self.compiler = compiler
+
+    def make_module(self, source_template):
+        return self.compiler.make_module(source_template)
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
