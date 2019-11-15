@@ -13,8 +13,14 @@ static PyObject *set_debug(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *load(PyObject *self, PyObject *soname_obj)
+static PyObject *load(PyObject *self, PyObject *args)
 {
+    PyObject *soname_obj;
+    const char *init_name;
+
+    if (!PyArg_ParseTuple(args, "Os", &soname_obj, &init_name)) {
+        return NULL;
+    }
     PyObject *string_obj = NULL;
     const char *soname;
     if (!PyUnicode_FSConverter(soname_obj, &string_obj)) {
@@ -32,7 +38,7 @@ static PyObject *load(PyObject *self, PyObject *soname_obj)
         return NULL;
     }
 
-    void *initfn = dlsym(mylib, "HPyInit_mytest");
+    void *initfn = dlsym(mylib, init_name);
     if (initfn == NULL) {
         const char *error = dlerror();
         if (error == NULL)
@@ -52,7 +58,7 @@ static PyObject *load(PyObject *self, PyObject *soname_obj)
 
 static PyMethodDef HPyMethods[] = {
     {"set_debug", (PyCFunction)set_debug, METH_O, "TODO"},
-    {"load", (PyCFunction)load, METH_O, "Load a .hpy.so"},
+    {"load", (PyCFunction)load, METH_VARARGS, "Load a .hpy.so"},
     {NULL, NULL, 0, NULL}
 };
 

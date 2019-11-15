@@ -19,14 +19,14 @@ static HPyMethodDef MyTestMethods[] = {
 
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
-    .m_name = "mytest",
+    .m_name = "%(name)s",
     .m_doc = "some test for hpy",
     .m_size = -1,
     .m_methods = MyTestMethods
 };
 
-HPy_MODINIT(mytest)
-static HPy init_mytest_impl(HPyContext ctx)
+HPy_MODINIT(%(name)s)
+static HPy init_%(name)s_impl(HPyContext ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);
@@ -37,13 +37,15 @@ static HPy init_mytest_impl(HPyContext ctx)
 """
 
 
-def expand_template(source_template):
+def expand_template(source_template, name):
     method_table = []
     expanded_lines = ['#include <hpy.h>']
     for line in source_template.split('\n'):
         match = r_marker_init.match(line)
         if match:
-            exp = INIT_TEMPLATE % {'methods': '\n    '.join(method_table)}
+            exp = INIT_TEMPLATE % {
+                'methods': '\n    '.join(method_table),
+                'name': name}
             method_table = None   # don't fill it any more
             expanded_lines.append(exp)
             continue
@@ -59,36 +61,36 @@ def expand_template(source_template):
     return '\n'.join(expanded_lines)
 
 
+class HPyLoader(ExtensionFileLoader):
+    def create_module(self, spec):
+        import hpy_universal
+        return hpy_universal.load(spec.origin, f"HPyInit_{spec.name}")
 
 class ExtensionCompiler:
     def __init__(self, tmpdir, abimode):
         self.tmpdir = tmpdir
         self.abimode = abimode
 
-    def make_module(self, source_template):
+    def make_module(self, source_template, name):
         universal_mode = self.abimode == 'universal'
-        source = expand_template(source_template)
-        filename = self.tmpdir.join('mytest.c')
+        source = expand_template(source_template, name)
+        filename = self.tmpdir.join(f'{name}.c')
         filename.write(source)
         #
-        ext = get_extension(str(filename), 'mytest', include_dirs=[INCLUDE_DIR],
+        ext = get_extension(str(filename), name, include_dirs=[INCLUDE_DIR],
                             extra_compile_args=['-Wfatal-errors'])
         so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
                                 universal_mode=universal_mode)
         #
         if universal_mode:
-            loader = HPyLoader("mytest", so_filename)
-            spec = importlib.util.spec_from_loader('mytest', loader)
+            loader = HPyLoader(name, so_filename)
+            spec = importlib.util.spec_from_loader(name, loader)
         else:
-            spec = importlib.util.spec_from_file_location('mytest', so_filename)
+            spec = importlib.util.spec_from_file_location(name, so_filename)
         module = importlib.util.module_from_spec(spec)
-        sys.modules['mytest'] = module
+        sys.modules[name] = module
         spec.loader.exec_module(module)
         return module
-
-    def load_universal_module(self, so_filename):
-        import hpy_universal
-        return hpy_universal.load(so_filename)
 
 
 @pytest.mark.usefixtures('initargs')
@@ -97,15 +99,8 @@ class HPyTest:
     def initargs(self, compiler):
         self.compiler = compiler
 
-    def make_module(self, source_template):
-        return self.compiler.make_module(source_template)
-
-class HPyLoader(ExtensionFileLoader):
-    def create_module(self, spec):
-        import hpy_universal
-        name = spec.name
-        path = spec.origin
-        return hpy_universal.load(path)
+    def make_module(self, source_template, name='mytest'):
+        return self.compiler.make_module(source_template, name)
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py

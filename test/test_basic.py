@@ -15,6 +15,12 @@ class TestBasic(HPyTest):
         assert mod.__spec__.loader is mod.__loader__
         assert mod.__file__
 
+    def test_different_name(self):
+        mod = self.make_module("""
+            @INIT
+        """, name="foo")
+        assert mod.__name__ == "foo"
+
     def test_noop_function(self):
         mod = self.make_module("""
             HPy_FUNCTION(f)
