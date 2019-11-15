@@ -130,22 +130,27 @@ def main():
     autogen_func = root.join('hpy-api', 'include', 'universal', 'autogen_func.h')
     autogen_ctx_def = root.join('cpython-universal', 'src', 'autogen_ctx_def.h')
 
-
     autogen = AutoGen(root.join('tools', 'public_api.h'))
     for func in autogen.functions:
         print(func)
 
+    ctx_decl = autogen.gen_ctx_decl()
+    func_trampolines = autogen.gen_func_trampolines()
+    ctx_def = autogen.gen_ctx_def()
+
+
+    return
     with autogen_ctx.open('w') as f:
         print(DISCLAIMER, file=f)
-        print(autogen.gen_ctx_decl(), file=f)
+        print(ctx_decl, file=f)
 
     with autogen_func.open('w') as f:
         print(DISCLAIMER, file=f)
-        print(autogen.gen_func_trampolines(), file=f)
+        print(func_trampolines, file=f)
 
     with autogen_ctx_def.open('w') as f:
         print(DISCLAIMER, file=f)
-        print(autogen.gen_ctx_def(), file=f)
+        print(ctx_def, file=f)
 
 if __name__ == '__main__':
     main()

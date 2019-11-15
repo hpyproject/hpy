@@ -16,6 +16,10 @@ HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);
 
+int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...);
+HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
+HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
+
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);
