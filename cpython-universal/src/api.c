@@ -158,5 +158,11 @@ Number_Add(HPyContext ctx, HPy x, HPy y)
     return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
 }
 
+static HPy
+Unicode_FromString(HPyContext ctx, const char *utf8)
+{
+    return _py2h(PyUnicode_FromString(utf8));
+}
+
 
 #include "autogen_ctx_def.h"

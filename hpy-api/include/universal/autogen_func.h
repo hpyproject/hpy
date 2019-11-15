@@ -56,3 +56,9 @@ HPyNumber_Add(HPyContext ctx, HPy x, HPy y)
 {
     return ctx->number_Add(ctx, x, y);
 }
+
+static inline HPy
+HPyUnicode_FromString(HPyContext ctx, const char *utf8)
+{
+    return ctx->unicode_FromString(ctx, utf8);
+}
