@@ -10,4 +10,5 @@ struct _HPyContext_s {
     void (*close)(HPyContext, HPy h);
     HPy (*long_FromLong)(HPyContext, long value);
     int (*arg_VaParse)(HPyContext, HPy args, const char *fmt, va_list vl);
+    HPy (*number_Add)(HPyContext, HPy x, HPy y);
 };

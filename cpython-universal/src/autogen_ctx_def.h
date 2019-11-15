@@ -9,4 +9,5 @@ struct _HPyContext_s global_ctx = {
     .close = &Close,
     .long_FromLong = &Long_FromLong,
     .arg_VaParse = &Arg_VaParse,
+    .number_Add = &Number_Add,
 };

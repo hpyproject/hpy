@@ -50,3 +50,9 @@ HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...)
     va_end(vl);
     return res;
 }
+
+static inline HPy
+HPyNumber_Add(HPyContext ctx, HPy x, HPy y)
+{
+    return ctx->number_Add(ctx, x, y);
+}

@@ -152,5 +152,11 @@ Arg_VaParse(HPyContext ctx, HPy args, const char *fmt, va_list vl)
     return PyArg_VaParse(_h2py(args), fmt, vl);
 }
 
+static HPy
+Number_Add(HPyContext ctx, HPy x, HPy y)
+{
+    return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
+}
+
 
 #include "autogen_ctx_def.h"
