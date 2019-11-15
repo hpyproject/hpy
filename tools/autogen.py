@@ -40,12 +40,24 @@ class Function:
     def ctx_name(self):
         return self._CTX_NAME.sub(r'ctx_', self.name)
 
+    def is_varargs(self):
+        return (len(self.node.type.args.params) > 0 and
+                isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
+
     def ctx_decl(self):
         # turn the function declaration into a function POINTER declaration
         newnode = deepcopy(self.node)
         newnode.type = c_ast.PtrDecl(type=newnode.type, quals=[])
         # fix the name of the function pointer
         typedecl = self._find_typedecl(newnode)
+        # replace an ellipsis with a 'va_list _vl' argument
+        if self.is_varargs():
+            arg = c_ast.Decl('_vl', [], [], [],
+                c_ast.TypeDecl('_vl', [],
+                    c_ast.IdentifierType(['va_list'])),
+                None, None)
+            newnode.type.type.args.params[-1] = arg
+        #
         typedecl.declname = self.ctx_name()
         return toC(newnode)
 
@@ -55,15 +67,34 @@ class Function:
         w = parts.append
         w('static inline')
         w(toC(self.node))
-        w('{\n')
-        if rettype == 'void':
-            w('    ctx->%s' % self.ctx_name())
+        w('{\n    ')
+
+        if not self.is_varargs():
+            if rettype == 'void':
+                w('ctx->%s' % self.ctx_name())
+            else:
+                w('return ctx->%s' % self.ctx_name())
+            w('(')
+            params = [p.name for p in self.node.type.args.params]
+            w(', '.join(params))
+            w(');')
         else:
-            w('    return ctx->%s' % self.ctx_name())
-        w('(')
-        params = [p.name for p in self.node.type.args.params]
-        w(', '.join(params))
-        w(');')
+            last_param = self.node.type.args.params[-2].name
+            w('va_list _vl;')
+            w('va_start(_vl, %s);' % last_param)
+            if rettype == 'void':
+                w('ctx->%s' % self.ctx_name())
+            else:
+                w('%s _res = ctx->%s' % (rettype, self.ctx_name()))
+            w('(')
+            params = [p.name for p in self.node.type.args.params[:-1]]
+            params.append('_vl')
+            w(', '.join(params))
+            w(');')
+            w('va_end(_vl);')
+            if rettype != 'void':
+                w('return _res;')
+
         w('\n}')
         return ' '.join(parts)
 
@@ -138,8 +169,6 @@ def main():
     func_trampolines = autogen.gen_func_trampolines()
     ctx_def = autogen.gen_ctx_def()
 
-
-    return
     with autogen_ctx.open('w') as f:
         print(DISCLAIMER, file=f)
         print(ctx_decl, file=f)

@@ -59,7 +59,7 @@ extern HPyContext _ctx_for_trampolines;
     static struct _object *                                                    \
     fnname##_trampoline(struct _object *self, struct _object *args)            \
     {                                                                          \
-        return _ctx_for_trampolines->callRealFunctionFromTrampoline(           \
+        return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, args, fnname##_impl);                  \
     }                                                                          \
     static void                                                                \

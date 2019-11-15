@@ -45,7 +45,7 @@ create_method_defs(HPyModuleDef *hpydef)
 
 
 static HPy
-Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
+ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 {
     // create a new PyModuleDef
 
@@ -69,7 +69,7 @@ Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 }
 
 static HPy
-None_Get(HPyContext ctx)
+ctx_None_Get(HPyContext ctx)
 {
     Py_INCREF(Py_None);
     return _py2h(Py_None);
@@ -77,7 +77,7 @@ None_Get(HPyContext ctx)
 
 
 static struct _object *
-CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
+ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
                                struct _object *args, HPyCFunction func)
 {
     return _h2py(func(ctx, _py2h(self), _py2h(args)));
@@ -85,14 +85,14 @@ CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
 
 
 static HPy
-FromPyObject(HPyContext ctx, struct _object *obj)
+ctx_FromPyObject(HPyContext ctx, struct _object *obj)
 {
     Py_INCREF(obj);
     return _py2h(obj);
 }
 
 static struct _object *
-AsPyObject(HPyContext ctx, HPy h)
+ctx_AsPyObject(HPyContext ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
     Py_INCREF(obj);
@@ -100,13 +100,13 @@ AsPyObject(HPyContext ctx, HPy h)
 }
 
 static void
-Close(HPyContext ctx, HPy h)
+ctx_Close(HPyContext ctx, HPy h)
 {
     _hclose(h);
 }
 
 static HPy
-Dup(HPyContext ctx, HPy h)
+ctx_Dup(HPyContext ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
     Py_XINCREF(obj);
@@ -114,26 +114,26 @@ Dup(HPyContext ctx, HPy h)
 }
 
 static HPy
-Long_FromLong(HPyContext ctx, long value)
+ctx_Long_FromLong(HPyContext ctx, long value)
 {
     return _py2h(PyLong_FromLong(value));
 }
 
 static int
-Arg_VaParse(HPyContext ctx, HPy args, const char *fmt, va_list vl)
+ctx_Arg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, va_list vl)
 {
     /* XXX EXPLODES IF THERE ARE SOME 'PyObject *' RETURNED */
     return PyArg_VaParse(_h2py(args), fmt, vl);
 }
 
 static HPy
-Number_Add(HPyContext ctx, HPy x, HPy y)
+ctx_Number_Add(HPyContext ctx, HPy x, HPy y)
 {
     return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
 }
 
 static HPy
-Unicode_FromString(HPyContext ctx, const char *utf8)
+ctx_Unicode_FromString(HPyContext ctx, const char *utf8)
 {
     return _py2h(PyUnicode_FromString(utf8));
 }
