@@ -1,36 +1,10 @@
 #include <Python.h>
 #include <stdlib.h>
-#include "universal/hpy.h"
+#include "api.h"
 
 static PyModuleDef empty_moduledef = {
     PyModuleDef_HEAD_INIT
 };
-
-// XXX: we should properly allocate it dynamically&growing
-static PyObject *objects[100];
-static Py_ssize_t last_handle = 0;
-HPy
-_py2h(PyObject *obj)
-{
-    Py_ssize_t i = last_handle++;
-    objects[i] = obj;
-    return (HPy){(void*)i};
-}
-
-PyObject *
-_h2py(HPy h)
-{
-    Py_ssize_t i = (Py_ssize_t)h._o;
-    return objects[i];
-}
-
-void
-_hclose(HPy h)
-{
-    Py_ssize_t i = (Py_ssize_t)h._o;
-    Py_XDECREF(objects[i]);
-    objects[i] = NULL;
-}
 
 // this malloc a result which will never be freed. Too bad
 static PyMethodDef *
