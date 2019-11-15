@@ -47,63 +47,10 @@ typedef struct {
         return init_##modname##_impl(ctx);                     \
     }
 
-struct _HPyContext_s {
-    int version;
-    HPy (*module_Create)(HPyContext ctx, HPyModuleDef *def);
-    HPy (*none_Get)(HPyContext ctx);
-    struct _object *(*callRealFunctionFromTrampoline)(HPyContext ctx,
-              struct _object *self, struct _object *args, HPyCFunction func);
-    HPy (*fromPyObject)(HPyContext ctx, struct _object *obj);
-    struct _object *(*asPyObject)(HPyContext ctx, HPy h);
-    HPy (*dup)(HPyContext, HPy h);
-    void (*close)(HPyContext, HPy h);
-    HPy (*long_FromLong)(HPyContext, long value);
-};
+#include "autogen_ctx.h"
+#include "autogen_func.h"
 
 extern HPyContext _ctx_for_trampolines;
-
-static inline HPy
-HPyModule_Create(HPyContext ctx, HPyModuleDef *def)
-{
-    // XXX: think about versioning
-    return ctx->module_Create(ctx, def);
-}
-
-static inline HPy
-HPyNone_Get(HPyContext ctx)
-{
-    return ctx->none_Get(ctx);
-}
-
-static inline HPy
-HPy_FromPyObject(HPyContext ctx, struct _object *obj)
-{
-    return ctx->fromPyObject(ctx, obj);
-}
-
-static inline struct _object *
-HPy_AsPyObject(HPyContext ctx, HPy h)
-{
-    return ctx->asPyObject(ctx, h);
-}
-
-static inline HPy
-HPy_Dup(HPyContext ctx, HPy h)
-{
-    return ctx->dup(ctx, h);
-}
-
-static inline void
-HPy_Close(HPyContext ctx, HPy h)
-{
-    ctx->close(ctx, h);
-}
-
-static inline HPy
-HPyLong_FromLong(HPyContext ctx, long value)
-{
-    return ctx->long_FromLong(ctx, value);
-}
 
 
 #define HPy_FUNCTION(fnname)                                                   \

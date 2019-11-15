@@ -146,14 +146,4 @@ Long_FromLong(HPyContext ctx, long value)
 }
 
 
-struct _HPyContext_s global_ctx = {
-    .version = 1,
-    .module_Create = &Module_Create,
-    .none_Get = &None_Get,
-    .callRealFunctionFromTrampoline = &CallRealFunctionFromTrampoline,
-    .fromPyObject = &FromPyObject,
-    .asPyObject = &AsPyObject,
-    .dup = &Dup,
-    .close = &Close,
-    .long_FromLong = &Long_FromLong,
-};
+#include "autogen_ctx_def.h"
