@@ -1,6 +1,5 @@
 import sys
 import types
-import importlib
 from .support import HPyTest
 
 
