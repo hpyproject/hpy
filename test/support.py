@@ -2,10 +2,10 @@ import os, sys
 import pytest
 import re
 import importlib.util
+from importlib.machinery import ExtensionFileLoader
 
 THIS_DIR = os.path.dirname(__file__)
 INCLUDE_DIR = os.path.join(THIS_DIR, '../hpy-api/include')
-CPYTHON_UNIVERSAL_DIR = os.path.join(THIS_DIR, '../cpython-universal')
 
 
 r_marker_init = re.compile(r"\s*@INIT\s*$")
@@ -77,19 +77,16 @@ class ExtensionCompiler:
                                 universal_mode=universal_mode)
         #
         if universal_mode:
-            return self.load_universal_module(so_filename)
+            loader = HPyLoader("mytest", so_filename)
+            spec = importlib.util.spec_from_loader('mytest', loader)
         else:
             spec = importlib.util.spec_from_file_location('mytest', so_filename)
-            module = importlib.util.module_from_spec(spec)
-            sys.modules['mytest'] = module
-            spec.loader.exec_module(module)
-            return module
+        module = importlib.util.module_from_spec(spec)
+        sys.modules['mytest'] = module
+        spec.loader.exec_module(module)
+        return module
 
     def load_universal_module(self, so_filename):
-        # add CPYTHON_UNIVERSAL_DIR to sys.path, to ensure that we can run the
-        # test locally
-        if CPYTHON_UNIVERSAL_DIR not in sys.path:
-            sys.path.insert(0, CPYTHON_UNIVERSAL_DIR)
         import hpy_universal
         return hpy_universal.load(so_filename)
 
@@ -102,6 +99,13 @@ class HPyTest:
 
     def make_module(self, source_template):
         return self.compiler.make_module(source_template)
+
+class HPyLoader(ExtensionFileLoader):
+    def create_module(self, spec):
+        import hpy_universal
+        name = spec.name
+        path = spec.origin
+        return hpy_universal.load(path)
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py

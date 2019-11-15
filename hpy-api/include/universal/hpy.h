@@ -6,7 +6,7 @@
 #include <stdarg.h>
 
 typedef intptr_t HPy_ssize_t;
-typedef struct { void *_o; } HPy;
+typedef struct { HPy_ssize_t _i; } HPy;
 
 typedef struct _HPyContext_s *HPyContext;
 typedef HPy (*HPyCFunction)(HPyContext, HPy self, HPy args);
@@ -14,8 +14,8 @@ struct _object;  /* that's PyObject inside CPython */
 typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
                                              struct _object *args);
 
-#define HPy_NULL ((HPy){NULL})
-#define HPy_IsNull(x) ((x)._o == NULL)
+#define HPy_NULL ((HPy){0})
+#define HPy_IsNull(x) ((x)._i == 0)
 
 typedef void (*_HPyMethodPairFunc)(HPyCFunction *out_func,
                                    _HPy_CPyCFunction *out_trampoline);
