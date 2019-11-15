@@ -35,20 +35,19 @@ _py2h(PyObject *obj)
     Py_ssize_t i = h_free_list;
     h_free_list = ((Py_ssize_t)all_handles[i]) >> 1;
     all_handles[i] = obj;
-    return (HPy){(void*)i};
+    return (HPy){i};
 }
 
 PyObject *
 _h2py(HPy h)
 {
-    Py_ssize_t i = (Py_ssize_t)h._o;
-    return all_handles[i];
+    return all_handles[h._i];
 }
 
 void
 _hclose(HPy h)
 {
-    Py_ssize_t i = (Py_ssize_t)h._o;
+    Py_ssize_t i = h._i;
     Py_XDECREF(all_handles[i]);
     all_handles[i] = (PyObject *)((h_free_list << 1) | 1);
     h_free_list = i;
