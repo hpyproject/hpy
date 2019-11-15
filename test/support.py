@@ -5,7 +5,6 @@ import importlib.util
 
 THIS_DIR = os.path.dirname(__file__)
 INCLUDE_DIR = os.path.join(THIS_DIR, '../hpy-api/include')
-CPYTHON_UNIVERSAL_DIR = os.path.join(THIS_DIR, '../cpython-universal')
 
 
 r_marker_init = re.compile(r"\s*@INIT\s*$")
@@ -86,10 +85,6 @@ class ExtensionCompiler:
             return module
 
     def load_universal_module(self, so_filename):
-        # add CPYTHON_UNIVERSAL_DIR to sys.path, to ensure that we can run the
-        # test locally
-        if CPYTHON_UNIVERSAL_DIR not in sys.path:
-            sys.path.insert(0, CPYTHON_UNIVERSAL_DIR)
         import hpy_universal
         return hpy_universal.load(so_filename)
 
