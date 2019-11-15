@@ -145,5 +145,12 @@ Long_FromLong(HPyContext ctx, long value)
     return _py2h(PyLong_FromLong(value));
 }
 
+static int
+Arg_VaParse(HPyContext ctx, HPy args, const char *fmt, va_list vl)
+{
+    /* XXX EXPLODES IF THERE ARE SOME 'PyObject *' RETURNED */
+    return PyArg_VaParse(_h2py(args), fmt, vl);
+}
+
 
 #include "autogen_ctx_def.h"

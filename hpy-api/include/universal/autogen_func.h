@@ -40,3 +40,13 @@ HPyLong_FromLong(HPyContext ctx, long value)
 {
     return ctx->long_FromLong(ctx, value);
 }
+
+static inline int
+HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...)
+{
+    va_list vl;
+    va_start(vl, fmt);
+    int res = ctx->arg_VaParse(ctx, args, fmt, vl);
+    va_end(vl);
+    return res;
+}

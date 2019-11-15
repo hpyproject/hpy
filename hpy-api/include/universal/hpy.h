@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 typedef intptr_t HPy_ssize_t;
 typedef struct { void *_o; } HPy;
