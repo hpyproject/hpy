@@ -38,12 +38,16 @@ class Function:
         return toC(newnode)
 
     def trampoline_def(self):
+        rettype = toC(self.node.type.type)
         parts = []
         w = parts.append
         w('static inline')
         w(toC(self.node))
         w('{\n')
-        w('    return ctx->%s' % self.ctx_name())
+        if rettype == 'void':
+            w('    ctx->%s' % self.ctx_name())
+        else:
+            w('    return ctx->%s' % self.ctx_name())
         w('(')
         params = [p.name for p in self.node.type.args.params]
         w(', '.join(params))
@@ -78,13 +82,24 @@ class AutoGen:
         v.visit(self.ast)
         self.functions = v.functions
 
-    def gen_ctx(self):
+    def gen_ctx_decl(self):
         lines = []
         w = lines.append
         w('struct _HPyContext_s {')
         w('    int ctx_version;')
         for f in self.functions:
             w('    %s;' % f.ctx_decl())
+        w('};')
+        return '\n'.join(lines)
+
+    def gen_ctx_def(self):
+        lines = []
+        w = lines.append
+        w('struct _HPyContext_s global_ctx = {')
+        w('    .ctx_version = 1,')
+        for f in self.functions:
+            name = f.ctx_name()
+            w('    .%s = &%s,' % (name, name))
         w('};')
         return '\n'.join(lines)
 
@@ -96,14 +111,17 @@ class AutoGen:
         return '\n'.join(lines)
 
 
+
 def main():
     autogen = AutoGen('public_api.h')
     for func in autogen.functions:
         print(func)
     print()
-    print(autogen.gen_ctx())
+    print(autogen.gen_ctx_decl())
     print()
     print(autogen.gen_func_trampolines())
+    print()
+    print(autogen.gen_ctx_def())
 
 if __name__ == '__main__':
     main()
