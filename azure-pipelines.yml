@@ -21,7 +21,7 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    cd cpython-universal && python -m pip install .
+    cd cpython-universal && python setup.py build_ext -if
   displayName: 'Build project'
 
 - script: |
