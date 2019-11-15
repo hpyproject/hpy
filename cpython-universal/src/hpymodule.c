@@ -59,15 +59,15 @@ static PyMethodDef HPyMethods[] = {
 
 static struct PyModuleDef hpydef = {
     PyModuleDef_HEAD_INIT,
-    .m_name = "hpy",
-    .m_doc = "HPy",
+    .m_name = "hpy_universal",
+    .m_doc = "HPy universal runtime for CPython",
     .m_size = 0,
     .m_methods = HPyMethods,
 };
 
 
 PyMODINIT_FUNC
-PyInit_hpy(void)
+PyInit_hpy_universal(void)
 {
     return PyModuleDef_Init(&hpydef);
 }
