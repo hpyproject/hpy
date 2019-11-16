@@ -45,6 +45,19 @@ class TestBasic(HPyTest):
         """)
         assert mod.f() is mod
 
+    def test_identity_function(self):
+        mod = self.make_module("""
+            HPy_FUNCTION(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Dup(ctx, arg);
+            }
+            @EXPORT f METH_O
+            @INIT
+        """)
+        x = object()
+        assert mod.f(x) is x
+
     def test_wrong_number_or_arguments(self):
         mod = self.make_module("""
             HPy_FUNCTION(f_noargs)
@@ -67,19 +80,6 @@ class TestBasic(HPyTest):
             mod.f_o()
         with pytest.raises(TypeError):
             mod.f_o(1, 2)
-
-    def test_identity_function(self):
-        mod = self.make_module("""
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                return HPy_Dup(ctx, arg);
-            }
-            @EXPORT f METH_O
-            @INIT
-        """)
-        x = object()
-        assert mod.f(x) is x
 
     def test_int_add(self):
         mod = self.make_module("""
