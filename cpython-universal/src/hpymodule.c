@@ -13,20 +13,76 @@ static PyObject *set_debug(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *load(PyObject *self, PyObject *args)
-{
-    PyObject *soname_obj;
-    const char *init_name;
+static const char *prefix = "HPyInit";
 
-    if (!PyArg_ParseTuple(args, "Os", &soname_obj, &init_name)) {
+static PyObject *
+get_encoded_name(PyObject *name) {
+    PyObject *tmp;
+    PyObject *encoded = NULL;
+    PyObject *modname = NULL;
+    Py_ssize_t name_len, lastdot;
+
+    /* Get the short name (substring after last dot) */
+    name_len = PyUnicode_GetLength(name);
+    lastdot = PyUnicode_FindChar(name, '.', 0, name_len, -1);
+    if (lastdot < -1) {
+        return NULL;
+    } else if (lastdot >= 0) {
+        tmp = PyUnicode_Substring(name, lastdot + 1, name_len);
+        if (tmp == NULL)
+            return NULL;
+        name = tmp;
+        /* "name" now holds a new reference to the substring */
+    } else {
+        Py_INCREF(name);
+    }
+
+    /* Encode to ASCII */
+    encoded = PyUnicode_AsEncodedString(name, "ascii", NULL);
+    if (encoded != NULL) {
+    } else {
+        goto error;
+    }
+
+    /* Replace '-' by '_' */
+    modname = PyObject_CallMethod(encoded, "replace", "cc", '-', '_');
+    if (modname == NULL)
+        goto error;
+
+    Py_DECREF(name);
+    Py_DECREF(encoded);
+    return modname;
+error:
+    Py_DECREF(name);
+    Py_XDECREF(encoded);
+    return NULL;
+}
+
+
+static PyObject *load_from_spec(PyObject *self, PyObject *args)
+{
+    PyObject *name_unicode, *name, *path, *pathbytes;
+
+    name_unicode = PyObject_GetAttrString(args, "name");
+    if (name_unicode == NULL) {
         return NULL;
     }
-    PyObject *string_obj = NULL;
-    const char *soname;
-    if (!PyUnicode_FSConverter(soname_obj, &string_obj)) {
-        return NULL;
+    name = get_encoded_name(name_unicode);
+    if (name == NULL) {
+        goto error;
     }
-    soname = PyBytes_AS_STRING(string_obj);
+    const char *shortname = PyBytes_AS_STRING(name);
+    char init_name[258];
+    PyOS_snprintf(init_name, sizeof(init_name), "%.20s_%.200s",
+            prefix, shortname);
+
+    path = PyObject_GetAttrString(args, "origin");
+    if (path == NULL)
+        goto error;
+    pathbytes = PyUnicode_EncodeFSDefault(path);
+    if (pathbytes == NULL)
+        goto error;
+    const char *soname = PyBytes_AS_STRING(pathbytes);
 
     printf("loading %s\n", soname);
     void *mylib = dlopen(soname, RTLD_NOW); // how closes this?
@@ -35,7 +91,7 @@ static PyObject *load(PyObject *self, PyObject *args)
         if (error == NULL)
             error = "unknown dlopen() error";
         PyErr_Format(PyExc_RuntimeError, "dlopen: %s", error);
-        return NULL;
+        goto error;
     }
 
     void *initfn = dlsym(mylib, init_name);
@@ -44,21 +100,30 @@ static PyObject *load(PyObject *self, PyObject *args)
         if (error == NULL)
             error = "unknown dlsym() error";
         PyErr_Format(PyExc_RuntimeError, "dlsym: %s", error);
-        return NULL;
+        goto error;
     }
 
     HPy mod = ((InitFuncPtr)initfn)(&global_ctx);
     PyObject *py_mod = _h2py(mod);
     // XXX close the handle
 
-    Py_CLEAR(string_obj);
+    Py_DECREF(name_unicode);
+    Py_XDECREF(name);
+    Py_XDECREF(path);
+    Py_XDECREF(pathbytes);
     return py_mod;
+error:
+    Py_DECREF(name_unicode);
+    Py_XDECREF(name);
+    Py_XDECREF(path);
+    Py_XDECREF(pathbytes);
+    return NULL;
 }
 
 
 static PyMethodDef HPyMethods[] = {
     {"set_debug", (PyCFunction)set_debug, METH_O, "TODO"},
-    {"load", (PyCFunction)load, METH_VARARGS, "Load a .hpy.so"},
+    {"load_from_spec", (PyCFunction)load_from_spec, METH_O, "Load a .hpy.so"},
     {NULL, NULL, 0, NULL}
 };
 

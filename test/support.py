@@ -64,7 +64,7 @@ def expand_template(source_template, name):
 class HPyLoader(ExtensionFileLoader):
     def create_module(self, spec):
         import hpy_universal
-        return hpy_universal.load(spec.origin, f"HPyInit_{spec.name}")
+        return hpy_universal.load_from_spec(spec)
 
 class ExtensionCompiler:
     def __init__(self, tmpdir, abimode):
