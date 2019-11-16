@@ -61,7 +61,9 @@ error:
 
 static PyObject *load_from_spec(PyObject *self, PyObject *args)
 {
-    PyObject *name_unicode, *name, *path, *pathbytes;
+    PyObject *name_unicode, *name;
+    PyObject *path = NULL;
+    PyObject *pathbytes = NULL;
 
     name_unicode = PyObject_GetAttrString(args, "name");
     if (name_unicode == NULL) {
