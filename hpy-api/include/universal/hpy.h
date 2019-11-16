@@ -40,7 +40,7 @@ typedef struct {
 } HPyModuleDef;
 
 #define HPy_MODINIT(modname)                                   \
-    HPyContext _ctx_for_trampolines;                           \
+    __attribute__((hidden)) HPyContext _ctx_for_trampolines;   \
     static HPy init_##modname##_impl(HPyContext ctx);          \
     HPy HPyInit_##modname(HPyContext ctx)                      \
     {                                                          \
