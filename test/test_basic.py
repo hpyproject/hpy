@@ -1,3 +1,4 @@
+import pytest
 import sys
 import types
 from .support import HPyTest
@@ -31,6 +32,41 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f() is None
+
+    def test_self_is_module(self):
+        mod = self.make_module("""
+            HPy_FUNCTION(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            {
+                return HPy_Dup(ctx, self);
+            }
+            @EXPORT f METH_NOARGS
+            @INIT
+        """)
+        assert mod.f() is mod
+
+    def test_wrong_number_or_arguments(self):
+        mod = self.make_module("""
+            HPy_FUNCTION(f_noargs)
+            static HPy f_noargs_impl(HPyContext ctx, HPy self, HPy args)
+            {
+                return HPyNone_Get(ctx);
+            }
+            HPy_FUNCTION(f_o)
+            static HPy f_o_impl(HPyContext ctx, HPy self, HPy args)
+            {
+                return HPyNone_Get(ctx);
+            }
+            @EXPORT f_noargs METH_NOARGS
+            @EXPORT f_o METH_O
+            @INIT
+        """)
+        with pytest.raises(TypeError):
+            mod.f_noargs(1)
+        with pytest.raises(TypeError):
+            mod.f_o()
+        with pytest.raises(TypeError):
+            mod.f_o(1, 2)
 
     def test_identity_function(self):
         mod = self.make_module("""
