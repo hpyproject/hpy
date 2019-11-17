@@ -58,7 +58,7 @@ class TestBasic(HPyTest):
         x = object()
         assert mod.f(x) is x
 
-    def test_wrong_number_or_arguments(self):
+    def test_wrong_number_of_arguments(self):
         mod = self.make_module("""
             HPy_FUNCTION(f_noargs)
             static HPy f_noargs_impl(HPyContext ctx, HPy self, HPy args)
