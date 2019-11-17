@@ -153,6 +153,17 @@ class AutoGen:
             lines.append('')
         return '\n'.join(lines)
 
+    def gen_pypy_decl(self):
+        lines = []
+        w = lines.append
+        w("HPyContextS = rffi.CStruct('_HPyContext_s',")
+        w("    ('ctx_version', rffi.INT_real),")
+        for f in self.functions:
+            w("    ('%s', rffi.VOIDP)," % f.ctx_name())
+        w("    hints={'eci': eci},")
+        w(")")
+        return '\n'.join(lines)
+
 
 def main():
     root = py.path.local(__file__).dirpath().dirpath()
@@ -160,6 +171,7 @@ def main():
     autogen_ctx = universal_headers.join('autogen_ctx.h')
     autogen_func = universal_headers.join('autogen_func.h')
     autogen_ctx_def = root.join('cpython-universal', 'src', 'autogen_ctx_def.h')
+    autogen_pypy = root.join('tools', 'autogen_pypy.txt')
 
     autogen = AutoGen(root.join('tools', 'public_api.h'))
     for func in autogen.functions:
@@ -168,6 +180,7 @@ def main():
     ctx_decl = autogen.gen_ctx_decl()
     func_trampolines = autogen.gen_func_trampolines()
     ctx_def = autogen.gen_ctx_def()
+    pypy_decl = autogen.gen_pypy_decl()
 
     with autogen_ctx.open('w') as f:
         print(DISCLAIMER, file=f)
@@ -180,6 +193,9 @@ def main():
     with autogen_ctx_def.open('w') as f:
         print(DISCLAIMER, file=f)
         print(ctx_def, file=f)
+
+    with autogen_pypy.open('w') as f:
+        print(pypy_decl, file=f)
 
 if __name__ == '__main__':
     main()
