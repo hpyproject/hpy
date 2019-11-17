@@ -23,8 +23,8 @@ class TestBasic(HPyTest):
 
     def test_noop_function(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyNone_Get(ctx);
             }
@@ -35,8 +35,8 @@ class TestBasic(HPyTest):
 
     def test_self_is_module(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, self);
             }
@@ -47,7 +47,7 @@ class TestBasic(HPyTest):
 
     def test_identity_function(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
+            HPy_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, arg);
@@ -60,7 +60,7 @@ class TestBasic(HPyTest):
 
     def test_long_aslong(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
+            HPy_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long a = HPyLong_AsLong(ctx, arg);
@@ -73,13 +73,13 @@ class TestBasic(HPyTest):
 
     def test_wrong_number_of_arguments(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f_noargs)
-            static HPy f_noargs_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f_noargs)
+            static HPy f_noargs_impl(HPyContext ctx, HPy self)
             {
                 return HPyNone_Get(ctx);
             }
-            HPy_FUNCTION(f_o)
-            static HPy f_o_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_O(f_o)
+            static HPy f_o_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPyNone_Get(ctx);
             }
@@ -96,11 +96,13 @@ class TestBasic(HPyTest):
 
     def test_many_int_arguments(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_VARARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
             {
                 long a, b, c, d, e;
-                if (!HPyArg_ParseTuple(ctx, args, "lllll", &a, &b, &c, &d, &e))
+                if (!HPyArg_Parse(ctx, args, nargs, "lllll",
+                                  &a, &b, &c, &d, &e))
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx,
                     10000*a + 1000*b + 100*c + 10*d + e);
@@ -112,7 +114,7 @@ class TestBasic(HPyTest):
 
     def test_close(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
+            HPy_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy one = HPyLong_FromLong(ctx, 1);
@@ -129,8 +131,8 @@ class TestBasic(HPyTest):
 
     def test_string(self):
         mod = self.make_module("""
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "foobar");
             }

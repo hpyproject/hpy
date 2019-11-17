@@ -6,8 +6,8 @@ class TestCPythonCompatibility(HPyTest):
     def test_frompyobject(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 
@@ -29,8 +29,8 @@ class TestCPythonCompatibility(HPyTest):
     def test_hpy_close(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 
@@ -51,8 +51,8 @@ class TestCPythonCompatibility(HPyTest):
     def test_hpy_dup(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 
@@ -77,8 +77,8 @@ class TestCPythonCompatibility(HPyTest):
             #include <Python.h>
             #define NUM_HANDLES  10000
 
-            HPy_FUNCTION(f)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy args)
+            HPy_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 

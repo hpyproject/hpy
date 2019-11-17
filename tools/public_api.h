@@ -3,6 +3,7 @@ typedef int HPy;
 typedef int HPyContext;
 typedef int HPyModuleDef;
 typedef int HPyCFunction;
+typedef int HPy_ssize_t;
 
 
 /* HPy public API */
@@ -14,7 +15,8 @@ void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 
-int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...);
+int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
+                 const char *fmt, ...);
 HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
 
