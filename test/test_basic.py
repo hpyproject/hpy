@@ -81,20 +81,21 @@ class TestBasic(HPyTest):
         with pytest.raises(TypeError):
             mod.f_o(1, 2)
 
-    def test_int_add(self):
+    def test_many_int_arguments(self):
         mod = self.make_module("""
             HPy_FUNCTION(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy args)
             {
-                long a, b;
-                if (!HPyArg_ParseTuple(ctx, args, "ll", &a, &b))
+                long a, b, c, d, e;
+                if (!HPyArg_ParseTuple(ctx, args, "lllll", &a, &b, &c, &d, &e))
                     return HPy_NULL;
-                return HPyLong_FromLong(ctx, a + b);
+                return HPyLong_FromLong(ctx,
+                    10000*a + 1000*b + 100*c + 10*d + e);
             }
             @EXPORT f METH_VARARGS
             @INIT
         """)
-        assert mod.f(30, 12) == 42
+        assert mod.f(4, 5, 6, 7, 8) == 45678
 
     def test_close(self):
         mod = self.make_module("""
