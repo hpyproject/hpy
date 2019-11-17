@@ -4,9 +4,7 @@ import re
 import importlib.util
 from importlib.machinery import ExtensionFileLoader
 
-THIS_DIR = os.path.dirname(__file__)
-INCLUDE_DIR = os.path.join(THIS_DIR, '../hpy-api/include')
-
+import hpy_devel
 
 r_marker_init = re.compile(r"\s*@INIT\s*$")
 r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(METH_\w+)\s*$")
@@ -77,7 +75,8 @@ class ExtensionCompiler:
         filename = self.tmpdir.join(f'{name}.c')
         filename.write(source)
         #
-        ext = get_extension(str(filename), name, include_dirs=[INCLUDE_DIR],
+        ext = get_extension(str(filename), name,
+                            include_dirs=[hpy_devel.get_include()],
                             extra_compile_args=['-Wfatal-errors'])
         so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
                                 universal_mode=universal_mode)

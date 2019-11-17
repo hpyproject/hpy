@@ -28,7 +28,7 @@ toC.gen = CGenerator()
 @attr.s
 class Function:
     _CTX_NAME = re.compile(r'^_?HPy_?')
-    
+
     name = attr.ib()
     node = attr.ib(repr=False)
 
@@ -102,7 +102,7 @@ class Function:
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self):
         self.functions = []
-    
+
     def visit_Decl(self, node):
         if not isinstance(node.type, c_ast.FuncDecl):
             return
@@ -154,11 +154,11 @@ class AutoGen:
         return '\n'.join(lines)
 
 
-
 def main():
     root = py.path.local(__file__).dirpath().dirpath()
-    autogen_ctx = root.join('hpy-api', 'include', 'universal', 'autogen_ctx.h')
-    autogen_func = root.join('hpy-api', 'include', 'universal', 'autogen_func.h')
+    universal_headers = root.join('hpy-api', 'hpy_devel', 'include', 'universal')
+    autogen_ctx = universal_headers.join('autogen_ctx.h')
+    autogen_func = universal_headers.join('autogen_func.h')
     autogen_ctx_def = root.join('cpython-universal', 'src', 'autogen_ctx_def.h')
 
     autogen = AutoGen(root.join('tools', 'public_api.h'))
