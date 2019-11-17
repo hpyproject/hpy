@@ -4,8 +4,6 @@ import re
 import importlib.util
 from importlib.machinery import ExtensionFileLoader
 
-import hpy_devel
-
 r_marker_init = re.compile(r"\s*@INIT\s*$")
 r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(METH_\w+)\s*$")
 
@@ -65,9 +63,10 @@ class HPyLoader(ExtensionFileLoader):
         return hpy_universal.load_from_spec(spec)
 
 class ExtensionCompiler:
-    def __init__(self, tmpdir, abimode):
+    def __init__(self, tmpdir, abimode, include_dir):
         self.tmpdir = tmpdir
         self.abimode = abimode
+        self.include_dir = include_dir
 
     def make_module(self, source_template, name):
         universal_mode = self.abimode == 'universal'
@@ -76,7 +75,7 @@ class ExtensionCompiler:
         filename.write(source)
         #
         ext = get_extension(str(filename), name,
-                            include_dirs=[hpy_devel.get_include()],
+                            include_dirs=[self.include_dir],
                             extra_compile_args=['-Wfatal-errors'])
         so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
                                 universal_mode=universal_mode)

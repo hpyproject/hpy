@@ -27,5 +27,5 @@ steps:
 
 - script: |
     pip install pytest pytest-azurepipelines
-    pytest test/
+    pytest --correct test/
   displayName: 'pytest'
