@@ -6,7 +6,7 @@
 
 /* XXX: it would be nice if we could include hpy.h WITHOUT bringing in all the
    stuff from Python.h, to make sure that people don't use the CPython API by
-   mistake. How to achieve it, though? */
+   mistake. How to achieve it, though? Is defining Py_LIMITED_API enough? */
 
 /* XXX: should we:
  *    - enforce PY_SSIZE_T_CLEAN in hpy
