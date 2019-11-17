@@ -86,8 +86,7 @@ static PyObject *load_from_spec(PyObject *self, PyObject *args)
         goto error;
     const char *soname = PyBytes_AS_STRING(pathbytes);
 
-    printf("loading %s\n", soname);
-    void *mylib = dlopen(soname, RTLD_NOW); // how closes this?
+    void *mylib = dlopen(soname, RTLD_NOW); // who closes this?
     if (mylib == NULL) {
         const char *error = dlerror();
         if (error == NULL)
