@@ -2,6 +2,16 @@
 #include <stdlib.h>
 #include "api.h"
 
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#else
+# include <stdint.h>
+# if (defined (__SVR4) && defined (__sun)) || defined(_AIX) || defined(__hpux)
+#  include <alloca.h>
+# endif
+#endif
+
+
 static PyModuleDef empty_moduledef = {
     PyModuleDef_HEAD_INIT
 };
@@ -34,7 +44,7 @@ create_method_defs(HPyModuleDef *hpydef)
         dst->ml_flags = src->ml_flags;
         dst->ml_doc = src->ml_doc;
 
-        HPyCFunction impl_func;
+        void *impl_func;
         PyCFunction trampoline_func;
         src->ml_meth(&impl_func, &trampoline_func);
         dst->ml_meth = trampoline_func;
@@ -76,11 +86,36 @@ ctx_None_Get(HPyContext ctx)
 }
 
 
+typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);
+typedef HPy (*HPyMeth_O)(HPyContext, HPy self, HPy arg);
+typedef HPy (*HPyMeth_VarArgs)(HPyContext, HPy self, HPy *args, HPy_ssize_t);
+
 static struct _object *
 ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
-                               struct _object *args, HPyCFunction func)
+                               struct _object *args, void *func, int ml_flags)
 {
-    return _h2py(func(ctx, _py2h(self), _py2h(args)));
+    switch (ml_flags)
+    {
+    case METH_NOARGS: {
+        HPyMeth_NoArgs f = (HPyMeth_NoArgs)func;
+        return _h2py(f(ctx, _py2h(self)));
+    }
+    case METH_O: {
+        HPyMeth_O f = (HPyMeth_O)func;
+        return _h2py(f(ctx, _py2h(self), _py2h(args)));
+    }
+    case METH_VARARGS: {
+        HPyMeth_VarArgs f = (HPyMeth_VarArgs)func;
+        Py_ssize_t nargs = PyTuple_GET_SIZE(args);
+        HPy *h_args = alloca(nargs * sizeof(HPy));
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            h_args[i] = _py2h(PyTuple_GET_ITEM(args, i));
+        }
+        return _h2py(f(ctx, _py2h(self), h_args, nargs));
+    }
+    default:
+        abort();  // XXX
+    }
 }
 
 
@@ -126,10 +161,34 @@ ctx_Long_AsLong(HPyContext ctx, HPy h)
 }
 
 static int
-ctx_Arg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, va_list vl)
+ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
+              const char *fmt, va_list vl)
 {
-    /* XXX EXPLODES IF THERE ARE SOME 'PyObject *' RETURNED */
-    return PyArg_VaParse(_h2py(args), fmt, vl);
+    const char *fmt1 = fmt;
+    Py_ssize_t i = 0;
+
+    while (*fmt1 != 0) {
+        if (i >= nargs) {
+            abort(); // XXX
+        }
+        switch (*fmt1++) {
+        case 'l': {
+            long *output = va_arg(vl, long *);
+            long value = HPyLong_AsLong(ctx, args[i]);
+            // XXX check for exceptions
+            *output = value;
+            break;
+        }
+        default:
+            abort();  // XXX
+        }
+        i++;
+    }
+    if (i != nargs) {
+        abort();   // XXX
+    }
+
+    return 1;
 }
 
 static HPy

@@ -52,7 +52,7 @@ static inline struct _object *HPy_AsPyObject(HPyContext ctx, HPy h) {
      return ctx->ctx_AsPyObject ( ctx, h ); 
 }
 
-static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, HPyCFunction func) {
-     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, func ); 
+static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags) {
+     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, func, ml_flags ); 
 }
 

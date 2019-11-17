@@ -21,5 +21,5 @@ struct _HPyContext_s {
     HPy (*ctx_Unicode_FromString)(HPyContext ctx, const char *utf8);
     HPy (*ctx_FromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
-    struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, HPyCFunction func);
+    struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags);
 };

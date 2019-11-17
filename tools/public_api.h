@@ -29,4 +29,5 @@ struct _object *HPy_AsPyObject(HPyContext ctx, HPy h);
 struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
                                                     struct _object *self,
                                                     struct _object *args,
-                                                    HPyCFunction func);
+                                                    void *func,
+                                                    int ml_flags);
