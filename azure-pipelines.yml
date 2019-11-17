@@ -12,6 +12,8 @@ strategy:
 
 jobs:
 - job: LibraryTests
+  pool:
+    vmImage: 'ubuntu-latest'
   displayName: 'Main tests'
   steps:
   - task: UsePythonVersion@0
@@ -34,6 +36,8 @@ jobs:
     displayName: 'pytest'
 
 - job: ExampleTests
+  pool:
+    vmImage: 'ubuntu-latest'
   displayName: 'Test usage examples'
   steps:
   - task: UsePythonVersion@0
