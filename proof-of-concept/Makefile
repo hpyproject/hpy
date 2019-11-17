@@ -1,4 +1,4 @@
-pof.cpython-37m-x86_64-linux-gnu.so: pof.c ../src/include/*.h
+pof.cpython-37m-x86_64-linux-gnu.so: pof.c
 	python3.7 setup.py build_ext -i -f
 
 .PHONY: test
