@@ -6,6 +6,12 @@ static HPy do_nothing_impl(HPyContext ctx, HPy self, HPy args)
     return HPyNone_Get(ctx);
 }
 
+HPy_FUNCTION(double_obj)
+static HPy double_obj_impl(HPyContext ctx, HPy self, HPy obj)
+{
+    return HPyNumber_Add(ctx, obj, obj);
+}
+
 HPy_FUNCTION(add_ints)
 static HPy add_ints_impl(HPyContext ctx, HPy self, HPy args)
 {
@@ -18,6 +24,7 @@ static HPy add_ints_impl(HPyContext ctx, HPy self, HPy args)
 
 static HPyMethodDef PofMethods[] = {
     {"do_nothing", do_nothing, METH_NOARGS, ""},
+    {"double", double_obj, METH_O, ""},
     {"add_ints", add_ints, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
