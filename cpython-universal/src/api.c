@@ -119,6 +119,12 @@ ctx_Long_FromLong(HPyContext ctx, long value)
     return _py2h(PyLong_FromLong(value));
 }
 
+static long
+ctx_Long_AsLong(HPyContext ctx, HPy h)
+{
+    return PyLong_AsLong(_h2py(h));
+}
+
 static int
 ctx_Arg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, va_list vl)
 {

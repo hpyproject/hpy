@@ -58,6 +58,19 @@ class TestBasic(HPyTest):
         x = object()
         assert mod.f(x) is x
 
+    def test_long_aslong(self):
+        mod = self.make_module("""
+            HPy_FUNCTION(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                long a = HPyLong_AsLong(ctx, arg);
+                return HPyLong_FromLong(ctx, a * 2);
+            }
+            @EXPORT f METH_O
+            @INIT
+        """)
+        assert mod.f(45) == 90
+
     def test_wrong_number_of_arguments(self):
         mod = self.make_module("""
             HPy_FUNCTION(f_noargs)

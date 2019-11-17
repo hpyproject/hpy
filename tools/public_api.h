@@ -12,6 +12,7 @@ HPy HPyNone_Get(HPyContext ctx);
 HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);
+long HPyLong_AsLong(HPyContext ctx, HPy h);
 
 int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...);
 HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);

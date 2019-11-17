@@ -15,6 +15,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Dup = &ctx_Dup,
     .ctx_Close = &ctx_Close,
     .ctx_Long_FromLong = &ctx_Long_FromLong,
+    .ctx_Long_AsLong = &ctx_Long_AsLong,
     .ctx_Arg_ParseTuple = &ctx_Arg_ParseTuple,
     .ctx_Number_Add = &ctx_Number_Add,
     .ctx_Unicode_FromString = &ctx_Unicode_FromString,
