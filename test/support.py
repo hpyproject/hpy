@@ -1,8 +1,6 @@
 import os, sys
 import pytest
 import re
-import importlib.util
-from importlib.machinery import ExtensionFileLoader
 
 r_marker_init = re.compile(r"\s*@INIT\s*$")
 r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(METH_\w+)\s*$")
@@ -92,19 +90,28 @@ class ExtensionCompiler:
         """
         so_filename = self.compile_module(source_template, name)
         if self.universal_mode:
-            # we've got an universal module, let's load it through
-            # hpy_universal
-            import hpy_universal
-            spec = Spec(name, so_filename)
-            return hpy_universal.load_from_spec(spec)
+            return self.load_universal_module(name, so_filename)
         else:
-            # we've got a normal CPython module compiled with the CPython
-            # API/ABI, let's load it normally
-            assert self.abimode == 'cpython'
-            spec = importlib.util.spec_from_file_location(name, so_filename)
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            return module
+            return self.load_cython_module(name, so_filename)
+
+    def load_universal_module(self, name, so_filename):
+        assert self.abimode == 'universal'
+        import hpy_universal
+        spec = Spec(name, so_filename)
+        return hpy_universal.load_from_spec(spec)
+
+    def load_cython_module(self, name, so_filename):
+        assert self.abimode == 'cpython'
+        # we've got a normal CPython module compiled with the CPython API/ABI,
+        # let's load it normally. It is important to do the imports only here,
+        # because this file will be imported also by PyPy tests which runs on
+        # Python2
+        import importlib.util
+        from importlib.machinery import ExtensionFileLoader
+        spec = importlib.util.spec_from_file_location(name, so_filename)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
 
 
 @pytest.mark.usefixtures('initargs')
