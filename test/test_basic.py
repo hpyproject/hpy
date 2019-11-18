@@ -26,7 +26,7 @@ class TestBasic(HPyTest):
             HPy_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
-                return HPyNone_Get(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
             }
             @EXPORT f METH_NOARGS
             @INIT
@@ -76,12 +76,12 @@ class TestBasic(HPyTest):
             HPy_METH_NOARGS(f_noargs)
             static HPy f_noargs_impl(HPyContext ctx, HPy self)
             {
-                return HPyNone_Get(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
             }
             HPy_METH_O(f_o)
             static HPy f_o_impl(HPyContext ctx, HPy self, HPy arg)
             {
-                return HPyNone_Get(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
             }
             @EXPORT f_noargs METH_NOARGS
             @EXPORT f_o METH_O

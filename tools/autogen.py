@@ -40,6 +40,9 @@ class Function:
     def ctx_name(self):
         return self._CTX_NAME.sub(r'ctx_', self.name)
 
+    def ctx_impl_name(self):
+        return '&%s' % self.ctx_name()
+
     def is_varargs(self):
         return (len(self.node.type.args.params) > 0 and
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
@@ -99,13 +102,35 @@ class Function:
         return ' '.join(parts)
 
 
+@attr.s
+class GlobalVar:
+    name = attr.ib()
+    node = attr.ib(repr=False)
+
+    def ctx_name(self):
+        return self.name
+
+    def ctx_impl_name(self):
+        return '(HPy){CONSTANT_%s}' % (self.name.upper(),)
+
+    def ctx_decl(self):
+        return toC(self.node)
+
+    def trampoline_def(self):
+        return None
+
+
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self):
-        self.functions = []
+        self.declarations = []
 
     def visit_Decl(self, node):
-        if not isinstance(node.type, c_ast.FuncDecl):
-            return
+        if isinstance(node.type, c_ast.FuncDecl):
+            self._visit_function(node)
+        elif isinstance(node.type, c_ast.TypeDecl):
+            self._visit_global_var(node)
+
+    def _visit_function(self, node):
         name = node.name
         if not name.startswith('HPy') and not name.startswith('_HPy'):
             print('WARNING: Ignoring non-hpy declaration: %s' % name)
@@ -114,7 +139,15 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
             if hasattr(p, 'name') and p.name is None:
                 raise ValueError("non-named argument in declaration of %s" %
                                  name)
-        self.functions.append(Function(name, node))
+        self.declarations.append(Function(name, node))
+
+    def _visit_global_var(self, node):
+        name = node.name
+        if not name.startswith('h_'):
+            print('WARNING: Ignoring non-hpy variable declaration: %s' % name)
+            return
+        assert toC(node.type.type) == "HPy"
+        self.declarations.append(GlobalVar(name, node))
 
 
 class AutoGen:
@@ -122,19 +155,19 @@ class AutoGen:
     def __init__(self, filename):
         self.ast = pycparser.parse_file(filename, use_cpp=True)
         #self.ast.show()
-        self.collect_functions()
+        self.collect_declarations()
 
-    def collect_functions(self):
+    def collect_declarations(self):
         v = FuncDeclVisitor()
         v.visit(self.ast)
-        self.functions = v.functions
+        self.declarations = v.declarations
 
     def gen_ctx_decl(self):
         lines = []
         w = lines.append
         w('struct _HPyContext_s {')
         w('    int ctx_version;')
-        for f in self.functions:
+        for f in self.declarations:
             w('    %s;' % f.ctx_decl())
         w('};')
         return '\n'.join(lines)
@@ -144,17 +177,20 @@ class AutoGen:
         w = lines.append
         w('struct _HPyContext_s global_ctx = {')
         w('    .ctx_version = 1,')
-        for f in self.functions:
+        for f in self.declarations:
             name = f.ctx_name()
-            w('    .%s = &%s,' % (name, name))
+            impl = f.ctx_impl_name()
+            w('    .%s = %s,' % (name, impl))
         w('};')
         return '\n'.join(lines)
 
     def gen_func_trampolines(self):
         lines = []
-        for f in self.functions:
-            lines.append(f.trampoline_def())
-            lines.append('')
+        for f in self.declarations:
+            trampoline = f.trampoline_def()
+            if trampoline:
+                lines.append(trampoline)
+                lines.append('')
         return '\n'.join(lines)
 
     def gen_pypy_decl(self):
@@ -162,7 +198,7 @@ class AutoGen:
         w = lines.append
         w("HPyContextS = rffi.CStruct('_HPyContext_s',")
         w("    ('ctx_version', rffi.INT_real),")
-        for f in self.functions:
+        for f in self.declarations:
             w("    ('%s', rffi.VOIDP)," % f.ctx_name())
         w("    hints={'eci': eci},")
         w(")")
@@ -178,7 +214,7 @@ def main():
     autogen_pypy = root.join('tools', 'autogen_pypy.txt')
 
     autogen = AutoGen(root.join('tools', 'public_api.h'))
-    for func in autogen.functions:
+    for func in autogen.declarations:
         print(func)
 
     ctx_decl = autogen.gen_ctx_decl()

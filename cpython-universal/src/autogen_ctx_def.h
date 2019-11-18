@@ -10,6 +10,7 @@
 
 struct _HPyContext_s global_ctx = {
     .ctx_version = 1,
+    .h_None = (HPy){CONSTANT_H_NONE},
     .ctx_Module_Create = &ctx_Module_Create,
     .ctx_None_Get = &ctx_None_Get,
     .ctx_Dup = &ctx_Dup,
