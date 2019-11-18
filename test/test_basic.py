@@ -1,16 +1,16 @@
 import pytest
 import sys
-import types
 from .support import HPyTest
 
 
 class TestBasic(HPyTest):
 
     def test_empty_module(self):
+        import sys
         mod = self.make_module("""
             @INIT
         """)
-        assert type(mod) is types.ModuleType
+        assert type(mod) is type(sys)
 
     def test_different_name(self):
         mod = self.make_module("""
