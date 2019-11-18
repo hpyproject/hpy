@@ -53,7 +53,7 @@ jobs:
     displayName: 'Build pof wheel'
 
   - script: |
-      python -m pip install proof-of-concept/*.whl
+      python -m pip install proof-of-concept/dist/*.whl
     displayName: 'Install pof'
 
   - script: |
