@@ -137,3 +137,17 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f() == "foobar"
+
+    def test_bool(self):
+        mod = self.make_module("""
+            HPy_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                int cond = HPyLong_AsLong(ctx, arg) > 5;
+                return HPy_Dup(ctx, cond ? ctx->h_True : ctx->h_False);
+            }
+            @EXPORT f METH_O
+            @INIT
+        """)
+        assert mod.f(4) is False
+        assert mod.f(6) is True

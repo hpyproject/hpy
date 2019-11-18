@@ -26,6 +26,9 @@ allocate_more_handles(void)
     if (h_num_allocated == 0) {
         new_handles[CONSTANT_H_NULL] = NULL;
         new_handles[CONSTANT_H_NONE] = Py_None;
+        new_handles[CONSTANT_H_FALSE] = Py_False;
+        new_handles[CONSTANT_H_TRUE] = Py_True;
+        assert(CONSTANT__H_TOTAL == 4);
     }
 
     PyMem_Free(all_handles);

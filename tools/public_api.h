@@ -9,6 +9,8 @@ typedef int HPy_ssize_t;
 /* HPy public API */
 
 HPy h_None;
+HPy h_True;
+HPy h_False;
 
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPyNone_Get(HPyContext ctx);

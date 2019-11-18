@@ -35,11 +35,15 @@ typedef Py_ssize_t HPy_ssize_t;
 
 typedef struct _HPyContext_s {
     HPy h_None;
+    HPy h_True;
+    HPy h_False;
 } *HPyContext;
 
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx = {
     .h_None = _py2h(Py_None),
+    .h_True = _py2h(Py_True),
+    .h_False = _py2h(Py_False),
 };
 
 HPyAPI_FUNC(HPyContext)

@@ -11,6 +11,8 @@
 struct _HPyContext_s {
     int ctx_version;
     HPy h_None;
+    HPy h_True;
+    HPy h_False;
     HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def);
     HPy (*ctx_None_Get)(HPyContext ctx);
     HPy (*ctx_Dup)(HPyContext ctx, HPy h);
