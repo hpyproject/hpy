@@ -110,6 +110,10 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
         if not name.startswith('HPy') and not name.startswith('_HPy'):
             print('WARNING: Ignoring non-hpy declaration: %s' % name)
             return
+        for p in node.type.args.params:
+            if hasattr(p, 'name') and p.name is None:
+                raise ValueError("non-named argument in declaration of %s" %
+                                 name)
         self.functions.append(Function(name, node))
 
 

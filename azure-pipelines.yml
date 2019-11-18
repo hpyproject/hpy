@@ -1,31 +1,69 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    py36:
-      python.version: '3.6'
-    py37:
-      python.version: '3.7'
+jobs:
+- job: LibraryTests
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: 'Main tests'
+  strategy:
+    matrix:
+      py36:
+        python.version: '3.6'
+      py37:
+        python.version: '3.7'
+      py38:
+        python.version: '3.8'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+  - script: |
+      python -m pip install --upgrade pip
+    displayName: 'Install dependencies'
 
-- script: |
-    python -m pip install --upgrade pip
-  displayName: 'Install dependencies'
+  - script: |
+      python -m pip install hpy-api/
+      python -m pip install .
+    displayName: 'Build project'
 
-- script: |
-    python -m pip install hpy-api/
-    python -m pip install .
-  displayName: 'Build project'
+  - script: |
+      pip install pytest pytest-azurepipelines
+      pytest --correct test/
+    displayName: 'pytest'
 
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest --correct test/
-  displayName: 'pytest'
+- job: ExampleTests
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: 'Test usage examples'
+  strategy:
+    matrix:
+      py36:
+        python.version: '3.6'
+      py37:
+        python.version: '3.7'
+      py38:
+        python.version: '3.8'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      proof-of-concept/build_wheel_nodeps.sh
+    displayName: 'Build pof wheel'
+
+  - script: |
+      python -m pip install proof-of-concept/dist/*.whl
+    displayName: 'Install pof'
+
+  - script: |
+      python -m pip install pytest pytest-azurepipelines
+    displayName: 'Install test dependencies'
+
+  - script: |
+      python -m pytest proof-of-concept/
+    displayName: 'Run pof tests'
