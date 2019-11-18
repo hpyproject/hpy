@@ -12,10 +12,6 @@ static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
      return ctx->ctx_Module_Create ( ctx, def ); 
 }
 
-static inline HPy HPyNone_Get(HPyContext ctx) {
-     return ctx->ctx_None_Get ( ctx ); 
-}
-
 static inline HPy HPy_Dup(HPyContext ctx, HPy h) {
      return ctx->ctx_Dup ( ctx, h ); 
 }

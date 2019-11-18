@@ -14,7 +14,6 @@ struct _HPyContext_s global_ctx = {
     .h_True = (HPy){CONSTANT_H_TRUE},
     .h_False = (HPy){CONSTANT_H_FALSE},
     .ctx_Module_Create = &ctx_Module_Create,
-    .ctx_None_Get = &ctx_None_Get,
     .ctx_Dup = &ctx_Dup,
     .ctx_Close = &ctx_Close,
     .ctx_Long_FromLong = &ctx_Long_FromLong,
