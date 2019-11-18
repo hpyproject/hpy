@@ -57,19 +57,23 @@ def expand_template(source_template, name):
     return '\n'.join(expanded_lines)
 
 
-class HPyLoader(ExtensionFileLoader):
-    def create_module(self, spec):
-        import hpy_universal
-        return hpy_universal.load_from_spec(spec)
+class Spec(object):
+    def __init__(self, name, origin):
+        self.name = name
+        self.origin = origin
+
 
 class ExtensionCompiler:
     def __init__(self, tmpdir, abimode, include_dir):
         self.tmpdir = tmpdir
         self.abimode = abimode
         self.include_dir = include_dir
+        self.universal_mode = self.abimode == 'universal'
 
-    def make_module(self, source_template, name):
-        universal_mode = self.abimode == 'universal'
+    def compile_module(self, source_template, name):
+        """
+        Create and compile a HPy module from the template
+        """
         source = expand_template(source_template, name)
         filename = self.tmpdir.join(name + '.c')
         filename.write(source)
@@ -78,24 +82,40 @@ class ExtensionCompiler:
                             include_dirs=[self.include_dir],
                             extra_compile_args=['-Wfatal-errors'])
         so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
-                                universal_mode=universal_mode)
-        #
-        if universal_mode:
-            loader = HPyLoader(name, so_filename)
-            spec = importlib.util.spec_from_loader(name, loader)
+                                universal_mode=self.universal_mode)
+        return so_filename
+
+    def make_module(self, source_template, name):
+        """
+        Compile&load a modulo into memory. This is NOT a proper import: e.g. the module
+        is not put into sys.modules
+        """
+        so_filename = self.compile_module(source_template, name)
+        if self.universal_mode:
+            # we've got an universal module, let's load it through
+            # hpy_universal
+            import hpy_universal
+            spec = Spec(name, so_filename)
+            return hpy_universal.load_from_spec(spec)
         else:
+            # we've got a normal CPython module compiled with the CPython
+            # API/ABI, let's load it normally
+            assert self.abimode == 'cpython'
             spec = importlib.util.spec_from_file_location(name, so_filename)
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[name] = module
-        spec.loader.exec_module(module)
-        return module
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
 
 
 @pytest.mark.usefixtures('initargs')
 class HPyTest:
     @pytest.fixture()
     def initargs(self, compiler):
+        # compiler is a fixture defined in conftest
         self.compiler = compiler
+
+    def compile_module(self, source_template, name):
+        return self.compiler.compile_module(source_template, name)
 
     def make_module(self, source_template, name='mytest'):
         return self.compiler.make_module(source_template, name)
