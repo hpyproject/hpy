@@ -1,18 +1,17 @@
 trigger:
 - master
 
-strategy:
-  matrix:
-    py36:
-      python.version: '3.6'
-    py37:
-      python.version: '3.7'
-
 jobs:
 - job: LibraryTests
   pool:
     vmImage: 'ubuntu-latest'
   displayName: 'Main tests'
+  strategy:
+    matrix:
+      py36:
+        python.version: '3.6'
+      py37:
+        python.version: '3.7'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -37,6 +36,12 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   displayName: 'Test usage examples'
+  strategy:
+    matrix:
+      py36:
+        python.version: '3.6'
+      py37:
+        python.version: '3.7'
   steps:
   - task: UsePythonVersion@0
     inputs:
