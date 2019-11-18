@@ -12,6 +12,8 @@ jobs:
         python.version: '3.6'
       py37:
         python.version: '3.7'
+      py38:
+        python.version: '3.8'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -42,6 +44,8 @@ jobs:
         python.version: '3.6'
       py37:
         python.version: '3.7'
+      py38:
+        python.version: '3.8'
   steps:
   - task: UsePythonVersion@0
     inputs:
