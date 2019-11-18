@@ -1,5 +1,11 @@
-import pytest
-import sys
+"""
+NOTE: this tests are also meant to be run as PyPy "applevel" tests.
+
+This means that global imports will NOT be visible inside the test
+functions. In particular, you have to "import pytest" inside the test in order
+to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
+"fake pytest module")
+"""
 from .support import HPyTest
 
 
@@ -69,6 +75,7 @@ class TestBasic(HPyTest):
         assert mod.f(45) == 90
 
     def test_wrong_number_of_arguments(self):
+        import pytest
         mod = self.make_module("""
             HPy_METH_NOARGS(f_noargs)
             static HPy f_noargs_impl(HPyContext ctx, HPy self)
