@@ -101,6 +101,9 @@ class Function:
         w('\n}')
         return ' '.join(parts)
 
+    def ctx_pypy_type(self):
+        return 'rffi.VOIDP'
+
 
 @attr.s
 class GlobalVar:
@@ -118,6 +121,9 @@ class GlobalVar:
 
     def trampoline_def(self):
         return None
+
+    def ctx_pypy_type(self):
+        return 'HPy'
 
 
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
@@ -199,7 +205,7 @@ class AutoGen:
         w("HPyContextS = rffi.CStruct('_HPyContext_s',")
         w("    ('ctx_version', rffi.INT_real),")
         for f in self.declarations:
-            w("    ('%s', rffi.VOIDP)," % f.ctx_name())
+            w("    ('%s', %s)," % (f.ctx_name(), f.ctx_pypy_type()))
         w("    hints={'eci': eci},")
         w(")")
         return '\n'.join(lines)
