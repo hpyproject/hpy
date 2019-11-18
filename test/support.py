@@ -71,7 +71,7 @@ class ExtensionCompiler:
     def make_module(self, source_template, name):
         universal_mode = self.abimode == 'universal'
         source = expand_template(source_template, name)
-        filename = self.tmpdir.join(f'{name}.c')
+        filename = self.tmpdir.join(name + '.c')
         filename.write(source)
         #
         ext = get_extension(str(filename), name,
