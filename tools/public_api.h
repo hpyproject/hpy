@@ -11,6 +11,7 @@ typedef int HPy_ssize_t;
 HPy h_None;
 HPy h_True;
 HPy h_False;
+HPy h_ValueError;
 
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);
@@ -23,6 +24,7 @@ int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
 HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
 
+void HPyErr_SetString(HPyContext ctx, HPy type, const char *message);
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);

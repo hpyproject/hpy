@@ -28,7 +28,8 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_NONE] = Py_None;
         new_handles[CONSTANT_H_FALSE] = Py_False;
         new_handles[CONSTANT_H_TRUE] = Py_True;
-        assert(CONSTANT__H_TOTAL == 4);
+        new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
+        assert(CONSTANT__H_TOTAL == 5);
     }
 
     PyMem_Free(all_handles);

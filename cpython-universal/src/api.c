@@ -197,4 +197,11 @@ ctx_Unicode_FromString(HPyContext ctx, const char *utf8)
 }
 
 
+static void
+ctx_Err_SetString(HPyContext ctx, HPy type, const char *message)
+{
+    PyErr_SetString(_h2py(type), message);
+}
+
+
 #include "autogen_ctx_def.h"
