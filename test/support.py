@@ -78,7 +78,7 @@ class ExtensionCompiler:
         #
         ext = get_extension(str(filename), name,
                             include_dirs=[self.include_dir],
-                            extra_compile_args=['-Wfatal-errors'])
+                            extra_compile_args=['-Wfatal-errors', '-g', '-Og'])
         so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
                                 universal_mode=self.universal_mode)
         return so_filename
