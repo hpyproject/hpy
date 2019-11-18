@@ -1,3 +1,5 @@
+pwd
+ls
 python -m virtualenv venv/builder
 PY_BUILDER="`pwd`/venv/builder/bin/python3"
 echo "Running with $PY_BUILDER"
