@@ -11,9 +11,6 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert type(mod) is types.ModuleType
-        assert mod.__loader__.name == 'mytest'
-        assert mod.__spec__.loader is mod.__loader__
-        assert mod.__file__
 
     def test_different_name(self):
         mod = self.make_module("""
