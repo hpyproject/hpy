@@ -32,8 +32,8 @@ static inline long HPyLong_AsLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsLong ( ctx, h ); 
 }
 
-static inline int HPyArg_ParseTuple(HPyContext ctx, HPy args, const char *fmt, ...) {
-     va_list _vl; va_start(_vl, fmt); int _res = ctx->ctx_Arg_ParseTuple ( ctx, args, fmt, _vl ); va_end(_vl); return _res; 
+static inline int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...) {
+     va_list _vl; va_start(_vl, fmt); int _res = ctx->ctx_Arg_Parse ( ctx, args, nargs, fmt, _vl ); va_end(_vl); return _res; 
 }
 
 static inline HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y) {
@@ -52,7 +52,7 @@ static inline struct _object *HPy_AsPyObject(HPyContext ctx, HPy h) {
      return ctx->ctx_AsPyObject ( ctx, h ); 
 }
 
-static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, HPyCFunction func) {
-     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, func ); 
+static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags) {
+     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, func, ml_flags ); 
 }
 
