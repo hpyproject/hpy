@@ -59,13 +59,13 @@ error:
 }
 
 
-static PyObject *load_from_spec(PyObject *self, PyObject *args)
+static PyObject *load_from_spec(PyObject *self, PyObject *spec)
 {
     PyObject *name_unicode, *name;
     PyObject *path = NULL;
     PyObject *pathbytes = NULL;
 
-    name_unicode = PyObject_GetAttrString(args, "name");
+    name_unicode = PyObject_GetAttrString(spec, "name");
     if (name_unicode == NULL) {
         return NULL;
     }
@@ -78,7 +78,7 @@ static PyObject *load_from_spec(PyObject *self, PyObject *args)
     PyOS_snprintf(init_name, sizeof(init_name), "%.20s_%.200s",
             prefix, shortname);
 
-    path = PyObject_GetAttrString(args, "origin");
+    path = PyObject_GetAttrString(spec, "origin");
     if (path == NULL)
         goto error;
     pathbytes = PyUnicode_EncodeFSDefault(path);
