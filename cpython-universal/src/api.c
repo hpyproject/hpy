@@ -78,13 +78,6 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
     return _py2h(result);
 }
 
-static HPy
-ctx_None_Get(HPyContext ctx)
-{
-    Py_INCREF(Py_None);
-    return _py2h(Py_None);
-}
-
 
 typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);
 typedef HPy (*HPyMeth_O)(HPyContext, HPy self, HPy arg);

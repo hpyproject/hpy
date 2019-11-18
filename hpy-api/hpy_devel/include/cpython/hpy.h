@@ -24,13 +24,7 @@
 
 
 typedef struct { PyObject *_o; } HPy;
-typedef long HPyContext;
 typedef Py_ssize_t HPy_ssize_t;
-
-HPyAPI_FUNC(HPyContext)
-_HPyGetContext(void) {
-    return 42;
-}
 
 /* For internal usage only. These should be #undef at the end of this header.
    If you need to convert HPy to PyObject* and vice-versa, you should use the
@@ -38,6 +32,24 @@ _HPyGetContext(void) {
 */
 #define _h2py(x) (x._o)
 #define _py2h(o) ((HPy){o})
+
+typedef struct _HPyContext_s {
+    HPy h_None;
+    HPy h_True;
+    HPy h_False;
+} *HPyContext;
+
+/* XXX! should be defined only once, not once for every .c! */
+static struct _HPyContext_s _global_ctx = {
+    .h_None = _py2h(Py_None),
+    .h_True = _py2h(Py_True),
+    .h_False = _py2h(Py_False),
+};
+
+HPyAPI_FUNC(HPyContext)
+_HPyGetContext(void) {
+    return &_global_ctx;
+}
 
 
 #define HPy_NULL ((HPy){NULL})

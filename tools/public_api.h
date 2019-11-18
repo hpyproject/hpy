@@ -8,8 +8,11 @@ typedef int HPy_ssize_t;
 
 /* HPy public API */
 
+HPy h_None;
+HPy h_True;
+HPy h_False;
+
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
-HPy HPyNone_Get(HPyContext ctx);
 HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);

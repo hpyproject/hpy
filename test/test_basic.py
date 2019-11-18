@@ -23,7 +23,7 @@ class TestBasic(HPyTest):
             HPy_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
-                return HPyNone_Get(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
             }
             @EXPORT f METH_NOARGS
             @INIT
@@ -73,12 +73,12 @@ class TestBasic(HPyTest):
             HPy_METH_NOARGS(f_noargs)
             static HPy f_noargs_impl(HPyContext ctx, HPy self)
             {
-                return HPyNone_Get(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
             }
             HPy_METH_O(f_o)
             static HPy f_o_impl(HPyContext ctx, HPy self, HPy arg)
             {
-                return HPyNone_Get(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
             }
             @EXPORT f_noargs METH_NOARGS
             @EXPORT f_o METH_O
@@ -137,3 +137,17 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f() == "foobar"
+
+    def test_bool(self):
+        mod = self.make_module("""
+            HPy_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                int cond = HPyLong_AsLong(ctx, arg) > 5;
+                return HPy_Dup(ctx, cond ? ctx->h_True : ctx->h_False);
+            }
+            @EXPORT f METH_O
+            @INIT
+        """)
+        assert mod.f(4) is False
+        assert mod.f(6) is True

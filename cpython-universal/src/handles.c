@@ -12,13 +12,23 @@ static Py_ssize_t h_free_list = -1;
 static void
 allocate_more_handles(void)
 {
-    Py_ssize_t i, allocate = (h_num_allocated / 2) * 3 + 32;
+    Py_ssize_t base = (h_num_allocated < CONSTANT_H__TOTAL ?
+                       CONSTANT_H__TOTAL : h_num_allocated);
+    Py_ssize_t i, allocate = (base / 2) * 3 + 32;
     PyObject **new_handles = PyMem_Malloc(sizeof(PyObject *) * allocate);
     memcpy(new_handles, all_handles, sizeof(PyObject *) * h_num_allocated);
 
-    for (i = allocate - 1; i >= h_num_allocated && i > 0; i--) {
+    for (i = allocate - 1; i >= base; i--) {
         new_handles[i] = (PyObject *)((h_free_list << 1) | 1);
         h_free_list = i;
+    }
+
+    if (h_num_allocated == 0) {
+        new_handles[CONSTANT_H_NULL] = NULL;
+        new_handles[CONSTANT_H_NONE] = Py_None;
+        new_handles[CONSTANT_H_FALSE] = Py_False;
+        new_handles[CONSTANT_H_TRUE] = Py_True;
+        assert(CONSTANT__H_TOTAL == 4);
     }
 
     PyMem_Free(all_handles);
