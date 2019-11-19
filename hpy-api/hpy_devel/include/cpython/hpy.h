@@ -131,6 +131,14 @@ typedef PyMethodDef HPyMethodDef;
     }
 
 
+/* XXX: this function is copied&pasted THREE times:
+ *     hpy_devel/include/hpy.h
+ *     cpython-universal/api.c
+ *     pypy/module/hpy_universal/src/getargs.c
+ *
+ * We need a way to share this kind of common code
+ */
+
 HPyAPI_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs, const char *fmt, ...)
 {

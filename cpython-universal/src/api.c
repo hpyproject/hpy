@@ -153,6 +153,14 @@ ctx_Long_AsLong(HPyContext ctx, HPy h)
     return PyLong_AsLong(_h2py(h));
 }
 
+/* XXX: this function is copied&pasted THREE times:
+ *     hpy_devel/include/hpy.h
+ *     cpython-universal/api.c
+ *     pypy/module/hpy_universal/src/getargs.c
+ *
+ * We need a way to share this kind of common code
+ */
+
 static int
 ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
               const char *fmt, va_list vl)
