@@ -103,3 +103,17 @@ class TestCPythonCompatibility(HPyTest):
             @INIT
         """)
         assert mod.f() == 0
+
+    def test_meth_cpy_noargs(self):
+        mod = self.make_module("""
+            #include <Python.h>
+
+            HPy_METH_CPY_NOARGS(f)
+            static PyObject *f_impl(PyObject *self, PyObject *args)
+            {
+                return PyLong_FromLong(1234);
+            }
+            @EXPORT f METH_CPY_NOARGS
+            @INIT
+        """)
+        assert mod.f() == 1234

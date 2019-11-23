@@ -105,6 +105,8 @@ typedef PyMethodDef HPyMethodDef;
 
 /* function declaration */
 
+#define METH_CPY_NOARGS METH_NOARGS
+
 #define HPy_METH_NOARGS(NAME)                                           \
     static HPy NAME##_impl(HPyContext, HPy);                            \
     static PyObject* NAME(PyObject *self, PyObject *noargs)             \
@@ -128,6 +130,14 @@ typedef PyMethodDef HPyMethodDef;
         HPy *items = (HPy *)&PyTuple_GET_ITEM(args, 0);                 \
         Py_ssize_t nargs = PyTuple_GET_SIZE(args);                      \
         return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self), items, nargs));\
+    }
+
+
+#define HPy_METH_CPY_NOARGS(NAME)                                       \
+    static PyObject* NAME##_impl(PyObject *self, PyObject *noargs);     \
+    static PyObject* NAME(PyObject *self, PyObject *noargs)             \
+    {                                                                   \
+        return NAME##_impl(self, noargs);                               \
     }
 
 
