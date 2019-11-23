@@ -149,3 +149,21 @@ class TestCPythonCompatibility(HPyTest):
             @INIT
         """)
         assert mod.f(4, 5, 6) == 456
+
+    def test_meth_cpy_keywords(self):
+        mod = self.make_module("""
+            #include <Python.h>
+
+            HPy_METH_CPY_VARARGS_KEYWORDS(f)
+            static PyObject *f_impl(PyObject *self, PyObject *args, PyObject *kwargs)
+            {
+                static char *kwlist[] = { "a", "b", "c", NULL };
+                long a, b, c;
+                if (!PyArg_ParseTupleAndKeywords(args, kwargs, "lll", kwlist, &a, &b, &c))
+                    return NULL;
+                return PyLong_FromLong(100*a + 10*b + c);
+            }
+            @EXPORT f METH_CPY_VARARGS_KEYWORDS
+            @INIT
+        """)
+        assert mod.f(c=6, b=5, a=4) == 456
