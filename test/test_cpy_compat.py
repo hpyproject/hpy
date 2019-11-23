@@ -117,3 +117,35 @@ class TestCPythonCompatibility(HPyTest):
             @INIT
         """)
         assert mod.f() == 1234
+
+    def test_meth_cpy_o(self):
+        mod = self.make_module("""
+            #include <Python.h>
+
+            HPy_METH_CPY_O(f)
+            static PyObject *f_impl(PyObject *self, PyObject *arg)
+            {
+                long x = PyLong_AsLong(arg);
+                return PyLong_FromLong(x * 2);
+            }
+            @EXPORT f METH_CPY_O
+            @INIT
+        """)
+        assert mod.f(45) == 90
+
+    def test_meth_cpy_varargs(self):
+        mod = self.make_module("""
+            #include <Python.h>
+
+            HPy_METH_CPY_VARARGS(f)
+            static PyObject *f_impl(PyObject *self, PyObject *args)
+            {
+                long a, b, c;
+                if (!PyArg_ParseTuple(args, "lll", &a, &b, &c))
+                    return NULL;
+                return PyLong_FromLong(100*a + 10*b + c);
+            }
+            @EXPORT f METH_CPY_VARARGS
+            @INIT
+        """)
+        assert mod.f(4, 5, 6) == 456

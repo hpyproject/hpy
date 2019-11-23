@@ -110,7 +110,8 @@ extern HPyContext _ctx_for_trampolines;
         *out_trampoline = fnname##_impl;                                       \
     }
 
-
+#define HPy_METH_CPY_O(NAME) HPy_METH_CPY_NOARGS(NAME)
+#define HPy_METH_CPY_VARARGS(NAME) HPy_METH_CPY_NOARGS(NAME)
 
 #define METH_VARARGS  0x0001
 #define METH_KEYWORDS 0x0002
@@ -121,5 +122,7 @@ extern HPyContext _ctx_for_trampolines;
 // make sure to use a bit which is unused by CPython
 #define _HPy_METH_CPY 0x100000
 #define METH_CPY_NOARGS (METH_NOARGS | _HPy_METH_CPY)
+#define METH_CPY_O (METH_O | _HPy_METH_CPY)
+#define METH_CPY_VARARGS (METH_VARARGS | _HPy_METH_CPY)
 
 #endif /* HPy_UNIVERSAL_H */

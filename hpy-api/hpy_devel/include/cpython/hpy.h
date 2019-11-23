@@ -106,6 +106,8 @@ typedef PyMethodDef HPyMethodDef;
 /* function declaration */
 
 #define METH_CPY_NOARGS METH_NOARGS
+#define METH_CPY_O METH_O
+#define METH_CPY_VARARGS METH_VARARGS
 
 #define HPy_METH_NOARGS(NAME)                                           \
     static HPy NAME##_impl(HPyContext, HPy);                            \
@@ -140,6 +142,8 @@ typedef PyMethodDef HPyMethodDef;
         return NAME##_impl(self, noargs);                               \
     }
 
+#define HPy_METH_CPY_O(NAME) HPy_METH_CPY_NOARGS(NAME)
+#define HPy_METH_CPY_VARARGS(NAME) HPy_METH_CPY_NOARGS(NAME)
 
 /* XXX: this function is copied&pasted THREE times:
  *     hpy_devel/include/hpy.h
