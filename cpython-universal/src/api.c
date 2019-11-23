@@ -41,7 +41,7 @@ create_method_defs(HPyModuleDef *hpydef)
         HPyMethodDef *src = &hpydef->m_methods[i];
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->ml_name;
-        dst->ml_flags = src->ml_flags;
+        dst->ml_flags = src->ml_flags & ~_HPy_METH_CPY;
         dst->ml_doc = src->ml_doc;
 
         void *impl_func;

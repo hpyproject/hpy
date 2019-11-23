@@ -99,11 +99,27 @@ extern HPyContext _ctx_for_trampolines;
         *out_trampoline = fnname##_trampoline;                                 \
     }
 
+
+#define HPy_METH_CPY_NOARGS(fnname)                                            \
+    static struct _object *                                                    \
+    fnname##_impl(struct _object *self, struct _object *noargs);               \
+    static void                                                                \
+    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
+    {                                                                          \
+        *out_func = NULL;                                                      \
+        *out_trampoline = fnname##_impl;                                       \
+    }
+
+
+
 #define METH_VARARGS  0x0001
 #define METH_KEYWORDS 0x0002
 /* METH_NOARGS and METH_O must not be combined with the flags above. */
 #define METH_NOARGS   0x0004
 #define METH_O        0x0008
 
+// make sure to use a bit which is unused by CPython
+#define _HPy_METH_CPY 0x100000
+#define METH_CPY_NOARGS (METH_NOARGS | _HPy_METH_CPY)
 
 #endif /* HPy_UNIVERSAL_H */
