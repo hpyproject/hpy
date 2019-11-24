@@ -108,8 +108,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
 
-            HPy_METH_CPY_NOARGS(f)
-            static PyObject *f_impl(PyObject *self, PyObject *args)
+            static PyObject *f(PyObject *self, PyObject *args)
             {
                 return PyLong_FromLong(1234);
             }
@@ -122,8 +121,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
 
-            HPy_METH_CPY_O(f)
-            static PyObject *f_impl(PyObject *self, PyObject *arg)
+            static PyObject *f(PyObject *self, PyObject *arg)
             {
                 long x = PyLong_AsLong(arg);
                 return PyLong_FromLong(x * 2);
@@ -137,8 +135,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
 
-            HPy_METH_CPY_VARARGS(f)
-            static PyObject *f_impl(PyObject *self, PyObject *args)
+            static PyObject *f(PyObject *self, PyObject *args)
             {
                 long a, b, c;
                 if (!PyArg_ParseTuple(args, "lll", &a, &b, &c))
@@ -154,8 +151,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
 
-            HPy_METH_CPY_VARARGS_KEYWORDS(f)
-            static PyObject *f_impl(PyObject *self, PyObject *args, PyObject *kwargs)
+            static PyObject *f(PyObject *self, PyObject *args, PyObject *kwargs)
             {
                 static char *kwlist[] = { "a", "b", "c", NULL };
                 long a, b, c;

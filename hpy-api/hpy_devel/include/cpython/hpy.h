@@ -136,24 +136,6 @@ typedef PyMethodDef HPyMethodDef;
     }
 
 
-#define HPy_METH_CPY_NOARGS(NAME)                                       \
-    static PyObject* NAME##_impl(PyObject *self, PyObject *noargs);     \
-    static PyObject* NAME(PyObject *self, PyObject *noargs)             \
-    {                                                                   \
-        return NAME##_impl(self, noargs);                               \
-    }
-
-#define HPy_METH_CPY_O(NAME) HPy_METH_CPY_NOARGS(NAME)
-#define HPy_METH_CPY_VARARGS(NAME) HPy_METH_CPY_NOARGS(NAME)
-
-#define HPy_METH_CPY_VARARGS_KEYWORDS(NAME)                                         \
-    static PyObject* NAME##_impl(PyObject *self, PyObject *args, PyObject *kwargs); \
-    static PyObject* NAME(PyObject *self, PyObject *args, PyObject *kwargs)         \
-    {                                                                               \
-        return NAME##_impl(self, args, kwargs);                                     \
-    }
-
-
 
 /* XXX: this function is copied&pasted THREE times:
  *     hpy_devel/include/hpy.h

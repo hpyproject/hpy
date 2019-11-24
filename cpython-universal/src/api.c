@@ -44,10 +44,19 @@ create_method_defs(HPyModuleDef *hpydef)
         dst->ml_flags = src->ml_flags & ~_HPy_METH_CPY;
         dst->ml_doc = src->ml_doc;
 
-        void *impl_func;
-        PyCFunction trampoline_func;
-        src->ml_meth(&impl_func, &trampoline_func);
-        dst->ml_meth = trampoline_func;
+        if (src->ml_flags & _HPy_METH_CPY) {
+            // this is a legacy function: ml_meth already contains a function
+            // pointer with the correct CPython signature
+            dst->ml_meth = (PyCFunction)src->ml_meth;
+        }
+        else {
+            // HPy function: cal ml_meth to get pointers to the impl_func and
+            // the cpy trampoline
+            void *impl_func;
+            PyCFunction trampoline_func;
+            src->ml_meth(&impl_func, &trampoline_func);
+            dst->ml_meth = trampoline_func;
+        }
     }
     result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
