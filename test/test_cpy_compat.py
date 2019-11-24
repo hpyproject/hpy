@@ -6,7 +6,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_frompyobject(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -20,7 +20,7 @@ class TestCPythonCompatibility(HPyTest):
                 Py_DECREF(o);
                 return h;
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         x = mod.f()
@@ -29,7 +29,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_hpy_close(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -43,7 +43,7 @@ class TestCPythonCompatibility(HPyTest):
                 return HPyLong_FromLong(ctx, (long)(final_refcount -
                                                     initial_refcount));
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         assert mod.f() == -1
@@ -51,7 +51,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_hpy_dup(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -67,7 +67,7 @@ class TestCPythonCompatibility(HPyTest):
                 return HPyLong_FromLong(ctx, (long)(final_refcount -
                                                     initial_refcount));
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         assert mod.f() == +1
@@ -77,7 +77,7 @@ class TestCPythonCompatibility(HPyTest):
             #include <Python.h>
             #define NUM_HANDLES  10000
 
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -99,7 +99,7 @@ class TestCPythonCompatibility(HPyTest):
              error:
                 return HPyLong_FromLong(ctx, (long)result);
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         assert mod.f() == 0
@@ -112,7 +112,7 @@ class TestCPythonCompatibility(HPyTest):
             {
                 return PyLong_FromLong(1234);
             }
-            @EXPORT f METH_CPY_NOARGS
+            @EXPORT f METH_NOARGS
             @INIT
         """)
         assert mod.f() == 1234
@@ -126,7 +126,7 @@ class TestCPythonCompatibility(HPyTest):
                 long x = PyLong_AsLong(arg);
                 return PyLong_FromLong(x * 2);
             }
-            @EXPORT f METH_CPY_O
+            @EXPORT f METH_O
             @INIT
         """)
         assert mod.f(45) == 90
@@ -142,7 +142,7 @@ class TestCPythonCompatibility(HPyTest):
                     return NULL;
                 return PyLong_FromLong(100*a + 10*b + c);
             }
-            @EXPORT f METH_CPY_VARARGS
+            @EXPORT f METH_VARARGS
             @INIT
         """)
         assert mod.f(4, 5, 6) == 456
@@ -159,7 +159,7 @@ class TestCPythonCompatibility(HPyTest):
                     return NULL;
                 return PyLong_FromLong(100*a + 10*b + c);
             }
-            @EXPORT f METH_CPY_VARARGS_KEYWORDS
+            @EXPORT f METH_VARARGS | METH_KEYWORDS
             @INIT
         """)
         assert mod.f(c=6, b=5, a=4) == 456

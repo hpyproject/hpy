@@ -3,7 +3,7 @@ import pytest
 import re
 
 r_marker_init = re.compile(r"\s*@INIT\s*$")
-r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(METH_\w+)\s*$")
+r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(.*)\s*$")
 
 INIT_TEMPLATE = """
 static HPyMethodDef MyTestMethods[] = {

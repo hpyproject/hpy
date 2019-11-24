@@ -41,21 +41,22 @@ create_method_defs(HPyModuleDef *hpydef)
         HPyMethodDef *src = &hpydef->m_methods[i];
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->ml_name;
-        dst->ml_flags = src->ml_flags & ~_HPy_METH_CPY;
         dst->ml_doc = src->ml_doc;
 
-        if (src->ml_flags & _HPy_METH_CPY) {
-            // this is a legacy function: ml_meth already contains a function
-            // pointer with the correct CPython signature
-            dst->ml_meth = (PyCFunction)src->ml_meth;
-        }
-        else {
+        if (src->ml_flags & _HPy_METH) {
             // HPy function: cal ml_meth to get pointers to the impl_func and
             // the cpy trampoline
             void *impl_func;
             PyCFunction trampoline_func;
             src->ml_meth(&impl_func, &trampoline_func);
             dst->ml_meth = trampoline_func;
+            dst->ml_flags = src->ml_flags & ~_HPy_METH;
+        }
+        else {
+            // legacy function: ml_meth already contains a function pointer
+            // with the correct CPython signature
+            dst->ml_meth = (PyCFunction)src->ml_meth;
+            dst->ml_flags = src->ml_flags;
         }
     }
     result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
@@ -98,15 +99,15 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
 {
     switch (ml_flags)
     {
-    case METH_NOARGS: {
+    case HPy_METH_NOARGS: {
         HPyMeth_NoArgs f = (HPyMeth_NoArgs)func;
         return _h2py(f(ctx, _py2h(self)));
     }
-    case METH_O: {
+    case HPy_METH_O: {
         HPyMeth_O f = (HPyMeth_O)func;
         return _h2py(f(ctx, _py2h(self), _py2h(args)));
     }
-    case METH_VARARGS: {
+    case HPy_METH_VARARGS: {
         HPyMeth_VarArgs f = (HPyMeth_VarArgs)func;
         Py_ssize_t nargs = PyTuple_GET_SIZE(args);
         HPy *h_args = alloca(nargs * sizeof(HPy));

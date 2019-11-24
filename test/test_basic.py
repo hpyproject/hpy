@@ -26,36 +26,36 @@ class TestBasic(HPyTest):
 
     def test_noop_function(self):
         mod = self.make_module("""
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         assert mod.f() is None
 
     def test_self_is_module(self):
         mod = self.make_module("""
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, self);
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         assert mod.f() is mod
 
     def test_identity_function(self):
         mod = self.make_module("""
-            HPy_METH_O(f)
+            HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, arg);
             }
-            @EXPORT f METH_O
+            @EXPORT f HPy_METH_O
             @INIT
         """)
         x = object()
@@ -63,13 +63,13 @@ class TestBasic(HPyTest):
 
     def test_long_aslong(self):
         mod = self.make_module("""
-            HPy_METH_O(f)
+            HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long a = HPyLong_AsLong(ctx, arg);
                 return HPyLong_FromLong(ctx, a * 2);
             }
-            @EXPORT f METH_O
+            @EXPORT f HPy_METH_O
             @INIT
         """)
         assert mod.f(45) == 90
@@ -77,18 +77,18 @@ class TestBasic(HPyTest):
     def test_wrong_number_of_arguments(self):
         import pytest
         mod = self.make_module("""
-            HPy_METH_NOARGS(f_noargs)
+            HPy_DEF_METH_NOARGS(f_noargs)
             static HPy f_noargs_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            HPy_METH_O(f_o)
+            HPy_DEF_METH_O(f_o)
             static HPy f_o_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f_noargs METH_NOARGS
-            @EXPORT f_o METH_O
+            @EXPORT f_noargs HPy_METH_NOARGS
+            @EXPORT f_o HPy_METH_O
             @INIT
         """)
         with pytest.raises(TypeError):
@@ -100,7 +100,7 @@ class TestBasic(HPyTest):
 
     def test_many_int_arguments(self):
         mod = self.make_module("""
-            HPy_METH_VARARGS(f)
+            HPy_DEF_METH_VARARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -111,14 +111,14 @@ class TestBasic(HPyTest):
                 return HPyLong_FromLong(ctx,
                     10000*a + 1000*b + 100*c + 10*d + e);
             }
-            @EXPORT f METH_VARARGS
+            @EXPORT f HPy_METH_VARARGS
             @INIT
         """)
         assert mod.f(4, 5, 6, 7, 8) == 45678
 
     def test_close(self):
         mod = self.make_module("""
-            HPy_METH_O(f)
+            HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy one = HPyLong_FromLong(ctx, 1);
@@ -128,32 +128,32 @@ class TestBasic(HPyTest):
                 HPy_Close(ctx, one);
                 return res;
             }
-            @EXPORT f METH_O
+            @EXPORT f HPy_METH_O
             @INIT
         """)
         assert mod.f(41.5) == 42.5
 
     def test_string(self):
         mod = self.make_module("""
-            HPy_METH_NOARGS(f)
+            HPy_DEF_METH_NOARGS(f)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "foobar");
             }
-            @EXPORT f METH_NOARGS
+            @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
         assert mod.f() == "foobar"
 
     def test_bool(self):
         mod = self.make_module("""
-            HPy_METH_O(f)
+            HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int cond = HPyLong_AsLong(ctx, arg) > 5;
                 return HPy_Dup(ctx, cond ? ctx->h_True : ctx->h_False);
             }
-            @EXPORT f METH_O
+            @EXPORT f HPy_METH_O
             @INIT
         """)
         assert mod.f(4) is False
@@ -162,7 +162,7 @@ class TestBasic(HPyTest):
     def test_exception(self):
         import pytest
         mod = self.make_module("""
-            HPy_METH_O(f)
+            HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long x = HPyLong_AsLong(ctx, arg);
@@ -174,7 +174,7 @@ class TestBasic(HPyTest):
                     return HPy_NULL;
                 }
             }
-            @EXPORT f METH_O
+            @EXPORT f HPy_METH_O
             @INIT
         """)
         assert mod.f(-10) == 10

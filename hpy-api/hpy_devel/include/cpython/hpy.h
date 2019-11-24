@@ -104,27 +104,21 @@ typedef PyMethodDef HPyMethodDef;
 
 
 /* function declaration */
-
-#define METH_CPY_NOARGS METH_NOARGS
-#define METH_CPY_O METH_O
-#define METH_CPY_VARARGS METH_VARARGS
-#define METH_CPY_VARARGS_KEYWORDS (METH_VARARGS | METH_KEYWORDS)
-
-#define HPy_METH_NOARGS(NAME)                                           \
+#define HPy_DEF_METH_NOARGS(NAME)                                       \
     static HPy NAME##_impl(HPyContext, HPy);                            \
     static PyObject* NAME(PyObject *self, PyObject *noargs)             \
     {                                                                   \
         return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self)));       \
     }
 
-#define HPy_METH_O(NAME)                                                \
+#define HPy_DEF_METH_O(NAME)                                            \
     static HPy NAME##_impl(HPyContext, HPy, HPy);                       \
     static PyObject* NAME(PyObject *self, PyObject *arg)                \
     {                                                                   \
         return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self), _py2h(arg)));\
     }
 
-#define HPy_METH_VARARGS(NAME)                                          \
+#define HPy_DEF_METH_VARARGS(NAME)                                      \
     static HPy NAME##_impl(HPyContext, HPy, HPy *, Py_ssize_t);         \
     static PyObject* NAME(PyObject *self, PyObject *args)               \
     {                                                                   \
@@ -135,6 +129,9 @@ typedef PyMethodDef HPyMethodDef;
         return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self), items, nargs));\
     }
 
+#define HPy_METH_NOARGS METH_NOARGS
+#define HPy_METH_O METH_O
+#define HPy_METH_VARARGS METH_VARARGS
 
 
 /* XXX: this function is copied&pasted THREE times:
