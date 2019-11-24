@@ -1,18 +1,18 @@
 #include "hpy.h"
 
-HPy_METH_NOARGS(do_nothing)
+HPy_DEF_METH_NOARGS(do_nothing)
 static HPy do_nothing_impl(HPyContext ctx, HPy self)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
-HPy_METH_O(double_obj)
+HPy_DEF_METH_O(double_obj)
 static HPy double_obj_impl(HPyContext ctx, HPy self, HPy obj)
 {
     return HPyNumber_Add(ctx, obj, obj);
 }
 
-HPy_METH_VARARGS(add_ints)
+HPy_DEF_METH_VARARGS(add_ints)
 static HPy add_ints_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     long a, b;
@@ -23,9 +23,9 @@ static HPy add_ints_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 
 
 static HPyMethodDef PofMethods[] = {
-    {"do_nothing", do_nothing, METH_NOARGS, ""},
-    {"double", double_obj, METH_O, ""},
-    {"add_ints", add_ints, METH_VARARGS, ""},
+    {"do_nothing", do_nothing, HPy_METH_NOARGS, ""},
+    {"double", double_obj, HPy_METH_O, ""},
+    {"add_ints", add_ints, HPy_METH_VARARGS, ""},
     {NULL, NULL, 0, NULL}
 };
 
