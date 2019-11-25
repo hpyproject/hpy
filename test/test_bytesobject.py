@@ -2,7 +2,7 @@ from .support import HPyTest
 
 class TestBytesObject(HPyTest):
 
-    def test_Bytes_Check(self):
+    def test_Check(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
@@ -17,7 +17,7 @@ class TestBytesObject(HPyTest):
         assert mod.f(b'hello') is True
         assert mod.f('hello') is False
 
-    def test_Bytes_Size(self):
+    def test_Size(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
@@ -31,7 +31,7 @@ class TestBytesObject(HPyTest):
         """)
         assert mod.f(b'hello') == 55
 
-    def test_Bytes_AsString(self):
+    def test_AsString(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
@@ -48,7 +48,7 @@ class TestBytesObject(HPyTest):
         """)
         assert mod.f(b'ABC') == 100*ord('A') + 10*ord('B') + ord('C')
 
-    def test_Bytes_AS_STRING(self):
+    def test_AS_STRING(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
