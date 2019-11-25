@@ -44,6 +44,10 @@ static inline void HPyErr_SetString(HPyContext ctx, HPy type, const char *messag
      ctx->ctx_Err_SetString ( ctx, type, message ); 
 }
 
+static inline int HPyBytes_Check(HPyContext ctx, HPy o) {
+     return ctx->ctx_Bytes_Check ( ctx, o ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }

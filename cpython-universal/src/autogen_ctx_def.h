@@ -23,6 +23,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Number_Add = &ctx_Number_Add,
     .ctx_Unicode_FromString = &ctx_Unicode_FromString,
     .ctx_Err_SetString = &ctx_Err_SetString,
+    .ctx_Bytes_Check = &ctx_Bytes_Check,
     .ctx_FromPyObject = &ctx_FromPyObject,
     .ctx_AsPyObject = &ctx_AsPyObject,
     .ctx_CallRealFunctionFromTrampoline = &ctx_CallRealFunctionFromTrampoline,

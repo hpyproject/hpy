@@ -221,5 +221,10 @@ ctx_Err_SetString(HPyContext ctx, HPy type, const char *message)
     PyErr_SetString(_h2py(type), message);
 }
 
+static int
+ctx_Bytes_Check(HPyContext ctx, HPy o)
+{
+    return PyBytes_Check(_h2py(o));
+}
 
 #include "autogen_ctx_def.h"

@@ -23,6 +23,7 @@ struct _HPyContext_s {
     HPy (*ctx_Number_Add)(HPyContext ctx, HPy x, HPy y);
     HPy (*ctx_Unicode_FromString)(HPyContext ctx, const char *utf8);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy type, const char *message);
+    int (*ctx_Bytes_Check)(HPyContext ctx, HPy o);
     HPy (*ctx_FromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
     struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags);

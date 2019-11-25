@@ -26,6 +26,10 @@ HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
 
 void HPyErr_SetString(HPyContext ctx, HPy type, const char *message);
 
+/* bytesobject.h */
+int HPyBytes_Check(HPyContext ctx, HPy o);
+
+
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);
 struct _object *HPy_AsPyObject(HPyContext ctx, HPy h);

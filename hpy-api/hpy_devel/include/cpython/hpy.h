@@ -233,5 +233,11 @@ HPyErr_SetString(HPyContext ctx, HPy type, const char *message)
     PyErr_SetString(_h2py(type), message);
 }
 
+/* bytesobject.h */
+HPyAPI_FUNC(int)
+HPyBytes_Check(HPyContext ctx, HPy o)
+{
+    return PyBytes_Check(_h2py(o));
+}
 
 #endif /* !HPy_CPYTHON_H */
