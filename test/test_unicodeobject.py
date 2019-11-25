@@ -4,7 +4,7 @@ from .support import HPyTest
 
 class TestUnicodeObject(HPyTest):
 
-    def test_Unicode_Check(self):
+    def test_Check(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
@@ -19,7 +19,19 @@ class TestUnicodeObject(HPyTest):
         assert mod.f('hello') is True
         assert mod.f(b'hello') is False
 
-    def test_Unicode_AsUTF8String(self):
+    def test_FromString(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                return HPyUnicode_FromString(ctx, "foobar");
+            }
+            @EXPORT f HPy_METH_NOARGS
+            @INIT
+        """)
+        assert mod.f() == "foobar"
+
+    def test_AsUTF8String(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)

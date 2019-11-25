@@ -133,18 +133,6 @@ class TestBasic(HPyTest):
         """)
         assert mod.f(41.5) == 42.5
 
-    def test_string(self):
-        mod = self.make_module("""
-            HPy_DEF_METH_NOARGS(f)
-            static HPy f_impl(HPyContext ctx, HPy self)
-            {
-                return HPyUnicode_FromString(ctx, "foobar");
-            }
-            @EXPORT f HPy_METH_NOARGS
-            @INIT
-        """)
-        assert mod.f() == "foobar"
-
     def test_bool(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
