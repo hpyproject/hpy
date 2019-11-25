@@ -36,10 +36,6 @@ static inline HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y) {
      return ctx->ctx_Number_Add ( ctx, x, y ); 
 }
 
-static inline HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8) {
-     return ctx->ctx_Unicode_FromString ( ctx, utf8 ); 
-}
-
 static inline void HPyErr_SetString(HPyContext ctx, HPy type, const char *message) {
      ctx->ctx_Err_SetString ( ctx, type, message ); 
 }
@@ -62,6 +58,18 @@ static inline char *HPyBytes_AsString(HPyContext ctx, HPy o) {
 
 static inline char *HPyBytes_AS_STRING(HPyContext ctx, HPy o) {
      return ctx->ctx_Bytes_AS_STRING ( ctx, o ); 
+}
+
+static inline HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8) {
+     return ctx->ctx_Unicode_FromString ( ctx, utf8 ); 
+}
+
+static inline int HPyUnicode_Check(HPyContext ctx, HPy o) {
+     return ctx->ctx_Unicode_Check ( ctx, o ); 
+}
+
+static inline HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy o) {
+     return ctx->ctx_Unicode_AsUTF8String ( ctx, o ); 
 }
 
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {

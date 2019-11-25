@@ -22,7 +22,6 @@ long HPyLong_AsLong(HPyContext ctx, HPy h);
 int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
                  const char *fmt, ...);
 HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
-HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
 
 void HPyErr_SetString(HPyContext ctx, HPy type, const char *message);
 
@@ -33,6 +32,10 @@ HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy o);
 char* HPyBytes_AsString(HPyContext ctx, HPy o);
 char* HPyBytes_AS_STRING(HPyContext ctx, HPy o);
 
+/* unicodeobject.h */
+HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
+int HPyUnicode_Check(HPyContext ctx, HPy o);
+HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy o);
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);

@@ -21,13 +21,15 @@ struct _HPyContext_s {
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
     int (*ctx_Arg_Parse)(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, va_list _vl);
     HPy (*ctx_Number_Add)(HPyContext ctx, HPy x, HPy y);
-    HPy (*ctx_Unicode_FromString)(HPyContext ctx, const char *utf8);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy type, const char *message);
     int (*ctx_Bytes_Check)(HPyContext ctx, HPy o);
     HPy_ssize_t (*ctx_Bytes_Size)(HPyContext ctx, HPy o);
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext ctx, HPy o);
     char *(*ctx_Bytes_AsString)(HPyContext ctx, HPy o);
     char *(*ctx_Bytes_AS_STRING)(HPyContext ctx, HPy o);
+    HPy (*ctx_Unicode_FromString)(HPyContext ctx, const char *utf8);
+    int (*ctx_Unicode_Check)(HPyContext ctx, HPy o);
+    HPy (*ctx_Unicode_AsUTF8String)(HPyContext ctx, HPy o);
     HPy (*ctx_FromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
     struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags);

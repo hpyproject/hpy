@@ -214,6 +214,18 @@ ctx_Unicode_FromString(HPyContext ctx, const char *utf8)
     return _py2h(PyUnicode_FromString(utf8));
 }
 
+static int
+ctx_Unicode_Check(HPyContext ctx, HPy o)
+{
+    return PyUnicode_Check(_h2py(o));
+}
+
+static HPy
+ctx_Unicode_AsUTF8String(HPyContext ctx, HPy o)
+{
+    return _py2h(PyUnicode_AsUTF8String(_h2py(o)));
+}
+
 
 static void
 ctx_Err_SetString(HPyContext ctx, HPy type, const char *message)
