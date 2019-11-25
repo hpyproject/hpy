@@ -28,6 +28,10 @@ void HPyErr_SetString(HPyContext ctx, HPy type, const char *message);
 
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy o);
+HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy o);
+HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy o);
+char* HPyBytes_AsString(HPyContext ctx, HPy o);
+char* HPyBytes_AS_STRING(HPyContext ctx, HPy o);
 
 
 /* integration with the old CPython API */

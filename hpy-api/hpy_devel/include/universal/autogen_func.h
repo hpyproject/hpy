@@ -48,6 +48,22 @@ static inline int HPyBytes_Check(HPyContext ctx, HPy o) {
      return ctx->ctx_Bytes_Check ( ctx, o ); 
 }
 
+static inline HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy o) {
+     return ctx->ctx_Bytes_Size ( ctx, o ); 
+}
+
+static inline HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy o) {
+     return ctx->ctx_Bytes_GET_SIZE ( ctx, o ); 
+}
+
+static inline char *HPyBytes_AsString(HPyContext ctx, HPy o) {
+     return ctx->ctx_Bytes_AsString ( ctx, o ); 
+}
+
+static inline char *HPyBytes_AS_STRING(HPyContext ctx, HPy o) {
+     return ctx->ctx_Bytes_AS_STRING ( ctx, o ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }

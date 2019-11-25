@@ -227,4 +227,29 @@ ctx_Bytes_Check(HPyContext ctx, HPy o)
     return PyBytes_Check(_h2py(o));
 }
 
+static HPy_ssize_t
+ctx_Bytes_Size(HPyContext ctx, HPy o)
+{
+    return PyBytes_Size(_h2py(o));
+}
+
+static HPy_ssize_t
+ctx_Bytes_GET_SIZE(HPyContext ctx, HPy o)
+{
+    return PyBytes_GET_SIZE(_h2py(o));
+}
+
+static char*
+ctx_Bytes_AsString(HPyContext ctx, HPy o)
+{
+    return PyBytes_AsString(_h2py(o));
+}
+
+static char*
+ctx_Bytes_AS_STRING(HPyContext ctx, HPy o)
+{
+    return PyBytes_AS_STRING(_h2py(o));
+}
+
+
 #include "autogen_ctx_def.h"

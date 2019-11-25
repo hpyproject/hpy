@@ -240,4 +240,29 @@ HPyBytes_Check(HPyContext ctx, HPy o)
     return PyBytes_Check(_h2py(o));
 }
 
+HPyAPI_FUNC(HPy_ssize_t)
+HPyBytes_Size(HPyContext ctx, HPy o)
+{
+    return PyBytes_Size(_h2py(o));
+}
+
+HPyAPI_FUNC(HPy_ssize_t)
+HPyBytes_GET_SIZE(HPyContext ctx, HPy o)
+{
+    return PyBytes_GET_SIZE(_h2py(o));
+}
+
+HPyAPI_FUNC(char*)
+HPyBytes_AsString(HPyContext ctx, HPy o)
+{
+    return PyBytes_AsString(_h2py(o));
+}
+
+HPyAPI_FUNC(char*)
+HPyBytes_AS_STRING(HPyContext ctx, HPy o)
+{
+    return PyBytes_AS_STRING(_h2py(o));
+}
+
+
 #endif /* !HPy_CPYTHON_H */
