@@ -84,6 +84,11 @@ HPy_Close(HPyContext ctx, HPy handle)
 
 /* moduleobject.h */
 typedef PyModuleDef HPyModuleDef;
+
+// this is the type of the field HPyMethodDef.ml_meth: cast to it to silence
+// warnings
+typedef PyCFunction HPyMeth;
+
 #define HPyModuleDef_HEAD_INIT PyModuleDef_HEAD_INIT
 
 HPyAPI_FUNC(HPy)

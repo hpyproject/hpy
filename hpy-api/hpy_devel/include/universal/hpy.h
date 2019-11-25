@@ -16,8 +16,7 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(x) ((x)._i == 0)
 
-typedef void (*_HPyMethodPairFunc)(void **out_func,
-                                   _HPy_CPyCFunction *out_trampoline);
+typedef void (*HPyMeth)(void **out_func, _HPy_CPyCFunction *out_trampoline);
 
 /* ml_flags can be:
  *
@@ -29,7 +28,7 @@ typedef void (*_HPyMethodPairFunc)(void **out_func,
  */
 typedef struct {
     const char   *ml_name;   /* The name of the built-in function/method */
-    _HPyMethodPairFunc ml_meth;   /* see HPy_FUNCTION() */
+    HPyMeth      ml_meth;    /* see HPy_DEF_METH_*() */
     int          ml_flags;   /* Combination of METH_xxx flags, which mostly
                                 describe the args expected by the C func */
     const char   *ml_doc;    /* The __doc__ attribute, or NULL */

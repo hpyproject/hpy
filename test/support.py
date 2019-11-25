@@ -47,8 +47,14 @@ def expand_template(source_template, name):
         match = r_marker_export.match(line)
         if match:
             ml_name, ml_flags = match.group(1), match.group(2)
-            method_table.append('{"%s", %s, %s, NULL},' % (
-                ml_name, ml_name, ml_flags))
+            if not ml_flags.startswith('HPy_'):
+                # this is a legacy function: add a cast to (HPyMeth) to
+                # silence warnings
+                cast = '(HPyMeth)'
+            else:
+                cast = ''
+            method_table.append('{"%s", %s%s, %s, NULL},' % (
+                    ml_name, cast, ml_name, ml_flags))
             continue
 
         expanded_lines.append(line)
