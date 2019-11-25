@@ -60,7 +60,15 @@ typedef struct {
 
 extern HPyContext _ctx_for_trampolines;
 
+/* METH declaration */
+#define HPy_DECL_METH_NOARGS(fnname)                                    \
+    void fnname(void **out_func, _HPy_CPyCFunction *out_trampoline);
 
+#define HPy_DECL_METH_O(NAME) HPy_DECL_METH_NOARGS(NAME)
+#define HPy_DECL_METH_VARARGS(NAME) HPy_DECL_METH_NOARGS(NAME)
+
+
+/* METH definition */
 #define HPy_DEF_METH_NOARGS(fnname)                                            \
     static HPy fnname##_impl(HPyContext ctx, HPy self);                        \
     static struct _object *                                                    \
@@ -69,7 +77,7 @@ extern HPyContext _ctx_for_trampolines;
         return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, NULL, fnname##_impl, HPy_METH_NOARGS); \
     }                                                                          \
-    static void                                                                \
+    void                                                                       \
     fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
@@ -84,7 +92,7 @@ extern HPyContext _ctx_for_trampolines;
         return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, arg, fnname##_impl, HPy_METH_O);       \
     }                                                                          \
-    static void                                                                \
+    void                                                                       \
     fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
@@ -99,7 +107,7 @@ extern HPyContext _ctx_for_trampolines;
         return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, args, fnname##_impl, HPy_METH_VARARGS);\
     }                                                                          \
-    static void                                                                \
+    void                                                                       \
     fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
     {                                                                          \
         *out_func = fnname##_impl;                                             \

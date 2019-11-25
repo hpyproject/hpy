@@ -107,25 +107,32 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
 /* methodobject.h */
 typedef PyMethodDef HPyMethodDef;
 
+// XXX: we need to find a way to let the user declare things as static if
+// he/she wants
 
-/* function declaration */
+/* METH declaration */
+#define HPy_DECL_METH_NOARGS(NAME) PyObject* NAME(PyObject *, PyObject *);
+#define HPy_DECL_METH_O(NAME) HPy_DECL_METH_NOARGS(NAME)
+#define HPy_DECL_METH_VARARGS(NAME) HPy_DECL_METH_NOARGS(NAME)
+
+/* METH definition */
 #define HPy_DEF_METH_NOARGS(NAME)                                       \
     static HPy NAME##_impl(HPyContext, HPy);                            \
-    static PyObject* NAME(PyObject *self, PyObject *noargs)             \
+    PyObject* NAME(PyObject *self, PyObject *noargs)                    \
     {                                                                   \
         return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self)));       \
     }
 
 #define HPy_DEF_METH_O(NAME)                                            \
     static HPy NAME##_impl(HPyContext, HPy, HPy);                       \
-    static PyObject* NAME(PyObject *self, PyObject *arg)                \
+    PyObject* NAME(PyObject *self, PyObject *arg)                       \
     {                                                                   \
         return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self), _py2h(arg)));\
     }
 
 #define HPy_DEF_METH_VARARGS(NAME)                                      \
     static HPy NAME##_impl(HPyContext, HPy, HPy *, Py_ssize_t);         \
-    static PyObject* NAME(PyObject *self, PyObject *args)               \
+    PyObject* NAME(PyObject *self, PyObject *args)                      \
     {                                                                   \
         /* get the tuple elements as an array of "PyObject *", which */ \
         /* is equivalent to an array of "HPy" with enough casting... */ \

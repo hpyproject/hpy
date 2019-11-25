@@ -74,15 +74,24 @@ class ExtensionCompiler:
         self.include_dir = include_dir
         self.universal_mode = self.abimode == 'universal'
 
-    def compile_module(self, source_template, name):
+    def _expand(self, name, template):
+        source = expand_template(template, name)
+        filename = self.tmpdir.join(name + '.c')
+        filename.write(source)
+        return filename
+
+    def compile_module(self, main_template, name, extra_templates):
         """
         Create and compile a HPy module from the template
         """
-        source = expand_template(source_template, name)
-        filename = self.tmpdir.join(name + '.c')
-        filename.write(source)
+        filename = self._expand(name, main_template)
+        sources = []
+        for i, template in enumerate(extra_templates):
+            extra_filename = self._expand('extmod_%d' % i, template)
+            sources.append(extra_filename)
         #
         ext = get_extension(str(filename), name,
+                            sources=sources,
                             include_dirs=[self.include_dir],
                             extra_compile_args=['-Wfatal-errors', '-g', '-Og'],
                             extra_link_args=['-g'])
@@ -90,12 +99,12 @@ class ExtensionCompiler:
                                 universal_mode=self.universal_mode)
         return so_filename
 
-    def make_module(self, source_template, name):
+    def make_module(self, main_template, name, extra_templates):
         """
         Compile&load a modulo into memory. This is NOT a proper import: e.g. the module
         is not put into sys.modules
         """
-        so_filename = self.compile_module(source_template, name)
+        so_filename = self.compile_module(main_template, name, extra_templates)
         if self.universal_mode:
             return self.load_universal_module(name, so_filename)
         else:
@@ -128,11 +137,8 @@ class HPyTest:
         # compiler is a fixture defined in conftest
         self.compiler = compiler
 
-    def compile_module(self, source_template, name):
-        return self.compiler.compile_module(source_template, name)
-
-    def make_module(self, source_template, name='mytest'):
-        return self.compiler.make_module(source_template, name)
+    def make_module(self, source_template, name='mytest', extra_templates=()):
+        return self.compiler.make_module(source_template, name, extra_templates)
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py

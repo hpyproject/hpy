@@ -181,3 +181,39 @@ class TestBasic(HPyTest):
         with pytest.raises(ValueError) as exc:
             mod.f(20)
         assert str(exc.value) == 'hello world'
+
+    def test_decl_meth(self):
+        main = """
+            HPy_DECL_METH_NOARGS(f);
+            HPy_DECL_METH_O(g);
+            HPy_DECL_METH_VARARGS(h);
+
+            @EXPORT f HPy_METH_NOARGS
+            @EXPORT g HPy_METH_O
+            @EXPORT h HPy_METH_VARARGS
+            @INIT
+        """
+        extra = """
+            HPy_DEF_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, 12345);
+            }
+            HPy_DEF_METH_O(g)
+            static HPy g_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Dup(ctx, arg);
+            }
+            HPy_DEF_METH_VARARGS(h)
+            static HPy h_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                long a, b;
+                if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx, 10*a + b);
+            }
+        """
+        mod = self.make_module(main, extra_templates=[extra])
+        assert mod.f() == 12345
+        assert mod.g(42) == 42
+        assert mod.h(5, 6) == 56
