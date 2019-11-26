@@ -68,11 +68,12 @@ class Spec(object):
 
 
 class ExtensionCompiler:
-    def __init__(self, tmpdir, abimode, include_dir):
+    def __init__(self, tmpdir, abimode, include_dir, compiler_verbose=False):
         self.tmpdir = tmpdir
         self.abimode = abimode
         self.include_dir = include_dir
         self.universal_mode = self.abimode == 'universal'
+        self.compiler_verbose = compiler_verbose
 
     def _expand(self, name, template):
         source = expand_template(template, name)
@@ -95,7 +96,8 @@ class ExtensionCompiler:
                             include_dirs=[self.include_dir],
                             extra_compile_args=['-Wfatal-errors', '-g', '-Og'],
                             extra_link_args=['-g'])
-        so_filename = c_compile(str(self.tmpdir), ext, compiler_verbose=False,
+        so_filename = c_compile(str(self.tmpdir), ext,
+                                compiler_verbose=self.compiler_verbose,
                                 universal_mode=self.universal_mode)
         return so_filename
 
