@@ -27,7 +27,7 @@ toC.gen = CGenerator()
 
 @attr.s
 class Function:
-    _CTX_NAME = re.compile(r'^_?HPy_?')
+    _BASE_NAME = re.compile(r'^_?HPy_?')
 
     name = attr.ib()
     node = attr.ib(repr=False)
@@ -37,9 +37,12 @@ class Function:
             node = node.type
         return node
 
+    def base_name(self):
+        return self._BASE_NAME.sub('', self.name)
+
     def ctx_name(self):
         # e.g. "ctx_Module_Create"
-        return self._CTX_NAME.sub(r'ctx_', self.name)
+        return self._BASE_NAME.sub(r'ctx_', self.name)
 
     def ctx_impl_name(self):
         return '&%s' % self.ctx_name()
@@ -106,6 +109,42 @@ class Function:
 
         w('\n}')
         return ' '.join(parts)
+
+    def implementation(self):
+        def signature(base_name):
+            # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
+            newnode = deepcopy(self.node)
+            typedecl = self._find_typedecl(newnode)
+            typedecl.declname = '_HPy_IMPL_NAME(%s)' % base_name     # rename the function
+            return toC(newnode)
+        #
+        def call(pyfunc, return_type):
+            # return _py2h(PyNumber_Add(_h2py(x), _h2py(y)))
+            args = []
+            for p in self.node.type.args.params:
+                if toC(p.type) == 'HPyContext':
+                    continue
+                elif toC(p.type) == 'HPy':
+                    arg = '_h2py(%s)' % p.name
+                else:
+                    arg = p.name
+                args.append(arg)
+            result = '%s(%s)' % (pyfunc, ', '.join(args))
+            if return_type == 'HPy':
+                result = '_py2h(%s)' % result
+            return result
+        #
+        lines = []
+        w = lines.append
+        base_name = self.base_name()
+        pyfunc = 'Py' + base_name
+        return_type = toC(self.node.type.type)
+        w('HPyAPI_STORAGE %s' % signature(self.base_name()))
+        w('{')
+        w('    return %s;' % call(pyfunc, return_type))
+        w('}')
+        return '\n'.join(lines)
+
 
     def ctx_pypy_type(self):
         return 'rffi.VOIDP'
@@ -225,6 +264,25 @@ class AutoGen:
                 lines.append('')
         return '\n'.join(lines)
 
+    def gen_func_implementations(self):
+        # XXX: we need a better way to decide which functions to include/exclude
+        exclude = set(['HPyModule_Create',
+                       'HPy_Dup',
+                       'HPy_Close',
+                       'HPyArg_Parse',
+                       'HPy_FromPyObject',
+                       'HPy_AsPyObject',
+                       '_HPy_CallRealFunctionFromTrampoline'])
+        lines = []
+        for f in self.declarations:
+            if not isinstance(f, Function):
+                continue
+            if f.name in exclude:
+                continue
+            lines.append(f.implementation())
+            lines.append('')
+        return '\n'.join(lines)
+
     def gen_pypy_decl(self):
         lines = []
         w = lines.append
@@ -243,6 +301,7 @@ def main():
     autogen_ctx = include.join('universal', 'autogen_ctx.h')
     autogen_trampolines = include.join('universal', 'autogen_trampolines.h')
     autogen_ctx_def = root.join('cpython-universal', 'src', 'autogen_ctx_def.h')
+    autogen_impl = include.join('common', 'autogen_impl.h')
     autogen_pypy = root.join('tools', 'autogen_pypy.txt')
 
     autogen = AutoGen(root.join('tools', 'public_api.h'))
@@ -252,6 +311,7 @@ def main():
     ctx_decl = autogen.gen_ctx_decl()
     func_trampolines = autogen.gen_func_trampolines()
     ctx_def = autogen.gen_ctx_def()
+    impl = autogen.gen_func_implementations()
     pypy_decl = autogen.gen_pypy_decl()
 
     with autogen_ctx.open('w') as f:
@@ -265,6 +325,10 @@ def main():
     with autogen_ctx_def.open('w') as f:
         print(DISCLAIMER, file=f)
         print(ctx_def, file=f)
+
+    with autogen_impl.open('w') as f:
+        print(DISCLAIMER, file=f)
+        print(impl, file=f)
 
     with autogen_pypy.open('w') as f:
         print(pypy_decl, file=f)

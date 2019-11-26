@@ -14,11 +14,12 @@
 #include <Python.h>
 
 #ifdef __GNUC__
-#define HPyAPI_FUNC(restype)  __attribute__((unused)) static inline restype
+#define HPyAPI_STORAGE __attribute__((unused)) static inline
 #else
-#define HPyAPI_FUNC(restype)  static inline restype
-#endif
+#define HPyAPI_STORAGE static inline
+#endif /* __GNUC__ */
 
+#define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
 
 typedef struct { PyObject *_o; } HPy;
 typedef Py_ssize_t HPy_ssize_t;
@@ -148,9 +149,12 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
     return result;
 }
 
-#define _HPy_API_NAME(name) HPy##name
-#include "../common/autogen_funcs.h"
-#undef _HPy_API_NAME
-
+/* expand impl functions as:
+ *     static inline HPyLong_FromLong(...);
+ *
+ */
+#define _HPy_IMPL_NAME(name) HPy##name
+#include "../common/autogen_impl.h"
+#undef _HPy_IMPL_NAME
 
 #endif /* !HPy_CPYTHON_H */

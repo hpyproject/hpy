@@ -192,10 +192,15 @@ ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
     return 1;
 }
 
-
-#define HPyAPI_FUNC(restype)  static restype
-#define _HPy_API_NAME(name) ctx_##name
-#include "common/autogen_funcs.h"
-#undef _HPy_API_NAME
+/* expand impl functions as:
+ *     static ctx_Long_FromLong(...);
+ *
+ * Then, they are automatically stored in the global context by
+ * autogen_ctx_def
+ */
+#define HPyAPI_STORAGE static
+#define _HPy_IMPL_NAME(name) ctx_##name
+#include "common/autogen_impl.h"
+#undef _HPy_IMPL_NAME
 
 #include "autogen_ctx_def.h"
