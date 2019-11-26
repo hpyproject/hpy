@@ -61,14 +61,6 @@ _HPyGetContext(void) {
 }
 
 
-
-HPyAPI_FUNC(HPy)
-HPyNone_Get(HPyContext ctx)
-{
-    Py_INCREF(Py_None);
-    return _py2h(Py_None);
-}
-
 HPyAPI_FUNC(HPy)
 HPy_Dup(HPyContext ctx, HPy handle)
 {
