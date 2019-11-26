@@ -16,24 +16,7 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(x) ((x)._i == 0)
 
-typedef void (*HPyMeth)(void **out_func, _HPy_CPyCFunction *out_trampoline);
-
-/* ml_flags can be:
- *
- *   - METH_NOARGS, METH_O, etc: in this case ml_meth is interpreted as a legacy
- *     CPython function
- *
- *   - HPy_METH_NOARGS, etc: in this case ml_meth is interpreted as a new-style
- *     HPy function
- */
-typedef struct {
-    const char   *ml_name;   /* The name of the built-in function/method */
-    HPyMeth      ml_meth;    /* see HPy_DEF_METH_*() */
-    int          ml_flags;   /* Combination of METH_xxx flags, which mostly
-                                describe the args expected by the C func */
-    const char   *ml_doc;    /* The __doc__ attribute, or NULL */
-} HPyMethodDef;
-
+#include "meth.h"
 
 #define HPyModuleDef_HEAD_INIT NULL
 
@@ -60,68 +43,6 @@ typedef struct {
 
 extern HPyContext _ctx_for_trampolines;
 
-/* METH declaration */
-#define HPy_DECL_METH_NOARGS(fnname)                                    \
-    void fnname(void **out_func, _HPy_CPyCFunction *out_trampoline);
-
-#define HPy_DECL_METH_O(NAME) HPy_DECL_METH_NOARGS(NAME)
-#define HPy_DECL_METH_VARARGS(NAME) HPy_DECL_METH_NOARGS(NAME)
-
-
-/* METH definition */
-#define HPy_DEF_METH_NOARGS(fnname)                                            \
-    static HPy fnname##_impl(HPyContext ctx, HPy self);                        \
-    static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *noargs)          \
-    {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, NULL, fnname##_impl, HPy_METH_NOARGS); \
-    }                                                                          \
-    void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
-    {                                                                          \
-        *out_func = fnname##_impl;                                             \
-        *out_trampoline = fnname##_trampoline;                                 \
-    }
-
-#define HPy_DEF_METH_O(fnname)                                                 \
-    static HPy fnname##_impl(HPyContext ctx, HPy self, HPy arg);               \
-    static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *arg)             \
-    {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, arg, fnname##_impl, HPy_METH_O);       \
-    }                                                                          \
-    void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
-    {                                                                          \
-        *out_func = fnname##_impl;                                             \
-        *out_trampoline = fnname##_trampoline;                                 \
-    }
-
-#define HPy_DEF_METH_VARARGS(fnname)                                           \
-    static HPy fnname##_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t);\
-    static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *args)            \
-    {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, args, fnname##_impl, HPy_METH_VARARGS);\
-    }                                                                          \
-    void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
-    {                                                                          \
-        *out_func = fnname##_impl;                                             \
-        *out_trampoline = fnname##_trampoline;                                 \
-    }
-
-
-// make sure to use a bit which is unused by CPython
-#define _HPy_METH 0x100000
-#define HPy_METH_VARARGS  (0x0001 | _HPy_METH)
-#define HPy_METH_KEYWORDS (0x0002 | _HPy_METH)
-/* METH_NOARGS and METH_O must not be combined with the flags above. */
-#define HPy_METH_NOARGS   (0x0004 | _HPy_METH)
-#define HPy_METH_O        (0x0008 | _HPy_METH)
 
 
 #endif /* HPy_UNIVERSAL_H */
