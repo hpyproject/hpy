@@ -38,6 +38,7 @@ class Function:
         return node
 
     def ctx_name(self):
+        # e.g. "ctx_Module_Create"
         return self._CTX_NAME.sub(r'ctx_', self.name)
 
     def ctx_impl_name(self):
@@ -48,6 +49,8 @@ class Function:
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
 
     def ctx_decl(self):
+        # e.g. "HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def)"
+        #
         # turn the function declaration into a function POINTER declaration
         newnode = deepcopy(self.node)
         newnode.type = c_ast.PtrDecl(type=newnode.type, quals=[])
@@ -65,6 +68,9 @@ class Function:
         return toC(newnode)
 
     def trampoline_def(self):
+        # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
+        #      return ctx->ctx_Module_Create ( ctx, def );
+        # }
         rettype = toC(self.node.type.type)
         parts = []
         w = parts.append
@@ -169,6 +175,13 @@ class AutoGen:
         self.declarations = v.declarations
 
     def gen_ctx_decl(self):
+        # struct _HPyContext_s {
+        #     int ctx_version;
+        #     HPy h_None;
+        #     ...
+        #     HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def);
+        #     ...
+        # }
         lines = []
         w = lines.append
         w('struct _HPyContext_s {')
@@ -179,6 +192,13 @@ class AutoGen:
         return '\n'.join(lines)
 
     def gen_ctx_def(self):
+        # struct _HPyContext_s global_ctx = {
+        #     .ctx_version = 1,
+        #     .h_None = (HPy){CONSTANT_H_NONE},
+        #     ...
+        #     .ctx_Module_Create = &ctx_Module_Create,
+        #     ...
+        # }
         lines = []
         w = lines.append
         w('struct _HPyContext_s global_ctx = {')
