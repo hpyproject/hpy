@@ -21,8 +21,6 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 #include "module.h"
 
 #include "autogen_ctx.h"
-#include "autogen_func.h"
-
-
+#include "autogen_trampolines.h"
 
 #endif /* HPY_UNIVERSAL_H */
