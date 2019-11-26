@@ -134,43 +134,6 @@ HPyArg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs, const char *fmt, ...)
 
 
 HPyAPI_FUNC(HPy)
-HPyLong_FromLong(HPyContext ctx, long v)
-{
-    return _py2h(PyLong_FromLong(v));
-}
-
-HPyAPI_FUNC(long)
-HPyLong_AsLong(HPyContext ctx, HPy h)
-{
-    return PyLong_AsLong(_h2py(h));
-}
-
-HPyAPI_FUNC(HPy)
-HPyNumber_Add(HPyContext ctx, HPy x, HPy y)
-{
-    return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
-}
-
-HPyAPI_FUNC(HPy)
-HPyUnicode_FromString(HPyContext ctx, const char *utf8)
-{
-    return _py2h(PyUnicode_FromString(utf8));
-}
-
-HPyAPI_FUNC(int)
-HPyUnicode_Check(HPyContext ctx, HPy o)
-{
-    return PyUnicode_Check(_h2py(o));
-}
-
-HPyAPI_FUNC(HPy)
-HPyUnicode_AsUTF8String(HPyContext ctx, HPy o)
-{
-    return _py2h(PyUnicode_AsUTF8String(_h2py(o)));
-}
-
-
-HPyAPI_FUNC(HPy)
 HPy_FromPyObject(HPyContext ctx, PyObject *obj)
 {
     Py_XINCREF(obj);
@@ -185,42 +148,9 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
     return result;
 }
 
-HPyAPI_FUNC(void)
-HPyErr_SetString(HPyContext ctx, HPy type, const char *message)
-{
-    PyErr_SetString(_h2py(type), message);
-}
-
-/* bytesobject.h */
-HPyAPI_FUNC(int)
-HPyBytes_Check(HPyContext ctx, HPy o)
-{
-    return PyBytes_Check(_h2py(o));
-}
-
-HPyAPI_FUNC(HPy_ssize_t)
-HPyBytes_Size(HPyContext ctx, HPy o)
-{
-    return PyBytes_Size(_h2py(o));
-}
-
-HPyAPI_FUNC(HPy_ssize_t)
-HPyBytes_GET_SIZE(HPyContext ctx, HPy o)
-{
-    return PyBytes_GET_SIZE(_h2py(o));
-}
-
-HPyAPI_FUNC(char*)
-HPyBytes_AsString(HPyContext ctx, HPy o)
-{
-    return PyBytes_AsString(_h2py(o));
-}
-
-HPyAPI_FUNC(char*)
-HPyBytes_AS_STRING(HPyContext ctx, HPy o)
-{
-    return PyBytes_AS_STRING(_h2py(o));
-}
+#define _HPy_API_NAME(name) HPy##name
+#include "../common/autogen_funcs.h"
+#undef _HPy_API_NAME
 
 
 #endif /* !HPy_CPYTHON_H */

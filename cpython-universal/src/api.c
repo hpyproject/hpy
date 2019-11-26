@@ -151,17 +151,7 @@ ctx_Dup(HPyContext ctx, HPy h)
     return _py2h(obj);
 }
 
-static HPy
-ctx_Long_FromLong(HPyContext ctx, long value)
-{
-    return _py2h(PyLong_FromLong(value));
-}
 
-static long
-ctx_Long_AsLong(HPyContext ctx, HPy h)
-{
-    return PyLong_AsLong(_h2py(h));
-}
 
 /* XXX: this function is copied&pasted THREE times:
  *     hpy_devel/include/hpy.h
@@ -202,66 +192,10 @@ ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
     return 1;
 }
 
-static HPy
-ctx_Number_Add(HPyContext ctx, HPy x, HPy y)
-{
-    return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
-}
 
-static HPy
-ctx_Unicode_FromString(HPyContext ctx, const char *utf8)
-{
-    return _py2h(PyUnicode_FromString(utf8));
-}
-
-static int
-ctx_Unicode_Check(HPyContext ctx, HPy o)
-{
-    return PyUnicode_Check(_h2py(o));
-}
-
-static HPy
-ctx_Unicode_AsUTF8String(HPyContext ctx, HPy o)
-{
-    return _py2h(PyUnicode_AsUTF8String(_h2py(o)));
-}
-
-
-static void
-ctx_Err_SetString(HPyContext ctx, HPy type, const char *message)
-{
-    PyErr_SetString(_h2py(type), message);
-}
-
-static int
-ctx_Bytes_Check(HPyContext ctx, HPy o)
-{
-    return PyBytes_Check(_h2py(o));
-}
-
-static HPy_ssize_t
-ctx_Bytes_Size(HPyContext ctx, HPy o)
-{
-    return PyBytes_Size(_h2py(o));
-}
-
-static HPy_ssize_t
-ctx_Bytes_GET_SIZE(HPyContext ctx, HPy o)
-{
-    return PyBytes_GET_SIZE(_h2py(o));
-}
-
-static char*
-ctx_Bytes_AsString(HPyContext ctx, HPy o)
-{
-    return PyBytes_AsString(_h2py(o));
-}
-
-static char*
-ctx_Bytes_AS_STRING(HPyContext ctx, HPy o)
-{
-    return PyBytes_AS_STRING(_h2py(o));
-}
-
+#define HPyAPI_FUNC(restype)  static restype
+#define _HPy_API_NAME(name) ctx_##name
+#include "common/autogen_funcs.h"
+#undef _HPy_API_NAME
 
 #include "autogen_ctx_def.h"
