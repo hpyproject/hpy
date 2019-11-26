@@ -169,6 +169,12 @@ class AutoGen:
         #self.ast.show()
         self.collect_declarations()
 
+    def get(self, name):
+        for d in self.declarations:
+            if d.name == name:
+                return d
+        raise KeyError(name)
+
     def collect_declarations(self):
         v = FuncDeclVisitor()
         v.visit(self.ast)
