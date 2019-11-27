@@ -234,3 +234,15 @@ class TestBasic(HPyTest):
         assert mod.f() == 12345
         assert mod.g(42) == 42
         assert mod.h(5, 6) == 56
+
+    def test_Float_FromDouble(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                return HPyFloat_FromDouble(ctx, 123.45);
+            }
+            @EXPORT f HPy_METH_NOARGS
+            @INIT
+        """)
+        assert mod.f() == 123.45

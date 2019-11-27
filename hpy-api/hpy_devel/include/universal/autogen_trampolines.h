@@ -28,6 +28,10 @@ static inline long HPyLong_AsLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsLong ( ctx, h ); 
 }
 
+static inline HPy HPyFloat_FromDouble(HPyContext ctx, double v) {
+     return ctx->ctx_Float_FromDouble ( ctx, v ); 
+}
+
 static inline int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...) {
      va_list _vl; va_start(_vl, fmt); int _res = ctx->ctx_Arg_Parse ( ctx, args, nargs, fmt, _vl ); va_end(_vl); return _res; 
 }

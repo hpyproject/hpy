@@ -18,6 +18,11 @@ HPyAPI_STORAGE long _HPy_IMPL_NAME(Long_AsLong)(HPyContext ctx, HPy h)
     return PyLong_AsLong(_h2py(h));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Float_FromDouble)(HPyContext ctx, double v)
+{
+    return _py2h(PyFloat_FromDouble(v));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
 {
     return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));

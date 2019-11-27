@@ -20,6 +20,7 @@ struct _HPyContext_s {
     void (*ctx_Close)(HPyContext ctx, HPy h);
     HPy (*ctx_Long_FromLong)(HPyContext ctx, long value);
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
+    HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
     int (*ctx_Arg_Parse)(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, va_list _vl);
     HPy (*ctx_Number_Add)(HPyContext ctx, HPy x, HPy y);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy type, const char *message);

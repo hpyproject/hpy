@@ -20,6 +20,7 @@ HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);
 long HPyLong_AsLong(HPyContext ctx, HPy h);
+HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
 int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
                  const char *fmt, ...);
