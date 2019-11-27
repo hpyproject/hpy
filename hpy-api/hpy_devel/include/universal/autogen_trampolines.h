@@ -72,6 +72,10 @@ static inline HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy o) {
      return ctx->ctx_Unicode_AsUTF8String ( ctx, o ); 
 }
 
+static inline HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size) {
+     return ctx->ctx_Unicode_FromWideChar ( ctx, w, size ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }

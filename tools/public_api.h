@@ -4,6 +4,7 @@ typedef int HPyContext;
 typedef int HPyModuleDef;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
+typedef int wchar_t;
 
 
 /* HPy public API */
@@ -37,6 +38,8 @@ char* HPyBytes_AS_STRING(HPyContext ctx, HPy o);
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
 int HPyUnicode_Check(HPyContext ctx, HPy o);
 HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy o);
+HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
+
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);

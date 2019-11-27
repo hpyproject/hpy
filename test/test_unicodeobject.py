@@ -31,6 +31,23 @@ class TestUnicodeObject(HPyTest):
         """)
         assert mod.f() == "foobar"
 
+    def test_FromWideChar(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                const wchar_t *buf = L"hell\xf2 world";
+                long n = HPyLong_AsLong(ctx, arg);
+                return HPyUnicode_FromWideChar(ctx, buf, n);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        assert mod.f(-1) == "hellò world"
+        assert mod.f(11) == "hellò world"
+        assert mod.f(5) == "hellò"
+
+
     def test_AsUTF8String(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)

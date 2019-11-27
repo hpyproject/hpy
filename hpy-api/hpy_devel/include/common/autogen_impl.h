@@ -68,3 +68,8 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Unicode_AsUTF8String)(HPyContext ctx, HPy o)
     return _py2h(PyUnicode_AsUTF8String(_h2py(o)));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Unicode_FromWideChar)(HPyContext ctx, const wchar_t *w, HPy_ssize_t size)
+{
+    return _py2h(PyUnicode_FromWideChar(w, size));
+}
+
