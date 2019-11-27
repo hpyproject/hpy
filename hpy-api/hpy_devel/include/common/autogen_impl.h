@@ -83,3 +83,13 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME(List_Append)(HPyContext ctx, HPy list, HPy ite
     return PyList_Append(_h2py(list), _h2py(item));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Dict_New)(HPyContext ctx)
+{
+    return _py2h(PyDict_New());
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME(Dict_SetItem)(HPyContext ctx, HPy dict, HPy key, HPy val)
+{
+    return PyDict_SetItem(_h2py(dict), _h2py(key), _h2py(val));
+}
+

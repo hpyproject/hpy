@@ -84,6 +84,14 @@ static inline int HPyList_Append(HPyContext ctx, HPy list, HPy item) {
      return ctx->ctx_List_Append ( ctx, list, item ); 
 }
 
+static inline HPy HPyDict_New(HPyContext ctx) {
+     return ctx->ctx_Dict_New ( ctx ); 
+}
+
+static inline int HPyDict_SetItem(HPyContext ctx, HPy dict, HPy key, HPy val) {
+     return ctx->ctx_Dict_SetItem ( ctx, dict, key, val ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }

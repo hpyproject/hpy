@@ -44,6 +44,10 @@ HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
 HPy HPyList_New(HPyContext ctx, HPy_ssize_t len);
 int HPyList_Append(HPyContext ctx, HPy list, HPy item);
 
+/* dictobject.h */
+HPy HPyDict_New(HPyContext ctx);
+int HPyDict_SetItem(HPyContext ctx, HPy dict, HPy key, HPy val);
+
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);
