@@ -17,6 +17,13 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(x) ((x)._i == 0)
 
+// XXX: we need to decide whether these are part of the official API or not,
+// and maybe introduce a better naming convetion. For now, they are needed for
+// ujson
+static inline HPy HPy_FromVoidP(void *p) { return (HPy){(HPy_ssize_t)p}; }
+static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
+
+
 #include "meth.h"
 #include "module.h"
 

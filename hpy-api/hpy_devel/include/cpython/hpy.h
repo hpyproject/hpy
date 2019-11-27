@@ -47,6 +47,13 @@ static struct _HPyContext_s _global_ctx;
 #define HPy_NULL ((HPy){NULL})
 #define HPy_IsNull(x) ((x)._o == NULL)
 
+// XXX: we need to decide whether these are part of the official API or not,
+// and maybe introduce a better naming convetion. For now, they are needed for
+// ujson
+static inline HPy HPy_FromVoidP(void *p) { return (HPy){(PyObject*)p}; }
+static inline void* HPy_AsVoidP(HPy h) { return (void*)h._o; }
+
+
 HPyAPI_FUNC(HPyContext)
 _HPyGetContext(void) {
     HPyContext ctx = &_global_ctx;
