@@ -14,6 +14,7 @@ struct _HPyContext_s global_ctx = {
     .h_True = (HPy){CONSTANT_H_TRUE},
     .h_False = (HPy){CONSTANT_H_FALSE},
     .h_ValueError = (HPy){CONSTANT_H_VALUEERROR},
+    .h_TypeError = (HPy){CONSTANT_H_TYPEERROR},
     .ctx_Module_Create = &ctx_Module_Create,
     .ctx_Dup = &ctx_Dup,
     .ctx_Close = &ctx_Close,

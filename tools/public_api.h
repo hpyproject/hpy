@@ -12,6 +12,7 @@ HPy h_None;
 HPy h_True;
 HPy h_False;
 HPy h_ValueError;
+HPy h_TypeError;
 
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);

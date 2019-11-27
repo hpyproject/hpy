@@ -8,7 +8,8 @@
 #define CONSTANT_H_TRUE                2
 #define CONSTANT_H_FALSE               3
 #define CONSTANT_H_VALUEERROR          4
-#define CONSTANT_H__TOTAL              5
+#define CONSTANT_H_TYPEERROR           5
+#define CONSTANT_H__TOTAL              6
 
 extern struct _HPyContext_s global_ctx;
 HPy _py2h(PyObject *);

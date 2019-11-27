@@ -14,6 +14,7 @@ struct _HPyContext_s {
     HPy h_True;
     HPy h_False;
     HPy h_ValueError;
+    HPy h_TypeError;
     HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def);
     HPy (*ctx_Dup)(HPyContext ctx, HPy h);
     void (*ctx_Close)(HPyContext ctx, HPy h);

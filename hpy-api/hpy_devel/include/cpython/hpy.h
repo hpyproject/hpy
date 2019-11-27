@@ -38,6 +38,7 @@ typedef struct _HPyContext_s {
     HPy h_True;
     HPy h_False;
     HPy h_ValueError;
+    HPy h_TypeError;
 } *HPyContext;
 
 /* XXX! should be defined only once, not once for every .c! */
@@ -56,6 +57,7 @@ _HPyGetContext(void) {
         ctx->h_True = _py2h(Py_True);
         ctx->h_False = _py2h(Py_False);
         ctx->h_ValueError = _py2h(PyExc_ValueError);
+        ctx->h_TypeError = _py2h(PyExc_TypeError);
     }
     return ctx;
 }

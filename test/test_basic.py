@@ -170,6 +170,35 @@ class TestBasic(HPyTest):
             mod.f(20)
         assert str(exc.value) == 'hello world'
 
+    def test_builtin_handles(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                long i = HPyLong_AsLong(ctx, arg);
+                HPy h;
+                switch(i) {
+                    case 1: h = ctx->h_None; break;
+                    case 2: h = ctx->h_False; break;
+                    case 3: h = ctx->h_True; break;
+                    case 4: h = ctx->h_ValueError; break;
+                    case 5: h = ctx->h_TypeError; break;
+                    default:
+                        HPyErr_SetString(ctx, ctx->h_ValueError, "invalid choice");
+                        return HPy_NULL;
+                }
+                return HPy_Dup(ctx, h);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        builtin_objs = ('<NULL>', None, False, True, ValueError, TypeError)
+        for i, obj in enumerate(builtin_objs):
+            if i == 0:
+                continue
+            assert mod.f(i) is obj
+
     def test_decl_meth(self):
         main = """
             HPy_DECL_METH_NOARGS(f);
