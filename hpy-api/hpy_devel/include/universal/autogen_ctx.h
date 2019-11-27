@@ -32,6 +32,8 @@ struct _HPyContext_s {
     int (*ctx_Unicode_Check)(HPyContext ctx, HPy o);
     HPy (*ctx_Unicode_AsUTF8String)(HPyContext ctx, HPy o);
     HPy (*ctx_Unicode_FromWideChar)(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
+    HPy (*ctx_List_New)(HPyContext ctx, HPy_ssize_t len);
+    int (*ctx_List_Append)(HPyContext ctx, HPy list, HPy item);
     HPy (*ctx_FromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
     struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags);

@@ -76,6 +76,14 @@ static inline HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_
      return ctx->ctx_Unicode_FromWideChar ( ctx, w, size ); 
 }
 
+static inline HPy HPyList_New(HPyContext ctx, HPy_ssize_t len) {
+     return ctx->ctx_List_New ( ctx, len ); 
+}
+
+static inline int HPyList_Append(HPyContext ctx, HPy list, HPy item) {
+     return ctx->ctx_List_Append ( ctx, list, item ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }

@@ -40,6 +40,10 @@ int HPyUnicode_Check(HPyContext ctx, HPy o);
 HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy o);
 HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
 
+/* listobject.h */
+HPy HPyList_New(HPyContext ctx, HPy_ssize_t len);
+int HPyList_Append(HPyContext ctx, HPy list, HPy item);
+
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);

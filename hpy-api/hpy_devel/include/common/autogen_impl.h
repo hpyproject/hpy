@@ -73,3 +73,13 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Unicode_FromWideChar)(HPyContext ctx, const wc
     return _py2h(PyUnicode_FromWideChar(w, size));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(List_New)(HPyContext ctx, HPy_ssize_t len)
+{
+    return _py2h(PyList_New(len));
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME(List_Append)(HPyContext ctx, HPy list, HPy item)
+{
+    return PyList_Append(_h2py(list), _h2py(item));
+}
+
