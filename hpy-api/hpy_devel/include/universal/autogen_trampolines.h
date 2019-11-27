@@ -24,6 +24,14 @@ static inline HPy HPyLong_FromLong(HPyContext ctx, long value) {
      return ctx->ctx_Long_FromLong ( ctx, value ); 
 }
 
+static inline HPy HPyLong_FromLongLong(HPyContext ctx, long long v) {
+     return ctx->ctx_Long_FromLongLong ( ctx, v ); 
+}
+
+static inline HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v) {
+     return ctx->ctx_Long_FromUnsignedLongLong ( ctx, v ); 
+}
+
 static inline long HPyLong_AsLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsLong ( ctx, h ); 
 }

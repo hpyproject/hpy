@@ -19,6 +19,9 @@ HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);
+HPy HPyLong_FromLongLong(HPyContext ctx, long long v);
+HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v);
+
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 

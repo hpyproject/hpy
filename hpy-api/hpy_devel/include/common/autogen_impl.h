@@ -13,6 +13,16 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext ctx, long value)
     return _py2h(PyLong_FromLong(value));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromLongLong)(HPyContext ctx, long long v)
+{
+    return _py2h(PyLong_FromLongLong(v));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromUnsignedLongLong)(HPyContext ctx, unsigned long long v)
+{
+    return _py2h(PyLong_FromUnsignedLongLong(v));
+}
+
 HPyAPI_STORAGE long _HPy_IMPL_NAME(Long_AsLong)(HPyContext ctx, HPy h)
 {
     return PyLong_AsLong(_h2py(h));

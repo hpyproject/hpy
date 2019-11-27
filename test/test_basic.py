@@ -246,3 +246,31 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f() == 123.45
+
+    def test_Long_FromLongLong(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                // take a value which doesn't fit in 32 bit
+                long long val = 2147483648;
+                return HPyLong_FromLongLong(ctx, val);
+            }
+            @EXPORT f HPy_METH_NOARGS
+            @INIT
+        """)
+        assert mod.f() == 2147483648
+
+    def test_Long_FromUnsignedLongLong(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_NOARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                // take a value which doesn't fit in unsigned 32 bit
+                unsigned long long val = 4294967296;
+                return HPyLong_FromUnsignedLongLong(ctx, val);
+            }
+            @EXPORT f HPy_METH_NOARGS
+            @INIT
+        """)
+        assert mod.f() == 4294967296
