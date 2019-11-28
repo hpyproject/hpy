@@ -27,30 +27,30 @@ HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
 int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
                  const char *fmt, ...);
-HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
+HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
 
-void HPyErr_SetString(HPyContext ctx, HPy type, const char *message);
+void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 
 /* bytesobject.h */
-int HPyBytes_Check(HPyContext ctx, HPy o);
-HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy o);
-HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy o);
-char* HPyBytes_AsString(HPyContext ctx, HPy o);
-char* HPyBytes_AS_STRING(HPyContext ctx, HPy o);
+int HPyBytes_Check(HPyContext ctx, HPy h);
+HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);
+HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy h);
+char* HPyBytes_AsString(HPyContext ctx, HPy h);
+char* HPyBytes_AS_STRING(HPyContext ctx, HPy h);
 
 /* unicodeobject.h */
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
-int HPyUnicode_Check(HPyContext ctx, HPy o);
-HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy o);
+int HPyUnicode_Check(HPyContext ctx, HPy h);
+HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy h);
 HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
 
 /* listobject.h */
 HPy HPyList_New(HPyContext ctx, HPy_ssize_t len);
-int HPyList_Append(HPyContext ctx, HPy list, HPy item);
+int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
 HPy HPyDict_New(HPyContext ctx);
-int HPyDict_SetItem(HPyContext ctx, HPy dict, HPy key, HPy val);
+int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
 
 
 /* integration with the old CPython API */
