@@ -147,7 +147,7 @@ class Function:
 
 
     def ctx_pypy_type(self):
-        return 'rffi.VOIDP'
+        return 'void *'
 
 
 @attr.s
@@ -168,7 +168,7 @@ class GlobalVar:
         return None
 
     def ctx_pypy_type(self):
-        return 'HPy'
+        return 'struct _HPy_s'
 
 
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
@@ -286,12 +286,11 @@ class AutoGen:
     def gen_pypy_decl(self):
         lines = []
         w = lines.append
-        w("HPyContextS = rffi.CStruct('_HPyContext_s',")
-        w("    ('ctx_version', rffi.INT_real),")
+        w("typedef struct _HPyContext_s {")
+        w("    int ctx_version;")
         for f in self.declarations:
-            w("    ('%s', %s)," % (f.ctx_name(), f.ctx_pypy_type()))
-        w("    hints={'eci': eci},")
-        w(")")
+            w("    %s %s;" % (f.ctx_pypy_type(), f.ctx_name()))
+        w("} _struct_HPyContext_s;")
         return '\n'.join(lines)
 
 
