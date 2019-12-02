@@ -103,7 +103,7 @@ class ExtensionCompiler:
         ext = get_extension(str(filename), name,
                             sources=sources,
                             include_dirs=[self.include_dir],
-                            extra_compile_args=['-Wfatal-errors', '-g', '-Og'],
+                            extra_compile_args=['-Wfatal-errors', '-g', '-O0'],
                             extra_link_args=['-g'])
         so_filename = c_compile(str(self.tmpdir), ext,
                                 compiler_verbose=self.compiler_verbose,
