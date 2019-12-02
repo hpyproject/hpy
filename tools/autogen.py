@@ -159,6 +159,8 @@ class Function:
         w = lines.append
         w('@API.func("%s")' % signature)
         w('def %s(space, %s):' % (self.name, ', '.join(argnames)))
+        w('    from rpython.rlib.nonconst import NonConstant # for the annotator')
+        w('    if NonConstant(False): return 0')
         w('    raise NotImplementedError')
         w('')
         return '\n'.join(lines)
