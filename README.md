@@ -5,6 +5,8 @@ HPy: a better API for Python
 
 **IRC channel** : #hpy on freenode.net
 
+**Mailing list**: [hpy-dev@python.org](https://mail.python.org/mailman3/lists/hpy-dev.python.org/)
+
 The goal of the project is to design a better API for extending Python
 in C. The current API is specific to the current implementation of CPython: it
 exposes a lot of internal details which makes it hard:
@@ -98,4 +100,3 @@ What does `HPy` means?
 
 The "H" in `HPy` stands for "handle": one of the key idea of the new API is to
 use fully opaque handles to represent and pass around Python objects.
-
