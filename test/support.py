@@ -160,6 +160,10 @@ class HPyTest:
     def make_module(self, source_template, name='mytest', extra_templates=()):
         return self.compiler.make_module(source_template, name, extra_templates)
 
+    def should_check_refcount(self):
+        # defaults to True on CPython, but is set to False by e.g. PyPy
+        return True
+
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
 
