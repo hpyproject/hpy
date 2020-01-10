@@ -3,6 +3,15 @@ from .support import HPyTest
 
 class TestCPythonCompatibility(HPyTest):
 
+    # One note about the should_check_refcount() in the tests below: on
+    # CPython, handles are actually implemented as INCREF/DECREF, so we can
+    # check e.g. after an HPy_Dup the refcnt is += 1. However, on PyPy they
+    # are implemented in a completely different way which is unrelated to the
+    # refcnt (this is the whole point of HPy, after all :)). So in many of the
+    # following ttests, checking the actual result of the function doesn't
+    # really make sens on PyPy. We still run the functions to ensure they do
+    # not crash, though.
+
     def test_frompyobject(self):
         mod = self.make_module("""
             #include <Python.h>
@@ -49,7 +58,9 @@ class TestCPythonCompatibility(HPyTest):
             @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
-        assert mod.f() == -1
+        x = mod.f()
+        if self.should_check_refcount():
+            assert x == -1
 
     def test_hpy_dup(self):
         mod = self.make_module("""
@@ -73,7 +84,9 @@ class TestCPythonCompatibility(HPyTest):
             @EXPORT f HPy_METH_NOARGS
             @INIT
         """)
-        assert mod.f() == +1
+        x = mod.f()
+        if self.should_check_refcount():
+            assert res == +1
 
     def test_many_handles(self):
         mod = self.make_module("""
