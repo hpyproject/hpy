@@ -102,7 +102,7 @@ class TestCPythonCompatibility(HPyTest):
         """)
         x = mod.f()
         if self.should_check_refcount():
-            assert res == +1
+            assert x == +1
 
     def test_many_handles(self):
         mod = self.make_module("""
