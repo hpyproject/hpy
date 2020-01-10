@@ -38,6 +38,22 @@ class TestCPythonCompatibility(HPyTest):
         if self.should_check_refcount():
             assert x == [1234, +1]
 
+    def test_aspyobject(self):
+        mod = self.make_module("""
+            #include <Python.h>
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                PyObject *o = HPy_AsPyObject(ctx, arg);
+                long val = PyLong_AsLong(o);
+                Py_DecRef(o);
+                return HPyLong_FromLong(ctx, val*2);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        assert mod.f(21) == 42
+
     def test_hpy_close(self):
         mod = self.make_module("""
             #include <Python.h>
