@@ -1,1 +1,1 @@
-recursive-include hpy-api/include *.h
+recursive-include hpy/devel/include *.h

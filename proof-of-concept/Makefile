@@ -8,4 +8,4 @@ test: pof.cpython-37m-x86_64-linux-gnu.so
 universal: pof.hpy.so
 
 pof.hpy.so: pof.c
-	gcc -shared -fPIC -o pof.hpy.so -I../hpy-api/hpy_devel/include -DHPY_UNIVERSAL_ABI pof.c
+	gcc -shared -fPIC -o pof.hpy.so -I../hpy/devel/include -DHPY_UNIVERSAL_ABI pof.c

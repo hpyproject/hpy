@@ -1,1 +1,1 @@
-hpy_devel
+hpy.devel
