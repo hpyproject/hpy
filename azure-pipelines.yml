@@ -1,5 +1,6 @@
-trigger:
-- master
+# by default, pipelines are enabled for all branches
+# trigger:
+# - master
 
 jobs:
 - job: LibraryTests
