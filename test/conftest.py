@@ -13,7 +13,8 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope='session')
 def hpy_include_dir(request):
-    from hpy.devel import get_include
+    if request.config.getoption('--correct'):
+        from hpy.devel import get_include
         return get_include()
     else:
         import os
