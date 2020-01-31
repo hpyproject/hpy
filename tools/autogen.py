@@ -323,7 +323,7 @@ def main():
     include = root.join('hpy', 'devel', 'include')
     autogen_ctx = include.join('universal', 'autogen_ctx.h')
     autogen_trampolines = include.join('universal', 'autogen_trampolines.h')
-    autogen_ctx_def = root.join('cpython-universal', 'src', 'autogen_ctx_def.h')
+    autogen_ctx_def = root.join('hpy', 'universal', 'src', 'autogen_ctx_def.h')
     autogen_impl = include.join('common', 'autogen_impl.h')
     autogen_pypy = root.join('tools', 'autogen_pypy.txt')
 
