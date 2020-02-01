@@ -26,7 +26,6 @@ jobs:
     displayName: 'Install dependencies'
 
   - script: |
-      python -m pip install hpy-api/
       python -m pip install .
     displayName: 'Build project'
 
