@@ -320,10 +320,10 @@ class AutoGen:
 
 def main():
     root = py.path.local(__file__).dirpath().dirpath()
-    include = root.join('hpy-api', 'hpy_devel', 'include')
+    include = root.join('hpy', 'devel', 'include')
     autogen_ctx = include.join('universal', 'autogen_ctx.h')
     autogen_trampolines = include.join('universal', 'autogen_trampolines.h')
-    autogen_ctx_def = root.join('cpython-universal', 'src', 'autogen_ctx_def.h')
+    autogen_ctx_def = root.join('hpy', 'universal', 'src', 'autogen_ctx_def.h')
     autogen_impl = include.join('common', 'autogen_impl.h')
     autogen_pypy = root.join('tools', 'autogen_pypy.txt')
 

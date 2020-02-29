@@ -1,14 +1,16 @@
 from setuptools import setup, Extension
 
 setup(
-    name="hpy_universal",
+    name="hpy.devel",
+    packages = ['hpy.devel'],
+    include_package_data=True,
     ext_modules = [
-        Extension('hpy_universal',
-                  ['cpython-universal/src/hpymodule.c',
-                   'cpython-universal/src/handles.c',
-                   'cpython-universal/src/api.c',
+        Extension('hpy.universal',
+                  ['hpy/universal/src/hpymodule.c',
+                   'hpy/universal/src/handles.c',
+                   'hpy/universal/src/api.c',
                   ],
-                  include_dirs=['hpy-api/hpy_devel/include'],
+                  include_dirs=['hpy/devel/include'],
         )]
 
 )
