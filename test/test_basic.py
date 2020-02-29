@@ -116,6 +116,22 @@ class TestBasic(HPyTest):
         """)
         assert mod.f(4, 5, 6, 7, 8) == 45678
 
+    def test_many_handle_arguments(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_VARARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy a, b;
+                if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
+                    return HPy_NULL;
+                return HPyNumber_Add(ctx, a, b);
+            }
+            @EXPORT f HPy_METH_VARARGS
+            @INIT
+        """)
+        assert mod.f("a", "b") == "ab"
+
     def test_close(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)

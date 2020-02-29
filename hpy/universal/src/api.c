@@ -180,6 +180,11 @@ ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
             *output = value;
             break;
         }
+        case 'O': {
+            HPy *output = va_arg(vl, HPy *);
+            *output = args[i];
+            break;
+        }
         default:
             abort();  // XXX
         }
