@@ -116,3 +116,7 @@ static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx
      return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, func, ml_flags ); 
 }
 
+static inline struct _object *_HPy_CallRealFunctionWithKeywordsFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, int ml_flags) {
+     return ctx->ctx_CallRealFunctionWithKeywordsFromTrampoline ( ctx, self, args, kw, func, ml_flags ); 
+}
+

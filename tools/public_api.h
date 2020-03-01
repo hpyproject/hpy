@@ -63,3 +63,10 @@ struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
                                                     struct _object *args,
                                                     void *func,
                                                     int ml_flags);
+
+struct _object *_HPy_CallRealFunctionWithKeywordsFromTrampoline(HPyContext ctx,
+                                                    struct _object *self,
+                                                    struct _object *args,
+                                                    struct _object *kw,
+                                                    void *func,
+                                                    int ml_flags);
