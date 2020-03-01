@@ -82,6 +82,25 @@ typedef struct {
         *out_trampoline = fnname##_trampoline;                                 \
     }
 
+#define HPy_DEF_METH_KEYWORDS(fnname)                                          \
+    static HPy fnname##_impl(HPyContext ctx, HPy self,                         \
+                             HPy *kw, char *kwnames[], HPy_ssize_t);           \
+    static struct _object *                                                    \
+    fnname##_trampoline(struct _object *self, struct _object *args,            \
+                        struct _object *kw)                                    \
+    {                                                                          \
+        return _HPy_CallRealFunctionWithKeywordsFromTrampoline(                \
+            _ctx_for_trampolines, self, args, kw, fnname##_impl,               \
+            HPy_METH_KEYWORDS);                                                \
+    }                                                                          \
+    void                                                                       \
+    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
+    {                                                                          \
+        *out_func = fnname##_impl;                                             \
+        *out_trampoline = fnname##_trampoline;                                 \
+    }
+
+
 
 // make sure to use a bit which is unused by CPython
 #define _HPy_METH 0x100000
