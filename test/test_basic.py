@@ -132,6 +132,22 @@ class TestBasic(HPyTest):
         """)
         assert mod.f("a", "b") == "ab"
 
+    def test_handle_keyword_arguments(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_KEYWORDS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPy a, b;
+                if (!HPyArg_ParseKeyword(ctx, kw, "OO", &a, &b))
+                    return HPy_NULL;
+                return HPyNumber_Add(ctx, a, b);
+            }
+            @EXPORT f HPy_DEF_METH_KEYWORDS
+            @INIT
+        """)
+        assert mod.f(a="x", b="y") == "xy"
+
     def test_close(self):
         mod = self.make_module("""
             HPy_DEF_METH_O(f)
