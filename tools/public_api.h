@@ -27,6 +27,8 @@ HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
 int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
                  const char *fmt, ...);
+int HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
+                const char *fmt, ...);
 HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
 
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);

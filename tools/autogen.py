@@ -289,9 +289,11 @@ class AutoGen:
                        'HPy_Dup',
                        'HPy_Close',
                        'HPyArg_Parse',
+                       'HPyArg_ParseKeywords',
                        'HPy_FromPyObject',
                        'HPy_AsPyObject',
-                       '_HPy_CallRealFunctionFromTrampoline'])
+                       '_HPy_CallRealFunctionFromTrampoline',
+                       '_HPy_CallRealFunctionWithKeywordsFromTrampoline'])
         lines = []
         for f in self.declarations:
             if not isinstance(f, Function):
