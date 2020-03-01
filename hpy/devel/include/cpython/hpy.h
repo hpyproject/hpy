@@ -147,6 +147,11 @@ HPyArg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs, const char *fmt, ...)
     return 1;
 }
 
+HPyAPI_FUNC(int)
+HPyArg_ParseKeywords(HPyContext ctx, HPy *args, Py_ssize_t nargs, const char *fmt, ...)
+{
+  return HPyArg_Parse(ctx, args, nargs, fmt);
+}
 
 HPyAPI_FUNC(HPy)
 HPy_FromPyObject(HPyContext ctx, PyObject *obj)

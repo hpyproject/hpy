@@ -13,7 +13,8 @@ typedef struct _HPy_s HPy;
 typedef struct _HPyContext_s *HPyContext;
 struct _object;  /* that's PyObject inside CPython */
 typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
-                                             struct _object *args);
+                                             struct _object *args,
+                                             struct _object *kw);
 
 #define _HPy_HIDDEN   __attribute__((visibility("hidden")))
 #define HPy_NULL ((HPy){0})

@@ -139,14 +139,14 @@ class TestBasic(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b;
-                if (!HPyArg_ParseKeyword(ctx, kw, "OO", &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, "OO", &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
             }
-            @EXPORT f HPy_DEF_METH_KEYWORDS
+            @EXPORT f HPy_METH_KEYWORDS
             @INIT
         """)
-        assert mod.f(a="x", b="y") == "xy"
+        assert mod.f("x", "y") == "xy"
 
     def test_close(self):
         mod = self.make_module("""
@@ -236,10 +236,12 @@ class TestBasic(HPyTest):
             HPy_DECL_METH_NOARGS(f);
             HPy_DECL_METH_O(g);
             HPy_DECL_METH_VARARGS(h);
+            HPy_DECL_METH_KEYWORDS(i);
 
             @EXPORT f HPy_METH_NOARGS
             @EXPORT g HPy_METH_O
             @EXPORT h HPy_METH_VARARGS
+            @EXPORT i HPy_METH_KEYWORDS
             @INIT
         """
         extra = """
@@ -261,11 +263,22 @@ class TestBasic(HPyTest):
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
+            HPy_DEF_METH_KEYWORDS(i)
+            static HPy i_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs,
+                              HPy kw)
+            {
+                // TODO: Also parse kw args.
+                long a, b;
+                if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx, 10*a + b);
+            }
         """
         mod = self.make_module(main, extra_templates=[extra])
         assert mod.f() == 12345
         assert mod.g(42) == 42
         assert mod.h(5, 6) == 56
+        assert mod.i(4, 3) == 43
 
     def test_Float_FromDouble(self):
         mod = self.make_module("""

@@ -47,9 +47,9 @@ create_method_defs(HPyModuleDef *hpydef)
             // HPy function: cal ml_meth to get pointers to the impl_func and
             // the cpy trampoline
             void *impl_func;
-            PyCFunction trampoline_func;
+            PyCFunctionWithKeywords trampoline_func;
             src->ml_meth(&impl_func, &trampoline_func);
-            dst->ml_meth = trampoline_func;
+            dst->ml_meth = (PyCFunction)trampoline_func;
             dst->ml_flags = src->ml_flags & ~_HPy_METH;
         }
         else {
@@ -121,6 +121,29 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
     }
 }
 
+typedef HPy (*HPyMeth_Keywords)(HPyContext, HPy self, HPy *args, HPy_ssize_t,
+                                HPy kw);
+
+static struct _object *
+ctx_CallRealFunctionWithKeywordsFromTrampoline(HPyContext ctx,
+                               struct _object *self, struct _object *args,
+                               struct _object *kw, void *func, int ml_flags)
+{
+  switch (ml_flags)
+  {
+  case HPy_METH_KEYWORDS: {
+     HPyMeth_Keywords f = (HPyMeth_Keywords)func;
+     Py_ssize_t nargs = PyTuple_GET_SIZE(args);
+     HPy *h_args = alloca(nargs * sizeof(HPy));
+     for (Py_ssize_t i = 0; i < nargs; i++) {
+         h_args[i] = _py2h(PyTuple_GET_ITEM(args, i));
+     }
+     return _h2py(f(ctx, _py2h(self), h_args, nargs, _py2h(kw)));
+  }
+  default:
+      abort();  // XXX
+  }
+}
 
 static HPy
 ctx_FromPyObject(HPyContext ctx, struct _object *obj)
@@ -195,6 +218,13 @@ ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
     }
 
     return 1;
+}
+
+static int
+ctx_Arg_ParseKeywords(HPyContext ctx, HPy *args, Py_ssize_t nargs,
+              const char *fmt, va_list vl)
+{
+  return ctx_Arg_Parse(ctx, args, nargs, fmt, vl);
 }
 
 /* expand impl functions as:
