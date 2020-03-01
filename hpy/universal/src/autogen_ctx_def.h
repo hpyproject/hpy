@@ -24,6 +24,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Long_AsLong = &ctx_Long_AsLong,
     .ctx_Float_FromDouble = &ctx_Float_FromDouble,
     .ctx_Arg_Parse = &ctx_Arg_Parse,
+    .ctx_Arg_ParseKeywords = &ctx_Arg_ParseKeywords,
     .ctx_Number_Add = &ctx_Number_Add,
     .ctx_Err_SetString = &ctx_Err_SetString,
     .ctx_Bytes_Check = &ctx_Bytes_Check,

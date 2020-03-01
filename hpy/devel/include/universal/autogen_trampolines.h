@@ -44,6 +44,10 @@ static inline int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, con
      va_list _vl; va_start(_vl, fmt); int _res = ctx->ctx_Arg_Parse ( ctx, args, nargs, fmt, _vl ); va_end(_vl); return _res; 
 }
 
+static inline int HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...) {
+     va_list _vl; va_start(_vl, fmt); int _res = ctx->ctx_Arg_ParseKeywords ( ctx, args, nargs, fmt, _vl ); va_end(_vl); return _res; 
+}
+
 static inline HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2) {
      return ctx->ctx_Number_Add ( ctx, h1, h2 ); 
 }

@@ -108,8 +108,3 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME(Dict_SetItem)(HPyContext ctx, HPy h_dict, HPy 
     return PyDict_SetItem(_h2py(h_dict), _h2py(h_key), _h2py(h_val));
 }
 
-HPyAPI_STORAGE struct _object *_HPy_IMPL_NAME(CallRealFunctionWithKeywordsFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, int ml_flags)
-{
-    return PyCallRealFunctionWithKeywordsFromTrampoline(self, args, kw, func, ml_flags);
-}
-
