@@ -48,6 +48,10 @@ static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *mess
      ctx->ctx_Err_SetString ( ctx, h_type, message ); 
 }
 
+static inline int HPyObject_IsTrue(HPyContext ctx, HPy h) {
+     return ctx->ctx_Object_IsTrue ( ctx, h ); 
+}
+
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }

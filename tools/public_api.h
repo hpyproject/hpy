@@ -29,6 +29,9 @@ HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
 
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 
+/* object.h */
+int HPyObject_IsTrue(HPyContext ctx, HPy h);
+
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);

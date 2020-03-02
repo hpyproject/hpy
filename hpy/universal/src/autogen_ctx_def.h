@@ -25,6 +25,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Float_FromDouble = &ctx_Float_FromDouble,
     .ctx_Number_Add = &ctx_Number_Add,
     .ctx_Err_SetString = &ctx_Err_SetString,
+    .ctx_Object_IsTrue = &ctx_Object_IsTrue,
     .ctx_Bytes_Check = &ctx_Bytes_Check,
     .ctx_Bytes_Size = &ctx_Bytes_Size,
     .ctx_Bytes_GET_SIZE = &ctx_Bytes_GET_SIZE,
