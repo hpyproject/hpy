@@ -49,6 +49,7 @@ int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 /* dictobject.h */
 HPy HPyDict_New(HPyContext ctx);
 int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
+HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
 
 /* integration with the old CPython API */
