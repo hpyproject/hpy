@@ -41,6 +41,9 @@ allocate_more_handles(void)
 HPy
 _py2h(PyObject *obj)
 {
+    if (obj == NULL) {
+        return HPy_NULL;
+    }
     if (h_free_list < 0) {
         allocate_more_handles();
     }
@@ -53,6 +56,9 @@ _py2h(PyObject *obj)
 PyObject *
 _h2py(HPy h)
 {
+    if (HPy_IsNull(h)) {
+      return NULL;
+    }
     return all_handles[h._i];
 }
 
