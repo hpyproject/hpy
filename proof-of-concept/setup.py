@@ -1,11 +1,15 @@
-import sys, os
+import os
+import sys
 from setuptools import setup, Extension
 import hpy.devel
 
 setup(
     name="hpy-pof",
-    ext_modules = [
-        Extension('pof', ['pof.c'], include_dirs=[hpy.devel.get_include()]),
+    ext_modules=[
+        Extension(
+            'pof', ['pof.c'] + hpy.devel.get_sources(),
+            include_dirs=[hpy.devel.get_include()],
+        ),
     ],
-    setup_requires = ['hpy.devel'],
+    setup_requires=['hpy.devel'],
 )
