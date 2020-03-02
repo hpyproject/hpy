@@ -147,7 +147,7 @@ class TestBasic(HPyTest):
             @EXPORT f HPy_METH_KEYWORDS
             @INIT
         """)
-        assert mod.f("x", "y") == "xy"
+        assert mod.f("x", b="y") == "xy"
 
     def test_close(self):
         mod = self.make_module("""

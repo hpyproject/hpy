@@ -51,15 +51,28 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw, const
   va_start(vl, keywords);
   const char *fmt1 = fmt;
   HPy_ssize_t i = 0;
+  HPy_ssize_t nkw = 0;
+  HPy current_arg;
+
+  while (keywords[nkw] != NULL) nkw++;
 
   while (*fmt1 != 0) {
-      if (i >= nargs) {
-          abort(); // XXX
+      if (i >= nkw) {
+        abort(); // XXX
       }
-      _HPyArg_ParseItem(ctx, args[i], &fmt1, vl);
+      if (i < nargs) {
+        current_arg = args[i];
+      }
+      else {
+        current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
+        if (HPy_IsNull(current_arg)) {
+          abort(); // XXX
+        }
+      }
+      _HPyArg_ParseItem(ctx, current_arg, &fmt1, vl);
       i++;
   }
-  if (i != nargs) {
+  if (i != nkw) {
       abort();   // XXX
   }
 
