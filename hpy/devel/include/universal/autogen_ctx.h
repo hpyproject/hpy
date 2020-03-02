@@ -23,8 +23,6 @@ struct _HPyContext_s {
     HPy (*ctx_Long_FromUnsignedLongLong)(HPyContext ctx, unsigned long long v);
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
-    int (*ctx_Arg_Parse)(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, va_list _vl);
-    int (*ctx_Arg_ParseKeywords)(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, va_list _vl);
     HPy (*ctx_Number_Add)(HPyContext ctx, HPy h1, HPy h2);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     int (*ctx_Bytes_Check)(HPyContext ctx, HPy h);
