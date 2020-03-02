@@ -38,6 +38,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_List_Append = &ctx_List_Append,
     .ctx_Dict_New = &ctx_Dict_New,
     .ctx_Dict_SetItem = &ctx_Dict_SetItem,
+    .ctx_Dict_GetItem = &ctx_Dict_GetItem,
     .ctx_FromPyObject = &ctx_FromPyObject,
     .ctx_AsPyObject = &ctx_AsPyObject,
     .ctx_CallRealFunctionFromTrampoline = &ctx_CallRealFunctionFromTrampoline,

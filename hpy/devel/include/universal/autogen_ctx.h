@@ -38,6 +38,7 @@ struct _HPyContext_s {
     int (*ctx_List_Append)(HPyContext ctx, HPy h_list, HPy h_item);
     HPy (*ctx_Dict_New)(HPyContext ctx);
     int (*ctx_Dict_SetItem)(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
+    HPy (*ctx_Dict_GetItem)(HPyContext ctx, HPy h_dict, HPy h_key);
     HPy (*ctx_FromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
     struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, void *func, int ml_flags);

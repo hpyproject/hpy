@@ -100,6 +100,10 @@ static inline int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_v
      return ctx->ctx_Dict_SetItem ( ctx, h_dict, h_key, h_val ); 
 }
 
+static inline HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key) {
+     return ctx->ctx_Dict_GetItem ( ctx, h_dict, h_key ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }
