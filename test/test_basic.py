@@ -139,7 +139,7 @@ class TestBasic(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b;
-                static char *kwlist[] = {"a", "b", 0};
+                static const char *kwlist[] = {"a", "b", 0};
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
@@ -156,7 +156,7 @@ class TestBasic(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b;
-                static char *kwlist[] = {"a", "b", 0};
+                static const char *kwlist[] = {"a", "b", 0};
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
@@ -165,6 +165,25 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f(b="y", a="x") == "xy"
+
+    def test_handle_optional_keyword_arguments(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_KEYWORDS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPy a, b;
+                b = HPyLong_FromLong(ctx, 5);
+                static const char *kwlist[] = {"a", "b", 0};
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O|O", kwlist, &a, &b))
+                    return HPy_NULL;
+                return HPyNumber_Add(ctx, a, b);
+            }
+            @EXPORT f HPy_METH_KEYWORDS
+            @INIT
+        """)
+        # assert mod.f(a=3, b=2) == 5
+        assert mod.f(a=3) == 8
 
     def test_close(self):
         mod = self.make_module("""
