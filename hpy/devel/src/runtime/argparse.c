@@ -16,9 +16,10 @@ int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list
       break;
   }
   default:
-      abort();  // XXX
+      HPyErr_SetString(ctx, ctx->h_ValueError, "XXX: Unknown arg format code");
+      return 0;
   }
-  return 0;
+  return 1;
 }
 
 HPyAPI_RUNTIME_FUNC(int)
@@ -31,13 +32,17 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
 
     while (*fmt1 != 0) {
         if (i >= nargs) {
-            abort(); // XXX
+            HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too few arguments passed");
+            return 0;
         }
-        _HPyArg_ParseItem(ctx, args[i], &fmt1, vl);
+        if (!_HPyArg_ParseItem(ctx, args[i], &fmt1, vl)) {
+            return 0;;
+        }
         i++;
     }
     if (i != nargs) {
-        abort();   // XXX
+        HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too many arguments passed");
+        return 0;
     }
 
     va_end(vl);
@@ -65,7 +70,8 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         continue;
       }
       if (i >= nkw) {
-        abort(); // XXX
+        HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too few keywords for fmt)");
+        return 0;
       }
       if (i < nargs) {
         current_arg = args[i];
@@ -74,18 +80,22 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
       }
       if (!HPy_IsNull(current_arg)) {
-        _HPyArg_ParseItem(ctx, current_arg, &fmt1, vl);
+        if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, vl)) {
+          return 0;
+        }
       }
       else if (optional) {
         fmt1++;
       }
       else {
-        abort(); // XXX
+        HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: no value for required argument");
+        return 0;
       }
       i++;
   }
   if (i != nkw) {
-      abort();   // XXX
+      HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too many keywords for fmt)");
+      return 0;
   }
 
   va_end(vl);
