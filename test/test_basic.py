@@ -139,7 +139,8 @@ class TestBasic(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b;
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, "OO", &a, &b))
+                static char *kwlist[] = {"a", "b", 0};
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
             }
