@@ -26,6 +26,11 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 static inline HPy HPy_FromVoidP(void *p) { return (HPy){(HPy_ssize_t)p}; }
 static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
+#ifdef __GNUC__
+#define HPyAPI_RUNTIME_FUNC(restype) __attribute__((visibility("hidden"))) restype
+#else
+#define HPyAPI_RUNTIME_FUNC(restype) restype
+#endif /* __GNUC__ */
 
 #include "meth.h"
 #include "module.h"

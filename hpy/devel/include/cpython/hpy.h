@@ -21,6 +21,12 @@
 
 #define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
 
+#ifdef __GNUC__
+#define HPyAPI_RUNTIME_FUNC(restype) __attribute__((visibility("hidden"))) restype
+#else
+#define HPyAPI_RUNTIME_FUNC(restype) restype
+#endif /* __GNUC__ */
+
 typedef struct { PyObject *_o; } HPy;
 typedef Py_ssize_t HPy_ssize_t;
 
@@ -101,58 +107,6 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
         return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
-/* XXX: this function is copied&pasted THREE times:
- *     hpy_devel/include/hpy.h
- *     cpython-universal/api.c
- *     pypy/module/hpy_universal/src/getargs.c
- *
- * We need a way to share this kind of common code
- */
-
-HPyAPI_FUNC(int)
-HPyArg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs, const char *fmt, ...)
-{
-    va_list vl;
-    va_start(vl, fmt);
-    const char *fmt1 = fmt;
-    Py_ssize_t i = 0;
-
-    while (*fmt1 != 0) {
-        if (i >= nargs) {
-            abort(); // XXX
-        }
-        switch (*fmt1++) {
-        case 'l': {
-            long *output = va_arg(vl, long *);
-            long value = PyLong_AsLong(_h2py(args[i]));
-            // XXX check for exceptions
-            *output = value;
-            break;
-        }
-        case 'O': {
-            HPy *output = va_arg(vl, HPy *);
-            *output = args[i];
-            break;
-        }
-        default:
-            abort();  // XXX
-        }
-        i++;
-    }
-    if (i != nargs) {
-        abort();   // XXX
-    }
-
-    va_end(vl);
-    return 1;
-}
-
-HPyAPI_FUNC(int)
-HPyArg_ParseKeywords(HPyContext ctx, HPy *args, Py_ssize_t nargs, const char *fmt, ...)
-{
-  return HPyArg_Parse(ctx, args, nargs, fmt);
-}
-
 HPyAPI_FUNC(HPy)
 HPy_FromPyObject(HPyContext ctx, PyObject *obj)
 {
@@ -175,5 +129,11 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #define _HPy_IMPL_NAME(name) HPy##name
 #include "../common/autogen_impl.h"
 #undef _HPy_IMPL_NAME
+
+/* include runtime functions as
+ */
+#define _HPy_RUNTIME_NAME(name) HPy##name
+#include "../common/runtime.h"
+#undef _HPy_RUNTIME_NAME
 
 #endif /* !HPy_CPYTHON_H */

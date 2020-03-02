@@ -174,59 +174,6 @@ ctx_Dup(HPyContext ctx, HPy h)
     return _py2h(obj);
 }
 
-
-
-/* XXX: this function is copied&pasted THREE times:
- *     hpy_devel/include/hpy.h
- *     cpython-universal/api.c
- *     pypy/module/hpy_universal/src/getargs.c
- *
- * We need a way to share this kind of common code
- */
-
-static int
-ctx_Arg_Parse(HPyContext ctx, HPy *args, Py_ssize_t nargs,
-              const char *fmt, va_list vl)
-{
-    const char *fmt1 = fmt;
-    Py_ssize_t i = 0;
-
-    while (*fmt1 != 0) {
-        if (i >= nargs) {
-            abort(); // XXX
-        }
-        switch (*fmt1++) {
-        case 'l': {
-            long *output = va_arg(vl, long *);
-            long value = HPyLong_AsLong(ctx, args[i]);
-            // XXX check for exceptions
-            *output = value;
-            break;
-        }
-        case 'O': {
-            HPy *output = va_arg(vl, HPy *);
-            *output = args[i];
-            break;
-        }
-        default:
-            abort();  // XXX
-        }
-        i++;
-    }
-    if (i != nargs) {
-        abort();   // XXX
-    }
-
-    return 1;
-}
-
-static int
-ctx_Arg_ParseKeywords(HPyContext ctx, HPy *args, Py_ssize_t nargs,
-              const char *fmt, va_list vl)
-{
-  return ctx_Arg_Parse(ctx, args, nargs, fmt, vl);
-}
-
 /* expand impl functions as:
  *     static ctx_Long_FromLong(...);
  *
@@ -237,5 +184,11 @@ ctx_Arg_ParseKeywords(HPyContext ctx, HPy *args, Py_ssize_t nargs,
 #define _HPy_IMPL_NAME(name) ctx_##name
 #include "common/autogen_impl.h"
 #undef _HPy_IMPL_NAME
+
+/* include runtime functions as
+ */
+#define _HPy_RUNTIME_NAME(name) HPy##name
+#include "common/runtime.h"
+#undef _HPy_RUNTIME_NAME
 
 #include "autogen_ctx_def.h"
