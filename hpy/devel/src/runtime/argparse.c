@@ -51,6 +51,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
   va_list vl;
   va_start(vl, keywords);
   const char *fmt1 = fmt;
+  int optional = 0;
   HPy_ssize_t i = 0;
   HPy_ssize_t nkw = 0;
   HPy current_arg;
@@ -58,6 +59,11 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
   while (keywords[nkw] != NULL) nkw++;
 
   while (*fmt1 != 0) {
+      if (*fmt1 == '|') {
+        optional = 1;
+        fmt1++;
+        continue;
+      }
       if (i >= nkw) {
         abort(); // XXX
       }
@@ -66,11 +72,16 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
       }
       else {
         current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
-        if (HPy_IsNull(current_arg)) {
-          abort(); // XXX
-        }
       }
-      _HPyArg_ParseItem(ctx, current_arg, &fmt1, vl);
+      if (!HPy_IsNull(current_arg)) {
+        _HPyArg_ParseItem(ctx, current_arg, &fmt1, vl);
+      }
+      else if (optional) {
+        fmt1++;
+      }
+      else {
+        abort(); // XXX
+      }
       i++;
   }
   if (i != nkw) {
