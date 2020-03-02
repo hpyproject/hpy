@@ -132,7 +132,7 @@ class TestBasic(HPyTest):
         """)
         assert mod.f("a", "b") == "ab"
 
-    def test_handle_keyword_arguments(self):
+    def test_handle_some_keyword_arguments(self):
         mod = self.make_module("""
             HPy_DEF_METH_KEYWORDS(f)
             static HPy f_impl(HPyContext ctx, HPy self,
@@ -148,6 +148,23 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f("x", b="y") == "xy"
+
+    def test_handle_reordered_keyword_arguments(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_KEYWORDS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPy a, b;
+                static char *kwlist[] = {"a", "b", 0};
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
+                    return HPy_NULL;
+                return HPyNumber_Add(ctx, a, b);
+            }
+            @EXPORT f HPy_METH_KEYWORDS
+            @INIT
+        """)
+        assert mod.f(b="y", a="x") == "xy"
 
     def test_close(self):
         mod = self.make_module("""
