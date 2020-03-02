@@ -1,5 +1,26 @@
 #include "hpy.h"
 
+int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list vl)
+{
+  switch (*(*fmt)++) {
+  case 'l': {
+      long *output = va_arg(vl, long *);
+      long value = HPyLong_AsLong(ctx, current_arg);
+      // XXX check for exceptions
+      *output = value;
+      break;
+  }
+  case 'O': {
+      HPy *output = va_arg(vl, HPy *);
+      *output = current_arg;
+      break;
+  }
+  default:
+      abort();  // XXX
+  }
+  return 0;
+}
+
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
 {
@@ -12,22 +33,7 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
         if (i >= nargs) {
             abort(); // XXX
         }
-        switch (*fmt1++) {
-        case 'l': {
-            long *output = va_arg(vl, long *);
-            long value = HPyLong_AsLong(ctx, args[i]);
-            // XXX check for exceptions
-            *output = value;
-            break;
-        }
-        case 'O': {
-            HPy *output = va_arg(vl, HPy *);
-            *output = args[i];
-            break;
-        }
-        default:
-            abort();  // XXX
-        }
+        _HPyArg_ParseItem(ctx, args[i], &fmt1, vl);
         i++;
     }
     if (i != nargs) {
@@ -50,22 +56,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw, const
       if (i >= nargs) {
           abort(); // XXX
       }
-      switch (*fmt1++) {
-      case 'l': {
-          long *output = va_arg(vl, long *);
-          long value = HPyLong_AsLong(ctx, args[i]);
-          // XXX check for exceptions
-          *output = value;
-          break;
-      }
-      case 'O': {
-          HPy *output = va_arg(vl, HPy *);
-          *output = args[i];
-          break;
-      }
-      default:
-          abort();  // XXX
-      }
+      _HPyArg_ParseItem(ctx, args[i], &fmt1, vl);
       i++;
   }
   if (i != nargs) {
