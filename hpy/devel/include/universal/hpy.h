@@ -32,6 +32,10 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #define HPyAPI_RUNTIME_FUNC(restype) restype
 #endif /* __GNUC__ */
 
+/* include runtime functions
+ */
+#include "common/runtime.h"
+
 #include "meth.h"
 #include "module.h"
 

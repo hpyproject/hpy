@@ -185,10 +185,4 @@ ctx_Dup(HPyContext ctx, HPy h)
 #include "common/autogen_impl.h"
 #undef _HPy_IMPL_NAME
 
-/* include runtime functions as
- */
-#define _HPy_RUNTIME_NAME(name) HPy##name
-#include "common/runtime.h"
-#undef _HPy_RUNTIME_NAME
-
 #include "autogen_ctx_def.h"

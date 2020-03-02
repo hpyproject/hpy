@@ -132,8 +132,6 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 
 /* include runtime functions as
  */
-#define _HPy_RUNTIME_NAME(name) HPy##name
 #include "../common/runtime.h"
-#undef _HPy_RUNTIME_NAME
 
 #endif /* !HPy_CPYTHON_H */
