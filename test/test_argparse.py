@@ -212,7 +212,7 @@ class TestArgParseKeywords(HPyTest):
             mod.f()
         assert str(exc.value) == "XXX: Empty keyword parameter name"
 
-    def test_positional_only_and_keyword_argument(self):
+    def test_positional_only_argument(self):
         import pytest
         mod = self.make_module("""
             HPy_DEF_METH_KEYWORDS(f)
@@ -234,3 +234,13 @@ class TestArgParseKeywords(HPyTest):
         with pytest.raises(TypeError) as exc:
             mod.f(a=1, b=2)
         assert str(exc.value) == "XXX: no value for required argument"
+
+    def test_keyword_only_argument(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="O$O")
+        assert mod.f(1, b=2) == 3
+        assert mod.f(a=1, b=2) == 3
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == (
+            "XXX: keyword only argument passed as positional argument")

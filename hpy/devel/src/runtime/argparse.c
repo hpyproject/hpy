@@ -73,6 +73,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
   va_start(vl, keywords);
   const char *fmt1 = fmt;
   int optional = 0;
+  int keyword_only = 0;
   HPy_ssize_t i = 0;
   HPy_ssize_t nkw = 0;
   HPy current_arg;
@@ -94,12 +95,22 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         fmt1++;
         continue;
       }
+      if (*fmt1 == '$') {
+        optional = 1;
+        keyword_only = 1;
+        fmt1++;
+        continue;
+      }
       if (i >= nkw) {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too few keywords for fmt)");
         return 0;
       }
       current_arg = HPy_NULL;
       if (i < nargs) {
+        if (keyword_only) {
+          HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: keyword only argument passed as positional argument");
+          return 0;
+        }
         current_arg = args[i];
       }
       else if (!HPy_IsNull(kw) && *keywords[i]) {
