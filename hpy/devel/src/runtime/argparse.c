@@ -73,10 +73,11 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too few keywords for fmt)");
         return 0;
       }
+      current_arg = HPy_NULL;
       if (i < nargs) {
         current_arg = args[i];
       }
-      else {
+      else if (!HPy_IsNull(kw)) {
         current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
       }
       if (!HPy_IsNull(current_arg)) {
