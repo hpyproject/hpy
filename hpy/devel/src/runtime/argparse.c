@@ -5,6 +5,14 @@
 int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list vl)
 {
   switch (*(*fmt)++) {
+  case 'i': {
+      int *output = va_arg(vl, int *);
+      _BREAK_IF_OPTIONAL(current_arg);
+      int value = (int) HPyLong_AsLong(ctx, current_arg);
+      // XXX check for exceptions
+      *output = value;
+      break;
+  }
   case 'l': {
       long *output = va_arg(vl, long *);
       _BREAK_IF_OPTIONAL(current_arg);

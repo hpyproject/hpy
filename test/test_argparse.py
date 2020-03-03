@@ -9,6 +9,39 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 from .support import HPyTest
 
 
+class TestParseItem(HPyTest):
+    def make_parse_item(self, fmt, type, hpy_converter):
+        mod = self.make_module("""
+            HPy_DEF_METH_VARARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {{
+                {type} a;
+                if (!HPyArg_Parse(ctx, args, nargs, "{fmt}", &a))
+                    return HPy_NULL;
+                return {hpy_converter}(ctx, a);
+            }}
+            @EXPORT f HPy_METH_VARARGS
+            @INIT
+        """.format(fmt=fmt, type=type, hpy_converter=hpy_converter))
+        return mod
+
+    def test_i(self):
+        mod = self.make_parse_item("i", "int", "HPyLong_FromLong")
+        assert mod.f(1) == 1
+        assert mod.f(-2) == -2
+
+    def test_l(self):
+        mod = self.make_parse_item("l", "long", "HPyLong_FromLong")
+        assert mod.f(1) == 1
+        assert mod.f(-2) == -2
+
+    def test_O(self):
+        mod = self.make_parse_item("O", "HPy", "HPy_Dup")
+        assert mod.f("a") == "a"
+        assert mod.f(5) == 5
+
+
 class TestArgParse(HPyTest):
     def make_two_arg_add(self, fmt="OO"):
         mod = self.make_module("""
