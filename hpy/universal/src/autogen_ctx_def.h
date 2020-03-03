@@ -43,5 +43,4 @@ struct _HPyContext_s global_ctx = {
     .ctx_FromPyObject = &ctx_FromPyObject,
     .ctx_AsPyObject = &ctx_AsPyObject,
     .ctx_CallRealFunctionFromTrampoline = &ctx_CallRealFunctionFromTrampoline,
-    .ctx_CallRealFunctionWithKeywordsFromTrampoline = &ctx_CallRealFunctionWithKeywordsFromTrampoline,
 };

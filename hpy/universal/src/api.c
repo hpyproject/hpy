@@ -92,10 +92,13 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);
 typedef HPy (*HPyMeth_O)(HPyContext, HPy self, HPy arg);
 typedef HPy (*HPyMeth_VarArgs)(HPyContext, HPy self, HPy *args, HPy_ssize_t);
+typedef HPy (*HPyMeth_Keywords)(HPyContext, HPy self, HPy *args, HPy_ssize_t,
+                                HPy kw);
 
 static struct _object *
 ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
-                               struct _object *args, void *func, int ml_flags)
+                               struct _object *args, struct _object *kw,
+                               void *func, int ml_flags)
 {
     switch (ml_flags)
     {
@@ -116,33 +119,18 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
         }
         return _h2py(f(ctx, _py2h(self), h_args, nargs));
     }
+    case HPy_METH_KEYWORDS: {
+       HPyMeth_Keywords f = (HPyMeth_Keywords)func;
+       Py_ssize_t nargs = PyTuple_GET_SIZE(args);
+       HPy *h_args = alloca(nargs * sizeof(HPy));
+       for (Py_ssize_t i = 0; i < nargs; i++) {
+           h_args[i] = _py2h(PyTuple_GET_ITEM(args, i));
+       }
+       return _h2py(f(ctx, _py2h(self), h_args, nargs, _py2h(kw)));
+    }
     default:
         abort();  // XXX
     }
-}
-
-typedef HPy (*HPyMeth_Keywords)(HPyContext, HPy self, HPy *args, HPy_ssize_t,
-                                HPy kw);
-
-static struct _object *
-ctx_CallRealFunctionWithKeywordsFromTrampoline(HPyContext ctx,
-                               struct _object *self, struct _object *args,
-                               struct _object *kw, void *func, int ml_flags)
-{
-  switch (ml_flags)
-  {
-  case HPy_METH_KEYWORDS: {
-     HPyMeth_Keywords f = (HPyMeth_Keywords)func;
-     Py_ssize_t nargs = PyTuple_GET_SIZE(args);
-     HPy *h_args = alloca(nargs * sizeof(HPy));
-     for (Py_ssize_t i = 0; i < nargs; i++) {
-         h_args[i] = _py2h(PyTuple_GET_ITEM(args, i));
-     }
-     return _h2py(f(ctx, _py2h(self), h_args, nargs, _py2h(kw)));
-  }
-  default:
-      abort();  // XXX
-  }
 }
 
 static HPy

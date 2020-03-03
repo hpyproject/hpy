@@ -44,7 +44,7 @@ typedef struct {
     fnname##_trampoline(struct _object *self, struct _object *noargs)          \
     {                                                                          \
         return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, NULL, fnname##_impl,                   \
+            _ctx_for_trampolines, self, NULL, NULL, fnname##_impl,             \
             HPy_METH_NOARGS);                                                  \
     }                                                                          \
     void                                                                       \
@@ -60,7 +60,7 @@ typedef struct {
     fnname##_trampoline(struct _object *self, struct _object *arg)             \
     {                                                                          \
         return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, arg, fnname##_impl, HPy_METH_O);       \
+            _ctx_for_trampolines, self, arg, NULL, fnname##_impl, HPy_METH_O); \
     }                                                                          \
     void                                                                       \
     fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
@@ -76,7 +76,7 @@ typedef struct {
     fnname##_trampoline(struct _object *self, struct _object *args)            \
     {                                                                          \
         return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, args, fnname##_impl,                   \
+            _ctx_for_trampolines, self, args, NULL, fnname##_impl,             \
             HPy_METH_VARARGS);                                                 \
     }                                                                          \
     void                                                                       \
@@ -93,7 +93,7 @@ typedef struct {
     fnname##_trampoline(struct _object *self, struct _object *args,            \
                         struct _object *kw)                                    \
     {                                                                          \
-        return _HPy_CallRealFunctionWithKeywordsFromTrampoline(                \
+        return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, args, kw, fnname##_impl,               \
             HPy_METH_KEYWORDS);                                                \
     }                                                                          \
