@@ -41,8 +41,7 @@ typedef struct {
 #define HPy_DEF_METH_NOARGS(fnname)                                            \
     static HPy fnname##_impl(HPyContext ctx, HPy self);                        \
     static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *noargs,          \
-                        struct _object *nokw)                                  \
+    fnname##_trampoline(struct _object *self, struct _object *noargs)          \
     {                                                                          \
         return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, NULL, fnname##_impl,                   \
@@ -58,8 +57,7 @@ typedef struct {
 #define HPy_DEF_METH_O(fnname)                                                 \
     static HPy fnname##_impl(HPyContext ctx, HPy self, HPy arg);               \
     static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *arg,             \
-                        struct _object *nokw)                                  \
+    fnname##_trampoline(struct _object *self, struct _object *arg)             \
     {                                                                          \
         return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, arg, fnname##_impl, HPy_METH_O);       \
@@ -75,8 +73,7 @@ typedef struct {
     static HPy fnname##_impl(HPyContext ctx, HPy self, HPy *args,              \
                              HPy_ssize_t nargs);                               \
     static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *args,            \
-                        struct _object *nokw)                                  \
+    fnname##_trampoline(struct _object *self, struct _object *args)            \
     {                                                                          \
         return _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, self, args, fnname##_impl,                   \
@@ -104,7 +101,7 @@ typedef struct {
     fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
-        *out_trampoline = fnname##_trampoline;                                 \
+        *out_trampoline = (_HPy_CPyCFunction) fnname##_trampoline;             \
     }
 
 // make sure to use a bit which is unused by CPython

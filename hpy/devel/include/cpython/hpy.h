@@ -130,8 +130,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #include "../common/autogen_impl.h"
 #undef _HPy_IMPL_NAME
 
-/* include runtime functions as
- */
+// include runtime functions
 #include "../common/runtime.h"
 
 #endif /* !HPy_CPYTHON_H */

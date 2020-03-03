@@ -13,8 +13,7 @@ typedef struct _HPy_s HPy;
 typedef struct _HPyContext_s *HPyContext;
 struct _object;  /* that's PyObject inside CPython */
 typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
-                                             struct _object *args,
-                                             struct _object *kw);
+                                             struct _object *args);
 
 #define _HPy_HIDDEN   __attribute__((visibility("hidden")))
 #define HPy_NULL ((HPy){0})
@@ -32,8 +31,7 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #define HPyAPI_RUNTIME_FUNC(restype) restype
 #endif /* __GNUC__ */
 
-/* include runtime functions
- */
+// include runtime functions
 #include "common/runtime.h"
 
 #include "meth.h"
