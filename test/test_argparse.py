@@ -17,6 +17,7 @@ class TestArgParse(HPyTest):
                               HPy *args, HPy_ssize_t nargs)
             {{
                 HPy a, b;
+                b = HPyLong_FromLong(ctx, 5);
                 if (!HPyArg_Parse(ctx, args, nargs, "{fmt}", &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
@@ -80,6 +81,11 @@ class TestArgParse(HPyTest):
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2, 3)
         assert str(exc.value) == "XXX: Too many arguments passed"
+
+    def test_optional_args(self):
+        mod = self.make_two_arg_add(fmt="O|O")
+        assert mod.f(1) == 6
+        assert mod.f(3, 4) == 7
 
 
 class TestArgParseKeywords(HPyTest):
@@ -152,7 +158,9 @@ class TestArgParseKeywords(HPyTest):
             @INIT
         """)
         assert mod.f(a=3, b=2) == 5
+        assert mod.f(3, 2) == 5
         assert mod.f(a=3) == 8
+        assert mod.f(3) == 8
 
     def test_unsupported_fmt(self):
         import pytest

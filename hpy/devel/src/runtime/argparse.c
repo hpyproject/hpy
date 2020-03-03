@@ -28,17 +28,33 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
     va_list vl;
     va_start(vl, fmt);
     const char *fmt1 = fmt;
+    int optional = 0;
     HPy_ssize_t i = 0;
+    HPy current_arg;
 
     while (*fmt1 != 0) {
-        if (i >= nargs) {
-            HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too few arguments passed");
+        if (*fmt1 == '|') {
+          optional = 1;
+          fmt1++;
+          continue;
+        }
+        current_arg = HPy_NULL;
+        if (i < nargs) {
+          current_arg = args[i];
+        }
+        if (!HPy_IsNull(current_arg)) {
+          if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, vl)) {
             return 0;
+          }
+          i++;
         }
-        if (!_HPyArg_ParseItem(ctx, args[i], &fmt1, vl)) {
-            return 0;;
+        else if (optional) {
+          fmt1++;
         }
-        i++;
+        else {
+          HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too few arguments passed");
+          return 0;
+        }
     }
     if (i != nargs) {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too many arguments passed");
