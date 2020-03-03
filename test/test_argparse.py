@@ -90,7 +90,7 @@ class TestArgParseKeywords(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {{
                 HPy a, b;
-                static const char *kwlist[] = {{ "a", "b", 0 }};
+                static const char *kwlist[] = {{ "a", "b", NULL }};
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "{fmt}",
                                           kwlist, &a, &b))
                     return HPy_NULL;
@@ -108,7 +108,7 @@ class TestArgParseKeywords(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b;
-                static const char *kwlist[] = {"a", "b", 0};
+                static const char *kwlist[] = { "a", "b", NULL };
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
@@ -125,7 +125,7 @@ class TestArgParseKeywords(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b;
-                static const char *kwlist[] = {"a", "b", 0};
+                static const char *kwlist[] = { "a", "b", NULL };
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
@@ -143,7 +143,7 @@ class TestArgParseKeywords(HPyTest):
             {
                 HPy a, b;
                 b = HPyLong_FromLong(ctx, 5);
-                static const char *kwlist[] = {"a", "b", 0};
+                static const char *kwlist[] = { "a", "b", NULL };
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O|O", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
