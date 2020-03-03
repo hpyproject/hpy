@@ -266,8 +266,6 @@ class AutoGen:
         exclude = set(['HPyModule_Create',
                        'HPy_Dup',
                        'HPy_Close',
-                       'HPyArg_Parse',
-                       'HPyArg_ParseKeywords',
                        'HPy_FromPyObject',
                        'HPy_AsPyObject',
                        '_HPy_CallRealFunctionFromTrampoline'])
