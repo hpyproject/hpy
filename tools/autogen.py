@@ -25,6 +25,40 @@ def toC(node):
 toC.gen = CGenerator()
 
 
+RUST_TYPE_MAPPING = {
+    ('unsigned', 'long', 'long'): 'c_ulonglong',
+    ('long', 'long'): 'c_longlong',
+    ('void', ): 'c_void',
+    ('char', ): 'c_char',
+    ('int', ): 'c_int',
+    ('long', ): 'c_long',
+    ('double', ): 'c_double',
+}
+
+
+def rust_name(cname):
+    if cname == 'self':
+        return 'slf'
+    return cname
+
+
+def rust_type(ctype):
+    """Translation from C to Rust type."""
+    if isinstance(ctype, c_ast.TypeDecl):
+        inner = ctype.type
+        if isinstance(inner, c_ast.IdentifierType):
+            names = tuple(inner.names)
+            mapped = RUST_TYPE_MAPPING.get(names)
+            if mapped is not None:
+                return mapped
+            assert len(names) == 1  # RUST_TYPE_MAPPING should handle other cases
+            return names[0]
+        if isinstance(inner, c_ast.Struct) and inner.name == '_object':
+            return 'PyObject'
+
+    if isinstance(ctype, c_ast.PtrDecl):
+        return "*mut " + rust_type(ctype.type)
+
 @attr.s
 class Function:
     _BASE_NAME = re.compile(r'^_?HPy_?')
@@ -43,6 +77,9 @@ class Function:
     def ctx_name(self):
         # e.g. "ctx_Module_Create"
         return self._BASE_NAME.sub(r'ctx_', self.name)
+
+    def ctx_rust_name(self):
+        return self.ctx_name()  # TODO maybe provide more "Rustic" names
 
     def ctx_impl_name(self):
         return '&%s' % self.ctx_name()
@@ -149,6 +186,17 @@ class Function:
     def ctx_pypy_type(self):
         return 'void *'
 
+    def ctx_rust_type(self):
+        newnode = deepcopy(self.node)
+        rust_params = []
+        for p in self.node.type.args.params:
+            if isinstance(p, c_ast.EllipsisParam):
+                continue  # TODO
+            rust_params.append((rust_name(p.name), rust_type(p.type)))
+        rtype = rust_type(self.node.type.type)
+        return 'unsafe extern "C" fn(' + ', '.join(
+            '%s: %s' % (n, t) for n, t in rust_params) + ') -> %s' % rtype
+
     def pypy_stub(self):
         signature = toC(self.node)
         if self.is_varargs():
@@ -185,6 +233,12 @@ class GlobalVar:
 
     def ctx_pypy_type(self):
         return 'struct _HPy_s'
+
+    def ctx_rust_type(self):
+        return 'HPy'
+
+    def ctx_rust_name(self):
+        return re.sub(r'^h_', '', self.name)
 
     def pypy_stub(self):
         return ''
@@ -317,6 +371,19 @@ class AutoGen:
             w(f.pypy_stub())
         return '\n'.join(lines)
 
+    def gen_rust_decl(self):
+        lines = []
+        w = lines.append
+        w("use crate::ffi::*;")
+        w("")
+        w("struct  _HPyContext_s {")
+        w("    version: c_int,")
+        for f in self.declarations:
+            w("    %s: %s," % (f.ctx_rust_name(), f.ctx_rust_type()))
+        w("}")
+        w("")
+        w("type HPyContext = *mut _HPyContext_s;")
+        return '\n'.join(lines)
 
 def main():
     root = py.path.local(__file__).dirpath().dirpath()
@@ -326,6 +393,7 @@ def main():
     autogen_ctx_def = root.join('hpy', 'universal', 'src', 'autogen_ctx_def.h')
     autogen_impl = include.join('common', 'autogen_impl.h')
     autogen_pypy = root.join('tools', 'autogen_pypy.txt')
+    autogen_rust = root.join('tools', 'autogen_rust.txt')
 
     autogen = AutoGen(root.join('tools', 'public_api.h'))
     for func in autogen.declarations:
@@ -336,6 +404,7 @@ def main():
     ctx_def = autogen.gen_ctx_def()
     impl = autogen.gen_func_implementations()
     pypy_decl = autogen.gen_pypy_decl()
+    rust_decl = autogen.gen_rust_decl()
 
     with autogen_ctx.open('w') as f:
         print(DISCLAIMER, file=f)
@@ -355,6 +424,9 @@ def main():
 
     with autogen_pypy.open('w') as f:
         print(pypy_decl, file=f)
+
+    with autogen_rust.open('w') as f:
+        print(rust_decl, file=f)
 
 if __name__ == '__main__':
     main()
