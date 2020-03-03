@@ -217,9 +217,9 @@ class TestBasic(HPyTest):
             static HPy i_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs,
                               HPy kw)
             {
-                // TODO: Also parse kw args.
                 long a, b;
-                if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+                static const char *kwlist[] = { "a", "b", NULL };
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "ll", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
@@ -229,6 +229,7 @@ class TestBasic(HPyTest):
         assert mod.g(42) == 42
         assert mod.h(5, 6) == 56
         assert mod.i(4, 3) == 43
+        assert mod.i(a=2, b=5) == 25
 
     def test_Float_FromDouble(self):
         mod = self.make_module("""
