@@ -73,14 +73,14 @@ class TestArgParse(HPyTest):
         mod = self.make_two_arg_add()
         with pytest.raises(TypeError) as exc:
             mod.f()
-        assert str(exc.value) == "XXX: Too few arguments passed"
+        assert str(exc.value) == "XXX: required positional argument missing"
 
     def test_too_many_args(self):
         import pytest
         mod = self.make_two_arg_add()
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2, 3)
-        assert str(exc.value) == "XXX: Too many arguments passed"
+        assert str(exc.value) == "XXX: mismatched args (too many arguments for fmt)"
 
     def test_optional_args(self):
         mod = self.make_two_arg_add(fmt="O|O")

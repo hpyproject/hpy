@@ -1,16 +1,13 @@
 #include "hpy.h"
 
+#define _BREAK_IF_OPTIONAL(current_arg) if (HPy_IsNull(current_arg)) break;
+
 int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list vl)
 {
-  if (HPy_IsNull(current_arg)) {
-    // here a null current_arg represents an optional argument
-    (*fmt)++;
-    va_arg(vl, void *);
-    return 1;
-  }
   switch (*(*fmt)++) {
   case 'l': {
       long *output = va_arg(vl, long *);
+      _BREAK_IF_OPTIONAL(current_arg);
       long value = HPyLong_AsLong(ctx, current_arg);
       // XXX check for exceptions
       *output = value;
@@ -18,6 +15,7 @@ int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list
   }
   case 'O': {
       HPy *output = va_arg(vl, HPy *);
+      _BREAK_IF_OPTIONAL(current_arg);
       *output = current_arg;
       break;
   }
@@ -52,15 +50,16 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
           if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, vl)) {
             return 0;
           }
-          i++;
         }
         else {
-          HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too few arguments passed");
+          HPyErr_SetString(ctx, ctx->h_TypeError,
+                           "XXX: required positional argument missing");
           return 0;
         }
+        i++;
     }
-    if (i != nargs) {
-        HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too many arguments passed");
+    if (i < nargs) {
+        HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too many arguments for fmt)");
         return 0;
     }
 
