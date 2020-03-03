@@ -87,6 +87,13 @@ class TestArgParse(HPyTest):
         assert mod.f(1) == 6
         assert mod.f(3, 4) == 7
 
+    def test_keyword_only_args_fails(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="O$O")
+        with pytest.raises(ValueError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "XXX: Unknown arg format code"
+
 
 class TestArgParseKeywords(HPyTest):
     def make_two_arg_add(self, fmt="OO"):
