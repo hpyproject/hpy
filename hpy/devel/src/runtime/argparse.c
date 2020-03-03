@@ -61,7 +61,16 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
   HPy_ssize_t nkw = 0;
   HPy current_arg;
 
-  while (keywords[nkw] != NULL) nkw++;
+  // first count positional only arguments
+  while (keywords[nkw] != NULL && !*keywords[nkw]) nkw++;
+  // then check and count the rest
+  while (keywords[nkw] != NULL) {
+    if (!*keywords[nkw]) {
+      HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Empty keyword parameter name");
+      return 0;
+    }
+    nkw++;
+  }
 
   while (*fmt1 != 0) {
       if (*fmt1 == '|') {
@@ -77,7 +86,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
       if (i < nargs) {
         current_arg = args[i];
       }
-      else if (!HPy_IsNull(kw)) {
+      else if (!HPy_IsNull(kw) && *keywords[i]) {
         current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
       }
       if (!HPy_IsNull(current_arg)) {

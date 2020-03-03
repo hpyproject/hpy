@@ -181,3 +181,48 @@ class TestArgParseKeywords(HPyTest):
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "XXX: mismatched args (too many keywords for fmt)"
+
+    def test_blank_keyword_argument_exception(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_KEYWORDS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPy a, b, c;
+                b = HPyLong_FromLong(ctx, 5);
+                static const char *kwlist[] = { "", "b", "", NULL };
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OOO", kwlist,
+                                          &a, &b, &c))
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT f HPy_METH_KEYWORDS
+            @INIT
+        """)
+        with pytest.raises(TypeError) as exc:
+            mod.f()
+        assert str(exc.value) == "XXX: Empty keyword parameter name"
+
+    def test_positional_only_and_keyword_argument(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_KEYWORDS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPy a, b;
+                b = HPyLong_FromLong(ctx, 5);
+                static const char *kwlist[] = { "", "b", NULL };
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O|O", kwlist, &a, &b))
+                    return HPy_NULL;
+                return HPyNumber_Add(ctx, a, b);
+            }
+            @EXPORT f HPy_METH_KEYWORDS
+            @INIT
+        """)
+        assert mod.f(1, b=2) == 3
+        assert mod.f(1, 2) == 3
+        with pytest.raises(TypeError) as exc:
+            mod.f(a=1, b=2)
+        assert str(exc.value) == "XXX: no value for required argument"
