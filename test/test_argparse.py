@@ -91,11 +91,12 @@ class TestArgParseKeywords(HPyTest):
             {{
                 HPy a, b;
                 static const char *kwlist[] = {{ "a", "b", 0 }};
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "{fmt}", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "{fmt}",
+                                          kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
             }}
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT f HPy_METH_KEYWORDS
             @INIT
         """.format(fmt=fmt))
         return mod
@@ -165,7 +166,7 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_two_arg_add(fmt="OO")
         with pytest.raises(TypeError) as exc:
             mod.f(1)
-        assert str(exc.value) == "XXX:"
+        assert str(exc.value) == "XXX: no value for required argument"
 
     def test_mismatched_args_too_few_keywords(self):
         import pytest
