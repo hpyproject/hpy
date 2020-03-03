@@ -2,6 +2,12 @@
 
 int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list vl)
 {
+  if (HPy_IsNull(current_arg)) {
+    // here a null current_arg represents an optional argument
+    (*fmt)++;
+    va_arg(vl, void *);
+    return 1;
+  }
   switch (*(*fmt)++) {
   case 'l': {
       long *output = va_arg(vl, long *);
@@ -42,14 +48,11 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
         if (i < nargs) {
           current_arg = args[i];
         }
-        if (!HPy_IsNull(current_arg)) {
+        if (!HPy_IsNull(current_arg) || optional) {
           if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, vl)) {
             return 0;
           }
           i++;
-        }
-        else if (optional) {
-          fmt1++;
         }
         else {
           HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Too few arguments passed");
@@ -116,13 +119,10 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
       else if (!HPy_IsNull(kw) && *keywords[i]) {
         current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
       }
-      if (!HPy_IsNull(current_arg)) {
+      if (!HPy_IsNull(current_arg) || optional) {
         if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, vl)) {
           return 0;
         }
-      }
-      else if (optional) {
-        fmt1++;
       }
       else {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: no value for required argument");
