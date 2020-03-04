@@ -49,11 +49,19 @@ class TestArgParse(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {{
-                HPy a, b;
-                b = HPyLong_FromLong(ctx, 5);
+                HPy a;
+                HPy b = HPy_NULL;
+                HPy res;
                 if (!HPyArg_Parse(ctx, args, nargs, "{fmt}", &a, &b))
                     return HPy_NULL;
-                return HPyNumber_Add(ctx, a, b);
+                if (HPy_IsNull(b)) {{
+                    b = HPyLong_FromLong(ctx, 5);
+                }} else {{
+                    b = HPy_Dup(ctx, b);
+                }}
+                res = HPyNumber_Add(ctx, a, b);
+                HPy_Close(ctx, b);
+                return res;
             }}
             @EXPORT f HPy_METH_VARARGS
             @INIT
@@ -148,20 +156,7 @@ class TestArgParseKeywords(HPyTest):
         return mod
 
     def test_handle_two_arguments(self):
-        mod = self.make_module("""
-            HPy_DEF_METH_KEYWORDS(f)
-            static HPy f_impl(HPyContext ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
-            {
-                HPy a, b;
-                static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OO", kwlist, &a, &b))
-                    return HPy_NULL;
-                return HPyNumber_Add(ctx, a, b);
-            }
-            @EXPORT f HPy_METH_KEYWORDS
-            @INIT
-        """)
+        mod = self.make_two_arg_add("OO")
         assert mod.f("x", b="y") == "xy"
 
     def test_handle_reordered_arguments(self):
@@ -187,12 +182,20 @@ class TestArgParseKeywords(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
-                HPy a, b;
-                b = HPyLong_FromLong(ctx, 5);
+                HPy a;
+                HPy b = HPy_NULL;
+                HPy res;
                 static const char *kwlist[] = { "a", "b", NULL };
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O|O", kwlist, &a, &b))
                     return HPy_NULL;
-                return HPyNumber_Add(ctx, a, b);
+                if (HPy_IsNull(b)) {{
+                    b = HPyLong_FromLong(ctx, 5);
+                }} else {{
+                    b = HPy_Dup(ctx, b);
+                }}
+                res = HPyNumber_Add(ctx, a, b);
+                HPy_Close(ctx, b);
+                return res;
             }
             @EXPORT f HPy_METH_KEYWORDS
             @INIT
@@ -238,7 +241,6 @@ class TestArgParseKeywords(HPyTest):
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
                 HPy a, b, c;
-                b = HPyLong_FromLong(ctx, 5);
                 static const char *kwlist[] = { "", "b", "", NULL };
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "OOO", kwlist,
                                           &a, &b, &c))
@@ -259,18 +261,27 @@ class TestArgParseKeywords(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
-                HPy a, b;
-                b = HPyLong_FromLong(ctx, 5);
+                HPy a;
+                HPy b = HPy_NULL;
+                HPy res;
                 static const char *kwlist[] = { "", "b", NULL };
                 if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O|O", kwlist, &a, &b))
                     return HPy_NULL;
-                return HPyNumber_Add(ctx, a, b);
+                if (HPy_IsNull(b)) {
+                    b = HPyLong_FromLong(ctx, 5);
+                } else {
+                    b = HPy_Dup(ctx, b);
+                }
+                res = HPyNumber_Add(ctx, a, b);
+                HPy_Close(ctx, b);
+                return res;
             }
             @EXPORT f HPy_METH_KEYWORDS
             @INIT
         """)
         assert mod.f(1, b=2) == 3
         assert mod.f(1, 2) == 3
+        assert mod.f(1) == 6
         with pytest.raises(TypeError) as exc:
             mod.f(a=1, b=2)
         assert str(exc.value) == "XXX: no value for required argument"
