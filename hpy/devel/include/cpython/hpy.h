@@ -22,10 +22,12 @@
 #define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
 
 #ifdef __GNUC__
-#define HPyAPI_RUNTIME_FUNC(restype) __attribute__((visibility("hidden"))) restype
+#define _HPy_HIDDEN  __attribute__((visibility("hidden")))
 #else
-#define HPyAPI_RUNTIME_FUNC(restype) restype
+#define _HPy_HIDDEN
 #endif /* __GNUC__ */
+
+#define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
 typedef struct { PyObject *_o; } HPy;
 typedef Py_ssize_t HPy_ssize_t;
