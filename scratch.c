@@ -25,37 +25,103 @@
  *
  * Decision: We could add a hpy/compat.h that supports accessing
  *           the old Python mapping and sequence get item slots.
- *           For example, HPyDict_GetItem.
+ *           For example, HPyDict_GetItem_NotBorrowed.
  *
- * Decision: We should add an HPyBuffer protocol.
+ *           PyDict_GetItem returns a borrower reference.
+ *           HPyDict_GetItem_NotBorrowed should return a new handle that has
+ *           to be closed.
+ *
+ * Decision: HPy API functions MUST NOT return a borrowed reference (add to
+ *           official documentation).
+ *
+ * Decision: We should add an HPyBuffer protocol (design to be decided).
  *
  */
 
-typedef struct {
-  HPy _h;
-  void * _data;
-  HPy_ssize_t _length;
-} HPySequence;
+HPy HPy_GetItem(HPyContext ctx, HPy obj, HPy idx);
+HPy HPy_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx);
+HPy HPy_GetItem_s(HPyContext ctx, HPy obj, const char * idx); // UTF8 bytes
 
-HPy foo;
-HPySequence foo_seq = HPy_AsSequence(ctx, foo);
-HPy item = HPySequence_GetItem(ctx, foo_seq, 42);
-HPySequence_SetItem(ctx, foo_seq, 40, item);
-HPySequence_Close(ctx, foo_seq);
-HPy_Close(ctx, item);
+int HPy_SetItem(HPyContext ctx, HPy obj, HPy idx, HPy value);
+int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
+int HPy_SetItem_s(HPyContext ctx, HPy obj, const char * idx, HPy value); // UTF8 bytes
 
-HPy foo;
-HPy idx = HPyLong_FromLong(ctx, 42);
-// check errors
-HPy item = HPyObject_GetItem(ctx, foo, idx);
-HPy_Close(ctx, idx);
-HPy_Close(ctx, item);
+HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy idx);
+HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char * idx); // UTF8 bytes
 
-HPy foo;
-// check errors
-HPy item = HPyObject_GetItemI(ctx, foo, 42);
-HPy_Close(ctx, idx);
-HPy_Close(ctx, item);
+int HPy_SetAttr(HPyContext ctx, HPy obj, HPy idx, HPy value);
+int HPy_SetAttr_s(HPyContext ctx, HPy obj, const char * idx, HPy value); // UTF8 bytes
+
+/*
+ * Should we have an HPy_RETURN_NONE macro?
+ *
+ * Decision: Yes we should, but it should be HPy_RETURN_NONE(ctx).
+ *
+ * Decision: We should also change HPy_IsNull(x) to HPy_IsNull(ctx, x).
+ *
+ */
+
+#define HPy_RETURN_NONE(ctx) return HPy_Dup(ctx, ctx->h_None);
+
+#define HPy_IsNull(ctx, x) ...;
+
+/*
+ * Should we add HPy_AsVoidP and HPy_FromVoidP to the API? Should they be on
+ * the ctx or not?
+ *
+ * Decision: Yes, they should be part of the API.
+ *
+ * Decision: They should take the ctx as an argument in case a future
+ *           implementation needs it (much like HPy_IsNull).
+ */
+
+// universal
+static inline HPy HPy_FromVoidP(HPyContext ctx, void *p) { return (HPy){(HPy_ssize_t)p}; }
+static inline void* HPy_AsVoidP(HPyContext ctx, HPy h) { return (void*)h._i; }
+
+// cpython (the -/+4 is to avoid people casting it to PyObject)
+static inline HPy HPy_FromVoidP(HPyContext ctx, void *p) { return (HPy){(HPy_ssize_t)p - 4}; }
+static inline void* HPy_AsVoidP(HPyContext ctx, HPy h) { return (void*)h._o + 4; }
+
+/*
+ * Should we implement HPy_Dump?
+ *
+ * Question: What should it print and where should it print it?
+ *
+ * Decision: It's useful for debugging if all macros are also available as functions
+ *           definitions.
+ *
+ * Decision: It should dump to stderr just like PyObject_Dump.
+ */
+
+/*
+ * How do we silence warnings from using HPy_METH_KEYWORDS?
+ *
+ * Decision: Write a cast to HPyMeth.
+ */
+
+{"add_ints_kw", (HPyMeth) add_ints_kw, HPy_METH_KEYWORDS, ""}
+
+/*
+ * How should HPyErr_Format be implemented? Should we avoid va_args?
+ *
+ * Decision:
+ */
+
+HPyErr_Format(ctx, const char *fmt, ...) {
+  const char *msg = HPyStr_Format(ctx, fmt, ...);
+  HPyErr_SetString(msg);
+}
+
+ctx->ctx_HPyErr_Format(???)
+
+/*
+ * Should make specifying values for optional arguments & dup / closing them
+ * less messy?
+ *
+ * Decision: Right now, No. In the future, someone should invent
+ *           ARGUMENT_CLINIC for HPy.
+ */
 
 /*
  * Should HPy support Python without the GIL?
