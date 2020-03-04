@@ -19,7 +19,16 @@
  * Explore the idea of "protocols" and whether we can use it for things like
  * PyDict_GetItem (hodgestar, antocuni, ...)
  *
- * Decision:
+ * Decision: We should start with HPy_GetItem and HPy_SetItem and
+ *           HPy_GetItem_i and HPy_SetItem_i. And HPy_GetAttr, HPy_SetAttr,
+ *           HPy_GetAttr_s and HPy_SetAttr_s.
+ *
+ * Decision: We could add a hpy/compat.h that supports accessing
+ *           the old Python mapping and sequence get item slots.
+ *           For example, HPyDict_GetItem.
+ *
+ * Decision: We should add an HPyBuffer protocol.
+ *
  */
 
 typedef struct {
