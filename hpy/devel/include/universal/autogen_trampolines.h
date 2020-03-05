@@ -60,6 +60,14 @@ static inline HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
      return ctx->ctx_GetAttr_s ( ctx, obj, name ); 
 }
 
+static inline int HPy_HasAttr(HPyContext ctx, HPy obj, HPy name) {
+     return ctx->ctx_HasAttr ( ctx, obj, name ); 
+}
+
+static inline int HPy_HasAttr_s(HPyContext ctx, HPy obj, const char *name) {
+     return ctx->ctx_HasAttr_s ( ctx, obj, name ); 
+}
+
 static inline int HPy_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
      return ctx->ctx_SetAttr ( ctx, obj, name, value ); 
 }

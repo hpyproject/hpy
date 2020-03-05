@@ -28,6 +28,8 @@ struct _HPyContext_s {
     int (*ctx_Object_IsTrue)(HPyContext ctx, HPy h);
     HPy (*ctx_GetAttr)(HPyContext ctx, HPy obj, HPy name);
     HPy (*ctx_GetAttr_s)(HPyContext ctx, HPy obj, const char *name);
+    int (*ctx_HasAttr)(HPyContext ctx, HPy obj, HPy name);
+    int (*ctx_HasAttr_s)(HPyContext ctx, HPy obj, const char *name);
     int (*ctx_SetAttr)(HPyContext ctx, HPy obj, HPy name, HPy value);
     int (*ctx_SetAttr_s)(HPyContext ctx, HPy obj, const char *name, HPy value);
     HPy (*ctx_GetItem)(HPyContext ctx, HPy obj, HPy key);
