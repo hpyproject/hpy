@@ -124,7 +124,160 @@ ctx->ctx_HPyErr_Format(???)
  */
 
 /*
+ * Should we rename "struct _object*" to "PyObject*" and "_HPy_PyCFunction"
+ * to "PyCFunction" in universal/hpy.h?
+ *
+ * Decision: No. This would generate a warning if one imports Python.h.
+ *
+ * Decision: Comment in the code that this _object* is PyObject* and why we
+ *           cannot call it that.
+ *
+ * Decision: In user documentation, just call ing PyObject *.
+ */
+
+/*
+ * How should the API pass around exceptions?
+ *
+ * Decision: Follow CPython for each API call.
+ *
+ */
+
+// E.g. API call returns HPy:
+
+HPy h = HPyLong_FromLong(ctx, 5);
+if (HPy_IsNull(ctx, h)) {
+  // handle error
+  // python error has been set by the API call
+}
+
+// or
+
+HPy h = HPyLong_FromLong(ctx, 5);
+if (HPyErr_Occurred(ctx)) {
+  // handle error
+  // python error has been set by the API call
+}
+
+// E.g. API call returns a value that is not an HPy:
+
+long l = HPyLong_AsLong(ctx, h);
+if (l == -1 && HPyErr_Occurred(ctx)) {
+  // handle error
+  // python error has been set by the API call
+}
+
+// E.g. API call returns a success or error flag:
+
+// int error = HPyArg_Parse(...);
+if (!HPyArg_Parse(...)) {
+  // handle error
+  // python error has been set by the API call
+}
+
+/*
+ * How should support for creating custom Python types look?
+ *
+ * Decisions:
+ *
+ *
+ */
+
+// When using C-API:
+
+typedef struct {
+  PyObject_HEAD
+     /* Type-specific fields go here. */
+     PyObject *x;
+     PyObject *y;
+     double *data;
+  int size;
+} PointObject;
+
+// When using HPy:
+
+typedef struct {
+    HPyObject_HEAD
+    double x;
+    double y;
+} HPy_Point;
+
+typedef struct {
+    HPyObject_HEAD
+    HPyField a;
+    HPyField b;
+} HPy_Rectangle;
+
+/* Possible HPy code */
+
+typedef struct {
+    ??? ob_type;
+} _HPy_ObjectHeader;
+
+#define HPyObject_HEAD _HPy_ObjectHeader head;
+
+#define HPy_STORE(ctx, obj, field, value) ((ctx)->ctx_HPy_StoreInto((_HPy_ObjectHeader *) obj, &((obj)->field), value))
+#define HPy_STORE_INTO(ctx, obj, pointer, value) ((ctx)->ctx_HPy_StoreInto((_HPy_ObjectHeader *) obj, pointer, value))
+
+// Using the debug mode ctx, this should check that obj->ob_type->tp_traverse is not NULL.
+void HPy_StoreInto(HPyContext ctx, _HPy_ObjectHeader *obj, HPyField *pointer, HPy value)
+
+// HPy_New:
+//
+// * Should return a handle.
+// * It should be possible to go from the handle to struct, but not
+//   from struct to handle. E.g. HPy_CAST(ctx, HPyRectangle, h) -> HPyRectangle,
+//   but no inverse.
+// * We should not have an HPy_Init at the moment -- HPy_New both allocates
+//   the object and initializes it. We will add separate allocation and init
+//   later if we encounter a need for it.
+// * HPyTypeSpec should follow the CPython type spec.
+
+#define HPy_CAST(ctx, return_type, h) (return_type *) ctx->ctx_HPy_Cast(h)
+
+void* HPy_Cast(ctx, HPy h);
+
+HPy HPy_TypeFromSpec(ctx, HPyTypeSpec type_spec);
+HPy HPy_New(ctx, HPy h_type);
+
+/* end of possible HPy code */
+
+HPy new_rect(HPy p1, HPy p2) {
+    // HPy_New always initialize the whole object to 0. We can also have
+    // HPy_NewUninitialized if we don't want to pay the penalty
+    HPy_Rectangle *rect;
+    HPy rect_handle = HPy_New(ctx, HPy_Rectangle, h_rectangle_type, &rect);
+
+    // HPy_Store does a write barrier on PyPy, and DECREF the old rect->a on
+    // CPython if needed
+    HPy_Store(ctx, rect, a, p1);
+    HPy_Store(ctx, rect, b, p2);
+    return rect_handle;
+}
+
+double calc_diagonal(HPy rect_handle) {
+    // rect is valid until rect_handle is closed. on PyPy we pin the object, and
+    // we unpin it when we close the handle
+    HPy_Rectangle *rect = HPy_Cast(HPy_Rectangle, rect_handle);
+
+    // HPy_Load reads a field and turn it into a handle
+    HPy p1_handle = HPy_Load(rect->a); // p1 is a handle which must be closed
+    HPy_Point *p1 = HPy_Cast(HPy_Point, p1_handle);
+
+    // for C99 compilers, we can also provide a macro which declares p2 and
+    // p2_handle automatically and does the equivalent of the two lines above
+    HPY_LOAD(HPy_Point, p2, rect->b);
+
+    double diag = sqrt(p1->x - p2->x /* etc. etc. */);
+
+    // close all the handles
+    HPy_Close(p1_handle);
+    HPy_Close(p2_handle);
+
+    return diag;
+}
+
+/*
  * Should HPy support Python without the GIL?
  *
- * Decision: ???
+ * Problem left as an exercise for the reader.
  */
