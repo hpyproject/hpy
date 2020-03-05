@@ -90,6 +90,65 @@ class TestObject(HPyTest):
         assert mod.f(ClassAttr()) == 10
         assert mod.f(PropAttr()) == 11
 
+    def test_setattr(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy name;
+                int result;
+                name = HPyUnicode_FromString(ctx, "foo");
+                if (HPy_IsNull(name))
+                    return HPy_NULL;
+                result = HPy_SetAttr(ctx, arg, name, ctx->h_True);
+                HPy_Close(ctx, name);
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+
+        class Attrs:
+            pass
+
+        class ClassAttr:
+            pass
+
+        class ReadOnlyPropAttr:
+            @property
+            def foo(self):
+                return 11
+
+        class WritablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+        a = Attrs()
+        mod.f(a)
+        assert a.foo is True
+
+        mod.f(ClassAttr)
+        assert ClassAttr.foo is True
+        assert ClassAttr().foo is True
+
+        with pytest.raises(AttributeError):
+            mod.f(object())
+
+        with pytest.raises(AttributeError):
+            mod.f(ReadOnlyPropAttr())
+
+        b = WritablePropAttr()
+        mod.f(b)
+        assert b.foo is True
+
     def test_getitem(self):
         import pytest
         mod = self.make_module("""

@@ -102,7 +102,7 @@ ctx_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
 
 static int
 ctx_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
-  return -1;
+  return PyObject_SetAttr(_h2py(obj), _h2py(name), _h2py(value));
 }
 
 static int
