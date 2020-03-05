@@ -108,6 +108,11 @@ HPy_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
   return PyObject_SetAttr(_h2py(obj), _h2py(name), _h2py(value));
 }
 
+HPyAPI_FUNC(int)
+HPy_SetAttr_s(HPyContext ctx, HPy obj, const char *name, HPy value) {
+  return PyObject_SetAttrString(_h2py(obj), name, _h2py(value));
+}
+
 HPyAPI_FUNC(HPy)
 HPy_GetItem(HPyContext ctx, HPy obj, HPy key) {
   return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
