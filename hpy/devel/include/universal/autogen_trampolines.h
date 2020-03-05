@@ -52,6 +52,46 @@ static inline int HPyObject_IsTrue(HPyContext ctx, HPy h) {
      return ctx->ctx_Object_IsTrue ( ctx, h ); 
 }
 
+static inline HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name) {
+     return ctx->ctx_GetAttr ( ctx, obj, name ); 
+}
+
+static inline HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
+     return ctx->ctx_GetAttr_s ( ctx, obj, name ); 
+}
+
+static inline int HPy_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
+     return ctx->ctx_SetAttr ( ctx, obj, name, value ); 
+}
+
+static inline int HPy_SetAttr_s(HPyContext ctx, HPy obj, const char *name, HPy value) {
+     return ctx->ctx_SetAttr_s ( ctx, obj, name, value ); 
+}
+
+static inline HPy HPy_GetItem(HPyContext ctx, HPy obj, HPy key) {
+     return ctx->ctx_GetItem ( ctx, obj, key ); 
+}
+
+static inline HPy HPy_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
+     return ctx->ctx_GetItem_i ( ctx, obj, idx ); 
+}
+
+static inline HPy HPy_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
+     return ctx->ctx_GetItem_s ( ctx, obj, key ); 
+}
+
+static inline int HPy_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value) {
+     return ctx->ctx_SetItem ( ctx, obj, key, value ); 
+}
+
+static inline int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value) {
+     return ctx->ctx_SetItem_i ( ctx, obj, idx, value ); 
+}
+
+static inline int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
+     return ctx->ctx_SetItem_s ( ctx, obj, key, value ); 
+}
+
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }
