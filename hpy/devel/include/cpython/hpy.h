@@ -99,6 +99,11 @@ HPy_GetAttr(HPyContext ctx, HPy obj, HPy name) {
 }
 
 HPyAPI_FUNC(HPy)
+HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
+  return _py2h(PyObject_GetAttrString(_h2py(obj), name));
+}
+
+HPyAPI_FUNC(HPy)
 HPy_GetItem(HPyContext ctx, HPy obj, HPy key) {
   return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
 }

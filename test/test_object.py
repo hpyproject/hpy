@@ -52,6 +52,44 @@ class TestObject(HPyTest):
         assert mod.f(ClassAttr()) == 10
         assert mod.f(PropAttr()) == 11
 
+    def test_getattr_s(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy result;
+                result = HPy_GetAttr_s(ctx, arg, "foo");
+                if (HPy_IsNull(result))
+                    return HPy_NULL;
+                return result;
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+
+        class Attrs:
+            def __init__(self, **kw):
+                for k, v in kw.items():
+                    setattr(self, k, v)
+
+        class ClassAttr:
+            foo = 10
+
+        class PropAttr:
+            @property
+            def foo(self):
+                return 11
+
+        assert mod.f(Attrs(foo=5)) == 5
+        with pytest.raises(AttributeError):
+            mod.f(Attrs())
+        with pytest.raises(AttributeError):
+            mod.f(42)
+        assert mod.f(ClassAttr) == 10
+        assert mod.f(ClassAttr()) == 10
+        assert mod.f(PropAttr()) == 11
+
     def test_getitem(self):
         import pytest
         mod = self.make_module("""

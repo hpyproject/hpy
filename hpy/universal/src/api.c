@@ -97,7 +97,7 @@ ctx_GetAttr(HPyContext ctx, HPy obj, HPy name) {
 
 static HPy
 ctx_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
-  return HPy_NULL;
+  return _py2h(PyObject_GetAttrString(_h2py(obj), name));
 }
 
 static int
