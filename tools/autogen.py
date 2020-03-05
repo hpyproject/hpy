@@ -263,12 +263,24 @@ class AutoGen:
 
     def gen_func_implementations(self):
         # XXX: we need a better way to decide which functions to include/exclude
-        exclude = set(['HPyModule_Create',
-                       'HPy_Dup',
-                       'HPy_Close',
-                       'HPy_FromPyObject',
-                       'HPy_AsPyObject',
-                       '_HPy_CallRealFunctionFromTrampoline'])
+        exclude = set([
+            'HPy_Dup',
+            'HPy_Close',
+            'HPy_FromPyObject',
+            'HPy_GetAttr',
+            'HPy_GetAttr_s',
+            'HPy_SetAttr',
+            'HPy_SetAttr_s',
+            'HPy_GetItem',
+            'HPy_GetItem_i',
+            'HPy_GetItem_s',
+            'HPy_SetItem',
+            'HPy_SetItem_i',
+            'HPy_SetItem_s',
+            'HPy_AsPyObject',
+            'HPyModule_Create',
+            '_HPy_CallRealFunctionFromTrampoline',
+        ])
         lines = []
         for f in self.declarations:
             if not isinstance(f, Function):
