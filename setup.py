@@ -9,6 +9,7 @@ setup(
                   ['hpy/universal/src/hpymodule.c',
                    'hpy/universal/src/handles.c',
                    'hpy/universal/src/api.c',
+                   'hpy/devel/src/runtime/argparse.c',
                   ],
                   include_dirs=['hpy/devel/include'],
         )]

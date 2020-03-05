@@ -30,7 +30,7 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_TRUE] = Py_True;
         new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
         new_handles[CONSTANT_H_TYPEERROR] = PyExc_TypeError;
-        assert(CONSTANT__H_TOTAL == 6);
+        assert(CONSTANT_H__TOTAL == 6);
     }
 
     PyMem_Free(all_handles);
@@ -41,6 +41,11 @@ allocate_more_handles(void)
 HPy
 _py2h(PyObject *obj)
 {
+    if (obj == NULL) {
+        // Return the existing copy of HPy_NULL and don't create a new
+        // handle.
+        return HPy_NULL;
+    }
     if (h_free_list < 0) {
         allocate_more_handles();
     }
@@ -53,6 +58,8 @@ _py2h(PyObject *obj)
 PyObject *
 _h2py(HPy h)
 {
+    // If HPy_IsNull(h), the h._i = 0 and the line below returns the
+    // pointer attached to the 0th handle, i.e. NULL.
     return all_handles[h._i];
 }
 

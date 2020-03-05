@@ -8,3 +8,6 @@ def test_double():
 
 def test_add_ints():
     assert pof.add_ints(30, 12) == 42
+
+def test_add_ints_kw():
+    assert pof.add_ints_kw(b=30, a=12) == 42

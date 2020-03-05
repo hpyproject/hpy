@@ -59,14 +59,6 @@ class Function:
         newnode.type = c_ast.PtrDecl(type=newnode.type, quals=[])
         # fix the name of the function pointer
         typedecl = self._find_typedecl(newnode)
-        # replace an ellipsis with a 'va_list _vl' argument
-        if self.is_varargs():
-            arg = c_ast.Decl('_vl', [], [], [],
-                c_ast.TypeDecl('_vl', [],
-                    c_ast.IdentifierType(['va_list'])),
-                None, None)
-            newnode.type.type.args.params[-1] = arg
-        #
         typedecl.declname = self.ctx_name()
         return toC(newnode)
 
@@ -81,31 +73,17 @@ class Function:
         w(toC(self.node))
         w('{\n    ')
 
-        if not self.is_varargs():
-            if rettype == 'void':
-                w('ctx->%s' % self.ctx_name())
-            else:
-                w('return ctx->%s' % self.ctx_name())
-            w('(')
-            params = [p.name for p in self.node.type.args.params]
-            w(', '.join(params))
-            w(');')
+        # trampolines cannot deal with varargs easily
+        assert not self.is_varargs()
+
+        if rettype == 'void':
+            w('ctx->%s' % self.ctx_name())
         else:
-            last_param = self.node.type.args.params[-2].name
-            w('va_list _vl;')
-            w('va_start(_vl, %s);' % last_param)
-            if rettype == 'void':
-                w('ctx->%s' % self.ctx_name())
-            else:
-                w('%s _res = ctx->%s' % (rettype, self.ctx_name()))
-            w('(')
-            params = [p.name for p in self.node.type.args.params[:-1]]
-            params.append('_vl')
-            w(', '.join(params))
-            w(');')
-            w('va_end(_vl);')
-            if rettype != 'void':
-                w('return _res;')
+            w('return ctx->%s' % self.ctx_name())
+        w('(')
+        params = [p.name for p in self.node.type.args.params]
+        w(', '.join(params))
+        w(');')
 
         w('\n}')
         return ' '.join(parts)
@@ -288,7 +266,6 @@ class AutoGen:
         exclude = set(['HPyModule_Create',
                        'HPy_Dup',
                        'HPy_Close',
-                       'HPyArg_Parse',
                        'HPy_FromPyObject',
                        'HPy_AsPyObject',
                        '_HPy_CallRealFunctionFromTrampoline'])

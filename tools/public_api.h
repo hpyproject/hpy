@@ -25,11 +25,12 @@ HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v);
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
-int HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs,
-                 const char *fmt, ...);
 HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
 
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
+
+/* object.h */
+int HPyObject_IsTrue(HPyContext ctx, HPy h);
 
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
@@ -50,7 +51,11 @@ int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
 HPy HPyDict_New(HPyContext ctx);
+// TODO: Remove HPyDict_SetItem and _GetItem and replace them with
+//       HPyObject_SetItem and _GetItem that don't borrow or steal
+//       handles.
 int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
+HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
 
 /* integration with the old CPython API */
@@ -61,5 +66,6 @@ struct _object *HPy_AsPyObject(HPyContext ctx, HPy h);
 struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
                                                     struct _object *self,
                                                     struct _object *args,
+                                                    struct _object *kw,
                                                     void *func,
                                                     int ml_flags);

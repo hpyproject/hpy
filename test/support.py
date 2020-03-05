@@ -103,7 +103,9 @@ class ExtensionCompiler:
         Create and compile a HPy module from the template
         """
         filename = self._expand(name, main_template)
-        sources = []
+        sources = [
+            'hpy/devel/src/runtime/argparse.c',
+        ]
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
             sources.append(extra_filename)
