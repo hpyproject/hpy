@@ -101,6 +101,16 @@ ctx_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
 }
 
 static int
+ctx_HasAttr(HPyContext ctx, HPy obj, HPy name) {
+  return PyObject_HasAttr(_h2py(obj), _h2py(name));
+}
+
+static int
+ctx_HasAttr_s(HPyContext ctx, HPy obj, const char *name) {
+  return PyObject_HasAttrString(_h2py(obj), name);
+}
+
+static int
 ctx_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
   return PyObject_SetAttr(_h2py(obj), _h2py(name), _h2py(value));
 }

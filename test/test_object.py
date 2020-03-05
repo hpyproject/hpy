@@ -90,6 +90,85 @@ class TestObject(HPyTest):
         assert mod.f(ClassAttr()) == 10
         assert mod.f(PropAttr()) == 11
 
+    def test_hasattr(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy name;
+                int result;
+                name = HPyUnicode_FromString(ctx, "foo");
+                if (HPy_IsNull(name))
+                    return HPy_NULL;
+                result = HPy_HasAttr(ctx, arg, name);
+                HPy_Close(ctx, name);
+                if (result == -1)
+                    return HPy_NULL;
+                if (result)
+                    return HPy_Dup(ctx, ctx->h_True);
+                return HPy_Dup(ctx, ctx->h_False);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+
+        class Attrs:
+            def __init__(self, **kw):
+                for k, v in kw.items():
+                    setattr(self, k, v)
+
+        class ClassAttr:
+            foo = 10
+
+        class PropAttr:
+            @property
+            def foo(self):
+                return 11
+
+        assert mod.f(Attrs(foo=5)) is True
+        assert mod.f(Attrs()) is False
+        assert mod.f(42) is False
+        assert mod.f(ClassAttr) is True
+        assert mod.f(ClassAttr()) is True
+        assert mod.f(PropAttr()) is True
+
+    def test_hasattr_s(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_HasAttr_s(ctx, arg, "foo");
+                if (result == -1)
+                    return HPy_NULL;
+                if (result)
+                    return HPy_Dup(ctx, ctx->h_True);
+                return HPy_Dup(ctx, ctx->h_False);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+
+        class Attrs:
+            def __init__(self, **kw):
+                for k, v in kw.items():
+                    setattr(self, k, v)
+
+        class ClassAttr:
+            foo = 10
+
+        class PropAttr:
+            @property
+            def foo(self):
+                return 11
+
+        assert mod.f(Attrs(foo=5)) is True
+        assert mod.f(Attrs()) is False
+        assert mod.f(42) is False
+        assert mod.f(ClassAttr) is True
+        assert mod.f(ClassAttr()) is True
+        assert mod.f(PropAttr()) is True
+
     def test_setattr(self):
         import pytest
         mod = self.make_module("""
