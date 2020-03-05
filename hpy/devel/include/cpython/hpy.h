@@ -94,6 +94,11 @@ HPy_Close(HPyContext ctx, HPy handle)
 /* object.h */
 
 HPyAPI_FUNC(HPy)
+HPy_GetAttr(HPyContext ctx, HPy obj, HPy name) {
+  return _py2h(PyObject_GetAttr(_h2py(obj), _h2py(name)));
+}
+
+HPyAPI_FUNC(HPy)
 HPy_GetItem(HPyContext ctx, HPy obj, HPy key) {
   return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
 }

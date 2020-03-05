@@ -92,7 +92,7 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 
 static HPy
 ctx_GetAttr(HPyContext ctx, HPy obj, HPy name) {
-  return HPy_NULL;
+  return _py2h(PyObject_GetAttr(_h2py(obj), _h2py(name)));
 }
 
 static HPy
