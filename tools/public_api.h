@@ -35,6 +35,9 @@ int HPyObject_IsTrue(HPyContext ctx, HPy h);
 HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);
 HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name);
 
+int HPy_HasAttr(HPyContext ctx, HPy obj, HPy name);
+int HPy_HasAttr_s(HPyContext ctx, HPy obj, const char *name);
+
 int HPy_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value);
 int HPy_SetAttr_s(HPyContext ctx, HPy obj, const char *name, HPy value);
 

@@ -269,6 +269,8 @@ class AutoGen:
             'HPy_FromPyObject',
             'HPy_GetAttr',
             'HPy_GetAttr_s',
+            'HPy_HasAttr',
+            'HPy_HasAttr_s',
             'HPy_SetAttr',
             'HPy_SetAttr_s',
             'HPy_GetItem',
