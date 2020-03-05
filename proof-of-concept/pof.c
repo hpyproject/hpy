@@ -33,7 +33,7 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 }
 
 
-static HPyMethodDef PofMethods[] = {
+static const HPyMethodDef PofMethods[] = {
     {"do_nothing", do_nothing, HPy_METH_NOARGS, ""},
     {"double", double_obj, HPy_METH_O, ""},
     {"add_ints", add_ints, HPy_METH_VARARGS, ""},
@@ -41,7 +41,7 @@ static HPyMethodDef PofMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-static HPyModuleDef moduledef = {
+static const HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
     .m_name = "pof",
     .m_doc = "HPy Proof of Concept",
@@ -49,13 +49,34 @@ static HPyModuleDef moduledef = {
     .m_methods = PofMethods
 };
 
+typedef struct {
+    HPyObject_HEAD
+    double x;
+    double y;
+} HPy_Point;
+
+static const HPyType_Slot point_type_slots[] = {
+    {0, NULL},
+};
+
+static const HPyType_Spec point_type_spec = {
+    .name = "pof.Point",
+    .basicsize = sizeof(HPy_Point),
+    .itemsize = 0,
+    .flags = HPy_TPFLAGS_DEFAULT,
+    .slots = point_type_slots,
+};
 
 HPy_MODINIT(pof)
 static HPy init_pof_impl(HPyContext ctx)
 {
-    HPy m;
+    HPy m, h_point_type;
     m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
+    h_point_type = HPy_TypeFromSpec(ctx, point_type_spec);
+    if (HPy_IsNull(h_point_type))
+      return HPy_NULL;
+    HPy_SetAttr_s(ctx, m, "Point", h_point_type);
     return m;
 }
