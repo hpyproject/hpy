@@ -91,6 +91,23 @@ HPy_Close(HPyContext ctx, HPy handle)
     Py_XDECREF(_h2py(handle));
 }
 
+/* object.h */
+
+HPyAPI_FUNC(HPy)
+HPy_GetItem(HPyContext ctx, HPy obj, HPy key) {
+  return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
+}
+
+HPyAPI_FUNC(HPy)
+HPy_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
+  PyObject* key = PyLong_FromSsize_t(idx);
+  if (key == NULL)
+    return HPy_NULL;
+  HPy result = _py2h(PyObject_GetItem(_h2py(obj), key));
+  Py_DECREF(key);
+  return result;
+}
+
 /* moduleobject.h */
 typedef PyModuleDef HPyModuleDef;
 

@@ -88,6 +88,48 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
     return _py2h(result);
 }
 
+/* HPy object protocol */
+
+HPy ctx_GetAttr(HPyContext ctx, HPy obj, HPy name) {
+  return HPy_NULL;
+}
+HPy ctx_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
+  return HPy_NULL;
+}
+
+int ctx_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
+  return -1;
+}
+int ctx_SetAttr_s(HPyContext ctx, HPy obj, const char *name, HPy value) {
+  return -1;
+}
+
+HPy ctx_GetItem(HPyContext ctx, HPy obj, HPy key) {
+  return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
+}
+HPy ctx_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
+  PyObject* key = PyLong_FromSsize_t(idx);
+  if (key == NULL)
+    return HPy_NULL;
+  HPy result = _py2h(PyObject_GetItem(_h2py(obj), key));
+  Py_DECREF(key);
+  return result;
+}
+HPy ctx_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
+  return HPy_NULL;
+}
+
+int ctx_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value) {
+  return -1;
+}
+int ctx_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value) {
+  return -1;
+}
+int ctx_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
+  return -1;
+}
+
+/* HPyMeth */
 
 typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);
 typedef HPy (*HPyMeth_O)(HPyContext, HPy self, HPy arg);
