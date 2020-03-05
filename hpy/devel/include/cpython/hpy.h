@@ -133,6 +133,16 @@ HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value) {
   return result;
 }
 
+HPyAPI_FUNC(int)
+HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
+  PyObject* key_o = PyUnicode_FromString(key);
+  if (key_o == NULL)
+    return -1;
+  int result = PyObject_SetItem(_h2py(obj), key_o, _h2py(value));
+  Py_DECREF(key_o);
+  return result;
+}
+
 /* moduleobject.h */
 typedef PyModuleDef HPyModuleDef;
 

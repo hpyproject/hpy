@@ -135,3 +135,25 @@ class TestObject(HPyTest):
         assert mod.f([False]) == [True]
         with pytest.raises(IndexError):
             mod.f([])
+
+    def test_setitem_s(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_SetItem_s(ctx, arg, "limes", ctx->h_True);
+                if (result < 0)
+                    return HPy_NULL;
+                return arg;
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        assert mod.f({}) == {"limes": True}
+        assert mod.f({"a": 1}) == {"a": 1, "limes": True}
+        assert mod.f({"limes": False}) == {"limes": True}
+
+        with pytest.raises(TypeError):
+            mod.f([])

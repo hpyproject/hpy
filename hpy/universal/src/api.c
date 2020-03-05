@@ -152,7 +152,12 @@ ctx_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value) {
 
 static int
 ctx_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
-  return -1;
+  PyObject* key_o = PyUnicode_FromString(key);
+  if (key_o == NULL)
+    return -1;
+  int result = PyObject_SetItem(_h2py(obj), key_o, _h2py(value));
+  Py_DECREF(key_o);
+  return result;
 }
 
 /* HPyMeth */
