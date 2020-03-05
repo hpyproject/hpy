@@ -116,7 +116,12 @@ HPy ctx_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
   return result;
 }
 HPy ctx_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
-  return HPy_NULL;
+  PyObject* key_o = PyUnicode_FromString(key);
+  if (key_o == NULL)
+    return HPy_NULL;
+  HPy result = _py2h(PyObject_GetItem(_h2py(obj), key_o));
+  Py_DECREF(key_o);
+  return result;
 }
 
 int ctx_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value) {

@@ -108,6 +108,16 @@ HPy_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
   return result;
 }
 
+HPyAPI_FUNC(HPy)
+HPy_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
+  PyObject* key_o = PyUnicode_FromString(key);
+  if (key_o == NULL)
+    return HPy_NULL;
+  HPy result = _py2h(PyObject_GetItem(_h2py(obj), key_o));
+  Py_DECREF(key_o);
+  return result;
+}
+
 /* moduleobject.h */
 typedef PyModuleDef HPyModuleDef;
 

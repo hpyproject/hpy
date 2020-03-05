@@ -61,3 +61,26 @@ class TestObject(HPyTest):
         assert mod.f(["hello"]) == "hello"
         with pytest.raises(IndexError):
             mod.f([])
+
+    def test_getitem_s(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy result;
+                result = HPy_GetItem_s(ctx, arg, "limes");
+                if (HPy_IsNull(result))
+                    return HPy_NULL;
+                return result;
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        assert mod.f({"limes": "hello"}) == "hello"
+        with pytest.raises(KeyError) as exc:
+            mod.f({"oranges": "bad"})
+        assert exc.value.args == ("limes",)
+
+        with pytest.raises(TypeError):
+            mod.f([])
