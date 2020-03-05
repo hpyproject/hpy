@@ -84,3 +84,31 @@ class TestObject(HPyTest):
 
         with pytest.raises(TypeError):
             mod.f([])
+
+    def test_setitem(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy key;
+                int result;
+                key = HPyLong_FromLong(ctx, 0);
+                if (HPy_IsNull(key))
+                    return HPy_NULL;
+                result = HPy_SetItem(ctx, arg, key, ctx->h_True);
+                HPy_Close(ctx, key);
+                if (result < 0)
+                    return HPy_NULL;
+                return arg;
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        assert mod.f({}) == {0: True}
+        assert mod.f({"a": 1}) == {"a": 1, 0: True}
+        assert mod.f({0: False}) == {0: True}
+
+        assert mod.f([False]) == [True]
+        with pytest.raises(IndexError):
+            mod.f([])

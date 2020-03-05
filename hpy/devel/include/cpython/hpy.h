@@ -118,6 +118,12 @@ HPy_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
   return result;
 }
 
+HPyAPI_FUNC(int)
+HPy_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value) {
+  return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
+}
+
+
 /* moduleobject.h */
 typedef PyModuleDef HPyModuleDef;
 
