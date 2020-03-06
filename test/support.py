@@ -1,5 +1,5 @@
 import os, sys
-import pytest
+import pytest, py
 import re
 
 PY2 = sys.version_info[0] == 2
@@ -104,7 +104,8 @@ class ExtensionCompiler:
         """
         filename = self._expand(name, main_template)
         sources = [
-            'hpy/devel/src/runtime/argparse.c',
+            str(py.path.local(__file__).dirpath().dirpath().join(
+                'hpy/devel/src/runtime/argparse.c')),
         ]
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
