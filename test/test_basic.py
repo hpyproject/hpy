@@ -203,6 +203,7 @@ class TestBasic(HPyTest):
             assert mod.f(i) is obj
 
     def test_decl_meth(self):
+        import pytest
         main = """
             HPy_DECL_METH_NOARGS(f);
             HPy_DECL_METH_O(g);
@@ -251,6 +252,8 @@ class TestBasic(HPyTest):
         assert mod.h(5, 6) == 56
         assert mod.i(4, 3) == 43
         assert mod.i(a=2, b=5) == 25
+        with pytest.raises(TypeError):
+            mod.h("not an integer", "not an integer either")
 
     def test_Float_FromDouble(self):
         mod = self.make_module("""

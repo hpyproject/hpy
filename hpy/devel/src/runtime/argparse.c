@@ -8,16 +8,18 @@ int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list
   case 'i': {
       int *output = va_arg(vl, int *);
       _BREAK_IF_OPTIONAL(current_arg);
-      int value = (int) HPyLong_AsLong(ctx, current_arg);
-      // XXX check for exceptions
-      *output = value;
+      long value = HPyLong_AsLong(ctx, current_arg);
+      if (value == -1 && HPyErr_Occurred(ctx))
+          return 0;
+      *output = (int)value;
       break;
   }
   case 'l': {
       long *output = va_arg(vl, long *);
       _BREAK_IF_OPTIONAL(current_arg);
       long value = HPyLong_AsLong(ctx, current_arg);
-      // XXX check for exceptions
+      if (value == -1 && HPyErr_Occurred(ctx))
+          return 0;
       *output = value;
       break;
   }
