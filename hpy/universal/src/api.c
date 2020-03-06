@@ -46,7 +46,7 @@ create_method_defs(HPyModuleDef *hpydef)
         if (src->ml_flags & _HPy_METH) {
             // HPy function: cal ml_meth to get pointers to the impl_func and
             // the cpy trampoline
-            void *impl_func;
+            _HPy_FuncPtr impl_func;
             PyCFunction trampoline_func;
             src->ml_meth(&impl_func, &trampoline_func);
             dst->ml_meth = (PyCFunction)trampoline_func;

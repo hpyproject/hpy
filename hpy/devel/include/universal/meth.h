@@ -1,6 +1,9 @@
 #ifndef HPY_UNIVERSAL_METH_H
 #define HPY_UNIVERSAL_METH_H
 
+/* Pointer to a function returning HPy, with unspecified arguments */
+typedef HPy (*_HPy_FuncPtr)();
+
 /* in universal mode, an HPyMeth is a function which returns two output
  * arguments:
  *
@@ -12,7 +15,8 @@
  * generate them on the fly, and for the sake of simplicity it is easier to
  * just let the C compiler to generate it. This is done by the DEF macros.
  */
-typedef void (*HPyMeth)(void **out_func, _HPy_CPyCFunction *out_trampoline);
+typedef void (*HPyMeth)(_HPy_FuncPtr *out_func,
+                        _HPy_CPyCFunction *out_trampoline);
 
 /* ml_flags can be:
  *
@@ -31,7 +35,7 @@ typedef struct {
 } HPyMethodDef;
 
 #define HPy_DECL_METH_NOARGS(fnname)                                    \
-    void fnname(void **out_func, _HPy_CPyCFunction *out_trampoline);
+    void fnname(_HPy_FuncPtr *out_func, _HPy_CPyCFunction *out_trampoline);
 
 #define HPy_DECL_METH_O(NAME) HPy_DECL_METH_NOARGS(NAME)
 #define HPy_DECL_METH_VARARGS(NAME) HPy_DECL_METH_NOARGS(NAME)
@@ -48,7 +52,7 @@ typedef struct {
             HPy_METH_NOARGS);                                                  \
     }                                                                          \
     void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
+    fnname(_HPy_FuncPtr *out_func, _HPy_CPyCFunction *out_trampoline)          \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
         *out_trampoline = fnname##_trampoline;                                 \
@@ -63,7 +67,7 @@ typedef struct {
             _ctx_for_trampolines, self, arg, NULL, fnname##_impl, HPy_METH_O); \
     }                                                                          \
     void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
+    fnname(_HPy_FuncPtr *out_func, _HPy_CPyCFunction *out_trampoline)          \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
         *out_trampoline = fnname##_trampoline;                                 \
@@ -80,7 +84,7 @@ typedef struct {
             HPy_METH_VARARGS);                                                 \
     }                                                                          \
     void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
+    fnname(_HPy_FuncPtr *out_func, _HPy_CPyCFunction *out_trampoline)          \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
         *out_trampoline = fnname##_trampoline;                                 \
@@ -98,7 +102,7 @@ typedef struct {
             HPy_METH_KEYWORDS);                                                \
     }                                                                          \
     void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
+    fnname(_HPy_FuncPtr *out_func, _HPy_CPyCFunction *out_trampoline)          \
     {                                                                          \
         *out_func = fnname##_impl;                                             \
         *out_trampoline = (_HPy_CPyCFunction) fnname##_trampoline;             \
