@@ -125,12 +125,20 @@ class TestObject(HPyTest):
             def foo(self):
                 return 11
 
+        class PropAttrRaising:
+            @property
+            def foo(self):
+                raise RuntimeError
+
+
         assert mod.f(Attrs(foo=5)) is True
         assert mod.f(Attrs()) is False
         assert mod.f(42) is False
         assert mod.f(ClassAttr) is True
         assert mod.f(ClassAttr()) is True
         assert mod.f(PropAttr()) is True
+        assert mod.f(PropAttrRaising()) is False
+
 
     def test_hasattr_s(self):
         mod = self.make_module("""
@@ -162,12 +170,18 @@ class TestObject(HPyTest):
             def foo(self):
                 return 11
 
+        class PropAttrRaising:
+            @property
+            def foo(self):
+                raise RuntimeError
+
         assert mod.f(Attrs(foo=5)) is True
         assert mod.f(Attrs()) is False
         assert mod.f(42) is False
         assert mod.f(ClassAttr) is True
         assert mod.f(ClassAttr()) is True
         assert mod.f(PropAttr()) is True
+        assert mod.f(PropAttrRaising()) is False
 
     def test_setattr(self):
         import pytest
