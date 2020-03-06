@@ -32,6 +32,23 @@ void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 /* object.h */
 int HPyObject_IsTrue(HPyContext ctx, HPy h);
 
+HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);
+HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name);
+
+int HPy_HasAttr(HPyContext ctx, HPy obj, HPy name);
+int HPy_HasAttr_s(HPyContext ctx, HPy obj, const char *name);
+
+int HPy_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value);
+int HPy_SetAttr_s(HPyContext ctx, HPy obj, const char *name, HPy value);
+
+HPy HPy_GetItem(HPyContext ctx, HPy obj, HPy key);
+HPy HPy_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx);
+HPy HPy_GetItem_s(HPyContext ctx, HPy obj, const char *key);
+
+int HPy_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value);
+int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
+int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
+
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);
@@ -51,12 +68,12 @@ int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
 HPy HPyDict_New(HPyContext ctx);
-// TODO: Remove HPyDict_SetItem and _GetItem and replace them with
-//       HPyObject_SetItem and _GetItem that don't borrow or steal
-//       handles.
+// TODO: Move HPyDict_SetItem and _GetItem (we have HPy_SetItem and _GetItem)
+//       out of the base API.
+// TODO: Leave name as HPyDict_SetItem (it doesn't steal).
+// TODO: Rename to HPyDict_GetItem_NewHandle.
 int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
 HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
-
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);
