@@ -27,7 +27,10 @@ HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
 HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
 
+/* pyerrors.h */
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
+/* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
+int HPyErr_Occurred(HPyContext ctx);
 
 /* object.h */
 int HPyObject_IsTrue(HPyContext ctx, HPy h);

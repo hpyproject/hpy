@@ -170,6 +170,11 @@ ctx_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
   return result;
 }
 
+static int
+ctx_Err_Occurred(HPyContext ctx) {
+  return PyErr_Occurred() ? 1 : 0;
+}
+
 /* HPyMeth */
 
 typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);

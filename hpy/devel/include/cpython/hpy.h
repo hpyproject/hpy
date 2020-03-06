@@ -173,6 +173,11 @@ HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
   return result;
 }
 
+HPyAPI_FUNC(int)
+HPyErr_Occurred(HPyContext ctx) {
+  return PyErr_Occurred() ? 1 : 0;
+}
+
 /* moduleobject.h */
 typedef PyModuleDef HPyModuleDef;
 

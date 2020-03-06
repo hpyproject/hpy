@@ -25,6 +25,7 @@ struct _HPyContext_s {
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
     HPy (*ctx_Number_Add)(HPyContext ctx, HPy h1, HPy h2);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
+    int (*ctx_Err_Occurred)(HPyContext ctx);
     int (*ctx_Object_IsTrue)(HPyContext ctx, HPy h);
     HPy (*ctx_GetAttr)(HPyContext ctx, HPy obj, HPy name);
     HPy (*ctx_GetAttr_s)(HPyContext ctx, HPy obj, const char *name);

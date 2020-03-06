@@ -152,6 +152,27 @@ class TestBasic(HPyTest):
             mod.f(20)
         assert str(exc.value) == 'hello world'
 
+    def test_exception_occurred(self):
+        import pytest
+        mod = self.make_module("""
+            HPy_DEF_METH_O(f)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                long x = HPyLong_AsLong(ctx, arg);
+                if (HPyErr_Occurred(ctx)) {
+                    HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
+                    return HPy_NULL;
+                }
+                return HPyLong_FromLong(ctx, -1002);
+            }
+            @EXPORT f HPy_METH_O
+            @INIT
+        """)
+        assert mod.f(-10) == -1002
+        with pytest.raises(ValueError) as exc:
+            mod.f("not an integer")
+        assert str(exc.value) == 'hello world'
+
     def test_builtin_handles(self):
         import pytest
         mod = self.make_module("""

@@ -282,6 +282,7 @@ class AutoGen:
             'HPy_AsPyObject',
             'HPyModule_Create',
             '_HPy_CallRealFunctionFromTrampoline',
+            'HPyErr_Occurred',
         ])
         lines = []
         for f in self.declarations:
