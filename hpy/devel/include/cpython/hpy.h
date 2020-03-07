@@ -112,7 +112,8 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
 typedef PyType_Slot HPyType_Slot;
 typedef PyType_Spec HPyType_Spec;
 #define HPyObject_HEAD PyObject_HEAD
-#define HPy_TPFLAGS_DEFAULT Py_TPFLAGS_DEFAULT
+#define HPy_TPFLAGS_BASETYPE Py_TPFLAGS_BASETYPE
+#define HPy_TPFLAGS_DEFAULT (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE)
 
 
 HPyAPI_FUNC(HPy)
