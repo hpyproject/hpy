@@ -30,6 +30,7 @@ class Function:
     _BASE_NAME = re.compile(r'^_?HPy_?')
 
     name = attr.ib()
+    cpython_name = attr.ib()
     node = attr.ib(repr=False)
 
     def _find_typedecl(self, node):
@@ -114,8 +115,9 @@ class Function:
         #
         lines = []
         w = lines.append
-        base_name = self.base_name()
-        pyfunc = 'Py' + base_name
+        pyfunc = self.cpython_name
+        if not pyfunc:
+            raise ValueError(f"Cannot generate implementation for {self}")
         return_type = toC(self.node.type.type)
         w('HPyAPI_STORAGE %s' % signature(self.base_name()))
         w('{')
@@ -169,8 +171,9 @@ class GlobalVar:
 
 
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
-    def __init__(self):
+    def __init__(self, convert_name):
         self.declarations = []
+        self.convert_name = convert_name
 
     def visit_Decl(self, node):
         if isinstance(node.type, c_ast.FuncDecl):
@@ -187,7 +190,8 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
             if hasattr(p, 'name') and p.name is None:
                 raise ValueError("non-named argument in declaration of %s" %
                                  name)
-        self.declarations.append(Function(name, node))
+        cpy_name = self.convert_name(name)
+        self.declarations.append(Function(name, cpy_name, node))
 
     def _visit_global_var(self, node):
         name = node.name
@@ -196,6 +200,33 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
             return
         assert toC(node.type.type) == "HPy"
         self.declarations.append(GlobalVar(name, node))
+
+SPECIAL_CASES = {
+    'HPy_Dup': None,
+    'HPy_Close': None,
+    'HPy_FromPyObject': None,
+    'HPy_GetAttr': None,
+    'HPy_GetAttr_s': None,
+    'HPy_HasAttr': None,
+    'HPy_HasAttr_s': None,
+    'HPy_SetAttr': None,
+    'HPy_SetAttr_s': None,
+    'HPy_GetItem': None,
+    'HPy_GetItem_i': None,
+    'HPy_GetItem_s': None,
+    'HPy_SetItem': None,
+    'HPy_SetItem_i': None,
+    'HPy_SetItem_s': None,
+    'HPy_AsPyObject': None,
+    'HPyModule_Create': None,
+    '_HPy_CallRealFunctionFromTrampoline': None,
+    'HPyErr_Occurred': None,
+}
+
+def convert_name(hpy_name):
+    if hpy_name in SPECIAL_CASES:
+        return SPECIAL_CASES[hpy_name]
+    return re.sub(r'^_?HPy_?', 'Py', hpy_name)
 
 
 class AutoGen:
@@ -212,7 +243,7 @@ class AutoGen:
         raise KeyError(name)
 
     def collect_declarations(self):
-        v = FuncDeclVisitor()
+        v = FuncDeclVisitor(convert_name)
         v.visit(self.ast)
         self.declarations = v.declarations
 
@@ -262,33 +293,11 @@ class AutoGen:
         return '\n'.join(lines)
 
     def gen_func_implementations(self):
-        # XXX: we need a better way to decide which functions to include/exclude
-        exclude = set([
-            'HPy_Dup',
-            'HPy_Close',
-            'HPy_FromPyObject',
-            'HPy_GetAttr',
-            'HPy_GetAttr_s',
-            'HPy_HasAttr',
-            'HPy_HasAttr_s',
-            'HPy_SetAttr',
-            'HPy_SetAttr_s',
-            'HPy_GetItem',
-            'HPy_GetItem_i',
-            'HPy_GetItem_s',
-            'HPy_SetItem',
-            'HPy_SetItem_i',
-            'HPy_SetItem_s',
-            'HPy_AsPyObject',
-            'HPyModule_Create',
-            '_HPy_CallRealFunctionFromTrampoline',
-            'HPyErr_Occurred',
-        ])
         lines = []
         for f in self.declarations:
             if not isinstance(f, Function):
                 continue
-            if f.name in exclude:
+            if not f.cpython_name:
                 continue
             lines.append(f.implementation())
             lines.append('')

@@ -10,6 +10,7 @@ def autogen(tmpdir_factory):
         typedef int HPy;
         typedef int HPyContext;
         HPy h_None;
+        HPy HPy_Dup(HPyContext ctx, HPy h);
         HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
         HPy HPyLong_FromLong(HPyContext ctx, long value);
         char* HPyBytes_AsString(HPyContext ctx, HPy o);
@@ -37,6 +38,11 @@ class TestFunction:
             }
         """
         assert src_equal(x, expected)
+
+    def test_no_implementation(self, autogen):
+        func = autogen.get('HPy_Dup')
+        with pytest.raises(ValueError):
+            func.implementation()
 
     def test_implementation_hpy_types(self, autogen):
         func = autogen.get('HPyNumber_Add')
