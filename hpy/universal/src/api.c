@@ -88,53 +88,6 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
     return _py2h(result);
 }
 
-/* HPy object protocol */
-
-static HPy
-ctx_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
-  PyObject* key = PyLong_FromSsize_t(idx);
-  if (key == NULL)
-    return HPy_NULL;
-  HPy result = _py2h(PyObject_GetItem(_h2py(obj), key));
-  Py_DECREF(key);
-  return result;
-}
-
-static HPy
-ctx_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
-  PyObject* key_o = PyUnicode_FromString(key);
-  if (key_o == NULL)
-    return HPy_NULL;
-  HPy result = _py2h(PyObject_GetItem(_h2py(obj), key_o));
-  Py_DECREF(key_o);
-  return result;
-}
-
-static int
-ctx_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value) {
-  PyObject* key = PyLong_FromSsize_t(idx);
-  if (key == NULL)
-    return -1;
-  int result = PyObject_SetItem(_h2py(obj), key, _h2py(value));
-  Py_DECREF(key);
-  return result;
-}
-
-static int
-ctx_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value) {
-  PyObject* key_o = PyUnicode_FromString(key);
-  if (key_o == NULL)
-    return -1;
-  int result = PyObject_SetItem(_h2py(obj), key_o, _h2py(value));
-  Py_DECREF(key_o);
-  return result;
-}
-
-static int
-ctx_Err_Occurred(HPyContext ctx) {
-  return PyErr_Occurred() ? 1 : 0;
-}
-
 /* HPyMeth */
 
 typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);
@@ -219,7 +172,7 @@ ctx_Dup(HPyContext ctx, HPy h)
 #define HPyAPI_STORAGE static
 #define _HPy_IMPL_NAME(name) ctx_##name
 #define _HPy_IMPL_NAME_NOPREFIX(name) ctx_##name
-#include "common/autogen_impl.h"
+#include "common/implementation.h"
 #undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
