@@ -48,6 +48,46 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME(Object_IsTrue)(HPyContext ctx, HPy h)
     return PyObject_IsTrue(_h2py(h));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(GetAttr)(HPyContext ctx, HPy obj, HPy name)
+{
+    return _py2h(PyObject_GetAttr(_h2py(obj), _h2py(name)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(GetAttr_s)(HPyContext ctx, HPy obj, const char *name)
+{
+    return _py2h(PyObject_GetAttrString(_h2py(obj), name));
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(HasAttr)(HPyContext ctx, HPy obj, HPy name)
+{
+    return PyObject_HasAttr(_h2py(obj), _h2py(name));
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(HasAttr_s)(HPyContext ctx, HPy obj, const char *name)
+{
+    return PyObject_HasAttrString(_h2py(obj), name);
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(SetAttr)(HPyContext ctx, HPy obj, HPy name, HPy value)
+{
+    return PyObject_SetAttr(_h2py(obj), _h2py(name), _h2py(value));
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(SetAttr_s)(HPyContext ctx, HPy obj, const char *name, HPy value)
+{
+    return PyObject_SetAttrString(_h2py(obj), name, _h2py(value));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(GetItem)(HPyContext ctx, HPy obj, HPy key)
+{
+    return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(SetItem)(HPyContext ctx, HPy obj, HPy key, HPy value)
+{
+    return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
+}
+
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)
 {
     return PyBytes_Check(_h2py(h));

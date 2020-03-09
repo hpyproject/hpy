@@ -94,7 +94,11 @@ class Function:
             # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
             newnode = deepcopy(self.node)
             typedecl = self._find_typedecl(newnode)
-            typedecl.declname = '_HPy_IMPL_NAME(%s)' % base_name     # rename the function
+            # rename the function
+            if self.name.startswith('HPy_'):
+                typedecl.declname = '_HPy_IMPL_NAME_NOPREFIX(%s)' % base_name
+            else:
+                typedecl.declname = '_HPy_IMPL_NAME(%s)' % base_name
             return toC(newnode)
         #
         def call(pyfunc, return_type):
@@ -204,21 +208,21 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
 SPECIAL_CASES = {
     'HPy_Dup': None,
     'HPy_Close': None,
-    'HPy_FromPyObject': None,
-    'HPy_GetAttr': None,
-    'HPy_GetAttr_s': None,
-    'HPy_HasAttr': None,
-    'HPy_HasAttr_s': None,
-    'HPy_SetAttr': None,
-    'HPy_SetAttr_s': None,
-    'HPy_GetItem': None,
+    'HPyModule_Create': None,
+    'HPy_GetAttr': 'PyObject_GetAttr',
+    'HPy_GetAttr_s': 'PyObject_GetAttrString',
+    'HPy_HasAttr': 'PyObject_HasAttr',
+    'HPy_HasAttr_s': 'PyObject_HasAttrString',
+    'HPy_SetAttr': 'PyObject_SetAttr',
+    'HPy_SetAttr_s': 'PyObject_SetAttrString',
+    'HPy_GetItem': 'PyObject_GetItem',
     'HPy_GetItem_i': None,
     'HPy_GetItem_s': None,
-    'HPy_SetItem': None,
+    'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
+    'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
-    'HPyModule_Create': None,
     '_HPy_CallRealFunctionFromTrampoline': None,
     'HPyErr_Occurred': None,
 }

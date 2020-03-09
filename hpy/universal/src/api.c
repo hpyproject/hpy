@@ -91,41 +91,6 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 /* HPy object protocol */
 
 static HPy
-ctx_GetAttr(HPyContext ctx, HPy obj, HPy name) {
-  return _py2h(PyObject_GetAttr(_h2py(obj), _h2py(name)));
-}
-
-static HPy
-ctx_GetAttr_s(HPyContext ctx, HPy obj, const char *name) {
-  return _py2h(PyObject_GetAttrString(_h2py(obj), name));
-}
-
-static int
-ctx_HasAttr(HPyContext ctx, HPy obj, HPy name) {
-  return PyObject_HasAttr(_h2py(obj), _h2py(name));
-}
-
-static int
-ctx_HasAttr_s(HPyContext ctx, HPy obj, const char *name) {
-  return PyObject_HasAttrString(_h2py(obj), name);
-}
-
-static int
-ctx_SetAttr(HPyContext ctx, HPy obj, HPy name, HPy value) {
-  return PyObject_SetAttr(_h2py(obj), _h2py(name), _h2py(value));
-}
-
-static int
-ctx_SetAttr_s(HPyContext ctx, HPy obj, const char *name, HPy value) {
-  return PyObject_SetAttrString(_h2py(obj), name, _h2py(value));
-}
-
-static HPy
-ctx_GetItem(HPyContext ctx, HPy obj, HPy key) {
-  return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
-}
-
-static HPy
 ctx_GetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
   PyObject* key = PyLong_FromSsize_t(idx);
   if (key == NULL)
@@ -143,11 +108,6 @@ ctx_GetItem_s(HPyContext ctx, HPy obj, const char *key) {
   HPy result = _py2h(PyObject_GetItem(_h2py(obj), key_o));
   Py_DECREF(key_o);
   return result;
-}
-
-static int
-ctx_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value) {
-  return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
 static int
@@ -258,7 +218,9 @@ ctx_Dup(HPyContext ctx, HPy h)
  */
 #define HPyAPI_STORAGE static
 #define _HPy_IMPL_NAME(name) ctx_##name
+#define _HPy_IMPL_NAME_NOPREFIX(name) ctx_##name
 #include "common/autogen_impl.h"
+#undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
 #include "autogen_ctx_def.h"
