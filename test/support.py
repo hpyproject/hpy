@@ -84,9 +84,9 @@ class ExtensionCompiler:
         """
         self.tmpdir = tmpdir
         self.abimode = abimode
-        self.base_dir = base_dir
-        self.include_dir = base_dir.joinpath('include')
-        self.src_dir = base_dir.joinpath('src', 'runtime')
+        self.base_dir = py.path.local(base_dir)
+        self.include_dir = self.base_dir.join('include')
+        self.src_dir = self.base_dir.join('src', 'runtime')
         self.universal_mode = self.abimode == 'universal'
         self.compiler_verbose = compiler_verbose
         self.cpython_include_dirs = cpython_include_dirs
@@ -110,7 +110,7 @@ class ExtensionCompiler:
         """
         filename = self._expand(name, main_template)
         sources = [
-            self.src_dir.joinpath('argparse.c'),
+            self.src_dir.join('argparse.c'),
         ]
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
