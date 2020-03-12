@@ -1,3 +1,4 @@
+set -e
 python -m pip install virtualenv
 python -m virtualenv venv/builder
 PY_BUILDER="`pwd`/venv/builder/bin/python3"
