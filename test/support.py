@@ -110,7 +110,7 @@ class ExtensionCompiler:
         """
         filename = self._expand(name, main_template)
         sources = [
-            self.src_dir.join('argparse.c'),
+            str(self.src_dir.join('argparse.c')),
         ]
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
