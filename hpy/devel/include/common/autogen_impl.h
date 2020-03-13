@@ -93,6 +93,11 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(SetItem)(HPyContext ctx, HPy obj, HPy
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(New)(HPyContext ctx, HPy h_type, void **data)
+{
+    return _py2h(PyNew(_h2py(h_type), data));
+}
+
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)
 {
     return PyBytes_Check(_h2py(h));

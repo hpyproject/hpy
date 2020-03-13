@@ -112,6 +112,10 @@ static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
      return ctx->ctx_Cast ( ctx, h ); 
 }
 
+static inline HPy HPy_New(HPyContext ctx, HPy h_type, void **data) {
+     return ctx->ctx_New ( ctx, h_type, data ); 
+}
+
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }

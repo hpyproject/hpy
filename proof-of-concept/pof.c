@@ -38,6 +38,25 @@ typedef struct {
     double y;
 } HPy_Point;
 
+HPy_DEF_METH_VARARGS(Point_new)
+static HPy Point_new_impl (HPyContext ctx, HPy self, HPy *args,
+                            HPy_ssize_t nargs)
+{
+    double x, y;
+    if (!HPyArg_Parse(ctx, args, nargs, "dd", &x, &y))
+        return HPy_NULL;
+    HPy h_point_type = HPy_GetAttr_s(ctx, self, "Point");
+    HPy_Point *point;
+    HPy h_point = HPy_New(ctx, h_point_type, &point);
+    HPy_Close(ctx, h_point_type);
+    if (HPy_IsNull(h_point))
+        return HPy_NULL;
+    point->x = x;
+    point->y = y;
+
+    return h_point
+}
+
 HPy_DEF_METH_NOARGS(Point_repr)
 static HPy Point_repr_impl(HPyContext ctx, HPy self)
 {
@@ -47,6 +66,7 @@ static HPy Point_repr_impl(HPyContext ctx, HPy self)
 }
 
 static const HPyType_Slot point_type_slots[] = {
+    {Py_tp_new, Point_new},
     {Py_tp_repr, Point_repr},
     {0, NULL},
 };
