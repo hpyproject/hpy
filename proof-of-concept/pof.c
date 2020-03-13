@@ -33,7 +33,7 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 }
 
 
-static const HPyMethodDef PofMethods[] = {
+static HPyMethodDef PofMethods[] = {
     {"do_nothing", do_nothing, HPy_METH_NOARGS, ""},
     {"double", double_obj, HPy_METH_O, ""},
     {"add_ints", add_ints, HPy_METH_VARARGS, ""},
@@ -41,7 +41,7 @@ static const HPyMethodDef PofMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-static const HPyModuleDef moduledef = {
+static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
     .m_name = "pof",
     .m_doc = "HPy Proof of Concept",
@@ -74,7 +74,7 @@ static HPy init_pof_impl(HPyContext ctx)
     m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
-    h_point_type = HPy_TypeFromSpec(ctx, point_type_spec);
+    h_point_type = HPyType_FromSpec(ctx, &point_type_spec);
     if (HPy_IsNull(h_point_type))
       return HPy_NULL;
     HPy_SetAttr_s(ctx, m, "Point", h_point_type);

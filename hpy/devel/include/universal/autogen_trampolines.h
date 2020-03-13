@@ -56,6 +56,10 @@ static inline int HPyObject_IsTrue(HPyContext ctx, HPy h) {
      return ctx->ctx_Object_IsTrue ( ctx, h ); 
 }
 
+static inline HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec) {
+     return ctx->ctx_Type_FromSpec ( ctx, spec ); 
+}
+
 static inline HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name) {
      return ctx->ctx_GetAttr ( ctx, obj, name ); 
 }

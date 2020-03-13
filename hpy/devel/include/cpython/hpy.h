@@ -109,6 +109,12 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
         return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
+typedef PyType_Slot HPyType_Slot;
+typedef PyType_Spec HPyType_Spec;
+#define HPyObject_HEAD PyObject_HEAD
+#define HPy_TPFLAGS_DEFAULT Py_TPFLAGS_DEFAULT
+
+
 HPyAPI_FUNC(HPy)
 HPy_FromPyObject(HPyContext ctx, PyObject *obj)
 {

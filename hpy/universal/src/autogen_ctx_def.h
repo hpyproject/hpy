@@ -27,6 +27,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Err_SetString = &ctx_Err_SetString,
     .ctx_Err_Occurred = &ctx_Err_Occurred,
     .ctx_Object_IsTrue = &ctx_Object_IsTrue,
+    .ctx_Type_FromSpec = &ctx_Type_FromSpec,
     .ctx_GetAttr = &ctx_GetAttr,
     .ctx_GetAttr_s = &ctx_GetAttr_s,
     .ctx_HasAttr = &ctx_HasAttr,
