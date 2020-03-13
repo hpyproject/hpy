@@ -54,6 +54,8 @@ int HPy_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value);
 int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
 int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
 
+void* _HPy_Cast(HPyContext ctx, HPy h);
+
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);

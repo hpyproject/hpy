@@ -221,6 +221,7 @@ SPECIAL_CASES = {
     'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
+    '_HPy_Cast': None,
     'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
     '_HPy_CallRealFunctionFromTrampoline': None,

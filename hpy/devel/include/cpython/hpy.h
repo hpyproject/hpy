@@ -115,6 +115,14 @@ typedef PyType_Spec HPyType_Spec;
 #define HPy_TPFLAGS_BASETYPE Py_TPFLAGS_BASETYPE
 #define HPy_TPFLAGS_DEFAULT (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE)
 
+#define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
+
+
+HPyAPI_FUNC(void*)
+_HPy_Cast(HPyContext ctx, HPy h)
+{
+    return (void*)_h2py(h);
+}
 
 HPyAPI_FUNC(HPy)
 HPy_FromPyObject(HPyContext ctx, PyObject *obj)

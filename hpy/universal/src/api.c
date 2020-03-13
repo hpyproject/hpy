@@ -88,6 +88,12 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
     return _py2h(result);
 }
 
+static void*
+ctx_Cast(HPyContext ctx, HPy h)
+{
+    return (void*)_h2py(h);
+}
+
 /* HPyMeth */
 
 typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);

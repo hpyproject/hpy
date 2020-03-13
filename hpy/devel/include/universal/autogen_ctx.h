@@ -40,6 +40,7 @@ struct _HPyContext_s {
     int (*ctx_SetItem)(HPyContext ctx, HPy obj, HPy key, HPy value);
     int (*ctx_SetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
     int (*ctx_SetItem_s)(HPyContext ctx, HPy obj, const char *key, HPy value);
+    void *(*ctx_Cast)(HPyContext ctx, HPy h);
     int (*ctx_Bytes_Check)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_Size)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext ctx, HPy h);

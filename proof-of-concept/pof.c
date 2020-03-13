@@ -32,6 +32,32 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
     return HPyLong_FromLong(ctx, a+b);
 }
 
+typedef struct {
+    HPyObject_HEAD
+    double x;
+    double y;
+} HPy_Point;
+
+HPy_DEF_METH_NOARGS(Point_repr)
+static HPy Point_repr_impl(HPyContext ctx, HPy self)
+{
+    HPy_Point *point = HPy_CAST(ctx, HPy_Point, self);
+    return HPyUnicode_FromString(ctx, "Point()");
+    //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
+}
+
+static const HPyType_Slot point_type_slots[] = {
+    {Py_tp_repr, Point_repr},
+    {0, NULL},
+};
+
+static const HPyType_Spec point_type_spec = {
+    .name = "pof.Point",
+    .basicsize = sizeof(HPy_Point),
+    .itemsize = 0,
+    .flags = HPy_TPFLAGS_DEFAULT,
+    .slots = point_type_slots,
+};
 
 static HPyMethodDef PofMethods[] = {
     {"do_nothing", do_nothing, HPy_METH_NOARGS, ""},
@@ -47,24 +73,6 @@ static HPyModuleDef moduledef = {
     .m_doc = "HPy Proof of Concept",
     .m_size = -1,
     .m_methods = PofMethods
-};
-
-typedef struct {
-    HPyObject_HEAD
-    double x;
-    double y;
-} HPy_Point;
-
-static const HPyType_Slot point_type_slots[] = {
-    {0, NULL},
-};
-
-static const HPyType_Spec point_type_spec = {
-    .name = "pof.Point",
-    .basicsize = sizeof(HPy_Point),
-    .itemsize = 0,
-    .flags = HPy_TPFLAGS_DEFAULT,
-    .slots = point_type_slots,
 };
 
 HPy_MODINIT(pof)
