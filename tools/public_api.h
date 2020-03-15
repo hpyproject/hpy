@@ -48,6 +48,20 @@ HPy HPyNumber_Index(HPyContext ctx, HPy h1);
 HPy HPyNumber_Long(HPyContext ctx, HPy h1);
 HPy HPyNumber_Float(HPyContext ctx, HPy h1);
 
+HPy HPyNumber_InPlaceAdd(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceSubtract(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceMultiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceMatrixMultiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceFloorDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceTrueDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceRemainder(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlacePower(HPyContext ctx, HPy h1, HPy h2, HPy h3);
+HPy HPyNumber_InPlaceLshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceRshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceAnd(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceXor(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
+
 /* pyerrors.h */
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */

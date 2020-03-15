@@ -124,6 +124,58 @@ static inline HPy HPyNumber_Float(HPyContext ctx, HPy h1) {
      return ctx->ctx_Number_Float ( ctx, h1 ); 
 }
 
+static inline HPy HPyNumber_InPlaceAdd(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceAdd ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceSubtract(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceSubtract ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceMultiply(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceMultiply ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceMatrixMultiply(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceMatrixMultiply ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceFloorDivide(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceFloorDivide ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceTrueDivide(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceTrueDivide ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceRemainder(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceRemainder ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlacePower(HPyContext ctx, HPy h1, HPy h2, HPy h3) {
+     return ctx->ctx_Number_InPlacePower ( ctx, h1, h2, h3 ); 
+}
+
+static inline HPy HPyNumber_InPlaceLshift(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceLshift ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceRshift(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceRshift ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceAnd(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceAnd ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceXor(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceXor ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_InPlaceOr(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_InPlaceOr ( ctx, h1, h2 ); 
+}
+
 static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message) {
      ctx->ctx_Err_SetString ( ctx, h_type, message ); 
 }

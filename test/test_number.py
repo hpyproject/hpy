@@ -103,3 +103,78 @@ class TestNumber(HPyTest):
             @INIT
         """)
         assert mod.f(m1, m2) == m1.__matmul__(m2)
+
+    def test_inplace_binary(self):
+        import operator
+        for c_name, py_name in [
+                ('Add', '__iadd__'),
+                ('Subtract', '__isub__'),
+                ('Multiply', '__imul__'),
+                ('FloorDivide', '__ifloordiv__'),
+                ('TrueDivide', '__itruediv__'),
+                ('Remainder', '__imod__'),
+                ('Lshift', '__ilshift__'),
+                ('Rshift', '__irshift__'),
+                ('And', '__iand__'),
+                ('Xor', '__ixor__'),
+                ('Or', '__ior__'),
+                ]:
+            mod = self.make_module("""
+                HPy_DEF_METH_VARARGS(f)
+                static HPy f_impl(HPyContext ctx, HPy self,
+                                  HPy *args, HPy_ssize_t nargs)
+                {
+                    HPy a, b;
+                    if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
+                        return HPy_NULL;
+                    return HPyNumber_InPlace%s(ctx, a, b);
+                }
+                @EXPORT f HPy_METH_VARARGS
+                @INIT
+            """ % (c_name,), name='number_'+c_name)
+            class A:
+                def mymethod(self, b):
+                    return (py_name, b)
+            setattr(A, py_name, A.mymethod)
+            assert mod.f(A(), 12.34) == A().mymethod(12.34)
+
+    def test_inplace_power(self):
+        mod = self.make_module("""
+            HPy_DEF_METH_VARARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy a, b, c;
+                if (!HPyArg_Parse(ctx, args, nargs, "OOO", &a, &b, &c))
+                    return HPy_NULL;
+                return HPyNumber_InPlacePower(ctx, a, b, c);
+            }
+            @EXPORT f HPy_METH_VARARGS
+            @INIT
+        """)
+        class A:
+            def __ipow__(self, b):
+                return ('ipow', b)
+        assert mod.f(A(), 5, None) == A().__ipow__(5)
+        assert mod.f(4, 5, 7) == pow(4, 5, 7)
+
+    def test_inplace_matmul(self):
+        class Mat:
+            def __imatmul__(self, other):
+                return ('imatmul', self, other)
+        m1 = Mat()
+        m2 = Mat()
+        mod = self.make_module("""
+            HPy_DEF_METH_VARARGS(f)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy a, b;
+                if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
+                    return HPy_NULL;
+                return HPyNumber_InPlaceMatrixMultiply(ctx, a, b);
+            }
+            @EXPORT f HPy_METH_VARARGS
+            @INIT
+        """)
+        assert mod.f(m1, m2) == m1.__imatmul__(m2)

@@ -138,6 +138,71 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_Float)(HPyContext ctx, HPy h1)
     return _py2h(PyNumber_Float(_h2py(h1)));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceAdd)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceAdd(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceSubtract)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceSubtract(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceMultiply)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceMultiply(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceMatrixMultiply)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceMatrixMultiply(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceFloorDivide)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceFloorDivide(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceTrueDivide)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceTrueDivide(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceRemainder)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceRemainder(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlacePower)(HPyContext ctx, HPy h1, HPy h2, HPy h3)
+{
+    return _py2h(PyNumber_InPlacePower(_h2py(h1), _h2py(h2), _h2py(h3)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceLshift)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceLshift(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceRshift)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceRshift(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceAnd)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceAnd(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceXor)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceXor(_h2py(h1), _h2py(h2)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Number_InPlaceOr)(HPyContext ctx, HPy h1, HPy h2)
+{
+    return _py2h(PyNumber_InPlaceOr(_h2py(h1), _h2py(h2)));
+}
+
 HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetString)(HPyContext ctx, HPy h_type, const char *message)
 {
     return PyErr_SetString(_h2py(h_type), message);
