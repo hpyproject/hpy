@@ -44,6 +44,86 @@ static inline HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2) {
      return ctx->ctx_Number_Add ( ctx, h1, h2 ); 
 }
 
+static inline HPy HPyNumber_Subtract(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Subtract ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Multiply(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Multiply ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_MatrixMultiply(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_MatrixMultiply ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_FloorDivide(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_FloorDivide ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_TrueDivide(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_TrueDivide ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Remainder(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Remainder ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Divmod(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Divmod ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Power(HPyContext ctx, HPy h1, HPy h2, HPy h3) {
+     return ctx->ctx_Number_Power ( ctx, h1, h2, h3 ); 
+}
+
+static inline HPy HPyNumber_Negative(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Negative ( ctx, h1 ); 
+}
+
+static inline HPy HPyNumber_Positive(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Positive ( ctx, h1 ); 
+}
+
+static inline HPy HPyNumber_Absolute(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Absolute ( ctx, h1 ); 
+}
+
+static inline HPy HPyNumber_Invert(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Invert ( ctx, h1 ); 
+}
+
+static inline HPy HPyNumber_Lshift(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Lshift ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Rshift(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Rshift ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_And(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_And ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Xor(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Xor ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Or(HPyContext ctx, HPy h1, HPy h2) {
+     return ctx->ctx_Number_Or ( ctx, h1, h2 ); 
+}
+
+static inline HPy HPyNumber_Index(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Index ( ctx, h1 ); 
+}
+
+static inline HPy HPyNumber_Long(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Long ( ctx, h1 ); 
+}
+
+static inline HPy HPyNumber_Float(HPyContext ctx, HPy h1) {
+     return ctx->ctx_Number_Float ( ctx, h1 ); 
+}
+
 static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message) {
      ctx->ctx_Err_SetString ( ctx, h_type, message ); 
 }

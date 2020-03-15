@@ -25,7 +25,28 @@ HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v);
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
+/* abstract.h */
 HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Subtract(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Multiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_MatrixMultiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_FloorDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_TrueDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Remainder(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Divmod(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Power(HPyContext ctx, HPy h1, HPy h2, HPy h3);
+HPy HPyNumber_Negative(HPyContext ctx, HPy h1);
+HPy HPyNumber_Positive(HPyContext ctx, HPy h1);
+HPy HPyNumber_Absolute(HPyContext ctx, HPy h1);
+HPy HPyNumber_Invert(HPyContext ctx, HPy h1);
+HPy HPyNumber_Lshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Rshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_And(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Xor(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Or(HPyContext ctx, HPy h1, HPy h2);
+HPy HPyNumber_Index(HPyContext ctx, HPy h1);
+HPy HPyNumber_Long(HPyContext ctx, HPy h1);
+HPy HPyNumber_Float(HPyContext ctx, HPy h1);
 
 /* pyerrors.h */
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
