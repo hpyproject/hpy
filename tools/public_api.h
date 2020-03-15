@@ -25,7 +25,42 @@ HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v);
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 
-HPy HPyNumber_Add(HPyContext ctx, HPy h1, HPy h2);
+/* abstract.h */
+HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Subtract(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Multiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_MatrixMultiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_FloorDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_TrueDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Remainder(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Divmod(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Power(HPyContext ctx, HPy h1, HPy h2, HPy h3);
+HPy HPy_Negative(HPyContext ctx, HPy h1);
+HPy HPy_Positive(HPyContext ctx, HPy h1);
+HPy HPy_Absolute(HPyContext ctx, HPy h1);
+HPy HPy_Invert(HPyContext ctx, HPy h1);
+HPy HPy_Lshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Rshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_And(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Xor(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Or(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_Index(HPyContext ctx, HPy h1);
+HPy HPy_Long(HPyContext ctx, HPy h1);
+HPy HPy_Float(HPyContext ctx, HPy h1);
+
+HPy HPy_InPlaceAdd(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceSubtract(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceMultiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceMatrixMultiply(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceFloorDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceTrueDivide(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceRemainder(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlacePower(HPyContext ctx, HPy h1, HPy h2, HPy h3);
+HPy HPy_InPlaceLshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceRshift(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceAnd(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceXor(HPyContext ctx, HPy h1, HPy h2);
+HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 
 /* pyerrors.h */
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);

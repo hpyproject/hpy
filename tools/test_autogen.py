@@ -11,7 +11,7 @@ def autogen(tmpdir_factory):
         typedef int HPyContext;
         HPy h_None;
         HPy HPy_Dup(HPyContext ctx, HPy h);
-        HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
+        HPy HPy_Add(HPyContext ctx, HPy x, HPy y);
         HPy HPyLong_FromLong(HPyContext ctx, long value);
         char* HPyBytes_AsString(HPyContext ctx, HPy o);
     """)
@@ -26,15 +26,15 @@ def src_equal(a, b):
 class TestFunction:
 
     def test_ctx_decl(self, autogen):
-        func = autogen.get('HPyNumber_Add')
-        assert func.ctx_decl() == 'HPy (*ctx_Number_Add)(HPyContext ctx, HPy x, HPy y)'
+        func = autogen.get('HPy_Add')
+        assert func.ctx_decl() == 'HPy (*ctx_Add)(HPyContext ctx, HPy x, HPy y)'
 
     def test_trampoline_def(self, autogen):
-        func = autogen.get('HPyNumber_Add')
+        func = autogen.get('HPy_Add')
         x = func.trampoline_def()
         expected = """
-            static inline HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y) {
-                return ctx->ctx_Number_Add ( ctx, x, y );
+            static inline HPy HPy_Add(HPyContext ctx, HPy x, HPy y) {
+                return ctx->ctx_Add ( ctx, x, y );
             }
         """
         assert src_equal(x, expected)
@@ -45,11 +45,11 @@ class TestFunction:
             func.implementation()
 
     def test_implementation_hpy_types(self, autogen):
-        func = autogen.get('HPyNumber_Add')
+        func = autogen.get('HPy_Add')
         x = func.implementation()
         expected = """
             HPyAPI_STORAGE
-            HPy _HPy_IMPL_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
+            HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext ctx, HPy x, HPy y)
             {
                 return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
             }

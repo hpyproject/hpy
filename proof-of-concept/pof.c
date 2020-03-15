@@ -9,7 +9,7 @@ static HPy do_nothing_impl(HPyContext ctx, HPy self)
 HPy_DEF_METH_O(double_obj)
 static HPy double_obj_impl(HPyContext ctx, HPy self, HPy obj)
 {
-    return HPyNumber_Add(ctx, obj, obj);
+    return HPy_Add(ctx, obj, obj);
 }
 
 HPy_DEF_METH_VARARGS(add_ints)
