@@ -19,7 +19,7 @@ class TestNumber(HPyTest):
                 HPy_DEF_METH_O(f)
                 static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
                 {
-                    return HPyNumber_%s(ctx, arg);
+                    return HPy_%s(ctx, arg);
                 }
                 @EXPORT f HPy_METH_O
                 @INIT
@@ -58,7 +58,7 @@ class TestNumber(HPyTest):
                     HPy a, b;
                     if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
                         return HPy_NULL;
-                    return HPyNumber_%s(ctx, a, b);
+                    return HPy_%s(ctx, a, b);
                 }
                 @EXPORT f HPy_METH_VARARGS
                 @INIT
@@ -75,7 +75,7 @@ class TestNumber(HPyTest):
                 HPy a, b, c;
                 if (!HPyArg_Parse(ctx, args, nargs, "OOO", &a, &b, &c))
                     return HPy_NULL;
-                return HPyNumber_Power(ctx, a, b, c);
+                return HPy_Power(ctx, a, b, c);
             }
             @EXPORT f HPy_METH_VARARGS
             @INIT
@@ -97,7 +97,7 @@ class TestNumber(HPyTest):
                 HPy a, b;
                 if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
                     return HPy_NULL;
-                return HPyNumber_MatrixMultiply(ctx, a, b);
+                return HPy_MatrixMultiply(ctx, a, b);
             }
             @EXPORT f HPy_METH_VARARGS
             @INIT
@@ -127,7 +127,7 @@ class TestNumber(HPyTest):
                     HPy a, b;
                     if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
                         return HPy_NULL;
-                    return HPyNumber_InPlace%s(ctx, a, b);
+                    return HPy_InPlace%s(ctx, a, b);
                 }
                 @EXPORT f HPy_METH_VARARGS
                 @INIT
@@ -147,7 +147,7 @@ class TestNumber(HPyTest):
                 HPy a, b, c;
                 if (!HPyArg_Parse(ctx, args, nargs, "OOO", &a, &b, &c))
                     return HPy_NULL;
-                return HPyNumber_InPlacePower(ctx, a, b, c);
+                return HPy_InPlacePower(ctx, a, b, c);
             }
             @EXPORT f HPy_METH_VARARGS
             @INIT
@@ -172,7 +172,7 @@ class TestNumber(HPyTest):
                 HPy a, b;
                 if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
                     return HPy_NULL;
-                return HPyNumber_InPlaceMatrixMultiply(ctx, a, b);
+                return HPy_InPlaceMatrixMultiply(ctx, a, b);
             }
             @EXPORT f HPy_METH_VARARGS
             @INIT
