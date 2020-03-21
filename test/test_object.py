@@ -303,7 +303,7 @@ class TestObject(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy key, result;
-                key = HPyLong_FromLong(ctx, 0);
+                key = HPyLong_FromLong(ctx, 3);
                 if (HPy_IsNull(key))
                     return HPy_NULL;
                 result = HPy_GetItem(ctx, arg, key);
@@ -315,12 +315,12 @@ class TestObject(HPyTest):
             @EXPORT f HPy_METH_O
             @INIT
         """)
-        assert mod.f({0: "hello"}) == "hello"
+        assert mod.f({3: "hello"}) == "hello"
         with pytest.raises(KeyError) as exc:
             mod.f({1: "bad"})
-        assert exc.value.args == (0,)
+        assert exc.value.args == (3,)
 
-        assert mod.f(["hello"]) == "hello"
+        assert mod.f([0, 1, 2, "hello"]) == "hello"
         with pytest.raises(IndexError):
             mod.f([])
 
@@ -331,7 +331,7 @@ class TestObject(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy result;
-                result = HPy_GetItem_i(ctx, arg, 0);
+                result = HPy_GetItem_i(ctx, arg, 3);
                 if (HPy_IsNull(result))
                     return HPy_NULL;
                 return result;
@@ -339,12 +339,12 @@ class TestObject(HPyTest):
             @EXPORT f HPy_METH_O
             @INIT
         """)
-        assert mod.f({0: "hello"}) == "hello"
+        assert mod.f({3: "hello"}) == "hello"
         with pytest.raises(KeyError) as exc:
             mod.f({1: "bad"})
-        assert exc.value.args == (0,)
+        assert exc.value.args == (3,)
 
-        assert mod.f(["hello"]) == "hello"
+        assert mod.f([0, 1, 2, "hello"]) == "hello"
         with pytest.raises(IndexError):
             mod.f([])
 
@@ -379,7 +379,7 @@ class TestObject(HPyTest):
             {
                 HPy key;
                 int result;
-                key = HPyLong_FromLong(ctx, 0);
+                key = HPyLong_FromLong(ctx, 3);
                 if (HPy_IsNull(key))
                     return HPy_NULL;
                 result = HPy_SetItem(ctx, arg, key, ctx->h_True);
@@ -391,11 +391,11 @@ class TestObject(HPyTest):
             @EXPORT f HPy_METH_O
             @INIT
         """)
-        assert mod.f({}) == {0: True}
-        assert mod.f({"a": 1}) == {"a": 1, 0: True}
-        assert mod.f({0: False}) == {0: True}
+        assert mod.f({}) == {3: True}
+        assert mod.f({"a": 1}) == {"a": 1, 3: True}
+        assert mod.f({3: False}) == {3: True}
 
-        assert mod.f([False]) == [True]
+        assert mod.f([0, 1, 2, False]) == [0, 1, 2, True]
         with pytest.raises(IndexError):
             mod.f([])
 
@@ -406,7 +406,7 @@ class TestObject(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int result;
-                result = HPy_SetItem_i(ctx, arg, 0, ctx->h_True);
+                result = HPy_SetItem_i(ctx, arg, 3, ctx->h_True);
                 if (result < 0)
                     return HPy_NULL;
                 return arg;
@@ -414,11 +414,11 @@ class TestObject(HPyTest):
             @EXPORT f HPy_METH_O
             @INIT
         """)
-        assert mod.f({}) == {0: True}
-        assert mod.f({"a": 1}) == {"a": 1, 0: True}
-        assert mod.f({0: False}) == {0: True}
+        assert mod.f({}) == {3: True}
+        assert mod.f({"a": 1}) == {"a": 1, 3: True}
+        assert mod.f({3: False}) == {3: True}
 
-        assert mod.f([False]) == [True]
+        assert mod.f([0, 1, 2, False]) == [0, 1, 2, True]
         with pytest.raises(IndexError):
             mod.f([])
 
