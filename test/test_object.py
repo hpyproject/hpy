@@ -386,7 +386,7 @@ class TestObject(HPyTest):
                 HPy_Close(ctx, key);
                 if (result < 0)
                     return HPy_NULL;
-                return arg;
+                return HPy_Dup(ctx, arg);
             }
             @EXPORT f HPy_METH_O
             @INIT
@@ -409,7 +409,7 @@ class TestObject(HPyTest):
                 result = HPy_SetItem_i(ctx, arg, 3, ctx->h_True);
                 if (result < 0)
                     return HPy_NULL;
-                return arg;
+                return HPy_Dup(ctx, arg);
             }
             @EXPORT f HPy_METH_O
             @INIT
@@ -432,7 +432,7 @@ class TestObject(HPyTest):
                 result = HPy_SetItem_s(ctx, arg, "limes", ctx->h_True);
                 if (result < 0)
                     return HPy_NULL;
-                return arg;
+                return HPy_Dup(ctx, arg);
             }
             @EXPORT f HPy_METH_O
             @INIT
