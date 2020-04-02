@@ -1,2 +1,2 @@
 # Requirements for building the documentation
-# Currently there are none except Sphinx itself. :)
+sphinx==2.4
