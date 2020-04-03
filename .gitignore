@@ -66,3 +66,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Sphinx
+docs/_build/
