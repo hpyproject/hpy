@@ -117,33 +117,103 @@ Depending on the compilation options, and HPy extension can target three
 different ABIs:
 
 CPython
+
   In this mode, HPy is implemented as a set of C macros and ``static inline``
   functions which translate the HPy API into the CPython API at compile
   time. The result is a compiled extension which is indistinguishable from a
-  "normal" one and can be distributed using all the standard tools. The ABI
-  tag is defined by the version of CPython which is used to compile it (e.g.,
-  ``cpython-37m``).
+  "normal" one and can be distributed using all the standard tools and will
+  run at the very same speed. The ABI tag is defined by the version of CPython
+  which is used to compile it (e.g., ``cpython-37m``),
 
-Universal
+HPy Universal
   As the name suggests, the HPy Universal ABI is designed to be loaded and
   executed by a variety of different Python implementations. Compiled
   extensions can be loaded unmodified on all the interpreters which supports
   it.  PyPy supports it natively.  CPython supports it by using the
-  ``hpy.universal`` package.  The ABI tag has not been formally defined yet,
-  but it will be something like ``hpy-1``, where ``1`` is the version of the
-  API.
+  ``hpy.universal`` package, and there is a small speed penalty compared to
+  the CPython ABI.  The ABI tag has not been formally defined yet, but it will
+  be something like ``hpy-1``, where ``1`` is the version of the API.
 
-Hybrid
+HPy Hybrid
   To allow an incremental transition to HPy, it is possible to use both HPy
   and Python/C API calls in the same extension. In this case, it is not
   possible to target the Universal ABI because the resulting compiled library
   also needs to be compatible with a specific CPython version.. The ABI tag
   will be something like ``hpy-1_cpython-37m``.
 
+Moreover, each alternative Python implementation could decide to implement its
+own non-universal ABI if it makes sense for them. For example, a hypotetical
+project *DummyPython* could decide to ship its own ``hpy.h`` which implements
+the HPy API but generates a DLL which targets the DummyPython ABI.
+
+This means that to compile an extension for CPython, you can choose whether to
+target the CPython ABI or the Universal ABI. The advantage of the former is
+that it runs at the same speed, while the advantage of the latter is that you
+can distribute a single binary, although with a small speed penalty on
+CPython.  Obviously, nothing stops you to compile and distribute both
+versions: this is very similar to what most projects are already doing, since
+they automatically compile and distribute extensions for many different
+CPython versions.
 
 
-Extension writers vs implementation writers
---------------------------------------------
+HPy for authors of C extensions
+--------------------------------
+
+If you are writing a Python extension in C, you are a consumer of the HPy
+API. There are two big advantages in using HPy instead of the old Python/C
+API:
+
+  - Speed on PyPy and other alternative implementations: according to early
+    :ref:`benchmarks`, an extension written in HPy can be ~3x faster than the
+    equivalent extenson writting in Python/C.
+
+  - Improved debugging: when you load extensions in :ref:`debugging mode`,
+    many common mistakes are checked and reported automatically.
+
+  - Universal binaries: you can choose to distribute only Universal ABI
+    binaries. This comes with a small speed penalty con CPython, but for
+    non-performance critical libraries it might still be a good tradeoff.
+
+
+HPy for authors of Cython extensions
+------------------------------------
+
+If you use Cython, you can't use HPy directly. The plan is to write a Cython
+backend which emits HPy code instead of Python/C code: once this is done, you
+will get the benefits of HPy automatically.
+
+
+HPy for authors of extensions in other languages
+-------------------------------------------------
+
+On the API side, HPy is designed with C in mind, so it is not directly useful
+if you want to write an extension in a language different than C.
+
+However, Python bindings for other languages could decide to target the HPy
+Universal ABI instead of the CPython ABI, and generate extensions which can be
+loaded seamlessly on all Python implementations which supports it.  This is
+the route taken for example by Rust (XXX put a link?).
+
+
+HPy for alternative Python implementations
+-------------------------------------------
+
+If you are writing an alternative Python implementation, there is a good
+chance that you already know how painful it is to support the Python/C
+API. HPy is designed to be both faster and easier to implement!
+
+You have two choices:
+
+  - support the Universal ABI: in this case, you just need to export the
+    needed functions and to add a hook to ``dlopen()`` the desired libraries
+
+  - use a custom ABI: in this case, you have to write your own replacement for
+    ``hpy.h`` and recompile the C extensions with it.
+
+
+
+Early benchmarks
+-----------------
 
 Projects involved
 -----------------
