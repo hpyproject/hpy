@@ -28,7 +28,7 @@ include:
 
   - `PyPy <https://doc.pypy.org/en/latest/faq.html#do-cpython-extension-modules-work-with-pypy>`_
 
-  - `Jython <https://www.jyni.org/>`
+  - `Jython <https://www.jyni.org/>`_
 
   - `IronPython <https://github.com/IronLanguages/ironclad>`_
 
@@ -68,14 +68,79 @@ sub-goals include (but are not necessarily limited to):
   - internal details might still be available, but in a opt-in way: for
     example, if Cython wants to iterate over a list of integers, it can ask if
     the implementation provides a direct low-level access to the content
-    (e.g. in the form of a `int64_t[]` array) and use that. But at the same
+    (e.g. in the form of a ``int64_t[]`` array) and use that. But at the same
     time, be ready to handle the generic fallback case.
-
-
 
 
 API vs ABI
 -----------
+
+HPy defines *both* and API and an ABI. Before digging further into details,
+let's distinguish them:
+
+  - The API works at the level of source code: it is the set of functions,
+    macros, types and structs which developers can use to write their own
+    extension modules.  For C programs, the API is generally made available
+    throuh one or more header file (``*.h``).
+
+  - The ABI works at the level of compiled code: it is the interface between
+    the host interpreter and the compiled DLL.  Given a target CPU and
+    operating system it defines things like the set of exported symbols, the
+    precise memory layout of objects, the size of types, etc.
+
+In general it is possible to compile the same source into multiple compiled
+libraries, each one targeting a different ABI. :pep:`3149` states that the
+filename of the compiled extension should contain the *ABI tag* to specificy
+what is the target ABI. For example, if you compile an extension called
+``simple.c`` on CPython 3.7, you get a DLL called
+``simple.cpython-37m-x86_64-linux-gnu.so``:
+
+  - ``cpython-37m`` is the ABI tag, in this case CPython 3.7
+
+  - ``x86_64`` is the CPU architecture
+
+  - ``linux-gnu`` is the operating system
+
+The same source code compiled on PyPy3.6 7.2.0 results in a file called
+``simple.pypy3-72-x86_64-linux-gnu.so``:
+
+  - ``pypy3-72`` mean "PyPy3.x", version "7.2.x"
+
+The HPy C API is exposed to the user by including ``hpy.h`` and it is
+explained in its own section of the documentation.
+
+
+HPy target ABIs
+----------------
+
+Depending on the compilation options, and HPy extension can target three
+different ABIs:
+
+CPython
+  In this mode, HPy is implemented as a set of C macros and ``static inline``
+  functions which translate the HPy API into the CPython API at compile
+  time. The result is a compiled extension which is indistinguishable from a
+  "normal" one and can be distributed using all the standard tools. The ABI
+  tag is defined by the version of CPython which is used to compile it (e.g.,
+  ``cpython-37m``).
+
+Universal
+  As the name suggests, the HPy Universal ABI is designed to be loaded and
+  executed by a variety of different Python implementations. Compiled
+  extensions can be loaded unmodified on all the interpreters which supports
+  it.  PyPy supports it natively.  CPython supports it by using the
+  ``hpy.universal`` package.  The ABI tag has not been formally defined yet,
+  but it will be something like ``hpy-1``, where ``1`` is the version of the
+  API.
+
+Hybrid
+  To allow an incremental transition to HPy, it is possible to use both HPy
+  and Python/C API calls in the same extension. In this case, it is not
+  possible to target the Universal ABI because the resulting compiled library
+  also needs to be compatible with a specific CPython version.. The ABI tag
+  will be something like ``hpy-1_cpython-37m``.
+
+
 
 Extension writers vs implementation writers
 --------------------------------------------
