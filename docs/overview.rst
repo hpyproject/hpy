@@ -67,7 +67,7 @@ Hide internal details
 
 Simplicity
   The HPy API aims to be smaller and easier to study/use/manage than the
-  existing one. Sometimes there is a trade-off between this goal and the other
+  existing one. Sometimes there is a trade-off between this goal and the others
   above, in particular *Performance on CPython* and *Easy migration*.  The
   general approach is to have an API which is "as simple as possible" while
   not violating the other goals.
@@ -93,12 +93,12 @@ API vs ABI
 HPy defines *both* and API and an ABI. Before digging further into details,
 let's distinguish them:
 
-  - The API works at the level of source code: it is the set of functions,
+  - The **API** works at the level of source code: it is the set of functions,
     macros, types and structs which developers can use to write their own
     extension modules.  For C programs, the API is generally made available
-    throuh one or more header file (``*.h``).
+    through one or more header files (``*.h``).
 
-  - The ABI works at the level of compiled code: it is the interface between
+  - The **ABI** works at the level of compiled code: it is the interface between
     the host interpreter and the compiled DLL.  Given a target CPU and
     operating system it defines things like the set of exported symbols, the
     precise memory layout of objects, the size of types, etc.
@@ -119,7 +119,7 @@ what is the target ABI. For example, if you compile an extension called
 The same source code compiled on PyPy3.6 7.2.0 results in a file called
 ``simple.pypy3-72-x86_64-linux-gnu.so``:
 
-  - ``pypy3-72`` mean "PyPy3.x", version "7.2.x"
+  - ``pypy3-72`` is the ABI tag, in this case "PyPy3.x", version "7.2.x"
 
 The HPy C API is exposed to the user by including ``hpy.h`` and it is
 explained in its own section of the documentation.
@@ -134,7 +134,6 @@ Depending on the compilation options, and HPy extension can target three
 different ABIs:
 
 CPython
-
   In this mode, HPy is implemented as a set of C macros and ``static inline``
   functions which translate the HPy API into the CPython API at compile
   time. The result is a compiled extension which is indistinguishable from a
@@ -155,7 +154,7 @@ HPy Hybrid
   To allow an incremental transition to HPy, it is possible to use both HPy
   and Python/C API calls in the same extension. In this case, it is not
   possible to target the Universal ABI because the resulting compiled library
-  also needs to be compatible with a specific CPython version.. The ABI tag
+  also needs to be compatible with a specific CPython version. The ABI tag
   will be something like ``hpy-1_cpython-37m``.
 
 Moreover, each alternative Python implementation could decide to implement its
@@ -165,7 +164,7 @@ the HPy API but generates a DLL which targets the DummyPython ABI.
 
 This means that to compile an extension for CPython, you can choose whether to
 target the CPython ABI or the Universal ABI. The advantage of the former is
-that it runs at the same speed, while the advantage of the latter is that you
+that it runs at native speed, while the advantage of the latter is that you
 can distribute a single binary, although with a small speed penalty on
 CPython.  Obviously, nothing stops you to compile and distribute both
 versions: this is very similar to what most projects are already doing, since
@@ -200,7 +199,7 @@ backend which emits HPy code instead of Python/C code: once this is done, you
 will get the benefits of HPy automatically.
 
 
-HPy for authors of extensions in other languages
+HPy for writing extensions in other languages
 -------------------------------------------------
 
 On the API side, HPy is designed with C in mind, so it is not directly useful
