@@ -227,19 +227,119 @@ You have two choices:
     ``hpy.h`` and recompile the C extensions with it.
 
 
+Current status and roadmap
+--------------------------
+
+At the moment of writing, HPy is still in its early stages of development. The
+following milestones have been reached:
+
+  - it is possible to write extensions which expose module-level functions,
+    with all the various kinds of calling conventions
+
+  - there is a limited support for argument parsing (only a couple of basic
+    types actually work)
+
+  - there is support for raising and catching exceptions
+
+  - it is possible to choose between the CPython and the HPy Universal ABIs
+    when compiling an extension module
+
+  - extensions compiled with the CPython ABI work out of the box on CPython
+
+  - it is possible to load HPy Universal extensions on CPython, thanks to the
+    ``hpy.universal`` package
+
+  - it is possible to load HPy Universal extensions on
+    PyPy (using the PyPy `hpy branch <https://foss.heptapod.net/pypy/pypy/tree/branch/hpy>`_
+
+  - it is possible to load HPy Universal extensions on GraalPython (XXX link)
+
+
+However, there is still a long road before HPy is usable for the general
+public. In particular, the following features are on our roadmap but has not
+been implemented yet:
+
+  - it is not possible to write custome types in C. There is already a WIP
+    branch to address this issue
+
+  - only a handful of the original Python/C functions has been ported to
+    HPy. Porting most of them is straighforward, so for now the priority is to
+    work on the "hard" features to prove that the HPy approach works, and we
+    port new functions as needed
+
+  - the debug mode simply does not exist (yet!)
+
+  - there is not a standard/easy way to integrate HPy in a
+    ``distutils/setuptools`` based workflow. The only way to compile HPy
+    extensions right now is to manually close the git repo and tweak your
+    ``setup.py``. Eventually, we plan to offer a workflow which integrates
+    seamlessly with ``pip``, ``setuptools``, etc.
+
+  - there is no integration with Cython. The medium-term plan is that Cython
+    automatically generates HPy-compatible C code
+
 
 Early benchmarks
 -----------------
 
+To validate our approach, we ported a simple yet performance critical module
+to HPy. We choose `ultrajson <https://github.com/pyhandle/ultrajson-hpy>`_
+because it is simple enough to require porting only a handful of API
+functions, but at the same time it is performance critical and it does many
+API calls during the parsing of a JSON file.
+
+This `blog post <https://morepypy.blogspot.com/2019/12/hpy-kick-off-sprint-report.html>`_
+explains the results in more detail, but they can be summarized as follows:
+
+  - ``ujson-hpy`` compiled with the CPython ABI is as fast as the original
+    ``ujson``.
+
+  - A bit surprisingly, ``ujson-hpy`` compiled with the HPy Universal ABI is
+    only 10% slower on CPython.  We need more evidence than a single benchmark
+    of course, but if the overhead of the HPy Universal ABI is only 10% on
+    CPython, for many projects it might be small enough to avoid caring about
+    compiling/distributing extensions with the CPython ABI, in the long term.
+
+  - On PyPy, ``ujson-hpy`` runs 3x faster than the original ``ujson``. Note
+    the HPy implementation on PyPy is not fully optimized yet, so we expect
+    even bigger speedups eventually.
+
+
 Projects involved
 -----------------
+
+HPy was born during EuroPython 2019, were a small group of people started to
+discuss about the problems of the Python/C API and how it would be nice to
+have a way to fix them.  Since then, it gathered the attention and interest of
+people which are involved in many projects of the Python ecosystem.  The
+following is a (probably incomplete) list of projects whose core developers
+are involved in HPy, in one way or the other.  The mere presence in this list
+does not mean that the project as a whole endorse or recognize HPy in any way,
+just that some of the people involved contributed to the
+code/design/discussions of HPy:
+
+  - PyPy
+
+  - CPython
+
+  - Cython
+
+  - Numpy (XXX for mattip: do you think it is good/correct to include numpy here?)
+
+  - GraalPython
+
+  - RustPython
+
+  - PyO3 (Rust bindings for Python)
+
+
 
 
 Related work
 -------------
 
-A partial list of alternative implementations which offer a compatibility
-layer include:
+A partial list of alternative implementations which offer a Python/C
+compatibility layer include:
 
   - `PyPy <https://doc.pypy.org/en/latest/faq.html#do-cpython-extension-modules-work-with-pypy>`_
 
