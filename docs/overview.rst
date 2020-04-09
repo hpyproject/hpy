@@ -127,7 +127,7 @@ explained in its own section of the documentation.
 
 .. _hpy-target-abis:
 
-HPy target ABIs
+Target ABIs
 ----------------
 
 Depending on the compilation options, and HPy extension can target three
@@ -172,8 +172,8 @@ they automatically compile and distribute extensions for many different
 CPython versions.
 
 
-HPy for authors of C extensions
---------------------------------
+C extensions
+--------------
 
 If you are writing a Python extension in C, you are a consumer of the HPy
 API. There are two big advantages in using HPy instead of the old Python/C
@@ -191,16 +191,16 @@ API:
     non-performance critical libraries it might still be a good tradeoff.
 
 
-HPy for authors of Cython extensions
-------------------------------------
+Cython extensions
+-----------------
 
 If you use Cython, you can't use HPy directly. The plan is to write a Cython
 backend which emits HPy code instead of Python/C code: once this is done, you
 will get the benefits of HPy automatically.
 
 
-HPy for writing extensions in other languages
--------------------------------------------------
+Extensions in other languages
+------------------------------
 
 On the API side, HPy is designed with C in mind, so it is not directly useful
 if you want to write an extension in a language different than C.
@@ -211,8 +211,8 @@ loaded seamlessly on all Python implementations which supports it.  This is
 the route taken for example by Rust (XXX put a link?).
 
 
-HPy for alternative Python implementations
--------------------------------------------
+Benefits for alternative Python implementations
+------------------------------------------------
 
 If you are writing an alternative Python implementation, there is a good
 chance that you already know how painful it is to support the Python/C
