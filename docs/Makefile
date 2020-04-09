@@ -20,4 +20,9 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 livehtml:
-	@sphinx-autobuild "$(SOURCEDIR)" -b html $(SPHINXOPTS) $(BUILDDIR)/html
+	@sphinx-autobuild \
+		"$(SOURCEDIR)" \
+		-b html \
+		--ignore "*~" \
+		--ignore ".#*" \
+		$(SPHINXOPTS) $(BUILDDIR)/html
