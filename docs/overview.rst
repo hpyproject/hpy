@@ -7,10 +7,9 @@ Motivation and goals
 The biggest quality of the Python ecosystem is to have a huge number of high
 quality libraries for all kind of jobs. Many of them, especially in the
 scientific community, are written in C and exposed to Python using the
-`Python/C API <https://docs.python.org/3/c-api/index.html>`_.
-
-However, the Python/C API exposes a number of CPython's implementation details
-and low-level data structure layout. This has two important consequences:
+`Python/C API <https://docs.python.org/3/c-api/index.html>`_.  However, the
+Python/C API exposes a number of CPython's implementation details and
+low-level data structure layouts. This has two important consequences:
 
   1. any alternative implementation which want to support C extensions needs
      to either follow the same low-level layout or to provide a compatibility
@@ -22,21 +21,10 @@ and low-level data structure layout. This has two important consequences:
 
 During the course of the years, it became evident that emulating the Python/C
 API in an efficient way is `challenging, if not impossible
-<https://morepypy.blogspot.com/2018/09/inside-cpyext-why-emulating-cpython-c.html>`_. A
-partial list of alternative implementations which offer a compatibility layer
-include:
-
-  - `PyPy <https://doc.pypy.org/en/latest/faq.html#do-cpython-extension-modules-work-with-pypy>`_
-
-  - `Jython <https://www.jyni.org/>`_
-
-  - `IronPython <https://github.com/IronLanguages/ironclad>`_
-
-  - `GraalPython <https://github.com/graalvm/graalpython>`_
-
-The main goal of HPy is provide a C API which is possible to implement in an
-efficient way on a number of very diverse implementations.  The following is a
-list of sub-goals.
+<https://morepypy.blogspot.com/2018/09/inside-cpyext-why-emulating-cpython-c.html>`_.
+The main goal of HPy is provide a **C API which is possible to implement in an
+efficient way on a number of very diverse implementations**.  The following is
+a list of sub-goals.
 
 Performance on CPython
   HPy is usable on CPython from day 1 with no performance impact compared to
@@ -246,3 +234,18 @@ Early benchmarks
 
 Projects involved
 -----------------
+
+
+Related work
+-------------
+
+A partial list of alternative implementations which offer a compatibility
+layer include:
+
+  - `PyPy <https://doc.pypy.org/en/latest/faq.html#do-cpython-extension-modules-work-with-pypy>`_
+
+  - `Jython <https://www.jyni.org/>`_
+
+  - `IronPython <https://github.com/IronLanguages/ironclad>`_
+
+  - `GraalPython <https://github.com/graalvm/graalpython>`_
