@@ -7,7 +7,7 @@ Motivation and goals
 The biggest quality of the Python ecosystem is to have a huge number of high
 quality libraries for all kind of jobs. Many of them, especially in the
 scientific community, are written in C and exposed to Python using the
-Python/C API.
+`Python/C API <https://docs.python.org/3/c-api/index.html>`_.
 
 However, the Python/C API exposes a number of CPython's implementation details
 and low-level data structure layout. This has two important consequences:
@@ -35,41 +35,68 @@ include:
   - `GraalPython <https://github.com/graalvm/graalpython>`_
 
 The main goal of HPy is provide a C API which is possible to implement in an
-efficient way on a number of very diverse implementations.  The other
-sub-goals include (but are not necessarily limited to):
+efficient way on a number of very diverse implementations.  The following is a
+list of sub-goals.
 
-  - to be usable on CPython *right now* with no (or almost no) performance
-    impact
+Performance on CPython
+  HPy is usable on CPython from day 1 with no performance impact compared to
+  the existing Python/C API.
 
-  - to make the adoption **incremental**: it should be possible to migrate
-    existing C extensions piece by piece and to use the old and the new API
-    side-by-side during the transition
 
-  - to provide better debugging experience: in debug mode, you could get
-    precise notification about which handles are kept open for too long
-    or used after being closed.
+Incremental adoption
+  It is possible to port existing C extensions piece by piece and to use
+  the old and the new API side-by-side during the transition.
 
-  - to be more friendly for other implementations: in particular, we do not
-    want reference counting to be part of the API: we want a more generic way
-    of managing resources which is possible to implement with different
-    strategies, including the existing reference counting and/or with a moving
-    GC (like the ones used by PyPy or Java, for example)
 
-  - to be smaller and easier to study/use/manage than the existing one
+Easy migration
+  It should be easy to migrate existing C extensions to HPy. Thanks to an
+  appropriate and regular naming convention is should be obvious what is the
+  HPy equivalent of any existing Python/C API.  When a perfect replacement
+  does not exist, the documentation explains what are the alternative options.
 
-  - to avoid to expose internal details of a specific implementation, so that
-    each implementation can experiment with new memory layout of objects, add
-    optimizations, etc.
 
-  - to be written in a way which could make it possible in the future to have
-    a single binary which is ABI-compatible across multiple Python versions
-    and/or multiple implementations
+Better debugging
+  In debug mode, you get early and precise errors and warnings when you make
+  some specific kind of mistakes and/or violate the API rules and
+  assumptions. For example, you get an error if you try to use a handle which
+  has already been closed. It is possible to turn on the debug mode at startup
+  time, *without needing to recompile*.
 
-  - internal details might still be available, but in a opt-in way: for
-    example, if Cython wants to iterate over a list of integers, it can ask if
-    the implementation provides a direct low-level access to the content
-    (e.g. in the form of a ``int64_t[]`` array) and use that. But at the same
-    time, be ready to handle the generic fallback case.
+
+Hide internal details
+  The API is designed to allow a lot of flexibility for Python
+  implementations, allowing the possibility to explore different choices than
+  the ones used by CPython.  In particular, **reference counting is not part
+  of the API**: we want a more generic way of managing resources which is
+  possible to implement with different strategies, including the existing
+  reference counting and/or with a moving GC (like the ones used by PyPy or
+  Java, for example).
+
+  Moreover, we want to avoid exposing internal details of a specific
+  implementation, so that each implementation can experiment with new memory
+  layout of objects, add optimizations, etc.
+
+
+Simplicity
+  The HPy API aims to be smaller and easier to study/use/manage than the
+  existing one. Sometimes there is a trade-off between this goal and the other
+  above, in particular *Performance on CPython* and *Easy migration*.  The
+  general approach is to have an API which is "as simple as possible" while
+  not violating the other goals.
+
+
+Universal binaries
+  It is possible to compile extensions to a single binary which is
+  ABI-compatible across multiple Python versions and/or multiple
+  implementation. See :ref:`hpy-target-abis`.
+
+
+Opt-in low level data structures
+  Internal details might still be available, but in a opt-in way: for example,
+  if Cython wants to iterate over a list of integers, it can ask if the
+  implementation provides a direct low-level access to the content (e.g. in
+  the form of a ``int64_t[]`` array) and use that. But at the same time, be
+  ready to handle the generic fallback case.
 
 
 API vs ABI
@@ -109,6 +136,8 @@ The same source code compiled on PyPy3.6 7.2.0 results in a file called
 The HPy C API is exposed to the user by including ``hpy.h`` and it is
 explained in its own section of the documentation.
 
+
+.. _hpy-target-abis:
 
 HPy target ABIs
 ----------------
