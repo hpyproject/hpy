@@ -329,8 +329,6 @@ code/design/discussions of HPy:
 
   - Cython
 
-  - Numpy (XXX for mattip: do you think it is good/correct to include numpy here?)
-
   - GraalPython
 
   - RustPython
