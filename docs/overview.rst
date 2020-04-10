@@ -264,7 +264,7 @@ However, there is still a long road before HPy is usable for the general
 public. In particular, the following features are on our roadmap but has not
 been implemented yet:
 
-  - it is not possible to write custome types in C. There is already a WIP
+  - it is not possible to write custom types (like NumPy's ndarray) in C. There is already a WIP
     branch to address this issue
 
   - only a handful of the original Python/C functions has been ported to
