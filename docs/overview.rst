@@ -284,6 +284,8 @@ been implemented yet:
     automatically generates HPy-compatible C code
 
 
+.. _benchmarks:
+
 Early benchmarks
 -----------------
 
