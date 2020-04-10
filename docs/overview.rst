@@ -267,7 +267,7 @@ been implemented yet:
   - it is not possible to write custom types (like NumPy's ndarray) in C. There is already a WIP
     branch to address this issue
 
-  - only a handful of the original Python/C functions has been ported to
+  - only a handful of the original Python/C functions have been ported to
     HPy. Porting most of them is straighforward, so for now the priority is to
     work on the "hard" features to prove that the HPy approach works, and we
     port new functions as needed
