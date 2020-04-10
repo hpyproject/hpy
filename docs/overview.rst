@@ -276,7 +276,7 @@ been implemented yet:
 
   - there is not a standard/easy way to integrate HPy in a
     ``distutils/setuptools`` based workflow. The only way to compile HPy
-    extensions right now is to manually close the git repo and tweak your
+    extensions right now is to manually clone the git repo and tweak your
     ``setup.py``. Eventually, we plan to offer a workflow which integrates
     seamlessly with ``pip``, ``setuptools``, etc.
 
