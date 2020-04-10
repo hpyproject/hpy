@@ -171,6 +171,11 @@ versions: this is very similar to what most projects are already doing, since
 they automatically compile and distribute extensions for many different
 CPython versions.
 
+From the user point of view, extensions compiled for the CPython ABI can be
+distributed and installed as usual, while those compiled for the HPy Universal
+or HPy Hybrid ABIs requires to install the ``hpy.universal`` package on
+CPython.
+
 
 C extensions
 --------------
