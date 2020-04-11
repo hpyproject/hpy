@@ -213,7 +213,7 @@ if you want to write an extension in a language different than C.
 However, Python bindings for other languages could decide to target the HPy
 Universal ABI instead of the CPython ABI, and generate extensions which can be
 loaded seamlessly on all Python implementations which supports it.  This is
-the route taken for example by Rust (XXX put a link?).
+the route taken for example by `Rust <https://github.com/pyhandle/rust-hpy>`_.
 
 
 Benefits for alternative Python implementations
@@ -257,7 +257,8 @@ following milestones have been reached:
   - it is possible to load HPy Universal extensions on
     PyPy (using the PyPy `hpy branch <https://foss.heptapod.net/pypy/pypy/tree/branch/hpy>`_
 
-  - it is possible to load HPy Universal extensions on GraalPython (XXX link)
+  - it is possible to load HPy Universal extensions on `GraalPython
+    <https://github.com/graalvm/graalpython>`_
 
 
 However, there is still a long road before HPy is usable for the general
@@ -335,7 +336,7 @@ code/design/discussions of HPy:
 
   - RustPython
 
-  - PyO3 (Rust bindings for Python)
+  - rust-hpy (fork of the `cpython crate <https://crates.io/crates/cpython>`_)
 
 
 
