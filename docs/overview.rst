@@ -133,29 +133,31 @@ Target ABIs
 Depending on the compilation options, and HPy extension can target three
 different ABIs:
 
-CPython
-  In this mode, HPy is implemented as a set of C macros and ``static inline``
-  functions which translate the HPy API into the CPython API at compile
-  time. The result is a compiled extension which is indistinguishable from a
-  "normal" one and can be distributed using all the standard tools and will
-  run at the very same speed. The ABI tag is defined by the version of CPython
-  which is used to compile it (e.g., ``cpython-37m``),
+.. glossary::
 
-HPy Universal
-  As the name suggests, the HPy Universal ABI is designed to be loaded and
-  executed by a variety of different Python implementations. Compiled
-  extensions can be loaded unmodified on all the interpreters which supports
-  it.  PyPy supports it natively.  CPython supports it by using the
-  ``hpy.universal`` package, and there is a small speed penalty compared to
-  the CPython ABI.  The ABI tag has not been formally defined yet, but it will
-  be something like ``hpy-1``, where ``1`` is the version of the API.
+    CPython ABI
+      In this mode, HPy is implemented as a set of C macros and ``static inline``
+      functions which translate the HPy API into the CPython API at compile
+      time. The result is a compiled extension which is indistinguishable from a
+      "normal" one and can be distributed using all the standard tools and will
+      run at the very same speed. The ABI tag is defined by the version of CPython
+      which is used to compile it (e.g., ``cpython-37m``),
 
-HPy Hybrid
-  To allow an incremental transition to HPy, it is possible to use both HPy
-  and Python/C API calls in the same extension. In this case, it is not
-  possible to target the Universal ABI because the resulting compiled library
-  also needs to be compatible with a specific CPython version. The ABI tag
-  will be something like ``hpy-1_cpython-37m``.
+    HPy Universal ABI
+      As the name suggests, the HPy Universal ABI is designed to be loaded and
+      executed by a variety of different Python implementations. Compiled
+      extensions can be loaded unmodified on all the interpreters which supports
+      it.  PyPy supports it natively.  CPython supports it by using the
+      ``hpy.universal`` package, and there is a small speed penalty compared to
+      the CPython ABI.  The ABI tag has not been formally defined yet, but it will
+      be something like ``hpy-1``, where ``1`` is the version of the API.
+
+    HPy Hybrid ABI
+      To allow an incremental transition to HPy, it is possible to use both HPy
+      and Python/C API calls in the same extension. In this case, it is not
+      possible to target the Universal ABI because the resulting compiled library
+      also needs to be compatible with a specific CPython version. The ABI tag
+      will be something like ``hpy-1_cpython-37m``.
 
 Moreover, each alternative Python implementation could decide to implement its
 own non-universal ABI if it makes sense for them. For example, a hypotetical
@@ -210,10 +212,11 @@ Extensions in other languages
 On the API side, HPy is designed with C in mind, so it is not directly useful
 if you want to write an extension in a language different than C.
 
-However, Python bindings for other languages could decide to target the HPy
-Universal ABI instead of the CPython ABI, and generate extensions which can be
-loaded seamlessly on all Python implementations which supports it.  This is
-the route taken for example by `Rust <https://github.com/pyhandle/rust-hpy>`_.
+However, Python bindings for other languages could decide to target the
+:term:`HPy Universal ABI` instead of the :term:`CPython ABI`, and generate
+extensions which can be loaded seamlessly on all Python implementations which
+supports it.  This is the route taken for example by `Rust
+<https://github.com/pyhandle/rust-hpy>`_.
 
 
 Benefits for alternative Python implementations
@@ -246,10 +249,11 @@ following milestones have been reached:
 
   - there is support for raising and catching exceptions
 
-  - it is possible to choose between the CPython and the HPy Universal ABIs
-    when compiling an extension module
+  - it is possible to choose between the :term:`CPython ABI` and the
+    :term:`HPy Universal ABI` when compiling an extension module
 
-  - extensions compiled with the CPython ABI work out of the box on CPython
+  - extensions compiled with the CPython ABI work out of the box on
+    CPython
 
   - it is possible to load HPy Universal extensions on CPython, thanks to the
     ``hpy.universal`` package
@@ -265,8 +269,8 @@ However, there is still a long road before HPy is usable for the general
 public. In particular, the following features are on our roadmap but has not
 been implemented yet:
 
-  - it is not possible to write custom types (like NumPy's ndarray) in C. There is already a WIP
-    branch to address this issue
+  - it is not possible to write custom types (like NumPy's ndarray)
+    in C. There is already a WIP branch to address this issue
 
   - only a handful of the original Python/C functions have been ported to
     HPy. Porting most of them is straighforward, so for now the priority is to
