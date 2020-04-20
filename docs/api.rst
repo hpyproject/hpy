@@ -131,9 +131,9 @@ thread state in the future, in particular when there will be support for
 sub-interpreter.  Another possible usage could be to embed different versions
 or implementations of Python inside the same process.
 
-Moreover, ``HPyContext`` is used by the HPy Universal ABI to contain a sort of
-virtual function table which is used by the C extensions to call back into the
-Python interpreter.
+Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
+sort of virtual function table which is used by the C extensions to call back
+into the Python interpreter.
 
 
 A simple example
@@ -233,7 +233,7 @@ contain HPy support functions.  ``hpy.devel.get_include()`` return the
 directory in which to find ``hpy.h``.
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
-CPython, it will target the `CPython ABI`_ by default, so you will end up with
+CPython, it will target the :term:`CPython ABI` by default, so you will end up with
 a file named e.g. ``simple.cpython-37m-x86_64-linux-gnu.so`` which can be
 imported directly on CPython with no dependency on HPy.
 
