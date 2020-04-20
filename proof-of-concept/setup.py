@@ -5,8 +5,9 @@ setup(
     name="hpy-pof",
     ext_modules=[
         Extension(
-            'simple', ['simple.c'] + hpy.devel.get_sources(),
+            'pof', ['pof.c'] + hpy.devel.get_sources(),
             include_dirs=[hpy.devel.get_include()],
         ),
     ],
+    setup_requires=['hpy.devel'],
 )
