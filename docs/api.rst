@@ -114,3 +114,23 @@ identity, you can use ``HPy_Is()``::
    indices into a list, which is itself managed by the GC. When an object
    moves, the GC fixes the address into the list, without having to touch all
    the handles which have been passed to C.
+
+
+HPyContext
+-----------
+
+All HPy function calls take a ``HPyContext`` as a first argument, which
+represents the the Python interpreter all the handles belong to.  Strictly
+speaking, it would be possible to design the HPy API without using
+``HPyContext``: after all, all HPy function calls are ultimately mapped to
+Python/C function call, where there is no notion of context.
+
+One of the reasons to include ``HPyContext`` from the day one is to be
+future-proof: it is conceivable to use it to hold the interpreter or the
+thread state in the future, in particular when there will be support for
+sub-interpreter.  Another possible usage could be to embed different versions
+or implementations of Python inside the same process.
+
+Moreover, ``HPyContext`` is used by the HPy Universal ABI to contain a sort of
+virtual function table which is used by the C extensions to call back into the
+Python interpreter.
