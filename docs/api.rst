@@ -134,3 +134,149 @@ or implementations of Python inside the same process.
 Moreover, ``HPyContext`` is used by the HPy Universal ABI to contain a sort of
 virtual function table which is used by the C extensions to call back into the
 Python interpreter.
+
+
+A simple example
+-----------------
+
+In this section, we will see how to write a simple C extension using HPy. It
+is assumed that you are already familiar with the existing Python/C API, so we
+will underline the similarities and the differences with it.
+
+We want to create a function named ``myabs`` which takes a single argument and
+computes its absolute value::
+
+    #include "hpy.h"
+
+    HPy_DEF_METH_O(myabs)
+    static HPy myabs_impl(HPyContext ctx, HPy self, HPy obj)
+    {
+        return HPy_Absolute(ctx, obj);
+    }
+
+There are a couple of points which are worth to note:
+
+  * We use the macro ``HPy_DEF_METH_O`` to declare we are going to define a
+    HPy function called ``myabs``, which uses the ``METH_O`` calling
+    convention. As in Python/C, ``METH_O`` means that the function receives a
+    single argument.
+
+  * The actual C function which implements ``myabs`` is called ``myabs_impl``.
+
+  * It receives two arguments of type ``HPy``, which are handles which are
+    guaranteed to be valid: they are automatically closed by the caller, so
+    there is no need to call ``HPy_Close`` on them.
+
+  * It returns a handle, which has to be closed by the caller.
+
+  * ``HPy_Absolute`` is the equivalent of ``PyNumber_Absolute`` and obviosuly
+    computes the absolute value of the given argument.
+
+The usage of the macro is needed to maintain compatibility with CPython.  On
+CPython, C functions and methods have a C signature which is different than
+the one used by HPy: they don't receive a ``HPyContext`` and their arguments
+have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
+generates a trampoline function whose signature is appropriate for CPython and
+which calls the ``myabs_impl``.
+
+Now, we can define our module::
+
+    static HPyMethodDef SimpleMethods[] = {
+        {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
+        {NULL, NULL, 0, NULL}
+    };
+
+    static HPyModuleDef moduledef = {
+        HPyModuleDef_HEAD_INIT,
+        .m_name = "simple",
+        .m_doc = "HPy Example",
+        .m_size = -1,
+        .m_methods = SimpleMethods
+    };
+
+This part is very similar to the one you would write in Python/C.  Note that
+we specify ``myabs`` (and **not** ``myabs_impl``) in the method table, and
+that we have to indicate the calling convention again.  This is a deliberate
+choice, to minimize the changes needed to port existing extensions, and to
+make it easier to support hybrid extensions in which some of the methods are
+still written using the Python/C API.
+
+Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``.
+
+Building the module
+~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+   The integration with distutils/setuptools is probably going to change,
+   eventually.  The recipe shown here is just provisional and might stop
+   working eventually.
+
+Let's write a ``setup.py`` to build our extension:
+
+.. code-block:: python
+
+    from setuptools import setup, Extension
+    import hpy.devel
+    setup(
+        name="hpy-example",
+        ext_modules=[
+            Extension(
+                'simple', ['simple.c'] + hpy.devel.get_sources(),
+                include_dirs=[hpy.devel.get_include()],
+            ),
+        ],
+    )
+
+You need ``hpy.devel`` to be available in your path to run
+it. ``hpy.devel.get_sources()`` returns a list of additionaly C files which
+contain HPy support functions.  ``hpy.devel.get_include()`` return the
+directory in which to find ``hpy.h``.
+
+We can now build the extension by running ``python setup.py build_ext -i``. On
+CPython, it will target the `CPython ABI`_ by default, so you will end up with
+a file named e.g. ``simple.cpython-37m-x86_64-linux-gnu.so`` which can be
+imported directly on CPython with no dependency on HPy.
+
+VARARGS calling convention
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If we want to receive more than a single arguments, we need the
+``HPy_METH_VARARGS`` calling convention. Let's add a function ``add_ints``
+which adds two integers::
+
+    HPy_DEF_METH_VARARGS(add_ints)
+    static HPy add_ints_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+    {
+        long a, b;
+        if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+            return HPy_NULL;
+        return HPyLong_FromLong(ctx, a+b);
+    }
+
+There are a few things to note:
+
+  * The C signature is different than the corresponding Python/C
+    ``METH_VARARGS``: in particular, instead of taking a ``PyObject *args``,
+    we take an array of ``HPy`` and its size.  This allows e.g. PyPy to do a
+    call more efficiently, because you don't need to create a tuple just to
+    pass the arguments.
+
+  * We call ``HPyArg_Parse`` to parse the argument. Contrarily to almost all
+    the other HPy functions, this is **not** a thin wrapper around
+    ``PyArg_ParseTuple`` because as stated above we don't have a tuple to pass
+    to it, although the idea is to mimic its behavior as closely as
+    possible. The parsing logic is implemented from scratch inside HPy, and as
+    such there might be missing functionalities during the early stages of HPy
+    development.
+
+  * In case of error, we return ``HPy_NULL``: we cannot simply ``return NULL``
+    because ``HPy`` is not a pointer type.
+
+Once we write our function, we can add it to the ``SimpleMethods[]`` table,
+which now becomes::
+
+    static HPyMethodDef SimpleMethods[] = {
+        {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
+        {"add_ints", add_ints, HPy_METH_VARARGS, "Add two integers"},
+        {NULL, NULL, 0, NULL}
+    };

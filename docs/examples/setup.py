@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 import hpy.devel
 
 setup(
-    name="hpy-pof",
+    name="hpy-example",
     ext_modules=[
         Extension(
             'simple', ['simple.c'] + hpy.devel.get_sources(),
