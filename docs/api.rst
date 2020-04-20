@@ -25,7 +25,7 @@ Unix file descriptors, where you have ``dup()`` and ``close()``, and Windows'
 
 
 Handles vs ``PyObject *``
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. XXX I don't like this sentence, but I can't come up with anything better
    right now. Please rephrase/rewrite :)
@@ -43,9 +43,7 @@ For example, the following is a perfectly valid piece of Python/C code::
       PyObject *x = PyLong_FromLong(42);  // implicit INCREF on x
       PyObject *y = x;
       Py_INCREF(y);                       // INCREF on y
-      /*
-      ...
-      */
+      /* ... */
       Py_DECREF(x);
       Py_DECREF(x);                       // two DECREF on x
   }
@@ -56,9 +54,7 @@ In HPy, each handle must be closed independently. The example above becomes::
   {
       HPy x = HPyLong_FromLong(ctx, 42);
       HPy y = HPy_Dup(ctx, x);
-      /*
-      ...
-      */
+      /* ... */
       // we need to close x and y independently
       HPy_Close(ctx, x);
       HPy_Close(ctx, y);
