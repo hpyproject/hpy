@@ -30,8 +30,8 @@ There are several advantages to write your C extension in HPy:
   - it provides an improved debugging experience: in "debug mode", HPy
     actively checks for many common mistakes such as reference leaks and
     invalid usage of objects after they have been deleted. It is possible to
-    turn the "debug mode" on at startup time, without needing to recompile the
-    CPython nor the extension itself
+    turn the "debug mode" on at startup time, without needing to recompile
+    Python or the extension itself
 
 
 .. toctree::
