@@ -76,7 +76,9 @@ twice and that you don't forget to close any.
   the only way to find the corresponding ``Py_INCREF`` is to manually and
   carefully study the source code.  On the other hand, if you forget to call
   ``HPy_Close()``, the HPy debug mode is able to tell the precise code
-  location which created the unclosed handle.
+  location which created the unclosed handle.  Similarly, if you try to
+  operate on a closed handle, it will tell you the precise code locations
+  which created and closed it.
 
 
 The other important difference is that Python/C guarantees that multiple
