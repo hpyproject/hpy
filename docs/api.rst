@@ -31,10 +31,12 @@ Handles vs ``PyObject *``
    right now. Please rephrase/rewrite :)
 
 The biggest difference is that in the old Python/C API, multiple ``PyObject
-*`` references to the same objects are completely equivalent to each other. In
-particular, it does not matter on which particular reference you call
-``Py_INCREF`` and ``Py_DECREF``, as long as the total number of increfs and
-decrefs is the same at the end of the object lifetime.
+*`` references to the same objects are completely equivalent to each other,
+and they can be passed to Python/C API functions interchangeably. In
+particular, it does not matter which particular reference you call
+``Py_INCREF`` and ``Py_DECREF`` on, as long as the total number of increfs and
+decrefs to the underlying object is the same at the end of the object
+lifetime.
 
 For example, the following is a perfectly valid piece of Python/C code::
 
@@ -60,8 +62,9 @@ In HPy, each handle must be closed independently. The example above becomes::
       HPy_Close(ctx, y);
   }
 
-Calling ``HPy_Close()`` on the same handle twice is an error.  Forgetting to
-call ``HPy_Close()`` on a handle results in a memory leak.  When running in
+Calling any HPy function on a closed handle is an error. Calling
+``HPy_Close()`` on the same handle twice is an error.  Forgetting to call
+``HPy_Close()`` on a handle results in a memory leak.  When running in
 :ref:`debug mode`, HPy actively checks that you that you don't close a handle
 twice and that you don't forget to close any.
 
