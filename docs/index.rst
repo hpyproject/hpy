@@ -38,6 +38,7 @@ There are several advantages to write your C extension in HPy:
    :maxdepth: 2
 
    overview
+   API <api>
 
 
 Indices and tables
