@@ -109,7 +109,7 @@ identity, you can use ``HPy_Is()``::
    Contrarily to CPython, PyPy does not use reference counting for memory
    management: instead, it uses a *moving GC*, which means that the address of
    an object might change during its lifetime, and makes it hard to implement
-   a semantics like ``PyObject *`` where the address is directly exposed to
+   semantics like ``PyObject *``'s where the address is directly exposed to
    the user.  HPy solves this problem: handles are integers which represent
    indices into a list, which is itself managed by the GC. When an object
    moves, the GC fixes the address into the list, without having to touch all
@@ -154,7 +154,7 @@ computes its absolute value::
         return HPy_Absolute(ctx, obj);
     }
 
-There are a couple of points which are worth to note:
+There are a couple of points which are worth noting:
 
   * We use the macro ``HPy_DEF_METH_O`` to declare we are going to define a
     HPy function called ``myabs``, which uses the ``METH_O`` calling
@@ -261,7 +261,7 @@ There are a few things to note:
     call more efficiently, because you don't need to create a tuple just to
     pass the arguments.
 
-  * We call ``HPyArg_Parse`` to parse the argument. Contrarily to almost all
+  * We call ``HPyArg_Parse`` to parse the arguments. Contrarily to almost all
     the other HPy functions, this is **not** a thin wrapper around
     ``PyArg_ParseTuple`` because as stated above we don't have a tuple to pass
     to it, although the idea is to mimic its behavior as closely as
