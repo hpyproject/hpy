@@ -2,8 +2,7 @@ HPy API
 =======
 
 .. warning::
-   HPy is still in the early stages of development and as such the API is
-   subsequent to changes
+   HPy is still in the early stages of development and the API may change.
 
 Handles
 -------
@@ -111,21 +110,21 @@ identity, you can use ``HPy_Is()``::
    ``PyObject *`` in disguise, and ``HPy_Dup()`` and ``HPy_Close()`` are just
    aliases for ``Py_INCREF`` and ``Py_DECREF``.
 
-   Contrarily to CPython, PyPy does not use reference counting for memory
+   Unlike CPython, PyPy does not use reference counting for memory
    management: instead, it uses a *moving GC*, which means that the address of
-   an object might change during its lifetime, and makes it hard to implement
+   an object might change during its lifetime, and this makes it hard to implement
    semantics like ``PyObject *``'s where the address is directly exposed to
-   the user.  HPy solves this problem: handles are integers which represent
-   indices into a list, which is itself managed by the GC. When an object
-   moves, the GC fixes the address into the list, without having to touch all
-   the handles which have been passed to C.
+   the user.  HPy solves this problem: on PyPy, handles are integers which
+   represent indices into a list, which is itself managed by the GC. When an
+   object moves, the GC fixes the address in the list, without having to touch
+   all the handles which have been passed to C.
 
 
 HPyContext
 -----------
 
-All HPy function calls take a ``HPyContext`` as a first argument, which
-represents the the Python interpreter all the handles belong to.  Strictly
+All HPy function calls take an ``HPyContext`` as a first argument, which
+represents the Python interpreter all the handles belong to.  Strictly
 speaking, it would be possible to design the HPy API without using
 ``HPyContext``: after all, all HPy function calls are ultimately mapped to
 Python/C function call, where there is no notion of context.
@@ -174,12 +173,12 @@ There are a couple of points which are worth noting:
 
   * It returns a handle, which has to be closed by the caller.
 
-  * ``HPy_Absolute`` is the equivalent of ``PyNumber_Absolute`` and obviosuly
+  * ``HPy_Absolute`` is the equivalent of ``PyNumber_Absolute`` and
     computes the absolute value of the given argument.
 
-The usage of the macro is needed to maintain compatibility with CPython.  On
-CPython, C functions and methods have a C signature which is different than
-the one used by HPy: they don't receive a ``HPyContext`` and their arguments
+The ``HPy_DEF_METH_O`` macro is needed to maintain compatibility with CPython.
+In CPython, C functions and methods have a C signature that is different to
+the one used by HPy: they don't receive an ``HPyContext`` and their arguments
 have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
 generates a trampoline function whose signature is appropriate for CPython and
 which calls the ``myabs_impl``.
@@ -234,7 +233,7 @@ Let's write a ``setup.py`` to build our extension:
 
 You need ``hpy.devel`` to be available in your path to run
 it. ``hpy.devel.get_sources()`` returns a list of additionaly C files which
-contain HPy support functions.  ``hpy.devel.get_include()`` return the
+contain HPy support functions.  ``hpy.devel.get_include()`` returns the
 directory in which to find ``hpy.h``.
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
@@ -271,14 +270,14 @@ There are a few things to note:
     ``PyArg_ParseTuple`` because as stated above we don't have a tuple to pass
     to it, although the idea is to mimic its behavior as closely as
     possible. The parsing logic is implemented from scratch inside HPy, and as
-    such there might be missing functionalities during the early stages of HPy
+    such there might be missing functionality during the early stages of HPy
     development.
 
-  * In case of error, we return ``HPy_NULL``: we cannot simply ``return NULL``
+  * If an error occurs, we return ``HPy_NULL``: we cannot simply ``return NULL``
     because ``HPy`` is not a pointer type.
 
-Once we write our function, we can add it to the ``SimpleMethods[]`` table,
-which now becomes::
+Once we have written our function, we can add it to the ``SimpleMethods[]``
+table, which now becomes::
 
     static HPyMethodDef SimpleMethods[] = {
         {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
