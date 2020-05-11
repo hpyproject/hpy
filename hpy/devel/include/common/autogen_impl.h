@@ -48,11 +48,6 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME(Object_IsTrue)(HPyContext ctx, HPy h)
     return PyObject_IsTrue(_h2py(h));
 }
 
-HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Type_FromSpec)(HPyContext ctx, HPyType_Spec *spec)
-{
-    return _py2h(PyType_FromSpec(spec));
-}
-
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(GetAttr)(HPyContext ctx, HPy obj, HPy name)
 {
     return _py2h(PyObject_GetAttr(_h2py(obj), _h2py(name)));

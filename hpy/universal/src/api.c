@@ -169,6 +169,12 @@ ctx_Dup(HPyContext ctx, HPy h)
     return _py2h(obj);
 }
 
+static HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *spec)
+{
+    printf("implement me!\n");
+    abort();
+}
+
 /* expand impl functions as:
  *     static ctx_Long_FromLong(...);
  *

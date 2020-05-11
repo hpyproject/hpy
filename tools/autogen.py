@@ -228,6 +228,7 @@ SPECIAL_CASES = {
     '_HPy_CallRealFunctionFromTrampoline': None,
     'HPyErr_Occurred': None,
     'HPy_New': None,
+    'HPyType_FromSpec': None,
 }
 
 def convert_name(hpy_name):
