@@ -227,6 +227,7 @@ SPECIAL_CASES = {
     'HPy_AsPyObject': None,
     '_HPy_CallRealFunctionFromTrampoline': None,
     'HPyErr_Occurred': None,
+    'HPy_New': None,
 }
 
 def convert_name(hpy_name):
