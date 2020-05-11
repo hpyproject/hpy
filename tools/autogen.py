@@ -67,7 +67,6 @@ class Function:
         # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
-        rettype = toC(self.node.type.type)
         parts = []
         w = parts.append
         w('static inline')
@@ -76,8 +75,10 @@ class Function:
 
         # trampolines cannot deal with varargs easily
         assert not self.is_varargs()
-
-        if rettype == 'void':
+        #
+        returns_void = (isinstance(self.node.type.type, c_ast.TypeDecl) and
+                        toC(self.node.type.type) == 'void')
+        if returns_void:
             w('ctx->%s' % self.ctx_name())
         else:
             w('return ctx->%s' % self.ctx_name())

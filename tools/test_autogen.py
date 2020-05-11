@@ -11,6 +11,8 @@ def autogen(tmpdir_factory):
         typedef int HPyContext;
         HPy h_None;
         HPy HPy_Dup(HPyContext ctx, HPy h);
+        void HPy_Close(HPyContext ctx, HPy h);
+        void* _HPy_Cast(HPyContext ctx, HPy h);
         HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y);
         HPy HPyLong_FromLong(HPyContext ctx, long value);
         char* HPyBytes_AsString(HPyContext ctx, HPy o);
@@ -19,9 +21,10 @@ def autogen(tmpdir_factory):
 
 def src_equal(a, b):
     # try to compare two C sources, ignoring whitespace
-    a = ' '.join(a.split())
-    b = ' '.join(b.split())
-    return a == b
+    a = a.split()
+    b = b.split()
+    assert a == b
+    return True
 
 class TestFunction:
 
@@ -35,6 +38,26 @@ class TestFunction:
         expected = """
             static inline HPy HPyNumber_Add(HPyContext ctx, HPy x, HPy y) {
                 return ctx->ctx_Number_Add ( ctx, x, y );
+            }
+        """
+        assert src_equal(x, expected)
+
+    def test_trampoline_def_void(self, autogen):
+        func = autogen.get('HPy_Close')
+        x = func.trampoline_def()
+        expected = """
+            static inline void HPy_Close(HPyContext ctx, HPy h) {
+                ctx->ctx_Close ( ctx, h );
+            }
+        """
+        assert src_equal(x, expected)
+
+    def test_trampoline_def_voidstar(self, autogen):
+        func = autogen.get('_HPy_Cast')
+        x = func.trampoline_def()
+        expected = """
+            static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
+                return ctx->ctx_Cast ( ctx, h );
             }
         """
         assert src_equal(x, expected)
