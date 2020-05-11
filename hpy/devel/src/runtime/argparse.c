@@ -23,15 +23,15 @@ int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list
         *output = value;
         break;
     }
-    case 'd': {
-        double* output = va_arg(vl, double *);
-        _BREAK_IF_OPTIONAL(current_arg);
-        double value = HPyFloat_AsDouble(ctx, current_arg);
-        if (value == -1.0 && HPy_ErrOccurred())
-            return 0;
-        *output = value;
-        break;
-    }
+    /* case 'd': { */
+    /*     double* output = va_arg(vl, double *); */
+    /*     _BREAK_IF_OPTIONAL(current_arg); */
+    /*     double value = HPyFloat_AsDouble(ctx, current_arg); */
+    /*     if (value == -1.0 && HPy_ErrOccurred()) */
+    /*         return 0; */
+    /*     *output = value; */
+    /*     break; */
+    /* } */
     case 'O': {
         HPy *output = va_arg(vl, HPy *);
         _BREAK_IF_OPTIONAL(current_arg);
