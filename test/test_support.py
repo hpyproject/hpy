@@ -14,7 +14,10 @@ def test_expand_template():
         '{"test_h", (HPyMeth)test_h, METH_VARARGS | METH_KEYWORDS, NULL},'
         ]
     methods = '\n    '.join(method_table)
-    init_code = support.INIT_TEMPLATE % {'methods': methods, 'name': 'mytest'}
+    init_code = support.ExtensionTemplate.INIT_TEMPLATE % {
+        'methods': methods,
+        'name': 'mytest'
+    }
     assert expanded.rstrip() == f"""#include <hpy.h>
 
         some more C stuff

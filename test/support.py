@@ -1,66 +1,84 @@
 import os, sys
 import pytest, py
 import re
+import textwrap
 
 PY2 = sys.version_info[0] == 2
 
 r_marker_init = re.compile(r"\s*@INIT\s*$")
 r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(.*)\s*$")
 
-INIT_TEMPLATE = """
-static HPyMethodDef MyTestMethods[] = {
-    %(methods)s
-    {NULL, NULL, 0, NULL}
-};
+class ExtensionTemplate(object):
 
-static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "%(name)s",
-    .m_doc = "some test for hpy",
-    .m_size = -1,
-    .m_methods = MyTestMethods
-};
+    INIT_TEMPLATE = textwrap.dedent("""
+    static HPyMethodDef MyTestMethods[] = {
+        %(methods)s
+        {NULL, NULL, 0, NULL}
+    };
 
-HPy_MODINIT(%(name)s)
-static HPy init_%(name)s_impl(HPyContext ctx)
-{
-    HPy m;
-    m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    return m;
-}
-"""
+    static HPyModuleDef moduledef = {
+        HPyModuleDef_HEAD_INIT,
+        .m_name = "%(name)s",
+        .m_doc = "some test for hpy",
+        .m_size = -1,
+        .m_methods = MyTestMethods
+    };
+
+    HPy_MODINIT(%(name)s)
+    static HPy init_%(name)s_impl(HPyContext ctx)
+    {
+        HPy m;
+        m = HPyModule_Create(ctx, &moduledef);
+        if (HPy_IsNull(m))
+            return HPy_NULL;
+        return m;
+    }
+    """)
+
+    def __init__(self, src, name):
+        self.src = src
+        self.name = name
+        self.method_table = None
+
+    def expand(self):
+        self.method_table = []
+        self.output = ['#include <hpy.h>']
+        for line in self.src.split('\n'):
+            match = r_marker_init.match(line)
+            if match:
+                self.INIT()
+                continue
+
+            match = r_marker_export.match(line)
+            if match:
+                ml_name, ml_flags = match.group(1), match.group(2)
+                self.EXPORT(ml_name, ml_flags)
+                continue
+
+            self.output.append(line)
+        return '\n'.join(self.output)
+
+    def INIT(self):
+        exp = self.INIT_TEMPLATE % {
+            'methods': '\n    '.join(self.method_table),
+            'name': self.name}
+        self.method_table = None   # don't fill it any more
+        self.output.append(exp)
+
+    def EXPORT(self, ml_name, ml_flags):
+        if not ml_flags.startswith('HPy_'):
+            # this is a legacy function: add a cast to (HPyMeth) to
+            # silence warnings
+            cast = '(HPyMeth)'
+        else:
+            cast = ''
+        self.method_table.append('{"%s", %s%s, %s, NULL},' % (
+                ml_name, cast, ml_name, ml_flags))
 
 
-def expand_template(source_template, name):
-    method_table = []
-    expanded_lines = ['#include <hpy.h>']
-    for line in source_template.split('\n'):
-        match = r_marker_init.match(line)
-        if match:
-            exp = INIT_TEMPLATE % {
-                'methods': '\n    '.join(method_table),
-                'name': name}
-            method_table = None   # don't fill it any more
-            expanded_lines.append(exp)
-            continue
 
-        match = r_marker_export.match(line)
-        if match:
-            ml_name, ml_flags = match.group(1), match.group(2)
-            if not ml_flags.startswith('HPy_'):
-                # this is a legacy function: add a cast to (HPyMeth) to
-                # silence warnings
-                cast = '(HPyMeth)'
-            else:
-                cast = ''
-            method_table.append('{"%s", %s%s, %s, NULL},' % (
-                    ml_name, cast, ml_name, ml_flags))
-            continue
-
-        expanded_lines.append(line)
-    return '\n'.join(expanded_lines)
+def expand_template(template, name):
+    return ExtensionTemplate(template, name).expand()
 
 
 class Spec(object):
