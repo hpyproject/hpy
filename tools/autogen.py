@@ -8,6 +8,10 @@ from copy import deepcopy
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
+from packaging import version
+
+if version.parse(pycparser.__version__) < version.parse('2.20'):
+    raise ImportError('You need pycparsers>=2.20 to run autogen')
 
 DISCLAIMER = """
 /*
@@ -67,6 +71,7 @@ class Function:
         # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
+        rettype = toC(self.node.type.type)
         parts = []
         w = parts.append
         w('static inline')
@@ -75,10 +80,8 @@ class Function:
 
         # trampolines cannot deal with varargs easily
         assert not self.is_varargs()
-        #
-        returns_void = (isinstance(self.node.type.type, c_ast.TypeDecl) and
-                        toC(self.node.type.type) == 'void')
-        if returns_void:
+
+        if rettype == 'void':
             w('ctx->%s' % self.ctx_name())
         else:
             w('return ctx->%s' % self.ctx_name())
