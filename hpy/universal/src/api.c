@@ -169,19 +169,60 @@ ctx_Dup(HPyContext ctx, HPy h)
     return _py2h(obj);
 }
 
-static HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *spec)
+static PyType_Slot *
+create_slot_defs(HPyType_Spec *hpyspec)
 {
-    /* XXX is this correct, strictly speaking?
-     *
-     * In the universal mode, HPyType_Spec is a different struct than
-     * PyType_Spec: however, at the moment they share the very same layout,
-     * and recurively HPyType_Slot has the same layout as PyType_Slot, so the
-     * forceed cast works.
-     *
-     * The alternative solution is to malloc() a fresh PyType_Spec and
-     * manually copy all the fields, like we do in HPyModule_Create.
-     */
-    return _py2h(PyType_FromSpec((PyType_Spec*)spec));
+    // count the slots
+    Py_ssize_t count;
+    if (hpyspec->slots == NULL) {
+        count = 0;
+    }
+    else {
+        count = 0;
+        while (hpyspec->slots[count].slot != 0)
+            count++;
+    }
+
+    // allocate&fill the result
+    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (count+1));
+    if (result == NULL)
+        return NULL;
+    for(int i=0; i<count; i++) {
+        HPyType_Slot *src = &hpyspec->slots[i];
+        PyType_Slot *dst = &result[i];
+        // for now we assume that all the slots have the HPy calling
+        // convention, but we need a way to allow slots with the CPython
+        // signature, to make it easier to do incremental porting.
+        HPyMeth f = (HPyMeth)hpyspec->slots[i].pfunc;
+        void *impl_func;
+        _HPy_CPyCFunction trampoline_func;
+        f(&impl_func, &trampoline_func);
+        dst->slot = src->slot;
+        dst->pfunc = trampoline_func;
+    }
+    result[count] = (PyType_Slot){0, NULL};
+    return result;
+}
+
+static HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
+{
+    PyType_Spec *spec = PyMem_Malloc(sizeof(PyType_Spec));
+    if (spec == NULL) {
+        PyErr_NoMemory();
+        return HPy_NULL;
+    }
+    spec->name = hpyspec->name;
+    spec->basicsize = hpyspec->basicsize;
+    spec->itemsize = hpyspec->itemsize;
+    spec->flags = hpyspec->flags;
+    spec->slots = create_slot_defs(hpyspec);
+    if (spec->slots == NULL) {
+        PyMem_Free(spec);
+        PyErr_NoMemory();
+        return HPy_NULL;
+    }
+    PyObject *result = PyType_FromSpec(spec);
+    return _py2h(result);
 }
 
 /* expand impl functions as:

@@ -40,3 +40,40 @@ class TestType(HPyTest):
         class Sub(mod.Dummy):
             pass
         assert isinstance(Sub(), mod.Dummy)
+
+    def test_slots(self):
+        mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+            } DummyObject;
+
+            HPy_DEF_METH_NOARGS(Dummy_repr)
+            static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
+            {
+                return HPyUnicode_FromString(ctx, "<Dummy>");
+            }
+
+            HPy_DEF_METH_NOARGS(Dummy_abs)
+            static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, 1234);
+            }
+
+            static HPyType_Slot dummy_type_slots[] = {
+                {Py_tp_repr, Dummy_repr},
+                {Py_nb_absolute, Dummy_abs},
+                {0, NULL},
+            };
+
+            static HPyType_Spec dummy_type_spec = {
+                .name = "mytest.Dummy",
+                .basicsize = sizeof(DummyObject),
+                .slots = dummy_type_slots,
+            };
+
+            @EXPORT_TYPE("Dummy", dummy_type_spec)
+            @INIT
+        """)
+        d = mod.Dummy()
+        assert repr(d) == '<Dummy>'
+        assert abs(d) == 1234
