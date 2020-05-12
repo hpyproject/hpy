@@ -12,6 +12,7 @@ setup(
                    'hpy/devel/src/runtime/argparse.c',
                   ],
                   include_dirs=['hpy/devel/include'],
+                  #extra_compile_args=['-g', 'O0'],
         )]
 
 )

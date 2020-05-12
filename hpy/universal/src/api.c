@@ -18,16 +18,16 @@ static PyModuleDef empty_moduledef = {
 
 // this malloc a result which will never be freed. Too bad
 static PyMethodDef *
-create_method_defs(HPyModuleDef *hpydef)
+create_method_defs(HPyMethodDef *hpymethods)
 {
     // count the methods
     Py_ssize_t count;
-    if (hpydef->m_methods == NULL) {
+    if (hpymethods == NULL) {
         count = 0;
     }
     else {
         count = 0;
-        while (hpydef->m_methods[count].ml_name != NULL)
+        while (hpymethods[count].ml_name != NULL)
             count++;
     }
 
@@ -38,7 +38,7 @@ create_method_defs(HPyModuleDef *hpydef)
         return NULL;
     }
     for(int i=0; i<count; i++) {
-        HPyMethodDef *src = &hpydef->m_methods[i];
+        HPyMethodDef *src = &hpymethods[i];
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->ml_name;
         dst->ml_doc = src->ml_doc;
@@ -81,7 +81,7 @@ ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
     def->m_name = hpydef->m_name;
     def->m_doc = hpydef->m_doc;
     def->m_size = hpydef->m_size;
-    def->m_methods = create_method_defs(hpydef);
+    def->m_methods = create_method_defs(hpydef->m_methods);
     if (def->m_methods == NULL)
         return HPy_NULL;
     PyObject *result = PyModule_Create(def);
@@ -190,15 +190,30 @@ create_slot_defs(HPyType_Spec *hpyspec)
     for(int i=0; i<count; i++) {
         HPyType_Slot *src = &hpyspec->slots[i];
         PyType_Slot *dst = &result[i];
-        // for now we assume that all the slots have the HPy calling
-        // convention, but we need a way to allow slots with the CPython
-        // signature, to make it easier to do incremental porting.
-        HPyMeth f = (HPyMeth)hpyspec->slots[i].pfunc;
-        void *impl_func;
-        _HPy_CPyCFunction trampoline_func;
-        f(&impl_func, &trampoline_func);
         dst->slot = src->slot;
-        dst->pfunc = trampoline_func;
+        if (src->slot == Py_tp_methods) {
+            // src->pfunc contains a HPyMethodDef*, which we convert to the
+            // CPython's equivalent. The result of create_method_defs can't be
+            // freed because CPython stores an internal reference to it, so
+            // this creates a small leak :(
+            HPyMethodDef *hpymethods = (HPyMethodDef*)src->pfunc;
+            dst->pfunc = create_method_defs(hpymethods);
+            if (dst->pfunc == NULL) {
+                PyMem_Free(result);
+                return NULL;
+            }
+        }
+        else {
+            // this must be a slot which contains a function pointer.  For now
+            // we assume that it uses the HPy calling convention, but we need
+            // a way to allow slots with the CPython signature, to make it
+            // easier to do incremental porting.
+            HPyMeth f = (HPyMeth)hpyspec->slots[i].pfunc;
+            void *impl_func;
+            _HPy_CPyCFunction trampoline_func;
+            f(&impl_func, &trampoline_func);
+            dst->pfunc = trampoline_func;
+        }
     }
     result[count] = (PyType_Slot){0, NULL};
     return result;
