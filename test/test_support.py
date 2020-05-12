@@ -16,7 +16,8 @@ def test_expand_template():
     methods = '\n    '.join(method_table)
     init_code = support.ExtensionTemplate.INIT_TEMPLATE % {
         'methods': methods,
-        'name': 'mytest'
+        'name': 'mytest',
+        'init_types': '',
     }
     assert expanded.rstrip() == f"""#include <hpy.h>
 
