@@ -139,6 +139,12 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
     return result;
 }
 
+HPyAPI_FUNC(HPy)
+HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
+{
+    return _py2h(PyType_FromSpec(spec));
+}
+
 /* expand impl functions as:
  *     static inline HPyLong_FromLong(...);
  *

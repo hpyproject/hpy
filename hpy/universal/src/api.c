@@ -171,8 +171,17 @@ ctx_Dup(HPyContext ctx, HPy h)
 
 static HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *spec)
 {
-    printf("implement me!\n");
-    abort();
+    /* XXX is this correct, strictly speaking?
+     *
+     * In the universal mode, HPyType_Spec is a different struct than
+     * PyType_Spec: however, at the moment they share the very same layout,
+     * and recurively HPyType_Slot has the same layout as PyType_Slot, so the
+     * forceed cast works.
+     *
+     * The alternative solution is to malloc() a fresh PyType_Spec and
+     * manually copy all the fields, like we do in HPyModule_Create.
+     */
+    return _py2h(PyType_FromSpec((PyType_Spec*)spec));
 }
 
 /* expand impl functions as:
