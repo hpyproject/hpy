@@ -50,7 +50,7 @@ class TestType(HPyTest):
                     return HPy_NULL;
                 h_dummy_type = HPyType_FromSpec(ctx, &dummy_type_spec);
                 if (HPy_IsNull(h_dummy_type))
-                return HPy_NULL;
+                    return HPy_NULL;
                 HPy_SetAttr_s(ctx, m, "Dummy", h_dummy_type);
                 return m;
             }
