@@ -9,7 +9,7 @@ class TestList(HPyTest):
             {
                 return HPyList_New(ctx, 0);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() == []
@@ -28,7 +28,7 @@ class TestList(HPyTest):
                     return HPy_NULL;
                 return list;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(42) == [42, 42]

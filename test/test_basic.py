@@ -31,7 +31,7 @@ class TestBasic(HPyTest):
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() is None
@@ -43,7 +43,7 @@ class TestBasic(HPyTest):
             {
                 return HPy_Dup(ctx, self);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() is mod
@@ -55,7 +55,7 @@ class TestBasic(HPyTest):
             {
                 return HPy_Dup(ctx, arg);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         x = object()
@@ -69,7 +69,7 @@ class TestBasic(HPyTest):
                 long a = HPyLong_AsLong(ctx, arg);
                 return HPyLong_FromLong(ctx, a * 2);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(45) == 90
@@ -87,8 +87,8 @@ class TestBasic(HPyTest):
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f_noargs HPy_METH_NOARGS
-            @EXPORT f_o HPy_METH_O
+            @EXPORT(f_noargs, HPy_METH_NOARGS)
+            @EXPORT(f_o, HPy_METH_O)
             @INIT
         """)
         with pytest.raises(TypeError):
@@ -110,7 +110,7 @@ class TestBasic(HPyTest):
                 HPy_Close(ctx, one);
                 return res;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(41.5) == 42.5
@@ -123,7 +123,7 @@ class TestBasic(HPyTest):
                 int cond = HPyLong_AsLong(ctx, arg) > 5;
                 return HPy_Dup(ctx, cond ? ctx->h_True : ctx->h_False);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(4) is False
@@ -144,7 +144,7 @@ class TestBasic(HPyTest):
                     return HPy_NULL;
                 }
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(-10) == 10
@@ -165,7 +165,7 @@ class TestBasic(HPyTest):
                 }
                 return HPyLong_FromLong(ctx, -1002);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(-10) == -1002
@@ -193,7 +193,7 @@ class TestBasic(HPyTest):
                 }
                 return HPy_Dup(ctx, h);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         builtin_objs = ('<NULL>', None, False, True, ValueError, TypeError)
@@ -210,10 +210,10 @@ class TestBasic(HPyTest):
             HPy_DECL_METH_VARARGS(h);
             HPy_DECL_METH_KEYWORDS(i);
 
-            @EXPORT f HPy_METH_NOARGS
-            @EXPORT g HPy_METH_O
-            @EXPORT h HPy_METH_VARARGS
-            @EXPORT i HPy_METH_KEYWORDS
+            @EXPORT(f, HPy_METH_NOARGS)
+            @EXPORT(g, HPy_METH_O)
+            @EXPORT(h, HPy_METH_VARARGS)
+            @EXPORT(i, HPy_METH_KEYWORDS)
             @INIT
         """
         extra = """
@@ -262,7 +262,7 @@ class TestBasic(HPyTest):
             {
                 return HPyFloat_FromDouble(ctx, 123.45);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() == 123.45
@@ -276,7 +276,7 @@ class TestBasic(HPyTest):
                 long long val = 2147483648;
                 return HPyLong_FromLongLong(ctx, val);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() == 2147483648
@@ -290,7 +290,7 @@ class TestBasic(HPyTest):
                 unsigned long long val = 4294967296;
                 return HPyLong_FromUnsignedLongLong(ctx, val);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() == 4294967296

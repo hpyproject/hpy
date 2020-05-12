@@ -26,7 +26,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return result;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
 
@@ -64,7 +64,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return result;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
 
@@ -108,7 +108,7 @@ class TestObject(HPyTest):
                     return HPy_Dup(ctx, ctx->h_True);
                 return HPy_Dup(ctx, ctx->h_False);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
 
@@ -153,7 +153,7 @@ class TestObject(HPyTest):
                     return HPy_Dup(ctx, ctx->h_True);
                 return HPy_Dup(ctx, ctx->h_False);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
 
@@ -200,7 +200,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
 
@@ -254,7 +254,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
 
@@ -312,7 +312,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return result;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({0: "hello"}) == "hello"
@@ -336,7 +336,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return result;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({0: "hello"}) == "hello"
@@ -360,7 +360,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return result;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({"limes": "hello"}) == "hello"
@@ -388,7 +388,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return arg;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({}) == {0: True}
@@ -411,7 +411,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return arg;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({}) == {0: True}
@@ -434,7 +434,7 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return arg;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({}) == {"limes": True}

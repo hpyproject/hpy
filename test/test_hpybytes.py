@@ -11,7 +11,7 @@ class TestBytes(HPyTest):
                     return HPy_Dup(ctx, ctx->h_True);
                 return HPy_Dup(ctx, ctx->h_False);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         class MyBytes(bytes):
@@ -30,7 +30,7 @@ class TestBytes(HPyTest):
                 HPy_ssize_t b = HPyBytes_GET_SIZE(ctx, arg);
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(b'hello') == 55
@@ -47,7 +47,7 @@ class TestBytes(HPyTest):
                     res = (res * 10) + buf[i];
                 return HPyLong_FromLong(ctx, res);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(b'ABC') == 100*ord('A') + 10*ord('B') + ord('C')
@@ -64,7 +64,7 @@ class TestBytes(HPyTest):
                     res = (res * 10) + buf[i];
                 return HPyLong_FromLong(ctx, res);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(b'ABC') == 100*ord('A') + 10*ord('B') + ord('C')

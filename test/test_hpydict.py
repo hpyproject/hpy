@@ -9,7 +9,7 @@ class TestDict(HPyTest):
             {
                 return HPyDict_New(ctx);
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() == {}
@@ -27,7 +27,7 @@ class TestDict(HPyTest):
                     return HPy_NULL;
                 return dict;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f('hello') == {'hello': 1234}
@@ -45,7 +45,7 @@ class TestDict(HPyTest):
                     return HPy_Dup(ctx, ctx->h_None);
                 return val;
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f({'hello': 1}) == 1

@@ -21,7 +21,7 @@ class TestParseItem(HPyTest):
                     return HPy_NULL;
                 return {hpy_converter}(ctx, a);
             }}
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """.format(fmt=fmt, type=type, hpy_converter=hpy_converter))
         return mod
@@ -63,7 +63,7 @@ class TestArgParse(HPyTest):
                 HPy_Close(ctx, b);
                 return res;
             }}
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """.format(fmt=fmt))
         return mod
@@ -81,7 +81,7 @@ class TestArgParse(HPyTest):
                 return HPyLong_FromLong(ctx,
                     10000*a + 1000*b + 100*c + 10*d + e);
             }
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """)
         assert mod.f(4, 5, 6, 7, 8) == 45678
@@ -97,7 +97,7 @@ class TestArgParse(HPyTest):
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
             }
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """)
         assert mod.f("a", "b") == "ab"
@@ -150,7 +150,7 @@ class TestArgParseKeywords(HPyTest):
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
             }}
-            @EXPORT f HPy_METH_KEYWORDS
+            @EXPORT(f, HPy_METH_KEYWORDS)
             @INIT
         """.format(fmt=fmt))
         return mod
@@ -171,7 +171,7 @@ class TestArgParseKeywords(HPyTest):
                     return HPy_NULL;
                 return HPyNumber_Add(ctx, a, b);
             }
-            @EXPORT f HPy_METH_KEYWORDS
+            @EXPORT(f, HPy_METH_KEYWORDS)
             @INIT
         """)
         assert mod.f(b="y", a="x") == "xy"
@@ -197,7 +197,7 @@ class TestArgParseKeywords(HPyTest):
                 HPy_Close(ctx, b);
                 return res;
             }
-            @EXPORT f HPy_METH_KEYWORDS
+            @EXPORT(f, HPy_METH_KEYWORDS)
             @INIT
         """)
         assert mod.f(a=3, b=2) == 5
@@ -247,7 +247,7 @@ class TestArgParseKeywords(HPyTest):
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT f HPy_METH_KEYWORDS
+            @EXPORT(f, HPy_METH_KEYWORDS)
             @INIT
         """)
         with pytest.raises(TypeError) as exc:
@@ -276,7 +276,7 @@ class TestArgParseKeywords(HPyTest):
                 HPy_Close(ctx, b);
                 return res;
             }
-            @EXPORT f HPy_METH_KEYWORDS
+            @EXPORT(f, HPy_METH_KEYWORDS)
             @INIT
         """)
         assert mod.f(1, b=2) == 3

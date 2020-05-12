@@ -5,9 +5,6 @@ import textwrap
 
 PY2 = sys.version_info[0] == 2
 
-r_marker_init = re.compile(r"\s*@INIT\s*$")
-r_marker_export = re.compile(r"\s*@EXPORT\s+(\w+)\s+(.*)\s*$")
-
 class ExtensionTemplate(object):
 
     INIT_TEMPLATE = textwrap.dedent("""
@@ -35,6 +32,8 @@ class ExtensionTemplate(object):
     }
     """)
 
+    r_marker = re.compile(r"^\s*@([A-Z_]+)(\(.*\))?$")
+
     def __init__(self, src, name):
         self.src = src
         self.name = name
@@ -44,19 +43,26 @@ class ExtensionTemplate(object):
         self.method_table = []
         self.output = ['#include <hpy.h>']
         for line in self.src.split('\n'):
-            match = r_marker_init.match(line)
+            match = self.r_marker.match(line)
             if match:
-                self.INIT()
-                continue
-
-            match = r_marker_export.match(line)
-            if match:
-                ml_name, ml_flags = match.group(1), match.group(2)
-                self.EXPORT(ml_name, ml_flags)
-                continue
-
-            self.output.append(line)
+                name, args = self.parse_marker(match)
+                meth = getattr(self, name)
+                meth(*args)
+            else:
+                self.output.append(line)
         return '\n'.join(self.output)
+
+    def parse_marker(self, match):
+        name = match.group(1)
+        args = match.group(2)
+        if args is None:
+            args = ()
+        else:
+            assert args[0] == '('
+            assert args[-1] == ')'
+            args = args[1:-1].split(',')
+            args = [x.strip() for x in args]
+        return name, args
 
     def INIT(self):
         exp = self.INIT_TEMPLATE % {
