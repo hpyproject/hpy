@@ -15,7 +15,7 @@ class TestType(HPyTest):
         mod = self.make_module("""
             typedef struct {
                 HPyObject_HEAD
-            } HPy_Dummy;
+            } DummyObject;
 
             static HPyType_Slot dummy_type_slots[] = {
                 {0, NULL},
@@ -23,7 +23,7 @@ class TestType(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .basicsize = sizeof(HPy_Dummy),
+                .basicsize = sizeof(DummyObject),
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
                 .slots = dummy_type_slots,
@@ -32,6 +32,9 @@ class TestType(HPyTest):
             @EXPORT_TYPE("Dummy", dummy_type_spec)
             @INIT
         """)
+        assert isinstance(mod.Dummy, type)
+        assert mod.Dummy.__name__ == 'Dummy'
+        assert mod.Dummy.__module__ == 'mytest'
         assert isinstance(mod.Dummy(), mod.Dummy)
 
         class Sub(mod.Dummy):
