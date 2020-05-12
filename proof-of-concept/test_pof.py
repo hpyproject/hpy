@@ -13,5 +13,5 @@ def test_add_ints_kw():
     assert pof.add_ints_kw(b=30, a=12) == 42
 
 def test_point():
-    p = pof.Point()
-    assert repr(p) == 'Point()'
+    p = pof.Point(1, 2)
+    assert repr(p) == 'Point(?, ?)' # fixme when we have HPyFloat_FromDouble

@@ -42,8 +42,9 @@ HPy_DEF_METH_VARARGS(Point_new)
 static HPy Point_new_impl (HPyContext ctx, HPy self, HPy *args,
                             HPy_ssize_t nargs)
 {
-    double x, y;
-    if (!HPyArg_Parse(ctx, args, nargs, "dd", &x, &y))
+    // FIXME: we should use double, but HPyArg_Parse does not support "d" yet
+    long x, y;
+    if (!HPyArg_Parse(ctx, args, nargs, "ll", &x, &y))
         return HPy_NULL;
     HPy h_point_type = HPy_GetAttr_s(ctx, self, "Point");
     HPy_Point *point;
@@ -54,24 +55,24 @@ static HPy Point_new_impl (HPyContext ctx, HPy self, HPy *args,
     point->x = x;
     point->y = y;
 
-    return h_point
+    return h_point;
 }
 
 HPy_DEF_METH_NOARGS(Point_repr)
 static HPy Point_repr_impl(HPyContext ctx, HPy self)
 {
     HPy_Point *point = HPy_CAST(ctx, HPy_Point, self);
-    return HPyUnicode_FromString(ctx, "Point()");
+    return HPyUnicode_FromString(ctx, "Point(?, ?)");
     //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
 }
 
-static const HPyType_Slot point_type_slots[] = {
+static HPyType_Slot point_type_slots[] = {
     {Py_tp_new, Point_new},
     {Py_tp_repr, Point_repr},
     {0, NULL},
 };
 
-static const HPyType_Spec point_type_spec = {
+static HPyType_Spec point_type_spec = {
     .name = "pof.Point",
     .basicsize = sizeof(HPy_Point),
     .itemsize = 0,
