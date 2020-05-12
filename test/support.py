@@ -5,6 +5,10 @@ import textwrap
 
 PY2 = sys.version_info[0] == 2
 
+def reindent(s, indent):
+    s = textwrap.dedent(s)
+    return textwrap.indent(s, ' '*indent)
+
 class ExtensionTemplate(object):
 
     INIT_TEMPLATE = textwrap.dedent("""
@@ -28,6 +32,7 @@ class ExtensionTemplate(object):
         m = HPyModule_Create(ctx, &moduledef);
         if (HPy_IsNull(m))
             return HPy_NULL;
+        %(init_types)s
         return m;
     }
     """)
@@ -38,9 +43,11 @@ class ExtensionTemplate(object):
         self.src = src
         self.name = name
         self.method_table = None
+        self.type_table = None
 
     def expand(self):
         self.method_table = []
+        self.type_table = []
         self.output = ['#include <hpy.h>']
         for line in self.src.split('\n'):
             match = self.r_marker.match(line)
@@ -67,9 +74,12 @@ class ExtensionTemplate(object):
     def INIT(self):
         exp = self.INIT_TEMPLATE % {
             'methods': '\n    '.join(self.method_table),
+            'init_types': '\n'.join(self.type_table),
             'name': self.name}
-        self.method_table = None   # don't fill it any more
         self.output.append(exp)
+        # make sure that we don't fill the tables any more
+        self.method_table = None
+        self.type_table = None
 
     def EXPORT(self, ml_name, ml_flags):
         if not ml_flags.startswith('HPy_'):
@@ -81,7 +91,20 @@ class ExtensionTemplate(object):
         self.method_table.append('{"%s", %s%s, %s, NULL},' % (
                 ml_name, cast, ml_name, ml_flags))
 
-
+    def EXPORT_TYPE(self, name, spec):
+        i = len(self.type_table)
+        src = """
+            HPy {h} = HPyType_FromSpec(ctx, &{spec});
+            if (HPy_IsNull({h}))
+                return HPy_NULL;
+            if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0)
+                return HPy_NULL;
+            """
+        src = reindent(src, 4)
+        self.type_table.append(src.format(
+            h = 'h_type_%d' % i,
+            name = name,
+            spec = spec))
 
 def expand_template(template, name):
     return ExtensionTemplate(template, name).expand()
