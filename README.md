@@ -11,7 +11,8 @@ The goal of the project is to design a better API for extending Python
 in C. The current API is specific to the current implementation of CPython: it
 exposes a lot of internal details which makes it hard:
 
-  - to implement it for other Python implementations (e.g. PyPy, Jython, IronPython, etc.)
+  - to implement it for other Python implementations (e.g. PyPy, GraalPython,
+    Jython, IronPython, etc.)
 
   - to experiment with new things inside CPython itself: e.g. using a GC
     instead of refcounting, or to remove the GIL
