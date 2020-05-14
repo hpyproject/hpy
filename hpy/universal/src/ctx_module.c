@@ -1,6 +1,7 @@
 #include <Python.h>
 #include "hpy.h"
 #include "api.h"
+#include "handles.h"
 
 static PyModuleDef empty_moduledef = {
     PyModuleDef_HEAD_INIT

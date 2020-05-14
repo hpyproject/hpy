@@ -1,6 +1,7 @@
 #include <Python.h>
 #include <stdlib.h>
 #include "api.h"
+#include "handles.h"
 #include "ctx_module.h"
 
 static void*
