@@ -10,6 +10,7 @@ setup(
                    'hpy/universal/src/handles.c',
                    'hpy/universal/src/api.c',
                    'hpy/universal/src/ctx_module.c',
+                   'hpy/universal/src/ctx_meth.c',
                    'hpy/devel/src/runtime/argparse.c',
                   ],
                   include_dirs=['hpy/devel/include'],

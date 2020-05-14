@@ -1,6 +1,8 @@
 #ifndef HPY_HANDLES_H
 #define HPY_HANDLES_H
 
+#include <Python.h>
+
 #define CONSTANT_H_NULL                0
 #define CONSTANT_H_NONE                1
 #define CONSTANT_H_TRUE                2
