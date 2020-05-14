@@ -85,7 +85,7 @@ class TestType(HPyTest):
             static HPyMethodDef Dummy_methods[] = {
                 {"foo", Dummy_foo, HPy_METH_O},
                 {"bar", Dummy_bar, HPy_METH_NOARGS},
-                {NULL, NULL, NULL}
+                {NULL}
             };
 
             static HPyType_Slot dummy_type_slots[] = {
@@ -134,7 +134,7 @@ class TestType(HPyTest):
 
             static HPyMethodDef Point_methods[] = {
                 {"foo", Point_foo, HPy_METH_NOARGS},
-                {NULL, NULL, NULL}
+                {NULL},
             };
 
             static HPyType_Slot Point_slots[] = {
