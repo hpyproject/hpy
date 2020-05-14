@@ -1,6 +1,4 @@
-#include <Python.h>
-#include <stdlib.h>
-#include "api.h"
+#include "hpy.h"
 #include "handles.h"
 
 #include "ctx_module.h"

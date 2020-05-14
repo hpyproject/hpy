@@ -8,7 +8,7 @@ setup(
         Extension('hpy.universal',
                   ['hpy/universal/src/hpymodule.c',
                    'hpy/universal/src/handles.c',
-                   'hpy/universal/src/api.c',
+                   'hpy/universal/src/ctx.c',
                    'hpy/universal/src/ctx_module.c',
                    'hpy/universal/src/ctx_meth.c',
                    'hpy/universal/src/ctx_type.c',

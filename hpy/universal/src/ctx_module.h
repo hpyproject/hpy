@@ -1,6 +1,7 @@
 #ifndef HPY_CTX_MODULE_H
 #define HPY_CTX_MODULE_H
 
+#include <Python.h>
 #include "hpy.h"
 #include "api.h"
 
