@@ -9,10 +9,14 @@ setup(
                   ['hpy/universal/src/hpymodule.c',
                    'hpy/universal/src/handles.c',
                    'hpy/universal/src/api.c',
+                   'hpy/universal/src/ctx_module.c',
                    'hpy/devel/src/runtime/argparse.c',
                   ],
                   include_dirs=['hpy/devel/include'],
-                  #extra_compile_args=['-g', 'O0'],
+                  extra_compile_args=[
+                      '-DHPY_UNIVERSAL_ABI',
+                      #'-g', 'O0'
+                  ],
         )]
 
 )

@@ -3,6 +3,8 @@
 
 #include "universal/hpy.h"
 
+#define HPyAPI_STORAGE _HPy_HIDDEN
+
 #define CONSTANT_H_NULL                0
 #define CONSTANT_H_NONE                1
 #define CONSTANT_H_TRUE                2
@@ -15,5 +17,18 @@ extern struct _HPyContext_s global_ctx;
 HPy _py2h(PyObject *);
 PyObject *_h2py(HPy);
 void _hclose(HPy);
+
+
+/* declare alloca() */
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#else
+# include <stdint.h>
+# if (defined (__SVR4) && defined (__sun)) || defined(_AIX) || defined(__hpux)
+#  include <alloca.h>
+# endif
+#endif
+
+
 
 #endif /* HPY_API_H */
