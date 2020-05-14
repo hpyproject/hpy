@@ -46,9 +46,3 @@ HPyAPI_STORAGE int
 _HPy_IMPL_NAME(Err_Occurred)(HPyContext ctx) {
     return PyErr_Occurred() ? 1 : 0;
 }
-
-HPyAPI_STORAGE HPy
-_HPy_IMPL_NAME_NOPREFIX(New)(HPyContext ctx, HPy h_type, void **data) {
-    printf("implement me\n");
-    abort();
-}

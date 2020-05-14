@@ -1,6 +1,7 @@
 #ifndef HPY_UNIVERSAL_TYPE_H
 #define HPY_UNIVERSAL_TYPE_H
 
+#include <stdbool.h>
 
 typedef struct{
     int slot;    /* slot id, see below */
@@ -10,6 +11,7 @@ typedef struct{
 
 typedef struct {
     const char* name;
+    bool has_pyobject_head;
     int basicsize;
     int itemsize;
     unsigned int flags;

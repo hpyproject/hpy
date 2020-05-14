@@ -144,6 +144,13 @@ HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
     return _py2h(PyType_FromSpec(spec));
 }
 
+HPyAPI_FUNC(HPy)
+HPy_New(HPyContext ctx, HPy h, void **data)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "HPy_New not implemented");
+    return HPy_NULL;
+}
+
 /* expand impl functions as:
  *     static inline HPyLong_FromLong(...);
  *

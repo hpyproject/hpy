@@ -1,14 +1,43 @@
+#include <stddef.h>
 #include <Python.h>
 #include "hpy.h"
 #include "handles.h"
 #include "ctx_type.h"
 #include "ctx_module.h"
 
+/* by default, the C structs which bake an HPy custom type do NOT include
+ * PyObject_HEAD.  So, HPy_New must allocate a memory region which is big
+ * enough to contain PyObject_HEAD + any eventual extra padding + the actual
+ * user struct. We use the union_alignment to ensure that the payload is
+ * correctly aligned for every possible struct.
+ */
+
+typedef union {
+    unsigned char m_char[1];
+    unsigned short m_short;
+    unsigned int m_int;
+    unsigned long m_long;
+    unsigned long long m_longlong;
+    float m_float;
+    double m_double;
+    long double m_longdouble;
+    void *m_pointer;
+} union_alignment;
+
+typedef struct {
+    PyObject_HEAD
+    union_alignment payload;
+} GenericHPyObject;
+
+#define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
+
 
 HPyAPI_STORAGE void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
-    return (void*)_h2py(h);
+    // XXX: how do we implement ctx_Cast when has_pyobject_head==1?
+    GenericHPyObject *o = (GenericHPyObject*)(_h2py(h));
+    return (void*)o->payload.m_char;
 }
 
 static PyType_Slot *
@@ -69,8 +98,12 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
         PyErr_NoMemory();
         return HPy_NULL;
     }
+    if (hpyspec->has_pyobject_head) {
+        PyErr_SetString(PyExc_NotImplementedError, "has_pyobject_head not supported yet");
+        return HPy_NULL;
+    }
     spec->name = hpyspec->name;
-    spec->basicsize = hpyspec->basicsize;
+    spec->basicsize = hpyspec->basicsize + PyObject_HEAD_SIZE;
     spec->itemsize = hpyspec->itemsize;
     spec->flags = hpyspec->flags;
     spec->slots = create_slot_defs(hpyspec);
@@ -81,4 +114,21 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
     }
     PyObject *result = PyType_FromSpec(spec);
     return _py2h(result);
+}
+
+HPyAPI_STORAGE HPy
+ctx_New(HPyContext ctx, HPy h_type, void **data)
+{
+    PyObject *tp = _h2py(h_type);
+    if (!PyType_Check(tp)) {
+        PyErr_SetString(PyExc_TypeError, "HPy_New arg 1 must be a type");
+        return HPy_NULL;
+    }
+
+    GenericHPyObject *result = PyObject_New(GenericHPyObject, (PyTypeObject*)tp);
+    if (!result)
+        return HPy_NULL;
+
+    *data = (void*)result->payload.m_char;
+    return _py2h((PyObject*)result);
 }
