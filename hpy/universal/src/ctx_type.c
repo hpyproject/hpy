@@ -12,21 +12,22 @@
  * correctly aligned for every possible struct.
  */
 
-typedef union {
-    unsigned char m_char[1];
-    unsigned short m_short;
-    unsigned int m_int;
-    unsigned long m_long;
-    unsigned long long m_longlong;
-    float m_float;
-    double m_double;
-    long double m_longdouble;
-    void *m_pointer;
-} union_alignment;
 
 typedef struct {
     PyObject_HEAD
-    union_alignment payload;
+    union {
+        unsigned char payload[1];
+        // these fields are never accessed: they are present just to ensure
+        // the correct alignment of payload
+        unsigned short _m_short;
+        unsigned int _m_int;
+        unsigned long _m_long;
+        unsigned long long _m_longlong;
+        float _m_float;
+        double _m_double;
+        long double _m_longdouble;
+        void *_m_pointer;
+    };
 } GenericHPyObject;
 
 #define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
@@ -37,7 +38,7 @@ ctx_Cast(HPyContext ctx, HPy h)
 {
     // XXX: how do we implement ctx_Cast when has_pyobject_head==1?
     GenericHPyObject *o = (GenericHPyObject*)(_h2py(h));
-    return (void*)o->payload.m_char;
+    return (void*)o->payload;
 }
 
 static PyType_Slot *
@@ -129,6 +130,6 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     if (!result)
         return HPy_NULL;
 
-    *data = (void*)result->payload.m_char;
+    *data = (void*)result->payload;
     return _py2h((PyObject*)result);
 }
