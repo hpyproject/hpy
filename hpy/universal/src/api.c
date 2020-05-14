@@ -2,39 +2,11 @@
 #include <stdlib.h>
 #include "api.h"
 #include "handles.h"
+
 #include "ctx_module.h"
 #include "ctx_meth.h"
 #include "ctx_type.h"
-
-static HPy
-ctx_FromPyObject(HPyContext ctx, struct _object *obj)
-{
-    Py_INCREF(obj);
-    return _py2h(obj);
-}
-
-static struct _object *
-ctx_AsPyObject(HPyContext ctx, HPy h)
-{
-    PyObject *obj = _h2py(h);
-    Py_INCREF(obj);
-    return obj;
-}
-
-static void
-ctx_Close(HPyContext ctx, HPy h)
-{
-    _hclose(h);
-}
-
-static HPy
-ctx_Dup(HPyContext ctx, HPy h)
-{
-    PyObject *obj = _h2py(h);
-    Py_XINCREF(obj);
-    return _py2h(obj);
-}
-
+#include "ctx_misc.h"
 
 /* expand impl functions as:
  *     static ctx_Long_FromLong(...);

@@ -12,6 +12,7 @@ setup(
                    'hpy/universal/src/ctx_module.c',
                    'hpy/universal/src/ctx_meth.c',
                    'hpy/universal/src/ctx_type.c',
+                   'hpy/universal/src/ctx_misc.c',
                    'hpy/devel/src/runtime/argparse.c',
                   ],
                   include_dirs=['hpy/devel/include'],
