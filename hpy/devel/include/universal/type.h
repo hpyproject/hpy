@@ -16,8 +16,6 @@ typedef struct {
     HPyType_Slot *slots; /* terminated by slot==0. */
 } HPyType_Spec;
 
-#define HPyObject_HEAD
-
 /* All types are dynamically allocated */
 #define _Py_TPFLAGS_HEAPTYPE (1UL << 9)
 

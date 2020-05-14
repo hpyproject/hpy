@@ -13,17 +13,12 @@ class TestType(HPyTest):
 
     def test_simple_type(self):
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-            } DummyObject;
-
             static HPyType_Slot Dummy_slots[] = {
                 {0, NULL},
             };
 
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .basicsize = sizeof(DummyObject),
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
                 .slots = Dummy_slots,
@@ -43,10 +38,6 @@ class TestType(HPyTest):
 
     def test_slots(self):
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-            } DummyObject;
-
             HPy_DEF_METH_NOARGS(Dummy_repr)
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
@@ -67,7 +58,6 @@ class TestType(HPyTest):
 
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .basicsize = sizeof(DummyObject),
                 .slots = Dummy_slots
             };
 
@@ -80,10 +70,6 @@ class TestType(HPyTest):
 
     def test_tp_methods(self):
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-            } DummyObject;
-
             HPy_DEF_METH_O(Dummy_foo)
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
             {
@@ -109,7 +95,6 @@ class TestType(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .basicsize = sizeof(DummyObject),
                 .slots = dummy_type_slots,
             };
 
