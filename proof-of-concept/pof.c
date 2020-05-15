@@ -33,28 +33,24 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 }
 
 typedef struct {
-    HPyObject_HEAD
     double x;
     double y;
 } HPy_Point;
 
 HPy_DEF_METH_VARARGS(Point_new)
-static HPy Point_new_impl (HPyContext ctx, HPy self, HPy *args,
+static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
                             HPy_ssize_t nargs)
 {
     // FIXME: we should use double, but HPyArg_Parse does not support "d" yet
     long x, y;
     if (!HPyArg_Parse(ctx, args, nargs, "ll", &x, &y))
         return HPy_NULL;
-    HPy h_point_type = HPy_GetAttr_s(ctx, self, "Point");
     HPy_Point *point;
-    HPy h_point = HPy_New(ctx, h_point_type, &point);
-    HPy_Close(ctx, h_point_type);
+    HPy h_point = HPy_New(ctx, cls, &point);
     if (HPy_IsNull(h_point))
         return HPy_NULL;
     point->x = x;
     point->y = y;
-
     return h_point;
 }
 
@@ -75,7 +71,6 @@ static HPyType_Slot point_type_slots[] = {
 static HPyType_Spec point_type_spec = {
     .name = "pof.Point",
     .basicsize = sizeof(HPy_Point),
-    .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
     .slots = point_type_slots,
 };
