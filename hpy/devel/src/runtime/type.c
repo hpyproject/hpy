@@ -75,7 +75,7 @@ static void slot_copy_pfunc(HPyType_Slot *src, PyType_Slot *dst)
     dst->pfunc = trampoline_func;
 #else
     // CPython ABI mode
-    abort();
+    dst->pfunc = src->pfunc;
 #endif
 }
 
