@@ -1,8 +1,8 @@
 #include <stddef.h>
 #include <Python.h>
 #include "hpy.h"
+#include "common/runtime/type.h"
 #include "handles.h"
-#include "ctx_type.h"
 
 /* by default, the C structs which bake an HPy custom type do NOT include
  * PyObject_HEAD.  So, HPy_New must allocate a memory region which is big

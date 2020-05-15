@@ -11,11 +11,14 @@ setup(
                    'hpy/universal/src/ctx.c',
                    'hpy/universal/src/ctx_module.c',
                    'hpy/universal/src/ctx_meth.c',
-                   'hpy/universal/src/ctx_type.c',
                    'hpy/universal/src/ctx_misc.c',
                    'hpy/devel/src/runtime/argparse.c',
+                   'hpy/devel/src/runtime/type.c',
                   ],
-                  include_dirs=['hpy/devel/include'],
+                  include_dirs=[
+                      'hpy/devel/include',
+                      'hpy/universal/src',
+                  ],
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
                       #'-g', 'O0'

@@ -1,5 +1,5 @@
-#ifndef HPY_CTX_TYPE_H
-#define HPY_CTX_TYPE_H
+#ifndef HPY_COMMON_RUNTIME_H
+#define HPY_COMMON_RUNTIME_H
 
 #include <Python.h>
 #include "hpy.h"
@@ -10,4 +10,4 @@ HPyAPI_STORAGE HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec);
 HPyAPI_STORAGE HPy ctx_New(HPyContext ctx, HPy h_type, void **data);
 HPyAPI_STORAGE PyMethodDef *create_method_defs(HPyMethodDef *hpymethods);
 
-#endif /* HPY_CTX_TYPE_H */
+#endif /* HPY_COMMON_RUNTIME_H */

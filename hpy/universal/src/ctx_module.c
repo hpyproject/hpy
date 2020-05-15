@@ -1,8 +1,8 @@
 #include <Python.h>
 #include "hpy.h"
+#include "common/runtime/type.h"
 #include "api.h"
 #include "handles.h"
-#include "ctx_type.h"
 
 static PyModuleDef empty_moduledef = {
     PyModuleDef_HEAD_INIT

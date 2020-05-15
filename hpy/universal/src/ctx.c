@@ -1,9 +1,9 @@
 #include "hpy.h"
 #include "handles.h"
 
+#include "common/runtime/type.h"
 #include "ctx_module.h"
 #include "ctx_meth.h"
-#include "ctx_type.h"
 #include "ctx_misc.h"
 
 /* expand impl functions as:
