@@ -186,7 +186,11 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
         return HPy_NULL;
     }
     PyObject *result = PyType_FromSpec(spec);
-    // XXX: should we free() spec->slots?
+    /* note that we do NOT free the memory which was allocated by
+       create_method_defs, because that one is referenced internally by
+       CPython (which probably assumes it's statically allocated) */
+    PyMem_Free(spec->slots);
+    PyMem_Free(spec);
     return _py2h(result);
 }
 
