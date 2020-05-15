@@ -162,6 +162,6 @@ HPy_New(HPyContext ctx, HPy h, void **data)
 #undef _HPy_IMPL_NAME
 
 // include runtime functions
-#include "../common/runtime.h"
+#include "../common/runtime/argparse.h"
 
 #endif /* !HPy_CPYTHON_H */

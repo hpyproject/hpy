@@ -33,7 +33,7 @@ static inline HPy HPy_FromVoidP(void *p) { return (HPy){(HPy_ssize_t)p}; }
 static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 // include runtime functions
-#include "common/runtime.h"
+#include "common/runtime/argparse.h"
 
 #include "type.h"
 #include "typeslots.h"
