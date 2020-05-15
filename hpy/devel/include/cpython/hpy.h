@@ -135,7 +135,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #undef _HPy_IMPL_NAME
 
 #include "../common/runtime/argparse.h"
-#include "../common/runtime/type.h"
+#include "../common/runtime/ctx_type.h"
 
 
 HPyAPI_FUNC(HPy)

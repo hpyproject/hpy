@@ -1,6 +1,6 @@
 #include <Python.h>
 #include "hpy.h"
-#include "common/runtime/type.h"
+#include "common/runtime/ctx_type.h"
 #include "api.h"
 #include "handles.h"
 

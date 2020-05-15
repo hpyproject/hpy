@@ -163,7 +163,7 @@ class ExtensionCompiler:
             str(self.src_dir.join('argparse.c')),
         ]
         if self.abimode == 'cpython':
-            sources.append(str(self.src_dir.join('type.c')))
+            sources.append(str(self.src_dir.join('ctx_type.c')))
         #
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)

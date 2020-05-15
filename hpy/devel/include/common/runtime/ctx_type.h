@@ -1,5 +1,5 @@
-#ifndef HPY_COMMON_RUNTIME_TYPE_H
-#define HPY_COMMON_RUNTIME_TYPE_H
+#ifndef HPY_COMMON_RUNTIME_CTX_TYPE_H
+#define HPY_COMMON_RUNTIME_CTX_TYPE_H
 
 #include <Python.h>
 #include "hpy.h"
@@ -15,4 +15,4 @@ _HPy_HIDDEN HPy ctx_New(HPyContext ctx, HPy h_type, void **data);
 _HPy_HIDDEN PyMethodDef *create_method_defs(HPyMethodDef *hpymethods);
 #endif
 
-#endif /* HPY_COMMON_RUNTIME_TYPE_H */
+#endif /* HPY_COMMON_RUNTIME_CTX_TYPE_H */
