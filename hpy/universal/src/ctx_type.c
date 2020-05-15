@@ -3,7 +3,6 @@
 #include "hpy.h"
 #include "handles.h"
 #include "ctx_type.h"
-#include "ctx_module.h"
 
 /* by default, the C structs which bake an HPy custom type do NOT include
  * PyObject_HEAD.  So, HPy_New must allocate a memory region which is big
@@ -40,6 +39,56 @@ ctx_Cast(HPyContext ctx, HPy h)
     GenericHPyObject *o = (GenericHPyObject*)(_h2py(h));
     return (void*)o->payload;
 }
+
+// create_method_defs cannot be static because it's also called by
+// ctx_Module_Create.
+// This malloc a result which will never be freed. Too bad
+HPyAPI_STORAGE PyMethodDef *
+create_method_defs(HPyMethodDef *hpymethods)
+{
+    // count the methods
+    Py_ssize_t count;
+    if (hpymethods == NULL) {
+        count = 0;
+    }
+    else {
+        count = 0;
+        while (hpymethods[count].ml_name != NULL)
+            count++;
+    }
+
+    // allocate&fill the result
+    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (count+1));
+    if (result == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    for(int i=0; i<count; i++) {
+        HPyMethodDef *src = &hpymethods[i];
+        PyMethodDef *dst = &result[i];
+        dst->ml_name = src->ml_name;
+        dst->ml_doc = src->ml_doc;
+
+        if (src->ml_flags & _HPy_METH) {
+            // HPy function: cal ml_meth to get pointers to the impl_func and
+            // the cpy trampoline
+            void *impl_func;
+            PyCFunction trampoline_func;
+            src->ml_meth(&impl_func, &trampoline_func);
+            dst->ml_meth = (PyCFunction)trampoline_func;
+            dst->ml_flags = src->ml_flags & ~_HPy_METH;
+        }
+        else {
+            // legacy function: ml_meth already contains a function pointer
+            // with the correct CPython signature
+            dst->ml_meth = (PyCFunction)src->ml_meth;
+            dst->ml_flags = src->ml_flags;
+        }
+    }
+    result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
+    return result;
+}
+
 
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
