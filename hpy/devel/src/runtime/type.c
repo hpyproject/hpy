@@ -2,7 +2,11 @@
 #include <Python.h>
 #include "hpy.h"
 #include "common/runtime/type.h"
-#include "handles.h"
+
+#ifdef HPY_UNIVERSAL_ABI
+   // for _h2py and _py2h
+#  include "handles.h"
+#endif
 
 /* by default, the C structs which bake an HPy custom type do NOT include
  * PyObject_HEAD.  So, HPy_New must allocate a memory region which is big
@@ -10,7 +14,6 @@
  * user struct. We use the union_alignment to ensure that the payload is
  * correctly aligned for every possible struct.
  */
-
 
 typedef struct {
     PyObject_HEAD
@@ -32,7 +35,52 @@ typedef struct {
 #define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
 
 
-HPyAPI_STORAGE void*
+static void methoddef_copy_ml_meth_and_flags(HPyMethodDef *src, PyMethodDef *dst)
+{
+#ifdef HPY_UNIVERSAL_ABI
+    // Universal ABI mode: ml_meth could be either a legacy function or a
+    // new-style HPy method
+    if (src->ml_flags & _HPy_METH) {
+        // HPy function: cal ml_meth to get pointers to the impl_func and
+        // the cpy trampoline
+        void *impl_func;
+        PyCFunction trampoline_func;
+        src->ml_meth(&impl_func, &trampoline_func);
+        dst->ml_meth = (PyCFunction)trampoline_func;
+        dst->ml_flags = src->ml_flags & ~_HPy_METH;
+    }
+    else {
+        // legacy function: ml_meth already contains a function pointer
+        // with the correct CPython signature
+        dst->ml_meth = (PyCFunction)src->ml_meth;
+        dst->ml_flags = src->ml_flags;
+    }
+#else
+    // CPython ABI mode: ml_meth is already a PyCFunction function pointer
+    dst->ml_meth = src->ml_meth;
+    dst->ml_flags = src->ml_flags;
+#endif
+}
+
+static void slot_copy_pfunc(HPyType_Slot *src, PyType_Slot *dst)
+{
+#ifdef HPY_UNIVERSAL_ABI
+    // Universal ABI mode: for now we assume that it uses the HPy calling
+    // convention, but we need a way to allow slots with the CPython
+    // signature, similar to what we do in methoddef_copy_ml_meth_and_flags
+    HPyMeth f = (HPyMeth)src->pfunc;
+    void *impl_func;
+    _HPy_CPyCFunction trampoline_func;
+    f(&impl_func, &trampoline_func);
+    dst->pfunc = trampoline_func;
+#else
+    // CPython ABI mode
+    abort();
+#endif
+}
+
+
+_HPy_HIDDEN void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
     // XXX: how do we implement ctx_Cast when has_pyobject_head==1?
@@ -40,10 +88,9 @@ ctx_Cast(HPyContext ctx, HPy h)
     return (void*)o->payload;
 }
 
-// create_method_defs cannot be static because it's also called by
-// ctx_Module_Create.
+// note: this function is also called from ctx_module.c.
 // This malloc a result which will never be freed. Too bad
-HPyAPI_STORAGE PyMethodDef *
+_HPy_HIDDEN PyMethodDef *
 create_method_defs(HPyMethodDef *hpymethods)
 {
     // count the methods
@@ -68,27 +115,11 @@ create_method_defs(HPyMethodDef *hpymethods)
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->ml_name;
         dst->ml_doc = src->ml_doc;
-
-        if (src->ml_flags & _HPy_METH) {
-            // HPy function: cal ml_meth to get pointers to the impl_func and
-            // the cpy trampoline
-            void *impl_func;
-            PyCFunction trampoline_func;
-            src->ml_meth(&impl_func, &trampoline_func);
-            dst->ml_meth = (PyCFunction)trampoline_func;
-            dst->ml_flags = src->ml_flags & ~_HPy_METH;
-        }
-        else {
-            // legacy function: ml_meth already contains a function pointer
-            // with the correct CPython signature
-            dst->ml_meth = (PyCFunction)src->ml_meth;
-            dst->ml_flags = src->ml_flags;
-        }
+        methoddef_copy_ml_meth_and_flags(src, dst);
     }
     result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
 }
-
 
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
@@ -125,22 +156,14 @@ create_slot_defs(HPyType_Spec *hpyspec)
             }
         }
         else {
-            // this must be a slot which contains a function pointer.  For now
-            // we assume that it uses the HPy calling convention, but we need
-            // a way to allow slots with the CPython signature, to make it
-            // easier to do incremental porting.
-            HPyMeth f = (HPyMeth)hpyspec->slots[i].pfunc;
-            void *impl_func;
-            _HPy_CPyCFunction trampoline_func;
-            f(&impl_func, &trampoline_func);
-            dst->pfunc = trampoline_func;
+            slot_copy_pfunc(&hpyspec->slots[i], dst);
         }
     }
     result[count] = (PyType_Slot){0, NULL};
     return result;
 }
 
-HPyAPI_STORAGE HPy
+_HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
 {
     PyType_Spec *spec = PyMem_Malloc(sizeof(PyType_Spec));
@@ -163,10 +186,11 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
         return HPy_NULL;
     }
     PyObject *result = PyType_FromSpec(spec);
+    // XXX: should we free() spec->slots?
     return _py2h(result);
 }
 
-HPyAPI_STORAGE HPy
+_HPy_HIDDEN HPy
 ctx_New(HPyContext ctx, HPy h_type, void **data)
 {
     PyObject *tp = _h2py(h_type);

@@ -156,9 +156,15 @@ class ExtensionCompiler:
         Create and compile a HPy module from the template
         """
         filename = self._expand(name, main_template)
+        #
+        # XXX: we should probably use hpy.devel.get_sources() to get all the
+        # needed files
         sources = [
             str(self.src_dir.join('argparse.c')),
         ]
+        if self.abimode == 'cpython':
+            sources.append(str(self.src_dir.join('type.c')))
+        #
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
             sources.append(extra_filename)

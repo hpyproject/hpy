@@ -35,7 +35,7 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 // include runtime functions
 #include "common/runtime/argparse.h"
 
-#include "type.h"
+#include "common/type.h"
 #include "typeslots.h"
 #include "meth.h"
 #include "module.h"

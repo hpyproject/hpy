@@ -109,10 +109,8 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
         return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
-typedef PyType_Slot HPyType_Slot;
-typedef PyType_Spec HPyType_Spec;
-#define HPy_TPFLAGS_BASETYPE Py_TPFLAGS_BASETYPE
-#define HPy_TPFLAGS_DEFAULT (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE)
+/* #define HPy_TPFLAGS_BASETYPE Py_TPFLAGS_BASETYPE */
+/* #define HPy_TPFLAGS_DEFAULT (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE) */
 
 #define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
 
@@ -138,19 +136,6 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
     return result;
 }
 
-HPyAPI_FUNC(HPy)
-HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
-{
-    return _py2h(PyType_FromSpec(spec));
-}
-
-HPyAPI_FUNC(HPy)
-HPy_New(HPyContext ctx, HPy h, void **data)
-{
-    PyErr_SetString(PyExc_NotImplementedError, "HPy_New not implemented");
-    return HPy_NULL;
-}
-
 /* expand impl functions as:
  *     static inline HPyLong_FromLong(...);
  *
@@ -161,7 +146,21 @@ HPy_New(HPyContext ctx, HPy h, void **data)
 #undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
-// include runtime functions
 #include "../common/runtime/argparse.h"
+#include "../common/runtime/type.h"
+
+
+HPyAPI_FUNC(HPy)
+HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
+{
+    return ctx_Type_FromSpec(ctx, spec);
+}
+
+HPyAPI_FUNC(HPy)
+HPy_New(HPyContext ctx, HPy h, void **data)
+{
+    PyErr_SetString(PyExc_NotImplementedError, "HPy_New not implemented");
+    return HPy_NULL;
+}
 
 #endif /* !HPy_CPYTHON_H */
