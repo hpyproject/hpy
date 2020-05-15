@@ -109,18 +109,6 @@ HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef) {
         return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
-/* #define HPy_TPFLAGS_BASETYPE Py_TPFLAGS_BASETYPE */
-/* #define HPy_TPFLAGS_DEFAULT (Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HEAPTYPE) */
-
-#define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
-
-
-HPyAPI_FUNC(void*)
-_HPy_Cast(HPyContext ctx, HPy h)
-{
-    return (void*)_h2py(h);
-}
-
 HPyAPI_FUNC(HPy)
 HPy_FromPyObject(HPyContext ctx, PyObject *obj)
 {
@@ -159,8 +147,13 @@ HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
 HPyAPI_FUNC(HPy)
 HPy_New(HPyContext ctx, HPy h, void **data)
 {
-    PyErr_SetString(PyExc_NotImplementedError, "HPy_New not implemented");
-    return HPy_NULL;
+    return ctx_New(ctx, h, data);
+}
+
+HPyAPI_FUNC(void*)
+_HPy_Cast(HPyContext ctx, HPy h)
+{
+    return ctx_Cast(ctx, h);
 }
 
 #endif /* !HPy_CPYTHON_H */
