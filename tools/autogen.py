@@ -71,6 +71,8 @@ class Function:
         # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
+        if self.name in NO_TRAMPOLINES:
+            return None
         rettype = toC(self.node.type.type)
         parts = []
         w = parts.append
@@ -267,6 +269,11 @@ SPECIAL_CASES = {
     'HPy_New': None,
     'HPyType_FromSpec': None,
 }
+
+NO_TRAMPOLINES = set([
+    'HPy_New',
+    ])
+
 
 def convert_name(hpy_name):
     if hpy_name in SPECIAL_CASES:
