@@ -1,6 +1,7 @@
 #include <Python.h>
 #include <stdlib.h>
-#include "api.h"
+#include "hpy.h"
+#include "handles.h"
 
 
 /* XXX we should turn the fast-path of _py2h and _h2py into macros in api.h */

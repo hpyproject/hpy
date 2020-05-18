@@ -8,6 +8,10 @@ from copy import deepcopy
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
+from packaging import version
+
+if version.parse(pycparser.__version__) < version.parse('2.20'):
+    raise ImportError('You need pycparsers>=2.20 to run autogen')
 
 DISCLAIMER = """
 /*
@@ -67,6 +71,8 @@ class Function:
         # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
+        if self.name in NO_TRAMPOLINES:
+            return None
         rettype = toC(self.node.type.type)
         parts = []
         w = parts.append
@@ -221,11 +227,11 @@ SPECIAL_CASES = {
     'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
+    '_HPy_Cast': None,
     'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
     '_HPy_CallRealFunctionFromTrampoline': None,
     'HPyErr_Occurred': None,
-
     'HPy_Add': 'PyNumber_Add',
     'HPy_Subtract': 'PyNumber_Subtract',
     'HPy_Multiply': 'PyNumber_Multiply',
@@ -260,7 +266,14 @@ SPECIAL_CASES = {
     'HPy_InPlaceAnd': 'PyNumber_InPlaceAnd',
     'HPy_InPlaceXor': 'PyNumber_InPlaceXor',
     'HPy_InPlaceOr': 'PyNumber_InPlaceOr',
+    'HPy_New': None,
+    'HPyType_FromSpec': None,
 }
+
+NO_TRAMPOLINES = set([
+    'HPy_New',
+    ])
+
 
 def convert_name(hpy_name):
     if hpy_name in SPECIAL_CASES:

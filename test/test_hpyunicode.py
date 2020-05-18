@@ -13,7 +13,7 @@ class TestUnicode(HPyTest):
                     return HPy_Dup(ctx, ctx->h_True);
                 return HPy_Dup(ctx, ctx->h_False);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         class MyUnicode(str):
@@ -30,7 +30,7 @@ class TestUnicode(HPyTest):
             {
                 return HPyUnicode_FromString(ctx, "foobar");
             }
-            @EXPORT f HPy_METH_NOARGS
+            @EXPORT(f, HPy_METH_NOARGS)
             @INIT
         """)
         assert mod.f() == "foobar"
@@ -45,7 +45,7 @@ class TestUnicode(HPyTest):
                 long n = HPyLong_AsLong(ctx, arg);
                 return HPyUnicode_FromWideChar(ctx, buf, n);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         assert mod.f(-1) == "hellò world"
@@ -60,7 +60,7 @@ class TestUnicode(HPyTest):
             {
                 return HPyUnicode_AsUTF8String(ctx, arg);
             }
-            @EXPORT f HPy_METH_O
+            @EXPORT(f, HPy_METH_O)
             @INIT
         """)
         s = 'hellò'

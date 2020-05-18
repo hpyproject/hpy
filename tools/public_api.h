@@ -2,6 +2,7 @@
 typedef int HPy;
 typedef int HPyContext;
 typedef int HPyModuleDef;
+typedef int HPyType_Spec;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
 typedef int wchar_t;
@@ -69,6 +70,7 @@ int HPyErr_Occurred(HPyContext ctx);
 
 /* object.h */
 int HPyObject_IsTrue(HPyContext ctx, HPy h);
+HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec);
 
 HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);
 HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name);
@@ -86,6 +88,9 @@ HPy HPy_GetItem_s(HPyContext ctx, HPy obj, const char *key);
 int HPy_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value);
 int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
 int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
+
+void* _HPy_Cast(HPyContext ctx, HPy h);
+HPy HPy_New(HPyContext ctx, HPy h_type, void **data);
 
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);

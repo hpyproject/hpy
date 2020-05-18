@@ -60,6 +60,7 @@ struct _HPyContext_s {
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     int (*ctx_Err_Occurred)(HPyContext ctx);
     int (*ctx_Object_IsTrue)(HPyContext ctx, HPy h);
+    HPy (*ctx_Type_FromSpec)(HPyContext ctx, HPyType_Spec *spec);
     HPy (*ctx_GetAttr)(HPyContext ctx, HPy obj, HPy name);
     HPy (*ctx_GetAttr_s)(HPyContext ctx, HPy obj, const char *name);
     int (*ctx_HasAttr)(HPyContext ctx, HPy obj, HPy name);
@@ -72,6 +73,8 @@ struct _HPyContext_s {
     int (*ctx_SetItem)(HPyContext ctx, HPy obj, HPy key, HPy value);
     int (*ctx_SetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
     int (*ctx_SetItem_s)(HPyContext ctx, HPy obj, const char *key, HPy value);
+    void *(*ctx_Cast)(HPyContext ctx, HPy h);
+    HPy (*ctx_New)(HPyContext ctx, HPy h_type, void **data);
     int (*ctx_Bytes_Check)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_Size)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext ctx, HPy h);

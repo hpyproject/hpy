@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "api.h"
+#include "handles.h"
 
 typedef HPy (*InitFuncPtr)(HPyContext ctx);
 

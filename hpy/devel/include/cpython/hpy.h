@@ -134,7 +134,26 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
-// include runtime functions
-#include "../common/runtime.h"
+#include "../common/runtime/argparse.h"
+#include "../common/runtime/ctx_type.h"
+
+
+HPyAPI_FUNC(HPy)
+HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
+{
+    return ctx_Type_FromSpec(ctx, spec);
+}
+
+HPyAPI_FUNC(HPy)
+HPy_New(HPyContext ctx, HPy h, void **data)
+{
+    return ctx_New(ctx, h, data);
+}
+
+HPyAPI_FUNC(void*)
+_HPy_Cast(HPyContext ctx, HPy h)
+{
+    return ctx_Cast(ctx, h);
+}
 
 #endif /* !HPy_CPYTHON_H */

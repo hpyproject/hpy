@@ -21,7 +21,7 @@ class TestNumber(HPyTest):
                 {
                     return HPy_%s(ctx, arg);
                 }
-                @EXPORT f HPy_METH_O
+                @EXPORT(f, HPy_METH_O)
                 @INIT
             """ % (c_name,), name='number_'+c_name)
             assert mod.f(-5) == op(-5)
@@ -60,7 +60,7 @@ class TestNumber(HPyTest):
                         return HPy_NULL;
                     return HPy_%s(ctx, a, b);
                 }
-                @EXPORT f HPy_METH_VARARGS
+                @EXPORT(f, HPy_METH_VARARGS)
                 @INIT
             """ % (c_name,), name='number_'+c_name)
             assert mod.f(5, 4) == op(5, 4)
@@ -77,7 +77,7 @@ class TestNumber(HPyTest):
                     return HPy_NULL;
                 return HPy_Power(ctx, a, b, c);
             }
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """)
         assert mod.f(4, 5, None) == 4 ** 5
@@ -99,7 +99,7 @@ class TestNumber(HPyTest):
                     return HPy_NULL;
                 return HPy_MatrixMultiply(ctx, a, b);
             }
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """)
         assert mod.f(m1, m2) == m1.__matmul__(m2)
@@ -129,7 +129,7 @@ class TestNumber(HPyTest):
                         return HPy_NULL;
                     return HPy_InPlace%s(ctx, a, b);
                 }
-                @EXPORT f HPy_METH_VARARGS
+                @EXPORT(f, HPy_METH_VARARGS)
                 @INIT
             """ % (c_name,), name='number_'+c_name)
             class A:
@@ -149,7 +149,7 @@ class TestNumber(HPyTest):
                     return HPy_NULL;
                 return HPy_InPlacePower(ctx, a, b, c);
             }
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """)
         class A:
@@ -178,7 +178,7 @@ class TestNumber(HPyTest):
                     return HPy_NULL;
                 return HPy_InPlaceMatrixMultiply(ctx, a, b);
             }
-            @EXPORT f HPy_METH_VARARGS
+            @EXPORT(f, HPy_METH_VARARGS)
             @INIT
         """)
         assert mod.f(m1, m2) == m1.__imatmul__(m2)

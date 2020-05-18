@@ -32,6 +32,48 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
     return HPyLong_FromLong(ctx, a+b);
 }
 
+typedef struct {
+    double x;
+    double y;
+} HPy_Point;
+
+HPy_DEF_METH_VARARGS(Point_new)
+static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
+                            HPy_ssize_t nargs)
+{
+    // FIXME: we should use double, but HPyArg_Parse does not support "d" yet
+    long x, y;
+    if (!HPyArg_Parse(ctx, args, nargs, "ll", &x, &y))
+        return HPy_NULL;
+    HPy_Point *point;
+    HPy h_point = HPy_New(ctx, cls, &point);
+    if (HPy_IsNull(h_point))
+        return HPy_NULL;
+    point->x = x;
+    point->y = y;
+    return h_point;
+}
+
+HPy_DEF_METH_NOARGS(Point_repr)
+static HPy Point_repr_impl(HPyContext ctx, HPy self)
+{
+    HPy_Point *point = HPy_CAST(ctx, HPy_Point, self);
+    return HPyUnicode_FromString(ctx, "Point(?, ?)");
+    //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
+}
+
+static HPyType_Slot point_type_slots[] = {
+    {Py_tp_new, Point_new},
+    {Py_tp_repr, Point_repr},
+    {0, NULL},
+};
+
+static HPyType_Spec point_type_spec = {
+    .name = "pof.Point",
+    .basicsize = sizeof(HPy_Point),
+    .flags = HPy_TPFLAGS_DEFAULT,
+    .slots = point_type_slots,
+};
 
 static HPyMethodDef PofMethods[] = {
     {"do_nothing", do_nothing, HPy_METH_NOARGS, ""},
@@ -49,13 +91,16 @@ static HPyModuleDef moduledef = {
     .m_methods = PofMethods
 };
 
-
 HPy_MODINIT(pof)
 static HPy init_pof_impl(HPyContext ctx)
 {
-    HPy m;
+    HPy m, h_point_type;
     m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
+    h_point_type = HPyType_FromSpec(ctx, &point_type_spec);
+    if (HPy_IsNull(h_point_type))
+      return HPy_NULL;
+    HPy_SetAttr_s(ctx, m, "Point", h_point_type);
     return m;
 }
