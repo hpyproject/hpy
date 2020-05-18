@@ -134,6 +134,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
+#include "../common/macros.h"
 #include "../common/runtime/argparse.h"
 #include "../common/runtime/ctx_type.h"
 
@@ -145,7 +146,7 @@ HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec)
 }
 
 HPyAPI_FUNC(HPy)
-HPy_New(HPyContext ctx, HPy h, void **data)
+_HPy_New(HPyContext ctx, HPy h, void **data)
 {
     return ctx_New(ctx, h, data);
 }

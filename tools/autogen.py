@@ -266,12 +266,12 @@ SPECIAL_CASES = {
     'HPy_InPlaceAnd': 'PyNumber_InPlaceAnd',
     'HPy_InPlaceXor': 'PyNumber_InPlaceXor',
     'HPy_InPlaceOr': 'PyNumber_InPlaceOr',
-    'HPy_New': None,
+    '_HPy_New': None,
     'HPyType_FromSpec': None,
 }
 
 NO_TRAMPOLINES = set([
-    'HPy_New',
+    '_HPy_New',
     ])
 
 
