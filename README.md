@@ -97,7 +97,7 @@ Future](https://github.com/vstinner/talks/raw/master/2019-EuroPython/python_perf
 by Victor Stinner.
 
 
-What does `HPy` means?
+What does `HPy` mean?
 -----------------------
 
 The "H" in `HPy` stands for "handle": one of the key idea of the new API is to
