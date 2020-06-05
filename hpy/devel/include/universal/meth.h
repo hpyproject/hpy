@@ -6,12 +6,15 @@
    of the corresponding PyMethodDef.ml_flags
 */
 typedef enum {
-    HPyMeth_NOARGS = 0x0004,  // METH_NOARGS
-    HPyMeth_O      = 0x0008   // METH_O
+    HPyMeth_VARARGS  = 0x0001,  // METH_VARARGS
+    HPyMeth_KEYWORDS = 0x0003,  // METH_VARARGS | METH_KEYWORDS
+    HPyMeth_NOARGS   = 0x0004,  // METH_NOARGS
+    HPyMeth_O        = 0x0008   // METH_O
 } HPyMeth_Signature;
 
 typedef HPy (*HPyMeth_noargs)(HPyContext, HPy self);
 typedef HPy (*HPyMeth_o)(HPyContext ctx, HPy self, HPy arg);
+typedef HPy (*HPyMeth_varargs)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
 
 typedef struct {
     const char *name;             // The name of the built-in function/method
@@ -44,17 +47,31 @@ typedef struct {
             HPyMeth_O);                                                 \
     }
 
+#define _HPyMeth_TRAMPOLINE_HPyMeth_VARARGS(NAME, IMPL)                 \
+    static struct _object *                                             \
+    NAME(struct _object *self, struct _object *args)                    \
+    {                                                                   \
+        return _HPy_CallRealFunctionFromTrampoline(                     \
+            _ctx_for_trampolines, self, args, NULL, IMPL,               \
+            HPyMeth_VARARGS);                                           \
+    }
+
 
 /* macros to declare the prototype of "impl" depending on the signature. This
  * way, if we use the wrong signature, we get a nice compiler error.
  */
 
 #define _HPyMeth_DECLARE_IMPL(IMPL, SIG)     _HPyMeth_DECLARE_IMPL_##SIG(IMPL)
-#define _HPyMeth_DECLARE_IMPL_HPyMeth_NOARGS(IMPL) \
+
+#define _HPyMeth_DECLARE_IMPL_HPyMeth_NOARGS(IMPL)  \
     static HPy IMPL(HPyContext ctx, HPy self)
 
 #define _HPyMeth_DECLARE_IMPL_HPyMeth_O(IMPL) \
     static HPy IMPL(HPyContext ctx, HPy self, HPy arg)
+
+#define _HPyMeth_DECLARE_IMPL_HPyMeth_VARARGS(IMPL) \
+    static HPy IMPL(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
+
 
 /* Macro to define an HPyMeth:
  *     - declare the expected prototype for impl
@@ -75,37 +92,6 @@ typedef struct {
 
 
 /*
-#define HPy_DEF_METH_O(fnname)                                                 \
-    static HPy fnname##_impl(HPyContext ctx, HPy self, HPy arg);               \
-    static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *arg)             \
-    {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, arg, NULL, fnname##_impl, HPy_METH_O); \
-    }                                                                          \
-    void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
-    {                                                                          \
-        *out_func = fnname##_impl;                                             \
-        *out_trampoline = fnname##_trampoline;                                 \
-    }
-
-#define HPy_DEF_METH_VARARGS(fnname)                                           \
-    static HPy fnname##_impl(HPyContext ctx, HPy self, HPy *args,              \
-                             HPy_ssize_t nargs);                               \
-    static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *args)            \
-    {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, args, NULL, fnname##_impl,             \
-            HPy_METH_VARARGS);                                                 \
-    }                                                                          \
-    void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
-    {                                                                          \
-        *out_func = fnname##_impl;                                             \
-        *out_trampoline = fnname##_trampoline;                                 \
-    }
 
 #define HPy_DEF_METH_KEYWORDS(fnname)                                          \
     static HPy fnname##_impl(HPyContext ctx, HPy self,                         \
@@ -125,13 +111,6 @@ typedef struct {
         *out_trampoline = (_HPy_CPyCFunction) fnname##_trampoline;             \
     }
 
-// make sure to use a bit which is unused by CPython
-#define _HPy_METH 0x100000
-#define HPy_METH_VARARGS  (0x0001 | _HPy_METH)
-#define HPy_METH_KEYWORDS (0x0003 | _HPy_METH)
-// METH_NOARGS and METH_O must not be combined with the flags above.
-#define HPy_METH_NOARGS   (0x0004 | _HPy_METH)
-#define HPy_METH_O        (0x0008 | _HPy_METH)
 */
 
 #endif // HPY_UNIVERSAL_METH_H
