@@ -38,13 +38,13 @@ class TestType(HPyTest):
 
     def test_slots(self):
         mod = self.make_module("""
-            HPy_DEF_METH_NOARGS(Dummy_repr)
+            HPyMeth_DEFINE(Dummy_repr, "Dummy_repr", Dummy_repr_impl, HPyMeth_NOARGS)
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPy_DEF_METH_NOARGS(Dummy_abs)
+            HPyMeth_DEFINE(Dummy_abs, "Dummy_abs", Dummy_abs_impl, HPyMeth_NOARGS)
             static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -70,13 +70,13 @@ class TestType(HPyTest):
 
     def test_tp_methods(self):
         mod = self.make_module("""
-            HPy_DEF_METH_O(Dummy_foo)
+            HPyMeth_DEFINE(Dummy_foo, "Dummy_foo", Dummy_foo_impl, HPyMeth_O)
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Add(ctx, arg, arg);
             }
 
-            HPy_DEF_METH_NOARGS(Dummy_bar)
+            HPyMeth_DEFINE(Dummy_bar, "Dummy_bar", Dummy_bar_impl, HPyMeth_NOARGS)
             static HPy Dummy_bar_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -112,7 +112,7 @@ class TestType(HPyTest):
                 long y;
             } PointObject;
 
-            HPy_DEF_METH_KEYWORDS(Point_new)
+            HPyMeth_DEFINE(Point_new, "Point_new", Point_new_impl, HPyMeth_KEYWORDS)
             static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -125,7 +125,7 @@ class TestType(HPyTest):
                 return h_point;
             }
 
-            HPy_DEF_METH_NOARGS(Point_foo)
+            HPyMeth_DEFINE(Point_foo, "Point_foo", Point_foo_impl, HPyMeth_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
                 PointObject *point = HPy_CAST(ctx, PointObject, self);
