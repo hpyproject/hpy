@@ -1,12 +1,17 @@
 #ifndef HPY_UNIVERSAL_METH_H
 #define HPY_UNIVERSAL_METH_H
 
+/* the values of this enum are compatible with the corresponding CPython's
+   METH_*. In particular, the value of HPyMeth.signature is equal to the value
+   of the corresponding PyMethodDef.ml_flags
+*/
 typedef enum {
-      HPyMeth_NOARGS = 1,
+    HPyMeth_NOARGS = 0x0004,  // METH_NOARGS
+    HPyMeth_O      = 0x0008   // METH_O
 } HPyMeth_Signature;
 
-typedef HPy (*HPyMeth_noargs)(HPyContext, HPy);
-
+typedef HPy (*HPyMeth_noargs)(HPyContext, HPy self);
+typedef HPy (*HPyMeth_o)(HPyContext ctx, HPy self, HPy arg);
 
 typedef struct {
     const char *name;             // The name of the built-in function/method
@@ -28,7 +33,17 @@ typedef struct {
         return _HPy_CallRealFunctionFromTrampoline(                     \
             _ctx_for_trampolines, self, NULL, NULL, IMPL,               \
             HPyMeth_NOARGS);                                            \
-    }                                                                   \
+    }
+
+#define _HPyMeth_TRAMPOLINE_HPyMeth_O(NAME, IMPL)                       \
+    static struct _object *                                             \
+    NAME(struct _object *self, struct _object *arg)                     \
+    {                                                                   \
+        return _HPy_CallRealFunctionFromTrampoline(                     \
+            _ctx_for_trampolines, self, arg, NULL, IMPL,                \
+            HPyMeth_O);                                                 \
+    }
+
 
 /* macros to declare the prototype of "impl" depending on the signature. This
  * way, if we use the wrong signature, we get a nice compiler error.
@@ -37,6 +52,9 @@ typedef struct {
 #define _HPyMeth_DECLARE_IMPL(IMPL, SIG)     _HPyMeth_DECLARE_IMPL_##SIG(IMPL)
 #define _HPyMeth_DECLARE_IMPL_HPyMeth_NOARGS(IMPL) \
     static HPy IMPL(HPyContext ctx, HPy self)
+
+#define _HPyMeth_DECLARE_IMPL_HPyMeth_O(IMPL) \
+    static HPy IMPL(HPyContext ctx, HPy self, HPy arg)
 
 /* Macro to define an HPyMeth:
  *     - declare the expected prototype for impl

@@ -11,11 +11,11 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
         HPyMeth_noargs f = (HPyMeth_noargs)func;
         return _h2py(f(ctx, _py2h(self)));
     }
-    /*
-    case HPy_METH_O: {
-        HPyMeth_O f = (HPyMeth_O)func;
+    case HPyMeth_O: {
+        HPyMeth_o f = (HPyMeth_o)func;
         return _h2py(f(ctx, _py2h(self), _py2h(args)));
     }
+    /*
     case HPy_METH_VARARGS: {
         HPyMeth_VarArgs f = (HPyMeth_VarArgs)func;
         Py_ssize_t nargs = PyTuple_GET_SIZE(args);
