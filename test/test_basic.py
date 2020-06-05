@@ -26,7 +26,7 @@ class TestBasic(HPyTest):
 
     def test_noop_function(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, NOARGS)
+            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, ctx->h_None);

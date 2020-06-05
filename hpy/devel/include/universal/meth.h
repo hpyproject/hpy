@@ -21,7 +21,7 @@ typedef struct {
 
 #define HPyMeth_TRAMPOLINE(SYM, IMPL, SIG) _HPyMeth_TRAMPOLINE_##SIG(SYM, IMPL)
 
-#define _HPyMeth_TRAMPOLINE_NOARGS(NAME, IMPL)                          \
+#define _HPyMeth_TRAMPOLINE_HPyMeth_NOARGS(NAME, IMPL)                  \
     static struct _object *                                             \
     NAME(struct _object *self, struct _object *noargs)                  \
     {                                                                   \
@@ -35,7 +35,8 @@ typedef struct {
  */
 
 #define _HPyMeth_DECLARE_IMPL(IMPL, SIG)     _HPyMeth_DECLARE_IMPL_##SIG(IMPL)
-#define _HPyMeth_DECLARE_IMPL_NOARGS(IMPL)   static HPy IMPL(HPyContext ctx, HPy self)
+#define _HPyMeth_DECLARE_IMPL_HPyMeth_NOARGS(IMPL) \
+    static HPy IMPL(HPyContext ctx, HPy self)
 
 /* Macro to define an HPyMeth:
  *     - declare the expected prototype for impl
@@ -50,7 +51,7 @@ typedef struct {
         .name = NAME,                                                   \
         .impl = IMPL,                                                   \
         .cpython_trampoline = SYM##_trampoline,                         \
-        .signature = HPyMeth_##SIG                                      \
+        .signature = SIG                                                \
     };
 
 
