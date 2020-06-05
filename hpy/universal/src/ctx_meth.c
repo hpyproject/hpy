@@ -24,9 +24,8 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
         }
         return _h2py(f(ctx, _py2h(self), h_args, nargs));
     }
-    /*
-    case HPy_METH_KEYWORDS: {
-       HPyMeth_Keywords f = (HPyMeth_Keywords)func;
+    case HPyMeth_KEYWORDS: {
+       HPyMeth_keywords f = (HPyMeth_keywords)func;
        Py_ssize_t nargs = PyTuple_GET_SIZE(args);
        HPy *h_args = alloca(nargs * sizeof(HPy));
        for (Py_ssize_t i = 0; i < nargs; i++) {
@@ -34,7 +33,6 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
        }
        return _h2py(f(ctx, _py2h(self), h_args, nargs, _py2h(kw)));
     }
-    */
     default:
         abort();  // XXX
     }

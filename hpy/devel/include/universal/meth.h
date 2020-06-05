@@ -15,6 +15,10 @@ typedef enum {
 typedef HPy (*HPyMeth_noargs)(HPyContext, HPy self);
 typedef HPy (*HPyMeth_o)(HPyContext ctx, HPy self, HPy arg);
 typedef HPy (*HPyMeth_varargs)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
+typedef HPy (*HPyMeth_keywords)(HPyContext ctx, HPy self,
+                                HPy *args, HPy_ssize_t nargs, HPy kw);
+
+
 
 typedef struct {
     const char *name;             // The name of the built-in function/method
@@ -56,6 +60,15 @@ typedef struct {
             HPyMeth_VARARGS);                                           \
     }
 
+#define _HPyMeth_TRAMPOLINE_HPyMeth_KEYWORDS(NAME, IMPL)                \
+    static struct _object *                                             \
+    NAME(struct _object *self, struct _object *args, struct _object *kw)\
+    {                                                                   \
+        return _HPy_CallRealFunctionFromTrampoline(                     \
+            _ctx_for_trampolines, self, args, kw, IMPL,                 \
+            HPyMeth_KEYWORDS);                                          \
+    }
+
 
 /* macros to declare the prototype of "impl" depending on the signature. This
  * way, if we use the wrong signature, we get a nice compiler error.
@@ -71,6 +84,9 @@ typedef struct {
 
 #define _HPyMeth_DECLARE_IMPL_HPyMeth_VARARGS(IMPL) \
     static HPy IMPL(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
+
+#define _HPyMeth_DECLARE_IMPL_HPyMeth_KEYWORDS(IMPL) \
+    static HPy IMPL(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw);
 
 
 /* Macro to define an HPyMeth:
@@ -88,29 +104,5 @@ typedef struct {
         .cpython_trampoline = SYM##_trampoline,                         \
         .signature = SIG                                                \
     };
-
-
-
-/*
-
-#define HPy_DEF_METH_KEYWORDS(fnname)                                          \
-    static HPy fnname##_impl(HPyContext ctx, HPy self,                         \
-                             HPy *args, HPy_ssize_t nargs, HPy kw);            \
-    static struct _object *                                                    \
-    fnname##_trampoline(struct _object *self, struct _object *args,            \
-                        struct _object *kw)                                    \
-    {                                                                          \
-        return _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, self, args, kw, fnname##_impl,               \
-            HPy_METH_KEYWORDS);                                                \
-    }                                                                          \
-    void                                                                       \
-    fnname(void **out_func, _HPy_CPyCFunction *out_trampoline)                 \
-    {                                                                          \
-        *out_func = fnname##_impl;                                             \
-        *out_trampoline = (_HPy_CPyCFunction) fnname##_trampoline;             \
-    }
-
-*/
 
 #endif // HPY_UNIVERSAL_METH_H
