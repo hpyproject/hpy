@@ -12,17 +12,15 @@ def reindent(s, indent):
 class ExtensionTemplate(object):
 
     INIT_TEMPLATE = textwrap.dedent("""
-    static HPyMethodDef MyTestMethods[] = {
-        %(methods)s
-        {NULL, NULL, 0, NULL}
-    };
-
     static HPyModuleDef moduledef = {
         HPyModuleDef_HEAD_INIT,
         .m_name = "%(name)s",
         .m_doc = "some test for hpy",
         .m_size = -1,
-        .m_methods = MyTestMethods
+        .methods = {
+            %(methods)s
+            NULL
+        }
     };
 
     HPy_MODINIT(%(name)s)
@@ -81,15 +79,8 @@ class ExtensionTemplate(object):
         self.method_table = None
         self.type_table = None
 
-    def EXPORT(self, ml_name, ml_flags):
-        if not ml_flags.startswith('HPy_'):
-            # this is a legacy function: add a cast to (HPyMeth) to
-            # silence warnings
-            cast = '(HPyMeth)'
-        else:
-            cast = ''
-        self.method_table.append('{"%s", %s%s, %s, NULL},' % (
-                ml_name, cast, ml_name, ml_flags))
+    def EXPORT(self, meth):
+        self.method_table.append('&%s,' % meth)
 
     def EXPORT_TYPE(self, name, spec):
         i = len(self.type_table)

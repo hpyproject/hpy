@@ -1,24 +1,17 @@
 #include "ctx_meth.h"
 #include "handles.h"
 
-/* should these typedefs officialized as part of the official API? */
-typedef HPy (*HPyMeth_NoArgs)(HPyContext, HPy self);
-typedef HPy (*HPyMeth_O)(HPyContext, HPy self, HPy arg);
-typedef HPy (*HPyMeth_VarArgs)(HPyContext, HPy self, HPy *args, HPy_ssize_t);
-typedef HPy (*HPyMeth_Keywords)(HPyContext, HPy self, HPy *args, HPy_ssize_t,
-                                HPy kw);
-
 HPyAPI_STORAGE struct _object *
 ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
                                    struct _object *args, struct _object *kw,
-                                   void *func, int ml_flags)
+                                   void *func, HPyMeth_Signature sig)
 {
-    switch (ml_flags)
-    {
-    case HPy_METH_NOARGS: {
-        HPyMeth_NoArgs f = (HPyMeth_NoArgs)func;
+    switch (sig) {
+    case HPyMeth_NOARGS: {
+        HPyMeth_noargs f = (HPyMeth_noargs)func;
         return _h2py(f(ctx, _py2h(self)));
     }
+    /*
     case HPy_METH_O: {
         HPyMeth_O f = (HPyMeth_O)func;
         return _h2py(f(ctx, _py2h(self), _py2h(args)));
@@ -41,6 +34,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
        }
        return _h2py(f(ctx, _py2h(self), h_args, nargs, _py2h(kw)));
     }
+    */
     default:
         abort();  // XXX
     }

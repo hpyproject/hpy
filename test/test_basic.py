@@ -26,12 +26,13 @@ class TestBasic(HPyTest):
 
     def test_noop_function(self):
         mod = self.make_module("""
-            HPy_DEF_METH_NOARGS(f)
+            HPyMeth_DEFINE(f, "f", f_impl, NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT(f, HPy_METH_NOARGS)
+
+            @EXPORT(f)
             @INIT
         """)
         assert mod.f() is None

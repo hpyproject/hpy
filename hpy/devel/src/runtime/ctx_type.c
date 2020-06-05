@@ -35,35 +35,10 @@ typedef struct {
 #define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
 
 
-static void methoddef_copy_ml_meth_and_flags(HPyMethodDef *src, PyMethodDef *dst)
-{
-#ifdef HPY_UNIVERSAL_ABI
-    // Universal ABI mode: ml_meth could be either a legacy function or a
-    // new-style HPy method
-    if (src->ml_flags & _HPy_METH) {
-        // HPy function: cal ml_meth to get pointers to the impl_func and
-        // the cpy trampoline
-        void *impl_func;
-        PyCFunction trampoline_func;
-        src->ml_meth(&impl_func, &trampoline_func);
-        dst->ml_meth = (PyCFunction)trampoline_func;
-        dst->ml_flags = src->ml_flags & ~_HPy_METH;
-    }
-    else {
-        // legacy function: ml_meth already contains a function pointer
-        // with the correct CPython signature
-        dst->ml_meth = (PyCFunction)src->ml_meth;
-        dst->ml_flags = src->ml_flags;
-    }
-#else
-    // CPython ABI mode: ml_meth is already a PyCFunction function pointer
-    dst->ml_meth = src->ml_meth;
-    dst->ml_flags = src->ml_flags;
-#endif
-}
-
 static void slot_copy_pfunc(HPyType_Slot *src, PyType_Slot *dst)
 {
+    abort(); // fixme
+    /*
 #ifdef HPY_UNIVERSAL_ABI
     // Universal ABI mode: for now we assume that it uses the HPy calling
     // convention, but we need a way to allow slots with the CPython
@@ -77,6 +52,7 @@ static void slot_copy_pfunc(HPyType_Slot *src, PyType_Slot *dst)
     // CPython ABI mode
     dst->pfunc = src->pfunc;
 #endif
+    */
 }
 
 
@@ -91,7 +67,7 @@ ctx_Cast(HPyContext ctx, HPy h)
 // note: this function is also called from ctx_module.c.
 // This malloc a result which will never be freed. Too bad
 _HPy_HIDDEN PyMethodDef *
-create_method_defs(HPyMethodDef *hpymethods)
+create_method_defs(HPyMeth *hpymethods[])
 {
     // count the methods
     Py_ssize_t count;
@@ -100,7 +76,7 @@ create_method_defs(HPyMethodDef *hpymethods)
     }
     else {
         count = 0;
-        while (hpymethods[count].ml_name != NULL)
+        while (hpymethods[count] != NULL)
             count++;
     }
 
@@ -111,11 +87,12 @@ create_method_defs(HPyMethodDef *hpymethods)
         return NULL;
     }
     for(int i=0; i<count; i++) {
-        HPyMethodDef *src = &hpymethods[i];
+        HPyMeth *src = hpymethods[i];
         PyMethodDef *dst = &result[i];
-        dst->ml_name = src->ml_name;
-        dst->ml_doc = src->ml_doc;
-        methoddef_copy_ml_meth_and_flags(src, dst);
+        dst->ml_name = src->name;
+        dst->ml_doc = src->doc;
+        dst->ml_meth = (PyCFunction)src->cpython_trampoline;
+        dst->ml_flags = src->signature;
     }
     result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
@@ -144,6 +121,8 @@ create_slot_defs(HPyType_Spec *hpyspec)
         PyType_Slot *dst = &result[i];
         dst->slot = src->slot;
         if (src->slot == Py_tp_methods) {
+            abort(); // fixme
+            /*
             // src->pfunc contains a HPyMethodDef*, which we convert to the
             // CPython's equivalent. The result of create_method_defs can't be
             // freed because CPython stores an internal reference to it, so
@@ -154,6 +133,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
                 PyMem_Free(result);
                 return NULL;
             }
+            */
         }
         else {
             slot_copy_pfunc(&hpyspec->slots[i], dst);

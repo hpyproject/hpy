@@ -91,5 +91,5 @@ struct _HPyContext_s {
     HPy (*ctx_Dict_GetItem)(HPyContext ctx, HPy h_dict, HPy h_key);
     HPy (*ctx_FromPyObject)(HPyContext ctx, struct _object *obj);
     struct _object *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
-    struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, int ml_flags);
+    struct _object *(*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, HPyMeth_Signature sig);
 };

@@ -308,7 +308,7 @@ static inline struct _object *HPy_AsPyObject(HPyContext ctx, HPy h) {
      return ctx->ctx_AsPyObject ( ctx, h ); 
 }
 
-static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, int ml_flags) {
-     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, kw, func, ml_flags ); 
+static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, HPyMeth_Signature sig) {
+     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, kw, func, sig ); 
 }
 

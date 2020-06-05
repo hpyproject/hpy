@@ -6,6 +6,7 @@ typedef int HPyType_Spec;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
 typedef int wchar_t;
+typedef int HPyMeth_Signature;
 
 
 /* HPy public API */
@@ -128,4 +129,4 @@ struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
                                                     struct _object *args,
                                                     struct _object *kw,
                                                     void *func,
-                                                    int ml_flags);
+                                                    HPyMeth_Signature sig);
