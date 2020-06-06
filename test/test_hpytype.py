@@ -70,26 +70,26 @@ class TestType(HPyTest):
 
     def test_tp_methods(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(Dummy_foo, "Dummy_foo", Dummy_foo_impl, HPyMeth_O)
+            HPyMeth_DEFINE(Dummy_foo, "foo", Dummy_foo_impl, HPyMeth_O)
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Add(ctx, arg, arg);
             }
 
-            HPyMeth_DEFINE(Dummy_bar, "Dummy_bar", Dummy_bar_impl, HPyMeth_NOARGS)
+            HPyMeth_DEFINE(Dummy_bar, "bar", Dummy_bar_impl, HPyMeth_NOARGS)
             static HPy Dummy_bar_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            static HPyMethodDef Dummy_methods[] = {
-                {"foo", Dummy_foo, HPy_METH_O},
-                {"bar", Dummy_bar, HPy_METH_NOARGS},
-                {NULL}
+            static HPyMeth *Dummy_methods[] = {
+                &Dummy_foo,
+                &Dummy_bar,
+                NULL
             };
 
             static HPyType_Slot dummy_type_slots[] = {
-                {Py_tp_methods, Dummy_methods},
+                {HPy_tp_methods, Dummy_methods},
                 {0, NULL},
             };
 

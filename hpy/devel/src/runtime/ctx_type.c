@@ -35,27 +35,6 @@ typedef struct {
 #define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
 
 
-static void slot_copy_pfunc(HPyType_Slot *src, PyType_Slot *dst)
-{
-    abort(); // fixme
-    /*
-#ifdef HPY_UNIVERSAL_ABI
-    // Universal ABI mode: for now we assume that it uses the HPy calling
-    // convention, but we need a way to allow slots with the CPython
-    // signature, similar to what we do in methoddef_copy_ml_meth_and_flags
-    HPyMeth f = (HPyMeth)src->pfunc;
-    void *impl_func;
-    _HPy_CPyCFunction trampoline_func;
-    f(&impl_func, &trampoline_func);
-    dst->pfunc = trampoline_func;
-#else
-    // CPython ABI mode
-    dst->pfunc = src->pfunc;
-#endif
-    */
-}
-
-
 _HPy_HIDDEN void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
@@ -132,31 +111,25 @@ create_slot_defs(HPyType_Spec *hpyspec)
     for(int i=0; i<count; i++) {
         HPyType_Slot *src = &hpyspec->slots[i];
         PyType_Slot *dst = &result[i];
-        if (src->slot & HPy_SLOT) {
+        if (src->slot == HPy_tp_methods) {
+            HPyMeth **hpymethods = (HPyMeth**)src->pfunc;
+            dst->slot = Py_tp_methods;
+            dst->pfunc = create_method_defs(hpymethods, NULL);
+            if (dst->pfunc == NULL) {
+                PyMem_Free(result);
+                return NULL;
+            }
+        }
+        else if (src->slot == Py_tp_methods) {
+            abort(); // implement me
+        }
+        else if (src->slot & HPy_SLOT) {
             dst->slot = src->slot & ~HPy_SLOT;
             dst->pfunc = ((HPySlot*)src->pfunc)->cpy_trampoline;
         }
         else {
             // legacy slot
             abort(); // implement me
-        }
-        if (src->slot == Py_tp_methods) {
-            abort(); // fixme
-            /*
-            // src->pfunc contains a HPyMethodDef*, which we convert to the
-            // CPython's equivalent. The result of create_method_defs can't be
-            // freed because CPython stores an internal reference to it, so
-            // this creates a small leak :(
-            HPyMethodDef *hpymethods = (HPyMethodDef*)src->pfunc;
-            dst->pfunc = create_method_defs(hpymethods);
-            if (dst->pfunc == NULL) {
-                PyMem_Free(result);
-                return NULL;
-            }
-            */
-        }
-        else {
-            slot_copy_pfunc(&hpyspec->slots[i], dst);
         }
     }
     result[count] = (PyType_Slot){0, NULL};
