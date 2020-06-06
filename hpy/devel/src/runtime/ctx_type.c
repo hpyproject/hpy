@@ -91,7 +91,7 @@ create_method_defs(HPyMeth *hpymethods[])
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->name;
         dst->ml_doc = src->doc;
-        dst->ml_meth = (PyCFunction)src->cpython_trampoline;
+        dst->ml_meth = src->cpy_trampoline;
         dst->ml_flags = src->signature;
     }
     result[count] = (PyMethodDef){NULL, NULL, 0, NULL};

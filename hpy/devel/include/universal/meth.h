@@ -19,13 +19,12 @@ typedef HPy (*HPyMeth_keywords)(HPyContext ctx, HPy self,
                                 HPy *args, HPy_ssize_t nargs, HPy kw);
 
 
-
 typedef struct {
-    const char *name;             // The name of the built-in function/method
-    void *impl;                   // function pointer to the implementation
-    void *cpython_trampoline;     // CPython-only trampoline which calls impl()
-    HPyMeth_Signature signature;  // Specify the signature/calling convention of impl
-    const char *doc;              // The __doc__ attribute, or NULL
+    const char *name;               // The name of the built-in function/method
+    void *impl;                     // function pointer to the implementation
+    cpy_PyCFunction cpy_trampoline; // used by CPython to call impl
+    HPyMeth_Signature signature;    // Indicates impl's expected the signature
+    const char *doc;                // The __doc__ attribute, or NULL
 } HPyMeth;
 
 
@@ -101,7 +100,7 @@ typedef struct {
     HPyMeth SYM = {                                                     \
         .name = NAME,                                                   \
         .impl = IMPL,                                                   \
-        .cpython_trampoline = SYM##_trampoline,                         \
+        .cpy_trampoline = (cpy_PyCFunction)SYM##_trampoline,            \
         .signature = SIG                                                \
     };
 
