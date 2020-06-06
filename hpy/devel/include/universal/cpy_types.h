@@ -8,6 +8,7 @@
 
 typedef struct _object cpy_PyObject;
 typedef cpy_PyObject *(*cpy_PyCFunction)(cpy_PyObject *, cpy_PyObject *);
+typedef struct PyMethodDef cpy_PyMethodDef;
 
 
 #endif /* HPY_UNIVERSAL_CPY_TYPES_H */

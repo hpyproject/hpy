@@ -11,6 +11,7 @@ typedef struct {
     const char* m_name;
     const char* m_doc;
     HPy_ssize_t m_size;
+    cpy_PyMethodDef *legacy_methods;
     HPyMeth *methods[];
 } HPyModuleDef;
 

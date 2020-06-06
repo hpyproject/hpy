@@ -17,6 +17,7 @@ class ExtensionTemplate(object):
         .m_name = "%(name)s",
         .m_doc = "some test for hpy",
         .m_size = -1,
+        .legacy_methods = %(legacy_methods)s,
         .methods = {
             %(methods)s
             NULL
@@ -41,6 +42,7 @@ class ExtensionTemplate(object):
         self.src = src
         self.name = name
         self.method_table = None
+        self.legacy_methods = 'NULL'
         self.type_table = None
 
     def expand(self):
@@ -71,6 +73,7 @@ class ExtensionTemplate(object):
 
     def INIT(self):
         exp = self.INIT_TEMPLATE % {
+            'legacy_methods': self.legacy_methods,
             'methods': '\n    '.join(self.method_table),
             'init_types': '\n'.join(self.type_table),
             'name': self.name}
@@ -81,6 +84,9 @@ class ExtensionTemplate(object):
 
     def EXPORT(self, meth):
         self.method_table.append('&%s,' % meth)
+
+    def EXPORT_LEGACY(self, pymethoddef):
+        self.legacy_methods = pymethoddef
 
     def EXPORT_TYPE(self, name, spec):
         i = len(self.type_table)

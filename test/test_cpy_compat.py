@@ -158,7 +158,7 @@ class TestCPythonCompatibility(HPyTest):
         """)
         assert mod.f() == 0
 
-    def test_meth_cpy_noargs(self):
+    def test_legacy_methods(self):
         mod = self.make_module("""
             #include <Python.h>
 
@@ -166,46 +166,19 @@ class TestCPythonCompatibility(HPyTest):
             {
                 return PyLong_FromLong(1234);
             }
-            @EXPORT(f)
-            @INIT
-        """)
-        assert mod.f() == 1234
-
-    def test_meth_cpy_o(self):
-        mod = self.make_module("""
-            #include <Python.h>
-
-            static PyObject *f(PyObject *self, PyObject *arg)
+            static PyObject *g(PyObject *self, PyObject *arg)
             {
                 long x = PyLong_AsLong(arg);
                 return PyLong_FromLong(x * 2);
             }
-            @EXPORT(f)
-            @INIT
-        """)
-        assert mod.f(45) == 90
-
-    def test_meth_cpy_varargs(self):
-        mod = self.make_module("""
-            #include <Python.h>
-
-            static PyObject *f(PyObject *self, PyObject *args)
+            static PyObject *h(PyObject *self, PyObject *args)
             {
                 long a, b, c;
                 if (!PyArg_ParseTuple(args, "lll", &a, &b, &c))
                     return NULL;
                 return PyLong_FromLong(100*a + 10*b + c);
             }
-            @EXPORT(f)
-            @INIT
-        """)
-        assert mod.f(4, 5, 6) == 456
-
-    def test_meth_cpy_keywords(self):
-        mod = self.make_module("""
-            #include <Python.h>
-
-            static PyObject *f(PyObject *self, PyObject *args, PyObject *kwargs)
+            static PyObject *k(PyObject *self, PyObject *args, PyObject *kwargs)
             {
                 static char *kwlist[] = { "a", "b", "c", NULL };
                 long a, b, c;
@@ -213,7 +186,19 @@ class TestCPythonCompatibility(HPyTest):
                     return NULL;
                 return PyLong_FromLong(100*a + 10*b + c);
             }
-            @EXPORT(f)
+
+            static PyMethodDef my_legacy_methods[] = {
+                {"f", (PyCFunction)f, METH_NOARGS},
+                {"g", (PyCFunction)g, METH_O},
+                {"h", (PyCFunction)h, METH_VARARGS},
+                {"k", (PyCFunction)k, METH_VARARGS | METH_KEYWORDS},
+                {NULL}
+            };
+
+            @EXPORT_LEGACY(my_legacy_methods)
             @INIT
         """)
-        assert mod.f(c=6, b=5, a=4) == 456
+        assert mod.f() == 1234
+        assert mod.g(45) == 90
+        assert mod.h(4, 5, 6) == 456
+        assert mod.k(c=6, b=5, a=4) == 456

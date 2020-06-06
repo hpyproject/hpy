@@ -67,34 +67,47 @@ ctx_Cast(HPyContext ctx, HPy h)
 // note: this function is also called from ctx_module.c.
 // This malloc a result which will never be freed. Too bad
 _HPy_HIDDEN PyMethodDef *
-create_method_defs(HPyMeth *hpymethods[])
+create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
 {
     // count the methods
-    Py_ssize_t count;
-    if (hpymethods == NULL) {
-        count = 0;
+    Py_ssize_t hpy_count = 0;
+    Py_ssize_t legacy_count = 0;
+    Py_ssize_t total_count = 0;
+    if (hpymethods != NULL) {
+        while (hpymethods[hpy_count] != NULL)
+            hpy_count++;
     }
-    else {
-        count = 0;
-        while (hpymethods[count] != NULL)
-            count++;
+    if (legacy_methods != NULL) {
+        while (legacy_methods[legacy_count].ml_name != NULL)
+            legacy_count++;
     }
+    total_count = hpy_count + legacy_count;
 
     // allocate&fill the result
-    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (count+1));
+    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (total_count+1));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    for(int i=0; i<count; i++) {
+    // copy the HPy methods
+    for(int i=0; i<hpy_count; i++) {
         HPyMeth *src = hpymethods[i];
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->name;
-        dst->ml_doc = src->doc;
         dst->ml_meth = src->cpy_trampoline;
         dst->ml_flags = src->signature;
+        dst->ml_doc = src->doc;
     }
-    result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
+    // copy the legacy methods
+    for(int i=0; i<legacy_count; i++) {
+        PyMethodDef *src = &legacy_methods[i];
+        PyMethodDef *dst = &result[hpy_count + i];
+        dst->ml_name = src->ml_name;
+        dst->ml_meth = src->ml_meth;
+        dst->ml_flags = src->ml_flags;
+        dst->ml_doc = src->ml_doc;
+    }
+    result[total_count] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
 }
 
