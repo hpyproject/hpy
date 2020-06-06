@@ -132,7 +132,14 @@ create_slot_defs(HPyType_Spec *hpyspec)
     for(int i=0; i<count; i++) {
         HPyType_Slot *src = &hpyspec->slots[i];
         PyType_Slot *dst = &result[i];
-        dst->slot = src->slot;
+        if (src->slot & HPy_SLOT) {
+            dst->slot = src->slot & ~HPy_SLOT;
+            dst->pfunc = ((HPySlot*)src->pfunc)->cpy_trampoline;
+        }
+        else {
+            // legacy slot
+            abort(); // implement me
+        }
         if (src->slot == Py_tp_methods) {
             abort(); // fixme
             /*

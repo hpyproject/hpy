@@ -21,7 +21,7 @@ setup(
                   ],
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
-                      #'-g', 'O0'
+                      #'-g', '-O0'
                   ],
         )]
 

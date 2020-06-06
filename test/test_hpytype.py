@@ -38,21 +38,21 @@ class TestType(HPyTest):
 
     def test_slots(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(Dummy_repr, "Dummy_repr", Dummy_repr_impl, HPyMeth_NOARGS)
+            HPySlot_DEFINE(Dummy_repr, Dummy_repr_impl, HPySlot_unary)
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPyMeth_DEFINE(Dummy_abs, "Dummy_abs", Dummy_abs_impl, HPyMeth_NOARGS)
+            HPySlot_DEFINE(Dummy_abs, Dummy_abs_impl, HPySlot_unary)
             static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
             }
 
             static HPyType_Slot Dummy_slots[] = {
-                {Py_tp_repr, Dummy_repr},
-                {Py_nb_absolute, Dummy_abs},
+                {HPy_tp_repr, &Dummy_repr},
+                {HPy_nb_absolute, &Dummy_abs},
                 {0, NULL},
             };
 
