@@ -1,7 +1,7 @@
 #include "hpy.h"
 #include "api.h"
 
-HPyAPI_STORAGE struct _object *
-ctx_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self,
-                                   struct _object *args, struct _object *kw,
+HPyAPI_STORAGE cpy_PyObject *
+ctx_CallRealFunctionFromTrampoline(HPyContext ctx, cpy_PyObject *self,
+                                   cpy_PyObject *args, cpy_PyObject *kw,
                                    void *func, HPyMeth_Signature sig);

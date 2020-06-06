@@ -34,8 +34,8 @@ typedef struct {
 #define HPyMeth_TRAMPOLINE(SYM, IMPL, SIG) _HPyMeth_TRAMPOLINE_##SIG(SYM, IMPL)
 
 #define _HPyMeth_TRAMPOLINE_HPyMeth_NOARGS(NAME, IMPL)                  \
-    static struct _object *                                             \
-    NAME(struct _object *self, struct _object *noargs)                  \
+    static cpy_PyObject *                                               \
+    NAME(cpy_PyObject *self, cpy_PyObject *noargs)                      \
     {                                                                   \
         return _HPy_CallRealFunctionFromTrampoline(                     \
             _ctx_for_trampolines, self, NULL, NULL, IMPL,               \
@@ -43,8 +43,8 @@ typedef struct {
     }
 
 #define _HPyMeth_TRAMPOLINE_HPyMeth_O(NAME, IMPL)                       \
-    static struct _object *                                             \
-    NAME(struct _object *self, struct _object *arg)                     \
+    static cpy_PyObject *                                               \
+    NAME(cpy_PyObject *self, cpy_PyObject *arg)                         \
     {                                                                   \
         return _HPy_CallRealFunctionFromTrampoline(                     \
             _ctx_for_trampolines, self, arg, NULL, IMPL,                \
@@ -52,8 +52,8 @@ typedef struct {
     }
 
 #define _HPyMeth_TRAMPOLINE_HPyMeth_VARARGS(NAME, IMPL)                 \
-    static struct _object *                                             \
-    NAME(struct _object *self, struct _object *args)                    \
+    static cpy_PyObject *                                               \
+    NAME(cpy_PyObject *self, cpy_PyObject *args)                        \
     {                                                                   \
         return _HPy_CallRealFunctionFromTrampoline(                     \
             _ctx_for_trampolines, self, args, NULL, IMPL,               \
@@ -61,8 +61,8 @@ typedef struct {
     }
 
 #define _HPyMeth_TRAMPOLINE_HPyMeth_KEYWORDS(NAME, IMPL)                \
-    static struct _object *                                             \
-    NAME(struct _object *self, struct _object *args, struct _object *kw)\
+    static cpy_PyObject *                                               \
+    NAME(cpy_PyObject *self, cpy_PyObject *args, cpy_PyObject *kw)      \
     {                                                                   \
         return _HPy_CallRealFunctionFromTrampoline(                     \
             _ctx_for_trampolines, self, args, kw, IMPL,                 \
