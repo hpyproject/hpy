@@ -112,7 +112,7 @@ class TestType(HPyTest):
                 long y;
             } PointObject;
 
-            HPyMeth_DEFINE(Point_new, "Point_new", Point_new_impl, HPyMeth_KEYWORDS)
+            HPySlot_DEFINE(Point_new, Point_new_impl, HPySlot_new)
             static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -125,21 +125,21 @@ class TestType(HPyTest):
                 return h_point;
             }
 
-            HPyMeth_DEFINE(Point_foo, "Point_foo", Point_foo_impl, HPyMeth_NOARGS)
+            HPyMeth_DEFINE(Point_foo, "foo", Point_foo_impl, HPyMeth_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
                 PointObject *point = HPy_CAST(ctx, PointObject, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            static HPyMethodDef Point_methods[] = {
-                {"foo", Point_foo, HPy_METH_NOARGS},
-                {NULL},
+            static HPyMeth *Point_methods[] = {
+                &Point_foo,
+                NULL,
             };
 
             static HPyType_Slot Point_slots[] = {
-                {Py_tp_new, Point_new},
-                {Py_tp_methods, Point_methods},
+                {HPy_tp_new, &Point_new},
+                {HPy_tp_methods, Point_methods},
                 {0, NULL},
             };
 
