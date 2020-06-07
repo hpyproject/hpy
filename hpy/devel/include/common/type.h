@@ -3,19 +3,14 @@
 
 #include <stdbool.h>
 
-typedef struct{
-    int slot;    /* slot id, see below */
-    void *pfunc; /* function pointer */
-} HPyType_Slot;
-
-
 typedef struct {
     const char* name;
     bool has_pyobject_head;
     int basicsize;
     int itemsize;
     unsigned int flags;
-    HPyType_Slot *slots; /* terminated by slot==0. */
+    void *legacy_slots; // PyType_Slot *
+    HPyMeth *methods[];
 } HPyType_Spec;
 
 /* All types are dynamically allocated */

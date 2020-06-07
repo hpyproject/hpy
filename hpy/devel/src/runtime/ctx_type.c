@@ -55,8 +55,15 @@ sig2flags(HPyMeth_Signature sig)
     }
 }
 
-// note: this function is also called from ctx_module.c.
-// This malloc a result which will never be freed. Too bad
+/*
+ * Create a PyMethodDef which contains:
+ *     1. All the hpyspec->methods whose .slot == HPy_meth
+ *     2. All the PyMethodDef contained inside legacy_methods
+ *
+ * Notes:
+ *     - This function is also called from ctx_module.c.
+ *     - This malloc()s a result which will never be freed. Too bad
+ */
 _HPy_HIDDEN PyMethodDef *
 create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
 {
@@ -65,8 +72,9 @@ create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
     Py_ssize_t legacy_count = 0;
     Py_ssize_t total_count = 0;
     if (hpymethods != NULL) {
-        while (hpymethods[hpy_count] != NULL)
-            hpy_count++;
+        for(int i=0; hpymethods[i] != NULL; i++)
+            if (hpymethods[i]->slot == HPy_meth)
+                hpy_count++;
     }
     if (legacy_methods != NULL) {
         while (legacy_methods[legacy_count].ml_name != NULL)
@@ -81,9 +89,12 @@ create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
         return NULL;
     }
     // copy the HPy methods
-    for(int i=0; i<hpy_count; i++) {
+    int dst_idx = 0;
+    for(int i=0; hpymethods[i] != NULL; i++) {
         HPyMeth *src = hpymethods[i];
-        PyMethodDef *dst = &result[i];
+        if (src->slot != HPy_meth)
+            continue;
+        PyMethodDef *dst = &result[dst_idx++];
         dst->ml_name = src->name;
         dst->ml_meth = src->cpy_trampoline;
         dst->ml_flags = sig2flags(src->signature);
@@ -97,37 +108,53 @@ create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
     // copy the legacy methods
     for(int i=0; i<legacy_count; i++) {
         PyMethodDef *src = &legacy_methods[i];
-        PyMethodDef *dst = &result[hpy_count + i];
+        PyMethodDef *dst = &result[dst_idx++];
         dst->ml_name = src->ml_name;
         dst->ml_meth = src->ml_meth;
         dst->ml_flags = src->ml_flags;
         dst->ml_doc = src->ml_doc;
     }
-    result[total_count] = (PyMethodDef){NULL, NULL, 0, NULL};
+    result[dst_idx++] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
 }
 
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
-    // count the slots
-    Py_ssize_t count;
-    if (hpyspec->slots == NULL) {
-        count = 0;
+    // count the slots != HPy_meth
+    Py_ssize_t slots_count;
+    if (hpyspec->methods == NULL) {
+        slots_count = 0;
     }
     else {
-        count = 0;
-        while (hpyspec->slots[count].slot != 0)
-            count++;
+        slots_count = 0;
+        for(int i=0; hpyspec->methods[i] != NULL; i++)
+            if (hpyspec->methods[i]->slot != HPy_meth)
+                slots_count++;
     }
+    // add a slot to hold Py_tp_methods
+    slots_count++;
 
     // allocate&fill the result
-    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (count+1));
+    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (slots_count+1));
     if (result == NULL)
         return NULL;
-    for(int i=0; i<count; i++) {
-        HPyType_Slot *src = &hpyspec->slots[i];
-        PyType_Slot *dst = &result[i];
+
+    int dst_idx = 0;
+    for(int i=0; hpyspec->methods[i] != NULL; i++) {
+        HPyMeth *src = hpyspec->methods[i];
+        if (src->slot == HPy_meth)
+            continue;
+        PyType_Slot *dst = &result[dst_idx++];
+        if (!(src->slot & HPy_SLOT)) {
+            PyErr_SetString(PyExc_ValueError, "Invalid slot value: did you use HPy_*?");
+            return NULL;
+        }
+        dst->slot = src->slot & ~HPy_SLOT;
+        dst->pfunc = src->cpy_trampoline;
+    }
+
+    /*
         if (src->slot == HPy_tp_methods) {
             HPyMeth **hpymethods = (HPyMeth**)src->pfunc;
             dst->slot = Py_tp_methods;
@@ -140,16 +167,9 @@ create_slot_defs(HPyType_Spec *hpyspec)
         else if (src->slot == Py_tp_methods) {
             abort(); // implement me
         }
-        else if (src->slot & HPy_SLOT) {
-            dst->slot = src->slot & ~HPy_SLOT;
-            dst->pfunc = ((HPySlot*)src->pfunc)->cpy_trampoline;
-        }
-        else {
-            // legacy slot
-            abort(); // implement me
-        }
-    }
-    result[count] = (PyType_Slot){0, NULL};
+    */
+
+    result[dst_idx++] = (PyType_Slot){0, NULL};
     return result;
 }
 
@@ -169,6 +189,8 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
     spec->basicsize = hpyspec->basicsize + PyObject_HEAD_SIZE;
     spec->itemsize = hpyspec->itemsize;
     spec->flags = hpyspec->flags;
+    if (hpyspec->legacy_slots != NULL)
+        abort(); // FIXME
     spec->slots = create_slot_defs(hpyspec);
     if (spec->slots == NULL) {
         PyMem_Free(spec);

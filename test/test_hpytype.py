@@ -13,15 +13,10 @@ class TestType(HPyTest):
 
     def test_simple_type(self):
         mod = self.make_module("""
-            static HPyType_Slot Dummy_slots[] = {
-                {0, NULL},
-            };
-
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
-                .slots = Dummy_slots,
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -38,27 +33,25 @@ class TestType(HPyTest):
 
     def test_slots(self):
         mod = self.make_module("""
-            HPySlot_DEFINE(Dummy_repr, Dummy_repr_impl, HPySlot_unary)
+            HPyMeth_SLOT(Dummy_repr, HPy_tp_repr, Dummy_repr_impl, HPyMeth_NOARGS)
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPySlot_DEFINE(Dummy_abs, Dummy_abs_impl, HPySlot_unary)
+            HPyMeth_SLOT(Dummy_abs, HPy_nb_absolute, Dummy_abs_impl, HPyMeth_NOARGS)
             static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            static HPyType_Slot Dummy_slots[] = {
-                {HPy_tp_repr, &Dummy_repr},
-                {HPy_nb_absolute, &Dummy_abs},
-                {0, NULL},
-            };
-
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .slots = Dummy_slots
+                .methods = {
+                    &Dummy_repr,
+                    &Dummy_abs,
+                    NULL
+                }
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
