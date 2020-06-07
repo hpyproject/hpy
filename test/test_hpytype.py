@@ -75,20 +75,13 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            static HPyMeth *Dummy_methods[] = {
-                &Dummy_foo,
-                &Dummy_bar,
-                NULL
-            };
-
-            static HPyType_Slot dummy_type_slots[] = {
-                {HPy_tp_methods, Dummy_methods},
-                {0, NULL},
-            };
-
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .slots = dummy_type_slots,
+                .methods = {
+                    &Dummy_foo,
+                    &Dummy_bar,
+                    NULL
+                }
             };
 
             @EXPORT_TYPE("Dummy", dummy_type_spec)

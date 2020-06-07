@@ -135,11 +135,12 @@ create_slot_defs(HPyType_Spec *hpyspec)
     // add a slot to hold Py_tp_methods
     slots_count++;
 
-    // allocate&fill the result
+    // allocate the result PyType_Slot array
     PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (slots_count+1));
     if (result == NULL)
         return NULL;
 
+    // fill the result with non-meth slots
     int dst_idx = 0;
     for(int i=0; hpyspec->methods[i] != NULL; i++) {
         HPyMeth *src = hpyspec->methods[i];
@@ -154,21 +155,15 @@ create_slot_defs(HPyType_Spec *hpyspec)
         dst->pfunc = src->cpy_trampoline;
     }
 
-    /*
-        if (src->slot == HPy_tp_methods) {
-            HPyMeth **hpymethods = (HPyMeth**)src->pfunc;
-            dst->slot = Py_tp_methods;
-            dst->pfunc = create_method_defs(hpymethods, NULL);
-            if (dst->pfunc == NULL) {
-                PyMem_Free(result);
-                return NULL;
-            }
-        }
-        else if (src->slot == Py_tp_methods) {
-            abort(); // implement me
-        }
-    */
+    // add the "real" methods
+    PyMethodDef *m = create_method_defs(hpyspec->methods, NULL);
+    if (m == NULL) {
+        PyMem_Free(result);
+        return NULL;
+    }
+    result[dst_idx++] = (PyType_Slot){Py_tp_methods, m};
 
+    // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
     return result;
 }
