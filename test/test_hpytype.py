@@ -98,7 +98,7 @@ class TestType(HPyTest):
                 long y;
             } PointObject;
 
-            HPySlot_DEFINE(Point_new, Point_new_impl, HPySlot_new)
+            HPyMeth_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyMeth_KEYWORDS)
             static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -118,21 +118,14 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            static HPyMeth *Point_methods[] = {
-                &Point_foo,
-                NULL,
-            };
-
-            static HPyType_Slot Point_slots[] = {
-                {HPy_tp_new, &Point_new},
-                {HPy_tp_methods, Point_methods},
-                {0, NULL},
-            };
-
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .slots = Point_slots,
+                .methods = {
+                    &Point_new,
+                    &Point_foo,
+                    NULL
+                }
             };
 
             @EXPORT_TYPE("Point", Point_spec)
