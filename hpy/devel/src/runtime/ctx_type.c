@@ -43,6 +43,18 @@ ctx_Cast(HPyContext ctx, HPy h)
     return (void*)o->payload;
 }
 
+static int
+sig2flags(HPyMeth_Signature sig)
+{
+    switch(sig) {
+        case HPyMeth_VARARGS:  return METH_VARARGS;
+        case HPyMeth_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
+        case HPyMeth_NOARGS:   return METH_NOARGS;
+        case HPyMeth_O:        return METH_O;
+        default:               return -1;
+    }
+}
+
 // note: this function is also called from ctx_module.c.
 // This malloc a result which will never be freed. Too bad
 _HPy_HIDDEN PyMethodDef *
@@ -74,7 +86,12 @@ create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
         PyMethodDef *dst = &result[i];
         dst->ml_name = src->name;
         dst->ml_meth = src->cpy_trampoline;
-        dst->ml_flags = src->signature;
+        dst->ml_flags = sig2flags(src->signature);
+        if (dst->ml_flags == -1) {
+            PyMem_Free(result);
+            PyErr_SetString(PyExc_ValueError, "Unsupported HPyMeth signature");
+            return NULL;
+        }
         dst->ml_doc = src->doc;
     }
     // copy the legacy methods

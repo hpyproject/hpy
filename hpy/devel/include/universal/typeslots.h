@@ -1,9 +1,11 @@
-/* These magic numbers are the same as CPython, plus an HPy-specific flag */
-
 // this is the smallest flag which we can use while still keeping the types as
 // signed 32 bit ints
 #define HPy_SLOT 0x40000000
 
+// hpy-specific value (not used by CPython)
+#define HPy_meth (1 | HPy_SLOT)
+
+/* These magic numbers are the same as CPython, plus an HPy-specific flag */
 #define HPy_mp_ass_subscript (3 | HPy_SLOT)
 #define HPy_mp_length (4 | HPy_SLOT)
 #define HPy_mp_subscript (5 | HPy_SLOT)

@@ -1,15 +1,11 @@
 #ifndef HPY_UNIVERSAL_METH_H
 #define HPY_UNIVERSAL_METH_H
 
-/* the values of this enum are compatible with the corresponding CPython's
-   METH_*. In particular, the value of HPyMeth.signature is equal to the value
-   of the corresponding PyMethodDef.ml_flags
-*/
 typedef enum {
-    HPyMeth_VARARGS  = 0x0001,  // METH_VARARGS
-    HPyMeth_KEYWORDS = 0x0003,  // METH_VARARGS | METH_KEYWORDS
-    HPyMeth_NOARGS   = 0x0004,  // METH_NOARGS
-    HPyMeth_O        = 0x0008   // METH_O
+    HPyMeth_VARARGS  = 1,  // METH_VARARGS
+    HPyMeth_KEYWORDS = 2,  // METH_VARARGS | METH_KEYWORDS
+    HPyMeth_NOARGS   = 3,  // METH_NOARGS
+    HPyMeth_O        = 4   // METH_O
 } HPyMeth_Signature;
 
 typedef HPy (*HPyMeth_noargs)(HPyContext, HPy self);
@@ -20,10 +16,13 @@ typedef HPy (*HPyMeth_keywords)(HPyContext ctx, HPy self,
 
 
 typedef struct {
-    const char *name;               // The name of the built-in function/method
+    int slot;
     void *impl;                     // function pointer to the implementation
-    cpy_PyCFunction cpy_trampoline; // used by CPython to call impl
+    void *cpy_trampoline;           // used by CPython to call impl
     HPyMeth_Signature signature;    // Indicates impl's expected the signature
+
+    // the following fields are used only if slot == HPy_meth
+    const char *name;               // The name of the built-in function/method
     const char *doc;                // The __doc__ attribute, or NULL
 } HPyMeth;
 
@@ -98,10 +97,11 @@ typedef struct {
     _HPyMeth_DECLARE_IMPL(IMPL, SIG);                                   \
     HPyMeth_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
     HPyMeth SYM = {                                                     \
-        .name = NAME,                                                   \
+        .slot = HPy_meth,                                               \
         .impl = IMPL,                                                   \
-        .cpy_trampoline = (cpy_PyCFunction)SYM##_trampoline,            \
-        .signature = SIG                                                \
+        .cpy_trampoline = SYM##_trampoline,                             \
+        .signature = SIG,                                               \
+        .name = NAME                                                    \
     };
 
 #endif // HPY_UNIVERSAL_METH_H
