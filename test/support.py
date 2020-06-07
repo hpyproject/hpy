@@ -39,7 +39,7 @@ class ExtensionTemplate(object):
     r_marker = re.compile(r"^\s*@([A-Z_]+)(\(.*\))?$")
 
     def __init__(self, src, name):
-        self.src = src
+        self.src = textwrap.dedent(src)
         self.name = name
         self.method_table = None
         self.legacy_methods = 'NULL'
@@ -72,10 +72,15 @@ class ExtensionTemplate(object):
         return name, args
 
     def INIT(self):
+        if self.type_table:
+            init_types = '\n'.join(self.type_table)
+        else:
+            init_types = ''
+
         exp = self.INIT_TEMPLATE % {
             'legacy_methods': self.legacy_methods,
-            'methods': '\n    '.join(self.method_table),
-            'init_types': '\n'.join(self.type_table),
+            'methods': '\n        '.join(self.method_table),
+            'init_types': init_types,
             'name': self.name}
         self.output.append(exp)
         # make sure that we don't fill the tables any more
