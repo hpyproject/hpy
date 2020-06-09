@@ -121,17 +121,15 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
-    abort(); // FIXME
-    /*
     // count the slots != HPy_meth
     Py_ssize_t slots_count;
-    if (hpyspec->methods == NULL) {
+    if (hpyspec->defines == NULL) {
         slots_count = 0;
     }
     else {
         slots_count = 0;
-        for(int i=0; hpyspec->methods[i] != NULL; i++)
-            if (hpyspec->methods[i]->slot != HPy_meth)
+        for(int i=0; hpyspec->defines[i] != NULL; i++)
+            if (hpyspec->defines[i]->kind == HPyDef_Kind_Slot)
                 slots_count++;
     }
     // add a slot to hold Py_tp_methods
@@ -144,21 +142,21 @@ create_slot_defs(HPyType_Spec *hpyspec)
 
     // fill the result with non-meth slots
     int dst_idx = 0;
-    for(int i=0; hpyspec->methods[i] != NULL; i++) {
-        HPyMeth *src = hpyspec->methods[i];
-        if (src->slot == HPy_meth)
+    for(int i=0; hpyspec->defines[i] != NULL; i++) {
+        HPyDef *src = hpyspec->defines[i];
+        if (src->kind != HPyDef_Kind_Slot)
             continue;
         PyType_Slot *dst = &result[dst_idx++];
-        if (!(src->slot & HPy_SLOT)) {
+        if (!(src->slot.slot & HPy_SLOT)) {
             PyErr_SetString(PyExc_ValueError, "Invalid slot value: did you use HPy_*?");
             return NULL;
         }
-        dst->slot = src->slot & ~HPy_SLOT;
-        dst->pfunc = src->cpy_trampoline;
+        dst->slot = src->slot.slot & ~HPy_SLOT;
+        dst->pfunc = src->slot.cpy_trampoline;
     }
 
     // add the "real" methods
-    PyMethodDef *m = create_method_defs(hpyspec->methods, NULL);
+    PyMethodDef *m = create_method_defs(hpyspec->defines, NULL);
     if (m == NULL) {
         PyMem_Free(result);
         return NULL;
@@ -168,7 +166,6 @@ create_slot_defs(HPyType_Spec *hpyspec)
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
     return result;
-*/
 }
 
 

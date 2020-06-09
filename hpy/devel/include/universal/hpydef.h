@@ -47,12 +47,25 @@ typedef struct {
 
 // macros to automatically define HPyDefs of various kinds
 
+#define HPyDef_SLOT(SYM, SLOT, IMPL, SIG)                               \
+    HPyFunc_DECLARE(IMPL, SIG);                                         \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
+    HPyDef SYM = {                                                      \
+        .kind = HPyDef_Kind_Slot,                                       \
+        .slot = {                                                       \
+            .slot = SLOT,                                               \
+            .impl = IMPL,                                               \
+            .cpy_trampoline = SYM##_trampoline                          \
+        }                                                               \
+    };
+
+
 #define HPyDef_METH(SYM, NAME, IMPL, SIG)                               \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
     HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
     HPyDef SYM = {                                                      \
-            .kind = HPyDef_Kind_Meth,                                   \
-            .meth = {                                                   \
+        .kind = HPyDef_Kind_Meth,                                       \
+        .meth = {                                                       \
             .name = NAME,                                               \
             .impl = IMPL,                                               \
             .cpy_trampoline = SYM##_trampoline,                         \
