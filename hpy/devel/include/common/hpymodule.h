@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_MODULE_H
-#define HPY_UNIVERSAL_MODULE_H
+#ifndef HPY_UNIVERSAL_HPYMODULE_H
+#define HPY_UNIVERSAL_HPYMODULE_H
 
 // this is defined by HPy_MODINIT
 extern HPyContext _ctx_for_trampolines;
@@ -25,4 +25,4 @@ typedef struct {
         return init_##modname##_impl(ctx);                     \
     }
 
-#endif // HPY_UNIVERSAL_MODULE_H
+#endif // HPY_UNIVERSAL_HPYMODULE_H
