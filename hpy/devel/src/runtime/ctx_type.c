@@ -57,7 +57,7 @@ sig2flags(HPyFunc_Signature sig)
 
 /*
  * Create a PyMethodDef which contains:
- *     1. All the hpyspec->methods whose .slot == HPy_meth
+ *     1. All HPyMeth contained in hpyspec->defines
  *     2. All the PyMethodDef contained inside legacy_methods
  *
  * Notes:
@@ -121,7 +121,7 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
-    // count the slots != HPy_meth
+    // count the number of HPySlot inside hpyspec->defines
     Py_ssize_t slots_count;
     if (hpyspec->defines == NULL) {
         slots_count = 0;
