@@ -44,7 +44,6 @@ typedef struct {
     };
 } HPyDef;
 
-
 // macros to automatically define HPyDefs of various kinds
 
 #define HPyDef_SLOT(SYM, SLOT, IMPL, SIG)                               \

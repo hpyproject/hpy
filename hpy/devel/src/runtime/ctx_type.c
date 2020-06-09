@@ -55,6 +55,29 @@ sig2flags(HPyFunc_Signature sig)
     }
 }
 
+static int
+HPyDef_count(HPyDef *defs[], HPy_ssize_t *slots, HPy_ssize_t *meths)
+{
+    *slots = 0;
+    *meths = 0;
+    if (defs == NULL)
+        return 0;
+    for(int i=0; defs[i] != NULL; i++)
+        switch(defs[i]->kind) {
+        case HPyDef_Kind_Slot:
+            (*slots)++;
+            break;
+        case HPyDef_Kind_Meth:
+            (*meths)++;
+            break;
+        default:
+            PyErr_Format(PyExc_ValueError, "Invalid HPyDef.kind: %ld", defs[i]->kind);
+            return -1;
+        }
+    return 0;
+}
+
+
 /*
  * Create a PyMethodDef which contains:
  *     1. All HPyMeth contained in hpyspec->defines
@@ -67,20 +90,18 @@ sig2flags(HPyFunc_Signature sig)
 _HPy_HIDDEN PyMethodDef *
 create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 {
-    // count the methods
-    Py_ssize_t hpy_count = 0;
-    Py_ssize_t legacy_count = 0;
-    Py_ssize_t total_count = 0;
-    if (hpydefs != NULL) {
-        for(int i=0; hpydefs[i] != NULL; i++)
-            if (hpydefs[i]->kind == HPyDef_Kind_Meth)
-                hpy_count++;
-    }
+    // count the HPyMeth
+    HPy_ssize_t hpyslot_count = 0;
+    HPy_ssize_t hpymeth_count = 0;
+    if (HPyDef_count(hpydefs, &hpyslot_count, &hpymeth_count) == -1)
+        return NULL;
+    // count the legacy methods
+    HPy_ssize_t legacy_count = 0;
     if (legacy_methods != NULL) {
         while (legacy_methods[legacy_count].ml_name != NULL)
             legacy_count++;
     }
-    total_count = hpy_count + legacy_count;
+    HPy_ssize_t total_count = hpymeth_count + legacy_count;
 
     // allocate&fill the result
     PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (total_count+1));
@@ -121,22 +142,17 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
-    // count the number of HPySlot inside hpyspec->defines
-    Py_ssize_t slots_count;
-    if (hpyspec->defines == NULL) {
-        slots_count = 0;
-    }
-    else {
-        slots_count = 0;
-        for(int i=0; hpyspec->defines[i] != NULL; i++)
-            if (hpyspec->defines[i]->kind == HPyDef_Kind_Slot)
-                slots_count++;
-    }
+    // count the HPySlots
+    HPy_ssize_t hpyslot_count = 0;
+    HPy_ssize_t hpymeth_count = 0;
+    if (HPyDef_count(hpyspec->defines, &hpyslot_count, &hpymeth_count) == -1)
+        return NULL;
+
     // add a slot to hold Py_tp_methods
-    slots_count++;
+    hpyslot_count++;
 
     // allocate the result PyType_Slot array
-    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (slots_count+1));
+    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (hpyslot_count+1));
     if (result == NULL)
         return NULL;
 
