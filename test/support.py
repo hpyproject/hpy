@@ -18,8 +18,8 @@ class ExtensionTemplate(object):
         .m_doc = "some test for hpy",
         .m_size = -1,
         .legacy_methods = %(legacy_methods)s,
-        .methods = {
-            %(methods)s
+        .defines = {
+            %(defines)s
             NULL
         }
     };
@@ -41,12 +41,12 @@ class ExtensionTemplate(object):
     def __init__(self, src, name):
         self.src = textwrap.dedent(src)
         self.name = name
-        self.method_table = None
+        self.defines_table = None
         self.legacy_methods = 'NULL'
         self.type_table = None
 
     def expand(self):
-        self.method_table = []
+        self.defines_table = []
         self.type_table = []
         self.output = ['#include <hpy.h>']
         for line in self.src.split('\n'):
@@ -79,16 +79,16 @@ class ExtensionTemplate(object):
 
         exp = self.INIT_TEMPLATE % {
             'legacy_methods': self.legacy_methods,
-            'methods': '\n        '.join(self.method_table),
+            'defines': '\n        '.join(self.defines_table),
             'init_types': init_types,
             'name': self.name}
         self.output.append(exp)
         # make sure that we don't fill the tables any more
-        self.method_table = None
+        self.defines_table = None
         self.type_table = None
 
     def EXPORT(self, meth):
-        self.method_table.append('&%s,' % meth)
+        self.defines_table.append('&%s,' % meth)
 
     def EXPORT_LEGACY(self, pymethoddef):
         self.legacy_methods = pymethoddef

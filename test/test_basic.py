@@ -300,10 +300,12 @@ class TestBasic(HPyTest):
         import pytest
         with pytest.raises(ValueError) as exc:
             self.make_module("""
-                HPyMeth f = {
-                    .slot = HPy_meth,
-                    .name = "f",
-                    .signature = 1234,
+                HPyDef f = {
+                    .kind = HPyDef_Kind_Meth,
+                    .meth = {
+                        .name = "f",
+                        .signature = 1234,
+                    }
                 };
                 @EXPORT(f)
                 @INIT

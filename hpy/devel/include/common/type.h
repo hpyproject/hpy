@@ -10,7 +10,7 @@ typedef struct {
     int itemsize;
     unsigned int flags;
     void *legacy_slots; // PyType_Slot *
-    HPyMeth *methods[];
+    HPyDef *defines[];
 } HPyType_Spec;
 
 /* All types are dynamically allocated */

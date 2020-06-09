@@ -65,15 +65,15 @@ sig2flags(HPyFunc_Signature sig)
  *     - This malloc()s a result which will never be freed. Too bad
  */
 _HPy_HIDDEN PyMethodDef *
-create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
+create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 {
     // count the methods
     Py_ssize_t hpy_count = 0;
     Py_ssize_t legacy_count = 0;
     Py_ssize_t total_count = 0;
-    if (hpymethods != NULL) {
-        for(int i=0; hpymethods[i] != NULL; i++)
-            if (hpymethods[i]->slot == HPy_meth)
+    if (hpydefs != NULL) {
+        for(int i=0; hpydefs[i] != NULL; i++)
+            if (hpydefs[i]->kind == HPyDef_Kind_Meth)
                 hpy_count++;
     }
     if (legacy_methods != NULL) {
@@ -90,20 +90,20 @@ create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
     }
     // copy the HPy methods
     int dst_idx = 0;
-    for(int i=0; hpymethods[i] != NULL; i++) {
-        HPyMeth *src = hpymethods[i];
-        if (src->slot != HPy_meth)
+    for(int i=0; hpydefs[i] != NULL; i++) {
+        HPyDef *src = hpydefs[i];
+        if (src->kind != HPyDef_Kind_Meth)
             continue;
         PyMethodDef *dst = &result[dst_idx++];
-        dst->ml_name = src->name;
-        dst->ml_meth = src->cpy_trampoline;
-        dst->ml_flags = sig2flags(src->signature);
+        dst->ml_name = src->meth.name;
+        dst->ml_meth = src->meth.cpy_trampoline;
+        dst->ml_flags = sig2flags(src->meth.signature);
         if (dst->ml_flags == -1) {
             PyMem_Free(result);
             PyErr_SetString(PyExc_ValueError, "Unsupported HPyMeth signature");
             return NULL;
         }
-        dst->ml_doc = src->doc;
+        dst->ml_doc = src->meth.doc;
     }
     // copy the legacy methods
     for(int i=0; i<legacy_count; i++) {
@@ -121,6 +121,8 @@ create_method_defs(HPyMeth *hpymethods[], PyMethodDef *legacy_methods)
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
+    abort(); // FIXME
+    /*
     // count the slots != HPy_meth
     Py_ssize_t slots_count;
     if (hpyspec->methods == NULL) {
@@ -166,7 +168,9 @@ create_slot_defs(HPyType_Spec *hpyspec)
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
     return result;
+*/
 }
+
 
 _HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
