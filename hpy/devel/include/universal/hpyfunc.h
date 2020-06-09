@@ -17,15 +17,24 @@ typedef HPy (*HPyFunc_keywords)(HPyContext ctx, HPy self,
 
 
 /* Emit a forward declaration for a function SYM having a signature SIG, where
-   SIG is one of HPyFunc_Signature members. */
+   SIG is one of HPyFunc_Signature members.
+
+   Strictly speaking, the anonymous enum is not needed, since it just defines
+   a constant like Foo_sig which is never used anyway. However, since we try
+   to use "SIG" in the enum definition, we get a very nice error message in
+   case we use a SIG value which does not exists.  If we didn't use this
+   trick, we would get a VERY obscure error message, since gcc would see a
+   function call to something like _HPyFunc_DECLARE_HPyFunc_XXX.
+*/
 #define HPyFunc_DECLARE(SYM, SIG) \
     enum { SYM##_sig = SIG };     \
     _HPyFunc_DECLARE_##SIG(SYM)
 
 
 /* Emit a CPython-compatible trampoline which calls IMPL, where IMPL has the
-   signature SIG */
+   signature SIG. See above for why we need the anonymous enum. */
 #define HPyFunc_TRAMPOLINE(SYM, IMPL, SIG) \
+    enum { SYM##_sig = SIG };              \
     _HPyFunc_TRAMPOLINE_##SIG(SYM, IMPL)
 
 
