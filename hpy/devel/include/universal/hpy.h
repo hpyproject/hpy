@@ -40,7 +40,6 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #include "hpyfunc.h"
 #include "hpydef.h"
 #include "common/type.h"
-#include "typeslots.h"
 #include "module.h"
 
 #include "autogen_ctx.h"

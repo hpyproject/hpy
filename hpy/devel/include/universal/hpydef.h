@@ -2,9 +2,10 @@
 #define HPY_UNIVERSAL_HPYDEF_H
 
 #include "hpyfunc.h"
+#include "typeslots.h"
 
 typedef struct {
-    int slot;              // The slot to fill
+    HPySlot_Slot slot;     // The slot to fill
     void *impl;            // Function pointer to the implementation
     void *cpy_trampoline;  // Used by CPython to call impl
 } HPySlot;

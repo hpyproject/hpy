@@ -163,11 +163,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
         if (src->kind != HPyDef_Kind_Slot)
             continue;
         PyType_Slot *dst = &result[dst_idx++];
-        if (!(src->slot.slot & HPy_SLOT)) {
-            PyErr_SetString(PyExc_ValueError, "Invalid slot value: did you use HPy_*?");
-            return NULL;
-        }
-        dst->slot = src->slot.slot & ~HPy_SLOT;
+        dst->slot = src->slot.slot;
         dst->pfunc = src->slot.cpy_trampoline;
     }
 
