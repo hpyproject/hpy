@@ -295,3 +295,17 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f() == 4294967296
+
+    def test_unsupported_signature(self):
+        import pytest
+        with pytest.raises(ValueError) as exc:
+            self.make_module("""
+                HPyMeth f = {
+                    .slot = HPy_meth,
+                    .name = "f",
+                    .signature = 1234,
+                };
+                @EXPORT(f)
+                @INIT
+            """)
+        assert str(exc.value) == 'Unsupported HPyMeth signature'
