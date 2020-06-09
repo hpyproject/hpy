@@ -37,8 +37,8 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #include "common/macros.h"
 #include "common/runtime/argparse.h"
 
-#include "hpyfunc.h"
-#include "hpydef.h"
+#include "common/hpyfunc.h"
+#include "common/hpydef.h"
 #include "common/hpytype.h"
 #include "module.h"
 

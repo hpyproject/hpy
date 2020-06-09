@@ -1,8 +1,8 @@
 #ifndef HPY_UNIVERSAL_HPYDEF_H
 #define HPY_UNIVERSAL_HPYDEF_H
 
-#include "hpyfunc.h"
-#include "typeslots.h"
+#include "common/hpyfunc.h"
+#include "common/typeslots.h"
 
 typedef struct {
     HPySlot_Slot slot;     // The slot to fill
