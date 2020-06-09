@@ -1,4 +1,10 @@
+import os
 from setuptools import setup, Extension
+
+if 'HPY_DEBUG' in os.environ:
+    EXTRA_COMPILE_ARGS = ['-g', '-O0']
+else:
+    EXTRA_COMPILE_ARGS = []
 
 setup(
     name="hpy.devel",
@@ -21,8 +27,7 @@ setup(
                   ],
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
-                      #'-g', '-O0'
-                  ],
+                  ] + EXTRA_COMPILE_ARGS
         )]
 
 )
