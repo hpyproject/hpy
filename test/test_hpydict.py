@@ -4,7 +4,7 @@ class TestDict(HPyTest):
 
     def test_New(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyDict_New(ctx);
@@ -16,7 +16,7 @@ class TestDict(HPyTest):
 
     def test_SetItem(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy dict = HPyDict_New(ctx);
@@ -34,7 +34,7 @@ class TestDict(HPyTest):
 
     def test_GetItem(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy key = HPyUnicode_FromString(ctx, "hello");

@@ -26,7 +26,7 @@ class TestBasic(HPyTest):
 
     def test_noop_function(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, ctx->h_None);
@@ -39,7 +39,7 @@ class TestBasic(HPyTest):
 
     def test_self_is_module(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, self);
@@ -51,7 +51,7 @@ class TestBasic(HPyTest):
 
     def test_identity_function(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, arg);
@@ -64,7 +64,7 @@ class TestBasic(HPyTest):
 
     def test_long_aslong(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long a = HPyLong_AsLong(ctx, arg);
@@ -78,12 +78,12 @@ class TestBasic(HPyTest):
     def test_wrong_number_of_arguments(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f_noargs, "f_noargs", f_noargs_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f_noargs, "f_noargs", f_noargs_impl, HPyFunc_NOARGS)
             static HPy f_noargs_impl(HPyContext ctx, HPy self)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            HPyMeth_DEFINE(f_o, "f_o", f_o_impl, HPyMeth_O)
+            HPyDef_METH(f_o, "f_o", f_o_impl, HPyFunc_O)
             static HPy f_o_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, ctx->h_None);
@@ -101,7 +101,7 @@ class TestBasic(HPyTest):
 
     def test_close(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy one = HPyLong_FromLong(ctx, 1);
@@ -118,7 +118,7 @@ class TestBasic(HPyTest):
 
     def test_bool(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int cond = HPyLong_AsLong(ctx, arg) > 5;
@@ -133,7 +133,7 @@ class TestBasic(HPyTest):
     def test_exception(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long x = HPyLong_AsLong(ctx, arg);
@@ -156,7 +156,7 @@ class TestBasic(HPyTest):
     def test_exception_occurred(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long x = HPyLong_AsLong(ctx, arg);
@@ -177,7 +177,7 @@ class TestBasic(HPyTest):
     def test_builtin_handles(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 long i = HPyLong_AsLong(ctx, arg);
@@ -218,17 +218,17 @@ class TestBasic(HPyTest):
             @INIT
         """
         extra = """
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 12345);
             }
-            HPyMeth_DEFINE(g, "g", g_impl, HPyMeth_O)
+            HPyDef_METH(g, "g", g_impl, HPyFunc_O)
             static HPy g_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, arg);
             }
-            HPyMeth_DEFINE(h, "h", h_impl, HPyMeth_VARARGS)
+            HPyDef_METH(h, "h", h_impl, HPyFunc_VARARGS)
             static HPy h_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 long a, b;
@@ -236,7 +236,7 @@ class TestBasic(HPyTest):
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
-            HPyMeth_DEFINE(i, "i", i_impl, HPyMeth_KEYWORDS)
+            HPyDef_METH(i, "i", i_impl, HPyFunc_KEYWORDS)
             static HPy i_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs,
                               HPy kw)
             {
@@ -258,7 +258,7 @@ class TestBasic(HPyTest):
 
     def test_Float_FromDouble(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyFloat_FromDouble(ctx, 123.45);
@@ -270,7 +270,7 @@ class TestBasic(HPyTest):
 
     def test_Long_FromLongLong(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 // take a value which doesn't fit in 32 bit
@@ -284,7 +284,7 @@ class TestBasic(HPyTest):
 
     def test_Long_FromUnsignedLongLong(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 // take a value which doesn't fit in unsigned 32 bit

@@ -13,7 +13,7 @@ class TestObject(HPyTest):
     def test_getattr(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy name, result;
@@ -55,7 +55,7 @@ class TestObject(HPyTest):
     def test_getattr_s(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy result;
@@ -92,7 +92,7 @@ class TestObject(HPyTest):
 
     def test_hasattr(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy name;
@@ -142,7 +142,7 @@ class TestObject(HPyTest):
 
     def test_hasattr_s(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int result;
@@ -186,7 +186,7 @@ class TestObject(HPyTest):
     def test_setattr(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy name;
@@ -245,7 +245,7 @@ class TestObject(HPyTest):
     def test_setattr_s(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int result;
@@ -299,7 +299,7 @@ class TestObject(HPyTest):
     def test_getitem(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy key, result;
@@ -327,7 +327,7 @@ class TestObject(HPyTest):
     def test_getitem_i(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy result;
@@ -351,7 +351,7 @@ class TestObject(HPyTest):
     def test_getitem_s(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy result;
@@ -374,7 +374,7 @@ class TestObject(HPyTest):
     def test_setitem(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 HPy key;
@@ -402,7 +402,7 @@ class TestObject(HPyTest):
     def test_setitem_i(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int result;
@@ -425,7 +425,7 @@ class TestObject(HPyTest):
     def test_setitem_s(self):
         import pytest
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 int result;

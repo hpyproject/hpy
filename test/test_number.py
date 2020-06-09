@@ -16,7 +16,7 @@ class TestNumber(HPyTest):
                 ('Float', float),
                 ]:
             mod = self.make_module("""
-                HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+                HPyDef_METH(f, "f", f_impl, HPyFunc_O)
                 static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
                 {
                     return HPy_%s(ctx, arg);
@@ -51,7 +51,7 @@ class TestNumber(HPyTest):
                 ('Or', operator.or_),
                 ]:
             mod = self.make_module("""
-                HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_VARARGS)
+                HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext ctx, HPy self,
                                   HPy *args, HPy_ssize_t nargs)
                 {
@@ -68,7 +68,7 @@ class TestNumber(HPyTest):
 
     def test_power(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_VARARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -90,7 +90,7 @@ class TestNumber(HPyTest):
         m1 = Mat()
         m2 = Mat()
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_VARARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -120,7 +120,7 @@ class TestNumber(HPyTest):
                 ('Or', '__ior__'),
                 ]:
             mod = self.make_module("""
-                HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_VARARGS)
+                HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext ctx, HPy self,
                                   HPy *args, HPy_ssize_t nargs)
                 {
@@ -140,7 +140,7 @@ class TestNumber(HPyTest):
 
     def test_inplace_power(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_VARARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -169,7 +169,7 @@ class TestNumber(HPyTest):
         m1 = Mat()
         m2 = Mat()
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_VARARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {

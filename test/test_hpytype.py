@@ -33,13 +33,13 @@ class TestType(HPyTest):
 
     def test_slots(self):
         mod = self.make_module("""
-            HPyMeth_SLOT(Dummy_repr, HPy_tp_repr, Dummy_repr_impl, HPyMeth_NOARGS)
+            HPyMeth_SLOT(Dummy_repr, HPy_tp_repr, Dummy_repr_impl, HPyFunc_NOARGS)
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPyMeth_SLOT(Dummy_abs, HPy_nb_absolute, Dummy_abs_impl, HPyMeth_NOARGS)
+            HPyMeth_SLOT(Dummy_abs, HPy_nb_absolute, Dummy_abs_impl, HPyFunc_NOARGS)
             static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -63,13 +63,13 @@ class TestType(HPyTest):
 
     def test_tp_methods(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(Dummy_foo, "foo", Dummy_foo_impl, HPyMeth_O)
+            HPyDef_METH(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O)
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Add(ctx, arg, arg);
             }
 
-            HPyMeth_DEFINE(Dummy_bar, "bar", Dummy_bar_impl, HPyMeth_NOARGS)
+            HPyDef_METH(Dummy_bar, "bar", Dummy_bar_impl, HPyFunc_NOARGS)
             static HPy Dummy_bar_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -98,7 +98,7 @@ class TestType(HPyTest):
                 long y;
             } PointObject;
 
-            HPyMeth_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyMeth_KEYWORDS)
+            HPyMeth_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
             static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -111,7 +111,7 @@ class TestType(HPyTest):
                 return h_point;
             }
 
-            HPyMeth_DEFINE(Point_foo, "foo", Point_foo_impl, HPyMeth_NOARGS)
+            HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
                 PointObject *point = HPy_CAST(ctx, PointObject, self);

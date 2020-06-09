@@ -6,7 +6,7 @@ typedef int HPyType_Spec;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
 typedef int wchar_t;
-typedef int HPyMeth_Signature;
+typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
 
 
@@ -130,4 +130,4 @@ cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
                                                     cpy_PyObject *args,
                                                     cpy_PyObject *kw,
                                                     void *func,
-                                                    HPyMeth_Signature sig);
+                                                    HPyFunc_Signature sig);

@@ -44,13 +44,13 @@ ctx_Cast(HPyContext ctx, HPy h)
 }
 
 static int
-sig2flags(HPyMeth_Signature sig)
+sig2flags(HPyFunc_Signature sig)
 {
     switch(sig) {
-        case HPyMeth_VARARGS:  return METH_VARARGS;
-        case HPyMeth_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
-        case HPyMeth_NOARGS:   return METH_NOARGS;
-        case HPyMeth_O:        return METH_O;
+        case HPyFunc_VARARGS:  return METH_VARARGS;
+        case HPyFunc_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
+        case HPyFunc_NOARGS:   return METH_NOARGS;
+        case HPyFunc_O:        return METH_O;
         default:               return -1;
     }
 }

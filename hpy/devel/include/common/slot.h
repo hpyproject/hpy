@@ -12,8 +12,8 @@ typedef HPy (*HPySlot_new)(HPyContext ctx, HPy self,
 
 
 #define HPyMeth_SLOT(SYM, SLOT, IMPL, SIG)                              \
-    _HPyMeth_DECLARE_IMPL(IMPL, SIG);                                   \
-    HPyMeth_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
+    HPyFunc_DECLARE(IMPL, SIG);                                         \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
     HPyMeth SYM = {                                                     \
         .slot = SLOT,                                                   \
         .impl = IMPL,                                                   \

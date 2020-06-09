@@ -6,7 +6,7 @@ class TestUnicode(HPyTest):
 
     def test_Check(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 if (HPyUnicode_Check(ctx, arg))
@@ -25,7 +25,7 @@ class TestUnicode(HPyTest):
 
     def test_FromString(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "foobar");
@@ -37,7 +37,7 @@ class TestUnicode(HPyTest):
 
     def test_FromWideChar(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 const wchar_t buf[] = { 'h', 'e', 'l', 'l', 0xf2, ' ',
@@ -55,7 +55,7 @@ class TestUnicode(HPyTest):
 
     def test_AsUTF8String(self):
         mod = self.make_module("""
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPyUnicode_AsUTF8String(ctx, arg);

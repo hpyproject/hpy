@@ -15,7 +15,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_frompyobject(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -41,7 +41,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_aspyobject(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 PyObject *o = HPy_AsPyObject(ctx, arg);
@@ -57,7 +57,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_aspyobject_custom_class(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_O)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 PyObject *o = HPy_AsPyObject(ctx, arg);
@@ -79,7 +79,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_hpy_close(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -103,7 +103,7 @@ class TestCPythonCompatibility(HPyTest):
     def test_hpy_dup(self):
         mod = self.make_module("""
             #include <Python.h>
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
@@ -131,7 +131,7 @@ class TestCPythonCompatibility(HPyTest):
             #include <Python.h>
             #define NUM_HANDLES  10000
 
-            HPyMeth_DEFINE(f, "f", f_impl, HPyMeth_NOARGS)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
