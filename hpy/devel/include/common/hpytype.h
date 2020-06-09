@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_TYPE_H
-#define HPY_UNIVERSAL_TYPE_H
+#ifndef HPY_UNIVERSAL_HPYTYPE_H
+#define HPY_UNIVERSAL_HPYTYPE_H
 
 #include <stdbool.h>
 
@@ -23,4 +23,4 @@ typedef struct {
 
 #define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
 
-#endif /* HPY_UNIVERSAL_TYPE_H */
+#endif /* HPY_UNIVERSAL_HPYTYPE_H */

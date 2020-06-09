@@ -3,7 +3,7 @@
 
 #include <Python.h>
 #include "hpy.h"
-#include "common/type.h"
+#include "common/hpytype.h"
 
 _HPy_HIDDEN void* ctx_Cast(HPyContext ctx, HPy h);
 _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec);
