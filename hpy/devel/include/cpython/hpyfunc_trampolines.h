@@ -24,7 +24,7 @@
         /* is equivalent to an array of "HPy" with enough casting... */ \
         HPy *items = (HPy *)&PyTuple_GET_ITEM(args, 0);                 \
         Py_ssize_t nargs = PyTuple_GET_SIZE(args);                      \
-        return _h2py(NAME##_impl(_HPyGetContext(),                      \
+        return _h2py(IMPL(_HPyGetContext(),                             \
                                  _py2h(self), items, nargs));           \
     }
 
@@ -36,7 +36,7 @@
         /* is equivalent to an array of "HPy" with enough casting... */ \
         HPy *items = (HPy *)&PyTuple_GET_ITEM(args, 0);                 \
         Py_ssize_t nargs = PyTuple_GET_SIZE(args);                      \
-        return _h2py(NAME##_impl(_HPyGetContext(), _py2h(self),         \
+        return _h2py(IMPL(_HPyGetContext(), _py2h(self),                \
                                  items, nargs, _py2h(kw)));             \
     }
 

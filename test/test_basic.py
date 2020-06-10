@@ -203,13 +203,13 @@ class TestBasic(HPyTest):
                 continue
             assert mod.f(i) is obj
 
-    def test_extern_meth(self):
+    def test_extern_def(self):
         import pytest
         main = """
-            extern HPyMeth f;
-            extern HPyMeth g;
-            extern HPyMeth h;
-            extern HPyMeth i;
+            extern HPyDef f;
+            extern HPyDef g;
+            extern HPyDef h;
+            extern HPyDef i;
 
             @EXPORT(f)
             @EXPORT(g)
