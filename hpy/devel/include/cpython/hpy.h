@@ -39,8 +39,6 @@ typedef Py_ssize_t HPy_ssize_t;
 #define _h2py(x) (x._o)
 #define _py2h(o) ((HPy){o})
 
-//#include "meth.h"
-
 typedef struct _HPyContext_s {
     HPy h_None;
     HPy h_True;
