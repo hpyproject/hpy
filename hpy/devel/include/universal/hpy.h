@@ -20,7 +20,7 @@ typedef struct _HPy_s HPy;
 typedef struct _HPyContext_s *HPyContext;
 
 /* compatibility CPython types */
-#include "cpy_types.h"
+#include "common/cpy_types.h"
 
 
 /* misc stuff, which should probably go in its own header */

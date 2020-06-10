@@ -16,6 +16,10 @@ typedef struct {
 } HPyModuleDef;
 
 
+
+#ifdef HPY_UNIVERSAL_ABI
+
+// module initialization in the universal case
 #define HPy_MODINIT(modname)                                   \
     _HPy_HIDDEN HPyContext _ctx_for_trampolines;               \
     static HPy init_##modname##_impl(HPyContext ctx);          \
@@ -24,5 +28,18 @@ typedef struct {
         _ctx_for_trampolines = ctx;                            \
         return init_##modname##_impl(ctx);                     \
     }
+
+#else // HPY_UNIVERSAL_ABI
+
+// module initialization in the CPython case
+#define HPy_MODINIT(modname)                                   \
+    static HPy init_##modname##_impl(HPyContext ctx);          \
+    PyMODINIT_FUNC                                             \
+    PyInit_##modname(void)                                     \
+    {                                                          \
+        return _h2py(init_##modname##_impl(_HPyGetContext())); \
+    }
+
+#endif // HPY_UNIVERSAL_ABI
 
 #endif // HPY_UNIVERSAL_HPYMODULE_H

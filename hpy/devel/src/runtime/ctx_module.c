@@ -1,15 +1,17 @@
 #include <Python.h>
 #include "hpy.h"
 #include "common/runtime/ctx_type.h"
-#include "api.h"
-#include "handles.h"
+
+#ifdef HPY_UNIVERSAL_ABI
+   // for _h2py and _py2h
+#  include "handles.h"
+#endif
 
 static PyModuleDef empty_moduledef = {
     PyModuleDef_HEAD_INIT
 };
 
-
-HPyAPI_STORAGE HPy
+_HPy_HIDDEN HPy
 ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
 {
     // create a new PyModuleDef

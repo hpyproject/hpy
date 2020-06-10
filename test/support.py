@@ -165,6 +165,7 @@ class ExtensionCompiler:
             str(self.src_dir.join('argparse.c')),
         ]
         if self.abimode == 'cpython':
+            sources.append(str(self.src_dir.join('ctx_module.c')))
             sources.append(str(self.src_dir.join('ctx_type.c')))
         #
         for i, template in enumerate(extra_templates):

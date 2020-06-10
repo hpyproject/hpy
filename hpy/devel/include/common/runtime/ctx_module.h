@@ -2,7 +2,6 @@
 #define HPY_COMMON_RUNTIME_CTX_MODULE_H
 
 #include "hpy.h"
-#include "api.h"
 
 _HPy_HIDDEN HPy ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef);
 
