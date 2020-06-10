@@ -7,10 +7,10 @@ def test_expand_template():
         some more C stuff
         @INIT
     """, name='mytest')
-    method_table = ['&f,', '&g,']
-    methods = '\n        '.join(method_table)
+    defines_table = ['&f,', '&g,']
+    defines = '\n        '.join(defines_table)
     init_code = support.ExtensionTemplate.INIT_TEMPLATE % {
-        'methods': methods,
+        'defines': defines,
         'legacy_methods': 'NULL',
         'name': 'mytest',
         'init_types': '',
