@@ -263,12 +263,17 @@ def convert_name(hpy_name):
     return re.sub(r'^_?HPy_?', 'Py', hpy_name)
 
 
-class AutoGen:
+class HPyAPI:
 
     def __init__(self, filename):
         self.ast = pycparser.parse_file(filename, use_cpp=True)
         #self.ast.show()
         self.collect_declarations()
+
+    @classmethod
+    def parse(cls, filename):
+        return cls(filename)
+
 
     def get(self, name):
         for d in self.declarations:
@@ -280,23 +285,6 @@ class AutoGen:
         v = FuncDeclVisitor(convert_name)
         v.visit(self.ast)
         self.declarations = v.declarations
-
-    def gen_ctx_decl(self):
-        # struct _HPyContext_s {
-        #     int ctx_version;
-        #     HPy h_None;
-        #     ...
-        #     HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def);
-        #     ...
-        # }
-        lines = []
-        w = lines.append
-        w('struct _HPyContext_s {')
-        w('    int ctx_version;')
-        for f in self.declarations:
-            w('    %s;' % f.ctx_decl())
-        w('};')
-        return '\n'.join(lines)
 
     def gen_ctx_def(self):
         # struct _HPyContext_s global_ctx = {
