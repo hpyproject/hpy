@@ -308,7 +308,7 @@ static inline cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h) {
      return ctx->ctx_AsPyObject ( ctx, h ); 
 }
 
-static inline cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, cpy_PyObject *self, cpy_PyObject *args, cpy_PyObject *kw, void *func, HPyFunc_Signature sig) {
-     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, kw, func, sig ); 
+static inline cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig, void *func, void *args) {
+     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, sig, func, args ); 
 }
 

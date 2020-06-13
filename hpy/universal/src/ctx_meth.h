@@ -2,6 +2,5 @@
 #include "api.h"
 
 HPyAPI_STORAGE cpy_PyObject *
-ctx_CallRealFunctionFromTrampoline(HPyContext ctx, cpy_PyObject *self,
-                                   cpy_PyObject *args, cpy_PyObject *kw,
-                                   void *func, HPyFunc_Signature sig);
+ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
+                                   void *func, void *args);
