@@ -5,7 +5,7 @@ from .parse import toC
 
 
 class autogen_ctx_h(AutoGenFile):
-    PATH = 'hpy/devel/include/autogen_ctx.h'
+    PATH = 'hpy/devel/include/universal/autogen_ctx.h'
 
     ## struct _HPyContext_s {
     ##     int ctx_version;

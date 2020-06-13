@@ -30,7 +30,7 @@ def main():
                 autogen_ctx_def_h,
                 autogen_trampolines_h,
                 autogen_impl_h):
-        cls(api).generate()
+        cls(api).write(outdir)
 
     pypy_decl = api.gen_pypy_decl()
 

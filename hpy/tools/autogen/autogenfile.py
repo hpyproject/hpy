@@ -7,6 +7,7 @@ DISCLAIMER = """
        make autogen
 
 */
+
 """
 
 class AutoGenFile:
@@ -20,7 +21,8 @@ class AutoGenFile:
         raise NotImplementedError
 
     def write(self, root):
-        with root.join(PATH).open('w') as f:
+        with root.join(self.PATH).open('w') as f:
             if self.LANGUAGE == 'C':
                 f.write(DISCLAIMER)
             f.write(self.generate())
+            f.write('\n')
