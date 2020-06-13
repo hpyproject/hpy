@@ -36,34 +36,6 @@ class Function:
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
 
 
-    def trampoline_def(self):
-        # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
-        #      return ctx->ctx_Module_Create ( ctx, def );
-        # }
-        if self.name in NO_TRAMPOLINES:
-            return None
-        rettype = toC(self.node.type.type)
-        parts = []
-        w = parts.append
-        w('static inline')
-        w(toC(self.node))
-        w('{\n    ')
-
-        # trampolines cannot deal with varargs easily
-        assert not self.is_varargs()
-
-        if rettype == 'void':
-            w('ctx->%s' % self.ctx_name())
-        else:
-            w('return ctx->%s' % self.ctx_name())
-        w('(')
-        params = [p.name for p in self.node.type.args.params]
-        w(', '.join(params))
-        w(');')
-
-        w('\n}')
-        return ' '.join(parts)
-
     def implementation(self):
         def signature(base_name):
             # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
@@ -132,9 +104,6 @@ class GlobalVar:
 
     def ctx_name(self):
         return self.name
-
-    def trampoline_def(self):
-        return None
 
     def ctx_pypy_type(self):
         return 'struct _HPy_s'
@@ -237,10 +206,6 @@ SPECIAL_CASES = {
     'HPyType_FromSpec': None,
 }
 
-NO_TRAMPOLINES = set([
-    '_HPy_New',
-    ])
-
 
 def convert_name(hpy_name):
     if hpy_name in SPECIAL_CASES:
@@ -272,16 +237,6 @@ class HPyAPI:
         self.variables = []
         v = FuncDeclVisitor(self, convert_name)
         v.visit(self.ast)
-
-
-    def gen_func_trampolines(self):
-        lines = []
-        for f in self.declarations:
-            trampoline = f.trampoline_def()
-            if trampoline:
-                lines.append(trampoline)
-                lines.append('')
-        return '\n'.join(lines)
 
     def gen_func_implementations(self):
         lines = []
