@@ -10,7 +10,7 @@ if version.parse(pycparser.__version__) < version.parse('2.20'):
 
 from .parse import HPyAPI
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
-from .trampolines import autogen_trampolines_h
+from .trampolines import autogen_trampolines_h, autogen_impl_h
 from .autogenfile import DISCLAIMER # temporary
 
 
@@ -19,8 +19,6 @@ def main():
         print('Usage: python -m hpy.tools.autogen OUTDIR')
         sys.exit(1)
     outdir = py.path.local(sys.argv[1])
-    include = outdir.join('hpy', 'devel', 'include')
-    autogen_impl = include.join('common', 'autogen_impl.h')
     autogen_pypy = outdir.join('hpy', 'tools', 'autogen', 'autogen_pypy.txt')
 
     public_api_h = py.path.local(__file__).dirpath('public_api.h')
@@ -30,15 +28,11 @@ def main():
 
     for cls in (autogen_ctx_h,
                 autogen_ctx_def_h,
-                autogen_trampolines_h):
+                autogen_trampolines_h,
+                autogen_impl_h):
         cls(api).generate()
 
-    impl = api.gen_func_implementations()
     pypy_decl = api.gen_pypy_decl()
-
-    with autogen_impl.open('w') as f:
-        print(DISCLAIMER, file=f)
-        print(impl, file=f)
 
     with autogen_pypy.open('w') as f:
         print(pypy_decl, file=f)

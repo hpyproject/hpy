@@ -47,3 +47,56 @@ class autogen_trampolines_h(AutoGenFile):
 
         w('\n}')
         return ' '.join(parts)
+
+
+class autogen_impl_h(AutoGenFile):
+    PATH = 'hpy/devel/include/common/autogen_impl.h'
+
+    def generate(self):
+        lines = []
+        for func in self.api.functions:
+            if not func.cpython_name:
+                continue
+            lines.append(self.gen_implementation(func))
+            lines.append('')
+        return '\n'.join(lines)
+
+    def gen_implementation(self, func):
+        def signature(base_name):
+            # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
+            newnode = deepcopy(func.node)
+            typedecl = func._find_typedecl(newnode)
+            # rename the function
+            if func.name.startswith('HPy_'):
+                typedecl.declname = '_HPy_IMPL_NAME_NOPREFIX(%s)' % base_name
+            else:
+                typedecl.declname = '_HPy_IMPL_NAME(%s)' % base_name
+            return toC(newnode)
+        #
+        def call(pyfunc, return_type):
+            # return _py2h(PyNumber_Add(_h2py(x), _h2py(y)))
+            args = []
+            for p in func.node.type.args.params:
+                if toC(p.type) == 'HPyContext':
+                    continue
+                elif toC(p.type) == 'HPy':
+                    arg = '_h2py(%s)' % p.name
+                else:
+                    arg = p.name
+                args.append(arg)
+            result = '%s(%s)' % (pyfunc, ', '.join(args))
+            if return_type == 'HPy':
+                result = '_py2h(%s)' % result
+            return result
+        #
+        lines = []
+        w = lines.append
+        pyfunc = func.cpython_name
+        if not pyfunc:
+            raise ValueError(f"Cannot generate implementation for {self}")
+        return_type = toC(func.node.type.type)
+        w('HPyAPI_STORAGE %s' % signature(func.base_name()))
+        w('{')
+        w('    return %s;' % call(pyfunc, return_type))
+        w('}')
+        return '\n'.join(lines)

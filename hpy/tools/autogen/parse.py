@@ -36,46 +36,6 @@ class Function:
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
 
 
-    def implementation(self):
-        def signature(base_name):
-            # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
-            newnode = deepcopy(self.node)
-            typedecl = self._find_typedecl(newnode)
-            # rename the function
-            if self.name.startswith('HPy_'):
-                typedecl.declname = '_HPy_IMPL_NAME_NOPREFIX(%s)' % base_name
-            else:
-                typedecl.declname = '_HPy_IMPL_NAME(%s)' % base_name
-            return toC(newnode)
-        #
-        def call(pyfunc, return_type):
-            # return _py2h(PyNumber_Add(_h2py(x), _h2py(y)))
-            args = []
-            for p in self.node.type.args.params:
-                if toC(p.type) == 'HPyContext':
-                    continue
-                elif toC(p.type) == 'HPy':
-                    arg = '_h2py(%s)' % p.name
-                else:
-                    arg = p.name
-                args.append(arg)
-            result = '%s(%s)' % (pyfunc, ', '.join(args))
-            if return_type == 'HPy':
-                result = '_py2h(%s)' % result
-            return result
-        #
-        lines = []
-        w = lines.append
-        pyfunc = self.cpython_name
-        if not pyfunc:
-            raise ValueError(f"Cannot generate implementation for {self}")
-        return_type = toC(self.node.type.type)
-        w('HPyAPI_STORAGE %s' % signature(self.base_name()))
-        w('{')
-        w('    return %s;' % call(pyfunc, return_type))
-        w('}')
-        return '\n'.join(lines)
-
 
     def ctx_pypy_type(self):
         return 'void *'
@@ -237,17 +197,6 @@ class HPyAPI:
         self.variables = []
         v = FuncDeclVisitor(self, convert_name)
         v.visit(self.ast)
-
-    def gen_func_implementations(self):
-        lines = []
-        for f in self.declarations:
-            if not isinstance(f, Function):
-                continue
-            if not f.cpython_name:
-                continue
-            lines.append(f.implementation())
-            lines.append('')
-        return '\n'.join(lines)
 
     def gen_pypy_decl(self):
         lines = []
