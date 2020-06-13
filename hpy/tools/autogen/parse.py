@@ -31,9 +31,6 @@ class Function:
         # e.g. "ctx_Module_Create"
         return self._BASE_NAME.sub(r'ctx_', self.name)
 
-    def ctx_impl_name(self):
-        return '&%s' % self.ctx_name()
-
     def is_varargs(self):
         return (len(self.node.type.args.params) > 0 and
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
@@ -135,9 +132,6 @@ class GlobalVar:
 
     def ctx_name(self):
         return self.name
-
-    def ctx_impl_name(self):
-        return '(HPy){CONSTANT_%s}' % (self.name.upper(),)
 
     def trampoline_def(self):
         return None
@@ -279,24 +273,6 @@ class HPyAPI:
         v = FuncDeclVisitor(self, convert_name)
         v.visit(self.ast)
 
-    def gen_ctx_def(self):
-        # struct _HPyContext_s global_ctx = {
-        #     .ctx_version = 1,
-        #     .h_None = (HPy){CONSTANT_H_NONE},
-        #     ...
-        #     .ctx_Module_Create = &ctx_Module_Create,
-        #     ...
-        # }
-        lines = []
-        w = lines.append
-        w('struct _HPyContext_s global_ctx = {')
-        w('    .ctx_version = 1,')
-        for f in self.declarations:
-            name = f.ctx_name()
-            impl = f.ctx_impl_name()
-            w('    .%s = %s,' % (name, impl))
-        w('};')
-        return '\n'.join(lines)
 
     def gen_func_trampolines(self):
         lines = []

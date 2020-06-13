@@ -27,6 +27,9 @@ class autogen_ctx_h(AutoGenFile):
         w('};')
         return '\n'.join(lines)
 
+    def declare_var(self, var):
+        return toC(var.node)
+
     def declare_func(self, func):
         # e.g. "HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def)"
         #
@@ -38,5 +41,26 @@ class autogen_ctx_h(AutoGenFile):
         typedecl.declname = func.ctx_name()
         return toC(newnode)
 
-    def declare_var(self, var):
-        return toC(var.node)
+
+class autogen_ctx_def_h(AutoGenFile):
+    PATH = 'hpy/universal/src/autogen_ctx_def.h'
+
+    ## struct _HPyContext_s global_ctx = {
+    ##     .ctx_version = 1,
+    ##     .h_None = (HPy){CONSTANT_H_NONE},
+    ##     ...
+    ##     .ctx_Module_Create = &ctx_Module_Create,
+    ##     ...
+    ## }
+
+    def generate(self):
+        lines = []
+        w = lines.append
+        w('struct _HPyContext_s global_ctx = {')
+        w('    .ctx_version = 1,')
+        for var in self.api.variables:
+            w('    .%s = (HPy){CONSTANT_%s},' % (var.name, var.name.upper()))
+        for func in self.api.functions:
+            w('    .%s = &%s,' % (func.ctx_name(), func.ctx_name()))
+        w('};')
+        return '\n'.join(lines)
