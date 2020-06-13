@@ -1,6 +1,6 @@
 import py
 import pytest
-from autogen import AutoGen, Function, GlobalVar
+from hpy.tools.autogen.__main__ import AutoGen, Function, GlobalVar
 
 @pytest.fixture(scope='module')
 def autogen(tmpdir_factory):

@@ -1,6 +1,7 @@
 """
 Parse public_api.h and generates various stubs around
 """
+import sys
 import attr
 import re
 import py
@@ -372,15 +373,19 @@ class AutoGen:
 
 
 def main():
-    root = py.path.local(__file__).dirpath().dirpath()
-    include = root.join('hpy', 'devel', 'include')
+    if len(sys.argv) != 2:
+        print('Usage: python -m hpy.tools.autogen OUTDIR')
+        sys.exit(1)
+    outdir = py.path.local(sys.argv[1])
+    include = outdir.join('hpy', 'devel', 'include')
     autogen_ctx = include.join('universal', 'autogen_ctx.h')
     autogen_trampolines = include.join('universal', 'autogen_trampolines.h')
-    autogen_ctx_def = root.join('hpy', 'universal', 'src', 'autogen_ctx_def.h')
+    autogen_ctx_def = outdir.join('hpy', 'universal', 'src', 'autogen_ctx_def.h')
     autogen_impl = include.join('common', 'autogen_impl.h')
-    autogen_pypy = root.join('tools', 'autogen_pypy.txt')
+    autogen_pypy = outdir.join('hpy', 'tools', 'autogen', 'autogen_pypy.txt')
 
-    autogen = AutoGen(root.join('tools', 'public_api.h'))
+    public_api_h = py.path.local(__file__).dirpath('public_api.h')
+    autogen = AutoGen(public_api_h)
     for func in autogen.declarations:
         print(func)
 
