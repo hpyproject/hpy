@@ -38,16 +38,6 @@ class Function:
         return (len(self.node.type.args.params) > 0 and
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
 
-    def ctx_decl(self):
-        # e.g. "HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def)"
-        #
-        # turn the function declaration into a function POINTER declaration
-        newnode = deepcopy(self.node)
-        newnode.type = c_ast.PtrDecl(type=newnode.type, quals=[])
-        # fix the name of the function pointer
-        typedecl = self._find_typedecl(newnode)
-        typedecl.declname = self.ctx_name()
-        return toC(newnode)
 
     def trampoline_def(self):
         # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
@@ -149,9 +139,6 @@ class GlobalVar:
     def ctx_impl_name(self):
         return '(HPy){CONSTANT_%s}' % (self.name.upper(),)
 
-    def ctx_decl(self):
-        return toC(self.node)
-
     def trampoline_def(self):
         return None
 
@@ -163,8 +150,8 @@ class GlobalVar:
 
 
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
-    def __init__(self, convert_name):
-        self.declarations = []
+    def __init__(self, api, convert_name):
+        self.api = api
         self.convert_name = convert_name
 
     def visit_Decl(self, node):
@@ -183,7 +170,9 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
                 raise ValueError("non-named argument in declaration of %s" %
                                  name)
         cpy_name = self.convert_name(name)
-        self.declarations.append(Function(name, cpy_name, node))
+        func = Function(name, cpy_name, node)
+        self.api.declarations.append(func)
+        self.api.functions.append(func)
 
     def _visit_global_var(self, node):
         name = node.name
@@ -191,7 +180,9 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
             print('WARNING: Ignoring non-hpy variable declaration: %s' % name)
             return
         assert toC(node.type.type) == "HPy"
-        self.declarations.append(GlobalVar(name, node))
+        var = GlobalVar(name, node)
+        self.api.declarations.append(var)
+        self.api.variables.append(var)
 
 SPECIAL_CASES = {
     'HPy_Dup': None,
@@ -282,9 +273,11 @@ class HPyAPI:
         raise KeyError(name)
 
     def collect_declarations(self):
-        v = FuncDeclVisitor(convert_name)
+        self.declarations = [] # this should be removed, eventually
+        self.functions = []
+        self.variables = []
+        v = FuncDeclVisitor(self, convert_name)
         v.visit(self.ast)
-        self.declarations = v.declarations
 
     def gen_ctx_def(self):
         # struct _HPyContext_s global_ctx = {
