@@ -36,27 +36,6 @@ class Function:
                 isinstance(self.node.type.args.params[-1], c_ast.EllipsisParam))
 
 
-
-    def ctx_pypy_type(self):
-        return 'void *'
-
-    def pypy_stub(self):
-        signature = toC(self.node)
-        if self.is_varargs():
-            return '# %s' % signature
-        #
-        argnames = [p.name for p in self.node.type.args.params]
-        lines = []
-        w = lines.append
-        w('@API.func("%s")' % signature)
-        w('def %s(space, %s):' % (self.name, ', '.join(argnames)))
-        w('    from rpython.rlib.nonconst import NonConstant # for the annotator')
-        w('    if NonConstant(False): return 0')
-        w('    raise NotImplementedError')
-        w('')
-        return '\n'.join(lines)
-
-
 @attr.s
 class GlobalVar:
     name = attr.ib()
@@ -64,12 +43,6 @@ class GlobalVar:
 
     def ctx_name(self):
         return self.name
-
-    def ctx_pypy_type(self):
-        return 'struct _HPy_s'
-
-    def pypy_stub(self):
-        return ''
 
 
 class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
@@ -197,18 +170,3 @@ class HPyAPI:
         self.variables = []
         v = FuncDeclVisitor(self, convert_name)
         v.visit(self.ast)
-
-    def gen_pypy_decl(self):
-        lines = []
-        w = lines.append
-        w("typedef struct _HPyContext_s {")
-        w("    int ctx_version;")
-        for f in self.declarations:
-            w("    %s %s;" % (f.ctx_pypy_type(), f.ctx_name()))
-        w("} _struct_HPyContext_s;")
-        w("")
-        w("")
-        # generate stubs for all the API functions
-        for f in self.declarations:
-            w(f.pypy_stub())
-        return '\n'.join(lines)

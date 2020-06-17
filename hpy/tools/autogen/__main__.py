@@ -1,5 +1,5 @@
 """
-Parse public_api.h and generates various stubs around
+Parse public_api.h and generate various stubs around
 """
 import sys
 import py
@@ -11,8 +11,7 @@ if version.parse(pycparser.__version__) < version.parse('2.20'):
 from .parse import HPyAPI
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
 from .trampolines import autogen_trampolines_h, autogen_impl_h
-from .autogenfile import DISCLAIMER # temporary
-
+from .pypy import autogen_pypy_txt
 
 def main():
     if len(sys.argv) != 2:
@@ -29,13 +28,10 @@ def main():
     for cls in (autogen_ctx_h,
                 autogen_ctx_def_h,
                 autogen_trampolines_h,
-                autogen_impl_h):
+                autogen_impl_h,
+                autogen_pypy_txt):
         cls(api).write(outdir)
 
-    pypy_decl = api.gen_pypy_decl()
-
-    with autogen_pypy.open('w') as f:
-        print(pypy_decl, file=f)
 
 if __name__ == '__main__':
     main()
