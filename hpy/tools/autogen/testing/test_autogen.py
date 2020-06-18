@@ -113,46 +113,31 @@ class TestAutogen:
         """
         assert src_equal(got, exp)
 
-
-    # WIP: the following tests are still broken and needs to be fixed
-
-    def test_no_implementation(self, autogen):
-        func = autogen.get('HPy_Dup')
-        with pytest.raises(ValueError):
-            func.implementation()
-
-    def test_implementation_hpy_types(self, autogen):
-        func = autogen.get('HPy_Add')
-        x = func.implementation()
-        expected = """
+    def test_autogen_impl_h(self):
+        api = self.parse("""
+            HPy HPy_Dup(HPyContext ctx, HPy h);
+            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+            HPy HPyLong_FromLong(HPyContext ctx, long value);
+            char* HPyBytes_AsString(HPyContext ctx, HPy h);
+        """)
+        got = autogen_impl_h(api).generate()
+        exp = """
             HPyAPI_STORAGE
-            HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext ctx, HPy x, HPy y)
+            HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext ctx, HPy h1, HPy h2)
             {
-                return _py2h(PyNumber_Add(_h2py(x), _h2py(y)));
+                return _py2h(PyNumber_Add(_h2py(h1), _h2py(h2)));
             }
-        """
-        assert src_equal(x, expected)
 
-    def test_implementation_primitive_arg(self, autogen):
-        func = autogen.get('HPyLong_FromLong')
-        x = func.implementation()
-        expected = """
             HPyAPI_STORAGE
             HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext ctx, long value)
             {
                 return _py2h(PyLong_FromLong(value));
             }
-        """
-        assert src_equal(x, expected)
 
-    def test_implementation_ptr_return(self, autogen):
-        func = autogen.get('HPyBytes_AsString')
-        x = func.implementation()
-        expected = """
             HPyAPI_STORAGE
-            char *_HPy_IMPL_NAME(Bytes_AsString)(HPyContext ctx, HPy o)
+            char *_HPy_IMPL_NAME(Bytes_AsString)(HPyContext ctx, HPy h)
             {
-                return PyBytes_AsString(_h2py(o));
+                return PyBytes_AsString(_h2py(h));
             }
         """
-        assert src_equal(x, expected)
+        assert src_equal(got, exp)
