@@ -6,12 +6,12 @@ from hpy.tools.autogen.parse import HPyAPI
 from hpy.tools.autogen.ctx import autogen_ctx_h, autogen_ctx_def_h
 from hpy.tools.autogen.trampolines import autogen_trampolines_h, autogen_impl_h
 
-def src_equal(a, b):
+def src_equal(exp, got):
     # try to compare two C sources, ignoring whitespace
-    a = textwrap.dedent(a).strip()
-    b = textwrap.dedent(b).strip()
-    if a.split() != b.split():
-        diff = difflib.unified_diff(a.splitlines(), b.splitlines(),
+    exp = textwrap.dedent(exp).strip()
+    got = textwrap.dedent(got).strip()
+    if exp.split() != got.split():
+        diff = difflib.unified_diff(exp.splitlines(), got.splitlines(),
                                     fromfile='expected',
                                     tofile='got')
         print()
@@ -66,7 +66,7 @@ class TestAutogen:
             HPy h_None;
             HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
         """)
-        out = autogen_ctx_h(api).generate()
+        got = autogen_ctx_h(api).generate()
         exp = """
             struct _HPyContext_s {
                 int ctx_version;
@@ -74,14 +74,14 @@ class TestAutogen:
                 HPy (*ctx_Add)(HPyContext ctx, HPy h1, HPy h2);
             };
         """
-        assert src_equal(out, exp)
+        assert src_equal(exp, got)
 
     def test_autogen_ctx_def_h(self):
         api = self.parse("""
             HPy h_None;
             HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
         """)
-        out = autogen_ctx_def_h(api).generate()
+        got = autogen_ctx_def_h(api).generate()
         exp = """
             struct _HPyContext_s global_ctx = {
                 .ctx_version = 1,
@@ -89,39 +89,32 @@ class TestAutogen:
                 .ctx_Add = &ctx_Add,
             };
         """
-        assert src_equal(out, exp)
+        assert src_equal(exp, got)
 
-    # WIP: the following tests are still broken and needs to be fixed
-
-    def test_trampoline_def(self, autogen):
-        func = autogen.get('HPy_Add')
-        x = func.trampoline_def()
-        expected = """
-            static inline HPy HPy_Add(HPyContext ctx, HPy x, HPy y) {
-                return ctx->ctx_Add ( ctx, x, y );
+    def test_autogen_trampolines_h(self):
+        api = self.parse("""
+            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+            void HPy_Close(HPyContext ctx, HPy h);
+            void* _HPy_Cast(HPyContext ctx, HPy h);
+        """)
+        got = autogen_trampolines_h(api).generate()
+        exp = """
+            static inline HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2) {
+                return ctx->ctx_Add ( ctx, h1, h2 );
             }
-        """
-        assert src_equal(x, expected)
 
-    def test_trampoline_def_void(self, autogen):
-        func = autogen.get('HPy_Close')
-        x = func.trampoline_def()
-        expected = """
             static inline void HPy_Close(HPyContext ctx, HPy h) {
                 ctx->ctx_Close ( ctx, h );
             }
-        """
-        assert src_equal(x, expected)
 
-    def test_trampoline_def_voidstar(self, autogen):
-        func = autogen.get('_HPy_Cast')
-        x = func.trampoline_def()
-        expected = """
             static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
                 return ctx->ctx_Cast ( ctx, h );
             }
         """
-        assert src_equal(x, expected)
+        assert src_equal(got, exp)
+
+
+    # WIP: the following tests are still broken and needs to be fixed
 
     def test_no_implementation(self, autogen):
         func = autogen.get('HPy_Dup')
