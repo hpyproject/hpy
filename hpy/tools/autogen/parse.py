@@ -67,7 +67,6 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
                                  name)
         cpy_name = self.convert_name(name)
         func = Function(name, cpy_name, node)
-        self.api.declarations.append(func)
         self.api.functions.append(func)
 
     def _visit_global_var(self, node):
@@ -77,7 +76,6 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
             return
         assert toC(node.type.type) == "HPy"
         var = GlobalVar(name, node)
-        self.api.declarations.append(var)
         self.api.variables.append(var)
 
 SPECIAL_CASES = {
@@ -170,7 +168,6 @@ class HPyAPI:
         raise KeyError(name)
 
     def collect_declarations(self):
-        self.declarations = [] # this should be removed, eventually
         self.functions = []
         self.variables = []
         v = FuncDeclVisitor(self, convert_name)

@@ -22,8 +22,8 @@ def main():
 
     public_api_h = py.path.local(__file__).dirpath('public_api.h')
     api = HPyAPI.parse(public_api_h)
-    for func in api.declarations:
-        print(func)
+    ## for func in api.functions:
+    ##     print(func)
 
     for cls in (autogen_ctx_h,
                 autogen_ctx_def_h,
