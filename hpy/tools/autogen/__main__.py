@@ -11,6 +11,7 @@ if version.parse(pycparser.__version__) < version.parse('2.20'):
 from .parse import HPyAPI
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
 from .trampolines import autogen_trampolines_h, autogen_impl_h
+from .hpyfunc import autogen_hpyfunc_declare_h
 from .pypy import autogen_pypy_txt
 
 def main():
@@ -29,6 +30,7 @@ def main():
                 autogen_ctx_def_h,
                 autogen_trampolines_h,
                 autogen_impl_h,
+                autogen_hpyfunc_declare_h,
                 autogen_pypy_txt):
         cls(api).write(outdir)
 

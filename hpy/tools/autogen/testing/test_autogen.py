@@ -21,7 +21,7 @@ def src_equal(exp, got):
     return True
 
 @pytest.mark.usefixtures('initargs')
-class TestAutogen:
+class BaseTestAutogen:
 
     @pytest.fixture
     def initargs(self, tmpdir):
@@ -37,9 +37,8 @@ class TestAutogen:
         fname.write(src)
         return HPyAPI.parse(fname)
 
-    def autogen(self, cls, src):
-        api = self.parse(src)
-        return cls(api).generate()
+
+class TestHPyAPI(BaseTestAutogen):
 
     def test_ctx_name(self):
         api = self.parse("""
@@ -60,6 +59,9 @@ class TestAutogen:
         assert api.get_func('HPy_Dup').cpython_name is None
         assert api.get_func('HPyLong_AsLong').cpython_name == 'PyLong_AsLong'
         assert api.get_func('HPy_Add').cpython_name == 'PyNumber_Add'
+
+
+class TestAutoGen(BaseTestAutogen):
 
     def test_autogen_ctx_h(self):
         api = self.parse("""

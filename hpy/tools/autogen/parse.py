@@ -45,16 +45,36 @@ class GlobalVar:
         return self.name
 
 
-class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
+@attr.s
+class HPyFunc:
+    _BASE_NAME = re.compile(r'^HPyFunc_?')
+
+    name = attr.ib()
+    node = attr.ib(repr=False)
+
+    def base_name(self):
+        return self._BASE_NAME.sub('', self.name)
+
+
+class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self, api, convert_name):
         self.api = api
         self.convert_name = convert_name
+
+    def _is_function_ptr(self, node):
+        return (isinstance(node, c_ast.PtrDecl) and
+                isinstance(node.type, c_ast.FuncDecl))
 
     def visit_Decl(self, node):
         if isinstance(node.type, c_ast.FuncDecl):
             self._visit_function(node)
         elif isinstance(node.type, c_ast.TypeDecl):
             self._visit_global_var(node)
+
+    def visit_Typedef(self, node):
+        # find only typedefs to function pointers whose name starts by HPyFunc_
+        if node.name.startswith('HPyFunc_') and self._is_function_ptr(node.type):
+            self._visit_hpyfunc_typedef(node)
 
     def _visit_function(self, node):
         name = node.name
@@ -77,6 +97,11 @@ class FuncDeclVisitor(pycparser.c_ast.NodeVisitor):
         assert toC(node.type.type) == "HPy"
         var = GlobalVar(name, node)
         self.api.variables.append(var)
+
+    def _visit_hpyfunc_typedef(self, node):
+        hpyfunc = HPyFunc(node.name, node)
+        self.api.hpyfunc_typedefs.append(hpyfunc)
+
 
 SPECIAL_CASES = {
     'HPy_Dup': None,
@@ -148,7 +173,7 @@ class HPyAPI:
 
     def __init__(self, filename):
         self.ast = pycparser.parse_file(filename, use_cpp=True)
-        #self.ast.show()
+        ## print(); self.ast.show()
         self.collect_declarations()
 
     @classmethod
@@ -161,6 +186,9 @@ class HPyAPI:
     def get_var(self, name):
         return self._lookup(name, self.variables)
 
+    def get_hpyfunc_typedef(self, name):
+        return self._lookup(name, self.hpyfunc_typedefs)
+
     def _lookup(self, name, collection):
         for x in collection:
             if x.name == name:
@@ -170,5 +198,6 @@ class HPyAPI:
     def collect_declarations(self):
         self.functions = []
         self.variables = []
-        v = FuncDeclVisitor(self, convert_name)
+        self.hpyfunc_typedefs = []
+        v = HPyAPIVisitor(self, convert_name)
         v.visit(self.ast)
