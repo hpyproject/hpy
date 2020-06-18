@@ -1,3 +1,5 @@
+import textwrap
+import difflib
 import py
 import pytest
 from hpy.tools.autogen.parse import HPyAPI
@@ -6,9 +8,16 @@ from hpy.tools.autogen.trampolines import autogen_trampolines_h, autogen_impl_h
 
 def src_equal(a, b):
     # try to compare two C sources, ignoring whitespace
-    a = a.split()
-    b = b.split()
-    assert a == b
+    a = textwrap.dedent(a).strip()
+    b = textwrap.dedent(b).strip()
+    if a.split() != b.split():
+        diff = difflib.unified_diff(a.splitlines(), b.splitlines(),
+                                    fromfile='expected',
+                                    tofile='got')
+        print()
+        for line in diff:
+            print(line)
+        return False
     return True
 
 @pytest.mark.usefixtures('initargs')
@@ -63,6 +72,21 @@ class TestAutogen:
                 int ctx_version;
                 HPy h_None;
                 HPy (*ctx_Add)(HPyContext ctx, HPy h1, HPy h2);
+            };
+        """
+        assert src_equal(out, exp)
+
+    def test_autogen_ctx_def_h(self):
+        api = self.parse("""
+            HPy h_None;
+            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+        """)
+        out = autogen_ctx_def_h(api).generate()
+        exp = """
+            struct _HPyContext_s global_ctx = {
+                .ctx_version = 1,
+                .h_None = (HPy){CONSTANT_H_NONE},
+                .ctx_Add = &ctx_Add,
             };
         """
         assert src_equal(out, exp)
