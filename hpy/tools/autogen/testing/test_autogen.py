@@ -1,23 +1,8 @@
 import py
 import pytest
-from hpy.tools.autogen.parse import AutoGen, Function, GlobalVar
-
-@pytest.fixture(scope='module')
-def autogen(tmpdir_factory):
-    tmpdir = tmpdir_factory.mktemp('autogen')
-    fname = tmpdir.join('foo_api.c')
-    fname.write("""
-        typedef int HPy;
-        typedef int HPyContext;
-        HPy h_None;
-        HPy HPy_Dup(HPyContext ctx, HPy h);
-        void HPy_Close(HPyContext ctx, HPy h);
-        void* _HPy_Cast(HPyContext ctx, HPy h);
-        HPy HPy_Add(HPyContext ctx, HPy x, HPy y);
-        HPy HPyLong_FromLong(HPyContext ctx, long value);
-        char* HPyBytes_AsString(HPyContext ctx, HPy o);
-    """)
-    return AutoGen(str(fname))
+from hpy.tools.autogen.parse import HPyAPI
+from hpy.tools.autogen.ctx import autogen_ctx_h, autogen_ctx_def_h
+from hpy.tools.autogen.trampolines import autogen_trampolines_h, autogen_impl_h
 
 def src_equal(a, b):
     # try to compare two C sources, ignoring whitespace
@@ -26,11 +11,63 @@ def src_equal(a, b):
     assert a == b
     return True
 
-class TestFunction:
+@pytest.mark.usefixtures('initargs')
+class TestAutogen:
 
-    def test_ctx_decl(self, autogen):
-        func = autogen.get('HPy_Add')
-        assert func.ctx_decl() == 'HPy (*ctx_Add)(HPyContext ctx, HPy x, HPy y)'
+    @pytest.fixture
+    def initargs(self, tmpdir):
+        self.tmpdir = tmpdir
+
+    def parse(self, src):
+        fname = self.tmpdir.join('test_api.h')
+        # automatically add usefuly typedefs
+        src = """
+            typedef int HPy;
+            typedef int HPyContext;
+        """ + src
+        fname.write(src)
+        return HPyAPI.parse(fname)
+
+    def autogen(self, cls, src):
+        api = self.parse(src)
+        return cls(api).generate()
+
+    def test_ctx_name(self):
+        api = self.parse("""
+            HPy h_None;
+            HPy HPy_Dup(HPyContext ctx, HPy h);
+            void* _HPy_Cast(HPyContext ctx, HPy h);
+        """)
+        assert api.get_var('h_None').ctx_name() == 'h_None'
+        assert api.get_func('HPy_Dup').ctx_name() == 'ctx_Dup'
+        assert api.get_func('_HPy_Cast').ctx_name() == 'ctx_Cast'
+
+    def test_cpython_name(self):
+        api = self.parse("""
+            HPy HPy_Dup(HPyContext ctx, HPy h);
+            long HPyLong_AsLong(HPyContext ctx, HPy h);
+            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+        """)
+        assert api.get_func('HPy_Dup').cpython_name is None
+        assert api.get_func('HPyLong_AsLong').cpython_name == 'PyLong_AsLong'
+        assert api.get_func('HPy_Add').cpython_name == 'PyNumber_Add'
+
+    def test_autogen_ctx_h(self):
+        api = self.parse("""
+            HPy h_None;
+            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+        """)
+        out = autogen_ctx_h(api).generate()
+        exp = """
+            struct _HPyContext_s {
+                int ctx_version;
+                HPy h_None;
+                HPy (*ctx_Add)(HPyContext ctx, HPy h1, HPy h2);
+            };
+        """
+        assert src_equal(out, exp)
+
+    # WIP: the following tests are still broken and needs to be fixed
 
     def test_trampoline_def(self, autogen):
         func = autogen.get('HPy_Add')
@@ -102,10 +139,3 @@ class TestFunction:
             }
         """
         assert src_equal(x, expected)
-
-
-class TestGlobalVar:
-
-    def test_impl_name(self, autogen):
-        var = autogen.get('h_None')
-        assert var.ctx_impl_name() == '(HPy){CONSTANT_H_NONE}'

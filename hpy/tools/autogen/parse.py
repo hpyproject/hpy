@@ -157,11 +157,16 @@ class HPyAPI:
     def parse(cls, filename):
         return cls(filename)
 
+    def get_func(self, name):
+        return self._lookup(name, self.functions)
 
-    def get(self, name):
-        for d in self.declarations:
-            if d.name == name:
-                return d
+    def get_var(self, name):
+        return self._lookup(name, self.variables)
+
+    def _lookup(self, name, collection):
+        for x in collection:
+            if x.name == name:
+                return x
         raise KeyError(name)
 
     def collect_declarations(self):
