@@ -12,6 +12,7 @@ setup(
                    'hpy/universal/src/ctx_module.c',
                    'hpy/universal/src/ctx_meth.c',
                    'hpy/universal/src/ctx_misc.c',
+                   'hpy/universal/src/debugmode.c',
                    'hpy/devel/src/runtime/ctx_type.c',
                    'hpy/devel/src/runtime/argparse.c',
                   ],

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "hpy.h"
 #include "handles.h"
+#include "debugmode.h"
 
 
 /* XXX we should turn the fast-path of _py2h and _h2py into macros in api.h */
@@ -9,10 +10,17 @@
 static PyObject **all_handles;
 static Py_ssize_t h_num_allocated = 0;
 static Py_ssize_t h_free_list = -1;
+static Py_ssize_t h_free_list_2 = -1;
 
 static void
 allocate_more_handles(void)
 {
+    if (h_free_list_2 >= 0) {
+        h_free_list = h_free_list_2;
+        h_free_list_2 = -1;
+        return;
+    }
+
     Py_ssize_t base = (h_num_allocated < CONSTANT_H__TOTAL ?
                        CONSTANT_H__TOTAL : h_num_allocated);
     Py_ssize_t i, allocate = (base / 2) * 3 + 32;
@@ -31,7 +39,8 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_TRUE] = Py_True;
         new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
         new_handles[CONSTANT_H_TYPEERROR] = PyExc_TypeError;
-        assert(CONSTANT_H__TOTAL == 6);
+        HPY_ASSERT(CONSTANT_H__TOTAL == 6,
+            ("update handles.c with the list of constants"));
     }
 
     PyMem_Free(all_handles);
@@ -59,16 +68,39 @@ _py2h(PyObject *obj)
 PyObject *
 _h2py(HPy h)
 {
+    HPY_ASSERT(h._i >= 0 && h._i < h_num_allocated,
+        ("using an HPy containing garbage: _i = %zd", h._i));
     // If HPy_IsNull(h), the h._i = 0 and the line below returns the
     // pointer attached to the 0th handle, i.e. NULL.
-    return all_handles[h._i];
+    PyObject *result = all_handles[h._i];
+    if (h._i == 0) {
+        HPY_ASSERT(result == NULL, ("handle number 0 doesn't contain NULL"));
+        return NULL;
+    }
+    HPY_ASSERT((((Py_ssize_t)result) & 1) == 0,
+        ("using an HPy that was freed already (or never allocated): _i = %zd",
+         h._i));
+    HPY_ASSERT(result != NULL,
+        ("NULL PyObject unexpected in handle _i = %zd", h._i));
+    HPY_ASSERT(Py_REFCNT(result) > 0,
+        ("bogus (freed?) PyObject found in handle _i = %zd", h._i));
+    return result;
 }
 
 void
 _hclose(HPy h)
 {
     Py_ssize_t i = h._i;
-    Py_XDECREF(all_handles[i]);
-    all_handles[i] = (PyObject *)((h_free_list << 1) | 1);
-    h_free_list = i;
+    HPY_ASSERT(i >= 0 && i < h_num_allocated,
+        ("freeing an HPy containing garbage: _i = %zd", i));
+    HPY_ASSERT(i != 0, ("freeing HPy_NULL is not allowed"));
+    PyObject *old = all_handles[i];
+    HPY_ASSERT((((Py_ssize_t)old) & 1) == 0,
+        ("freeing an HPy that was freed already (or never allocated): _i = %zd",
+         i));
+    HPY_ASSERT(Py_REFCNT(old) > 0,
+        ("bogus PyObject found while freeing handle _i = %zd", h._i));
+    all_handles[i] = (PyObject *)((h_free_list_2 << 1) | 1);
+    h_free_list_2 = i;
+    Py_DECREF(old);
 }
