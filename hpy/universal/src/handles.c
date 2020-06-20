@@ -11,6 +11,9 @@ static PyObject **all_handles;
 static Py_ssize_t h_num_allocated = 0;
 static Py_ssize_t h_free_list = -1;
 static Py_ssize_t h_free_list_2 = -1;
+/* note: h_free_list_2 is only here for debugging.  We can push freed
+   handles directly into h_free_list.  But using two free lists makes
+   reuses occur later and in a less deterministic order. */
 
 static void
 allocate_more_handles(void)
