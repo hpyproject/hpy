@@ -5,16 +5,6 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-typedef intptr_t HPy_ssize_t;
-
-struct _HPy_s { HPy_ssize_t _i; };
-typedef struct _HPy_s HPy;
-
-typedef struct _HPyContext_s *HPyContext;
-struct _object;  /* that's PyObject inside CPython */
-typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
-                                             struct _object *args);
-
 #ifdef __GNUC__
 #define _HPy_HIDDEN  __attribute__((visibility("hidden")))
 #else
@@ -23,6 +13,17 @@ typedef struct _object *(*_HPy_CPyCFunction)(struct _object *self,
 
 #define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
+/* HPy types */
+typedef intptr_t HPy_ssize_t;
+struct _HPy_s { HPy_ssize_t _i; };
+typedef struct _HPy_s HPy;
+typedef struct _HPyContext_s *HPyContext;
+
+/* compatibility CPython types */
+#include "common/cpy_types.h"
+
+
+/* misc stuff, which should probably go in its own header */
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(x) ((x)._i == 0)
 
@@ -36,10 +37,10 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #include "common/macros.h"
 #include "common/runtime/argparse.h"
 
-#include "common/type.h"
-#include "typeslots.h"
-#include "meth.h"
-#include "module.h"
+#include "common/hpyfunc.h"
+#include "common/hpydef.h"
+#include "common/hpytype.h"
+#include "common/hpymodule.h"
 
 #include "autogen_ctx.h"
 #include "autogen_trampolines.h"

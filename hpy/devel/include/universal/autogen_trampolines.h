@@ -300,15 +300,15 @@ static inline HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key) {
      return ctx->ctx_Dict_GetItem ( ctx, h_dict, h_key ); 
 }
 
-static inline HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj) {
+static inline HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }
 
-static inline struct _object *HPy_AsPyObject(HPyContext ctx, HPy h) {
+static inline cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h) {
      return ctx->ctx_AsPyObject ( ctx, h ); 
 }
 
-static inline struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, struct _object *self, struct _object *args, struct _object *kw, void *func, int ml_flags) {
-     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, kw, func, ml_flags ); 
+static inline cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx, cpy_PyObject *self, cpy_PyObject *args, cpy_PyObject *kw, void *func, HPyFunc_Signature sig) {
+     return ctx->ctx_CallRealFunctionFromTrampoline ( ctx, self, args, kw, func, sig ); 
 }
 

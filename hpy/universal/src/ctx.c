@@ -2,7 +2,7 @@
 #include "handles.h"
 
 #include "common/runtime/ctx_type.h"
-#include "ctx_module.h"
+#include "common/runtime/ctx_module.h"
 #include "ctx_meth.h"
 #include "ctx_misc.h"
 

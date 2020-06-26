@@ -6,6 +6,8 @@ typedef int HPyType_Spec;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
 typedef int wchar_t;
+typedef int HPyFunc_Signature;
+typedef int cpy_PyObject;
 
 
 /* HPy public API */
@@ -119,13 +121,13 @@ int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
 HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
 /* integration with the old CPython API */
-HPy HPy_FromPyObject(HPyContext ctx, struct _object *obj);
-struct _object *HPy_AsPyObject(HPyContext ctx, HPy h);
+HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj);
+cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h);
 
 /* internal helpers which need to be exposed to modules for practical reasons :( */
-struct _object *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
-                                                    struct _object *self,
-                                                    struct _object *args,
-                                                    struct _object *kw,
+cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
+                                                    cpy_PyObject *self,
+                                                    cpy_PyObject *args,
+                                                    cpy_PyObject *kw,
                                                     void *func,
-                                                    int ml_flags);
+                                                    HPyFunc_Signature sig);

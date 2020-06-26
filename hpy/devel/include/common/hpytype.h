@@ -1,13 +1,7 @@
-#ifndef HPY_UNIVERSAL_TYPE_H
-#define HPY_UNIVERSAL_TYPE_H
+#ifndef HPY_UNIVERSAL_HPYTYPE_H
+#define HPY_UNIVERSAL_HPYTYPE_H
 
 #include <stdbool.h>
-
-typedef struct{
-    int slot;    /* slot id, see below */
-    void *pfunc; /* function pointer */
-} HPyType_Slot;
-
 
 typedef struct {
     const char* name;
@@ -15,7 +9,8 @@ typedef struct {
     int basicsize;
     int itemsize;
     unsigned int flags;
-    HPyType_Slot *slots; /* terminated by slot==0. */
+    void *legacy_slots; // PyType_Slot *
+    HPyDef *defines[];
 } HPyType_Spec;
 
 /* All types are dynamically allocated */
@@ -28,4 +23,4 @@ typedef struct {
 
 #define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
 
-#endif /* HPY_UNIVERSAL_TYPE_H */
+#endif /* HPY_UNIVERSAL_HPYTYPE_H */

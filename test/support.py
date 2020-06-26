@@ -12,17 +12,16 @@ def reindent(s, indent):
 class ExtensionTemplate(object):
 
     INIT_TEMPLATE = textwrap.dedent("""
-    static HPyMethodDef MyTestMethods[] = {
-        %(methods)s
-        {NULL, NULL, 0, NULL}
-    };
-
     static HPyModuleDef moduledef = {
         HPyModuleDef_HEAD_INIT,
         .m_name = "%(name)s",
         .m_doc = "some test for hpy",
         .m_size = -1,
-        .m_methods = MyTestMethods
+        .legacy_methods = %(legacy_methods)s,
+        .defines = {
+            %(defines)s
+            NULL
+        }
     };
 
     HPy_MODINIT(%(name)s)
@@ -40,13 +39,14 @@ class ExtensionTemplate(object):
     r_marker = re.compile(r"^\s*@([A-Z_]+)(\(.*\))?$")
 
     def __init__(self, src, name):
-        self.src = src
+        self.src = textwrap.dedent(src)
         self.name = name
-        self.method_table = None
+        self.defines_table = None
+        self.legacy_methods = 'NULL'
         self.type_table = None
 
     def expand(self):
-        self.method_table = []
+        self.defines_table = []
         self.type_table = []
         self.output = ['#include <hpy.h>']
         for line in self.src.split('\n'):
@@ -72,24 +72,26 @@ class ExtensionTemplate(object):
         return name, args
 
     def INIT(self):
+        if self.type_table:
+            init_types = '\n'.join(self.type_table)
+        else:
+            init_types = ''
+
         exp = self.INIT_TEMPLATE % {
-            'methods': '\n    '.join(self.method_table),
-            'init_types': '\n'.join(self.type_table),
+            'legacy_methods': self.legacy_methods,
+            'defines': '\n        '.join(self.defines_table),
+            'init_types': init_types,
             'name': self.name}
         self.output.append(exp)
         # make sure that we don't fill the tables any more
-        self.method_table = None
+        self.defines_table = None
         self.type_table = None
 
-    def EXPORT(self, ml_name, ml_flags):
-        if not ml_flags.startswith('HPy_'):
-            # this is a legacy function: add a cast to (HPyMeth) to
-            # silence warnings
-            cast = '(HPyMeth)'
-        else:
-            cast = ''
-        self.method_table.append('{"%s", %s%s, %s, NULL},' % (
-                ml_name, cast, ml_name, ml_flags))
+    def EXPORT(self, meth):
+        self.defines_table.append('&%s,' % meth)
+
+    def EXPORT_LEGACY(self, pymethoddef):
+        self.legacy_methods = pymethoddef
 
     def EXPORT_TYPE(self, name, spec):
         i = len(self.type_table)
@@ -163,6 +165,7 @@ class ExtensionCompiler:
             str(self.src_dir.join('argparse.c')),
         ]
         if self.abimode == 'cpython':
+            sources.append(str(self.src_dir.join('ctx_module.c')))
             sources.append(str(self.src_dir.join('ctx_type.c')))
         #
         for i, template in enumerate(extra_templates):

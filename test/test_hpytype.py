@@ -13,15 +13,10 @@ class TestType(HPyTest):
 
     def test_simple_type(self):
         mod = self.make_module("""
-            static HPyType_Slot Dummy_slots[] = {
-                {0, NULL},
-            };
-
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
-                .slots = Dummy_slots,
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -38,27 +33,25 @@ class TestType(HPyTest):
 
     def test_slots(self):
         mod = self.make_module("""
-            HPy_DEF_METH_NOARGS(Dummy_repr)
+            HPyDef_SLOT(Dummy_repr, HPy_tp_repr, Dummy_repr_impl, HPyFunc_NOARGS);
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPy_DEF_METH_NOARGS(Dummy_abs)
+            HPyDef_SLOT(Dummy_abs, HPy_nb_absolute, Dummy_abs_impl, HPyFunc_NOARGS);
             static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            static HPyType_Slot Dummy_slots[] = {
-                {Py_tp_repr, Dummy_repr},
-                {Py_nb_absolute, Dummy_abs},
-                {0, NULL},
-            };
-
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .slots = Dummy_slots
+                .defines = {
+                    &Dummy_repr,
+                    &Dummy_abs,
+                    NULL
+                }
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -70,32 +63,25 @@ class TestType(HPyTest):
 
     def test_tp_methods(self):
         mod = self.make_module("""
-            HPy_DEF_METH_O(Dummy_foo)
+            HPyDef_METH(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O)
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Add(ctx, arg, arg);
             }
 
-            HPy_DEF_METH_NOARGS(Dummy_bar)
+            HPyDef_METH(Dummy_bar, "bar", Dummy_bar_impl, HPyFunc_NOARGS)
             static HPy Dummy_bar_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            static HPyMethodDef Dummy_methods[] = {
-                {"foo", Dummy_foo, HPy_METH_O},
-                {"bar", Dummy_bar, HPy_METH_NOARGS},
-                {NULL}
-            };
-
-            static HPyType_Slot dummy_type_slots[] = {
-                {Py_tp_methods, Dummy_methods},
-                {0, NULL},
-            };
-
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .slots = dummy_type_slots,
+                .defines = {
+                    &Dummy_foo,
+                    &Dummy_bar,
+                    NULL
+                }
             };
 
             @EXPORT_TYPE("Dummy", dummy_type_spec)
@@ -112,7 +98,7 @@ class TestType(HPyTest):
                 long y;
             } PointObject;
 
-            HPy_DEF_METH_KEYWORDS(Point_new)
+            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
             static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -125,28 +111,21 @@ class TestType(HPyTest):
                 return h_point;
             }
 
-            HPy_DEF_METH_NOARGS(Point_foo)
+            HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
                 PointObject *point = HPy_CAST(ctx, PointObject, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            static HPyMethodDef Point_methods[] = {
-                {"foo", Point_foo, HPy_METH_NOARGS},
-                {NULL},
-            };
-
-            static HPyType_Slot Point_slots[] = {
-                {Py_tp_new, Point_new},
-                {Py_tp_methods, Point_methods},
-                {0, NULL},
-            };
-
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .slots = Point_slots,
+                .defines = {
+                    &Point_new,
+                    &Point_foo,
+                    NULL
+                }
             };
 
             @EXPORT_TYPE("Point", Point_spec)

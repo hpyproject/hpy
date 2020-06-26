@@ -35,51 +35,6 @@ typedef struct {
 #define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
 
 
-static void methoddef_copy_ml_meth_and_flags(HPyMethodDef *src, PyMethodDef *dst)
-{
-#ifdef HPY_UNIVERSAL_ABI
-    // Universal ABI mode: ml_meth could be either a legacy function or a
-    // new-style HPy method
-    if (src->ml_flags & _HPy_METH) {
-        // HPy function: cal ml_meth to get pointers to the impl_func and
-        // the cpy trampoline
-        void *impl_func;
-        PyCFunction trampoline_func;
-        src->ml_meth(&impl_func, &trampoline_func);
-        dst->ml_meth = (PyCFunction)trampoline_func;
-        dst->ml_flags = src->ml_flags & ~_HPy_METH;
-    }
-    else {
-        // legacy function: ml_meth already contains a function pointer
-        // with the correct CPython signature
-        dst->ml_meth = (PyCFunction)src->ml_meth;
-        dst->ml_flags = src->ml_flags;
-    }
-#else
-    // CPython ABI mode: ml_meth is already a PyCFunction function pointer
-    dst->ml_meth = src->ml_meth;
-    dst->ml_flags = src->ml_flags;
-#endif
-}
-
-static void slot_copy_pfunc(HPyType_Slot *src, PyType_Slot *dst)
-{
-#ifdef HPY_UNIVERSAL_ABI
-    // Universal ABI mode: for now we assume that it uses the HPy calling
-    // convention, but we need a way to allow slots with the CPython
-    // signature, similar to what we do in methoddef_copy_ml_meth_and_flags
-    HPyMeth f = (HPyMeth)src->pfunc;
-    void *impl_func;
-    _HPy_CPyCFunction trampoline_func;
-    f(&impl_func, &trampoline_func);
-    dst->pfunc = trampoline_func;
-#else
-    // CPython ABI mode
-    dst->pfunc = src->pfunc;
-#endif
-}
-
-
 _HPy_HIDDEN void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
@@ -88,80 +43,143 @@ ctx_Cast(HPyContext ctx, HPy h)
     return (void*)o->payload;
 }
 
-// note: this function is also called from ctx_module.c.
-// This malloc a result which will never be freed. Too bad
-_HPy_HIDDEN PyMethodDef *
-create_method_defs(HPyMethodDef *hpymethods)
+static int
+sig2flags(HPyFunc_Signature sig)
 {
-    // count the methods
-    Py_ssize_t count;
-    if (hpymethods == NULL) {
-        count = 0;
+    switch(sig) {
+        case HPyFunc_VARARGS:  return METH_VARARGS;
+        case HPyFunc_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
+        case HPyFunc_NOARGS:   return METH_NOARGS;
+        case HPyFunc_O:        return METH_O;
+        default:               return -1;
     }
-    else {
-        count = 0;
-        while (hpymethods[count].ml_name != NULL)
-            count++;
+}
+
+static int
+HPyDef_count(HPyDef *defs[], HPy_ssize_t *slots, HPy_ssize_t *meths)
+{
+    *slots = 0;
+    *meths = 0;
+    if (defs == NULL)
+        return 0;
+    for(int i=0; defs[i] != NULL; i++)
+        switch(defs[i]->kind) {
+        case HPyDef_Kind_Slot:
+            (*slots)++;
+            break;
+        case HPyDef_Kind_Meth:
+            (*meths)++;
+            break;
+        default:
+            PyErr_Format(PyExc_ValueError, "Invalid HPyDef.kind: %ld", defs[i]->kind);
+            return -1;
+        }
+    return 0;
+}
+
+
+/*
+ * Create a PyMethodDef which contains:
+ *     1. All HPyMeth contained in hpyspec->defines
+ *     2. All the PyMethodDef contained inside legacy_methods
+ *
+ * Notes:
+ *     - This function is also called from ctx_module.c.
+ *     - This malloc()s a result which will never be freed. Too bad
+ */
+_HPy_HIDDEN PyMethodDef *
+create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
+{
+    // count the HPyMeth
+    HPy_ssize_t hpyslot_count = 0;
+    HPy_ssize_t hpymeth_count = 0;
+    if (HPyDef_count(hpydefs, &hpyslot_count, &hpymeth_count) == -1)
+        return NULL;
+    // count the legacy methods
+    HPy_ssize_t legacy_count = 0;
+    if (legacy_methods != NULL) {
+        while (legacy_methods[legacy_count].ml_name != NULL)
+            legacy_count++;
     }
+    HPy_ssize_t total_count = hpymeth_count + legacy_count;
 
     // allocate&fill the result
-    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (count+1));
+    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (total_count+1));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    for(int i=0; i<count; i++) {
-        HPyMethodDef *src = &hpymethods[i];
-        PyMethodDef *dst = &result[i];
-        dst->ml_name = src->ml_name;
-        dst->ml_doc = src->ml_doc;
-        methoddef_copy_ml_meth_and_flags(src, dst);
+    // copy the HPy methods
+    int dst_idx = 0;
+    for(int i=0; hpydefs[i] != NULL; i++) {
+        HPyDef *src = hpydefs[i];
+        if (src->kind != HPyDef_Kind_Meth)
+            continue;
+        PyMethodDef *dst = &result[dst_idx++];
+        dst->ml_name = src->meth.name;
+        dst->ml_meth = src->meth.cpy_trampoline;
+        dst->ml_flags = sig2flags(src->meth.signature);
+        if (dst->ml_flags == -1) {
+            PyMem_Free(result);
+            PyErr_SetString(PyExc_ValueError, "Unsupported HPyMeth signature");
+            return NULL;
+        }
+        dst->ml_doc = src->meth.doc;
     }
-    result[count] = (PyMethodDef){NULL, NULL, 0, NULL};
+    // copy the legacy methods
+    for(int i=0; i<legacy_count; i++) {
+        PyMethodDef *src = &legacy_methods[i];
+        PyMethodDef *dst = &result[dst_idx++];
+        dst->ml_name = src->ml_name;
+        dst->ml_meth = src->ml_meth;
+        dst->ml_flags = src->ml_flags;
+        dst->ml_doc = src->ml_doc;
+    }
+    result[dst_idx++] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
 }
 
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
-    // count the slots
-    Py_ssize_t count;
-    if (hpyspec->slots == NULL) {
-        count = 0;
-    }
-    else {
-        count = 0;
-        while (hpyspec->slots[count].slot != 0)
-            count++;
-    }
+    // count the HPySlots
+    HPy_ssize_t hpyslot_count = 0;
+    HPy_ssize_t hpymeth_count = 0;
+    if (HPyDef_count(hpyspec->defines, &hpyslot_count, &hpymeth_count) == -1)
+        return NULL;
 
-    // allocate&fill the result
-    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (count+1));
+    // add a slot to hold Py_tp_methods
+    hpyslot_count++;
+
+    // allocate the result PyType_Slot array
+    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (hpyslot_count+1));
     if (result == NULL)
         return NULL;
-    for(int i=0; i<count; i++) {
-        HPyType_Slot *src = &hpyspec->slots[i];
-        PyType_Slot *dst = &result[i];
-        dst->slot = src->slot;
-        if (src->slot == Py_tp_methods) {
-            // src->pfunc contains a HPyMethodDef*, which we convert to the
-            // CPython's equivalent. The result of create_method_defs can't be
-            // freed because CPython stores an internal reference to it, so
-            // this creates a small leak :(
-            HPyMethodDef *hpymethods = (HPyMethodDef*)src->pfunc;
-            dst->pfunc = create_method_defs(hpymethods);
-            if (dst->pfunc == NULL) {
-                PyMem_Free(result);
-                return NULL;
-            }
-        }
-        else {
-            slot_copy_pfunc(&hpyspec->slots[i], dst);
-        }
+
+    // fill the result with non-meth slots
+    int dst_idx = 0;
+    for(int i=0; hpyspec->defines[i] != NULL; i++) {
+        HPyDef *src = hpyspec->defines[i];
+        if (src->kind != HPyDef_Kind_Slot)
+            continue;
+        PyType_Slot *dst = &result[dst_idx++];
+        dst->slot = src->slot.slot;
+        dst->pfunc = src->slot.cpy_trampoline;
     }
-    result[count] = (PyType_Slot){0, NULL};
+
+    // add the "real" methods
+    PyMethodDef *m = create_method_defs(hpyspec->defines, NULL);
+    if (m == NULL) {
+        PyMem_Free(result);
+        return NULL;
+    }
+    result[dst_idx++] = (PyType_Slot){Py_tp_methods, m};
+
+    // add the NULL sentinel at the end
+    result[dst_idx++] = (PyType_Slot){0, NULL};
     return result;
 }
+
 
 _HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
@@ -179,6 +197,8 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
     spec->basicsize = hpyspec->basicsize + PyObject_HEAD_SIZE;
     spec->itemsize = hpyspec->itemsize;
     spec->flags = hpyspec->flags;
+    if (hpyspec->legacy_slots != NULL)
+        abort(); // FIXME
     spec->slots = create_slot_defs(hpyspec);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
