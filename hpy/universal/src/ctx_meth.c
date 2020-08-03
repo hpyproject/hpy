@@ -36,6 +36,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
        }
        return _h2py(f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw)));
     }
+#include "autogen_ctx_call.i"
     default:
         abort();  // XXX
     }

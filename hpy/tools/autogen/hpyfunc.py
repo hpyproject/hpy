@@ -79,3 +79,32 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             declnode.type.type.names = ['cpy_PyObject']
             declnode.type = c_ast.PtrDecl(type=declnode.type, quals=[])
         return declnode
+
+
+class autogen_ctx_call_i(AutoGenFile):
+    PATH = 'hpy/universal/src/autogen_ctx_call.i'
+
+    def generate(self):
+        lines = []
+        w = lines.append
+        for hpyfunc in self.api.hpyfunc_typedefs:
+            name = hpyfunc.base_name()
+            NAME = name.upper()
+            if NAME in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
+                continue
+            #
+            result = '_h2py'    # xxx hard-coded for now
+            args = ['ctx']
+            for param in hpyfunc.params()[1:]:
+                if toC(param.type) == 'HPy':
+                    args.append(f'_py2h(a->{param.name})')
+                else:
+                    args.append(f'a->{param.name}')
+            args = ', '.join(args)
+            #
+            w(f'    case HPyFunc_{NAME}: {{')
+            w(f'        HPyFunc_{name} f = (HPyFunc_{name})func;')
+            w(f'        _HPyFunc_args_{NAME} *a = (_HPyFunc_args_{NAME}*)args;')
+            w(f'        return {result}(f({args}));')
+            w(f'    }}')
+        return '\n'.join(lines)

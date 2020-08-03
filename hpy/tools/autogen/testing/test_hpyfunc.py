@@ -1,5 +1,6 @@
 from hpy.tools.autogen.hpyfunc import autogen_hpyfunc_declare_h
 from hpy.tools.autogen.hpyfunc import autogen_hpyfunc_trampoline_h
+from hpy.tools.autogen.hpyfunc import autogen_ctx_call_i
 from hpy.tools.autogen.testing.test_autogen import BaseTestAutogen, src_equal
 
 class TestHPyFunc(BaseTestAutogen):
@@ -43,6 +44,20 @@ class TestHPyFunc(BaseTestAutogen):
                     _HPyFunc_args_FOO a = { arg, xy }; \
                     return _HPy_CallRealFunctionFromTrampoline( \
                         _ctx_for_trampolines, HPyFunc_FOO, IMPL, &a); \
+            }
+        """
+        assert src_equal(got, exp)
+
+    def test_autogen_ctx_call_i(self):
+        api = self.parse("""
+            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
+        """)
+        got = autogen_ctx_call_i(api).generate()
+        exp = r"""
+            case HPyFunc_FOO: {
+                HPyFunc_foo f = (HPyFunc_foo)func;
+                _HPyFunc_args_FOO *a = (_HPyFunc_args_FOO*)args;
+                return _h2py(f(ctx, _py2h(a->arg), a->xy));
             }
         """
         assert src_equal(got, exp)
