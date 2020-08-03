@@ -1,6 +1,7 @@
 from hpy.tools.autogen.hpyfunc import autogen_hpyfunc_declare_h
 from hpy.tools.autogen.hpyfunc import autogen_hpyfunc_trampoline_h
 from hpy.tools.autogen.hpyfunc import autogen_ctx_call_i
+from hpy.tools.autogen.hpyfunc import autogen_cpython_hpyfunc_trampoline_h
 from hpy.tools.autogen.testing.test_autogen import BaseTestAutogen, src_equal
 
 class TestHPyFunc(BaseTestAutogen):
@@ -59,5 +60,19 @@ class TestHPyFunc(BaseTestAutogen):
                 _HPyFunc_args_FOO *a = (_HPyFunc_args_FOO*)args;
                 return _h2py(f(ctx, _py2h(a->arg), a->xy));
             }
+        """
+        assert src_equal(got, exp)
+
+    def test_autogen_cpython_hpyfunc_trampoline_h(self):
+        api = self.parse("""
+            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
+        """)
+        got = autogen_cpython_hpyfunc_trampoline_h(api).generate()
+        exp = r"""
+            #define _HPyFunc_TRAMPOLINE_HPyFunc_FOO(SYM, IMPL) \
+                static cpy_PyObject *SYM(cpy_PyObject *arg, int xy) \
+                { \
+                    return _h2py(IMPL(_HPyGetContext(), _py2h(arg), xy)); \
+                }
         """
         assert src_equal(got, exp)

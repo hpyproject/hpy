@@ -32,6 +32,14 @@ class autogen_hpyfunc_declare_h(AutoGenFile):
         return '\n'.join(lines)
 
 
+def hpy_to_cpy(declnode):
+    if toC(declnode.type) == 'HPy':
+        declnode = deepcopy(declnode)
+        declnode.type.type.names = ['cpy_PyObject']
+        declnode.type = c_ast.PtrDecl(type=declnode.type, quals=[])
+    return declnode
+
+
 class autogen_hpyfunc_trampoline_h(AutoGenFile):
     PATH = 'hpy/devel/include/universal/autogen_hpyfunc_trampolines.h'
 
@@ -48,7 +56,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             params = hpyfunc.params()
             assert toC(params[0].type) == 'HPyContext'
             for param in params[1:]:
-                node = self.fix_type_of_arg(param)
+                node = hpy_to_cpy(param)
                 w(f'    {toC(node)};')
             w('} _HPyFunc_args_%s;' % (base_name,))
             w('')
@@ -56,8 +64,8 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             # generate the trampoline itself
             tramp_node = deepcopy(hpyfunc.node.type.type)
             tramp_node.type.declname = 'SYM'
-            tramp_node = self.fix_type_of_arg(tramp_node)
-            tramp_node.args.params = [self.fix_type_of_arg(p)
+            tramp_node = hpy_to_cpy(tramp_node)
+            tramp_node.args.params = [hpy_to_cpy(p)
                                       for p in tramp_node.args.params[1:]]
             arg_names = [param.name for param in tramp_node.args.params]
             arg_names = ', '.join(arg_names)
@@ -72,13 +80,6 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             w('    }')
             w('')
         return '\n'.join(lines)
-
-    def fix_type_of_arg(self, declnode):
-        if toC(declnode.type) == 'HPy':
-            declnode = deepcopy(declnode)
-            declnode.type.type.names = ['cpy_PyObject']
-            declnode.type = c_ast.PtrDecl(type=declnode.type, quals=[])
-        return declnode
 
 
 class autogen_ctx_call_i(AutoGenFile):
@@ -106,5 +107,42 @@ class autogen_ctx_call_i(AutoGenFile):
             w(f'        HPyFunc_{name} f = (HPyFunc_{name})func;')
             w(f'        _HPyFunc_args_{NAME} *a = (_HPyFunc_args_{NAME}*)args;')
             w(f'        return {result}(f({args}));')
+            w(f'    }}')
+        return '\n'.join(lines)
+
+
+class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
+    PATH = 'hpy/devel/include/cpython/autogen_hpyfunc_trampolines.h'
+
+    def generate(self):
+        lines = []
+        w = lines.append
+        for hpyfunc in self.api.hpyfunc_typedefs:
+            name = hpyfunc.base_name()
+            NAME = name.upper()
+            if NAME in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
+                continue
+            #
+            tramp_node = deepcopy(hpyfunc.node.type.type)
+            tramp_node.type.declname = 'SYM'
+            tramp_node = hpy_to_cpy(tramp_node)
+            tramp_node.args.params = [hpy_to_cpy(p)
+                                      for p in tramp_node.args.params[1:]]
+            if toC(hpyfunc.return_type()) == 'HPy':
+                result = '_h2py'
+            else:
+                result = ''
+            args = ['_HPyGetContext()']
+            for param in hpyfunc.params()[1:]:
+                if toC(param.type) == 'HPy':
+                    args.append(f'_py2h({param.name})')
+                else:
+                    args.append(f'{param.name}')
+            args = ', '.join(args)
+            #
+            w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{NAME}(SYM, IMPL) \\')
+            w(f'    static {toC(tramp_node)} \\')
+            w(f'    {{ \\')
+            w(f'        return {result}(IMPL({args})); \\')
             w(f'    }}')
         return '\n'.join(lines)

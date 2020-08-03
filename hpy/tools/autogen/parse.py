@@ -58,6 +58,9 @@ class HPyFunc:
     def params(self):
         return self.node.type.type.args.params
 
+    def return_type(self):
+        return self.node.type.type.type
+
 
 class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self, api, convert_name):

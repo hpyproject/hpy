@@ -48,7 +48,7 @@ typedef enum {
 #  include "universal/autogen_hpyfunc_trampolines.h"
 #else
 #  include "cpython/hpyfunc_trampolines.h"
-//#  include "cpython/autogen_hpyfunc_trampolines.h"
+#  include "cpython/autogen_hpyfunc_trampolines.h"
 #endif // HPY_UNIVERSAL_ABI
 
 #endif /* HPY_UNIVERSAL_HPYFUNC_H */
