@@ -37,28 +37,38 @@ class TestHPyFunc(BaseTestAutogen):
             typedef struct {
                 cpy_PyObject *arg;
                 int xy;
+                cpy_PyObject * result;
             } _HPyFunc_args_FOO;
 
             #define _HPyFunc_TRAMPOLINE_HPyFunc_FOO(SYM, IMPL) \
                 static cpy_PyObject *SYM(cpy_PyObject *arg, int xy) \
                 { \
                     _HPyFunc_args_FOO a = { arg, xy }; \
-                    return _HPy_CallRealFunctionFromTrampoline( \
-                        _ctx_for_trampolines, HPyFunc_FOO, IMPL, &a); \
-            }
+                    _HPy_CallRealFunctionFromTrampoline( \
+                       _ctx_for_trampolines, HPyFunc_FOO, IMPL, &a); \
+                    return a.result; \
+                }
         """
         assert src_equal(got, exp)
 
     def test_autogen_ctx_call_i(self):
         api = self.parse("""
             typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
+            typedef int (*HPyFunc_bar)(HPyContext ctx);
         """)
         got = autogen_ctx_call_i(api).generate()
         exp = r"""
             case HPyFunc_FOO: {
                 HPyFunc_foo f = (HPyFunc_foo)func;
                 _HPyFunc_args_FOO *a = (_HPyFunc_args_FOO*)args;
-                return _h2py(f(ctx, _py2h(a->arg), a->xy));
+                a->result = _h2py(f(ctx, _py2h(a->arg), a->xy));
+                return;
+            }
+            case HPyFunc_BAR: {
+                HPyFunc_bar f = (HPyFunc_bar)func;
+                _HPyFunc_args_BAR *a = (_HPyFunc_args_BAR*)args;
+                a->result = (f(ctx));
+                return;
             }
         """
         assert src_equal(got, exp)

@@ -11,10 +11,12 @@
     case HPyFunc_UNARY: {
         HPyFunc_unary f = (HPyFunc_unary)func;
         _HPyFunc_args_UNARY *a = (_HPyFunc_args_UNARY*)args;
-        return _h2py(f(ctx, _py2h(a->arg)));
+        a->result = _h2py(f(ctx, _py2h(a->arg)));
+        return;
     }
     case HPyFunc_REPR: {
         HPyFunc_repr f = (HPyFunc_repr)func;
         _HPyFunc_args_REPR *a = (_HPyFunc_args_REPR*)args;
-        return _h2py(f(ctx, _py2h(a->arg)));
+        a->result = _h2py(f(ctx, _py2h(a->arg)));
+        return;
     }

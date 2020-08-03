@@ -47,37 +47,36 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
         lines = []
         w = lines.append
         for hpyfunc in self.api.hpyfunc_typedefs:
-            base_name = hpyfunc.base_name().upper()
-            if base_name in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
+            NAME = hpyfunc.base_name().upper()
+            if NAME in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
                 continue
             #
-            # generate the struct that will contain all parameters
-            w('typedef struct {')
-            params = hpyfunc.params()
-            assert toC(params[0].type) == 'HPyContext'
-            for param in params[1:]:
-                node = hpy_to_cpy(param)
-                w(f'    {toC(node)};')
-            w('} _HPyFunc_args_%s;' % (base_name,))
-            w('')
-            #
-            # generate the trampoline itself
             tramp_node = deepcopy(hpyfunc.node.type.type)
             tramp_node.type.declname = 'SYM'
             tramp_node = hpy_to_cpy(tramp_node)
+            assert toC(tramp_node.args.params[0].type) == 'HPyContext'
             tramp_node.args.params = [hpy_to_cpy(p)
                                       for p in tramp_node.args.params[1:]]
             arg_names = [param.name for param in tramp_node.args.params]
             arg_names = ', '.join(arg_names)
-
-            w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{base_name}(SYM, IMPL) \\')
+            #
+            # generate the struct that will contain all parameters
+            w(f'typedef struct {{')
+            for param in tramp_node.args.params:
+                w(f'    {toC(param)};')
+            w(f'    {toC(tramp_node.type)} result;')
+            w(f'}} _HPyFunc_args_{NAME};')
+            w('')
+            #
+            # generate the trampoline itself
+            w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{NAME}(SYM, IMPL) \\')
             w(f'    static {toC(tramp_node)} \\')
-            w('    { \\')
-            w(f'        _HPyFunc_args_{base_name} a = {{ {arg_names} }}; \\')
-            w('        return _HPy_CallRealFunctionFromTrampoline( \\')
-            w(f'            _ctx_for_trampolines, HPyFunc_{base_name},'
-              ' IMPL, &a); \\')
-            w('    }')
+            w(f'    {{ \\')
+            w(f'        _HPyFunc_args_{NAME} a = {{ {arg_names} }}; \\')
+            w(f'        _HPy_CallRealFunctionFromTrampoline( \\')
+            w(f'           _ctx_for_trampolines, HPyFunc_{NAME}, IMPL, &a); \\')
+            w(f'        return a.result; \\')
+            w(f'    }}')
             w('')
         return '\n'.join(lines)
 
@@ -94,7 +93,10 @@ class autogen_ctx_call_i(AutoGenFile):
             if NAME in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
                 continue
             #
-            result = '_h2py'    # xxx hard-coded for now
+            if toC(hpyfunc.return_type()) == 'HPy':
+                result = '_h2py'
+            else:
+                result = ''
             args = ['ctx']
             for param in hpyfunc.params()[1:]:
                 if toC(param.type) == 'HPy':
@@ -106,7 +108,8 @@ class autogen_ctx_call_i(AutoGenFile):
             w(f'    case HPyFunc_{NAME}: {{')
             w(f'        HPyFunc_{name} f = (HPyFunc_{name})func;')
             w(f'        _HPyFunc_args_{NAME} *a = (_HPyFunc_args_{NAME}*)args;')
-            w(f'        return {result}(f({args}));')
+            w(f'        a->result = {result}(f({args}));')
+            w(f'        return;')
             w(f'    }}')
         return '\n'.join(lines)
 

@@ -125,10 +125,10 @@ HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj);
 cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h);
 
 /* internal helpers which need to be exposed to modules for practical reasons :( */
-cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
-                                                  HPyFunc_Signature sig,
-                                                  void *func,
-                                                  void *args);
+void _HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
+                                         HPyFunc_Signature sig,
+                                         void *func,
+                                         void *args);
 
 
 
