@@ -5,7 +5,11 @@ typedef enum {
     HPyFunc_VARARGS  = 1,  // METH_VARARGS
     HPyFunc_KEYWORDS = 2,  // METH_VARARGS | METH_KEYWORDS
     HPyFunc_NOARGS   = 3,  // METH_NOARGS
-    HPyFunc_O        = 4   // METH_O
+    HPyFunc_O        = 4,  // METH_O
+
+    HPyFunc_UNARY = 5,
+    HPyFunc_REPR = 6,
+
 } HPyFunc_Signature;
 
 // typedefs corresponding to the various HPyFunc_Signature members
@@ -45,8 +49,10 @@ typedef HPy (*HPyFunc_keywords)(HPyContext ctx, HPy self,
 
 #ifdef HPY_UNIVERSAL_ABI
 #  include "universal/hpyfunc_trampolines.h"
+#  include "universal/autogen_hpyfunc_trampolines.h"
 #else
 #  include "cpython/hpyfunc_trampolines.h"
+//#  include "cpython/autogen_hpyfunc_trampolines.h"
 #endif // HPY_UNIVERSAL_ABI
 
 #endif /* HPY_UNIVERSAL_HPYFUNC_H */

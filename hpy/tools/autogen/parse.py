@@ -55,6 +55,9 @@ class HPyFunc:
     def base_name(self):
         return self._BASE_NAME.sub('', self.name)
 
+    def params(self):
+        return self.node.type.type.args.params
+
 
 class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self, api, convert_name):

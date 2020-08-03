@@ -24,3 +24,52 @@ class autogen_hpyfunc_declare_h(AutoGenFile):
             name = hpyfunc.base_name().upper()
             w(f'#define _HPyFunc_DECLARE_HPyFunc_{name}(SYM) static {symdecl}')
         return '\n'.join(lines)
+
+
+class autogen_hpyfunc_trampoline_h(AutoGenFile):
+    PATH = 'hpy/devel/include/universal/autogen_hpyfunc_trampolines.h'
+
+    def generate(self):
+        lines = []
+        w = lines.append
+        for hpyfunc in self.api.hpyfunc_typedefs:
+            base_name = hpyfunc.base_name().upper()
+            if base_name in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
+                continue
+
+            # generate the struct that will contain all parameters
+            w('typedef struct {')
+            params = hpyfunc.params()
+            assert toC(params[0].type) == 'HPyContext'
+            for param in params[1:]:
+                node = self.fix_type_of_arg(param)
+                w(f'    {toC(node)};')
+            w('} _HPyFunc_args_%s;' % (base_name,))
+            w('')
+
+            # generate the trampoline itself
+            tramp_node = deepcopy(hpyfunc.node.type.type)
+            tramp_node.type.declname = 'SYM'
+            tramp_node = self.fix_type_of_arg(tramp_node)
+            tramp_node.args.params = [self.fix_type_of_arg(p)
+                                      for p in tramp_node.args.params[1:]]
+            arg_names = [param.name for param in tramp_node.args.params]
+            arg_names = ', '.join(arg_names)
+
+            w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{base_name}(SYM, IMPL) \\')
+            w(f'    static {toC(tramp_node)} \\')
+            w('    { \\')
+            w(f'        _HPyFunc_args_{base_name} a = {{ {arg_names} }}; \\')
+            w('        return _HPy_CallRealFunctionFromTrampoline( \\')
+            w(f'            _ctx_for_trampolines, HPyFunc_{base_name},'
+              ' IMPL, &a); \\')
+            w('    }')
+            w('')
+        return '\n'.join(lines)
+
+    def fix_type_of_arg(self, declnode):
+        if toC(declnode.type) == 'HPy':
+            declnode = deepcopy(declnode)
+            declnode.type.type.names = ['cpy_PyObject']
+            declnode.type = c_ast.PtrDecl(type=declnode.type, quals=[])
+        return declnode

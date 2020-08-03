@@ -12,6 +12,7 @@ from .parse import HPyAPI
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
 from .trampolines import autogen_trampolines_h, autogen_impl_h
 from .hpyfunc import autogen_hpyfunc_declare_h
+from .hpyfunc import autogen_hpyfunc_trampoline_h
 from .pypy import autogen_pypy_txt
 
 def main():
@@ -19,7 +20,6 @@ def main():
         print('Usage: python -m hpy.tools.autogen OUTDIR')
         sys.exit(1)
     outdir = py.path.local(sys.argv[1])
-    autogen_pypy = outdir.join('hpy', 'tools', 'autogen', 'autogen_pypy.txt')
 
     public_api_h = py.path.local(__file__).dirpath('public_api.h')
     api = HPyAPI.parse(public_api_h)
@@ -31,6 +31,7 @@ def main():
                 autogen_trampolines_h,
                 autogen_impl_h,
                 autogen_hpyfunc_declare_h,
+                autogen_hpyfunc_trampoline_h,
                 autogen_pypy_txt):
         cls(api).write(outdir)
 
