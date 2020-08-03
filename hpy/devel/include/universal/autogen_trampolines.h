@@ -40,6 +40,10 @@ static inline HPy HPyFloat_FromDouble(HPyContext ctx, double v) {
      return ctx->ctx_Float_FromDouble ( ctx, v ); 
 }
 
+static inline double HPyFloat_AsDouble(HPyContext ctx, HPy h) {
+     return ctx->ctx_Float_AsDouble ( ctx, h ); 
+}
+
 static inline HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2) {
      return ctx->ctx_Add ( ctx, h1, h2 ); 
 }
