@@ -18,3 +18,8 @@
     { \
         return _h2py(IMPL(_HPyGetContext(), _py2h(arg))); \
     }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_SSIZEARG(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *arg, HPy_ssize_t size) \
+    { \
+        return _h2py(IMPL(_HPyGetContext(), _py2h(arg), size)); \
+    }

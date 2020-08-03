@@ -20,3 +20,9 @@
         a->result = _h2py(f(ctx, _py2h(a->arg)));
         return;
     }
+    case HPyFunc_SSIZEARG: {
+        HPyFunc_ssizearg f = (HPyFunc_ssizearg)func;
+        _HPyFunc_args_SSIZEARG *a = (_HPyFunc_args_SSIZEARG*)args;
+        a->result = _h2py(f(ctx, _py2h(a->arg), a->size));
+        return;
+    }

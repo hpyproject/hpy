@@ -133,3 +133,26 @@ class TestType(HPyTest):
         """)
         p = mod.Point()
         assert p.foo() == 73
+
+    def test_getitem(self):
+        mod = self.make_module("""
+            HPyDef_SLOT(Dummy_getitem, HPy_sq_item, Dummy_getitem_impl, HPyFunc_SSIZEARG);
+            static HPy Dummy_getitem_impl(HPyContext ctx, HPy self, HPy_ssize_t idx)
+            {
+                return HPyLong_FromLong(ctx, (long)idx*2);
+            }
+
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .defines = {
+                    &Dummy_getitem,
+                    NULL
+                }
+            };
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @INIT
+        """)
+        d = mod.Dummy()
+        assert d[4] == 8
+        assert d[21] == 42

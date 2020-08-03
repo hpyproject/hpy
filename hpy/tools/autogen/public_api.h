@@ -148,3 +148,4 @@ typedef HPy (*HPyFunc_keywords)(HPyContext ctx, HPy self,
 
 typedef HPy (*HPyFunc_unary)(HPyContext ctx, HPy arg);
 typedef HPy (*HPyFunc_repr)(HPyContext ctx, HPy arg);
+typedef HPy (*HPyFunc_ssizearg)(HPyContext ctx, HPy arg, HPy_ssize_t size);

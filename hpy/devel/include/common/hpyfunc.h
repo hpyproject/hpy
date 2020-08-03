@@ -9,6 +9,7 @@ typedef enum {
 
     HPyFunc_UNARY = 5,
     HPyFunc_REPR = 6,
+    HPyFunc_SSIZEARG = 7,
 
 } HPyFunc_Signature;
 
