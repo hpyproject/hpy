@@ -21,6 +21,8 @@ class TestHPyFunc(BaseTestAutogen):
         got = autogen_hpyfunc_declare_h(api).generate()
         exp = """
             #define _HPyFunc_DECLARE_HPyFunc_NOARGS(SYM) static HPy SYM(HPyContext ctx, HPy self)
+
+            typedef HPy (*HPyFunc_noargs)(HPyContext ctx, HPy self);
         """
         assert src_equal(got, exp)
 

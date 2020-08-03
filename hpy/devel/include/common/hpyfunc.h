@@ -12,12 +12,8 @@ typedef enum {
 
 } HPyFunc_Signature;
 
-// typedefs corresponding to the various HPyFunc_Signature members
-typedef HPy (*HPyFunc_noargs)(HPyContext ctx, HPy self);
-typedef HPy (*HPyFunc_o)(HPyContext ctx, HPy self, HPy arg);
-typedef HPy (*HPyFunc_varargs)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
-typedef HPy (*HPyFunc_keywords)(HPyContext ctx, HPy self,
-                                HPy *args, HPy_ssize_t nargs, HPy kw);
+/* The typedefs corresponding to the various HPyFunc_Signature members
+   are produced inside autogen_hpyfunc_declare.h. */
 
 
 /* Emit a forward declaration for a function SYM having a signature SIG, where

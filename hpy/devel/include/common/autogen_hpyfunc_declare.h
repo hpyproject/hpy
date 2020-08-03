@@ -14,3 +14,10 @@
 #define _HPyFunc_DECLARE_HPyFunc_KEYWORDS(SYM) static HPy SYM(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 #define _HPyFunc_DECLARE_HPyFunc_UNARY(SYM) static HPy SYM(HPyContext ctx, HPy arg)
 #define _HPyFunc_DECLARE_HPyFunc_REPR(SYM) static HPy SYM(HPyContext ctx, HPy arg)
+
+typedef HPy (*HPyFunc_noargs)(HPyContext ctx, HPy self);
+typedef HPy (*HPyFunc_o)(HPyContext ctx, HPy self, HPy arg);
+typedef HPy (*HPyFunc_varargs)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
+typedef HPy (*HPyFunc_keywords)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw);
+typedef HPy (*HPyFunc_unary)(HPyContext ctx, HPy arg);
+typedef HPy (*HPyFunc_repr)(HPyContext ctx, HPy arg);

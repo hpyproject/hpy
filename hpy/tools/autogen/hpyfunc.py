@@ -23,6 +23,12 @@ class autogen_hpyfunc_declare_h(AutoGenFile):
             # generate a macro emitting 'symdecl'
             name = hpyfunc.base_name().upper()
             w(f'#define _HPyFunc_DECLARE_HPyFunc_{name}(SYM) static {symdecl}')
+        w('')
+
+        for hpyfunc in self.api.hpyfunc_typedefs:
+            # generate the typedef for HPyFunc_{base_name}
+            w(f'{toC(hpyfunc.node)};')
+
         return '\n'.join(lines)
 
 
@@ -36,7 +42,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             base_name = hpyfunc.base_name().upper()
             if base_name in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
                 continue
-
+            #
             # generate the struct that will contain all parameters
             w('typedef struct {')
             params = hpyfunc.params()
@@ -46,7 +52,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
                 w(f'    {toC(node)};')
             w('} _HPyFunc_args_%s;' % (base_name,))
             w('')
-
+            #
             # generate the trampoline itself
             tramp_node = deepcopy(hpyfunc.node.type.type)
             tramp_node.type.declname = 'SYM'
