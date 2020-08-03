@@ -27,6 +27,7 @@ HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v);
 
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
+double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
 /* abstract.h */
 HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
