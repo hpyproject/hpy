@@ -7,9 +7,30 @@ typedef enum {
     HPyFunc_NOARGS   = 3,  // METH_NOARGS
     HPyFunc_O        = 4,  // METH_O
 
-    HPyFunc_UNARY = 5,
-    HPyFunc_REPR = 6,
-    HPyFunc_SSIZEARG = 7,
+    HPyFunc_UNARYFUNC,
+    HPyFunc_BINARYFUNC,
+    HPyFunc_TERNARYFUNC,
+    HPyFunc_INQUIRY,
+    HPyFunc_LENFUNC,
+    HPyFunc_SSIZEARGFUNC,
+    HPyFunc_SSIZESSIZEARGFUNC,
+    HPyFunc_SSIZEOBJARGPROC,
+    HPyFunc_SSIZESSIZEOBJARGPROC,
+    HPyFunc_OBJOBJARGPROC,
+    HPyFunc_FREEFUNC,
+    HPyFunc_DESTRUCTOR,
+    HPyFunc_GETATTRFUNC,
+    HPyFunc_GETATTROFUNC,
+    HPyFunc_SETATTRFUNC,
+    HPyFunc_SETATTROFUNC,
+    HPyFunc_REPRFUNC,
+    HPyFunc_HASHFUNC,
+    HPyFunc_RICHCMPFUNC,
+    HPyFunc_GETITERFUNC,
+    HPyFunc_ITERNEXTFUNC,
+    HPyFunc_DESCRGETFUNC,
+    HPyFunc_DESCRSETFUNC,
+    HPyFunc_INITPROC,
 
 } HPyFunc_Signature;
 
