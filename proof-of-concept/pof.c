@@ -63,29 +63,31 @@ static HPy Point_repr_impl(HPyContext ctx, HPy self)
 }
 
 
+static HPyDef *point_type_defines[] = {
+    &Point_new,
+    &Point_repr,
+    NULL
+};
 static HPyType_Spec point_type_spec = {
     .name = "pof.Point",
     .basicsize = sizeof(HPy_Point),
     .flags = HPy_TPFLAGS_DEFAULT,
-    .defines = {
-        &Point_new,
-        &Point_repr,
-        NULL
-    }
+    .defines = point_type_defines
 };
 
+static HPyDef *module_defines[] = {
+    &do_nothing,
+    &double_obj,
+    &add_ints,
+    &add_ints_kw,
+    NULL
+};
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
     .m_name = "pof",
     .m_doc = "HPy Proof of Concept",
     .m_size = -1,
-    .defines = {
-        &do_nothing,
-        &double_obj,
-        &add_ints,
-        &add_ints_kw,
-        NULL
-    }
+    .defines = module_defines
 };
 
 HPy_MODINIT(pof)
