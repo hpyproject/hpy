@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
-from .parse import toC
+from .parse import toC, find_typedecl
 
 
 class autogen_trampolines_h(AutoGenFile):
@@ -65,7 +65,7 @@ class autogen_impl_h(AutoGenFile):
         def signature(base_name):
             # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
             newnode = deepcopy(func.node)
-            typedecl = func._find_typedecl(newnode)
+            typedecl = find_typedecl(newnode)
             # rename the function
             if func.name.startswith('HPy_'):
                 typedecl.declname = '_HPy_IMPL_NAME_NOPREFIX(%s)' % base_name

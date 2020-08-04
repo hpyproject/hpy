@@ -9,6 +9,10 @@ def toC(node):
     return toC.gen.visit(node)
 toC.gen = CGenerator()
 
+def find_typedecl(node):
+    while not isinstance(node, c_ast.TypeDecl):
+        node = node.type
+    return node
 
 
 @attr.s
@@ -18,11 +22,6 @@ class Function:
     name = attr.ib()
     cpython_name = attr.ib()
     node = attr.ib(repr=False)
-
-    def _find_typedecl(self, node):
-        while not isinstance(node, c_ast.TypeDecl):
-            node = node.type
-        return node
 
     def base_name(self):
         return self._BASE_NAME.sub('', self.name)

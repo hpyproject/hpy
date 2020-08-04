@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
-from .parse import toC
+from .parse import toC, find_typedecl
 
 
 class autogen_hpyfunc_declare_h(AutoGenFile):
@@ -57,6 +57,11 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             assert toC(tramp_node.args.params[0].type) == 'HPyContext'
             tramp_node.args.params = [hpy_to_cpy(p)
                                       for p in tramp_node.args.params[1:]]
+            for i, param in enumerate(tramp_node.args.params):
+                typedecl = find_typedecl(param.type)
+                if typedecl.declname is None:
+                    param.name = 'arg%d' % i
+                    typedecl.declname = 'arg%d' % i
             arg_names = [param.name for param in tramp_node.args.params]
             arg_names = ', '.join(arg_names)
             #
@@ -98,11 +103,14 @@ class autogen_ctx_call_i(AutoGenFile):
             else:
                 result = ''
             args = ['ctx']
-            for param in hpyfunc.params()[1:]:
+            for i, param in enumerate(hpyfunc.params()[1:]):
+                pname = param.name
+                if pname is None:
+                    pname = 'arg%d' % i
                 if toC(param.type) == 'HPy':
-                    args.append(f'_py2h(a->{param.name})')
+                    args.append(f'_py2h(a->{pname})')
                 else:
-                    args.append(f'a->{param.name}')
+                    args.append(f'a->{pname}')
             args = ', '.join(args)
             #
             w(f'    case HPyFunc_{NAME}: {{')
@@ -131,16 +139,25 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
             tramp_node = hpy_to_cpy(tramp_node)
             tramp_node.args.params = [hpy_to_cpy(p)
                                       for p in tramp_node.args.params[1:]]
+            for i, param in enumerate(tramp_node.args.params):
+                typedecl = find_typedecl(param.type)
+                if typedecl.declname is None:
+                    param.name = 'arg%d' % i
+                    typedecl.declname = 'arg%d' % i
+
             if toC(hpyfunc.return_type()) == 'HPy':
                 result = '_h2py'
             else:
                 result = ''
             args = ['_HPyGetContext()']
-            for param in hpyfunc.params()[1:]:
+            for i, param in enumerate(hpyfunc.params()[1:]):
+                pname = param.name
+                if pname is None:
+                    pname = 'arg%d' % i
                 if toC(param.type) == 'HPy':
-                    args.append(f'_py2h({param.name})')
+                    args.append(f'_py2h({pname})')
                 else:
-                    args.append(f'{param.name}')
+                    args.append(f'{pname}')
             args = ', '.join(args)
             #
             w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{NAME}(SYM, IMPL) \\')
