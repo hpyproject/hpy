@@ -69,7 +69,8 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             w(f'typedef struct {{')
             for param in tramp_node.args.params:
                 w(f'    {toC(param)};')
-            w(f'    {toC(tramp_node.type)} result;')
+            if toC(tramp_node.type) != 'void':
+                w(f'    {toC(tramp_node.type)} result;')
             w(f'}} _HPyFunc_args_{NAME};')
             w('')
             #
@@ -80,7 +81,10 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             w(f'        _HPyFunc_args_{NAME} a = {{ {arg_names} }}; \\')
             w(f'        _HPy_CallRealFunctionFromTrampoline( \\')
             w(f'           _ctx_for_trampolines, HPyFunc_{NAME}, IMPL, &a); \\')
-            w(f'        return a.result; \\')
+            if toC(tramp_node.type) == 'void':
+                w(f'        return; \\')
+            else:
+                w(f'        return a.result; \\')
             w(f'    }}')
             w('')
         return '\n'.join(lines)
@@ -98,10 +102,7 @@ class autogen_ctx_call_i(AutoGenFile):
             if NAME in ['NOARGS', 'O', 'VARARGS', 'KEYWORDS']:
                 continue
             #
-            if toC(hpyfunc.return_type()) == 'HPy':
-                result = '_h2py'
-            else:
-                result = ''
+            c_ret_type = toC(hpyfunc.return_type())
             args = ['ctx']
             for i, param in enumerate(hpyfunc.params()[1:]):
                 pname = param.name
@@ -116,7 +117,12 @@ class autogen_ctx_call_i(AutoGenFile):
             w(f'    case HPyFunc_{NAME}: {{')
             w(f'        HPyFunc_{name} f = (HPyFunc_{name})func;')
             w(f'        _HPyFunc_args_{NAME} *a = (_HPyFunc_args_{NAME}*)args;')
-            w(f'        a->result = {result}(f({args}));')
+            if c_ret_type == 'void':
+                w(f'        f({args});')
+            elif c_ret_type == 'HPy':
+                w(f'        a->result = _h2py(f({args}));')
+            else:
+                w(f'        a->result = f({args});')
             w(f'        return;')
             w(f'    }}')
         return '\n'.join(lines)

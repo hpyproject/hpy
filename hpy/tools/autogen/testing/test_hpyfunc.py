@@ -35,6 +35,7 @@ class TestHPyFunc(BaseTestAutogen):
         api = self.parse("""
             typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
             typedef HPy (*HPyFunc_bar)(HPyContext, HPy, int);
+            typedef void (*HPyFunc_proc)(HPyContext ctx, int x);
         """)
         got = autogen_hpyfunc_trampoline_h(api).generate()
         exp = r"""
@@ -68,6 +69,18 @@ class TestHPyFunc(BaseTestAutogen):
                     return a.result; \
                 }
 
+            typedef struct {
+                int x;
+            } _HPyFunc_args_PROC;
+
+            #define _HPyFunc_TRAMPOLINE_HPyFunc_PROC(SYM, IMPL) \
+                static void SYM(int x) \
+                { \
+                    _HPyFunc_args_PROC a = { x }; \
+                    _HPy_CallRealFunctionFromTrampoline( \
+                       _ctx_for_trampolines, HPyFunc_PROC, IMPL, &a); \
+                    return; \
+                }
         """
         assert src_equal(got, exp)
 
@@ -76,6 +89,7 @@ class TestHPyFunc(BaseTestAutogen):
             typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
             typedef int (*HPyFunc_bar)(HPyContext ctx);
             typedef int (*HPyFunc_baz)(HPyContext ctx, HPy, int);
+            typedef void (*HPyFunc_proc)(HPyContext ctx, int x);
         """)
         got = autogen_ctx_call_i(api).generate()
         exp = r"""
@@ -88,13 +102,19 @@ class TestHPyFunc(BaseTestAutogen):
             case HPyFunc_BAR: {
                 HPyFunc_bar f = (HPyFunc_bar)func;
                 _HPyFunc_args_BAR *a = (_HPyFunc_args_BAR*)args;
-                a->result = (f(ctx));
+                a->result = f(ctx);
                 return;
             }
             case HPyFunc_BAZ: {
                 HPyFunc_baz f = (HPyFunc_baz)func;
                 _HPyFunc_args_BAZ *a = (_HPyFunc_args_BAZ*)args;
-                a->result = (f(ctx, _py2h(a->arg0), a->arg1));
+                a->result = f(ctx, _py2h(a->arg0), a->arg1);
+                return;
+            }
+            case HPyFunc_PROC: {
+                HPyFunc_proc f = (HPyFunc_proc)func;
+                _HPyFunc_args_PROC *a = (_HPyFunc_args_PROC*)args;
+                f(ctx, a->x);
                 return;
             }
         """
