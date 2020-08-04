@@ -111,20 +111,23 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
     }
     // copy the HPy methods
     int dst_idx = 0;
-    for(int i=0; hpydefs[i] != NULL; i++) {
-        HPyDef *src = hpydefs[i];
-        if (src->kind != HPyDef_Kind_Meth)
-            continue;
-        PyMethodDef *dst = &result[dst_idx++];
-        dst->ml_name = src->meth.name;
-        dst->ml_meth = src->meth.cpy_trampoline;
-        dst->ml_flags = sig2flags(src->meth.signature);
-        if (dst->ml_flags == -1) {
-            PyMem_Free(result);
-            PyErr_SetString(PyExc_ValueError, "Unsupported HPyMeth signature");
-            return NULL;
+    if (hpydefs != NULL) {
+        for(int i=0; hpydefs[i] != NULL; i++) {
+            HPyDef *src = hpydefs[i];
+            if (src->kind != HPyDef_Kind_Meth)
+                continue;
+            PyMethodDef *dst = &result[dst_idx++];
+            dst->ml_name = src->meth.name;
+            dst->ml_meth = src->meth.cpy_trampoline;
+            dst->ml_flags = sig2flags(src->meth.signature);
+            if (dst->ml_flags == -1) {
+                PyMem_Free(result);
+                PyErr_SetString(PyExc_ValueError,
+                                "Unsupported HPyMeth signature");
+                return NULL;
+            }
+            dst->ml_doc = src->meth.doc;
         }
-        dst->ml_doc = src->meth.doc;
     }
     // copy the legacy methods
     for(int i=0; i<legacy_count; i++) {
@@ -158,13 +161,15 @@ create_slot_defs(HPyType_Spec *hpyspec)
 
     // fill the result with non-meth slots
     int dst_idx = 0;
-    for(int i=0; hpyspec->defines[i] != NULL; i++) {
-        HPyDef *src = hpyspec->defines[i];
-        if (src->kind != HPyDef_Kind_Slot)
-            continue;
-        PyType_Slot *dst = &result[dst_idx++];
-        dst->slot = src->slot.slot;
-        dst->pfunc = src->slot.cpy_trampoline;
+    if (hpyspec->defines != NULL) {
+        for(int i=0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *src = hpyspec->defines[i];
+            if (src->kind != HPyDef_Kind_Slot)
+                continue;
+            PyType_Slot *dst = &result[dst_idx++];
+            dst->slot = src->slot.slot;
+            dst->pfunc = src->slot.cpy_trampoline;
+        }
     }
 
     // add the "real" methods
