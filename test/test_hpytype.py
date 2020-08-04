@@ -146,12 +146,13 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, (long)idx*2);
             }
 
+            static HPyDef *Dummy_defines[] = {
+                &Dummy_getitem,
+                NULL
+            };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .defines = {
-                    &Dummy_getitem,
-                    NULL
-                }
+                .defines =  Dummy_defines
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
