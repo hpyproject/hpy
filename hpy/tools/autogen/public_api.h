@@ -126,10 +126,10 @@ HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj);
 cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h);
 
 /* internal helpers which need to be exposed to modules for practical reasons :( */
-cpy_PyObject *_HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
-                                                  HPyFunc_Signature sig,
-                                                  void *func,
-                                                  void *args);
+void _HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
+                                         HPyFunc_Signature sig,
+                                         void *func,
+                                         void *args);
 
 
 
@@ -146,3 +146,28 @@ typedef HPy (*HPyFunc_o)(HPyContext ctx, HPy self, HPy arg);
 typedef HPy (*HPyFunc_varargs)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs);
 typedef HPy (*HPyFunc_keywords)(HPyContext ctx, HPy self,
                                 HPy *args, HPy_ssize_t nargs, HPy kw);
+
+typedef HPy (*HPyFunc_unaryfunc)(HPyContext ctx, HPy);
+typedef HPy (*HPyFunc_binaryfunc)(HPyContext ctx, HPy, HPy);
+typedef HPy (*HPyFunc_ternaryfunc)(HPyContext ctx, HPy, HPy, HPy);
+typedef int (*HPyFunc_inquiry)(HPyContext ctx, HPy);
+typedef HPy_ssize_t (*HPyFunc_lenfunc)(HPyContext ctx, HPy);
+typedef HPy (*HPyFunc_ssizeargfunc)(HPyContext ctx, HPy, HPy_ssize_t);
+typedef HPy (*HPyFunc_ssizessizeargfunc)(HPyContext ctx, HPy, HPy_ssize_t, HPy_ssize_t);
+typedef int (*HPyFunc_ssizeobjargproc)(HPyContext ctx, HPy, HPy_ssize_t, HPy);
+typedef int (*HPyFunc_ssizessizeobjargproc)(HPyContext ctx, HPy, HPy_ssize_t, HPy_ssize_t, HPy);
+typedef int (*HPyFunc_objobjargproc)(HPyContext ctx, HPy, HPy, HPy);
+typedef void (*HPyFunc_freefunc)(HPyContext ctx, void *);
+typedef void (*HPyFunc_destructor)(HPyContext ctx, HPy);
+typedef HPy (*HPyFunc_getattrfunc)(HPyContext ctx, HPy, char *);
+typedef HPy (*HPyFunc_getattrofunc)(HPyContext ctx, HPy, HPy);
+typedef int (*HPyFunc_setattrfunc)(HPyContext ctx, HPy, char *, HPy);
+typedef int (*HPyFunc_setattrofunc)(HPyContext ctx, HPy, HPy, HPy);
+typedef HPy (*HPyFunc_reprfunc)(HPyContext ctx, HPy);
+//typedef Py_hash_t (*HPyFunc_hashfunc)(HPyContext ctx, HPy);
+typedef HPy (*HPyFunc_richcmpfunc)(HPyContext ctx, HPy, HPy, int);
+typedef HPy (*HPyFunc_getiterfunc)(HPyContext ctx, HPy);
+typedef HPy (*HPyFunc_iternextfunc)(HPyContext ctx, HPy);
+typedef HPy (*HPyFunc_descrgetfunc)(HPyContext ctx, HPy, HPy, HPy);
+typedef int (*HPyFunc_descrsetfunc)(HPyContext ctx, HPy, HPy, HPy);
+typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy, HPy, HPy);

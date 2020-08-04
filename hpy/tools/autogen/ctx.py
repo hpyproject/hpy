@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
-from .parse import toC
+from .parse import toC, find_typedecl
 
 
 class autogen_ctx_h(AutoGenFile):
@@ -37,7 +37,7 @@ class autogen_ctx_h(AutoGenFile):
         newnode = deepcopy(func.node)
         newnode.type = c_ast.PtrDecl(type=newnode.type, quals=[])
         # fix the name of the function pointer
-        typedecl = func._find_typedecl(newnode)
+        typedecl = find_typedecl(newnode)
         typedecl.declname = func.ctx_name()
         return toC(newnode)
 
