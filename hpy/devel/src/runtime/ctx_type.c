@@ -8,39 +8,11 @@
 #  include "handles.h"
 #endif
 
-/* by default, the C structs which bake an HPy custom type do NOT include
- * PyObject_HEAD.  So, HPy_New must allocate a memory region which is big
- * enough to contain PyObject_HEAD + any eventual extra padding + the actual
- * user struct. We use the union_alignment to ensure that the payload is
- * correctly aligned for every possible struct.
- */
-
-typedef struct {
-    PyObject_HEAD
-    union {
-        unsigned char payload[1];
-        // these fields are never accessed: they are present just to ensure
-        // the correct alignment of payload
-        unsigned short _m_short;
-        unsigned int _m_int;
-        unsigned long _m_long;
-        unsigned long long _m_longlong;
-        float _m_float;
-        double _m_double;
-        long double _m_longdouble;
-        void *_m_pointer;
-    };
-} GenericHPyObject;
-
-#define PyObject_HEAD_SIZE (offsetof(GenericHPyObject, payload))
-
 
 _HPy_HIDDEN void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
-    // XXX: how do we implement ctx_Cast when has_pyobject_head==1?
-    GenericHPyObject *o = (GenericHPyObject*)(_h2py(h));
-    return (void*)o->payload;
+    return _h2py(h);
 }
 
 static int
@@ -194,12 +166,8 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
         PyErr_NoMemory();
         return HPy_NULL;
     }
-    if (hpyspec->has_pyobject_head) {
-        PyErr_SetString(PyExc_NotImplementedError, "has_pyobject_head not supported yet");
-        return HPy_NULL;
-    }
     spec->name = hpyspec->name;
-    spec->basicsize = hpyspec->basicsize + PyObject_HEAD_SIZE;
+    spec->basicsize = hpyspec->basicsize;
     spec->itemsize = hpyspec->itemsize;
     spec->flags = hpyspec->flags;
     if (hpyspec->legacy_slots != NULL)
@@ -228,10 +196,10 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
         return HPy_NULL;
     }
 
-    GenericHPyObject *result = PyObject_New(GenericHPyObject, (PyTypeObject*)tp);
+    PyObject *result = PyObject_New(PyObject, (PyTypeObject*)tp);
     if (!result)
         return HPy_NULL;
 
-    *data = (void*)result->payload;
-    return _py2h((PyObject*)result);
+    *data = (void*)result;
+    return _py2h(result);
 }
