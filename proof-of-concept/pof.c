@@ -33,6 +33,7 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 }
 
 typedef struct {
+    HPyObject_HEAD
     double x;
     double y;
 } HPy_Point;
