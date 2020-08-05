@@ -51,16 +51,17 @@ HPyDef_count(HPyDef *defs[], HPy_ssize_t *slot_count, HPy_ssize_t *meth_count)
 
 static void
 legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
-                   HPy_ssize_t *meth_count)
+                   PyMethodDef **method_defs)
 {
     *slot_count = 0;
-    *meth_count = 0;
+    *method_defs = NULL;
     if (slots == NULL)
         return;
     for(int i=0; slots[i].slot != 0; i++)
         switch(slots[i].slot) {
         case Py_tp_methods:
-            abort();
+            *method_defs = (PyMethodDef *)slots[i].pfunc;
+            break;
         default:
             (*slot_count)++;
             break;
@@ -143,9 +144,9 @@ create_slot_defs(HPyType_Spec *hpyspec)
 
     // add the legacy slots
     HPy_ssize_t legacy_slot_count = 0;
-    HPy_ssize_t legacy_meth_count = 0;
+    PyMethodDef *legacy_method_defs = NULL;
     legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
-                       &legacy_meth_count);
+                       &legacy_method_defs);
 
     // add a slot to hold Py_tp_methods
     hpyslot_count++;
@@ -183,7 +184,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
     }
 
     // add the "real" methods
-    PyMethodDef *m = create_method_defs(hpyspec->defines, NULL);
+    PyMethodDef *m = create_method_defs(hpyspec->defines, legacy_method_defs);
     if (m == NULL) {
         PyMem_Free(result);
         return NULL;
