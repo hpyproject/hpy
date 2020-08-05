@@ -28,25 +28,43 @@ sig2flags(HPyFunc_Signature sig)
 }
 
 static int
-HPyDef_count(HPyDef *defs[], HPy_ssize_t *slots, HPy_ssize_t *meths)
+HPyDef_count(HPyDef *defs[], HPy_ssize_t *slot_count, HPy_ssize_t *meth_count)
 {
-    *slots = 0;
-    *meths = 0;
+    *slot_count = 0;
+    *meth_count = 0;
     if (defs == NULL)
         return 0;
     for(int i=0; defs[i] != NULL; i++)
         switch(defs[i]->kind) {
         case HPyDef_Kind_Slot:
-            (*slots)++;
+            (*slot_count)++;
             break;
         case HPyDef_Kind_Meth:
-            (*meths)++;
+            (*meth_count)++;
             break;
         default:
             PyErr_Format(PyExc_ValueError, "Invalid HPyDef.kind: %ld", defs[i]->kind);
             return -1;
         }
     return 0;
+}
+
+static void
+legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
+                   HPy_ssize_t *meth_count)
+{
+    *slot_count = 0;
+    *meth_count = 0;
+    if (slots == NULL)
+        return;
+    for(int i=0; slots[i].slot != 0; i++)
+        switch(slots[i].slot) {
+        case Py_tp_methods:
+            abort();
+        default:
+            (*slot_count)++;
+            break;
+        }
 }
 
 
@@ -123,24 +141,44 @@ create_slot_defs(HPyType_Spec *hpyspec)
     if (HPyDef_count(hpyspec->defines, &hpyslot_count, &hpymeth_count) == -1)
         return NULL;
 
+    // add the legacy slots
+    HPy_ssize_t legacy_slot_count = 0;
+    HPy_ssize_t legacy_meth_count = 0;
+    legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
+                       &legacy_meth_count);
+
     // add a slot to hold Py_tp_methods
     hpyslot_count++;
 
     // allocate the result PyType_Slot array
-    PyType_Slot *result = PyMem_Malloc(sizeof(PyType_Slot) * (hpyslot_count+1));
+    HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
+    PyType_Slot *result = PyMem_Malloc(
+        sizeof(PyType_Slot) * (total_slot_count + 1));
     if (result == NULL)
         return NULL;
 
     // fill the result with non-meth slots
     int dst_idx = 0;
     if (hpyspec->defines != NULL) {
-        for(int i=0; hpyspec->defines[i] != NULL; i++) {
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *src = hpyspec->defines[i];
             if (src->kind != HPyDef_Kind_Slot)
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = src->slot.slot;
             dst->pfunc = src->slot.cpy_trampoline;
+        }
+    }
+
+    // add the legacy slots (non-methods)
+    if (hpyspec->legacy_slots != NULL) {
+        PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
+        for (int i = 0; legacy_slots[i].slot != 0; i++) {
+            PyType_Slot *src = &legacy_slots[i];
+            if (src->slot == Py_tp_methods)
+                continue;
+            PyType_Slot *dst = &result[dst_idx++];
+            *dst = *src;
         }
     }
 
@@ -170,8 +208,6 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
     spec->basicsize = hpyspec->basicsize;
     spec->itemsize = hpyspec->itemsize;
     spec->flags = hpyspec->flags;
-    if (hpyspec->legacy_slots != NULL)
-        abort(); // FIXME
     spec->slots = create_slot_defs(hpyspec);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
