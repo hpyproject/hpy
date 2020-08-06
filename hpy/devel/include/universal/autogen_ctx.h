@@ -25,8 +25,11 @@ struct _HPyContext_s {
     HPy (*ctx_Dup)(HPyContext ctx, HPy h);
     void (*ctx_Close)(HPyContext ctx, HPy h);
     HPy (*ctx_Long_FromLong)(HPyContext ctx, long value);
+    HPy (*ctx_Long_FromUnsignedLong)(HPyContext ctx, unsigned long value);
     HPy (*ctx_Long_FromLongLong)(HPyContext ctx, long long v);
     HPy (*ctx_Long_FromUnsignedLongLong)(HPyContext ctx, unsigned long long v);
+    HPy (*ctx_Long_FromSize_t)(HPyContext ctx, size_t value);
+    HPy (*ctx_Long_FromSsize_t)(HPyContext ctx, HPy_ssize_t value);
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
     double (*ctx_Float_AsDouble)(HPyContext ctx, HPy h);
@@ -88,6 +91,7 @@ struct _HPyContext_s {
     HPy (*ctx_Bytes)(HPyContext ctx, HPy obj);
     HPy (*ctx_RichCompare)(HPyContext ctx, HPy v, HPy w, int op);
     int (*ctx_RichCompareBool)(HPyContext ctx, HPy v, HPy w, int op);
+    HPy_hash_t (*ctx_Hash)(HPyContext ctx, HPy obj);
     int (*ctx_Bytes_Check)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_Size)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext ctx, HPy h);

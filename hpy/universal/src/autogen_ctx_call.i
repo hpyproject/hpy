@@ -110,6 +110,12 @@
         a->result = _h2py(f(ctx, _py2h(a->arg0)));
         return;
     }
+    case HPyFunc_HASHFUNC: {
+        HPyFunc_hashfunc f = (HPyFunc_hashfunc)func;
+        _HPyFunc_args_HASHFUNC *a = (_HPyFunc_args_HASHFUNC*)args;
+        a->result = f(ctx, _py2h(a->arg0));
+        return;
+    }
     case HPyFunc_RICHCMPFUNC: {
         HPyFunc_richcmpfunc f = (HPyFunc_richcmpfunc)func;
         _HPyFunc_args_RICHCMPFUNC *a = (_HPyFunc_args_RICHCMPFUNC*)args;

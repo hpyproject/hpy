@@ -13,6 +13,11 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext ctx, long value)
     return _py2h(PyLong_FromLong(value));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromUnsignedLong)(HPyContext ctx, unsigned long value)
+{
+    return _py2h(PyLong_FromUnsignedLong(value));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromLongLong)(HPyContext ctx, long long v)
 {
     return _py2h(PyLong_FromLongLong(v));
@@ -21,6 +26,16 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromLongLong)(HPyContext ctx, long long v
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromUnsignedLongLong)(HPyContext ctx, unsigned long long v)
 {
     return _py2h(PyLong_FromUnsignedLongLong(v));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromSize_t)(HPyContext ctx, size_t value)
+{
+    return _py2h(PyLong_FromSize_t(value));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromSsize_t)(HPyContext ctx, HPy_ssize_t value)
+{
+    return _py2h(PyLong_FromSsize_t(value));
 }
 
 HPyAPI_STORAGE long _HPy_IMPL_NAME(Long_AsLong)(HPyContext ctx, HPy h)
@@ -286,6 +301,11 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(RichCompare)(HPyContext ctx, HPy v, H
 HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(RichCompareBool)(HPyContext ctx, HPy v, HPy w, int op)
 {
     return PyObject_RichCompareBool(_h2py(v), _h2py(w), op);
+}
+
+HPyAPI_STORAGE HPy_hash_t _HPy_IMPL_NAME_NOPREFIX(Hash)(HPyContext ctx, HPy obj)
+{
+    return PyObject_Hash(_h2py(obj));
 }
 
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)

@@ -24,12 +24,24 @@ static inline HPy HPyLong_FromLong(HPyContext ctx, long value) {
      return ctx->ctx_Long_FromLong ( ctx, value ); 
 }
 
+static inline HPy HPyLong_FromUnsignedLong(HPyContext ctx, unsigned long value) {
+     return ctx->ctx_Long_FromUnsignedLong ( ctx, value ); 
+}
+
 static inline HPy HPyLong_FromLongLong(HPyContext ctx, long long v) {
      return ctx->ctx_Long_FromLongLong ( ctx, v ); 
 }
 
 static inline HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v) {
      return ctx->ctx_Long_FromUnsignedLongLong ( ctx, v ); 
+}
+
+static inline HPy HPyLong_FromSize_t(HPyContext ctx, size_t value) {
+     return ctx->ctx_Long_FromSize_t ( ctx, value ); 
+}
+
+static inline HPy HPyLong_FromSsize_t(HPyContext ctx, HPy_ssize_t value) {
+     return ctx->ctx_Long_FromSsize_t ( ctx, value ); 
 }
 
 static inline long HPyLong_AsLong(HPyContext ctx, HPy h) {
@@ -270,6 +282,10 @@ static inline HPy HPy_RichCompare(HPyContext ctx, HPy v, HPy w, int op) {
 
 static inline int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op) {
      return ctx->ctx_RichCompareBool ( ctx, v, w, op ); 
+}
+
+static inline HPy_hash_t HPy_Hash(HPyContext ctx, HPy obj) {
+     return ctx->ctx_Hash ( ctx, obj ); 
 }
 
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {

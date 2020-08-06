@@ -172,6 +172,7 @@ SPECIAL_CASES = {
     'HPy_IsTrue': 'PyObject_IsTrue',
     'HPy_RichCompare': 'PyObject_RichCompare',
     'HPy_RichCompareBool': 'PyObject_RichCompareBool',
+    'HPy_Hash': 'PyObject_Hash',
 }
 
 
