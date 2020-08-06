@@ -204,6 +204,10 @@ static inline int HPyErr_Occurred(HPyContext ctx) {
      return ctx->ctx_Err_Occurred ( ctx ); 
 }
 
+static inline HPy HPyErr_NoMemory(HPyContext ctx) {
+     return ctx->ctx_Err_NoMemory ( ctx ); 
+}
+
 static inline int HPy_IsTrue(HPyContext ctx, HPy h) {
      return ctx->ctx_IsTrue ( ctx, h ); 
 }

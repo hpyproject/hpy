@@ -70,6 +70,7 @@ struct _HPyContext_s {
     HPy (*ctx_InPlaceOr)(HPyContext ctx, HPy h1, HPy h2);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     int (*ctx_Err_Occurred)(HPyContext ctx);
+    HPy (*ctx_Err_NoMemory)(HPyContext ctx);
     int (*ctx_IsTrue)(HPyContext ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext ctx, HPyType_Spec *spec);
     HPy (*ctx_Type_GenericNew)(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);

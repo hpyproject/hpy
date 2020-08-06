@@ -70,6 +70,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_InPlaceOr = &ctx_InPlaceOr,
     .ctx_Err_SetString = &ctx_Err_SetString,
     .ctx_Err_Occurred = &ctx_Err_Occurred,
+    .ctx_Err_NoMemory = &ctx_Err_NoMemory,
     .ctx_IsTrue = &ctx_IsTrue,
     .ctx_Type_FromSpec = &ctx_Type_FromSpec,
     .ctx_Type_GenericNew = &ctx_Type_GenericNew,

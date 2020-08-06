@@ -82,6 +82,7 @@ HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext ctx);
+HPy HPyErr_NoMemory(HPyContext ctx);
 
 /* object.h */
 int HPy_IsTrue(HPyContext ctx, HPy h);
