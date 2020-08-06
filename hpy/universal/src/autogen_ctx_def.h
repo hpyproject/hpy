@@ -33,6 +33,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Long_AsLong = &ctx_Long_AsLong,
     .ctx_Float_FromDouble = &ctx_Float_FromDouble,
     .ctx_Float_AsDouble = &ctx_Float_AsDouble,
+    .ctx_Number_Check = &ctx_Number_Check,
     .ctx_Add = &ctx_Add,
     .ctx_Subtract = &ctx_Subtract,
     .ctx_Multiply = &ctx_Multiply,

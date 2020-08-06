@@ -53,6 +53,11 @@ HPyAPI_STORAGE double _HPy_IMPL_NAME(Float_AsDouble)(HPyContext ctx, HPy h)
     return PyFloat_AsDouble(_h2py(h));
 }
 
+HPyAPI_STORAGE int _HPy_IMPL_NAME(Number_Check)(HPyContext ctx, HPy h)
+{
+    return PyNumber_Check(_h2py(h));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext ctx, HPy h1, HPy h2)
 {
     return _py2h(PyNumber_Add(_h2py(h1), _h2py(h2)));

@@ -33,6 +33,7 @@ struct _HPyContext_s {
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
     double (*ctx_Float_AsDouble)(HPyContext ctx, HPy h);
+    int (*ctx_Number_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Add)(HPyContext ctx, HPy h1, HPy h2);
     HPy (*ctx_Subtract)(HPyContext ctx, HPy h1, HPy h2);
     HPy (*ctx_Multiply)(HPyContext ctx, HPy h1, HPy h2);

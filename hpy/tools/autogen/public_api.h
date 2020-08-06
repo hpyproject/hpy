@@ -41,6 +41,7 @@ HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
 /* abstract.h */
+int HPyNumber_Check(HPyContext ctx, HPy h);
 HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_Subtract(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_Multiply(HPyContext ctx, HPy h1, HPy h2);
