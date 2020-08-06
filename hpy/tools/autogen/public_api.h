@@ -17,6 +17,12 @@ HPy h_True;
 HPy h_False;
 HPy h_ValueError;
 HPy h_TypeError;
+HPy h_BaseObjectType;   /* built-in 'object' */
+HPy h_TypeType;         /* built-in 'type' */
+HPy h_LongType;         /* built-in 'int' */
+HPy h_UnicodeType;      /* built-in 'str' */
+HPy h_TupleType;        /* built-in 'tuple' */
+HPy h_ListType;         /* built-in 'list' */
 
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);
