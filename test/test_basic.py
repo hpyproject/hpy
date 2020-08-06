@@ -331,3 +331,36 @@ class TestBasic(HPyTest):
                 @INIT
             """)
         assert str(exc.value) == 'Unsupported HPyMeth signature'
+
+    def test_repr_str_ascii_bytes(self):
+        mod = self.make_module("""
+            HPyDef_METH(f1, "f1", f1_impl, HPyFunc_O)
+            static HPy f1_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Repr(ctx, arg);
+            }
+            HPyDef_METH(f2, "f2", f2_impl, HPyFunc_O)
+            static HPy f2_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Str(ctx, arg);
+            }
+            HPyDef_METH(f3, "f3", f3_impl, HPyFunc_O)
+            static HPy f3_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_ASCII(ctx, arg);
+            }
+            HPyDef_METH(f4, "f4", f4_impl, HPyFunc_O)
+            static HPy f4_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Bytes(ctx, arg);
+            }
+            @EXPORT(f1)
+            @EXPORT(f2)
+            @EXPORT(f3)
+            @EXPORT(f4)
+            @INIT
+        """)
+        assert mod.f1("\u1234") == "'\u1234'"
+        assert mod.f2(42) == "42"
+        assert mod.f3("\u1234") == "'\\u1234'"
+        assert mod.f4(bytearray(b"foo")) == b"foo"

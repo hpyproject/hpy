@@ -248,6 +248,22 @@ static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
      return ctx->ctx_Cast ( ctx, h ); 
 }
 
+static inline HPy HPy_Repr(HPyContext ctx, HPy obj) {
+     return ctx->ctx_Repr ( ctx, obj ); 
+}
+
+static inline HPy HPy_Str(HPyContext ctx, HPy obj) {
+     return ctx->ctx_Str ( ctx, obj ); 
+}
+
+static inline HPy HPy_ASCII(HPyContext ctx, HPy obj) {
+     return ctx->ctx_ASCII ( ctx, obj ); 
+}
+
+static inline HPy HPy_Bytes(HPyContext ctx, HPy obj) {
+     return ctx->ctx_Bytes ( ctx, obj ); 
+}
+
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }

@@ -101,6 +101,11 @@ int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
 void* _HPy_Cast(HPyContext ctx, HPy h);
 HPy _HPy_New(HPyContext ctx, HPy h_type, void **data);
 
+HPy HPy_Repr(HPyContext ctx, HPy obj);
+HPy HPy_Str(HPyContext ctx, HPy obj);
+HPy HPy_ASCII(HPyContext ctx, HPy obj);
+HPy HPy_Bytes(HPyContext ctx, HPy obj);
+
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);

@@ -258,6 +258,26 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(SetItem)(HPyContext ctx, HPy obj, HPy
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Repr)(HPyContext ctx, HPy obj)
+{
+    return _py2h(PyObject_Repr(_h2py(obj)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Str)(HPyContext ctx, HPy obj)
+{
+    return _py2h(PyObject_Str(_h2py(obj)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(ASCII)(HPyContext ctx, HPy obj)
+{
+    return _py2h(PyObject_ASCII(_h2py(obj)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Bytes)(HPyContext ctx, HPy obj)
+{
+    return _py2h(PyObject_Bytes(_h2py(obj)));
+}
+
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)
 {
     return PyBytes_Check(_h2py(h));
