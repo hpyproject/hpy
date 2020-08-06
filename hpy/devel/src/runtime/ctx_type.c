@@ -240,3 +240,11 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     *data = (void*)result;
     return _py2h(result);
 }
+
+_HPy_HIDDEN HPy
+ctx_Type_GenericNew(HPyContext ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HPy kw)
+{
+    PyTypeObject *type = (PyTypeObject *)_h2py(h_type);
+    PyObject *res = type->tp_alloc(type, 0);
+    return _py2h(res);
+}

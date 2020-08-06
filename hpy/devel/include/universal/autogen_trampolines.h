@@ -212,6 +212,10 @@ static inline HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec) {
      return ctx->ctx_Type_FromSpec ( ctx, spec ); 
 }
 
+static inline HPy HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw) {
+     return ctx->ctx_Type_GenericNew ( ctx, type, args, nargs, kw ); 
+}
+
 static inline HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name) {
      return ctx->ctx_GetAttr ( ctx, obj, name ); 
 }

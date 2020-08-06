@@ -86,6 +86,7 @@ int HPyErr_Occurred(HPyContext ctx);
 /* object.h */
 int HPy_IsTrue(HPyContext ctx, HPy h);
 HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec);
+HPy HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
 
 HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);
 HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name);

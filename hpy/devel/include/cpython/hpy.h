@@ -158,6 +158,12 @@ _HPy_New(HPyContext ctx, HPy h, void **data)
     return ctx_New(ctx, h, data);
 }
 
+HPyAPI_FUNC(HPy)
+HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
+{
+    return ctx_Type_GenericNew(ctx, type, args, nargs, kw);
+}
+
 HPyAPI_FUNC(void*)
 _HPy_Cast(HPyContext ctx, HPy h)
 {

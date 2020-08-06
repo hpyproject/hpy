@@ -72,6 +72,7 @@ struct _HPyContext_s {
     int (*ctx_Err_Occurred)(HPyContext ctx);
     int (*ctx_IsTrue)(HPyContext ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext ctx, HPyType_Spec *spec);
+    HPy (*ctx_Type_GenericNew)(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
     HPy (*ctx_GetAttr)(HPyContext ctx, HPy obj, HPy name);
     HPy (*ctx_GetAttr_s)(HPyContext ctx, HPy obj, const char *name);
     int (*ctx_HasAttr)(HPyContext ctx, HPy obj, HPy name);
