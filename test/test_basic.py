@@ -378,3 +378,35 @@ class TestBasic(HPyTest):
         """)
         assert mod.f("1234") is True
         assert mod.f("") is False
+
+    def test_richcompare(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy arg2 = HPyLong_FromLong(ctx, 100);
+                HPy result = HPy_RichCompare(ctx, arg, arg2, HPy_GT);
+                HPy_Close(ctx, arg2);
+                return result;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(100) is False
+        assert mod.f(150) is True
+
+    def test_richcomparebool(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy arg2 = HPyLong_FromLong(ctx, 100);
+                int result = HPy_RichCompareBool(ctx, arg, arg2, HPy_GE);
+                HPy_Close(ctx, arg2);
+                return HPyLong_FromLong(ctx, -result);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(50) == 0
+        assert mod.f(100) == -1

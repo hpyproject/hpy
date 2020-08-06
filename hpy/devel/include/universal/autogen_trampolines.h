@@ -264,6 +264,14 @@ static inline HPy HPy_Bytes(HPyContext ctx, HPy obj) {
      return ctx->ctx_Bytes ( ctx, obj ); 
 }
 
+static inline HPy HPy_RichCompare(HPyContext ctx, HPy v, HPy w, int op) {
+     return ctx->ctx_RichCompare ( ctx, v, w, op ); 
+}
+
+static inline int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op) {
+     return ctx->ctx_RichCompareBool ( ctx, v, w, op ); 
+}
+
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }

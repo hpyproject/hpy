@@ -106,6 +106,9 @@ HPy HPy_Str(HPyContext ctx, HPy obj);
 HPy HPy_ASCII(HPyContext ctx, HPy obj);
 HPy HPy_Bytes(HPyContext ctx, HPy obj);
 
+HPy HPy_RichCompare(HPyContext ctx, HPy v, HPy w, int op);
+int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op);
+
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);

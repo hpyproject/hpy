@@ -170,6 +170,8 @@ SPECIAL_CASES = {
     'HPy_ASCII': 'PyObject_ASCII',
     'HPy_Bytes': 'PyObject_Bytes',
     'HPy_IsTrue': 'PyObject_IsTrue',
+    'HPy_RichCompare': 'PyObject_RichCompare',
+    'HPy_RichCompareBool': 'PyObject_RichCompareBool',
 }
 
 

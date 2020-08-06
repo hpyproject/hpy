@@ -278,6 +278,16 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Bytes)(HPyContext ctx, HPy obj)
     return _py2h(PyObject_Bytes(_h2py(obj)));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(RichCompare)(HPyContext ctx, HPy v, HPy w, int op)
+{
+    return _py2h(PyObject_RichCompare(_h2py(v), _h2py(w), op));
+}
+
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(RichCompareBool)(HPyContext ctx, HPy v, HPy w, int op)
+{
+    return PyObject_RichCompareBool(_h2py(v), _h2py(w), op);
+}
+
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)
 {
     return PyBytes_Check(_h2py(h));
