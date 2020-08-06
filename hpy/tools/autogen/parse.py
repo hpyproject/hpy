@@ -169,6 +169,7 @@ SPECIAL_CASES = {
     'HPy_Str': 'PyObject_Str',
     'HPy_ASCII': 'PyObject_ASCII',
     'HPy_Bytes': 'PyObject_Bytes',
+    'HPy_IsTrue': 'PyObject_IsTrue',
 }
 
 

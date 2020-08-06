@@ -364,3 +364,17 @@ class TestBasic(HPyTest):
         assert mod.f2(42) == "42"
         assert mod.f3("\u1234") == "'\\u1234'"
         assert mod.f4(bytearray(b"foo")) == b"foo"
+
+    def test_is_true(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                int cond = HPy_IsTrue(ctx, arg);
+                return HPy_Dup(ctx, cond ? ctx->h_True : ctx->h_False);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f("1234") is True
+        assert mod.f("") is False

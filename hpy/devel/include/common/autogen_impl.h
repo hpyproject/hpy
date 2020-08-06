@@ -213,7 +213,7 @@ HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetString)(HPyContext ctx, HPy h_type, co
     return PyErr_SetString(_h2py(h_type), message);
 }
 
-HPyAPI_STORAGE int _HPy_IMPL_NAME(Object_IsTrue)(HPyContext ctx, HPy h)
+HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(IsTrue)(HPyContext ctx, HPy h)
 {
     return PyObject_IsTrue(_h2py(h));
 }

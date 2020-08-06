@@ -188,8 +188,8 @@ static inline int HPyErr_Occurred(HPyContext ctx) {
      return ctx->ctx_Err_Occurred ( ctx ); 
 }
 
-static inline int HPyObject_IsTrue(HPyContext ctx, HPy h) {
-     return ctx->ctx_Object_IsTrue ( ctx, h ); 
+static inline int HPy_IsTrue(HPyContext ctx, HPy h) {
+     return ctx->ctx_IsTrue ( ctx, h ); 
 }
 
 static inline HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec) {
