@@ -68,7 +68,7 @@ More concrete goals
     [this blog post](https://morepypy.blogspot.com/2018/09/inside-cpyext-why-emulating-cpython-c.html)
     for details)
 
-  - Cython will adopt this from day one: exiting Cython programs will benefit
+  - Cython will adopt this from day one: existing Cython programs will benefit
     from this automatically
 
 
