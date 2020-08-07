@@ -63,6 +63,7 @@ class TestType(HPyTest):
         assert abs(d) == 1234
 
     def test_tp_methods(self):
+        import pytest
         mod = self.make_module("""
             HPyDef_METH(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O)
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
@@ -76,9 +77,20 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, 1234);
             }
 
+            HPyDef_METH(Dummy_setx, "setx", Dummy_setx_impl, HPyFunc_O)
+            static HPy Dummy_setx_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_SetAttr_s(ctx, self, "x", arg);
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
             static HPyDef *dummy_type_defines[] = {
                     &Dummy_foo,
                     &Dummy_bar,
+                    &Dummy_setx,
                     NULL
             };
 
@@ -93,6 +105,13 @@ class TestType(HPyTest):
         d = mod.Dummy()
         assert d.foo(21) == 42
         assert d.bar() == 1234
+        d.setx(42)
+        assert d.x == 42
+        with pytest.raises(TypeError):
+            mod.Dummy.setx()
+        class A: pass
+        with pytest.raises(TypeError):
+            mod.Dummy.setx(A(), 42)
 
     def test_HPy_New(self):
         mod = self.make_module("""
