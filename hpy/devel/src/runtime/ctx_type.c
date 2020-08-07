@@ -68,6 +68,15 @@ legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
         }
 }
 
+static int
+hpy_slot_to_cpy_slot(HPySlot_Slot src)
+{
+    switch (src) {
+        case HPy_tp_destroy: return Py_tp_dealloc;
+        default: return src;   /* same numeric value by default */
+    }
+}
+
 
 /*
  * Create a PyMethodDef which contains:
@@ -166,7 +175,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
             if (src->kind != HPyDef_Kind_Slot)
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
-            dst->slot = src->slot.slot;
+            dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
             dst->pfunc = src->slot.cpy_trampoline;
         }
     }

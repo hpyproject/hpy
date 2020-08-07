@@ -3,7 +3,8 @@ from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
 
-SPECIAL_CASES = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC')
+SPECIAL_CASES = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC',
+                 'DESTROYFUNC')
 
 class autogen_hpyfunc_declare_h(AutoGenFile):
     PATH = 'hpy/devel/include/common/autogen_hpyfunc_declare.h'

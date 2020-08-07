@@ -115,4 +115,5 @@ struct _HPyContext_s {
     HPy (*ctx_FromPyObject)(HPyContext ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
     void (*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, HPyFunc_Signature sig, void *func, void *args);
+    void (*ctx_CallDestroyAndThenDealloc)(HPyContext ctx, void *func, cpy_PyObject *self);
 };

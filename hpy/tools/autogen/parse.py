@@ -129,6 +129,7 @@ SPECIAL_CASES = {
     'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
     '_HPy_CallRealFunctionFromTrampoline': None,
+    '_HPy_CallDestroyAndThenDealloc': None,
     'HPyErr_Occurred': None,
     'HPy_Add': 'PyNumber_Add',
     'HPy_Subtract': 'PyNumber_Subtract',

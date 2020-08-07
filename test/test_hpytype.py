@@ -222,9 +222,7 @@ class TestType(HPyTest):
         p = mod.Point(1, 2)
         assert p.foo() == 12
 
-
-
-    def test_getitem(self):
+    def test_sq_item(self):
         mod = self.make_module("""
             HPyDef_SLOT(Dummy_getitem, HPy_sq_item, Dummy_getitem_impl, HPyFunc_SSIZEARGFUNC);
             static HPy Dummy_getitem_impl(HPyContext ctx, HPy self, HPy_ssize_t idx)
@@ -247,3 +245,62 @@ class TestType(HPyTest):
         d = mod.Dummy()
         assert d[4] == 8
         assert d[21] == 42
+
+    def test_tp_destroy(self):
+        import gc
+        mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+                long x, y;
+            } PointObject;
+
+            static long destroyed_x;
+
+            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
+            static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                PointObject *point;
+                HPy h_point = HPy_New(ctx, cls, &point);
+                if (HPy_IsNull(h_point))
+                    return HPy_NULL;
+                point->x = 7;
+                point->y = 3;
+                return h_point;
+            }
+
+            HPyDef_SLOT(Point_destroy, HPy_tp_destroy, Point_destroy_impl, HPyFunc_DESTROYFUNC)
+            static void Point_destroy_impl(void *obj)
+            {
+                PointObject *point = (PointObject *)obj;
+                destroyed_x += point->x;
+            }
+
+            static HPyDef *Point_defines[] = {
+                &Point_new,
+                &Point_destroy,
+                NULL
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines
+            };
+
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, destroyed_x);
+            }
+
+            @EXPORT_TYPE("Point", Point_spec)
+            @EXPORT(f)
+            @INIT
+        """)
+        point = mod.Point()
+        assert mod.f() == 0
+        del point
+        gc.collect()
+        assert mod.f() == 7
+        gc.collect()
+        assert mod.f() == 7

@@ -74,12 +74,6 @@
         f(ctx, a->arg0);
         return;
     }
-    case HPyFunc_DESTRUCTOR: {
-        HPyFunc_destructor f = (HPyFunc_destructor)func;
-        _HPyFunc_args_DESTRUCTOR *a = (_HPyFunc_args_DESTRUCTOR*)args;
-        f(ctx, _py2h(a->arg0));
-        return;
-    }
     case HPyFunc_GETATTRFUNC: {
         HPyFunc_getattrfunc f = (HPyFunc_getattrfunc)func;
         _HPyFunc_args_GETATTRFUNC *a = (_HPyFunc_args_GETATTRFUNC*)args;

@@ -1,3 +1,4 @@
+#include <Python.h>
 #include "ctx_meth.h"
 #include "handles.h"
 
@@ -55,4 +56,17 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
     default:
         abort();  // XXX
     }
+}
+
+
+HPyAPI_STORAGE void
+ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, PyObject *self)
+{
+    /* this is _HPy_Cast(_py2h(self)), but this just returns self for now */
+    void *obj = (void *)self;
+
+    HPyFunc_destroyfunc f = (HPyFunc_destroyfunc)func;
+    f(obj);
+
+    Py_TYPE(self)->tp_free(self);
 }

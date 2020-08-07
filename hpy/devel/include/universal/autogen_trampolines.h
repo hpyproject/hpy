@@ -380,3 +380,7 @@ static inline void _HPy_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_S
      ctx->ctx_CallRealFunctionFromTrampoline ( ctx, sig, func, args ); 
 }
 
+static inline void _HPy_CallDestroyAndThenDealloc(HPyContext ctx, void *func, cpy_PyObject *self) {
+     ctx->ctx_CallDestroyAndThenDealloc ( ctx, func, self ); 
+}
+

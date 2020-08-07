@@ -87,5 +87,15 @@ typedef struct {
         return a.result;                                                \
     }
 
+/* special case: this function is used as 'tp_dealloc', but from the user
+   point of view the slot is HPy_tp_destroy. */
+#define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
+    static void                                                         \
+    SYM(cpy_PyObject *self)                                             \
+    {                                                                   \
+        _HPy_CallDestroyAndThenDealloc(                                 \
+            _ctx_for_trampolines, IMPL, self);                          \
+    }
+
 
 #endif // HPY_UNIVERSAL_HPYFUNC_TRAMPOLINES_H

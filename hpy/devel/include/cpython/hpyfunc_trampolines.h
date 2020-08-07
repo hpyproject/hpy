@@ -52,4 +52,12 @@
                     items, nargs, _py2h(kw));                           \
     }
 
+#define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
+    static void                                                         \
+    SYM(PyObject *self)                                                 \
+    {                                                                   \
+        IMPL(self);                                                     \
+        Py_TYPE(self)->tp_free(self);                                   \
+    }
+
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
