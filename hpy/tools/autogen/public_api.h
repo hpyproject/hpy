@@ -41,6 +41,8 @@ HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
 /* abstract.h */
+HPy_ssize_t HPy_Length(HPyContext ctx, HPy h);
+
 int HPyNumber_Check(HPyContext ctx, HPy h);
 HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_Subtract(HPyContext ctx, HPy h1, HPy h2);
@@ -133,10 +135,12 @@ HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy h);
 HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
 
 /* listobject.h */
+int HPyList_Check(HPyContext ctx, HPy h);
 HPy HPyList_New(HPyContext ctx, HPy_ssize_t len);
 int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
+int HPyDict_Check(HPyContext ctx, HPy h);
 HPy HPyDict_New(HPyContext ctx);
 // TODO: Move HPyDict_SetItem and _GetItem (we have HPy_SetItem and _GetItem)
 //       out of the base API.
