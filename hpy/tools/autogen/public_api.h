@@ -10,6 +10,7 @@ typedef int wchar_t;
 typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
+typedef int HPyListBuilder;
 
 
 /* HPy public API */
@@ -162,6 +163,14 @@ void _HPy_CallDestroyAndThenDealloc(HPyContext ctx,
                                     void *func,
                                     cpy_PyObject *self);
 
+
+/* Builders */
+
+HPyListBuilder HPyListBuilder_New(HPyContext ctx, HPy_ssize_t initial_size);
+void HPyListBuilder_Set(HPyContext ctx, HPyListBuilder builder,
+                        HPy_ssize_t index, HPy h_item);
+HPy HPyListBuilder_Build(HPyContext ctx, HPyListBuilder builder);
+void HPyListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder);
 
 
 
