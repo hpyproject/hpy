@@ -165,6 +165,15 @@ SPECIAL_CASES = {
     'HPy_InPlaceOr': 'PyNumber_InPlaceOr',
     '_HPy_New': None,
     'HPyType_FromSpec': None,
+    'HPyType_GenericNew': None,
+    'HPy_Repr': 'PyObject_Repr',
+    'HPy_Str': 'PyObject_Str',
+    'HPy_ASCII': 'PyObject_ASCII',
+    'HPy_Bytes': 'PyObject_Bytes',
+    'HPy_IsTrue': 'PyObject_IsTrue',
+    'HPy_RichCompare': 'PyObject_RichCompare',
+    'HPy_RichCompareBool': 'PyObject_RichCompareBool',
+    'HPy_Hash': 'PyObject_Hash',
 }
 
 

@@ -5,7 +5,9 @@ typedef int HPyModuleDef;
 typedef int HPyType_Spec;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
+typedef int HPy_hash_t;
 typedef int wchar_t;
+typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
 
@@ -17,19 +19,29 @@ HPy h_True;
 HPy h_False;
 HPy h_ValueError;
 HPy h_TypeError;
+HPy h_BaseObjectType;   /* built-in 'object' */
+HPy h_TypeType;         /* built-in 'type' */
+HPy h_LongType;         /* built-in 'int' */
+HPy h_UnicodeType;      /* built-in 'str' */
+HPy h_TupleType;        /* built-in 'tuple' */
+HPy h_ListType;         /* built-in 'list' */
 
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
 HPy HPyLong_FromLong(HPyContext ctx, long value);
+HPy HPyLong_FromUnsignedLong(HPyContext ctx, unsigned long value);
 HPy HPyLong_FromLongLong(HPyContext ctx, long long v);
 HPy HPyLong_FromUnsignedLongLong(HPyContext ctx, unsigned long long v);
+HPy HPyLong_FromSize_t(HPyContext ctx, size_t value);
+HPy HPyLong_FromSsize_t(HPyContext ctx, HPy_ssize_t value);
 
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
 /* abstract.h */
+int HPyNumber_Check(HPyContext ctx, HPy h);
 HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_Subtract(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_Multiply(HPyContext ctx, HPy h1, HPy h2);
@@ -70,10 +82,12 @@ HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext ctx);
+HPy HPyErr_NoMemory(HPyContext ctx);
 
 /* object.h */
-int HPyObject_IsTrue(HPyContext ctx, HPy h);
+int HPy_IsTrue(HPyContext ctx, HPy h);
 HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec);
+HPy HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
 
 HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);
 HPy HPy_GetAttr_s(HPyContext ctx, HPy obj, const char *name);
@@ -94,6 +108,16 @@ int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
 
 void* _HPy_Cast(HPyContext ctx, HPy h);
 HPy _HPy_New(HPyContext ctx, HPy h_type, void **data);
+
+HPy HPy_Repr(HPyContext ctx, HPy obj);
+HPy HPy_Str(HPyContext ctx, HPy obj);
+HPy HPy_ASCII(HPyContext ctx, HPy obj);
+HPy HPy_Bytes(HPyContext ctx, HPy obj);
+
+HPy HPy_RichCompare(HPyContext ctx, HPy v, HPy w, int op);
+int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op);
+
+HPy_hash_t HPy_Hash(HPyContext ctx, HPy obj);
 
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
@@ -164,7 +188,7 @@ typedef HPy (*HPyFunc_getattrofunc)(HPyContext ctx, HPy, HPy);
 typedef int (*HPyFunc_setattrfunc)(HPyContext ctx, HPy, char *, HPy);
 typedef int (*HPyFunc_setattrofunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef HPy (*HPyFunc_reprfunc)(HPyContext ctx, HPy);
-//typedef Py_hash_t (*HPyFunc_hashfunc)(HPyContext ctx, HPy);
+typedef HPy_hash_t (*HPyFunc_hashfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_richcmpfunc)(HPyContext ctx, HPy, HPy, int);
 typedef HPy (*HPyFunc_getiterfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_iternextfunc)(HPyContext ctx, HPy);

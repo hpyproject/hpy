@@ -31,7 +31,16 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_TRUE] = Py_True;
         new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
         new_handles[CONSTANT_H_TYPEERROR] = PyExc_TypeError;
-        assert(CONSTANT_H__TOTAL == 6);
+        new_handles[CONSTANT_H_BASEOBJECTTYPE] = (PyObject *)&PyBaseObject_Type;
+        new_handles[CONSTANT_H_TYPETYPE] = (PyObject *)&PyType_Type;
+        new_handles[CONSTANT_H_LONGTYPE] = (PyObject *)&PyLong_Type;
+        new_handles[CONSTANT_H_UNICODETYPE] = (PyObject *)&PyUnicode_Type;
+        new_handles[CONSTANT_H_TUPLETYPE] = (PyObject *)&PyTuple_Type;
+        new_handles[CONSTANT_H_LISTTYPE] = (PyObject *)&PyList_Type;
+        if (CONSTANT_H__TOTAL != 12) {
+            fprintf(stderr, "bad value for CONSTANT_H__TOTAL in handles.c\n");
+            abort();
+        }
     }
 
     PyMem_Free(all_handles);

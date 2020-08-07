@@ -139,6 +139,41 @@ class TestType(HPyTest):
         p = mod.Point()
         assert p.foo() == 73
 
+    def test_HPyType_GenericNew(self):
+        mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+                long x;
+                long y;
+            } PointObject;
+
+            HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew, HPyFunc_KEYWORDS)
+
+            HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
+            static HPy Point_foo_impl(HPyContext ctx, HPy self)
+            {
+                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                return HPyLong_FromLong(ctx, point->x*10 + point->y);
+            }
+
+            static HPyDef *Point_defines[] = {
+                &Point_new,
+                &Point_foo,
+                NULL
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines
+            };
+
+            @EXPORT_TYPE("Point", Point_spec)
+            @INIT
+        """)
+        p = mod.Point()
+        assert p.foo() == 0
+
+
     def test_getitem(self):
         mod = self.make_module("""
             HPyDef_SLOT(Dummy_getitem, HPy_sq_item, Dummy_getitem_impl, HPyFunc_SSIZEARGFUNC);
