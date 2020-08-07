@@ -164,8 +164,10 @@ create_slot_defs(HPyType_Spec *hpyspec)
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
     PyType_Slot *result = PyMem_Malloc(
         sizeof(PyType_Slot) * (total_slot_count + 1));
-    if (result == NULL)
+    if (result == NULL) {
+        PyErr_NoMemory();
         return NULL;
+    }
 
     // fill the result with non-meth slots
     int dst_idx = 0;
@@ -221,7 +223,6 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
     spec->slots = create_slot_defs(hpyspec);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
-        PyErr_NoMemory();
         return HPy_NULL;
     }
     PyObject *result = PyType_FromSpec(spec);
