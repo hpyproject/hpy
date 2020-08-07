@@ -146,9 +146,3 @@
         a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1), _py2h(a->arg2));
         return;
     }
-    case HPyFunc_INITPROC: {
-        HPyFunc_initproc f = (HPyFunc_initproc)func;
-        _HPyFunc_args_INITPROC *a = (_HPyFunc_args_INITPROC*)args;
-        a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1), _py2h(a->arg2));
-        return;
-    }

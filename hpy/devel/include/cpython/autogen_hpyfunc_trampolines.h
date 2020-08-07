@@ -123,8 +123,3 @@
     { \
         return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1), _py2h(arg2))); \
     }
-#define _HPyFunc_TRAMPOLINE_HPyFunc_INITPROC(SYM, IMPL) \
-    static int SYM(cpy_PyObject *arg0, cpy_PyObject *arg1, cpy_PyObject *arg2) \
-    { \
-        return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1), _py2h(arg2))); \
-    }

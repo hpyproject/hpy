@@ -173,6 +173,56 @@ class TestType(HPyTest):
         p = mod.Point()
         assert p.foo() == 0
 
+    def test_tp_init(self):
+        mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+                long x;
+                long y;
+            } PointObject;
+
+            HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew, HPyFunc_KEYWORDS)
+
+            HPyDef_SLOT(Point_init, HPy_tp_init, Point_init_impl, HPyFunc_INITPROC)
+            static int Point_init_impl(HPyContext ctx, HPy self, HPy *args,
+                                       HPy_ssize_t nargs, HPy kw)
+            {
+                long x, y;
+                if (!HPyArg_Parse(ctx, args, nargs, "ll", &x, &y))
+                    return -1;
+
+                PointObject *p = HPy_CAST(ctx, PointObject, self);
+                p->x = x;
+                p->y = y;
+                return 0;
+            }
+
+            HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
+            static HPy Point_foo_impl(HPyContext ctx, HPy self)
+            {
+                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                return HPyLong_FromLong(ctx, point->x*10 + point->y);
+            }
+
+            static HPyDef *Point_defines[] = {
+                &Point_new,
+                &Point_init,
+                &Point_foo,
+                NULL
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines
+            };
+
+            @EXPORT_TYPE("Point", Point_spec)
+            @INIT
+        """)
+        p = mod.Point(1, 2)
+        assert p.foo() == 12
+
+
 
     def test_getitem(self):
         mod = self.make_module("""

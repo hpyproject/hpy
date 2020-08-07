@@ -194,4 +194,5 @@ typedef HPy (*HPyFunc_getiterfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_iternextfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_descrgetfunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_descrsetfunc)(HPyContext ctx, HPy, HPy, HPy);
-typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy, HPy, HPy);
+typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy self,
+                                HPy *args, HPy_ssize_t nargs, HPy kw);

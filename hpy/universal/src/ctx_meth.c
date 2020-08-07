@@ -40,6 +40,17 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
        a->result = _h2py(f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw)));
        return;
     }
+    case HPyFunc_INITPROC: {
+       HPyFunc_initproc f = (HPyFunc_initproc)func;
+       _HPyFunc_args_INITPROC *a = (_HPyFunc_args_INITPROC*)args;
+       Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
+       HPy *h_args = alloca(nargs * sizeof(HPy));
+       for (Py_ssize_t i = 0; i < nargs; i++) {
+           h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
+       }
+       a->result = f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw));
+       return;
+    }
 #include "autogen_ctx_call.i"
     default:
         abort();  // XXX

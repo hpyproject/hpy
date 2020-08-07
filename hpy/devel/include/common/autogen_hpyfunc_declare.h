@@ -35,7 +35,7 @@
 #define _HPyFunc_DECLARE_HPyFunc_ITERNEXTFUNC(SYM) static HPy SYM(HPyContext ctx, HPy)
 #define _HPyFunc_DECLARE_HPyFunc_DESCRGETFUNC(SYM) static HPy SYM(HPyContext ctx, HPy, HPy, HPy)
 #define _HPyFunc_DECLARE_HPyFunc_DESCRSETFUNC(SYM) static int SYM(HPyContext ctx, HPy, HPy, HPy)
-#define _HPyFunc_DECLARE_HPyFunc_INITPROC(SYM) static int SYM(HPyContext ctx, HPy, HPy, HPy)
+#define _HPyFunc_DECLARE_HPyFunc_INITPROC(SYM) static int SYM(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 
 typedef HPy (*HPyFunc_noargs)(HPyContext ctx, HPy self);
 typedef HPy (*HPyFunc_o)(HPyContext ctx, HPy self, HPy arg);
@@ -64,4 +64,4 @@ typedef HPy (*HPyFunc_getiterfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_iternextfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_descrgetfunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_descrsetfunc)(HPyContext ctx, HPy, HPy, HPy);
-typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy, HPy, HPy);
+typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw);
