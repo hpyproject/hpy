@@ -58,15 +58,15 @@ class TestList(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy h_self, HPy h_arg)
             {
                 HPyListBuilder builder = HPyListBuilder_New(ctx, 3);
-                HPyListBuilder_SetItem(ctx, builder, 0, h_arg);
-                HPyListBuilder_SetItem(ctx, builder, 1, ctx->h_True);
+                HPyListBuilder_Set(ctx, builder, 0, h_arg);
+                HPyListBuilder_Set(ctx, builder, 1, ctx->h_True);
                 HPy h_num = HPyLong_FromLong(ctx, -42);
                 if (HPy_IsNull(h_num))
                 {
                     HPyListBuilder_Cancel(ctx, builder);
                     return HPy_NULL;
                 }
-                HPyListBuilder_SetItem(ctx, builder, 2, h_num);
+                HPyListBuilder_Set(ctx, builder, 2, h_num);
                 HPy_Close(ctx, h_num);
                 HPy h_list = HPyListBuilder_Build(ctx, builder);
                 return h_list;
