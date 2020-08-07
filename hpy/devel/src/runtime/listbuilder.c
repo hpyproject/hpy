@@ -18,8 +18,8 @@ ctx_ListBuilder_New(HPyContext ctx, HPy_ssize_t initial_size)
 }
 
 _HPy_HIDDEN void
-ctx_ListBuilder_Set(HPyContext ctx, HPyListBuilder builder,
-                   HPy_ssize_t index, HPy h_item)
+ctx_ListBuilder_SetItem(HPyContext ctx, HPyListBuilder builder,
+                        HPy_ssize_t index, HPy h_item)
 {
     PyObject *lst = _h2py(builder._lst);
     if (lst != NULL) {

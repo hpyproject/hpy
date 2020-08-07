@@ -167,8 +167,8 @@ void _HPy_CallDestroyAndThenDealloc(HPyContext ctx,
 /* Builders */
 
 HPyListBuilder HPyListBuilder_New(HPyContext ctx, HPy_ssize_t initial_size);
-void HPyListBuilder_Set(HPyContext ctx, HPyListBuilder builder,
-                        HPy_ssize_t index, HPy h_item);
+void HPyListBuilder_SetItem(HPyContext ctx, HPyListBuilder builder,
+                            HPy_ssize_t index, HPy h_item);
 HPy HPyListBuilder_Build(HPyContext ctx, HPyListBuilder builder);
 void HPyListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder);
 

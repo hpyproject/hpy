@@ -14,7 +14,7 @@ object.
 PyList_New(5)/PyList_SET_ITEM() becomes::
 
     HPyListBuilder builder = HPyListBuilder_New(ctx, 5);
-    HPyListBuilder_Set(ctx, builder, 0, h_item0);
+    HPyListBuilder_SetItem(ctx, builder, 0, h_item0);
     ...
     HPyListBuilder_Append(ctx, builder, h_item5);
     ...

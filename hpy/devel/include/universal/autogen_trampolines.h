@@ -388,8 +388,8 @@ static inline HPyListBuilder HPyListBuilder_New(HPyContext ctx, HPy_ssize_t init
      return ctx->ctx_ListBuilder_New ( ctx, initial_size ); 
 }
 
-static inline void HPyListBuilder_Set(HPyContext ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item) {
-     ctx->ctx_ListBuilder_Set ( ctx, builder, index, h_item ); 
+static inline void HPyListBuilder_SetItem(HPyContext ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item) {
+     ctx->ctx_ListBuilder_SetItem ( ctx, builder, index, h_item ); 
 }
 
 static inline HPy HPyListBuilder_Build(HPyContext ctx, HPyListBuilder builder) {

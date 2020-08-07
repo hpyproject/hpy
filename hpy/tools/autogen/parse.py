@@ -177,7 +177,7 @@ SPECIAL_CASES = {
     'HPy_RichCompareBool': 'PyObject_RichCompareBool',
     'HPy_Hash': 'PyObject_Hash',
     'HPyListBuilder_New': None,
-    'HPyListBuilder_Set': None,
+    'HPyListBuilder_SetItem': None,
     'HPyListBuilder_Build': None,
     'HPyListBuilder_Cancel': None,
 }

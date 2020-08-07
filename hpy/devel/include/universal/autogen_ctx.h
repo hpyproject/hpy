@@ -117,7 +117,7 @@ struct _HPyContext_s {
     void (*ctx_CallRealFunctionFromTrampoline)(HPyContext ctx, HPyFunc_Signature sig, void *func, void *args);
     void (*ctx_CallDestroyAndThenDealloc)(HPyContext ctx, void *func, cpy_PyObject *self);
     HPyListBuilder (*ctx_ListBuilder_New)(HPyContext ctx, HPy_ssize_t initial_size);
-    void (*ctx_ListBuilder_Set)(HPyContext ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item);
+    void (*ctx_ListBuilder_SetItem)(HPyContext ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item);
     HPy (*ctx_ListBuilder_Build)(HPyContext ctx, HPyListBuilder builder);
     void (*ctx_ListBuilder_Cancel)(HPyContext ctx, HPyListBuilder builder);
 };

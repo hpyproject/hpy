@@ -117,7 +117,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_CallRealFunctionFromTrampoline = &ctx_CallRealFunctionFromTrampoline,
     .ctx_CallDestroyAndThenDealloc = &ctx_CallDestroyAndThenDealloc,
     .ctx_ListBuilder_New = &ctx_ListBuilder_New,
-    .ctx_ListBuilder_Set = &ctx_ListBuilder_Set,
+    .ctx_ListBuilder_SetItem = &ctx_ListBuilder_SetItem,
     .ctx_ListBuilder_Build = &ctx_ListBuilder_Build,
     .ctx_ListBuilder_Cancel = &ctx_ListBuilder_Cancel,
 };
