@@ -41,6 +41,8 @@ HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
 /* abstract.h */
+HPy_ssize_t HPy_Length(HPyContext ctx, HPy h);
+
 int HPyNumber_Check(HPyContext ctx, HPy h);
 HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_Subtract(HPyContext ctx, HPy h1, HPy h2);
@@ -133,10 +135,12 @@ HPy HPyUnicode_AsUTF8String(HPyContext ctx, HPy h);
 HPy HPyUnicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size);
 
 /* listobject.h */
+int HPyList_Check(HPyContext ctx, HPy h);
 HPy HPyList_New(HPyContext ctx, HPy_ssize_t len);
 int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
+int HPyDict_Check(HPyContext ctx, HPy h);
 HPy HPyDict_New(HPyContext ctx);
 // TODO: Move HPyDict_SetItem and _GetItem (we have HPy_SetItem and _GetItem)
 //       out of the base API.
@@ -154,6 +158,9 @@ void _HPy_CallRealFunctionFromTrampoline(HPyContext ctx,
                                          HPyFunc_Signature sig,
                                          void *func,
                                          void *args);
+void _HPy_CallDestroyAndThenDealloc(HPyContext ctx,
+                                    void *func,
+                                    cpy_PyObject *self);
 
 
 
@@ -182,7 +189,6 @@ typedef int (*HPyFunc_ssizeobjargproc)(HPyContext ctx, HPy, HPy_ssize_t, HPy);
 typedef int (*HPyFunc_ssizessizeobjargproc)(HPyContext ctx, HPy, HPy_ssize_t, HPy_ssize_t, HPy);
 typedef int (*HPyFunc_objobjargproc)(HPyContext ctx, HPy, HPy, HPy);
 typedef void (*HPyFunc_freefunc)(HPyContext ctx, void *);
-typedef void (*HPyFunc_destructor)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_getattrfunc)(HPyContext ctx, HPy, char *);
 typedef HPy (*HPyFunc_getattrofunc)(HPyContext ctx, HPy, HPy);
 typedef int (*HPyFunc_setattrfunc)(HPyContext ctx, HPy, char *, HPy);
@@ -194,4 +200,7 @@ typedef HPy (*HPyFunc_getiterfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_iternextfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_descrgetfunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_descrsetfunc)(HPyContext ctx, HPy, HPy, HPy);
-typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy, HPy, HPy);
+typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy self,
+                                HPy *args, HPy_ssize_t nargs, HPy kw);
+
+typedef void (*HPyFunc_destroyfunc)(void *);

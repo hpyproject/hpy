@@ -176,19 +176,6 @@ typedef struct {
 
 typedef struct {
     cpy_PyObject *arg0;
-} _HPyFunc_args_DESTRUCTOR;
-
-#define _HPyFunc_TRAMPOLINE_HPyFunc_DESTRUCTOR(SYM, IMPL) \
-    static void SYM(cpy_PyObject *arg0) \
-    { \
-        _HPyFunc_args_DESTRUCTOR a = { arg0 }; \
-        _HPy_CallRealFunctionFromTrampoline( \
-           _ctx_for_trampolines, HPyFunc_DESTRUCTOR, IMPL, &a); \
-        return; \
-    }
-
-typedef struct {
-    cpy_PyObject *arg0;
     char *arg1;
     cpy_PyObject * result;
 } _HPyFunc_args_GETATTRFUNC;
@@ -350,22 +337,6 @@ typedef struct {
         _HPyFunc_args_DESCRSETFUNC a = { arg0, arg1, arg2 }; \
         _HPy_CallRealFunctionFromTrampoline( \
            _ctx_for_trampolines, HPyFunc_DESCRSETFUNC, IMPL, &a); \
-        return a.result; \
-    }
-
-typedef struct {
-    cpy_PyObject *arg0;
-    cpy_PyObject *arg1;
-    cpy_PyObject *arg2;
-    int result;
-} _HPyFunc_args_INITPROC;
-
-#define _HPyFunc_TRAMPOLINE_HPyFunc_INITPROC(SYM, IMPL) \
-    static int SYM(cpy_PyObject *arg0, cpy_PyObject *arg1, cpy_PyObject *arg2) \
-    { \
-        _HPyFunc_args_INITPROC a = { arg0, arg1, arg2 }; \
-        _HPy_CallRealFunctionFromTrampoline( \
-           _ctx_for_trampolines, HPyFunc_INITPROC, IMPL, &a); \
         return a.result; \
     }
 
