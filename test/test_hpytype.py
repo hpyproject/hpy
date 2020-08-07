@@ -77,20 +77,16 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            HPyDef_METH(Dummy_setx, "setx", Dummy_setx_impl, HPyFunc_O)
-            static HPy Dummy_setx_impl(HPyContext ctx, HPy self, HPy arg)
+            HPyDef_METH(Dummy_identity, "identity", Dummy_identity_impl, HPyFunc_NOARGS)
+            static HPy Dummy_identity_impl(HPyContext ctx, HPy self)
             {
-                int result;
-                result = HPy_SetAttr_s(ctx, self, "x", arg);
-                if (result < 0)
-                    return HPy_NULL;
-                return HPy_Dup(ctx, ctx->h_None);
+                return HPy_Dup(ctx, self);
             }
 
             static HPyDef *dummy_type_defines[] = {
                     &Dummy_foo,
                     &Dummy_bar,
-                    &Dummy_setx,
+                    &Dummy_identity,
                     NULL
             };
 
@@ -105,13 +101,12 @@ class TestType(HPyTest):
         d = mod.Dummy()
         assert d.foo(21) == 42
         assert d.bar() == 1234
-        d.setx(42)
-        assert d.x == 42
+        assert d.identity() is d
         with pytest.raises(TypeError):
-            mod.Dummy.setx()
+            mod.Dummy.identity()
         class A: pass
         with pytest.raises(TypeError):
-            mod.Dummy.setx(A(), 42)
+            mod.Dummy.identity(A())
 
     def test_HPy_New(self):
         mod = self.make_module("""
