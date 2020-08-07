@@ -11,6 +11,12 @@ because only "lightweight" destructors are supported.  Use tp_finalize if
 you really need to do things with the context or with the handle of the
 object.
 
+Py_tp_methods, Py_tp_members and Py_tp_getset are no longer needed, because
+methods, members and getsets are specified "flatly" together with the other
+slots, using the standard mechanism of HPyDef_{METH,MEMBER,GETSET} and
+HPyType_Spec.defines
+
+
 PyList_New(5)/PyList_SET_ITEM() becomes::
 
     HPyListBuilder builder = HPyListBuilder_New(ctx, 5);
