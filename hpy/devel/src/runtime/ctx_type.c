@@ -95,7 +95,7 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
     HPy_ssize_t total_count = hpymeth_count + legacy_count;
 
     // allocate&fill the result
-    PyMethodDef *result = PyMem_Malloc(sizeof(PyMethodDef) * (total_count+1));
+    PyMethodDef *result = PyMem_Calloc(total_count+1, sizeof(PyMethodDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -140,7 +140,7 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
     HPy_ssize_t total_count = hpymember_count + legacy_count;
 
     // allocate&fill the result
-    PyMemberDef *result = PyMem_Malloc(sizeof(PyMemberDef) * (total_count+1));
+    PyMemberDef *result = PyMem_Calloc(total_count+1, sizeof(PyMemberDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -187,8 +187,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
-    PyType_Slot *result = PyMem_Malloc(
-        sizeof(PyType_Slot) * (total_slot_count + 1));
+    PyType_Slot *result = PyMem_Calloc(total_slot_count+1, sizeof(PyType_Slot));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -247,7 +246,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
 _HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
 {
-    PyType_Spec *spec = PyMem_Malloc(sizeof(PyType_Spec));
+    PyType_Spec *spec = PyMem_Calloc(1, sizeof(PyType_Spec));
     if (spec == NULL) {
         PyErr_NoMemory();
         return HPy_NULL;
