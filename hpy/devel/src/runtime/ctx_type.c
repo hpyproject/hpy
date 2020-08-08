@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <Python.h>
+#include "structmember.h" // for PyMemberDef
 #include "hpy.h"
 #include "common/runtime/ctx_type.h"
 
@@ -27,26 +28,16 @@ sig2flags(HPyFunc_Signature sig)
     }
 }
 
-static int
-HPyDef_count(HPyDef *defs[], HPy_ssize_t *slot_count, HPy_ssize_t *meth_count)
+static HPy_ssize_t
+HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
 {
-    *slot_count = 0;
-    *meth_count = 0;
+    HPy_ssize_t res = 0;
     if (defs == NULL)
-        return 0;
+        return res;
     for(int i=0; defs[i] != NULL; i++)
-        switch(defs[i]->kind) {
-        case HPyDef_Kind_Slot:
-            (*slot_count)++;
-            break;
-        case HPyDef_Kind_Meth:
-            (*meth_count)++;
-            break;
-        default:
-            PyErr_Format(PyExc_ValueError, "Invalid HPyDef.kind: %ld", defs[i]->kind);
-            return -1;
-        }
-    return 0;
+        if (defs[i]->kind == kind)
+            res++;
+    return res;
 }
 
 static void
@@ -90,11 +81,7 @@ hpy_slot_to_cpy_slot(HPySlot_Slot src)
 _HPy_HIDDEN PyMethodDef *
 create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 {
-    // count the HPyMeth
-    HPy_ssize_t hpyslot_count = 0;
-    HPy_ssize_t hpymeth_count = 0;
-    if (HPyDef_count(hpydefs, &hpyslot_count, &hpymeth_count) == -1)
-        return NULL;
+    HPy_ssize_t hpymeth_count = HPyDef_count(hpydefs, HPyDef_Kind_Meth);
     // count the legacy methods
     HPy_ssize_t legacy_count = 0;
     if (legacy_methods != NULL) {
@@ -142,23 +129,70 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
     return result;
 }
 
+static PyMemberDef *
+create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
+{
+    HPy_ssize_t hpymember_count = HPyDef_count(hpydefs, HPyDef_Kind_Member);
+    // count the legacy methods
+    HPy_ssize_t legacy_count = 0;
+    /* if (legacy_methods != NULL) { */
+    /*     while (legacy_methods[legacy_count].ml_name != NULL) */
+    /*         legacy_count++; */
+    /* } */
+    HPy_ssize_t total_count = hpymember_count + legacy_count;
+
+    // allocate&fill the result
+    PyMemberDef *result = PyMem_Malloc(sizeof(PyMemberDef) * (total_count+1));
+    if (result == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    // copy the HPy members
+    int dst_idx = 0;
+    if (hpydefs != NULL) {
+        for(int i=0; hpydefs[i] != NULL; i++) {
+            HPyDef *src = hpydefs[i];
+            if (src->kind != HPyDef_Kind_Member)
+                continue;
+            PyMemberDef *dst = &result[dst_idx++];
+            dst->name = src->member.name;
+            dst->type = src->member.type;
+            dst->offset = src->member.offset;
+            dst->doc = src->member.doc;
+            if (src->member.readonly)
+                dst->flags = READONLY;
+            else
+                dst->flags = 0; // read-write
+        }
+    }
+    // copy the legacy members
+    /*
+    for(int i=0; i<legacy_count; i++) {
+        PyMethodDef *src = &legacy_methods[i];
+        PyMethodDef *dst = &result[dst_idx++];
+        dst->ml_name = src->ml_name;
+        dst->ml_meth = src->ml_meth;
+        dst->ml_flags = src->ml_flags;
+        dst->ml_doc = src->ml_doc;
+    }
+    */
+    result[dst_idx++] = (PyMemberDef){NULL};
+    return result;
+}
+
+
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
-    // count the HPySlots
-    HPy_ssize_t hpyslot_count = 0;
-    HPy_ssize_t hpymeth_count = 0;
-    if (HPyDef_count(hpyspec->defines, &hpyslot_count, &hpymeth_count) == -1)
-        return NULL;
-
+    HPy_ssize_t hpyslot_count = HPyDef_count(hpyspec->defines, HPyDef_Kind_Slot);
     // add the legacy slots
     HPy_ssize_t legacy_slot_count = 0;
     PyMethodDef *legacy_method_defs = NULL;
     legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
                        &legacy_method_defs);
 
-    // add a slot to hold Py_tp_methods
-    hpyslot_count++;
+    // add slots to hold Py_tp_methods, Py_tp_members
+    hpyslot_count += 2;
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -195,12 +229,21 @@ create_slot_defs(HPyType_Spec *hpyspec)
     }
 
     // add the "real" methods
-    PyMethodDef *m = create_method_defs(hpyspec->defines, legacy_method_defs);
-    if (m == NULL) {
+    PyMethodDef *pymethods = create_method_defs(hpyspec->defines, legacy_method_defs);
+    if (pymethods == NULL) {
         PyMem_Free(result);
         return NULL;
     }
-    result[dst_idx++] = (PyType_Slot){Py_tp_methods, m};
+    result[dst_idx++] = (PyType_Slot){Py_tp_methods, pymethods};
+
+    // add the "real" members
+    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, NULL); // legacy_member_defs
+    if (pymembers == NULL) {
+        PyMem_Free(pymethods);
+        PyMem_Free(result);
+        return NULL;
+    }
+    result[dst_idx++] = (PyType_Slot){Py_tp_members, pymembers};
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
