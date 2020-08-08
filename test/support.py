@@ -158,6 +158,7 @@ class ExtensionCompiler:
         """
         Create and compile a HPy module from the template
         """
+        from distutils.core import Extension
         filename = self._expand(name, main_template)
         sources = [str(filename)]
         for i, template in enumerate(extra_templates):
@@ -173,12 +174,12 @@ class ExtensionCompiler:
             '-g',
         ]
         #
-        ext = self.hpy_devel.get_extension(
-            name,
-            hpy_abi=self.abimode,
+        ext = Extension(
+            '%s:%s' % (name, self.abimode),
             sources=sources,
             extra_compile_args=compile_args,
             extra_link_args=link_args)
+        self.hpy_devel.fix_extension(ext)
 
         so_filename = c_compile(str(self.tmpdir), ext,
                                 compiler_verbose=self.compiler_verbose,
