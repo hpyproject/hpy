@@ -153,10 +153,12 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
             if (src->kind != HPyDef_Kind_Member)
                 continue;
             PyMemberDef *dst = &result[dst_idx++];
-            dst->name = src->member.name;
+            /* for Python <= 3.6 compatibility, we need to remove the 'const'
+               qualifier from src->member.{name,doc} */
+            dst->name = (char *)src->member.name;
             dst->type = src->member.type;
             dst->offset = src->member.offset;
-            dst->doc = src->member.doc;
+            dst->doc = (char *)src->member.doc;
             if (src->member.readonly)
                 dst->flags = READONLY;
             else
