@@ -42,16 +42,20 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
 
 static void
 legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
-                   PyMethodDef **method_defs)
+                   PyMethodDef **method_defs, PyMemberDef **member_defs)
 {
     *slot_count = 0;
     *method_defs = NULL;
+    *member_defs = NULL;
     if (slots == NULL)
         return;
     for(int i=0; slots[i].slot != 0; i++)
         switch(slots[i].slot) {
         case Py_tp_methods:
             *method_defs = (PyMethodDef *)slots[i].pfunc;
+            break;
+        case Py_tp_members:
+            *member_defs = (PyMemberDef *)slots[i].pfunc;
             break;
         default:
             (*slot_count)++;
@@ -117,14 +121,8 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
         }
     }
     // copy the legacy methods
-    for(int i=0; i<legacy_count; i++) {
-        PyMethodDef *src = &legacy_methods[i];
-        PyMethodDef *dst = &result[dst_idx++];
-        dst->ml_name = src->ml_name;
-        dst->ml_meth = src->ml_meth;
-        dst->ml_flags = src->ml_flags;
-        dst->ml_doc = src->ml_doc;
-    }
+    for(int i=0; i<legacy_count; i++)
+        result[dst_idx++] = legacy_methods[i];
     result[dst_idx++] = (PyMethodDef){NULL, NULL, 0, NULL};
     return result;
 }
@@ -133,12 +131,12 @@ static PyMemberDef *
 create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
 {
     HPy_ssize_t hpymember_count = HPyDef_count(hpydefs, HPyDef_Kind_Member);
-    // count the legacy methods
+    // count the legacy members
     HPy_ssize_t legacy_count = 0;
-    /* if (legacy_methods != NULL) { */
-    /*     while (legacy_methods[legacy_count].ml_name != NULL) */
-    /*         legacy_count++; */
-    /* } */
+    if (legacy_members != NULL) {
+        while (legacy_members[legacy_count].name != NULL)
+            legacy_count++;
+    }
     HPy_ssize_t total_count = hpymember_count + legacy_count;
 
     // allocate&fill the result
@@ -166,16 +164,8 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
         }
     }
     // copy the legacy members
-    /*
-    for(int i=0; i<legacy_count; i++) {
-        PyMethodDef *src = &legacy_methods[i];
-        PyMethodDef *dst = &result[dst_idx++];
-        dst->ml_name = src->ml_name;
-        dst->ml_meth = src->ml_meth;
-        dst->ml_flags = src->ml_flags;
-        dst->ml_doc = src->ml_doc;
-    }
-    */
+    for(int i=0; i<legacy_count; i++)
+        result[dst_idx++] = legacy_members[i];
     result[dst_idx++] = (PyMemberDef){NULL};
     return result;
 }
@@ -188,8 +178,9 @@ create_slot_defs(HPyType_Spec *hpyspec)
     // add the legacy slots
     HPy_ssize_t legacy_slot_count = 0;
     PyMethodDef *legacy_method_defs = NULL;
+    PyMemberDef *legacy_member_defs = NULL;
     legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
-                       &legacy_method_defs);
+                       &legacy_method_defs, &legacy_member_defs);
 
     // add slots to hold Py_tp_methods, Py_tp_members
     hpyslot_count += 2;
@@ -221,7 +212,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
         PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
         for (int i = 0; legacy_slots[i].slot != 0; i++) {
             PyType_Slot *src = &legacy_slots[i];
-            if (src->slot == Py_tp_methods)
+            if (src->slot == Py_tp_methods || src->slot == Py_tp_members)
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
             *dst = *src;
@@ -237,7 +228,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
     result[dst_idx++] = (PyType_Slot){Py_tp_methods, pymethods};
 
     // add the "real" members
-    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, NULL); // legacy_member_defs
+    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs);
     if (pymembers == NULL) {
         PyMem_Free(pymethods);
         PyMem_Free(result);
@@ -247,6 +238,8 @@ create_slot_defs(HPyType_Spec *hpyspec)
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
+    if (dst_idx != total_slot_count + 1)
+        Py_FatalError("bogus slot count in create_slot_defs");
     return result;
 }
 
