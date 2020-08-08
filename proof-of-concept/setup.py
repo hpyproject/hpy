@@ -1,13 +1,11 @@
 from setuptools import setup, Extension
-import hpy.devel
+from hpy.devel import HPyExtension
 
+# XXXX use HPyExtension
 setup(
     name="hpy-pof",
     ext_modules=[
-        Extension(
-            'pof', ['pof.c'] + hpy.devel.get_sources(),
-            include_dirs=[hpy.devel.get_include()],
-        ),
+        HPyExtension('pof', sources=['pof.c']),
     ],
     setup_requires=['hpy.devel'],
 )

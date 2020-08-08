@@ -22,7 +22,7 @@ class HPyDevel:
     def get_ctx_sources(self):
         return list(map(str, self._ctx_sources))
 
-    def get_extension(self, name, **kwargs):
+    def get_extension(self, name, *args, **kwargs):
         """
         Create a setuptools.Extension() to compile an HPy module.
 
@@ -45,5 +45,5 @@ class HPyDevel:
 
 
 
-def HPyExtension(name, **kwargs):
-    return HPyDevel().get_extension(name, **kwargs)
+def HPyExtension(name, *args, **kwargs):
+    return HPyDevel().get_extension(name, *args, **kwargs)

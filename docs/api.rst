@@ -210,31 +210,20 @@ Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``.
 Building the module
 ~~~~~~~~~~~~~~~~~~~~
 
-.. note::
-   The integration with distutils/setuptools is probably going to change,
-   eventually.  The recipe shown here is just provisional and might stop
-   working eventually.
-
 Let's write a ``setup.py`` to build our extension:
 
 .. code-block:: python
+    from setuptools import setup
+    from hpy.devel import HPyExtension
 
-    from setuptools import setup, Extension
-    import hpy.devel
     setup(
         name="hpy-example",
         ext_modules=[
-            Extension(
-                'simple', ['simple.c'] + hpy.devel.get_sources(),
-                include_dirs=[hpy.devel.get_include()],
-            ),
+            HPyExtension('simple', sources=['simple.c']),
         ],
     )
 
-You need ``hpy.devel`` to be available in your path to run
-it. ``hpy.devel.get_sources()`` returns a list of additionaly C files which
-contain HPy support functions.  ``hpy.devel.get_include()`` returns the
-directory in which to find ``hpy.h``.
+You need ``hpy.devel`` to be available in your path to use ``HPyExtension``.
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
 CPython, it will target the :term:`CPython ABI` by default, so you will end up with
