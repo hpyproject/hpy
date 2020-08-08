@@ -64,7 +64,7 @@ typedef enum {
     HPy_tp_is_gc = 61,
     HPy_tp_iter = 62,
     HPy_tp_iternext = 63,
-    HPy_tp_methods = 64,
+    /*HPy_tp_methods = 64,*/
     HPy_tp_new = 65,
     HPy_tp_repr = 66,
     HPy_tp_richcompare = 67,
@@ -72,8 +72,8 @@ typedef enum {
     HPy_tp_setattro = 69,
     HPy_tp_str = 70,
     HPy_tp_traverse = 71,
-    HPy_tp_members = 72,
-    HPy_tp_getset = 73,
+    /*HPy_tp_members = 72,*/
+    /*HPy_tp_getset = 73,*/
     /*HPy_tp_free = 74,*/
     HPy_nb_matrix_multiply = 75,
     HPy_nb_inplace_matrix_multiply = 76,
