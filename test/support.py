@@ -121,12 +121,13 @@ class Spec(object):
 
 
 class ExtensionCompiler:
-    def __init__(self, tmpdir, abimode, base_dir, compiler_verbose=False,
+    def __init__(self, tmpdir, abimode, hpy_devel, compiler_verbose=False,
                  cpython_include_dirs=None):
         """
-        base_dir is the directory where to find include/, runtime/src,
-        etc. Usually it will point to hpy/devel/, but alternate implementation
-        can point to their own place.
+        hpy_devel is an instance of HPyDevel which specifies where to find
+        include/, runtime/src, etc. Usually it will point to hpy/devel/, but
+        alternate implementations can point to their own place (e.g. pypy puts
+        it into pypy/module/_hpy_universal/_vendored)
 
         cpython_include_dirs is a list of dirs where to find Python.h. If None,
         _build will automatically use the include dirs provided by distutils.
@@ -135,9 +136,7 @@ class ExtensionCompiler:
         """
         self.tmpdir = tmpdir
         self.abimode = abimode
-        self.base_dir = py.path.local(base_dir)
-        self.include_dir = self.base_dir.join('include')
-        self.src_dir = self.base_dir.join('src', 'runtime')
+        self.hpy_devel = hpy_devel
         self.universal_mode = self.abimode == 'universal'
         self.compiler_verbose = compiler_verbose
         self.cpython_include_dirs = cpython_include_dirs
@@ -160,17 +159,7 @@ class ExtensionCompiler:
         Create and compile a HPy module from the template
         """
         filename = self._expand(name, main_template)
-        #
-        # XXX: we should probably use hpy.devel.get_sources() to get all the
-        # needed files
-        sources = [
-            str(self.src_dir.join('argparse.c')),
-        ]
-        if self.abimode == 'cpython':
-            sources.append(str(self.src_dir.join('ctx_module.c')))
-            sources.append(str(self.src_dir.join('ctx_type.c')))
-            sources.append(str(self.src_dir.join('listbuilder.c')))
-        #
+        sources = []
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
             sources.append(extra_filename)
@@ -184,11 +173,17 @@ class ExtensionCompiler:
             '-g',
         ]
         #
+        # XXX eventually this logic should be moved to HPyExtension
+        sources += self.hpy_devel.get_extra_sources()
+        if self.abimode == 'cpython':
+            sources += self.hpy_devel.get_ctx_sources()
+        include_dirs = [self.hpy_devel.include_dir]
         ext = get_extension(str(filename), name,
                             sources=sources,
-                            include_dirs=[self.include_dir],
+                            include_dirs=include_dirs,
                             extra_compile_args=compile_args,
                             extra_link_args=link_args)
+
         so_filename = c_compile(str(self.tmpdir), ext,
                                 compiler_verbose=self.compiler_verbose,
                                 universal_mode=self.universal_mode,
