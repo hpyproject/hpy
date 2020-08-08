@@ -159,7 +159,7 @@ class ExtensionCompiler:
         Create and compile a HPy module from the template
         """
         filename = self._expand(name, main_template)
-        sources = []
+        sources = [str(filename)]
         for i, template in enumerate(extra_templates):
             extra_filename = self._expand('extmod_%d' % i, template)
             sources.append(extra_filename)
@@ -173,16 +173,12 @@ class ExtensionCompiler:
             '-g',
         ]
         #
-        # XXX eventually this logic should be moved to HPyExtension
-        sources += self.hpy_devel.get_extra_sources()
-        if self.abimode == 'cpython':
-            sources += self.hpy_devel.get_ctx_sources()
-        include_dirs = [self.hpy_devel.include_dir]
-        ext = get_extension(str(filename), name,
-                            sources=sources,
-                            include_dirs=include_dirs,
-                            extra_compile_args=compile_args,
-                            extra_link_args=link_args)
+        ext = self.hpy_devel.get_extension(
+            name,
+            hpy_abi=self.abimode,
+            sources=sources,
+            extra_compile_args=compile_args,
+            extra_link_args=link_args)
 
         so_filename = c_compile(str(self.tmpdir), ext,
                                 compiler_verbose=self.compiler_verbose,
@@ -237,13 +233,6 @@ class HPyTest:
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
-
-def get_extension(srcfilename, modname, sources=(), **kwds):
-    from distutils.core import Extension
-    allsources = [srcfilename]
-    for src in sources:
-        allsources.append(os.path.normpath(src))
-    return Extension(name=modname, sources=allsources, **kwds)
 
 def c_compile(tmpdir, ext, compiler_verbose=0, debug=None,
               universal_mode=False, cpython_include_dirs=None):
@@ -305,8 +294,8 @@ def _build_universal(tmpdir, ext, cpython_include_dirs):
     include_dirs = ext.include_dirs + cpython_include_dirs
     objects = compiler.compile(ext.sources,
                                output_dir=tmpdir,
-                               macros=[('HPY_UNIVERSAL_ABI', None)],
                                include_dirs=include_dirs,
+                               macros=ext.define_macros,
                                extra_preargs=ext.extra_compile_args)
 
     filename = ext.name + '.hpy.so'
