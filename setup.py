@@ -29,6 +29,10 @@ setup(
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
                   ] + EXTRA_COMPILE_ARGS
-        )]
-
+        )],
+      entry_points={
+          "distutils.setup_keywords": [
+              "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
+          ],
+      },
 )

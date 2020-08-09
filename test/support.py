@@ -175,11 +175,11 @@ class ExtensionCompiler:
         ]
         #
         ext = Extension(
-            '%s:%s' % (name, self.abimode),
+            name,
             sources=sources,
             extra_compile_args=compile_args,
             extra_link_args=link_args)
-        self.hpy_devel.fix_extension(ext)
+        self.hpy_devel.fix_extension(ext, hpy_abi=self.abimode)
 
         so_filename = c_compile(str(self.tmpdir), ext,
                                 compiler_verbose=self.compiler_verbose,
