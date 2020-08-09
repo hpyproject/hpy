@@ -37,12 +37,54 @@ class HPyDevel:
         if hpy_abi == 'universal':
             ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
 
+    def fix_distribution(self, dist, hpy_ext_modules):
+        from setuptools.command.build_ext import build_ext
+
+        def is_hpy_extension(ext_name):
+            return ext_name in is_hpy_extension._ext_names
+        is_hpy_extension._ext_names = set([ext.name for ext in hpy_ext_modules])
+
+        # add the hpy_extension modules to the normal ext_modules
+        if dist.ext_modules is None:
+            dist.ext_modules = []
+        dist.ext_modules += hpy_ext_modules
+
+        hpy_devel = self
+        base_class = dist.cmdclass.get('build_ext', build_ext)
+        class build_hpy_ext(base_class):
+            """
+            Custom distutils command which properly recognizes and handle hpy
+            extensions:
+
+              - modify 'include_dirs', 'sources' and 'define_macros' depending on
+                the selected hpy_abi
+
+              - modify the filename extension if we are targeting the universal
+                ABI.
+            """
+
+            def build_extension(self, ext):
+                if is_hpy_extension(ext.name):
+                    # add the required include_dirs, sources and macros
+                    hpy_devel.fix_extension(ext, hpy_abi=self.distribution.hpy_abi)
+                super(build_hpy_ext, self).build_extension(ext)
+
+            def get_ext_filename(self, ext_name):
+                # this is needed to give the .hpy.so extension to universal extensions
+                if is_hpy_extension(ext_name) and self.distribution.hpy_abi == 'universal':
+                    ext_path = ext_name.split('.')
+                    ext_suffix = '.hpy.so' # XXX Windows?
+                    return os.path.join(*ext_path) + ext_suffix
+                return super(build_hpy_ext, self).get_ext_filename(ext_name)
+
+        dist.cmdclass['build_ext'] = build_hpy_ext
+
+
 
 def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
     """
     setuptools entry point, see setup.py
     """
-    from setuptools.command.build_ext import build_ext
     assert attr == 'hpy_ext_modules'
 
     # Add a global option --hpy-abi to setup.py
@@ -52,41 +94,5 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
             ('hpy-abi=', None, 'Specify the HPy ABI mode (default: cpython)')
         ]
 
-    def is_hpy_extension(ext_name):
-        return ext_name in is_hpy_extension._ext_names
-    is_hpy_extension._ext_names = set([ext.name for ext in hpy_ext_modules])
-
-    # add the hpy_extension modules to the normal ext_modules
-    if dist.ext_modules is None:
-        dist.ext_modules = []
-    dist.ext_modules += hpy_ext_modules
-
     hpy_devel = HPyDevel()
-    base_class = dist.cmdclass.get('build_ext', build_ext)
-    class build_hpy_ext(base_class):
-        """
-        Custom distutils command which properly recognizes and handle hpy
-        extensions:
-
-          - modify 'include_dirs', 'sources' and 'define_macros' depending on
-            the selected hpy_abi
-
-          - modify the filename extension if we are targeting the universal
-            ABI.
-        """
-
-        def build_extension(self, ext):
-            if is_hpy_extension(ext.name):
-                # add the required include_dirs, sources and macros
-                hpy_devel.fix_extension(ext, hpy_abi=self.distribution.hpy_abi)
-            super(build_hpy_ext, self).build_extension(ext)
-
-        def get_ext_filename(self, ext_name):
-            # this is needed to give the .hpy.so extension to universal extensions
-            if is_hpy_extension(ext_name) and self.distribution.hpy_abi == 'universal':
-                ext_path = ext_name.split('.')
-                ext_suffix = '.hpy.so'
-                return os.path.join(*ext_path) + ext_suffix
-            return super(build_hpy_ext, self).get_ext_filename(ext_name)
-
-    dist.cmdclass['build_ext'] = build_hpy_ext
+    hpy_devel.fix_distribution(dist, hpy_ext_modules)
