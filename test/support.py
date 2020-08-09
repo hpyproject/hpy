@@ -122,25 +122,23 @@ class Spec(object):
 
 class ExtensionCompiler:
     def __init__(self, tmpdir, abimode, hpy_devel, compiler_verbose=False,
-                 cpython_include_dirs=None):
+                 extra_include_dirs=None):
         """
         hpy_devel is an instance of HPyDevel which specifies where to find
         include/, runtime/src, etc. Usually it will point to hpy/devel/, but
         alternate implementations can point to their own place (e.g. pypy puts
         it into pypy/module/_hpy_universal/_vendored)
 
-        cpython_include_dirs is a list of dirs where to find Python.h. If None,
-        _build will automatically use the include dirs provided by distutils.
-        Alternate Python implementations can use this to #include their own
-        version of Python.h
+        extra_include_dirs is a list of include dirs which is put BEFORE all
+        others. By default it is empty, but it is used e.g. by PyPy to make
+        sure that #include <Python.h> picks its own version, instead of the
+        system-wide one.
         """
         self.tmpdir = tmpdir
         self.abimode = abimode
         self.hpy_devel = hpy_devel
-        #self.universal_mode = self.abimode == 'universal'
         self.compiler_verbose = compiler_verbose
-        self.cpython_include_dirs = cpython_include_dirs
-        #assert cpython_include_dirs is None # XXX fix PyPy
+        self.extra_include_dirs = extra_include_dirs
 
     def _expand(self, name, template):
         source = expand_template(template, name)
@@ -178,6 +176,7 @@ class ExtensionCompiler:
         ext = Extension(
             name,
             sources=sources,
+            include_dirs=self.extra_include_dirs,
             extra_compile_args=compile_args,
             extra_link_args=link_args)
 
