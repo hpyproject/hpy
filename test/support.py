@@ -140,7 +140,7 @@ class ExtensionCompiler:
         #self.universal_mode = self.abimode == 'universal'
         self.compiler_verbose = compiler_verbose
         self.cpython_include_dirs = cpython_include_dirs
-        assert cpython_include_dirs is None # XXX fix PyPy
+        #assert cpython_include_dirs is None # XXX fix PyPy
 
     def _expand(self, name, template):
         source = expand_template(template, name)

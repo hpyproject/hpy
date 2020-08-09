@@ -2,6 +2,9 @@ import os.path
 from pathlib import Path
 from setuptools import Extension
 
+# NOTE: this file is also imported by PyPy tests, so it must be compatible
+# with both Python 2.7 and Python 3.x
+
 _BASE_DIR = Path(__file__).parent
 
 class HPyDevel:
@@ -67,7 +70,7 @@ class HPyDevel:
                 if is_hpy_extension(ext.name):
                     # add the required include_dirs, sources and macros
                     hpy_devel.fix_extension(ext, hpy_abi=self.distribution.hpy_abi)
-                super(build_hpy_ext, self).build_extension(ext)
+                return base_class.build_extension(self, ext)
 
             def get_ext_filename(self, ext_name):
                 # this is needed to give the .hpy.so extension to universal extensions
@@ -75,7 +78,7 @@ class HPyDevel:
                     ext_path = ext_name.split('.')
                     ext_suffix = '.hpy.so' # XXX Windows?
                     return os.path.join(*ext_path) + ext_suffix
-                return super(build_hpy_ext, self).get_ext_filename(ext_name)
+                return base_class.get_ext_filename(self, ext_name)
 
         dist.cmdclass['build_ext'] = build_hpy_ext
 
