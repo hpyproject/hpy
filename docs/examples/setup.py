@@ -1,9 +1,9 @@
-from setuptools import setup
-from hpy.devel import HPyExtension
+from setuptools import setup, Extension
 
 setup(
     name="hpy-example",
-    ext_modules=[
-        HPyExtension('simple', sources=['simple.c']),
+    hpy_ext_modules=[
+        Extension('simple', sources=['simple.c']),
     ],
+    setup_requires=['hpy.devel'],
 )

@@ -213,22 +213,28 @@ Building the module
 Let's write a ``setup.py`` to build our extension:
 
 .. code-block:: python
-    from setuptools import setup
-    from hpy.devel import HPyExtension
+
+    from setuptools import setup, Extension
 
     setup(
         name="hpy-example",
-        ext_modules=[
-            HPyExtension('simple', sources=['simple.c']),
+        hpy_ext_modules=[
+            Extension('simple', sources=['simple.c']),
         ],
+        setup_requires=['hpy.devel'],
     )
-
-You need ``hpy.devel`` to be available in your path to use ``HPyExtension``.
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
 CPython, it will target the :term:`CPython ABI` by default, so you will end up with
 a file named e.g. ``simple.cpython-37m-x86_64-linux-gnu.so`` which can be
 imported directly on CPython with no dependency on HPy.
+
+To target the :term:`HPy Universal ABI` instead, it is possible to pass the
+option ``--hpy-abi=universal`` to ``setup.py``. The following command will
+produce a file called ``simple.hpy.so`` (note that you need to specify
+``--hpy-abi`` **before** ``build_ext``, since it is a global option)::
+
+  python setup.py --hpy-abi=universal build_ext -i
 
 VARARGS calling convention
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
