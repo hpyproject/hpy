@@ -18,7 +18,6 @@ class HPyDevel:
             ]
         # ctx_sources are needed only in Universal mode
         self._ctx_sources = list(self.src_dir.glob('ctx_*.c'))
-        self._ctx_sources.append(self.src_dir.joinpath('listbuilder.c')) # XXX
 
     def get_extra_sources(self):
         return list(map(str, self._extra_sources))
