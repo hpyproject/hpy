@@ -12,11 +12,11 @@ def hpy_devel(request):
     return HPyDevel()
 
 @pytest.fixture(params=['cpython', 'universal'])
-def abimode(request):
+def hpy_abi(request):
     return request.param
 
 @pytest.fixture
-def compiler(request, tmpdir, abimode, hpy_devel):
+def compiler(request, tmpdir, hpy_devel, hpy_abi):
     compiler_verbose = request.config.getoption('--compiler-v')
-    return ExtensionCompiler(tmpdir, abimode, hpy_devel,
+    return ExtensionCompiler(tmpdir, hpy_devel, hpy_abi,
                              compiler_verbose=compiler_verbose)

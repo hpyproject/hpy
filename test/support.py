@@ -121,7 +121,7 @@ class Spec(object):
 
 
 class ExtensionCompiler:
-    def __init__(self, tmpdir, abimode, hpy_devel, compiler_verbose=False,
+    def __init__(self, tmpdir, hpy_devel, hpy_abi, compiler_verbose=False,
                  extra_include_dirs=None):
         """
         hpy_devel is an instance of HPyDevel which specifies where to find
@@ -135,8 +135,8 @@ class ExtensionCompiler:
         system-wide one.
         """
         self.tmpdir = tmpdir
-        self.abimode = abimode
         self.hpy_devel = hpy_devel
+        self.hpy_abi = hpy_abi
         self.compiler_verbose = compiler_verbose
         self.extra_include_dirs = extra_include_dirs
 
@@ -182,7 +182,7 @@ class ExtensionCompiler:
 
         so_filename = c_compile(str(self.tmpdir), ext,
                                 hpy_devel=self.hpy_devel,
-                                hpy_abi=self.abimode,
+                                hpy_abi=self.hpy_abi,
                                 compiler_verbose=self.compiler_verbose)
         return so_filename
 
@@ -192,19 +192,19 @@ class ExtensionCompiler:
         is not put into sys.modules
         """
         so_filename = self.compile_module(main_template, name, extra_templates)
-        if self.abimode == 'universal':
+        if self.hpy_abi == 'universal':
             return self.load_universal_module(name, so_filename)
         else:
             return self.load_cython_module(name, so_filename)
 
     def load_universal_module(self, name, so_filename):
-        assert self.abimode == 'universal'
+        assert self.hpy_abi == 'universal'
         import hpy.universal
         spec = Spec(name, so_filename)
         return hpy.universal.load_from_spec(spec)
 
     def load_cython_module(self, name, so_filename):
-        assert self.abimode == 'cpython'
+        assert self.hpy_abi == 'cpython'
         # we've got a normal CPython module compiled with the CPython API/ABI,
         # let's load it normally. It is important to do the imports only here,
         # because this file will be imported also by PyPy tests which runs on
