@@ -1,6 +1,11 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
-#include <dlfcn.h>
+#ifdef MS_WIN32
+# include <windows.h>
+# include "misc_win32.h"
+#else
+# include <dlfcn.h>
+#endif
 #include <stdio.h>
 
 #include "api.h"

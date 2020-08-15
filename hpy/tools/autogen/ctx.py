@@ -47,7 +47,7 @@ class autogen_ctx_def_h(AutoGenFile):
 
     ## struct _HPyContext_s global_ctx = {
     ##     .ctx_version = 1,
-    ##     .h_None = (HPy){CONSTANT_H_NONE},
+    ##     .h_None = {CONSTANT_H_NONE},
     ##     ...
     ##     .ctx_Module_Create = &ctx_Module_Create,
     ##     ...
@@ -59,7 +59,7 @@ class autogen_ctx_def_h(AutoGenFile):
         w('struct _HPyContext_s global_ctx = {')
         w('    .ctx_version = 1,')
         for var in self.api.variables:
-            w('    .%s = (HPy){CONSTANT_%s},' % (var.name, var.name.upper()))
+            w('    .%s = {CONSTANT_%s},' % (var.name, var.name.upper()))
         for func in self.api.functions:
             w('    .%s = &%s,' % (func.ctx_name(), func.ctx_name()))
         w('};')
