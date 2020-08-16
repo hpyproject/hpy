@@ -190,9 +190,18 @@ def convert_name(hpy_name):
 
 
 class HPyAPI:
+    _r_comment = re.compile(r"/\*.*?\*/|//([^\n\\]|\\.)*?$",
+                            re.DOTALL | re.MULTILINE)
 
     def __init__(self, filename):
-        self.ast = pycparser.parse_file(filename, use_cpp=True)
+        with open(filename, 'r') as f:
+            csource = f.read()
+        # Remove comments.  NOTE: this assumes that comments are never inside
+        # string literals, but there shouldn't be any here.
+        def replace_keeping_newlines(m):
+            return ' ' + m.group().count('\n') * '\n'
+        csource = self._r_comment.sub(replace_keeping_newlines, csource)
+        self.ast = pycparser.CParser().parse(csource)
         ## print(); self.ast.show()
         self.collect_declarations()
 
