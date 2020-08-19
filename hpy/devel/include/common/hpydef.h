@@ -126,17 +126,17 @@ typedef struct {
         }                                           \
     };
 
-#define HPyDef_GET(SYM, NAME, IMPL, ...)                       \
-    static HPy IMPL(HPyContext ctx, HPy self, void *closure);  \
-    HPyFunc_TRAMPOLINE_PROPERTY_GETTER(SYM##_trampoline, IMPL) \
-    HPyDef SYM = {                                             \
-        .kind = HPyDef_Kind_GetSet,                            \
-        .getset = {                                            \
-            .name = NAME,                                      \
-            .getter_impl = IMPL,                               \
-            .getter_cpy_trampoline = SYM##_trampoline,         \
-            __VA_ARGS__                                        \
-        }                                                      \
+#define HPyDef_GET(SYM, NAME, IMPL, ...)                        \
+    static HPy IMPL(HPyContext ctx, HPy self, void *closure);   \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, HPyFunc_GETTER); \
+    HPyDef SYM = {                                              \
+        .kind = HPyDef_Kind_GetSet,                             \
+        .getset = {                                             \
+            .name = NAME,                                       \
+            .getter_impl = IMPL,                                \
+            .getter_cpy_trampoline = SYM##_trampoline,          \
+            __VA_ARGS__                                         \
+        }                                                       \
     };
 
 #endif /* HPY_UNIVERSAL_HPYDEF_H */

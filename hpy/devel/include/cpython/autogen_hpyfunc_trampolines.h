@@ -118,3 +118,13 @@
     { \
         return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1), _py2h(arg2))); \
     }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_GETTER(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *arg0, void *arg1) \
+    { \
+        return _h2py(IMPL(_HPyGetContext(), _py2h(arg0), arg1)); \
+    }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_SETTER(SYM, IMPL) \
+    static int SYM(cpy_PyObject *arg0, cpy_PyObject *arg1, void *arg2) \
+    { \
+        return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1), arg2)); \
+    }
