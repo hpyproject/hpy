@@ -129,6 +129,8 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
     for(int i=0; i<legacy_count; i++)
         result[dst_idx++] = legacy_methods[i];
     result[dst_idx++] = (PyMethodDef){NULL, NULL, 0, NULL};
+    if (dst_idx != total_count + 1)
+        Py_FatalError("bogus count in create_method_defs");
     return result;
 }
 
@@ -174,6 +176,8 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
     for(int i=0; i<legacy_count; i++)
         result[dst_idx++] = legacy_members[i];
     result[dst_idx++] = (PyMemberDef){NULL};
+    if (dst_idx != total_count + 1)
+        Py_FatalError("bogus count in create_member_defs");
     return result;
 }
 
@@ -216,6 +220,8 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
     for(int i=0; i<legacy_count; i++)
         result[dst_idx++] = legacy_getsets[i];
     result[dst_idx++] = (PyGetSetDef){NULL};
+    if (dst_idx != total_count + 1)
+        Py_FatalError("bogus count in create_getset_defs");
     return result;
 }
 
@@ -244,7 +250,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
         return NULL;
     }
 
-    // fill the result with non-meth slots
+    // fill the result with non-meth, non-member, non-getset slots
     int dst_idx = 0;
     if (hpyspec->defines != NULL) {
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
@@ -257,12 +263,13 @@ create_slot_defs(HPyType_Spec *hpyspec)
         }
     }
 
-    // add the legacy slots (non-methods)
+    // add the legacy slots (non-methods, non-members, non-getsets)
     if (hpyspec->legacy_slots != NULL) {
         PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
         for (int i = 0; legacy_slots[i].slot != 0; i++) {
             PyType_Slot *src = &legacy_slots[i];
-            if (src->slot == Py_tp_methods || src->slot == Py_tp_members)
+            if (src->slot == Py_tp_methods || src->slot == Py_tp_members ||
+                src->slot == Py_tp_getset)
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
             *dst = *src;
