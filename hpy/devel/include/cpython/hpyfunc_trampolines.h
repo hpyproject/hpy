@@ -60,4 +60,11 @@
         Py_TYPE(self)->tp_free(self);                                   \
     }
 
+#define HPyFunc_TRAMPOLINE_PROPERTY_GETTER(SYM, IMPL)                   \
+    static PyObject *                                                   \
+    SYM(PyObject *self, void *closure)                                  \
+    {                                                                   \
+        return _h2py(IMPL(_HPyGetContext(), _py2h(self), closure));     \
+    }
+
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H

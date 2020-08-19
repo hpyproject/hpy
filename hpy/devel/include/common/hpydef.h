@@ -60,18 +60,21 @@ typedef struct {
     const char *doc;
 } HPyMember;
 
-/*
-
 typedef struct {
-    ...
+    const char *name;
+    void *getter_impl;            // Function pointer to the implementation
+    void *setter_impl;            // Same; this may be NULL
+    void *getter_cpy_trampoline;  // Used by CPython to call getter_impl
+    void *setter_cpy_trampoline;  // Same; this may be NULL
+    const char *doc;
+    void *closure;
 } HPyGetSet;
-*/
 
 typedef enum {
     HPyDef_Kind_Slot = 1,
     HPyDef_Kind_Meth = 2,
     HPyDef_Kind_Member = 3,
-    // HPyDef_Kind_GetSet = 4,
+    HPyDef_Kind_GetSet = 4,
 } HPyDef_Kind;
 
 typedef struct {
@@ -80,7 +83,7 @@ typedef struct {
         HPySlot slot;
         HPyMeth meth;
         HPyMember member;
-        // HPyGetSet getset;
+        HPyGetSet getset;
     };
 } HPyDef;
 
@@ -121,6 +124,19 @@ typedef struct {
             .offset = OFFSET,                       \
             __VA_ARGS__                             \
         }                                           \
+    };
+
+#define HPyDef_GET(SYM, NAME, IMPL, ...)                       \
+    static HPy IMPL(HPyContext ctx, HPy self, void *closure);  \
+    HPyFunc_TRAMPOLINE_PROPERTY_GETTER(SYM##_trampoline, IMPL) \
+    HPyDef SYM = {                                             \
+        .kind = HPyDef_Kind_GetSet,                            \
+        .getset = {                                            \
+            .name = NAME,                                      \
+            .getter_impl = IMPL,                               \
+            .getter_cpy_trampoline = SYM##_trampoline,         \
+            __VA_ARGS__                                        \
+        }                                                      \
     };
 
 #endif /* HPY_UNIVERSAL_HPYDEF_H */
