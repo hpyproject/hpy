@@ -126,17 +126,34 @@ typedef struct {
         }                                           \
     };
 
-#define HPyDef_GET(SYM, NAME, IMPL, ...)                        \
-    static HPy IMPL(HPyContext ctx, HPy self, void *closure);   \
-    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, HPyFunc_GETTER); \
-    HPyDef SYM = {                                              \
-        .kind = HPyDef_Kind_GetSet,                             \
-        .getset = {                                             \
-            .name = NAME,                                       \
-            .getter_impl = IMPL,                                \
-            .getter_cpy_trampoline = SYM##_trampoline,          \
-            __VA_ARGS__                                         \
-        }                                                       \
+#define HPyDef_GET(SYM, NAME, IMPL, ...)                            \
+    static HPy IMPL(HPyContext ctx, HPy self, void *closure);       \
+    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, IMPL, HPyFunc_GETTER); \
+    HPyDef SYM = {                                                  \
+        .kind = HPyDef_Kind_GetSet,                                 \
+        .getset = {                                                 \
+            .name = NAME,                                           \
+            .getter_impl = IMPL,                                    \
+            .getter_cpy_trampoline = SYM##_get_trampoline,          \
+            __VA_ARGS__                                             \
+        }                                                           \
+    };
+
+#define HPyDef_GETSET(SYM, NAME, GETIMPL, SETIMPL, ...)                     \
+    static HPy GETIMPL(HPyContext ctx, HPy self, void *closure);            \
+    static int SETIMPL(HPyContext ctx, HPy self, HPy value, void *closure); \
+    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER);      \
+    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER);      \
+    HPyDef SYM = {                                                          \
+        .kind = HPyDef_Kind_GetSet,                                         \
+        .getset = {                                                         \
+            .name = NAME,                                                   \
+            .getter_impl = GETIMPL,                                         \
+            .setter_impl = SETIMPL,                                         \
+            .getter_cpy_trampoline = SYM##_get_trampoline,                  \
+            .setter_cpy_trampoline = SYM##_set_trampoline,                  \
+            __VA_ARGS__                                                     \
+        }                                                                   \
     };
 
 #endif /* HPY_UNIVERSAL_HPYDEF_H */
