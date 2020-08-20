@@ -60,18 +60,21 @@ typedef struct {
     const char *doc;
 } HPyMember;
 
-/*
-
 typedef struct {
-    ...
+    const char *name;
+    void *getter_impl;            // Function pointer to the implementation
+    void *setter_impl;            // Same; this may be NULL
+    void *getter_cpy_trampoline;  // Used by CPython to call getter_impl
+    void *setter_cpy_trampoline;  // Same; this may be NULL
+    const char *doc;
+    void *closure;
 } HPyGetSet;
-*/
 
 typedef enum {
     HPyDef_Kind_Slot = 1,
     HPyDef_Kind_Meth = 2,
     HPyDef_Kind_Member = 3,
-    // HPyDef_Kind_GetSet = 4,
+    HPyDef_Kind_GetSet = 4,
 } HPyDef_Kind;
 
 typedef struct {
@@ -80,7 +83,7 @@ typedef struct {
         HPySlot slot;
         HPyMeth meth;
         HPyMember member;
-        // HPyGetSet getset;
+        HPyGetSet getset;
     };
 } HPyDef;
 
@@ -121,6 +124,49 @@ typedef struct {
             .offset = OFFSET,                       \
             __VA_ARGS__                             \
         }                                           \
+    };
+
+#define HPyDef_GET(SYM, NAME, GETIMPL, ...)                                 \
+    HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                               \
+    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER);      \
+    HPyDef SYM = {                                                          \
+        .kind = HPyDef_Kind_GetSet,                                         \
+        .getset = {                                                         \
+            .name = NAME,                                                   \
+            .getter_impl = GETIMPL,                                         \
+            .getter_cpy_trampoline = SYM##_get_trampoline,                  \
+            __VA_ARGS__                                                     \
+        }                                                                   \
+    };
+
+#define HPyDef_SET(SYM, NAME, SETIMPL, ...)                                 \
+    HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                               \
+    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER);      \
+    HPyDef SYM = {                                                          \
+        .kind = HPyDef_Kind_GetSet,                                         \
+        .getset = {                                                         \
+            .name = NAME,                                                   \
+            .setter_impl = SETIMPL,                                         \
+            .setter_cpy_trampoline = SYM##_set_trampoline,                  \
+            __VA_ARGS__                                                     \
+        }                                                                   \
+    };
+
+#define HPyDef_GETSET(SYM, NAME, GETIMPL, SETIMPL, ...)                     \
+    HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                               \
+    HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                               \
+    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER);      \
+    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER);      \
+    HPyDef SYM = {                                                          \
+        .kind = HPyDef_Kind_GetSet,                                         \
+        .getset = {                                                         \
+            .name = NAME,                                                   \
+            .getter_impl = GETIMPL,                                         \
+            .setter_impl = SETIMPL,                                         \
+            .getter_cpy_trampoline = SYM##_get_trampoline,                  \
+            .setter_cpy_trampoline = SYM##_set_trampoline,                  \
+            __VA_ARGS__                                                     \
+        }                                                                   \
     };
 
 #endif /* HPY_UNIVERSAL_HPYDEF_H */

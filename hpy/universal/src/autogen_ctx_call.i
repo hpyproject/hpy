@@ -140,3 +140,15 @@
         a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1), _py2h(a->arg2));
         return;
     }
+    case HPyFunc_GETTER: {
+        HPyFunc_getter f = (HPyFunc_getter)func;
+        _HPyFunc_args_GETTER *a = (_HPyFunc_args_GETTER*)args;
+        a->result = _h2py(f(ctx, _py2h(a->arg0), a->arg1));
+        return;
+    }
+    case HPyFunc_SETTER: {
+        HPyFunc_setter f = (HPyFunc_setter)func;
+        _HPyFunc_args_SETTER *a = (_HPyFunc_args_SETTER*)args;
+        a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1), a->arg2);
+        return;
+    }

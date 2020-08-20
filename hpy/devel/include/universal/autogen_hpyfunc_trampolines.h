@@ -340,3 +340,34 @@ typedef struct {
         return a.result; \
     }
 
+typedef struct {
+    cpy_PyObject *arg0;
+    void *arg1;
+    cpy_PyObject * result;
+} _HPyFunc_args_GETTER;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_GETTER(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *arg0, void *arg1) \
+    { \
+        _HPyFunc_args_GETTER a = { arg0, arg1 }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_GETTER, IMPL, &a); \
+        return a.result; \
+    }
+
+typedef struct {
+    cpy_PyObject *arg0;
+    cpy_PyObject *arg1;
+    void *arg2;
+    int result;
+} _HPyFunc_args_SETTER;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_SETTER(SYM, IMPL) \
+    static int SYM(cpy_PyObject *arg0, cpy_PyObject *arg1, void *arg2) \
+    { \
+        _HPyFunc_args_SETTER a = { arg0, arg1, arg2 }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_SETTER, IMPL, &a); \
+        return a.result; \
+    }
+

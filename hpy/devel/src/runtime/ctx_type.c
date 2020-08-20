@@ -42,11 +42,13 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
 
 static void
 legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
-                   PyMethodDef **method_defs, PyMemberDef **member_defs)
+                   PyMethodDef **method_defs, PyMemberDef **member_defs,
+                   PyGetSetDef **getset_defs)
 {
     *slot_count = 0;
     *method_defs = NULL;
     *member_defs = NULL;
+    *getset_defs = NULL;
     if (slots == NULL)
         return;
     for(int i=0; slots[i].slot != 0; i++)
@@ -56,6 +58,9 @@ legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
             break;
         case Py_tp_members:
             *member_defs = (PyMemberDef *)slots[i].pfunc;
+            break;
+        case Py_tp_getset:
+            *getset_defs = (PyGetSetDef *)slots[i].pfunc;
             break;
         default:
             (*slot_count)++;
@@ -124,6 +129,8 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
     for(int i=0; i<legacy_count; i++)
         result[dst_idx++] = legacy_methods[i];
     result[dst_idx++] = (PyMethodDef){NULL, NULL, 0, NULL};
+    if (dst_idx != total_count + 1)
+        Py_FatalError("bogus count in create_method_defs");
     return result;
 }
 
@@ -169,6 +176,52 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
     for(int i=0; i<legacy_count; i++)
         result[dst_idx++] = legacy_members[i];
     result[dst_idx++] = (PyMemberDef){NULL};
+    if (dst_idx != total_count + 1)
+        Py_FatalError("bogus count in create_member_defs");
+    return result;
+}
+
+static PyGetSetDef *
+create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
+{
+    HPy_ssize_t hpygetset_count = HPyDef_count(hpydefs, HPyDef_Kind_GetSet);
+    // count the legacy members
+    HPy_ssize_t legacy_count = 0;
+    if (legacy_getsets != NULL) {
+        while (legacy_getsets[legacy_count].name != NULL)
+            legacy_count++;
+    }
+    HPy_ssize_t total_count = hpygetset_count + legacy_count;
+
+    // allocate&fill the result
+    PyGetSetDef *result = PyMem_Calloc(total_count+1, sizeof(PyGetSetDef));
+    if (result == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    // copy the HPy members
+    int dst_idx = 0;
+    if (hpydefs != NULL) {
+        for(int i=0; hpydefs[i] != NULL; i++) {
+            HPyDef *src = hpydefs[i];
+            if (src->kind != HPyDef_Kind_GetSet)
+                continue;
+            PyGetSetDef *dst = &result[dst_idx++];
+            /* for Python <= 3.6 compatibility, we need to remove the 'const'
+               qualifier from src->getset.{name,doc} */
+            dst->name = (char *)src->getset.name;
+            dst->get = src->getset.getter_cpy_trampoline;
+            dst->set = src->getset.setter_cpy_trampoline;
+            dst->doc = (char *)src->getset.doc;
+            dst->closure = src->getset.closure;
+        }
+    }
+    // copy the legacy members
+    for(int i=0; i<legacy_count; i++)
+        result[dst_idx++] = legacy_getsets[i];
+    result[dst_idx++] = (PyGetSetDef){NULL};
+    if (dst_idx != total_count + 1)
+        Py_FatalError("bogus count in create_getset_defs");
     return result;
 }
 
@@ -181,11 +234,13 @@ create_slot_defs(HPyType_Spec *hpyspec)
     HPy_ssize_t legacy_slot_count = 0;
     PyMethodDef *legacy_method_defs = NULL;
     PyMemberDef *legacy_member_defs = NULL;
+    PyGetSetDef *legacy_getset_defs = NULL;
     legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
-                       &legacy_method_defs, &legacy_member_defs);
+                       &legacy_method_defs, &legacy_member_defs,
+                       &legacy_getset_defs);
 
-    // add slots to hold Py_tp_methods, Py_tp_members
-    hpyslot_count += 2;
+    // add slots to hold Py_tp_methods, Py_tp_members, Py_tp_getset
+    hpyslot_count += 3;
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -195,7 +250,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
         return NULL;
     }
 
-    // fill the result with non-meth slots
+    // fill the result with non-meth, non-member, non-getset slots
     int dst_idx = 0;
     if (hpyspec->defines != NULL) {
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
@@ -208,12 +263,13 @@ create_slot_defs(HPyType_Spec *hpyspec)
         }
     }
 
-    // add the legacy slots (non-methods)
+    // add the legacy slots (non-methods, non-members, non-getsets)
     if (hpyspec->legacy_slots != NULL) {
         PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
         for (int i = 0; legacy_slots[i].slot != 0; i++) {
             PyType_Slot *src = &legacy_slots[i];
-            if (src->slot == Py_tp_methods || src->slot == Py_tp_members)
+            if (src->slot == Py_tp_methods || src->slot == Py_tp_members ||
+                src->slot == Py_tp_getset)
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
             *dst = *src;
@@ -236,6 +292,16 @@ create_slot_defs(HPyType_Spec *hpyspec)
         return NULL;
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_members, pymembers};
+
+    // add the "real" getsets
+    PyGetSetDef *pygetsets = create_getset_defs(hpyspec->defines, legacy_getset_defs);
+    if (pygetsets == NULL) {
+        PyMem_Free(pymembers);
+        PyMem_Free(pymethods);
+        PyMem_Free(result);
+        return NULL;
+    }
+    result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};

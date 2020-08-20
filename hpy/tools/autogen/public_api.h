@@ -211,5 +211,7 @@ typedef HPy (*HPyFunc_descrgetfunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_descrsetfunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy self,
                                 HPy *args, HPy_ssize_t nargs, HPy kw);
+typedef HPy (*HPyFunc_getter)(HPyContext ctx, HPy, void *);
+typedef int (*HPyFunc_setter)(HPyContext ctx, HPy, HPy, void *);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
