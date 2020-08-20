@@ -127,7 +127,7 @@ typedef struct {
     };
 
 #define HPyDef_GET(SYM, NAME, IMPL, ...)                            \
-    static HPy IMPL(HPyContext ctx, HPy self, void *closure);       \
+    HPyFunc_DECLARE(IMPL, HPyFunc_GETTER);                          \
     HPyFunc_TRAMPOLINE(SYM##_get_trampoline, IMPL, HPyFunc_GETTER); \
     HPyDef SYM = {                                                  \
         .kind = HPyDef_Kind_GetSet,                                 \
@@ -140,8 +140,8 @@ typedef struct {
     };
 
 #define HPyDef_GETSET(SYM, NAME, GETIMPL, SETIMPL, ...)                     \
-    static HPy GETIMPL(HPyContext ctx, HPy self, void *closure);            \
-    static int SETIMPL(HPyContext ctx, HPy self, HPy value, void *closure); \
+    HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                               \
+    HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                               \
     HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER);      \
     HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER);      \
     HPyDef SYM = {                                                          \
