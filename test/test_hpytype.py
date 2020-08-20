@@ -466,3 +466,56 @@ class TestType(HPyTest):
         assert p.z == 1073
         p.z = 1075
         assert p.z == 1075
+
+    def test_HPyDef_SET(self):
+        mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+                long x;
+                long y;
+            } PointObject;
+
+            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
+            static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                PointObject *point;
+                HPy h_point = HPy_New(ctx, cls, &point);
+                if (HPy_IsNull(h_point))
+                    return HPy_NULL;
+                point->x = 7;
+                point->y = 3;
+                return h_point;
+            }
+
+            HPyDef_SET(Point_z, "z", Point_z_set, .closure=(void *)1000)
+            static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
+            {
+                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                long current = point->x*10 + point->y + (long)closure;
+                long target = HPyLong_AsLong(ctx, value);  // assume no exception
+                point->y += target - current;
+                return 0;
+            }
+
+            HPyDef_MEMBER(Point_y, "y", HPyMember_LONG, offsetof(PointObject, y))
+
+            static HPyDef *Point_defines[] = {
+                &Point_new,
+                &Point_z,
+                &Point_y,
+                NULL
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines
+            };
+
+            @EXPORT_TYPE("Point", Point_spec)
+            @INIT
+        """)
+        p = mod.Point()
+        assert p.y == 3
+        p.z = 1075
+        assert p.y == 5
