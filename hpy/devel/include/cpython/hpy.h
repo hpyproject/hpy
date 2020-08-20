@@ -139,7 +139,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #include "../common/hpymodule.h"
 #include "../common/runtime/ctx_module.h"
 #include "../common/runtime/ctx_type.h"
-#include "../common/runtime/listbuilder.h"
+#include "../common/runtime/ctx_listbuilder.h"
 
 
 HPyAPI_FUNC(HPy)

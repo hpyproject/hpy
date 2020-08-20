@@ -20,7 +20,7 @@ setup(
                    'hpy/devel/src/runtime/ctx_module.c',
                    'hpy/devel/src/runtime/ctx_type.c',
                    'hpy/devel/src/runtime/argparse.c',
-                   'hpy/devel/src/runtime/listbuilder.c',
+                   'hpy/devel/src/runtime/ctx_listbuilder.c',
                   ],
                   include_dirs=[
                       'hpy/devel/include',
@@ -29,6 +29,10 @@ setup(
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
                   ] + EXTRA_COMPILE_ARGS
-        )]
-
+        )],
+      entry_points={
+          "distutils.setup_keywords": [
+              "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
+          ],
+      },
 )
