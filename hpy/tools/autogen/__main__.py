@@ -8,7 +8,7 @@ from packaging import version
 if version.parse(pycparser.__version__) < version.parse('2.20'):
     raise ImportError('You need pycparser>=2.20 to run autogen')
 
-from .parse import HPyAPI
+from .parse import HPyAPI, PUBLIC_API_H
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
 from .trampolines import autogen_trampolines_h, autogen_impl_h
 from .hpyfunc import autogen_hpyfunc_declare_h
@@ -23,8 +23,7 @@ def main():
         sys.exit(1)
     outdir = py.path.local(sys.argv[1])
 
-    public_api_h = py.path.local(__file__).dirpath('public_api.h')
-    api = HPyAPI.parse(public_api_h)
+    api = HPyAPI.parse(PUBLIC_API_H)
     ## for func in api.functions:
     ##     print(func)
 

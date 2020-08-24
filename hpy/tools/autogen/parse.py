@@ -1,9 +1,13 @@
 from copy import deepcopy
 import attr
 import re
+import py
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
+
+PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
+
 
 def toC(node):
     return toC.gen.visit(node)
