@@ -81,11 +81,15 @@ jobs:
   - script: |
       pip install pycparser==2.20
       pip install py==1.8.0
+      pip install packaging==19.2
     displayName: 'Install dependencies'
 
   - script: |
       make autogen
-      if [ -n "$(git status --porcelain)" ]; then
+      if [ -z "$(git status --porcelain)" ]; then
+          # clean working copy
+          echo "Working copy is clean, everything ok
+      else
           # Uncommitted changes
           echo "ERROR: uncommitted changes after running make autogen"
           echo "git status"
