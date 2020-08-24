@@ -6,10 +6,60 @@ functions. In particular, you have to "import pytest" inside the test in order
 to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
-from .support import HPyTest
+from .support import HPyTest, DefaultExtensionTemplate
+
+
+class PointTemplate(DefaultExtensionTemplate):
+    """
+    ExtensionTemplate with extra markers which helps to define again and again
+    a simple Point type. Note that every test can use a different combination
+    of markers, to test different features.
+    """
+
+    def DEFINE_PointObject(self):
+        return """
+            typedef struct {
+                HPyObject_HEAD
+                long x;
+                long y;
+            } PointObject;
+        """
+
+    def DEFINE_Point_new(self):
+        return """
+            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
+            static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                PointObject *point;
+                HPy h_point = HPy_New(ctx, cls, &point);
+                if (HPy_IsNull(h_point))
+                    return HPy_NULL;
+                point->x = 7;
+                point->y = 3;
+                return h_point;
+            }
+        """
+
+    def EXPORT_POINT_TYPE(self, *defines):
+        defines = ['&' + d for d in defines]
+        defines.append('NULL')
+        defines = ', '.join(defines)
+        #
+        self.EXPORT_TYPE('"Point"', "Point_spec")
+        return """
+            static HPyDef *Point_defines[] = { %s };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines
+            };
+        """ % defines
 
 
 class TestType(HPyTest):
+
+    ExtensionTemplate = PointTemplate
 
     def test_simple_type(self):
         mod = self.make_module("""
@@ -110,24 +160,8 @@ class TestType(HPyTest):
 
     def test_HPy_New(self):
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-                long x;
-                long y;
-            } PointObject;
-
-            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
-            static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
-                                      HPy_ssize_t nargs, HPy kw)
-            {
-                PointObject *point;
-                HPy h_point = HPy_New(ctx, cls, &point);
-                if (HPy_IsNull(h_point))
-                    return HPy_NULL;
-                point->x = 7;
-                point->y = 3;
-                return h_point;
-            }
+            @DEFINE_PointObject
+            @DEFINE_Point_new
 
             HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
@@ -136,18 +170,7 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            static HPyDef *Point_defines[] = {
-                &Point_new,
-                &Point_foo,
-                NULL
-            };
-            static HPyType_Spec Point_spec = {
-                .name = "mytest.Point",
-                .basicsize = sizeof(PointObject),
-                .defines = Point_defines
-            };
-
-            @EXPORT_TYPE("Point", Point_spec)
+            @EXPORT_POINT_TYPE(Point_new, Point_foo)
             @INIT
         """)
         p = mod.Point()
