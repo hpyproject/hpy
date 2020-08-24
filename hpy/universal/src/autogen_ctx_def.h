@@ -6,7 +6,6 @@
    Run this to regenerate:
        make autogen
 
-   TEMPORARY LINE TO PLAY WITH GITHUB DIFFS
 */
 
 struct _HPyContext_s global_ctx = {

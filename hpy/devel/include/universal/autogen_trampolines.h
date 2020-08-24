@@ -6,7 +6,6 @@
    Run this to regenerate:
        make autogen
 
-   TEMPORARY LINE TO PLAY WITH GITHUB DIFFS
 */
 
 static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {

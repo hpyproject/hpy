@@ -6,7 +6,6 @@
    Run this to regenerate:
        make autogen
 
-   TEMPORARY LINE TO PLAY WITH GITHUB DIFFS
 */
 
 #define _HPyFunc_DECLARE_HPyFunc_NOARGS(SYM) static HPy SYM(HPyContext ctx, HPy self)

@@ -6,7 +6,6 @@
    Run this to regenerate:
        make autogen
 
-   TEMPORARY LINE TO PLAY WITH GITHUB DIFFS
 */
 
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext ctx, long value)
