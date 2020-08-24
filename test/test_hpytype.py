@@ -274,25 +274,10 @@ class TestType(HPyTest):
     def test_tp_destroy(self):
         import gc
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-                long x, y;
-            } PointObject;
+            @DEFINE_PointObject
+            @DEFINE_Point_new
 
             static long destroyed_x;
-
-            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
-            static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
-                                      HPy_ssize_t nargs, HPy kw)
-            {
-                PointObject *point;
-                HPy h_point = HPy_New(ctx, cls, &point);
-                if (HPy_IsNull(h_point))
-                    return HPy_NULL;
-                point->x = 7;
-                point->y = 3;
-                return h_point;
-            }
 
             HPyDef_SLOT(Point_destroy, HPy_tp_destroy, Point_destroy_impl, HPyFunc_DESTROYFUNC)
             static void Point_destroy_impl(void *obj)
@@ -301,34 +286,23 @@ class TestType(HPyTest):
                 destroyed_x += point->x;
             }
 
-            static HPyDef *Point_defines[] = {
-                &Point_new,
-                &Point_destroy,
-                NULL
-            };
-            static HPyType_Spec Point_spec = {
-                .name = "mytest.Point",
-                .basicsize = sizeof(PointObject),
-                .defines = Point_defines
-            };
-
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            HPyDef_METH(get_destroyed_x, "get_destroyed_x", get_destroyed_x_impl, HPyFunc_NOARGS)
+            static HPy get_destroyed_x_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, destroyed_x);
             }
 
-            @EXPORT_TYPE("Point", Point_spec)
-            @EXPORT(f)
+            @EXPORT_POINT_TYPE(&Point_new, &Point_destroy)
+            @EXPORT(get_destroyed_x)
             @INIT
         """)
-        point = mod.Point()
-        assert mod.f() == 0
+        point = mod.Point(7, 3)
+        assert mod.get_destroyed_x() == 0
         del point
         gc.collect()
-        assert mod.f() == 7
+        assert mod.get_destroyed_x() == 7
         gc.collect()
-        assert mod.f() == 7
+        assert mod.get_destroyed_x() == 7
 
 
     def test_HPyDef_GET(self):
