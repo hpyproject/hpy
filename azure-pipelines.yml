@@ -89,7 +89,7 @@ jobs:
       make autogen
       if [ -z "$(git status --porcelain)" ]; then
           # clean working copy
-          echo "Working copy is clean, everything ok
+          echo "Working copy is clean, everything ok"
       else
           # Uncommitted changes
           echo "ERROR: uncommitted changes after running make autogen"
