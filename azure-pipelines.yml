@@ -82,6 +82,7 @@ jobs:
       pip install pycparser==2.20
       pip install py==1.8.0
       pip install packaging==19.2
+      pip install attrs==19.3.0
     displayName: 'Install dependencies'
 
   - script: |
