@@ -6,6 +6,7 @@
    Run this to regenerate:
        make autogen
 
+   TEMPORARY LINE TO PLAY WITH GITHUB DIFFS
 */
 
 #define _HPyFunc_TRAMPOLINE_HPyFunc_UNARYFUNC(SYM, IMPL) \
