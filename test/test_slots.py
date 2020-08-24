@@ -34,27 +34,20 @@ class TestSlots(HPyTest):
 
     def test_sq_item(self):
         mod = self.make_module("""
-            HPyDef_SLOT(Dummy_getitem, HPy_sq_item, Dummy_getitem_impl, HPyFunc_SSIZEARGFUNC);
-            static HPy Dummy_getitem_impl(HPyContext ctx, HPy self, HPy_ssize_t idx)
+            @DEFINE_PointObject
+
+            HPyDef_SLOT(Point_getitem, HPy_sq_item, Point_getitem_impl, HPyFunc_SSIZEARGFUNC);
+            static HPy Point_getitem_impl(HPyContext ctx, HPy self, HPy_ssize_t idx)
             {
                 return HPyLong_FromLong(ctx, (long)idx*2);
             }
 
-            static HPyDef *Dummy_defines[] = {
-                &Dummy_getitem,
-                NULL
-            };
-            static HPyType_Spec Dummy_spec = {
-                .name = "mytest.Dummy",
-                .defines =  Dummy_defines
-            };
-
-            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @EXPORT_POINT_TYPE(&Point_getitem)
             @INIT
         """)
-        d = mod.Dummy()
-        assert d[4] == 8
-        assert d[21] == 42
+        p = mod.Point()
+        assert p[4] == 8
+        assert p[21] == 42
 
     def test_tp_destroy(self):
         import gc
