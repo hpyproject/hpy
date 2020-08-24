@@ -67,3 +67,37 @@ jobs:
   - script: |
       python -m pytest proof-of-concept/
     displayName: 'Run pof tests'
+
+- job: CheckAutogen
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: 'Check autogen'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+    displayName: 'Use Python 3.8'
+
+  - script: |
+      pip install pycparser==2.20
+      pip install py==1.8.0
+      pip install packaging==19.2
+      pip install attrs==19.3.0
+    displayName: 'Install dependencies'
+
+  - script: |
+      make autogen
+      if [ -z "$(git status --porcelain)" ]; then
+          # clean working copy
+          echo "Working copy is clean, everything ok"
+      else
+          # Uncommitted changes
+          echo "ERROR: uncommitted changes after running make autogen"
+          echo "git status"
+          git status
+          echo
+          echo "git diff"
+          git diff
+          exit 1
+      fi
+    displayName: 'make autogen'
