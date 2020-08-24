@@ -42,8 +42,7 @@ class PointTemplate(DefaultExtensionTemplate):
         """
 
     def EXPORT_POINT_TYPE(self, *defines):
-        defines = ['&' + d for d in defines]
-        defines.append('NULL')
+        defines += ('NULL',)
         defines = ', '.join(defines)
         #
         self.EXPORT_TYPE('"Point"', "Point_spec")
@@ -170,7 +169,7 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            @EXPORT_POINT_TYPE(Point_new, Point_foo)
+            @EXPORT_POINT_TYPE(&Point_new, &Point_foo)
             @INIT
         """)
         p = mod.Point()
@@ -178,11 +177,7 @@ class TestType(HPyTest):
 
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-                long x;
-                long y;
-            } PointObject;
+            @DEFINE_PointObject
 
             HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew, HPyFunc_KEYWORDS)
 
@@ -193,18 +188,7 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            static HPyDef *Point_defines[] = {
-                &Point_new,
-                &Point_foo,
-                NULL
-            };
-            static HPyType_Spec Point_spec = {
-                .name = "mytest.Point",
-                .basicsize = sizeof(PointObject),
-                .defines = Point_defines
-            };
-
-            @EXPORT_TYPE("Point", Point_spec)
+            @EXPORT_POINT_TYPE(&Point_new, &Point_foo)
             @INIT
         """)
         p = mod.Point()
@@ -212,11 +196,7 @@ class TestType(HPyTest):
 
     def test_tp_init(self):
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
-                long x;
-                long y;
-            } PointObject;
+            @DEFINE_PointObject
 
             HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew, HPyFunc_KEYWORDS)
 
@@ -241,19 +221,7 @@ class TestType(HPyTest):
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
-            static HPyDef *Point_defines[] = {
-                &Point_new,
-                &Point_init,
-                &Point_foo,
-                NULL
-            };
-            static HPyType_Spec Point_spec = {
-                .name = "mytest.Point",
-                .basicsize = sizeof(PointObject),
-                .defines = Point_defines
-            };
-
-            @EXPORT_TYPE("Point", Point_spec)
+            @EXPORT_POINT_TYPE(&Point_new, &Point_init, &Point_foo)
             @INIT
         """)
         p = mod.Point(1, 2)
