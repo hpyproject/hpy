@@ -6,7 +6,6 @@ C_DISCLAIMER = """
    Run this to regenerate:
        make autogen
 
-   TEMPORARY LINE TO PLAY WITH GITHUB DIFFS
 */
 """
 
