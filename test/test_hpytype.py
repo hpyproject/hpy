@@ -27,7 +27,7 @@ class PointTemplate(DefaultExtensionTemplate):
 
     def DEFINE_Point_new(self):
         return """
-            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
+            HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl)
             static HPy Point_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -92,13 +92,13 @@ class TestType(HPyTest):
 
     def test_HPyDef_SLOT(self):
         mod = self.make_module("""
-            HPyDef_SLOT(Dummy_repr, HPy_tp_repr, Dummy_repr_impl, HPyFunc_REPRFUNC);
+            HPyDef_SLOT(Dummy_repr, HPy_tp_repr, Dummy_repr_impl);
             static HPy Dummy_repr_impl(HPyContext ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPyDef_SLOT(Dummy_abs, HPy_nb_absolute, Dummy_abs_impl, HPyFunc_UNARYFUNC);
+            HPyDef_SLOT(Dummy_abs, HPy_nb_absolute, Dummy_abs_impl);
             static HPy Dummy_abs_impl(HPyContext ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -210,7 +210,7 @@ class TestType(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_xy
 
-            HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew, HPyFunc_KEYWORDS)
+            HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew)
 
             @EXPORT_POINT_TYPE(&Point_new, &Point_x, &Point_y)
             @INIT

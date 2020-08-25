@@ -9,9 +9,9 @@ class TestSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_xy
-            HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew, HPyFunc_KEYWORDS)
+            HPyDef_SLOT(Point_new, HPy_tp_new, HPyType_GenericNew)
 
-            HPyDef_SLOT(Point_init, HPy_tp_init, Point_init_impl, HPyFunc_INITPROC)
+            HPyDef_SLOT(Point_init, HPy_tp_init, Point_init_impl)
             static int Point_init_impl(HPyContext ctx, HPy self, HPy *args,
                                        HPy_ssize_t nargs, HPy kw)
             {
@@ -36,7 +36,7 @@ class TestSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(Point_getitem, HPy_sq_item, Point_getitem_impl, HPyFunc_SSIZEARGFUNC);
+            HPyDef_SLOT(Point_getitem, HPy_sq_item, Point_getitem_impl);
             static HPy Point_getitem_impl(HPyContext ctx, HPy self, HPy_ssize_t idx)
             {
                 return HPyLong_FromLong(ctx, (long)idx*2);
@@ -57,7 +57,7 @@ class TestSlots(HPyTest):
 
             static long destroyed_x;
 
-            HPyDef_SLOT(Point_destroy, HPy_tp_destroy, Point_destroy_impl, HPyFunc_DESTROYFUNC)
+            HPyDef_SLOT(Point_destroy, HPy_tp_destroy, Point_destroy_impl)
             static void Point_destroy_impl(void *obj)
             {
                 PointObject *point = (PointObject *)obj;

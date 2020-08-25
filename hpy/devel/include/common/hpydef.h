@@ -89,7 +89,21 @@ typedef struct {
 
 // macros to automatically define HPyDefs of various kinds
 
-#define HPyDef_SLOT(SYM, SLOT, IMPL, SIG)                               \
+
+/* ~~~ HPyDef_SLOT ~~~
+
+   This is the official version of HPyDef_SLOT, which automatically determines
+   the SIG from the SLOT. The anonymous enum is needed to get a nice
+   compile-time error in case we pass a SLOT which does not exist, see the
+   more detailed explanation in the comments around HPyFunc_DECLARE in
+   hpyfunc.h
+*/
+#define HPyDef_SLOT(SYM, SLOT, IMPL)                            \
+    enum { SYM##_slot = SLOT };                                 \
+    _HPyDef_SLOT(SYM, SLOT, IMPL, HPyFunc_SIG_FROM_SLOT(SLOT))
+
+// this is the actual implementation, after we determined the SIG
+#define _HPyDef_SLOT(SYM, SLOT, IMPL, SIG)                              \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
     HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
     HPyDef SYM = {                                                      \
