@@ -227,6 +227,9 @@ typedef void (*HPyFunc_destroyfunc)(void *);
 
 */
 
+// NOTE: if you uncomment/enable a slot below, make sure to write a corresponding
+// test in test_slots.py
+
 /* Note that the magic numbers are the same as CPython */
 typedef enum {
     //HPy_mp_ass_subscript = SLOT(3, HPyFunc_X),
