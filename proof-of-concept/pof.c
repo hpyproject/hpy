@@ -38,7 +38,7 @@ typedef struct {
     double y;
 } HPy_Point;
 
-HPyDef_SLOT(Point_new, HPy_tp_new, Point_new_impl, HPyFunc_KEYWORDS)
+HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
 static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
                            HPy_ssize_t nargs, HPy Kw)
 {
@@ -55,7 +55,7 @@ static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
     return h_point;
 }
 
-HPyDef_SLOT(Point_repr, HPy_tp_repr, Point_repr_impl, HPyFunc_NOARGS)
+HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext ctx, HPy self)
 {
     HPy_Point *point = HPy_CAST(ctx, HPy_Point, self);

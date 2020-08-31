@@ -64,6 +64,15 @@ class HPyFunc:
     def return_type(self):
         return self.node.type.type.type
 
+@attr.s
+class HPySlot:
+    # represent a declaration contained inside enum HPySlot_Slot, such as:
+    #        HPy_nb_add = SLOT(7, HPyFunc_BINARYFUNC)
+
+    name = attr.ib()      # "HPy_nb_add"
+    value = attr.ib()     # "7"
+    hpyfunc = attr.ib()   # "HPyFunc_BINARYFUNC"
+
 
 class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self, api, convert_name):
@@ -84,6 +93,8 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
         # find only typedefs to function pointers whose name starts by HPyFunc_
         if node.name.startswith('HPyFunc_') and self._is_function_ptr(node.type):
             self._visit_hpyfunc_typedef(node)
+        elif node.name == 'HPySlot_Slot':
+            self._visit_hpyslot_slot(node)
 
     def _visit_function(self, node):
         name = node.name
@@ -110,6 +121,18 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def _visit_hpyfunc_typedef(self, node):
         hpyfunc = HPyFunc(node.name, node)
         self.api.hpyfunc_typedefs.append(hpyfunc)
+
+    def _visit_hpyslot_slot(self, node):
+        for e in node.type.type.values.enumerators:
+            call = e.value
+            assert isinstance(call, c_ast.FuncCall) and call.name.name == 'SLOT'
+            assert len(call.args.exprs) == 2
+            const_value, id_hpyfunc = call.args.exprs
+            assert isinstance(const_value, c_ast.Constant) and const_value.type == 'int'
+            assert isinstance(id_hpyfunc, c_ast.ID)
+            value = const_value.value
+            hpyfunc = id_hpyfunc.name
+            self.api.hpyslots.append(HPySlot(e.name, value, hpyfunc))
 
 
 SPECIAL_CASES = {
@@ -222,6 +245,9 @@ class HPyAPI:
     def get_hpyfunc_typedef(self, name):
         return self._lookup(name, self.hpyfunc_typedefs)
 
+    def get_slot(self, name):
+        return self._lookup(name, self.hpyslots)
+
     def _lookup(self, name, collection):
         for x in collection:
             if x.name == name:
@@ -232,5 +258,6 @@ class HPyAPI:
         self.functions = []
         self.variables = []
         self.hpyfunc_typedefs = []
+        self.hpyslots = []
         v = HPyAPIVisitor(self, convert_name)
         v.visit(self.ast)

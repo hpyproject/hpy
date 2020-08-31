@@ -5,6 +5,7 @@ import pytest
 from hpy.tools.autogen.parse import HPyAPI
 from hpy.tools.autogen.ctx import autogen_ctx_h, autogen_ctx_def_h
 from hpy.tools.autogen.trampolines import autogen_trampolines_h, autogen_impl_h
+from hpy.tools.autogen.hpyslot import autogen_hpyslot_h
 
 def src_equal(exp, got):
     # try to compare two C sources, ignoring whitespace
@@ -59,6 +60,21 @@ class TestHPyAPI(BaseTestAutogen):
         assert api.get_func('HPy_Dup').cpython_name is None
         assert api.get_func('HPyLong_AsLong').cpython_name == 'PyLong_AsLong'
         assert api.get_func('HPy_Add').cpython_name == 'PyNumber_Add'
+
+    def test_hpyslot(self):
+        api = self.parse("""
+            typedef enum {
+                HPy_nb_add = SLOT(7, HPyFunc_BINARYFUNC),
+                HPy_tp_repr = SLOT(66, HPyFunc_REPRFUNC),
+            } HPySlot_Slot;
+        """)
+        nb_add = api.get_slot('HPy_nb_add')
+        assert nb_add.value == '7'
+        assert nb_add.hpyfunc == 'HPyFunc_BINARYFUNC'
+        #
+        tp_repr = api.get_slot('HPy_tp_repr')
+        assert tp_repr.value == '66'
+        assert tp_repr.hpyfunc == 'HPyFunc_REPRFUNC'
 
 
 class TestAutoGen(BaseTestAutogen):
@@ -141,5 +157,24 @@ class TestAutoGen(BaseTestAutogen):
             {
                 return PyBytes_AsString(_h2py(h));
             }
+        """
+        assert src_equal(got, exp)
+
+    def test_autogen_hpyslot_h(self):
+        api = self.parse("""
+            typedef enum {
+                HPy_nb_add = SLOT(7, HPyFunc_BINARYFUNC),
+                HPy_tp_repr = SLOT(66, HPyFunc_REPRFUNC),
+            } HPySlot_Slot;
+        """)
+        got = autogen_hpyslot_h(api).generate()
+        exp = """
+            typedef enum {
+                HPy_nb_add = 7,
+                HPy_tp_repr = 66,
+            } HPySlot_Slot;
+
+        #define _HPySlot_SIG__HPy_nb_add HPyFunc_BINARYFUNC
+        #define _HPySlot_SIG__HPy_tp_repr HPyFunc_REPRFUNC
         """
         assert src_equal(got, exp)
