@@ -152,6 +152,8 @@ HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
 /* tupleobject.h */
 HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n);
+// note: HPyTuple_Pack is implemented as a macro in common/macros.h
+
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj);
