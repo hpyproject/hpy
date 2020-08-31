@@ -15,6 +15,7 @@ from .hpyfunc import autogen_hpyfunc_declare_h
 from .hpyfunc import autogen_hpyfunc_trampoline_h
 from .hpyfunc import autogen_ctx_call_i
 from .hpyfunc import autogen_cpython_hpyfunc_trampoline_h
+from .hpyslot import autogen_hpyslot_h
 from .pypy import autogen_pypy_txt
 
 def main():
@@ -35,6 +36,7 @@ def main():
                 autogen_hpyfunc_trampoline_h,
                 autogen_ctx_call_i,
                 autogen_cpython_hpyfunc_trampoline_h,
+                autogen_hpyslot_h,
                 autogen_pypy_txt):
         cls(api).write(outdir)
 

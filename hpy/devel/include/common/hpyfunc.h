@@ -80,20 +80,4 @@ typedef enum {
 #  include "cpython/autogen_hpyfunc_trampolines.h"
 #endif // HPY_UNIVERSAL_ABI
 
-/* ~~~ HPyFunc_SIG_FROM_SLOT ~~~
-
-  Macro-magic to automatically determine the HPyFunc_Signature from a
-  symbolic slot name such as HPy_tp_repr, HPy_nb_add, etc.
- */
-
-#define HPyFunc_SIG_FROM_SLOT(SLOT) _HPyFunc_SIG_FROM_SLOT_##SLOT
-
-#define _HPyFunc_SIG_FROM_SLOT_HPy_tp_repr HPyFunc_REPRFUNC
-#define _HPyFunc_SIG_FROM_SLOT_HPy_nb_absolute HPyFunc_UNARYFUNC
-#define _HPyFunc_SIG_FROM_SLOT_HPy_tp_new HPyFunc_KEYWORDS
-#define _HPyFunc_SIG_FROM_SLOT_HPy_tp_init HPyFunc_INITPROC
-#define _HPyFunc_SIG_FROM_SLOT_HPy_sq_item HPyFunc_SSIZEARGFUNC
-#define _HPyFunc_SIG_FROM_SLOT_HPy_tp_destroy HPyFunc_DESTROYFUNC
-
-
 #endif /* HPY_UNIVERSAL_HPYFUNC_H */

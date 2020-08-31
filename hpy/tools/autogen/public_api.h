@@ -215,3 +215,100 @@ typedef HPy (*HPyFunc_getter)(HPyContext ctx, HPy, void *);
 typedef int (*HPyFunc_setter)(HPyContext ctx, HPy, HPy, void *);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
+
+
+/* ~~~ HPySlot_Slot ~~~
+
+   The following enum is used to generate autogen_hpyslot.h, which contains:
+
+     - The real definition of the enum HPySlot_Slot
+
+     - the macros #define _HPySlot_SIGNATURE_*
+
+*/
+
+/* Note that the magic numbers are the same as CPython */
+typedef enum {
+    //HPy_mp_ass_subscript = SLOT(3, HPyFunc_X),
+    //HPy_mp_length = SLOT(4, HPyFunc_X),
+    //HPy_mp_subscript = SLOT(5, HPyFunc_X),
+    HPy_nb_absolute = SLOT(6, HPyFunc_UNARYFUNC),
+    //HPy_nb_add = SLOT(7, HPyFunc_X),
+    //HPy_nb_and = SLOT(8, HPyFunc_X),
+    //HPy_nb_bool = SLOT(9, HPyFunc_X),
+    //HPy_nb_divmod = SLOT(10, HPyFunc_X),
+    //HPy_nb_float = SLOT(11, HPyFunc_X),
+    //HPy_nb_floor_divide = SLOT(12, HPyFunc_X),
+    //HPy_nb_index = SLOT(13, HPyFunc_X),
+    //HPy_nb_inplace_add = SLOT(14, HPyFunc_X),
+    //HPy_nb_inplace_and = SLOT(15, HPyFunc_X),
+    //HPy_nb_inplace_floor_divide = SLOT(16, HPyFunc_X),
+    //HPy_nb_inplace_lshift = SLOT(17, HPyFunc_X),
+    //HPy_nb_inplace_multiply = SLOT(18, HPyFunc_X),
+    //HPy_nb_inplace_or = SLOT(19, HPyFunc_X),
+    //HPy_nb_inplace_power = SLOT(20, HPyFunc_X),
+    //HPy_nb_inplace_remainder = SLOT(21, HPyFunc_X),
+    //HPy_nb_inplace_rshift = SLOT(22, HPyFunc_X),
+    //HPy_nb_inplace_subtract = SLOT(23, HPyFunc_X),
+    //HPy_nb_inplace_true_divide = SLOT(24, HPyFunc_X),
+    //HPy_nb_inplace_xor = SLOT(25, HPyFunc_X),
+    //HPy_nb_int = SLOT(26, HPyFunc_X),
+    //HPy_nb_invert = SLOT(27, HPyFunc_X),
+    //HPy_nb_lshift = SLOT(28, HPyFunc_X),
+    //HPy_nb_multiply = SLOT(29, HPyFunc_X),
+    //HPy_nb_negative = SLOT(30, HPyFunc_X),
+    //HPy_nb_or = SLOT(31, HPyFunc_X),
+    //HPy_nb_positive = SLOT(32, HPyFunc_X),
+    //HPy_nb_power = SLOT(33, HPyFunc_X),
+    //HPy_nb_remainder = SLOT(34, HPyFunc_X),
+    //HPy_nb_rshift = SLOT(35, HPyFunc_X),
+    //HPy_nb_subtract = SLOT(36, HPyFunc_X),
+    //HPy_nb_true_divide = SLOT(37, HPyFunc_X),
+    //HPy_nb_xor = SLOT(38, HPyFunc_X),
+    //HPy_sq_ass_item = SLOT(39, HPyFunc_X),
+    //HPy_sq_concat = SLOT(40, HPyFunc_X),
+    //HPy_sq_contains = SLOT(41, HPyFunc_X),
+    //HPy_sq_inplace_concat = SLOT(42, HPyFunc_X),
+    //HPy_sq_inplace_repeat = SLOT(43, HPyFunc_X),
+    HPy_sq_item = SLOT(44, HPyFunc_SSIZEARGFUNC),
+    //HPy_sq_length = SLOT(45, HPyFunc_X),
+    //HPy_sq_repeat = SLOT(46, HPyFunc_X),
+    //HPy_tp_alloc = SLOT(47, HPyFunc_X),      NOT SUPPORTED
+    //HPy_tp_base = SLOT(48, HPyFunc_X),
+    //HPy_tp_bases = SLOT(49, HPyFunc_X),
+    //HPy_tp_call = SLOT(50, HPyFunc_X),
+    //HPy_tp_clear = SLOT(51, HPyFunc_X),
+    //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
+    //HPy_tp_del = SLOT(53, HPyFunc_X),
+    //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
+    //HPy_tp_descr_set = SLOT(55, HPyFunc_X),
+    //HPy_tp_doc = SLOT(56, HPyFunc_X),
+    //HPy_tp_getattr = SLOT(57, HPyFunc_X),
+    //HPy_tp_getattro = SLOT(58, HPyFunc_X),
+    //HPy_tp_hash = SLOT(59, HPyFunc_X),
+    HPy_tp_init = SLOT(60, HPyFunc_INITPROC),
+    //HPy_tp_is_gc = SLOT(61, HPyFunc_X),
+    //HPy_tp_iter = SLOT(62, HPyFunc_X),
+    //HPy_tp_iternext = SLOT(63, HPyFunc_X),
+    //HPy_tp_methods = SLOT(64, HPyFunc_X),    NOT SUPPORTED
+    HPy_tp_new = SLOT(65, HPyFunc_KEYWORDS),
+    HPy_tp_repr = SLOT(66, HPyFunc_REPRFUNC),
+    //HPy_tp_richcompare = SLOT(67, HPyFunc_X),
+    //HPy_tp_setattr = SLOT(68, HPyFunc_X),
+    //HPy_tp_setattro = SLOT(69, HPyFunc_X),
+    //HPy_tp_str = SLOT(70, HPyFunc_X),
+    //HPy_tp_traverse = SLOT(71, HPyFunc_X),
+    //HPy_tp_members = SLOT(72, HPyFunc_X),    NOT SUPPORTED
+    //HPy_tp_getset = SLOT(73, HPyFunc_X),     NOT SUPPORTED
+    //HPy_tp_free = SLOT(74, HPyFunc_X),       NOT SUPPORTED
+    //HPy_nb_matrix_multiply = SLOT(75, HPyFunc_X),
+    //HPy_nb_inplace_matrix_multiply = SLOT(76, HPyFunc_X),
+    //HPy_am_await = SLOT(77, HPyFunc_X),
+    //HPy_am_aiter = SLOT(78, HPyFunc_X),
+    //HPy_am_anext = SLOT(79, HPyFunc_X),
+    //HPy_tp_finalize = SLOT(80, HPyFunc_X),
+
+    /* extra HPy slots */
+    HPy_tp_destroy = SLOT(1000, HPyFunc_DESTROYFUNC),
+
+} HPySlot_Slot;
