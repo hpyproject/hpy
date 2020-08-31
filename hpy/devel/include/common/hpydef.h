@@ -108,12 +108,12 @@ typedef struct {
    more detailed explanation in the comments around HPyFunc_DECLARE in
    hpyfunc.h
 */
-#define HPyDef_SLOT(SYM, SLOT, IMPL)                            \
+#define HPyDef_SLOT(SYM, IMPL, SLOT)                            \
     enum { SYM##_slot = SLOT };                                 \
-    _HPyDef_SLOT(SYM, SLOT, IMPL, HPySlot_SIG(SLOT))
+    _HPyDef_SLOT(SYM, IMPL, SLOT, HPySlot_SIG(SLOT))
 
 // this is the actual implementation, after we determined the SIG
-#define _HPyDef_SLOT(SYM, SLOT, IMPL, SIG)                              \
+#define _HPyDef_SLOT(SYM, IMPL, SLOT, SIG)                              \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
     HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
     HPyDef SYM = {                                                      \
