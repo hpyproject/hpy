@@ -368,6 +368,10 @@ static inline HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key) {
      return ctx->ctx_Dict_GetItem ( ctx, h_dict, h_key ); 
 }
 
+static inline HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n) {
+     return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }

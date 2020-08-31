@@ -150,6 +150,9 @@ HPy HPyDict_New(HPyContext ctx);
 int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
 HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
+/* tupleobject.h */
+HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n);
+
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj);
 cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h);
