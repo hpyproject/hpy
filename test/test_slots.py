@@ -81,3 +81,47 @@ class TestSlots(HPyTest):
         assert mod.get_destroyed_x() == 7
         gc.collect()
         assert mod.get_destroyed_x() == 7
+
+    def test_nb_ops(self):
+        mod = self.make_module(r"""
+            @DEFINE_PointObject
+
+            #define MYSLOT(NAME)                                               \
+                HPyDef_SLOT(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
+                static HPy NAME##_impl(HPyContext ctx, HPy self, HPy other)    \
+                {                                                              \
+                    HPy s = HPyUnicode_FromString(ctx, #NAME);                 \
+                    HPy res = HPyTuple_Pack(ctx, 3, self, s, other);           \
+                    HPy_Close(ctx, s);                                         \
+                    return res;                                                \
+                }
+
+            MYSLOT(add)
+            MYSLOT(and)
+            MYSLOT(divmod)
+            MYSLOT(floor_divide)
+            MYSLOT(lshift)
+            MYSLOT(multiply)
+            MYSLOT(or)
+            MYSLOT(remainder)
+            MYSLOT(rshift)
+            MYSLOT(subtract)
+            MYSLOT(true_divide)
+            MYSLOT(matrix_multiply)
+
+            @EXPORT_POINT_TYPE(&p_add, &p_and, &p_divmod, &p_floor_divide, &p_lshift, &p_multiply, &p_or, &p_remainder, &p_rshift, &p_subtract, &p_true_divide, &p_matrix_multiply)
+            @INIT
+        """)
+        p = mod.Point()
+        assert p + 42 == (p, "add", 42)
+        assert p & 42 == (p, "and", 42)
+        assert divmod(p, 42) == (p, "divmod", 42)
+        assert p // 42 == (p, "floor_divide", 42)
+        assert p << 42 == (p, "lshift", 42)
+        assert p * 42 == (p, "multiply", 42)
+        assert p | 42 == (p, "or", 42)
+        assert p % 42 == (p, "remainder", 42)
+        assert p >> 42 == (p, "rshift", 42)
+        assert p - 42 == (p, "subtract", 42)
+        assert p / 42 == (p, "true_divide", 42)
+        assert p @ 42 == (p, "matrix_multiply", 42)
