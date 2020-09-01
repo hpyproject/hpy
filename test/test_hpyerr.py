@@ -22,6 +22,10 @@ class TestErr(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self)
             {
                 HPy_FatalError(ctx, "boom!");
+                // note: no 'return' statement.  This also tests that
+                // the call above is known to never return---otherwise,
+                // we get a warning from the missing 'return' and it is
+                // turned into an error.
             }
             @EXPORT(f)
             @INIT
