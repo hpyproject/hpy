@@ -4,15 +4,17 @@ python2.7.
 
 This script tries to import all of them: it does not check any behavior, just
 that they are importable and thus are not using any py3-specific syntax.
+
+This script assumes that pathlib and pytest are installed (because the modules
+try to import them).
 """
 
 from __future__ import print_function
 import sys
-import os.path
-import glob
 import traceback
+import py
 
-ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
+ROOT = py.path.local(__file__).join('..', '..')
 
 def try_import(name):
     try:
@@ -35,28 +37,23 @@ def try_import_hpy_devel():
 
     Return the number of failed imports.
     """
-    init_py = os.path.join(ROOT, 'hpy', '__init__.py')
-    assert not os.path.exists(init_py)
+    failed = 0
+    init_py = ROOT.join('hpy', '__init__.py')
+    assert init_py.check(exists=False)
     try:
-        # create an empty __init__.py
-        with open(init_py, 'w') as f:
-            pass
-        if try_import('hpy.devel'):
-            return 0
-        else:
-            return 1 # 1 failed imports
+        init_py.write('') # create an empty __init__.py
+        if not try_import('hpy.devel'):
+            failed += 1
     finally:
-        os.remove(init_py)
+        init_py.remove()
+    return failed
 
 def try_import_tests():
     failed = 0
-    tests = os.path.join(ROOT, 'test', 'test_*.py')
-    for fname in glob.glob(tests):
-        fname = os.path.basename(fname)
-        fname, _ = os.path.splitext(fname)
-        if fname == 'test_support':
+    for t in ROOT.join('test').listdir('test_*.py'):
+        if t.purebasename == 'test_support':
             continue
-        if not try_import('test.%s' % fname):
+        if not try_import('test.%s' % t.purebasename):
             failed += 1
     return failed
 
@@ -65,7 +62,7 @@ def main():
         print('ERROR: this script should be run on top of python 2.7')
         sys.exit(1)
 
-    sys.path.insert(0, ROOT)
+    sys.path.insert(0, str(ROOT))
     failed = 0
     failed += try_import_hpy_devel()
     failed += try_import_tests()
