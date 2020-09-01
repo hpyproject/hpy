@@ -113,6 +113,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Dict_SetItem = &ctx_Dict_SetItem,
     .ctx_Dict_GetItem = &ctx_Dict_GetItem,
     .ctx_FatalError = &ctx_FatalError,
+    .ctx_Tuple_FromArray = &ctx_Tuple_FromArray,
     .ctx_FromPyObject = &ctx_FromPyObject,
     .ctx_AsPyObject = &ctx_AsPyObject,
     .ctx_CallRealFunctionFromTrampoline = &ctx_CallRealFunctionFromTrampoline,
@@ -121,4 +122,8 @@ struct _HPyContext_s global_ctx = {
     .ctx_ListBuilder_Set = &ctx_ListBuilder_Set,
     .ctx_ListBuilder_Build = &ctx_ListBuilder_Build,
     .ctx_ListBuilder_Cancel = &ctx_ListBuilder_Cancel,
+    .ctx_TupleBuilder_New = &ctx_TupleBuilder_New,
+    .ctx_TupleBuilder_Set = &ctx_TupleBuilder_Set,
+    .ctx_TupleBuilder_Build = &ctx_TupleBuilder_Build,
+    .ctx_TupleBuilder_Cancel = &ctx_TupleBuilder_Cancel,
 };

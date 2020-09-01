@@ -27,9 +27,15 @@
 /* HPy types */
 typedef intptr_t HPy_ssize_t;
 typedef intptr_t HPy_hash_t;
-struct _HPy_s { HPy_ssize_t _i; };
-typedef struct _HPy_s HPy;
-typedef struct { HPy _lst; } HPyListBuilder;
+
+/* The following types, when compiled with the present universal-mode header,
+   are each just a pointer-sized integer.  What this integer (or pointer)
+   means is up to the implementation.  For example, on both CPython and PyPy,
+   the HPy structure contains an index in a global array. */
+typedef struct _HPy_s { HPy_ssize_t _i; } HPy;
+typedef struct { HPy_ssize_t _lst; } HPyListBuilder;
+typedef struct { HPy_ssize_t _tup; } HPyTupleBuilder;
+
 typedef struct _HPyContext_s *HPyContext;
 
 /* compatibility CPython types */

@@ -11,6 +11,7 @@ typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
 typedef int HPyListBuilder;
+typedef int HPyTupleBuilder;
 
 
 /* HPy public API */
@@ -153,6 +154,11 @@ HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 /* pyerrors.h */
 void HPy_FatalError(HPyContext ctx, const char *message);
 
+/* tupleobject.h */
+HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n);
+// note: HPyTuple_Pack is implemented as a macro in common/macros.h
+
+
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext ctx, cpy_PyObject *obj);
 cpy_PyObject *HPy_AsPyObject(HPyContext ctx, HPy h);
@@ -174,6 +180,12 @@ void HPyListBuilder_Set(HPyContext ctx, HPyListBuilder builder,
                         HPy_ssize_t index, HPy h_item);
 HPy HPyListBuilder_Build(HPyContext ctx, HPyListBuilder builder);
 void HPyListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder);
+
+HPyTupleBuilder HPyTupleBuilder_New(HPyContext ctx, HPy_ssize_t initial_size);
+void HPyTupleBuilder_Set(HPyContext ctx, HPyTupleBuilder builder,
+                         HPy_ssize_t index, HPy h_item);
+HPy HPyTupleBuilder_Build(HPyContext ctx, HPyTupleBuilder builder);
+void HPyTupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder);
 
 
 
@@ -239,38 +251,38 @@ typedef enum {
     //HPy_mp_length = SLOT(4, HPyFunc_X),
     //HPy_mp_subscript = SLOT(5, HPyFunc_X),
     HPy_nb_absolute = SLOT(6, HPyFunc_UNARYFUNC),
-    //HPy_nb_add = SLOT(7, HPyFunc_X),
-    //HPy_nb_and = SLOT(8, HPyFunc_X),
-    //HPy_nb_bool = SLOT(9, HPyFunc_X),
-    //HPy_nb_divmod = SLOT(10, HPyFunc_X),
-    //HPy_nb_float = SLOT(11, HPyFunc_X),
-    //HPy_nb_floor_divide = SLOT(12, HPyFunc_X),
-    //HPy_nb_index = SLOT(13, HPyFunc_X),
-    //HPy_nb_inplace_add = SLOT(14, HPyFunc_X),
-    //HPy_nb_inplace_and = SLOT(15, HPyFunc_X),
-    //HPy_nb_inplace_floor_divide = SLOT(16, HPyFunc_X),
-    //HPy_nb_inplace_lshift = SLOT(17, HPyFunc_X),
-    //HPy_nb_inplace_multiply = SLOT(18, HPyFunc_X),
-    //HPy_nb_inplace_or = SLOT(19, HPyFunc_X),
-    //HPy_nb_inplace_power = SLOT(20, HPyFunc_X),
-    //HPy_nb_inplace_remainder = SLOT(21, HPyFunc_X),
-    //HPy_nb_inplace_rshift = SLOT(22, HPyFunc_X),
-    //HPy_nb_inplace_subtract = SLOT(23, HPyFunc_X),
-    //HPy_nb_inplace_true_divide = SLOT(24, HPyFunc_X),
-    //HPy_nb_inplace_xor = SLOT(25, HPyFunc_X),
-    //HPy_nb_int = SLOT(26, HPyFunc_X),
-    //HPy_nb_invert = SLOT(27, HPyFunc_X),
-    //HPy_nb_lshift = SLOT(28, HPyFunc_X),
-    //HPy_nb_multiply = SLOT(29, HPyFunc_X),
-    //HPy_nb_negative = SLOT(30, HPyFunc_X),
-    //HPy_nb_or = SLOT(31, HPyFunc_X),
-    //HPy_nb_positive = SLOT(32, HPyFunc_X),
-    //HPy_nb_power = SLOT(33, HPyFunc_X),
-    //HPy_nb_remainder = SLOT(34, HPyFunc_X),
-    //HPy_nb_rshift = SLOT(35, HPyFunc_X),
-    //HPy_nb_subtract = SLOT(36, HPyFunc_X),
-    //HPy_nb_true_divide = SLOT(37, HPyFunc_X),
-    //HPy_nb_xor = SLOT(38, HPyFunc_X),
+    HPy_nb_add = SLOT(7, HPyFunc_BINARYFUNC),
+    HPy_nb_and = SLOT(8, HPyFunc_BINARYFUNC),
+    HPy_nb_bool = SLOT(9, HPyFunc_INQUIRY),
+    HPy_nb_divmod = SLOT(10, HPyFunc_BINARYFUNC),
+    HPy_nb_float = SLOT(11, HPyFunc_UNARYFUNC),
+    HPy_nb_floor_divide = SLOT(12, HPyFunc_BINARYFUNC),
+    HPy_nb_index = SLOT(13, HPyFunc_UNARYFUNC),
+    HPy_nb_inplace_add = SLOT(14, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_and = SLOT(15, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_floor_divide = SLOT(16, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_lshift = SLOT(17, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_multiply = SLOT(18, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_or = SLOT(19, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_power = SLOT(20, HPyFunc_TERNARYFUNC),
+    HPy_nb_inplace_remainder = SLOT(21, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_rshift = SLOT(22, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_subtract = SLOT(23, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_true_divide = SLOT(24, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_xor = SLOT(25, HPyFunc_BINARYFUNC),
+    HPy_nb_int = SLOT(26, HPyFunc_UNARYFUNC),
+    HPy_nb_invert = SLOT(27, HPyFunc_UNARYFUNC),
+    HPy_nb_lshift = SLOT(28, HPyFunc_BINARYFUNC),
+    HPy_nb_multiply = SLOT(29, HPyFunc_BINARYFUNC),
+    HPy_nb_negative = SLOT(30, HPyFunc_UNARYFUNC),
+    HPy_nb_or = SLOT(31, HPyFunc_BINARYFUNC),
+    HPy_nb_positive = SLOT(32, HPyFunc_UNARYFUNC),
+    HPy_nb_power = SLOT(33, HPyFunc_TERNARYFUNC),
+    HPy_nb_remainder = SLOT(34, HPyFunc_BINARYFUNC),
+    HPy_nb_rshift = SLOT(35, HPyFunc_BINARYFUNC),
+    HPy_nb_subtract = SLOT(36, HPyFunc_BINARYFUNC),
+    HPy_nb_true_divide = SLOT(37, HPyFunc_BINARYFUNC),
+    HPy_nb_xor = SLOT(38, HPyFunc_BINARYFUNC),
     //HPy_sq_ass_item = SLOT(39, HPyFunc_X),
     //HPy_sq_concat = SLOT(40, HPyFunc_X),
     //HPy_sq_contains = SLOT(41, HPyFunc_X),
@@ -307,8 +319,8 @@ typedef enum {
     //HPy_tp_members = SLOT(72, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_getset = SLOT(73, HPyFunc_X),     NOT SUPPORTED
     //HPy_tp_free = SLOT(74, HPyFunc_X),       NOT SUPPORTED
-    //HPy_nb_matrix_multiply = SLOT(75, HPyFunc_X),
-    //HPy_nb_inplace_matrix_multiply = SLOT(76, HPyFunc_X),
+    HPy_nb_matrix_multiply = SLOT(75, HPyFunc_BINARYFUNC),
+    HPy_nb_inplace_matrix_multiply = SLOT(76, HPyFunc_BINARYFUNC),
     //HPy_am_await = SLOT(77, HPyFunc_X),
     //HPy_am_aiter = SLOT(78, HPyFunc_X),
     //HPy_am_anext = SLOT(79, HPyFunc_X),
