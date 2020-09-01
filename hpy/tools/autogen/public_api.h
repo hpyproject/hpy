@@ -151,6 +151,9 @@ HPy HPyDict_New(HPyContext ctx);
 int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
 HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
+/* pyerrors.h */
+void HPy_FatalError(HPyContext ctx, const char *message);
+
 /* tupleobject.h */
 HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h

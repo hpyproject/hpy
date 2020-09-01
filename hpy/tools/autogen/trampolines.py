@@ -9,6 +9,7 @@ class autogen_trampolines_h(AutoGenFile):
 
     NO_TRAMPOLINES = set([
         '_HPy_New',
+        'HPy_FatalError',
         ])
 
     def generate(self):
@@ -95,8 +96,9 @@ class autogen_impl_h(AutoGenFile):
         if not pyfunc:
             raise ValueError(f"Cannot generate implementation for {self}")
         return_type = toC(func.node.type.type)
+        return_stmt = '' if return_type == 'void' else 'return '
         w('HPyAPI_STORAGE %s' % signature(func.base_name()))
         w('{')
-        w('    return %s;' % call(pyfunc, return_type))
+        w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
         w('}')
         return '\n'.join(lines)

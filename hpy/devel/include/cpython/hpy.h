@@ -162,6 +162,12 @@ _HPy_New(HPyContext ctx, HPy h, void **data)
     return ctx_New(ctx, h, data);
 }
 
+HPyAPI_FUNC(void) _Py_NO_RETURN
+HPy_FatalError(HPyContext ctx, const char *message)
+{
+    Py_FatalError(message);
+}
+
 HPyAPI_FUNC(HPy)
 HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
 {

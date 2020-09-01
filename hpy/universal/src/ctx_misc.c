@@ -31,3 +31,9 @@ ctx_Dup(HPyContext ctx, HPy h)
     Py_XINCREF(obj);
     return _py2h(obj);
 }
+
+HPyAPI_STORAGE void
+ctx_FatalError(HPyContext ctx, const char *message)
+{
+    Py_FatalError(message);
+}

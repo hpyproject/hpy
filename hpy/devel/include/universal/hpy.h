@@ -11,6 +11,17 @@
 #define _HPy_HIDDEN
 #endif /* __GNUC__ */
 
+#if defined(__clang__) || \
+    (defined(__GNUC__) && \
+     ((__GNUC__ >= 3) || \
+      (__GNUC__ == 2) && (__GNUC_MINOR__ >= 5)))
+#  define _HPy_NO_RETURN __attribute__((__noreturn__))
+#elif defined(_MSC_VER)
+#  define _HPy_NO_RETURN __declspec(noreturn)
+#else
+#  define _HPy_NO_RETURN
+#endif
+
 #define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
 /* HPy types */
@@ -75,6 +86,16 @@ static inline HPy _HPy_New(HPyContext ctx, HPy h_type, void **data) {
     HPy h = ctx->ctx_New(ctx, h_type, &data_result);
     *data = data_result;
     return h;
+}
+
+static inline _HPy_NO_RETURN void
+HPy_FatalError(HPyContext ctx, const char *message) {
+    ctx->ctx_FatalError(ctx, message);
+    /* note: the following abort() is unreachable, but needed because the
+       _HPy_NO_RETURN doesn't seem to be sufficient.  I think that what
+       occurs is that this function is inlined, after which gcc forgets
+       that it couldn't return.  Having abort() inlined fixes that. */
+    abort();
 }
 
 

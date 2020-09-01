@@ -158,6 +158,7 @@ SPECIAL_CASES = {
     '_HPy_CallRealFunctionFromTrampoline': None,
     '_HPy_CallDestroyAndThenDealloc': None,
     'HPyErr_Occurred': None,
+    'HPy_FatalError': None,
     'HPy_Add': 'PyNumber_Add',
     'HPy_Subtract': 'PyNumber_Subtract',
     'HPy_Multiply': 'PyNumber_Multiply',
