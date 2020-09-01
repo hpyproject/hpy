@@ -82,7 +82,7 @@ class TestSlots(HPyTest):
         gc.collect()
         assert mod.get_destroyed_x() == 7
 
-    def test_nb_ops(self):
+    def test_nb_ops_binary(self):
         mod = self.make_module(r"""
             @DEFINE_PointObject
 
@@ -125,3 +125,62 @@ class TestSlots(HPyTest):
         assert p - 42 == (p, "subtract", 42)
         assert p / 42 == (p, "true_divide", 42)
         assert p @ 42 == (p, "matrix_multiply", 42)
+
+    def test_nb_ops_unary(self):
+        mod = self.make_module(r"""
+            @DEFINE_PointObject
+
+            #define MYSLOT(NAME)                                               \
+                HPyDef_SLOT(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
+                static HPy NAME##_impl(HPyContext ctx, HPy self)               \
+                {                                                              \
+                    HPy s = HPyUnicode_FromString(ctx, #NAME);                 \
+                    HPy res = HPyTuple_Pack(ctx, 2, s, self);                  \
+                    HPy_Close(ctx, s);                                         \
+                    return res;                                                \
+                }
+
+            MYSLOT(negative)
+            MYSLOT(positive)
+            MYSLOT(absolute)
+            MYSLOT(invert)
+
+            @EXPORT_POINT_TYPE(&p_negative, &p_positive, &p_absolute, &p_invert)
+            @INIT
+        """)
+        p = mod.Point()
+        assert +p == ('positive', p)
+        assert -p == ('negative', p)
+        assert abs(p) == ('absolute', p)
+        assert ~p == ('invert', p)
+
+    def test_nb_ops_type_conversion(self):
+        import operator
+        mod = self.make_module(r"""
+            @DEFINE_PointObject
+
+            HPyDef_SLOT(p_int, p_int_impl, HPy_nb_int);
+            static HPy p_int_impl(HPyContext ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, 42);
+            }
+
+            HPyDef_SLOT(p_float, p_float_impl, HPy_nb_float);
+            static HPy p_float_impl(HPyContext ctx, HPy self)
+            {
+                return HPyFloat_FromDouble(ctx, 123.4);
+            }
+
+            HPyDef_SLOT(p_index, p_index_impl, HPy_nb_index);
+            static HPy p_index_impl(HPyContext ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, -456);
+            }
+
+            @EXPORT_POINT_TYPE(&p_int, &p_float, &p_index)
+            @INIT
+        """)
+        p = mod.Point()
+        assert int(p) == 42
+        assert float(p) == 123.4
+        assert operator.index(p) == -456
