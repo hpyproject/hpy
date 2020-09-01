@@ -208,6 +208,10 @@ SPECIAL_CASES = {
     'HPyListBuilder_Build': None,
     'HPyListBuilder_Cancel': None,
     'HPyTuple_FromArray': None,
+    'HPyTupleBuilder_New': None,
+    'HPyTupleBuilder_Set': None,
+    'HPyTupleBuilder_Build': None,
+    'HPyTupleBuilder_Cancel': None,
 }
 
 

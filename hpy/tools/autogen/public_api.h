@@ -11,6 +11,7 @@ typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
 typedef int HPyListBuilder;
+typedef int HPyTupleBuilder;
 
 
 /* HPy public API */
@@ -176,6 +177,12 @@ void HPyListBuilder_Set(HPyContext ctx, HPyListBuilder builder,
                         HPy_ssize_t index, HPy h_item);
 HPy HPyListBuilder_Build(HPyContext ctx, HPyListBuilder builder);
 void HPyListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder);
+
+HPyTupleBuilder HPyTupleBuilder_New(HPyContext ctx, HPy_ssize_t initial_size);
+void HPyTupleBuilder_Set(HPyContext ctx, HPyTupleBuilder builder,
+                         HPy_ssize_t index, HPy h_item);
+HPy HPyTupleBuilder_Build(HPyContext ctx, HPyTupleBuilder builder);
+void HPyTupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder);
 
 
 
