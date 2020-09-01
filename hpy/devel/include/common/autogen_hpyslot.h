@@ -27,6 +27,7 @@ typedef enum {
     HPy_nb_rshift = 35,
     HPy_nb_subtract = 36,
     HPy_nb_true_divide = 37,
+    HPy_nb_xor = 38,
     HPy_sq_item = 44,
     HPy_tp_init = 60,
     HPy_tp_new = 65,
@@ -53,6 +54,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_rshift HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_subtract HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_true_divide HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_xor HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_sq_item HPyFunc_SSIZEARGFUNC
 #define _HPySlot_SIG__HPy_tp_init HPyFunc_INITPROC
 #define _HPySlot_SIG__HPy_tp_new HPyFunc_KEYWORDS

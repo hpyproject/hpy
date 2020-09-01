@@ -272,7 +272,7 @@ typedef enum {
     HPy_nb_rshift = SLOT(35, HPyFunc_BINARYFUNC),
     HPy_nb_subtract = SLOT(36, HPyFunc_BINARYFUNC),
     HPy_nb_true_divide = SLOT(37, HPyFunc_BINARYFUNC),
-    //HPy_nb_xor = SLOT(38, HPyFunc_X),
+    HPy_nb_xor = SLOT(38, HPyFunc_BINARYFUNC),
     //HPy_sq_ass_item = SLOT(39, HPyFunc_X),
     //HPy_sq_concat = SLOT(40, HPyFunc_X),
     //HPy_sq_contains = SLOT(41, HPyFunc_X),

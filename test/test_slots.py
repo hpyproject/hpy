@@ -107,9 +107,10 @@ class TestSlots(HPyTest):
             MYSLOT(rshift)
             MYSLOT(subtract)
             MYSLOT(true_divide)
+            MYSLOT(xor)
             MYSLOT(matrix_multiply)
 
-            @EXPORT_POINT_TYPE(&p_add, &p_and, &p_divmod, &p_floor_divide, &p_lshift, &p_multiply, &p_or, &p_remainder, &p_rshift, &p_subtract, &p_true_divide, &p_matrix_multiply)
+            @EXPORT_POINT_TYPE(&p_add, &p_and, &p_divmod, &p_floor_divide, &p_lshift, &p_multiply, &p_or, &p_remainder, &p_rshift, &p_subtract, &p_true_divide, &p_xor, &p_matrix_multiply)
             @INIT
         """)
         p = mod.Point()
@@ -124,6 +125,7 @@ class TestSlots(HPyTest):
         assert p >> 42 == (p, "rshift", 42)
         assert p - 42 == (p, "subtract", 42)
         assert p / 42 == (p, "true_divide", 42)
+        assert p ^ 42 == (p, "xor", 42)
         assert p @ 42 == (p, "matrix_multiply", 42)
 
     def test_nb_ops_unary(self):
