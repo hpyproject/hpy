@@ -113,5 +113,6 @@ jobs:
     displayName: 'Use Python 2.7'
 
   - script: |
+      pip install pathlib
       python test/check_py27_compat.py
     displayName: 'check_py27_compat.py'
