@@ -12,8 +12,15 @@ _HPy_HIDDEN HPyTupleBuilder
 ctx_TupleBuilder_New(HPyContext ctx, HPy_ssize_t initial_size)
 {
     PyObject *tup = PyTuple_New(initial_size);
-    if (tup == NULL)
+    if (tup == NULL) {
         PyErr_Clear();   /* delay the MemoryError */
+        /* note: it's done this way so that the caller doesn't need to
+           check if HPyTupleBuilder_New() or every HPyTupleBuilder_Set()
+           raised.  If there is a rare error like a MemoryError somewhere,
+           further calls to the HPyTupleBuilder are ignored.  The final
+           HPyTupleBuilder_Build() will re-raise the MemoryError and so
+           it's enough for the caller to check at that point. */
+    }
     return (HPyTupleBuilder){(HPy_ssize_t)tup};
 }
 
