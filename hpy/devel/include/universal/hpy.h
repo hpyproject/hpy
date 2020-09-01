@@ -85,6 +85,10 @@ static inline HPy _HPy_New(HPyContext ctx, HPy h_type, void **data) {
 static inline _HPy_NO_RETURN void
 HPy_FatalError(HPyContext ctx, const char *message) {
     ctx->ctx_FatalError(ctx, message);
+    /* note: the following abort() is unreachable, but needed because the
+       _HPy_NO_RETURN doesn't seem to be sufficient.  I think that what
+       occurs is that this function is inlined, after which gcc forgets
+       that it couldn't return.  Having abort() inlined fixes that. */
     abort();
 }
 
