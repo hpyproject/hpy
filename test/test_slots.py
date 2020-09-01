@@ -128,6 +128,50 @@ class TestSlots(HPyTest):
         assert p ^ 42 == (p, "xor", 42)
         assert p @ 42 == (p, "matrix_multiply", 42)
 
+    def test_nb_ops_inplace(self):
+        mod = self.make_module(r"""
+            @DEFINE_PointObject
+
+            #define MYSLOT(NAME)                                               \
+                HPyDef_SLOT(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
+                static HPy NAME##_impl(HPyContext ctx, HPy self, HPy other)    \
+                {                                                              \
+                    HPy s = HPyUnicode_FromString(ctx, #NAME);                 \
+                    HPy res = HPyTuple_Pack(ctx, 3, self, s, other);           \
+                    HPy_Close(ctx, s);                                         \
+                    return res;                                                \
+                }
+
+            MYSLOT(inplace_add)
+            MYSLOT(inplace_and)
+            MYSLOT(inplace_floor_divide)
+            MYSLOT(inplace_lshift)
+            MYSLOT(inplace_multiply)
+            MYSLOT(inplace_or)
+            MYSLOT(inplace_remainder)
+            MYSLOT(inplace_rshift)
+            MYSLOT(inplace_subtract)
+            MYSLOT(inplace_true_divide)
+            MYSLOT(inplace_xor)
+            MYSLOT(inplace_matrix_multiply)
+
+            @EXPORT_POINT_TYPE(&p_inplace_add, &p_inplace_and, &p_inplace_floor_divide, &p_inplace_lshift, &p_inplace_multiply, &p_inplace_or, &p_inplace_remainder, &p_inplace_rshift, &p_inplace_subtract, &p_inplace_true_divide, &p_inplace_xor, &p_inplace_matrix_multiply)
+            @INIT
+        """)
+        p = mod.Point()
+        tmp = p; tmp += 42; assert tmp == (p, "inplace_add", 42)
+        tmp = p; tmp &= 42; assert tmp == (p, "inplace_and", 42)
+        tmp = p; tmp //= 42; assert tmp == (p, "inplace_floor_divide", 42)
+        tmp = p; tmp <<= 42; assert tmp == (p, "inplace_lshift", 42)
+        tmp = p; tmp *= 42; assert tmp == (p, "inplace_multiply", 42)
+        tmp = p; tmp |= 42; assert tmp == (p, "inplace_or", 42)
+        tmp = p; tmp %= 42; assert tmp == (p, "inplace_remainder", 42)
+        tmp = p; tmp >>= 42; assert tmp == (p, "inplace_rshift", 42)
+        tmp = p; tmp -= 42; assert tmp == (p, "inplace_subtract", 42)
+        tmp = p; tmp /= 42; assert tmp == (p, "inplace_true_divide", 42)
+        tmp = p; tmp ^= 42; assert tmp == (p, "inplace_xor", 42)
+        tmp = p; tmp @= 42; assert tmp == (p, "inplace_matrix_multiply", 42)
+
     def test_nb_ops_unary(self):
         mod = self.make_module(r"""
             @DEFINE_PointObject

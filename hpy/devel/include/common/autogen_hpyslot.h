@@ -16,6 +16,18 @@ typedef enum {
     HPy_nb_float = 11,
     HPy_nb_floor_divide = 12,
     HPy_nb_index = 13,
+    HPy_nb_inplace_add = 14,
+    HPy_nb_inplace_and = 15,
+    HPy_nb_inplace_floor_divide = 16,
+    HPy_nb_inplace_lshift = 17,
+    HPy_nb_inplace_multiply = 18,
+    HPy_nb_inplace_or = 19,
+    HPy_nb_inplace_power = 20,
+    HPy_nb_inplace_remainder = 21,
+    HPy_nb_inplace_rshift = 22,
+    HPy_nb_inplace_subtract = 23,
+    HPy_nb_inplace_true_divide = 24,
+    HPy_nb_inplace_xor = 25,
     HPy_nb_int = 26,
     HPy_nb_invert = 27,
     HPy_nb_lshift = 28,
@@ -33,6 +45,7 @@ typedef enum {
     HPy_tp_new = 65,
     HPy_tp_repr = 66,
     HPy_nb_matrix_multiply = 75,
+    HPy_nb_inplace_matrix_multiply = 76,
     HPy_tp_destroy = 1000,
 } HPySlot_Slot;
 
@@ -43,6 +56,18 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_float HPyFunc_UNARYFUNC
 #define _HPySlot_SIG__HPy_nb_floor_divide HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_index HPyFunc_UNARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_add HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_and HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_floor_divide HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_lshift HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_multiply HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_or HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_power HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_remainder HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_rshift HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_subtract HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_true_divide HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_xor HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_int HPyFunc_UNARYFUNC
 #define _HPySlot_SIG__HPy_nb_invert HPyFunc_UNARYFUNC
 #define _HPySlot_SIG__HPy_nb_lshift HPyFunc_BINARYFUNC
@@ -60,4 +85,5 @@ typedef enum {
 #define _HPySlot_SIG__HPy_tp_new HPyFunc_KEYWORDS
 #define _HPySlot_SIG__HPy_tp_repr HPyFunc_REPRFUNC
 #define _HPySlot_SIG__HPy_nb_matrix_multiply HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_matrix_multiply HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_tp_destroy HPyFunc_DESTROYFUNC
