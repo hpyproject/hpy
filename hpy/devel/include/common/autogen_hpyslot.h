@@ -12,6 +12,7 @@ typedef enum {
     HPy_nb_absolute = 6,
     HPy_nb_add = 7,
     HPy_nb_and = 8,
+    HPy_nb_bool = 9,
     HPy_nb_divmod = 10,
     HPy_nb_float = 11,
     HPy_nb_floor_divide = 12,
@@ -52,6 +53,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_absolute HPyFunc_UNARYFUNC
 #define _HPySlot_SIG__HPy_nb_add HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_and HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_bool HPyFunc_INQUIRY
 #define _HPySlot_SIG__HPy_nb_divmod HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_float HPyFunc_UNARYFUNC
 #define _HPySlot_SIG__HPy_nb_floor_divide HPyFunc_BINARYFUNC

@@ -204,6 +204,7 @@ class TestSlots(HPyTest):
         import operator
         mod = self.make_module(r"""
             @DEFINE_PointObject
+            @DEFINE_Point_new
 
             HPyDef_SLOT(p_int, p_int_impl, HPy_nb_int);
             static HPy p_int_impl(HPyContext ctx, HPy self)
@@ -223,10 +224,20 @@ class TestSlots(HPyTest):
                 return HPyLong_FromLong(ctx, -456);
             }
 
-            @EXPORT_POINT_TYPE(&p_int, &p_float, &p_index)
+            HPyDef_SLOT(p_bool, p_bool_impl, HPy_nb_bool);
+            static int p_bool_impl(HPyContext ctx, HPy self)
+            {
+                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                return (point->x != 0);
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &p_int, &p_float, &p_index, &p_bool)
             @INIT
         """)
-        p = mod.Point()
+        p = mod.Point(0, 0)
         assert int(p) == 42
         assert float(p) == 123.4
         assert operator.index(p) == -456
+        #
+        assert bool(mod.Point(0, 0)) is False
+        assert bool(mod.Point(1, 0)) is True

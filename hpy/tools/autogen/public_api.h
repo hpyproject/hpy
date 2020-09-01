@@ -243,7 +243,7 @@ typedef enum {
     HPy_nb_absolute = SLOT(6, HPyFunc_UNARYFUNC),
     HPy_nb_add = SLOT(7, HPyFunc_BINARYFUNC),
     HPy_nb_and = SLOT(8, HPyFunc_BINARYFUNC),
-    //HPy_nb_bool = SLOT(9, HPyFunc_X),
+    HPy_nb_bool = SLOT(9, HPyFunc_INQUIRY),
     HPy_nb_divmod = SLOT(10, HPyFunc_BINARYFUNC),
     HPy_nb_float = SLOT(11, HPyFunc_UNARYFUNC),
     HPy_nb_floor_divide = SLOT(12, HPyFunc_BINARYFUNC),
