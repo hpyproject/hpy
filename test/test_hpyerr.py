@@ -15,3 +15,16 @@ class TestErr(HPyTest):
         """)
         with pytest.raises(MemoryError):
             mod.f()
+
+    def test_FatalError(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                HPy_FatalError(ctx, "boom!");
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        # Calling mod.f() gives a fatal error, ending in abort().
+        # How to check that?  For now we just check that the above compiles
