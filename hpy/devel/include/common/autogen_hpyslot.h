@@ -36,6 +36,7 @@ typedef enum {
     HPy_nb_negative = 30,
     HPy_nb_or = 31,
     HPy_nb_positive = 32,
+    HPy_nb_power = 33,
     HPy_nb_remainder = 34,
     HPy_nb_rshift = 35,
     HPy_nb_subtract = 36,
@@ -64,7 +65,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_inplace_lshift HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_multiply HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_or HPyFunc_BINARYFUNC
-#define _HPySlot_SIG__HPy_nb_inplace_power HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_nb_inplace_power HPyFunc_TERNARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_remainder HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_rshift HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_subtract HPyFunc_BINARYFUNC
@@ -77,6 +78,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_negative HPyFunc_UNARYFUNC
 #define _HPySlot_SIG__HPy_nb_or HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_positive HPyFunc_UNARYFUNC
+#define _HPySlot_SIG__HPy_nb_power HPyFunc_TERNARYFUNC
 #define _HPySlot_SIG__HPy_nb_remainder HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_rshift HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_subtract HPyFunc_BINARYFUNC

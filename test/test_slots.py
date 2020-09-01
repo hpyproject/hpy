@@ -241,3 +241,35 @@ class TestSlots(HPyTest):
         #
         assert bool(mod.Point(0, 0)) is False
         assert bool(mod.Point(1, 0)) is True
+
+    def test_nb_ops_power(self):
+        mod = self.make_module(r"""
+            @DEFINE_PointObject
+
+            HPyDef_SLOT(p_power, p_power_impl, HPy_nb_power);
+            static HPy p_power_impl(HPyContext ctx, HPy self, HPy x, HPy y)
+            {
+                HPy s = HPyUnicode_FromString(ctx, "power");
+                HPy res = HPyTuple_Pack(ctx, 4, self, s, x, y);
+                HPy_Close(ctx, s);
+                return res;
+            }
+
+            HPyDef_SLOT(p_inplace_power, p_inplace_power_impl, HPy_nb_inplace_power);
+            static HPy p_inplace_power_impl(HPyContext ctx, HPy self, HPy x, HPy y)
+            {
+                HPy s = HPyUnicode_FromString(ctx, "inplace_power");
+                HPy res = HPyTuple_Pack(ctx, 4, self, s, x, y);
+                HPy_Close(ctx, s);
+                return res;
+            }
+
+            @EXPORT_POINT_TYPE(&p_power, &p_inplace_power)
+            @INIT
+        """)
+        p = mod.Point()
+        assert p**42 == (p, 'power', 42, None)
+        assert pow(p, 42, 123) == (p, 'power', 42, 123)
+        tmp = p
+        tmp **= 42
+        assert tmp == (p, 'inplace_power', 42, None)
