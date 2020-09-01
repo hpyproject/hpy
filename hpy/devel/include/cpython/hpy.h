@@ -140,7 +140,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #include "../common/runtime/ctx_module.h"
 #include "../common/runtime/ctx_type.h"
 #include "../common/runtime/ctx_listbuilder.h"
-
+#include "../common/runtime/ctx_tuple.h"
 
 HPyAPI_FUNC(HPy)
 HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef)
@@ -195,6 +195,12 @@ HPyAPI_FUNC(void)
 HPyListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder)
 {
     ctx_ListBuilder_Cancel(ctx, builder);
+}
+
+HPyAPI_FUNC(HPy)
+HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n)
+{
+    return ctx_Tuple_FromArray(ctx, items, n);
 }
 
 #endif /* !HPy_CPYTHON_H */
