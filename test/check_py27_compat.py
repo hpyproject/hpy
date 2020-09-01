@@ -31,7 +31,9 @@ def try_import(name):
 def try_import_hpy_devel():
     """
     To import hpy.devel we need to create an empty hpy/__init__.py, because
-    python2.7 does not support namespace packages
+    python2.7 does not support namespace packages.
+
+    Return the number of failed imports.
     """
     init_py = os.path.join(ROOT, 'hpy', '__init__.py')
     assert not os.path.exists(init_py)
@@ -39,11 +41,15 @@ def try_import_hpy_devel():
         # create an empty __init__.py
         with open(init_py, 'w') as f:
             pass
-        return try_import('hpy.devel')
+        if try_import('hpy.devel'):
+            return 0
+        else:
+            return 1 # 1 failed imports
     finally:
         os.remove(init_py)
 
 def try_import_tests():
+    failed = 0
     tests = os.path.join(ROOT, 'test', 'test_*.py')
     for fname in glob.glob(tests):
         fname = os.path.basename(fname)
@@ -51,8 +57,8 @@ def try_import_tests():
         if fname == 'test_support':
             continue
         if not try_import('test.%s' % fname):
-            return False
-    return True
+            failed += 1
+    return failed
 
 def main():
     if sys.version_info[:2] != (2, 7):
@@ -60,9 +66,14 @@ def main():
         sys.exit(1)
 
     sys.path.insert(0, ROOT)
-    if not try_import_hpy_devel():
-        sys.exit(1)
-    if not try_import_tests():
+    failed = 0
+    failed += try_import_hpy_devel()
+    failed += try_import_tests()
+    print()
+    if failed == 0:
+        print('Everything ok!')
+    else:
+        print('%d failed imports :(' % failed)
         sys.exit(1)
 
 if __name__ == '__main__':
