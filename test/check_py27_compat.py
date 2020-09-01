@@ -23,7 +23,7 @@ def try_import(name):
     except:
         print('ERROR!')
         print()
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stdout)
         print()
         return False
     else:
