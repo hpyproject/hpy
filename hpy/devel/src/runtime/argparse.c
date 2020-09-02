@@ -68,18 +68,21 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
         }
         if (!HPy_IsNull(current_arg) || optional) {
           if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, &vl)) {
+            va_end(vl);
             return 0;
           }
         }
         else {
           HPyErr_SetString(ctx, ctx->h_TypeError,
                            "XXX: required positional argument missing");
+          va_end(vl);
           return 0;
         }
         i++;
     }
     if (i < nargs) {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too many arguments for fmt)");
+        va_end(vl);
         return 0;
     }
 
@@ -106,6 +109,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
   while (keywords[nkw] != NULL) {
     if (!*keywords[nkw]) {
       HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: Empty keyword parameter name");
+      va_end(vl);
       return 0;
     }
     nkw++;
@@ -125,12 +129,14 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
       }
       if (i >= nkw) {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too few keywords for fmt)");
+        va_end(vl);
         return 0;
       }
       current_arg = HPy_NULL;
       if (i < nargs) {
         if (keyword_only) {
           HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: keyword only argument passed as positional argument");
+          va_end(vl);
           return 0;
         }
         current_arg = args[i];
@@ -140,17 +146,20 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
       }
       if (!HPy_IsNull(current_arg) || optional) {
         if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, &vl)) {
+          va_end(vl);
           return 0;
         }
       }
       else {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: no value for required argument");
+        va_end(vl);
         return 0;
       }
       i++;
   }
   if (i != nkw) {
       HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too many keywords for fmt)");
+      va_end(vl);
       return 0;
   }
 
