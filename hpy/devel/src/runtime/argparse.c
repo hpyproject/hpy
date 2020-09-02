@@ -2,6 +2,7 @@
 
 #define _BREAK_IF_OPTIONAL(current_arg) if (HPy_IsNull(current_arg)) break;
 
+static
 int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
 {
     switch (*(*fmt)++) {
