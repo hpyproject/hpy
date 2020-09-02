@@ -83,6 +83,7 @@ class TestSlots(HPyTest):
         assert mod.get_destroyed_x() == 7
 
     def test_nb_ops_binary(self):
+        import operator
         mod = self.make_module(r"""
             @DEFINE_PointObject
 
@@ -126,9 +127,11 @@ class TestSlots(HPyTest):
         assert p - 42 == (p, "subtract", 42)
         assert p / 42 == (p, "true_divide", 42)
         assert p ^ 42 == (p, "xor", 42)
-        assert p @ 42 == (p, "matrix_multiply", 42)
+        # we can't use '@' because we want to be importable on py27
+        assert operator.matmul(p, 42) == (p, "matrix_multiply", 42)
 
     def test_nb_ops_inplace(self):
+        import operator
         mod = self.make_module(r"""
             @DEFINE_PointObject
 
@@ -170,7 +173,11 @@ class TestSlots(HPyTest):
         tmp = p; tmp -= 42; assert tmp == (p, "inplace_subtract", 42)
         tmp = p; tmp /= 42; assert tmp == (p, "inplace_true_divide", 42)
         tmp = p; tmp ^= 42; assert tmp == (p, "inplace_xor", 42)
-        tmp = p; tmp @= 42; assert tmp == (p, "inplace_matrix_multiply", 42)
+        #
+        # we can't use '@=' because we want to be importable on py27
+        tmp = p
+        tmp = operator.imatmul(p, 42)
+        assert tmp == (p, "inplace_matrix_multiply", 42)
 
     def test_nb_ops_unary(self):
         mod = self.make_module(r"""
