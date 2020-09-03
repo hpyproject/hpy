@@ -288,3 +288,62 @@ class TestType(HPyTest):
         assert p.y == 3
         p.z = 1075
         assert p.y == 5
+
+    def test_specparam_base(self):
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+            };
+
+            @INITCODE
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_Base, ctx->h_LongType },
+                    { 0 }
+                };
+            @EXPORT_TYPE("Dummy", Dummy_spec, param)
+            @INIT
+        """)
+        assert isinstance(mod.Dummy, type)
+        assert mod.Dummy.__name__ == 'Dummy'
+        assert mod.Dummy.__module__ == 'mytest'
+        assert issubclass(mod.Dummy, int)
+        assert isinstance(mod.Dummy(), mod.Dummy)
+        assert mod.Dummy() == 0
+        assert mod.Dummy(42) == 42
+
+        class Sub(mod.Dummy):
+            pass
+        assert isinstance(Sub(), mod.Dummy)
+
+    def test_specparam_basestuple(self):
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+            };
+
+            @INITCODE
+                HPy h_bases = HPyTuple_Pack(ctx, 1, ctx->h_LongType);
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_BasesTuple, h_bases },
+                    { 0 }
+                };
+            @EXPORT_TYPE("Dummy", Dummy_spec, param)
+            @INITCODE
+                HPy_Close(ctx, h_bases);
+            @INIT
+        """)
+        assert isinstance(mod.Dummy, type)
+        assert mod.Dummy.__name__ == 'Dummy'
+        assert mod.Dummy.__module__ == 'mytest'
+        assert issubclass(mod.Dummy, int)
+        assert isinstance(mod.Dummy(), mod.Dummy)
+        assert mod.Dummy() == 0
+        assert mod.Dummy(42) == 42
+
+        class Sub(mod.Dummy):
+            pass
+        assert isinstance(Sub(), mod.Dummy)
