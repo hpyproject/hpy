@@ -216,8 +216,8 @@ static inline int HPy_IsTrue(HPyContext ctx, HPy h) {
      return ctx->ctx_IsTrue ( ctx, h ); 
 }
 
-static inline HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec) {
-     return ctx->ctx_Type_FromSpec ( ctx, spec ); 
+static inline HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec, HPyType_SpecParam *optional_object_parameters) {
+     return ctx->ctx_Type_FromSpec ( ctx, spec, optional_object_parameters ); 
 }
 
 static inline HPy HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw) {

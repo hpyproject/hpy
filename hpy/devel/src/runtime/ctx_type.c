@@ -312,7 +312,8 @@ create_slot_defs(HPyType_Spec *hpyspec)
 
 
 _HPy_HIDDEN HPy
-ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec)
+ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
+                  HPyType_SpecParam *objparam)
 {
     PyType_Spec *spec = PyMem_Calloc(1, sizeof(PyType_Spec));
     if (spec == NULL) {
