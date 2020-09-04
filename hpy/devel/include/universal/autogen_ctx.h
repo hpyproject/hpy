@@ -72,6 +72,7 @@ struct _HPyContext_s {
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     int (*ctx_Err_Occurred)(HPyContext ctx);
     HPy (*ctx_Err_NoMemory)(HPyContext ctx);
+    void (*ctx_Err_Clear)(HPyContext ctx);
     int (*ctx_IsTrue)(HPyContext ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext ctx, HPyType_Spec *spec);
     HPy (*ctx_Type_GenericNew)(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
@@ -110,8 +111,6 @@ struct _HPyContext_s {
     int (*ctx_List_Append)(HPyContext ctx, HPy h_list, HPy h_item);
     int (*ctx_Dict_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Dict_New)(HPyContext ctx);
-    int (*ctx_Dict_SetItem)(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
-    HPy (*ctx_Dict_GetItem)(HPyContext ctx, HPy h_dict, HPy h_key);
     void (*ctx_FatalError)(HPyContext ctx, const char *message);
     HPy (*ctx_Tuple_FromArray)(HPyContext ctx, HPy items[], HPy_ssize_t n);
     HPy (*ctx_FromPyObject)(HPyContext ctx, cpy_PyObject *obj);

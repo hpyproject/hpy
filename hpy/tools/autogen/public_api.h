@@ -87,6 +87,7 @@ void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext ctx);
 HPy HPyErr_NoMemory(HPyContext ctx);
+void HPyErr_Clear(HPyContext ctx);
 
 /* object.h */
 int HPy_IsTrue(HPyContext ctx, HPy h);
@@ -144,12 +145,6 @@ int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 /* dictobject.h */
 int HPyDict_Check(HPyContext ctx, HPy h);
 HPy HPyDict_New(HPyContext ctx);
-// TODO: Move HPyDict_SetItem and _GetItem (we have HPy_SetItem and _GetItem)
-//       out of the base API.
-// TODO: Leave name as HPyDict_SetItem (it doesn't steal).
-// TODO: Rename to HPyDict_GetItem_NewHandle.
-int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
-HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
 /* pyerrors.h */
 void HPy_FatalError(HPyContext ctx, const char *message);
