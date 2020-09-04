@@ -106,6 +106,7 @@ class DefaultExtensionTemplate(object):
                 return HPy_NULL;
             if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0)
                 return HPy_NULL;
+            HPy_Close(ctx, {h});
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(
