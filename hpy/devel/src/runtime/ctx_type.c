@@ -310,13 +310,13 @@ create_slot_defs(HPyType_Spec *hpyspec)
     return result;
 }
 
-static int check_unknown_params(HPyType_SpecParam *objparam, const char *name)
+static int check_unknown_params(HPyType_SpecParam *params, const char *name)
 {
-    if (objparam == NULL)
+    if (params == NULL)
         return 0;
 
     int found_base = 0, found_basestuple = 0;
-    for (HPyType_SpecParam *p = objparam; p->kind != 0; p++) {
+    for (HPyType_SpecParam *p = params; p->kind != 0; p++) {
         switch (p->kind) {
             case HPyType_SpecParam_Base:
                 found_base++;
@@ -346,13 +346,13 @@ static int check_unknown_params(HPyType_SpecParam *objparam, const char *name)
     return 0;
 }
 
-static PyObject *build_bases_from_params(HPyType_SpecParam *objparam)
+static PyObject *build_bases_from_params(HPyType_SpecParam *params)
 {
-    if (objparam == NULL)
+    if (params == NULL)
         return NULL;
 
     int found_base = 0;
-    for (HPyType_SpecParam *p = objparam; p->kind != 0; p++) {
+    for (HPyType_SpecParam *p = params; p->kind != 0; p++) {
         switch (p->kind) {
             case HPyType_SpecParam_Base:
                 /* count the base entries (multiple entries are fine) */
@@ -371,7 +371,7 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *objparam)
         return NULL;
 
     found_base = 0;
-    for (HPyType_SpecParam *p = objparam; p->kind != 0; p++) {
+    for (HPyType_SpecParam *p = params; p->kind != 0; p++) {
         if (p->kind == HPyType_SpecParam_Base) {
             PyObject *base = _h2py(p->object);
             Py_INCREF(base);
@@ -384,9 +384,9 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *objparam)
 
 _HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
-                  HPyType_SpecParam *objparam)
+                  HPyType_SpecParam *params)
 {
-    if (check_unknown_params(objparam, hpyspec->name) < 0) {
+    if (check_unknown_params(params, hpyspec->name) < 0) {
         return HPy_NULL;
     }
     PyType_Spec *spec = PyMem_Calloc(1, sizeof(PyType_Spec));
@@ -403,7 +403,7 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         PyMem_Free(spec);
         return HPy_NULL;
     }
-    PyObject *bases = build_bases_from_params(objparam);
+    PyObject *bases = build_bases_from_params(params);
     if (PyErr_Occurred()) {
         return HPy_NULL;
     }

@@ -92,7 +92,7 @@ HPy HPyErr_NoMemory(HPyContext ctx);
 /* object.h */
 int HPy_IsTrue(HPyContext ctx, HPy h);
 HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec,
-                     HPyType_SpecParam *optional_object_parameters);
+                     HPyType_SpecParam *params);
 HPy HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
 
 HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);
