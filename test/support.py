@@ -46,7 +46,6 @@ class DefaultExtensionTemplate(object):
         self.defines_table = None
         self.legacy_methods = 'NULL'
         self.type_table = None
-        self.initcode = False
 
     def expand(self):
         self.defines_table = []
@@ -55,7 +54,6 @@ class DefaultExtensionTemplate(object):
         for line in self.src.split('\n'):
             match = self.r_marker.match(line)
             if match:
-                self.initcode = False       # '@' lines end the @INITCODE
                 name, args = self.parse_marker(match)
                 meth = getattr(self, name)
                 out = meth(*args)
@@ -63,12 +61,7 @@ class DefaultExtensionTemplate(object):
                     out = textwrap.dedent(out)
                     self.output.append(out)
             else:
-                if self.initcode and not line.lstrip():
-                    self.initcode = False   # blank lines end the @INITCODE
-                if self.initcode:
-                    self.type_table.append(line.lstrip())
-                else:
-                    self.output.append(line)
+                self.output.append(line)
         return '\n'.join(self.output)
 
     def parse_marker(self, match):
@@ -82,9 +75,6 @@ class DefaultExtensionTemplate(object):
             args = args[1:-1].split(',')
             args = [x.strip() for x in args]
         return name, args
-
-    def INITCODE(self):
-        self.initcode = True
 
     def INIT(self):
         if self.type_table:
@@ -108,10 +98,10 @@ class DefaultExtensionTemplate(object):
     def EXPORT_LEGACY(self, pymethoddef):
         self.legacy_methods = pymethoddef
 
-    def EXPORT_TYPE(self, name, spec, specparam='NULL'):
+    def EXPORT_TYPE(self, name, spec):
         i = len(self.type_table)
         src = """
-            HPy {h} = HPyType_FromSpec(ctx, &{spec}, {specparam});
+            HPy {h} = HPyType_FromSpec(ctx, &{spec}, NULL);
             if (HPy_IsNull({h}))
                 return HPy_NULL;
             if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0)
@@ -121,8 +111,16 @@ class DefaultExtensionTemplate(object):
         self.type_table.append(src.format(
             h = 'h_type_%d' % i,
             name = name,
-            spec = spec,
-            specparam = specparam))
+            spec = spec))
+
+    def EXTRA_INIT_FUNC(self, func):
+        src = """
+            {func}(ctx, m);
+            if (HPyErr_Occurred(ctx))
+                return HPy_NULL;
+            """
+        src = reindent(src, 4)
+        self.type_table.append(src.format(func=func))
 
 
 class Spec(object):

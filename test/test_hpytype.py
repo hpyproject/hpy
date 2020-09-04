@@ -297,12 +297,19 @@ class TestType(HPyTest):
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
             };
 
-            @INITCODE
+            static void make_Dummy(HPyContext ctx, HPy module)
+            {
                 HPyType_SpecParam param[] = {
                     { HPyType_SpecParam_Base, ctx->h_LongType },
                     { 0 }
                 };
-            @EXPORT_TYPE("Dummy", Dummy_spec, param)
+                HPy h_Dummy = HPyType_FromSpec(ctx, &Dummy_spec, param);
+                if (HPy_IsNull(h_Dummy))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Dummy", h_Dummy);
+                HPy_Close(ctx, h_Dummy);
+            }
+            @EXTRA_INIT_FUNC(make_Dummy)
             @INIT
         """)
         assert isinstance(mod.Dummy, type)
@@ -325,15 +332,23 @@ class TestType(HPyTest):
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
             };
 
-            @INITCODE
+            static void make_Dummy(HPyContext ctx, HPy module)
+            {
                 HPy h_bases = HPyTuple_Pack(ctx, 1, ctx->h_LongType);
+                if (HPy_IsNull(h_bases))
+                    return;
                 HPyType_SpecParam param[] = {
                     { HPyType_SpecParam_BasesTuple, h_bases },
                     { 0 }
                 };
-            @EXPORT_TYPE("Dummy", Dummy_spec, param)
-            @INITCODE
+                HPy h_Dummy = HPyType_FromSpec(ctx, &Dummy_spec, param);
                 HPy_Close(ctx, h_bases);
+                if (HPy_IsNull(h_Dummy))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Dummy", h_Dummy);
+                HPy_Close(ctx, h_Dummy);
+            }
+            @EXTRA_INIT_FUNC(make_Dummy)
             @INIT
         """)
         assert isinstance(mod.Dummy, type)
