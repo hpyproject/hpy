@@ -1,6 +1,3 @@
-#include <malloc.h>   /* for alloca() */
-
-
 /************************************************************/
 /* Emulate dlopen()&co. from the Windows API */
 
@@ -30,7 +27,7 @@ static void *dlsym(void *handle, const char *symbol)
            for __stdcall functions.
         */
         int i;
-        char *mangled_name = alloca(1 + strlen(symbol) + 1 + 3 + 1);
+        char mangled_name[1 + strlen(symbol) + 1 + 3 + 1];
         if (!mangled_name)
             return NULL;
         for (i = 0; i < 32; i++) {
