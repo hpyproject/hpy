@@ -126,7 +126,7 @@ jobs:
       versionSpec: '3.8'
     displayName: 'Use Python 3.8'
 
-  - script: sudo snap install cppcheck
+  - script: sudo snap install cppcheck --channel=latest/stable
     displayName: Install CPPCheck
 
   - script: make cppcheck
