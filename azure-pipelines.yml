@@ -129,5 +129,5 @@ jobs:
   - script: sudo snap install cppcheck
     displayName: Install CPPCheck
 
-  - script: cppcheck --error-exitcode=1 --enable=all --report-progress -I hpy/devel/include/ -I hpy/devel/include/common/ -I hpy/devel/include/cpython/ -I hpy/devel/include/universal/ -I hpy/universal/src/ -I $(python -c "from sysconfig import get_paths as gp; print(gp()[\"include\"])") --force -D NULL=0 .
+  - script: make cppcheck
     displayName: Run CPPCheck
