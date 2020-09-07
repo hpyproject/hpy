@@ -28,8 +28,6 @@ static void *dlsym(void *handle, const char *symbol)
         */
         int i;
         char mangled_name[1 + strlen(symbol) + 1 + 3 + 1];
-        if (!mangled_name)
-            return NULL;
         for (i = 0; i < 32; i++) {
             sprintf(mangled_name, "_%s@%d", symbol, i * 4);
             address = GetProcAddress((HMODULE)handle, mangled_name);
