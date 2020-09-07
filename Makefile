@@ -10,5 +10,5 @@ autogen:
 PYTHON_INCLUDE_DIR=$(shell python $$PWD/hpy/tools/include_path.py)
 
 cppcheck:
-	@mkdir -p cppcheck
-	@cppcheck --error-exitcode=1 --cppcheck-build-dir=${CPPCHECK_BUILD_DIR} --enable=all --report-progress -I hpy/devel/include/ -I hpy/devel/include/common/ -I hpy/devel/include/cpython/ -I hpy/devel/include/universal/ -I hpy/universal/src/ -I ${PYTHON_INCLUDE_DIR} --force -D NULL=0 .
+	@mkdir -p .cppcheck/
+	@cppcheck --error-exitcode=1 --cppcheck-build-dir=${CPPCHECK_BUILD_DIR} --enable=warning,performance,portability,information,unusedFunction,missingInclude --report-progress -I hpy/devel/include/ -I hpy/devel/include/common/ -I hpy/devel/include/cpython/ -I hpy/devel/include/universal/ -I hpy/universal/src/ -I ${PYTHON_INCLUDE_DIR} --force -D NULL=0 .

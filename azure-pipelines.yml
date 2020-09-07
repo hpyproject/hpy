@@ -131,7 +131,7 @@ jobs:
   - script: sudo snap install cppcheck --channel=latest/stable
     displayName: Install CPPCheck
 
-   - task: Cache@2
+  - task: Cache@2
     inputs:
       key: 'cppcheck | "$(Agent.OS)"'
       path: $(CPPCHECK_BUILD_DIR)
