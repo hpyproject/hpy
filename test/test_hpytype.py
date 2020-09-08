@@ -188,7 +188,7 @@ class TestType(HPyTest):
         assert p2.foo() == 42
 
 
-    def test_HPyDef_Member(self):
+    def test_HPyDef_Member_basic(self):
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_new
@@ -203,6 +203,59 @@ class TestType(HPyTest):
         p.y = 456
         assert p.x == 123
         assert p.y == 456
+
+    def test_HPyDef_Member_get_integers(self):
+        for kind, c_type in [
+                ('SHORT', 'short'),
+                ('INT', 'int'),
+                ('LONG', 'long'),
+                ('USHORT', 'unsigned short'),
+                ('UINT', 'unsigned int'),
+                ('ULONG', 'unsigned long'),
+                ('BYTE', 'char'),
+                ('UBYTE', 'unsigned char'),
+                ('LONGLONG', 'long long'),
+                ('ULONGLONG', 'unsigned long long'),
+                ('HPYSSIZET', 'HPy_ssize_t'),
+                ]:
+            mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+                %(c_type)s member;
+            } FooObject;
+
+            HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
+            static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                FooObject *foo;
+                HPy h_obj = HPy_New(ctx, cls, &foo);
+                if (HPy_IsNull(h_obj))
+                    return HPy_NULL;
+                foo->member = 42;
+                return h_obj;
+            }
+
+            HPyDef_MEMBER(Foo_member, "member", HPyMember_%(kind)s, offsetof(FooObject, member))
+
+            static HPyDef *Foo_defines[] = {
+                    &Foo_new,
+                    &Foo_member,
+                    NULL
+            };
+
+            static HPyType_Spec Foo_spec = {
+                .name = "mytest.Foo",
+                .basicsize = sizeof(FooObject),
+                .defines = Foo_defines
+            };
+
+
+            @EXPORT_TYPE("Foo", Foo_spec)
+            @INIT
+            """ % {'c_type': c_type, 'kind': kind})
+            foo = mod.Foo()
+            assert foo.member == 42
 
 
     def test_HPyType_GenericNew(self):
