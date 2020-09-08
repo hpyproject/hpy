@@ -10,6 +10,7 @@
 
 #include "api.h"
 #include "handles.h"
+#include "version.h"
 
 typedef HPy (*InitFuncPtr)(HPyContext ctx);
 
@@ -129,10 +130,15 @@ error:
     return NULL;
 }
 
+static PyObject *get_version(PyObject *self, PyObject *ignored)
+{
+    return Py_BuildValue("ss", HPY_VERSION, HPY_GIT_REVISION);
+}
 
 static PyMethodDef HPyMethods[] = {
     {"set_debug", (PyCFunction)set_debug, METH_O, "TODO"},
     {"load_from_spec", (PyCFunction)load_from_spec, METH_O, "Load a .hpy.so"},
+    {"get_version", (PyCFunction)get_version, METH_NOARGS, "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}
 };
 
