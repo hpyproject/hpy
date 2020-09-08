@@ -10,7 +10,7 @@
 
 #include "api.h"
 #include "handles.h"
-#include "version.h"
+#include "common/version.h"
 
 typedef HPy (*InitFuncPtr)(HPyContext ctx);
 
