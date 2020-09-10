@@ -245,7 +245,7 @@ class TestType(HPyTest):
             };
 
             static HPyType_Spec Foo_spec = {
-                .name = "mytest.Foo",
+                .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
                 .defines = Foo_defines
             };
@@ -253,7 +253,7 @@ class TestType(HPyTest):
 
             @EXPORT_TYPE("Foo", Foo_spec)
             @INIT
-            """ % {'c_type': c_type, 'kind': kind})
+            """ % {'c_type': c_type, 'kind': kind}, name='test_%s' % (kind,))
             foo = mod.Foo()
             assert foo.member == 42
 
