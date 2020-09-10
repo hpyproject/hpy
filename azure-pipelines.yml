@@ -116,3 +116,26 @@ jobs:
       pip install pytest pathlib
       python test/check_py27_compat.py
     displayName: 'check_py27_compat.py'
+- job: CPPCheck
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: "Run CPPCheck"
+  variables:
+    CPPCHECK_BUILD_DIR: $(Pipeline.Workspace)/.cppcheck
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+    displayName: 'Use Python 3.8'
+
+  - script: sudo snap install cppcheck --channel=latest/stable
+    displayName: Install CPPCheck
+
+  - task: Cache@2
+    inputs:
+      key: 'cppcheck | "$(Agent.OS)"'
+      path: $(CPPCHECK_BUILD_DIR)
+    displayName: Cache CPPCheck analysis files
+
+  - script: make cppcheck
+    displayName: Run CPPCheck
