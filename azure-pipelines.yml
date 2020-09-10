@@ -137,5 +137,5 @@ jobs:
       path: $(CPPCHECK_BUILD_DIR)
     displayName: Cache CPPCheck analysis files
 
-  - script: make -B cppcheck
+  - script: make cppcheck
     displayName: Run CPPCheck
