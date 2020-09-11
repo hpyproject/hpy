@@ -428,6 +428,10 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     PyObject *result = PyObject_New(PyObject, (PyTypeObject*)tp);
     if (!result)
         return HPy_NULL;
+#if PY_VERSION_HEX < 0x03080000
+    // Workaround for Python issue 35810; no longer necessary in Python 3.8
+    Py_INCREF(tp);
+#endif
 
     *data = (void*)result;
     return _py2h(result);
