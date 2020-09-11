@@ -187,6 +187,23 @@ class TestType(HPyTest):
         p2 = mod.Point(4, 2)
         assert p2.foo() == 42
 
+    def test_refcount(self):
+        import pytest
+        import sys
+        if not self.should_check_refcount():
+            pytest.skip()
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            @EXPORT_POINT_TYPE(&Point_new)
+            @INIT
+        """)
+        tp = mod.Point
+        init_refcount = sys.getrefcount(tp)
+        p = tp(1, 2)
+        assert sys.getrefcount(tp) == init_refcount + 1
+        p = None
+        assert sys.getrefcount(tp) == init_refcount
 
     def test_HPyDef_Member(self):
         mod = self.make_module("""
