@@ -204,7 +204,9 @@ class TestType(HPyTest):
         assert p.x == 123
         assert p.y == 456
 
-    def test_HPyDef_Member_get_integers(self):
+    def test_HPyDef_Member_integers(self):
+        import pytest
+        BIGNUM = 2**200
         for kind, c_type in [
                 ('SHORT', 'short'),
                 ('INT', 'int'),
@@ -250,11 +252,78 @@ class TestType(HPyTest):
                 .defines = Foo_defines
             };
 
+            @EXPORT_TYPE("Foo", Foo_spec)
+            @INIT
+            """ % {'c_type': c_type, 'kind': kind}, name='test_%s' % (kind,))
+            foo = mod.Foo()
+            assert foo.member == 42
+            foo.member = 43
+            assert foo.member == 43
+            with pytest.raises(OverflowError):
+                foo.member = BIGNUM
+            with pytest.raises(TypeError):
+                foo.member = None
+            with pytest.raises(TypeError):
+                del foo.member
+
+    def test_HPyDef_Member_readonly_integers(self):
+        import pytest
+        BIGNUM = 2**200
+        for kind, c_type in [
+                ('SHORT', 'short'),
+                ('INT', 'int'),
+                ('LONG', 'long'),
+                ('USHORT', 'unsigned short'),
+                ('UINT', 'unsigned int'),
+                ('ULONG', 'unsigned long'),
+                ('BYTE', 'char'),
+                ('UBYTE', 'unsigned char'),
+                ('LONGLONG', 'long long'),
+                ('ULONGLONG', 'unsigned long long'),
+                ('HPYSSIZET', 'HPy_ssize_t'),
+                ]:
+            mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+                %(c_type)s member;
+            } FooObject;
+
+            HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
+            static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                FooObject *foo;
+                HPy h_obj = HPy_New(ctx, cls, &foo);
+                if (HPy_IsNull(h_obj))
+                    return HPy_NULL;
+                foo->member = 42;
+                return h_obj;
+            }
+
+            HPyDef_MEMBER(Foo_member, "member", HPyMember_%(kind)s, offsetof(FooObject, member), 1)
+
+            static HPyDef *Foo_defines[] = {
+                    &Foo_new,
+                    &Foo_member,
+                    NULL
+            };
+
+            static HPyType_Spec Foo_spec = {
+                .name = "test_%(kind)s.Foo",
+                .basicsize = sizeof(FooObject),
+                .defines = Foo_defines
+            };
 
             @EXPORT_TYPE("Foo", Foo_spec)
             @INIT
             """ % {'c_type': c_type, 'kind': kind}, name='test_%s' % (kind,))
             foo = mod.Foo()
+            assert foo.member == 42
+            with pytest.raises(AttributeError):
+                foo.member = 43
+            assert foo.member == 42
+            with pytest.raises(AttributeError):
+                del foo.member
             assert foo.member == 42
 
 
