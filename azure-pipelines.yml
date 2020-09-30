@@ -139,3 +139,21 @@ jobs:
 
   - script: make cppcheck
     displayName: Run CPPCheck
+- job: infer
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: "Run infer"
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+    displayName: 'Use Python 3.8'
+  - script: |
+      pip install compiledb wheel;
+      VERSION=0.17.0; \
+      curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+      | sudo tar -C /opt -xJ && \
+      echo "##vso[task.prependpath]/opt/infer-linux64-v$VERSION/bin"
+    displayName: Install infer
+  - script: make infer
+    displayName: Run infer
