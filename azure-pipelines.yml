@@ -22,7 +22,7 @@ jobs:
     displayName: 'Use Python $(python.version)'
 
   - script: |
-      python -m pip install --upgrade pip
+      python -m pip install --upgrade pip wheel
     displayName: 'Install dependencies'
 
   - script: |
@@ -30,8 +30,8 @@ jobs:
     displayName: 'Build project'
 
   - script: |
-      pip install pytest pytest-azurepipelines
-      pytest test/
+      pip install pytest pytest-azurepipelines pytest-xdist
+      pytest -n auto test/
     displayName: 'pytest'
 
 - job: ExampleTests
@@ -117,15 +117,35 @@ jobs:
       python test/check_py27_compat.py
     displayName: 'check_py27_compat.py'
 
-- job: Valgrind
+- job: CPPCheck
   pool:
     vmImage: 'ubuntu-latest'
-  displayName: 'Check memory leaks'
+  displayName: "Run CPPCheck"
+  variables:
+    CPPCHECK_BUILD_DIR: $(Pipeline.Workspace)/.cppcheck
   steps:
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '3.8'
     displayName: 'Use Python 3.8'
+
+
+  - script: sudo snap install cppcheck --channel=latest/stable
+    displayName: Install CPPCheck
+
+  - task: Cache@2
+    inputs:
+      key: 'cppcheck | "$(Agent.OS)"'
+      path: $(CPPCHECK_BUILD_DIR)
+    displayName: Cache CPPCheck analysis files
+
+  - script: make cppcheck
+    displayName: Run CPPCheck
+
+- job: Valgrind
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: 'Check memory leaks'
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'
   - script: python -m pip install --upgrade pip

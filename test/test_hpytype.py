@@ -187,6 +187,23 @@ class TestType(HPyTest):
         p2 = mod.Point(4, 2)
         assert p2.foo() == 42
 
+    def test_refcount(self):
+        import pytest
+        import sys
+        if not self.should_check_refcount():
+            pytest.skip()
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            @EXPORT_POINT_TYPE(&Point_new)
+            @INIT
+        """)
+        tp = mod.Point
+        init_refcount = sys.getrefcount(tp)
+        p = tp(1, 2)
+        assert sys.getrefcount(tp) == init_refcount + 1
+        p = None
+        assert sys.getrefcount(tp) == init_refcount
 
     def test_HPyDef_Member(self):
         mod = self.make_module("""
@@ -288,3 +305,77 @@ class TestType(HPyTest):
         assert p.y == 3
         p.z = 1075
         assert p.y == 5
+
+    def test_specparam_base(self):
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+            };
+
+            static void make_Dummy(HPyContext ctx, HPy module)
+            {
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_Base, ctx->h_LongType },
+                    { 0 }
+                };
+                HPy h_Dummy = HPyType_FromSpec(ctx, &Dummy_spec, param);
+                if (HPy_IsNull(h_Dummy))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Dummy", h_Dummy);
+                HPy_Close(ctx, h_Dummy);
+            }
+            @EXTRA_INIT_FUNC(make_Dummy)
+            @INIT
+        """)
+        assert isinstance(mod.Dummy, type)
+        assert mod.Dummy.__name__ == 'Dummy'
+        assert mod.Dummy.__module__ == 'mytest'
+        assert issubclass(mod.Dummy, int)
+        assert isinstance(mod.Dummy(), mod.Dummy)
+        assert mod.Dummy() == 0
+        assert mod.Dummy(42) == 42
+
+        class Sub(mod.Dummy):
+            pass
+        assert isinstance(Sub(), mod.Dummy)
+
+    def test_specparam_basestuple(self):
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+            };
+
+            static void make_Dummy(HPyContext ctx, HPy module)
+            {
+                HPy h_bases = HPyTuple_Pack(ctx, 1, ctx->h_LongType);
+                if (HPy_IsNull(h_bases))
+                    return;
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_BasesTuple, h_bases },
+                    { 0 }
+                };
+                HPy h_Dummy = HPyType_FromSpec(ctx, &Dummy_spec, param);
+                HPy_Close(ctx, h_bases);
+                if (HPy_IsNull(h_Dummy))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Dummy", h_Dummy);
+                HPy_Close(ctx, h_Dummy);
+            }
+            @EXTRA_INIT_FUNC(make_Dummy)
+            @INIT
+        """)
+        assert isinstance(mod.Dummy, type)
+        assert mod.Dummy.__name__ == 'Dummy'
+        assert mod.Dummy.__module__ == 'mytest'
+        assert issubclass(mod.Dummy, int)
+        assert isinstance(mod.Dummy(), mod.Dummy)
+        assert mod.Dummy() == 0
+        assert mod.Dummy(42) == 42
+
+        class Sub(mod.Dummy):
+            pass
+        assert isinstance(Sub(), mod.Dummy)

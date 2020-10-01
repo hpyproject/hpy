@@ -101,7 +101,7 @@ class DefaultExtensionTemplate(object):
     def EXPORT_TYPE(self, name, spec):
         i = len(self.type_table)
         src = """
-            HPy {h} = HPyType_FromSpec(ctx, &{spec});
+            HPy {h} = HPyType_FromSpec(ctx, &{spec}, NULL);
             if (HPy_IsNull({h}))
                 return HPy_NULL;
             if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0)
@@ -113,6 +113,15 @@ class DefaultExtensionTemplate(object):
             h = 'h_type_%d' % i,
             name = name,
             spec = spec))
+
+    def EXTRA_INIT_FUNC(self, func):
+        src = """
+            {func}(ctx, m);
+            if (HPyErr_Occurred(ctx))
+                return HPy_NULL;
+            """
+        src = reindent(src, 4)
+        self.type_table.append(src.format(func=func))
 
 
 class Spec(object):

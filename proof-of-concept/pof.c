@@ -98,7 +98,7 @@ static HPy init_pof_impl(HPyContext ctx)
     m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
-    h_point_type = HPyType_FromSpec(ctx, &point_type_spec);
+    h_point_type = HPyType_FromSpec(ctx, &point_type_spec, NULL);
     if (HPy_IsNull(h_point_type))
       return HPy_NULL;
     HPy_SetAttr_s(ctx, m, "Point", h_point_type);
