@@ -146,6 +146,11 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   displayName: 'Check memory leaks'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+    displayName: 'Use Python 3.8'
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'
   - script: python -m pip install --upgrade pip
