@@ -285,7 +285,6 @@ class TestType(HPyTest):
 
     def test_HPyDef_Member_readonly_integers(self):
         import pytest
-        BIGNUM = 2**200
         for kind, c_type in [
                 ('SHORT', 'short'),
                 ('INT', 'int'),
@@ -317,7 +316,7 @@ class TestType(HPyTest):
                 return h_obj;
             }
 
-            HPyDef_MEMBER(Foo_member, "member", HPyMember_%(kind)s, offsetof(FooObject, member), 1)
+            HPyDef_MEMBER(Foo_member, "member", HPyMember_%(kind)s, offsetof(FooObject, member), .readonly=1)
 
             static HPyDef *Foo_defines[] = {
                     &Foo_new,
@@ -451,7 +450,7 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             del foo.NONE_member
 
-    def test_HPyDef_Member_readonly(self):
+    def test_HPyDef_Member_readonly_others(self):
         import pytest
         mod = self.make_module("""
             #include <string.h>
