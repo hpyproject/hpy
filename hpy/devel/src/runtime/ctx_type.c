@@ -420,6 +420,7 @@ _HPy_HIDDEN HPy
 ctx_New(HPyContext ctx, HPy h_type, void **data)
 {
     PyObject *tp = _h2py(h_type);
+    assert(tp != NULL);
     if (!PyType_Check(tp)) {
         PyErr_SetString(PyExc_TypeError, "HPy_New arg 1 must be a type");
         return HPy_NULL;
@@ -441,7 +442,13 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
 _HPy_HIDDEN HPy
 ctx_Type_GenericNew(HPyContext ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
-    PyTypeObject *type = (PyTypeObject *)_h2py(h_type);
-    PyObject *res = type->tp_alloc(type, 0);
+    PyObject *tp = _h2py(h_type);
+    assert(tp != NULL);
+    if (!PyType_Check(tp)) {
+        PyErr_SetString(PyExc_TypeError, "HPy_Type_GenericNew arg 1 must be a type");
+        return HPy_NULL;
+    }
+
+    PyObject *res = ((PyTypeObject*) tp)->tp_alloc((PyTypeObject*) tp, 0);
     return _py2h(res);
 }
