@@ -420,10 +420,7 @@ _HPy_HIDDEN HPy
 ctx_New(HPyContext ctx, HPy h_type, void **data)
 {
     PyObject *tp = _h2py(h_type);
-    if (tp == NULL) {
-        PyErr_SetString(PyExc_RuntimeError, "HPy_New arg 1 must not be a null handle");
-        return HPy_NULL;
-    }
+    assert(tp != NULL);
     if (!PyType_Check(tp)) {
         PyErr_SetString(PyExc_TypeError, "HPy_New arg 1 must be a type");
         return HPy_NULL;
@@ -446,10 +443,7 @@ _HPy_HIDDEN HPy
 ctx_Type_GenericNew(HPyContext ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     PyObject *tp = _h2py(h_type);
-    if (tp == NULL) {
-        PyErr_SetString(PyExc_RuntimeError, "HPy_Type_GenericNew arg 1 must not be a null handle");
-        return HPy_NULL;
-    }
+    assert(tp != NULL);
     if (!PyType_Check(tp)) {
         PyErr_SetString(PyExc_TypeError, "HPy_Type_GenericNew arg 1 must be a type");
         return HPy_NULL;
