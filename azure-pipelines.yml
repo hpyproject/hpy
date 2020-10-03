@@ -116,6 +116,7 @@ jobs:
       pip install pytest pathlib
       python test/check_py27_compat.py
     displayName: 'check_py27_compat.py'
+
 - job: CPPCheck
   pool:
     vmImage: 'ubuntu-latest'
@@ -128,6 +129,7 @@ jobs:
       versionSpec: '3.8'
     displayName: 'Use Python 3.8'
 
+
   - script: sudo snap install cppcheck --channel=latest/stable
     displayName: Install CPPCheck
 
@@ -139,6 +141,7 @@ jobs:
 
   - script: make cppcheck
     displayName: Run CPPCheck
+
 - job: infer
   pool:
     vmImage: 'ubuntu-latest'
@@ -157,3 +160,23 @@ jobs:
     displayName: Install infer
   - script: make infer
     displayName: Run infer
+
+- job: Valgrind
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: 'Check memory leaks'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+    displayName: 'Use Python 3.8'
+  - script: sudo apt update && sudo apt install -y valgrind
+    displayName: 'Install valgrind'
+  - script: python -m pip install --upgrade pip
+    displayName: 'Install dependencies'
+  - script: python -m pip install .
+    displayName: 'Build project'
+  - script: |
+      pip install pytest pytest-azurepipelines pytest-valgrind
+      make valgrind
+    displayName: 'Run valgrind'
