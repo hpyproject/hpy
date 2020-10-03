@@ -351,6 +351,7 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
     if (params == NULL)
         return NULL;
 
+    PyObject *tup;
     int found_base = 0;
     for (HPyType_SpecParam *p = params; p->kind != 0; p++) {
         switch (p->kind) {
@@ -360,13 +361,18 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
                 break;
             case HPyType_SpecParam_BasesTuple:
                 /* if there is instead a complete base tuple, just return it */
-                return _h2py(p->object);
+                /* we increment the reference count of the tuple here to match
+                   the reference counting on the tuple we create below when
+                   there is no HPyType_SpecParam_BasesTuple */
+                tup = _h2py(p->object);
+                Py_INCREF(tup);
+                return tup;
         }
     }
     if (found_base == 0)
         return NULL;
 
-    PyObject *tup = PyTuple_New(found_base);
+    tup = PyTuple_New(found_base);
     if (tup == NULL)
         return NULL;
 
@@ -405,12 +411,15 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     }
     PyObject *bases = build_bases_from_params(params);
     if (PyErr_Occurred()) {
+        PyMem_Free(spec->slots);
+        PyMem_Free(spec);
         return HPy_NULL;
     }
     PyObject *result = PyType_FromSpecWithBases(spec, bases);
     /* note that we do NOT free the memory which was allocated by
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
+    Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
     return _py2h(result);

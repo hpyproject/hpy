@@ -113,7 +113,7 @@ static PyObject *load_from_spec(PyObject *self, PyObject *spec)
 
     HPy mod = ((InitFuncPtr)initfn)(&global_ctx);
     if (HPy_IsNull(mod))
-        return NULL;
+        goto error;
     PyObject *py_mod = _h2py(mod);
     // XXX close the handle
 
