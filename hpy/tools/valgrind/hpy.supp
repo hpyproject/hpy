@@ -1,18 +1,9 @@
 {
-   <ctx_Module_Create_leak_leak>
+   <ctx_Module_Create_leak>
    Memcheck:Leak
    match-leak-kinds: definite,indirect
    ...
    fun:ctx_Module_Create
-   ...
-}
-
-{
-   <load_from_spec_leak>
-   Memcheck:Leak
-   match-leak-kinds: definite
-   ...
-   fun:load_from_spec
    ...
 }
 
