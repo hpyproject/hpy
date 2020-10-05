@@ -141,6 +141,21 @@ jobs:
   - script: make cppcheck
     displayName: Run CPPCheck
 
+- job: Flake8
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: "Run Python static analysis checks"
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.8'
+    displayName: 'Use Python 3.8'
+  - script: |
+      pip install flake8
+    displayName: Install dependencies
+  - script: make flake8
+    displayName: Run flake8
+
 - job: infer
   pool:
     vmImage: 'ubuntu-latest'
