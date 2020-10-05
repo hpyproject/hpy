@@ -3,6 +3,7 @@ typedef int HPy;
 typedef int HPyContext;
 typedef int HPyModuleDef;
 typedef int HPyType_Spec;
+typedef int HPyType_SpecParam;
 typedef int HPyCFunction;
 typedef int HPy_ssize_t;
 typedef int HPy_hash_t;
@@ -91,7 +92,8 @@ void HPyErr_Clear(HPyContext ctx);
 
 /* object.h */
 int HPy_IsTrue(HPyContext ctx, HPy h);
-HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec);
+HPy HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec,
+                     HPyType_SpecParam *params);
 HPy HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
 
 HPy HPy_GetAttr(HPyContext ctx, HPy obj, HPy name);

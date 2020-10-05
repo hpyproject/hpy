@@ -88,7 +88,7 @@ PyObject *
 _h2py(HPy h)
 {
     hpy_assert(h._i >= 0 && h._i < h_num_allocated,
-        "using an HPy containing garbage: _i = %zd", h._i);
+        "using an HPy containing garbage: _i = %p", (void *)h._i);
     // If HPy_IsNull(h), the h._i = 0 and the line below returns the
     // pointer attached to the 0th handle, i.e. NULL.
     PyObject *result = all_handles[h._i];
@@ -97,12 +97,12 @@ _h2py(HPy h)
         return NULL;
     }
     hpy_assert((((Py_ssize_t)result) & 1) == 0,
-        "using an HPy that was freed already (or never allocated): _i = %zd",
-        h._i);
+        "using an HPy that was freed already (or never allocated): _i = %p",
+        (void *)h._i);
     hpy_assert(result != NULL,
-        "NULL PyObject unexpected in handle _i = %zd", h._i);
+        "NULL PyObject unexpected in handle _i = %p", (void *)h._i);
     hpy_assert(Py_REFCNT(result) > 0,
-        "bogus (freed?) PyObject found in handle _i = %zd", h._i);
+        "bogus (freed?) PyObject found in handle _i = %p", (void *)h._i);
     return result;
 }
 
@@ -111,14 +111,14 @@ _hclose(HPy h)
 {
     Py_ssize_t i = h._i;
     hpy_assert(i >= 0 && i < h_num_allocated,
-        "freeing an HPy containing garbage: _i = %zd", i);
+        "freeing an HPy containing garbage: _i = %p", (void *)i);
     hpy_assert(i != 0, "freeing HPy_NULL is not allowed");
     PyObject *old = all_handles[i];
     hpy_assert((((Py_ssize_t)old) & 1) == 0,
-        "freeing an HPy that was freed already (or never allocated): _i = %zd",
-         i);
+        "freeing an HPy that was freed already (or never allocated): _i = %p",
+         (void *)i);
     hpy_assert(Py_REFCNT(old) > 0,
-        "bogus PyObject found while freeing handle _i = %zd", h._i);
+        "bogus PyObject found while freeing handle _i = %p", (void *)h._i);
     all_handles[i] = (PyObject *)((h_free_list_2 << 1) | 1);
     h_free_list_2 = i;
     Py_DECREF(old);

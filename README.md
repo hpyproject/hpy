@@ -102,3 +102,9 @@ What does `HPy` mean?
 
 The "H" in `HPy` stands for "handle": one of the key idea of the new API is to
 use fully opaque handles to represent and pass around Python objects.
+
+
+Donate to HPy
+-------------
+
+Become a financial contributor and help us sustain the HPy community: [Contribute to HPy](https://opencollective.com/hpy/contribute).
