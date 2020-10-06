@@ -14,9 +14,31 @@ def get_scm_config():
     import subprocess
     import pathlib
     import setuptools_scm
+
     version = setuptools_scm.get_version()
-    gitrev = subprocess.check_output('git describe --abbrev=7 --dirty '
-                                     '--always --tags --long'.split(), encoding='utf-8')
+    # After setuptools_scm.get_version, we know that there is a repository
+    try:
+        gitrev = subprocess.check_output(
+            "git describe --abbrev=7 --dirty --always --tags --long".split(),
+            encoding="utf-8",
+        )
+    except subprocess.CalledProcessError:
+        # it could be a Mercurial repository cloned with hg-git
+        hg_node = subprocess.check_output(
+            "hg log -r . -T {node}".split(), encoding="utf-8"
+        )
+        gitrev = None
+        with open(".hg/git-mapfile") as file:
+            for line in file:
+                if hg_node in line:
+                    gitrev = line.split(" ", 1)[0][:7]
+                    break
+        if gitrev is None:
+            raise RuntimeError(
+                "Mercurial repository created with hg-git but the Git rev"
+                " was not found in .hg/git-mapfile."
+            )
+
     gitrev = gitrev.strip()
     version_h = pathlib.Path('.').joinpath('hpy', 'devel', 'include', 'common', 'version.h')
     version_h.write_text(textwrap.dedent(f"""
