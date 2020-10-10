@@ -5,19 +5,22 @@
 jobs:
 - job: LibraryTests
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: '$(imageName)'
   displayName: 'Main tests'
   strategy:
     matrix:
       py36:
         python.version: '3.6'
+        imageName: 'ubuntu-latest'
       py37:
         python.version: '3.7'
+        imageName: 'ubuntu-latest'
       py38:
         python.version: '3.8'
+        imageName: 'ubuntu-latest'
       py38-macos:
         python.version: '3.8'
-        pool.vmImage: 'macOS-latest'
+        imageName: 'macos-latest'
   steps:
   - task: UsePythonVersion@0
     inputs:
