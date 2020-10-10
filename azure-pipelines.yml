@@ -5,16 +5,22 @@
 jobs:
 - job: LibraryTests
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: '$(imageName)'
   displayName: 'Main tests'
   strategy:
     matrix:
       py36:
         python.version: '3.6'
+        imageName: 'ubuntu-latest'
       py37:
         python.version: '3.7'
+        imageName: 'ubuntu-latest'
       py38:
         python.version: '3.8'
+        imageName: 'ubuntu-latest'
+      py38-macos:
+        python.version: '3.8'
+        imageName: 'macos-latest'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -163,7 +169,7 @@ jobs:
 - job: Valgrind
   pool:
     vmImage: 'ubuntu-latest'
-  displayName: 'Check memory leaks'
+  displayName: 'Run valgrind'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -178,4 +184,3 @@ jobs:
   - script: |
       pip install pytest pytest-azurepipelines pytest-valgrind
       make valgrind
-    displayName: 'Run valgrind'
