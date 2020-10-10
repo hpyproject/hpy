@@ -370,6 +370,7 @@ class TestType(HPyTest):
                 foo->STRING_member = s;
                 foo->CHAR_member = 'A';
                 strncpy(foo->ISTRING_member, "Hello", 6);
+                foo->BOOL_member = 0;
                 return h_obj;
             }
 
@@ -478,6 +479,7 @@ class TestType(HPyTest):
                 foo->STRING_member = s;
                 foo->CHAR_member = 'A';
                 strncpy(foo->ISTRING_member, "Hello", 6);
+                foo->BOOL_member = 0;
                 return h_obj;
             }
 
