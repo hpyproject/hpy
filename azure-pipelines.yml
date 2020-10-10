@@ -15,6 +15,9 @@ jobs:
         python.version: '3.7'
       py38:
         python.version: '3.8'
+      py38-macos:
+        python.version: '3.8'
+        pool.vmImage: 'macOS-latest'
   steps:
   - task: UsePythonVersion@0
     inputs:
