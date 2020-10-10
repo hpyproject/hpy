@@ -130,7 +130,6 @@ class TestObject(HPyTest):
             def foo(self):
                 raise RuntimeError
 
-
         assert mod.f(Attrs(foo=5)) is True
         assert mod.f(Attrs()) is False
         assert mod.f(42) is False
@@ -138,7 +137,6 @@ class TestObject(HPyTest):
         assert mod.f(ClassAttr()) is True
         assert mod.f(PropAttr()) is True
         assert mod.f(PropAttrRaising()) is False
-
 
     def test_hasattr_s(self):
         mod = self.make_module("""
@@ -458,5 +456,5 @@ class TestObject(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        assert mod.f([5,6,7,8]) == 4
+        assert mod.f([5, 6, 7, 8]) == 4
         assert mod.f({"a": 1}) == 1

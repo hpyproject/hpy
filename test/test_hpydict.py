@@ -1,5 +1,6 @@
 from .support import HPyTest
 
+
 class TestDict(HPyTest):
 
     def test_Check(self):

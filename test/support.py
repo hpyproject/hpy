@@ -1,14 +1,19 @@
-import os, sys
-import pytest, py
+import os
 import re
+import sys
 import textwrap
+
+import pytest
 
 PY2 = sys.version_info[0] == 2
 
+
 def reindent(s, indent):
     s = textwrap.dedent(s)
-    return ''.join(' '*indent + line if line.strip() else line
+    return ''.join(
+        ' ' * indent + line if line.strip() else line
         for line in s.splitlines(True))
+
 
 class DefaultExtensionTemplate(object):
 
@@ -110,9 +115,9 @@ class DefaultExtensionTemplate(object):
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(
-            h = 'h_type_%d' % i,
-            name = name,
-            spec = spec))
+            h='h_type_%d' % i,
+            name=name,
+            spec=spec))
 
     def EXTRA_INIT_FUNC(self, func):
         src = """
@@ -221,7 +226,6 @@ class ExtensionCompiler:
         # because this file will be imported also by PyPy tests which runs on
         # Python2
         import importlib.util
-        from importlib.machinery import ExtensionFileLoader
         spec = importlib.util.spec_from_file_location(name, so_filename)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
@@ -263,10 +267,12 @@ def c_compile(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
                 os.environ[key] = value
     return outputfilename
 
+
 def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
     # XXX compact but horrible :-(
     from distutils.core import Distribution
-    import distutils.errors, distutils.log
+    import distutils.errors
+    import distutils.log
     #
     dist = Distribution()
     dist.parse_config_files()

@@ -2,6 +2,7 @@
 
 from .support import HPyTest
 
+
 class TestUnicode(HPyTest):
 
     def test_Check(self):
@@ -51,7 +52,6 @@ class TestUnicode(HPyTest):
         assert mod.f(-1) == "hellò world"
         assert mod.f(11) == "hellò world"
         assert mod.f(5) == "hellò"
-
 
     def test_AsUTF8String(self):
         mod = self.make_module("""

@@ -1,5 +1,6 @@
 from .support import HPyTest
 
+
 class TestTuple(HPyTest):
 
     def test_FromArray(self):

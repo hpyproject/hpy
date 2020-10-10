@@ -1,5 +1,6 @@
 from . import support
 
+
 def expand_template(template, name):
     return support.DefaultExtensionTemplate(template, name).expand()
 

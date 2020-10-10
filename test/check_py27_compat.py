@@ -16,11 +16,12 @@ import py
 
 ROOT = py.path.local(__file__).join('..', '..')
 
+
 def try_import(name):
     try:
         print('Trying to import %s... ' % name, end='')
         __import__(name)
-    except:
+    except Exception:
         print('ERROR!')
         print()
         traceback.print_exc(file=sys.stdout)
@@ -29,6 +30,7 @@ def try_import(name):
     else:
         print('OK')
         return True
+
 
 def try_import_hpy_devel():
     """
@@ -41,12 +43,13 @@ def try_import_hpy_devel():
     init_py = ROOT.join('hpy', '__init__.py')
     assert init_py.check(exists=False)
     try:
-        init_py.write('') # create an empty __init__.py
+        init_py.write('')  # create an empty __init__.py
         if not try_import('hpy.devel'):
             failed += 1
     finally:
         init_py.remove()
     return failed
+
 
 def try_import_tests():
     failed = 0
@@ -56,6 +59,7 @@ def try_import_tests():
         if not try_import('test.%s' % t.purebasename):
             failed += 1
     return failed
+
 
 def main():
     if sys.version_info[:2] != (2, 7):
@@ -72,6 +76,7 @@ def main():
     else:
         print('%d failed imports :(' % failed)
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()

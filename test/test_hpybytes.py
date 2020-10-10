@@ -1,5 +1,6 @@
 from .support import HPyTest
 
+
 class TestBytes(HPyTest):
 
     def test_Check(self):
@@ -50,7 +51,7 @@ class TestBytes(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        assert mod.f(b'ABC') == 100*ord('A') + 10*ord('B') + ord('C')
+        assert mod.f(b'ABC') == 100 * ord('A') + 10 * ord('B') + ord('C')
 
     def test_AS_STRING(self):
         mod = self.make_module("""
@@ -67,4 +68,4 @@ class TestBytes(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        assert mod.f(b'ABC') == 100*ord('A') + 10*ord('B') + ord('C')
+        assert mod.f(b'ABC') == 100 * ord('A') + 10 * ord('B') + ord('C')

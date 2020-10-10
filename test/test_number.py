@@ -14,7 +14,7 @@ class TestNumber(HPyTest):
                 ('Index', operator.index),
                 ('Long', int),
                 ('Float', float),
-                ]:
+        ]:
             mod = self.make_module("""
                 HPyDef_METH(f, "f", f_impl, HPyFunc_O)
                 static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
@@ -23,7 +23,7 @@ class TestNumber(HPyTest):
                 }
                 @EXPORT(f)
                 @INIT
-            """ % (c_name,), name='number_'+c_name)
+            """ % (c_name,), name='number_' + c_name)
             assert mod.f(-5) == op(-5)
             assert mod.f(6) == op(6)
             try:
@@ -49,7 +49,7 @@ class TestNumber(HPyTest):
                 ('And', operator.and_),
                 ('Xor', operator.xor),
                 ('Or', operator.or_),
-                ]:
+        ]:
             mod = self.make_module("""
                 HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext ctx, HPy self,
@@ -62,7 +62,7 @@ class TestNumber(HPyTest):
                 }
                 @EXPORT(f)
                 @INIT
-            """ % (c_name,), name='number_'+c_name)
+            """ % (c_name,), name='number_' + c_name)
             assert mod.f(5, 4) == op(5, 4)
             assert mod.f(6, 3) == op(6, 3)
 
@@ -105,7 +105,6 @@ class TestNumber(HPyTest):
         assert mod.f(m1, m2) == m1.__matmul__(m2)
 
     def test_inplace_binary(self):
-        import operator
         for c_name, py_name in [
                 ('Add', '__iadd__'),
                 ('Subtract', '__isub__'),
@@ -118,7 +117,7 @@ class TestNumber(HPyTest):
                 ('And', '__iand__'),
                 ('Xor', '__ixor__'),
                 ('Or', '__ior__'),
-                ]:
+        ]:
             mod = self.make_module("""
                 HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext ctx, HPy self,
@@ -131,7 +130,7 @@ class TestNumber(HPyTest):
                 }
                 @EXPORT(f)
                 @INIT
-            """ % (c_name,), name='number_'+c_name)
+            """ % (c_name,), name='number_' + c_name)
             class A:
                 def mymethod(self, b):
                     return (py_name, b)

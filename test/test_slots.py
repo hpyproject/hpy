@@ -1,5 +1,6 @@
-from .support import HPyTest, DefaultExtensionTemplate
+from .support import HPyTest
 from .test_hpytype import PointTemplate
+
 
 class TestSlots(HPyTest):
 

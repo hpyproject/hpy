@@ -65,7 +65,6 @@ class PointTemplate(DefaultExtensionTemplate):
         """ % defines
 
 
-
 class TestType(HPyTest):
 
     ExtensionTemplate = PointTemplate
@@ -163,7 +162,8 @@ class TestType(HPyTest):
         assert d.identity() is d
         with pytest.raises(TypeError):
             mod.Dummy.identity()
-        class A: pass
+        class A:
+            pass
         with pytest.raises(TypeError):
             mod.Dummy.identity(A())
 
@@ -202,7 +202,7 @@ class TestType(HPyTest):
         init_refcount = sys.getrefcount(tp)
         p = tp(1, 2)
         assert sys.getrefcount(tp) == init_refcount + 1
-        p = None
+        p = None  # noqa
         assert sys.getrefcount(tp) == init_refcount
 
     def test_HPyDef_Member_basic(self):
@@ -236,7 +236,7 @@ class TestType(HPyTest):
                 ('LONGLONG', 'long long'),
                 ('ULONGLONG', 'unsigned long long'),
                 ('HPYSSIZET', 'HPy_ssize_t'),
-                ]:
+        ]:
             mod = self.make_module("""
             typedef struct {
                 HPyObject_HEAD
@@ -297,7 +297,7 @@ class TestType(HPyTest):
                 ('LONGLONG', 'long long'),
                 ('ULONGLONG', 'unsigned long long'),
                 ('HPYSSIZET', 'HPy_ssize_t'),
-                ]:
+        ]:
             mod = self.make_module("""
             typedef struct {
                 HPyObject_HEAD
@@ -551,7 +551,6 @@ class TestType(HPyTest):
             foo.NONE_member = None
         with pytest.raises(AttributeError):
             del foo.NONE_member
-
 
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""

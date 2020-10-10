@@ -185,7 +185,6 @@ class TestBasic(HPyTest):
         assert str(exc.value) == 'hello world'
 
     def test_builtin_handles(self):
-        import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)

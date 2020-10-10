@@ -1,5 +1,6 @@
 from .support import HPyTest
 
+
 class TestLong(HPyTest):
 
     def test_long_aslong(self):

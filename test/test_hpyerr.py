@@ -1,5 +1,6 @@
 from .support import HPyTest
 
+
 class TestErr(HPyTest):
 
     def test_NoMemory(self):
