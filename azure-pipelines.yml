@@ -169,7 +169,7 @@ jobs:
 - job: Valgrind
   pool:
     vmImage: 'ubuntu-latest'
-  displayName: 'Check memory leaks'
+  displayName: 'Run valgrind'
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -184,4 +184,3 @@ jobs:
   - script: |
       pip install pytest pytest-azurepipelines pytest-valgrind
       make valgrind
-    displayName: 'Run valgrind'
