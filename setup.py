@@ -39,10 +39,18 @@ def get_scm_config():
 
     return {} # use the default config
 
+dev_requirements = [
+    "pytest",
+    "pytest-xdist",
+]
+
 setup(
     name="hpy.devel",
     packages = ['hpy.devel'],
     include_package_data=True,
+    extras_require={
+        "dev": dev_requirements,
+    },
     ext_modules = [
         Extension('hpy.universal',
                   ['hpy/universal/src/hpymodule.c',
