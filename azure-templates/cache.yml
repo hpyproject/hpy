@@ -3,13 +3,22 @@
 #
 # Current caching:
 #
+# - pip
 # - ccache
 # - cppcheck
-# - pip
 
-variables:
-  PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
-  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+parameters:
+  - name: CCACHE_DIR
+    default: $(Pipeline.Workspace)/ccache
+    type: string
+
+  - name: CPPCHECK_BUILD_DIR
+    default: $(Pipeline.Workspace)/.cppcheck
+    type: string
+
+    default: $(Pipeline.Workspace)/.pip
+    - name: PIP_CACHE_DIR
+    type: string
 
 steps:
 - script: |
@@ -20,13 +29,13 @@ steps:
 - task: Cache@2
   inputs:
     key: 'ccache | "$(Agent.OS)" | "$(python.version)"'
-    path: $(CCACHE_DIR)
+    path: ${{ parameters.CCACHE_DIR }}
   displayName: Cache C compilation with ccache
 
 - task: Cache@2
   inputs:
     key: 'cppcheck | "$(Agent.OS)"'
-    path: $(CPPCHECK_BUILD_DIR)
+    path: ${{ parameters.CPPCHECK_BUILD_DIR }}
   displayName: Cache CPPCheck analysis files
 
 - task: Cache@2
@@ -35,5 +44,5 @@ steps:
     restoreKeys: |
       python | "$(Agent.OS)"
       python
-    path: $(PIP_CACHE_DIR)
+    path: ${{ parameters.PIP_CACHE_DIR }}
   displayName: Cache pip packages

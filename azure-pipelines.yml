@@ -19,10 +19,9 @@ jobs:
         imageName: 'macos-latest'
   steps:
   - template: azure-templates/cache.yml
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
+  - template: azure-templates/python.yml
+    parameters:
+      pythonVersion: $(python.version)
   - script: python -m pip install --upgrade pip wheel
     displayName: 'Install dependencies'
   - script: python -m pip install .
@@ -34,22 +33,27 @@ jobs:
 
 - job: ExampleTests
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: '$(imageName)'
   displayName: 'Test usage examples'
   strategy:
     matrix:
       py36:
         python.version: '3.6'
+        imageName: 'ubuntu-latest'
       py37:
         python.version: '3.7'
+        imageName: 'ubuntu-latest'
       py38:
         python.version: '3.8'
+        imageName: 'ubuntu-latest'
+      py38-macos:
+        python.version: '3.8'
+        imageName: 'macos-latest'
   steps:
   - template: azure-templates/cache.yml
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
+  - template: azure-templates/python.yml
+    parameters:
+      pythonVersion: $(python.version)
   - script: proof-of-concept/build_wheel_nodeps.sh
     displayName: 'Build pof wheel'
   - script: python -m pip install proof-of-concept/dist/*.whl
@@ -65,7 +69,7 @@ jobs:
   displayName: 'Check autogen'
   steps:
   - template: azure-templates/cache.yml
-  - template: azure-templates/python3-latest.yml
+  - template: azure-templates/python.yml
   - script: |
       pip install pycparser==2.20
       pip install py==1.8.0
@@ -95,7 +99,9 @@ jobs:
   displayName: 'Check Python2.7 compatibility'
   steps:
   - template: azure-templates/cache.yml
-  - template: azure-templates/python2-latest.yml
+  - template: azure-templates/python.yml
+    parameters:
+      pythonVersion: "2.7"
   - script: |
       pip install pytest pathlib
       python test/check_py27_compat.py
@@ -105,11 +111,9 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   displayName: "Run CPPCheck"
-  variables:
-    CPPCHECK_BUILD_DIR: $(Pipeline.Workspace)/.cppcheck
   steps:
   - template: azure-templates/cache.yml
-  - template: azure-templates/python3-latest.yml
+  - template: azure-templates/python.yml
   - script: sudo snap install cppcheck --channel=latest/stable
     displayName: Install CPPCheck
   - script: make cppcheck
@@ -121,7 +125,7 @@ jobs:
   displayName: "Run infer"
   steps:
   - template: azure-templates/cache.yml
-  - template: azure-templates/python3-latest.yml
+  - template: azure-templates/python.yml
   - script: |
       pip install compiledb wheel;
       VERSION=0.17.0; \
@@ -138,7 +142,7 @@ jobs:
   displayName: 'Run valgrind'
   steps:
   - template: azure-templates/cache.yml
-  - template: azure-templates/python3-latest.yml
+  - template: azure-templates/python.yml
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'
   - script: python -m pip install --upgrade pip
