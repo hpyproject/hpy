@@ -19,6 +19,8 @@ jobs:
         imageName: 'macos-latest'
   steps:
   - template: azure-templates/ccache.yml
+    parameters:
+      pythonVersion: $(python.version)
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)
@@ -51,6 +53,8 @@ jobs:
         imageName: 'macos-latest'
   steps:
   - template: azure-templates/ccache.yml
+    parameters:
+      pythonVersion: $(python.version)
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)

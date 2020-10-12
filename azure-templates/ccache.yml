@@ -6,6 +6,10 @@
 # - Cache cache folder
 
 parameters:
+  - name: pythonVersion
+    default: "3.8"
+    type: string
+
   - name: CCACHE_DIR
     default: $(Pipeline.Workspace)/ccache
     type: string
@@ -28,6 +32,6 @@ steps:
 
   - task: Cache@2
     inputs:
-      key: 'ccache | "$(Agent.OS)" | "$(python.version)"'
+      key: 'ccache | "$(Agent.OS)" | ${{ parameters.pythonVersion }}'
       path: ${{ parameters.CCACHE_DIR }}
     displayName: Cache C compilation with ccache
