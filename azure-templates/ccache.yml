@@ -19,7 +19,7 @@ steps:
 
   - script: |
       sudo brew install ccache
-      echo "##vso[task.prependpath]/opt/ccache/libexec"
+      echo "##vso[task.prependpath]$(brew --prefix)/opt/ccache/libexec"
     displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
     condition: eq( variables['Agent.OS'], 'Darwin' )
 
