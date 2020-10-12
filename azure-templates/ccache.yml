@@ -18,7 +18,7 @@ steps:
     condition: eq( variables['Agent.OS'], 'Linux' )
 
   - script: |
-      sudo brew install ccache
+      brew install ccache
       echo "##vso[task.prependpath]$(brew --prefix)/opt/ccache/libexec"
     displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
     condition: eq( variables['Agent.OS'], 'Darwin' )
