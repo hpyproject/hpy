@@ -16,8 +16,8 @@ parameters:
     default: $(Pipeline.Workspace)/.cppcheck
     type: string
 
+  - name: PIP_CACHE_DIR
     default: $(Pipeline.Workspace)/.pip
-    - name: PIP_CACHE_DIR
     type: string
 
 steps:
