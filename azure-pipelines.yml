@@ -136,6 +136,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Run valgrind'
   steps:
+  - template: azure-templates/ccache.yml
   - template: azure-templates/python.yml
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'
