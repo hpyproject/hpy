@@ -11,6 +11,9 @@ parameters:
     type: string
 
 steps:
+  - script: echo "##vso[task.setvariable variable=CCACHE_DIR]${{ parameters.CCACHE_DIR }}"
+    displayName: Set CCACHE_DIR to ${{ parameters.CCACHE_DIR }}
+
   - script: |
       sudo apt update && sudo apt install -y ccache
       echo "##vso[task.prependpath]/usr/lib/ccache"
@@ -20,7 +23,6 @@ steps:
   - script: |
       brew install ccache
       echo "##vso[task.prependpath]/usr/local/opt/ccache/libexec"
-      ls /usr/local/opt/ccache/libexec
     displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
     condition: eq( variables['Agent.OS'], 'Darwin' )
 

@@ -112,12 +112,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   displayName: "Run CPPCheck"
-  variables:
-    CPPCHECK_BUILD_DIR: $(Pipeline.Workspace)/.cppcheck
   steps:
   - template: azure-templates/cppcheck.yml
-    parameters:
-      CPPCHECK_BUILD_DIR: $(CPPCHECK_BUILD_DIR)
   - template: azure-templates/python.yml
   - script: make cppcheck
     displayName: Run CPPCheck
