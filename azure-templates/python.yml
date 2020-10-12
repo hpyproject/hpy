@@ -21,6 +21,9 @@ steps:
       versionSpec: ${{ parameters.pythonVersion }}
     displayName: Use python ${{ parameters.pythonVersion }}
 
+  - script: echo "##vso[task.setvariable variable=PIP_CACHE_DIR]${{ parameters.PIP_CACHE_DIR }}"
+    displayName: Set PIP_CACHE_DIR to ${{ parameters.PIP_CACHE_DIR }}
+
   - task: Cache@2
     inputs:
       key: 'python | "$(Agent.OS)"'
