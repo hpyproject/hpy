@@ -15,13 +15,13 @@ steps:
       sudo apt update && sudo apt install -y ccache
       echo "##vso[task.prependpath]/usr/lib/ccache"
     displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
-    condition: eq(variables["Agent.OS"], "Linux")
+    condition: eq( variables['Agent.OS'], 'Linux' )
 
   - script: |
       sudo brew install ccache
       echo "##vso[task.prependpath]/opt/ccache/libexec"
     displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
-    condition: eq(variables["Agent.OS"], "Darwin")
+    condition: eq( variables['Agent.OS'], 'Darwin' )
 
   - task: Cache@2
     inputs:
