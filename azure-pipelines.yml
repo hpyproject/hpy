@@ -1,34 +1,33 @@
-# by default, pipelines are enabled for all branches
-# trigger:
-# - master
-
 jobs:
 - job: LibraryTests
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: '$(imageName)'
   displayName: 'Main tests'
   strategy:
     matrix:
       py36:
         python.version: '3.6'
+        imageName: 'ubuntu-latest'
       py37:
         python.version: '3.7'
+        imageName: 'ubuntu-latest'
       py38:
         python.version: '3.8'
+        imageName: 'ubuntu-latest'
+      py38-macos:
+        python.version: '3.8'
+        imageName: 'macos-latest'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
-
-  - script: |
-      python -m pip install --upgrade pip wheel
+  - template: azure-templates/ccache.yml
+    parameters:
+      pythonVersion: $(python.version)
+  - template: azure-templates/python.yml
+    parameters:
+      pythonVersion: $(python.version)
+  - script: python -m pip install --upgrade pip wheel
     displayName: 'Install dependencies'
-
-  - script: |
-      python -m pip install .
+  - script: python -m pip install .
     displayName: 'Build project'
-
   - script: |
       pip install pytest pytest-azurepipelines pytest-xdist
       pytest -n auto test/
@@ -36,36 +35,36 @@ jobs:
 
 - job: ExampleTests
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: '$(imageName)'
   displayName: 'Test usage examples'
   strategy:
     matrix:
       py36:
         python.version: '3.6'
+        imageName: 'ubuntu-latest'
       py37:
         python.version: '3.7'
+        imageName: 'ubuntu-latest'
       py38:
         python.version: '3.8'
+        imageName: 'ubuntu-latest'
+      py38-macos:
+        python.version: '3.8'
+        imageName: 'macos-latest'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
-
-  - script: |
-      proof-of-concept/build_wheel_nodeps.sh
+  - template: azure-templates/ccache.yml
+    parameters:
+      pythonVersion: $(python.version)
+  - template: azure-templates/python.yml
+    parameters:
+      pythonVersion: $(python.version)
+  - script: proof-of-concept/build_wheel_nodeps.sh
     displayName: 'Build pof wheel'
-
-  - script: |
-      python -m pip install proof-of-concept/dist/*.whl
+  - script: python -m pip install proof-of-concept/dist/*.whl
     displayName: 'Install pof'
-
-  - script: |
-      python -m pip install pytest pytest-azurepipelines
+  - script: python -m pip install pytest pytest-azurepipelines
     displayName: 'Install test dependencies'
-
-  - script: |
-      python -m pytest proof-of-concept/
+  - script: python -m pytest proof-of-concept/
     displayName: 'Run pof tests'
 
 - job: CheckAutogen
@@ -73,18 +72,13 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Check autogen'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
-
+  - template: azure-templates/python.yml
   - script: |
       pip install pycparser==2.20
       pip install py==1.8.0
       pip install packaging==19.2
       pip install attrs==19.3.0
     displayName: 'Install dependencies'
-
   - script: |
       make autogen
       if [ -z "$(git status --porcelain)" ]; then
@@ -107,11 +101,9 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Check Python2.7 compatibility'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '2.7'
-    displayName: 'Use Python 2.7'
-
+  - template: azure-templates/python.yml
+    parameters:
+      pythonVersion: "2.7"
   - script: |
       pip install pytest pathlib
       python test/check_py27_compat.py
@@ -121,23 +113,9 @@ jobs:
   pool:
     vmImage: 'ubuntu-latest'
   displayName: "Run CPPCheck"
-  variables:
-    CPPCHECK_BUILD_DIR: $(Pipeline.Workspace)/.cppcheck
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
-
-  - script: sudo snap install cppcheck --channel=latest/stable
-    displayName: Install CPPCheck
-
-  - task: Cache@2
-    inputs:
-      key: 'cppcheck | "$(Agent.OS)"'
-      path: $(CPPCHECK_BUILD_DIR)
-    displayName: Cache CPPCheck analysis files
-
+  - template: azure-templates/cppcheck.yml
+  - template: azure-templates/python.yml
   - script: make cppcheck
     displayName: Run CPPCheck
 
@@ -161,10 +139,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: "Run infer"
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
+  - template: azure-templates/python.yml
   - script: |
       pip install compiledb wheel;
       VERSION=0.17.0; \
@@ -178,12 +153,10 @@ jobs:
 - job: Valgrind
   pool:
     vmImage: 'ubuntu-latest'
-  displayName: 'Check memory leaks'
+  displayName: 'Run valgrind'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
+  - template: azure-templates/ccache.yml
+  - template: azure-templates/python.yml
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'
   - script: python -m pip install --upgrade pip
@@ -193,4 +166,3 @@ jobs:
   - script: |
       pip install pytest pytest-azurepipelines pytest-valgrind
       make valgrind
-    displayName: 'Run valgrind'
