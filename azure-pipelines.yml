@@ -28,9 +28,6 @@ jobs:
     displayName: 'Build project'
   - script: |
       pip install pytest pytest-azurepipelines pytest-xdist
-      which cc
-      which clang
-      which gcc
       pytest -n auto test/
     displayName: 'pytest'
 
