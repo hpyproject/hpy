@@ -32,6 +32,6 @@ steps:
 
   - task: Cache@2
     inputs:
-      key: 'ccache | "$(Agent.OS)" | ${{ parameters.pythonVersion }}'
+      key: 'ccache | "$(Agent.OS)" | "${{ parameters.pythonVersion }}"'
       path: ${{ parameters.CCACHE_DIR }}
     displayName: Cache C compilation with ccache
