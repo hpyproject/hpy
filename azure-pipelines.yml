@@ -18,7 +18,7 @@ jobs:
         python.version: '3.8'
         imageName: 'macos-latest'
   steps:
-  - template: azure-templates/cache.yml
+  - template: azure-templates/ccache.yml
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)
@@ -50,7 +50,7 @@ jobs:
         python.version: '3.8'
         imageName: 'macos-latest'
   steps:
-  - template: azure-templates/cache.yml
+  - template: azure-templates/ccache.yml
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)
@@ -68,7 +68,6 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Check autogen'
   steps:
-  - template: azure-templates/cache.yml
   - template: azure-templates/python.yml
   - script: |
       pip install pycparser==2.20
@@ -98,7 +97,6 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Check Python2.7 compatibility'
   steps:
-  - template: azure-templates/cache.yml
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: "2.7"
@@ -112,10 +110,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: "Run CPPCheck"
   steps:
-  - template: azure-templates/cache.yml
+  - template: azure-templates/cppcheck.yml
   - template: azure-templates/python.yml
-  - script: sudo snap install cppcheck --channel=latest/stable
-    displayName: Install CPPCheck
   - script: make cppcheck
     displayName: Run CPPCheck
 
@@ -124,7 +120,6 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: "Run infer"
   steps:
-  - template: azure-templates/cache.yml
   - template: azure-templates/python.yml
   - script: |
       pip install compiledb wheel;
@@ -141,7 +136,6 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Run valgrind'
   steps:
-  - template: azure-templates/cache.yml
   - template: azure-templates/python.yml
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'

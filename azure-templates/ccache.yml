@@ -1,0 +1,23 @@
+# Step template for using ccache
+# ------------------------------
+#
+# Steps:
+# - Install ccache
+# - Cache cache folder
+
+parameters:
+  - name: CCACHE_DIR
+    default: $(Pipeline.Workspace)/ccache
+    type: string
+
+steps:
+  - script: |
+      sudo apt update && sudo apt install -y ccache
+      echo "##vso[task.prependpath]/usr/lib/ccache"
+    displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
+
+  - task: Cache@2
+    inputs:
+      key: 'ccache | "$(Agent.OS)" | "$(python.version)"'
+      path: ${{ parameters.CCACHE_DIR }}
+    displayName: Cache C compilation with ccache
