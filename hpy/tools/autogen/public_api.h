@@ -286,7 +286,7 @@ typedef enum {
     //HPy_sq_inplace_concat = SLOT(42, HPyFunc_X),
     //HPy_sq_inplace_repeat = SLOT(43, HPyFunc_X),
     HPy_sq_item = SLOT(44, HPyFunc_SSIZEARGFUNC),
-    //HPy_sq_length = SLOT(45, HPyFunc_X),
+    HPy_sq_length = SLOT(45, HPyFunc_LENFUNC),
     //HPy_sq_repeat = SLOT(46, HPyFunc_X),
     //HPy_tp_alloc = SLOT(47, HPyFunc_X),      NOT SUPPORTED
     //HPy_tp_base = SLOT(48, HPyFunc_X),

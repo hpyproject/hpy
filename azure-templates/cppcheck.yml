@@ -1,0 +1,24 @@
+# Step template for using cppcheck
+# --------------------------------
+#
+# Steps:
+# - Install cppcheck
+# - Cache cppcheck folder
+
+parameters:
+  - name: CPPCHECK_BUILD_DIR
+    default: $(Pipeline.Workspace)/.cppcheck
+    type: string
+
+steps:
+  - script: echo "##vso[task.setvariable variable=CPPCHECK_BUILD_DIR]${{ parameters.CPPCHECK_BUILD_DIR }}"
+    displayName: Set CPPCHECK_BUILD_DIR to ${{ parameters.CPPCHECK_BUILD_DIR }}
+
+  - script: sudo snap install cppcheck --channel=latest/stable
+    displayName: Install CPPCheck
+
+  - task: Cache@2
+    inputs:
+      key: 'cppcheck | "$(Agent.OS)"'
+      path: ${{ parameters.CPPCHECK_BUILD_DIR }}
+    displayName: Cache CPPCheck analysis files

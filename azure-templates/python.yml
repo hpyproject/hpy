@@ -1,0 +1,37 @@
+# Step template for using Python
+# ------------------------------
+#
+# Steps:
+# - use specified python
+# - cache pip
+# - updates pip and wheel
+
+parameters:
+  - name: pythonVersion
+    default: "3.8"
+    type: string
+
+  - name: PIP_CACHE_DIR
+    default: $(Pipeline.Workspace)/.pip
+    type: string
+
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: ${{ parameters.pythonVersion }}
+    displayName: Use python ${{ parameters.pythonVersion }}
+
+  - script: echo "##vso[task.setvariable variable=PIP_CACHE_DIR]${{ parameters.PIP_CACHE_DIR }}"
+    displayName: Set PIP_CACHE_DIR to ${{ parameters.PIP_CACHE_DIR }}
+
+  - task: Cache@2
+    inputs:
+      key: 'python | "$(Agent.OS)"'
+      restoreKeys: |
+        python | "$(Agent.OS)"
+        python
+      path: ${{ parameters.PIP_CACHE_DIR }}
+    displayName: Cache pip packages
+
+  - script: python -m pip install --upgrade pip wheel
+    displayName: Update pip and wheel
