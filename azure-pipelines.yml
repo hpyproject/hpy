@@ -1,7 +1,3 @@
-# by default, pipelines are enabled for all branches
-# trigger:
-# - master
-
 jobs:
 - job: LibraryTests
   pool:
@@ -21,43 +17,16 @@ jobs:
       py38-macos:
         python.version: '3.8'
         imageName: 'macos-latest'
-  variables:
-    PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
   steps:
+  - template: azure-templates/cache.yml
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
     displayName: 'Use Python $(python.version)'
-
-  - script: |
-      sudo apt update && sudo apt install -y ccache
-      echo "##vso[task.prependpath]/usr/lib/ccache"
-    displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
-
-  - task: Cache@2
-    inputs:
-      key: 'ccache | "$(Agent.OS)" | "$(python.version)"'
-      path: $(CCACHE_DIR)
-    displayName: Cache C compilation with ccache
-
-  - task: Cache@2
-    inputs:
-      key: 'python | "$(Agent.OS)"'
-      restoreKeys: |
-        python | "$(Agent.OS)"
-        python
-      path: $(PIP_CACHE_DIR)
-    displayName: Cache pip packages
-
-  - script: |
-      python -m pip install --upgrade pip wheel
+  - script: python -m pip install --upgrade pip wheel
     displayName: 'Install dependencies'
-
-  - script: |
-      python -m pip install .
+  - script: python -m pip install .
     displayName: 'Build project'
-
   - script: |
       pip install pytest pytest-azurepipelines pytest-xdist
       pytest -n auto test/
@@ -75,49 +44,19 @@ jobs:
         python.version: '3.7'
       py38:
         python.version: '3.8'
-  variables:
-    PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
-    CCACHE_DIR: $(Pipeline.Workspace)/ccache
   steps:
+  - template: azure-templates/cache.yml
   - task: UsePythonVersion@0
     inputs:
       versionSpec: '$(python.version)'
     displayName: 'Use Python $(python.version)'
-
-  - script: |
-      sudo apt update && sudo apt install -y ccache
-      echo "##vso[task.prependpath]/usr/lib/ccache"
-    displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
-
-  - task: Cache@2
-    inputs:
-      key: 'ccache | "$(Agent.OS)" | "$(python.version)"'
-      path: $(CCACHE_DIR)
-    displayName: Cache C compilation with ccache
-
-  - task: Cache@2
-    inputs:
-      key: 'python | "$(Agent.OS)"'
-      restoreKeys: |
-        python | "$(Agent.OS)"
-        python
-      path: $(PIP_CACHE_DIR)
-    displayName: Cache pip packages
-
-  - script: |
-      proof-of-concept/build_wheel_nodeps.sh
+  - script: proof-of-concept/build_wheel_nodeps.sh
     displayName: 'Build pof wheel'
-
-  - script: |
-      python -m pip install proof-of-concept/dist/*.whl
+  - script: python -m pip install proof-of-concept/dist/*.whl
     displayName: 'Install pof'
-
-  - script: |
-      python -m pip install pytest pytest-azurepipelines
+  - script: python -m pip install pytest pytest-azurepipelines
     displayName: 'Install test dependencies'
-
-  - script: |
-      python -m pytest proof-of-concept/
+  - script: python -m pytest proof-of-concept/
     displayName: 'Run pof tests'
 
 - job: CheckAutogen
@@ -125,18 +64,14 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Check autogen'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
-
+  - template: azure-templates/cache.yml
+  - template: azure-templates/python3-latest.yml
   - script: |
       pip install pycparser==2.20
       pip install py==1.8.0
       pip install packaging==19.2
       pip install attrs==19.3.0
     displayName: 'Install dependencies'
-
   - script: |
       make autogen
       if [ -z "$(git status --porcelain)" ]; then
@@ -159,11 +94,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Check Python2.7 compatibility'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '2.7'
-    displayName: 'Use Python 2.7'
-
+  - template: azure-templates/cache.yml
+  - template: azure-templates/python2-latest.yml
   - script: |
       pip install pytest pathlib
       python test/check_py27_compat.py
@@ -176,20 +108,10 @@ jobs:
   variables:
     CPPCHECK_BUILD_DIR: $(Pipeline.Workspace)/.cppcheck
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
-
+  - template: azure-templates/cache.yml
+  - template: azure-templates/python3-latest.yml
   - script: sudo snap install cppcheck --channel=latest/stable
     displayName: Install CPPCheck
-
-  - task: Cache@2
-    inputs:
-      key: 'cppcheck | "$(Agent.OS)"'
-      path: $(CPPCHECK_BUILD_DIR)
-    displayName: Cache CPPCheck analysis files
-
   - script: make cppcheck
     displayName: Run CPPCheck
 
@@ -198,10 +120,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: "Run infer"
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
+  - template: azure-templates/cache.yml
+  - template: azure-templates/python3-latest.yml
   - script: |
       pip install compiledb wheel;
       VERSION=0.17.0; \
@@ -217,10 +137,8 @@ jobs:
     vmImage: 'ubuntu-latest'
   displayName: 'Run valgrind'
   steps:
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.8'
-    displayName: 'Use Python 3.8'
+  - template: azure-templates/cache.yml
+  - template: azure-templates/python3-latest.yml
   - script: sudo apt update && sudo apt install -y valgrind
     displayName: 'Install valgrind'
   - script: python -m pip install --upgrade pip

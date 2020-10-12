@@ -1,0 +1,39 @@
+# Caching template for build jobs
+# -------------------------------
+#
+# Current caching:
+#
+# - ccache
+# - cppcheck
+# - pip
+
+variables:
+  PIP_CACHE_DIR: $(Pipeline.Workspace)/.pip
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+
+steps:
+- script: |
+    sudo apt update && sudo apt install -y ccache
+    echo "##vso[task.prependpath]/usr/lib/ccache"
+  displayName: Install ccache and update PATH to use linked versions of gcc, cc, etc
+
+- task: Cache@2
+  inputs:
+    key: 'ccache | "$(Agent.OS)" | "$(python.version)"'
+    path: $(CCACHE_DIR)
+  displayName: Cache C compilation with ccache
+
+- task: Cache@2
+  inputs:
+    key: 'cppcheck | "$(Agent.OS)"'
+    path: $(CPPCHECK_BUILD_DIR)
+  displayName: Cache CPPCheck analysis files
+
+- task: Cache@2
+  inputs:
+    key: 'python | "$(Agent.OS)"'
+    restoreKeys: |
+      python | "$(Agent.OS)"
+      python
+    path: $(PIP_CACHE_DIR)
+  displayName: Cache pip packages
