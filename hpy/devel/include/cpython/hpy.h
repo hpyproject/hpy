@@ -133,6 +133,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 
 #include "../common/macros.h"
 #include "../common/runtime/argparse.h"
+#include "../common/runtime/hlist.h"
 
 #include "../common/hpyfunc.h"
 #include "../common/hpydef.h"
