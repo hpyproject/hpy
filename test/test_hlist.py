@@ -18,7 +18,7 @@ class TestHList(HPyTest):
             {{
                 HList hl;
                 hl = HList_New(ctx, 3);
-                if (HList_IsNull(hl)) {{
+                if (hl == NULL) {{
                     return HPy_NULL;
                 }}
                 {ops}
@@ -69,7 +69,7 @@ class TestHList(HPyTest):
                     return HPy_NULL;
 
                 hl = HList_New(ctx, 2 * n);  // track n key-value pairs
-                if (HList_IsNull(hl))
+                if (hl == NULL)
                     return HPy_NULL;
 
                 HPy dict = HPyDict_New(ctx);

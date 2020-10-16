@@ -3,13 +3,7 @@
 
 #include "hpy.h"
 
-typedef struct {
-    HPy_ssize_t size;
-    HPy_ssize_t next;
-    HPy *handles;
-} HList;
-
-#define HList_IsNull(x) ((x).handles == NULL)
+typedef struct _HList_s * HList;
 
 HPyAPI_RUNTIME_FUNC(HList)
 HList_New(HPyContext ctx, HPy_ssize_t size);

@@ -9,7 +9,7 @@
  * HList hl;
  *
  * hl = HList_New(ctx, 5 * 2);  // track 5 key-value pairs
- * if (HList_IsNull(hl))
+ * if (hl == NULL)
  *     return HPy_NULL;
  *
  * HPy dict = HPyDict_New(ctx);
@@ -41,27 +41,40 @@
 #include <Python.h>
 #include "hpy.h"
 
+struct _HList_s {
+    HPy_ssize_t size;
+    HPy_ssize_t next;
+    HPy *handles;
+};
+
+
 HPyAPI_RUNTIME_FUNC(HList)
 HList_New(HPyContext ctx, HPy_ssize_t size)
 {
-    HList hl = (HList) {0, 0, NULL};
-    hl.handles = PyMem_Calloc(size, sizeof(HPy *));
-    if (hl.handles == NULL) {
+    HList hl;
+    hl = PyMem_Malloc(sizeof(struct _HList_s));
+    if (hl == NULL) {
         PyErr_NoMemory();
-        return hl;
+        return NULL;
     }
-    hl.size = size;
-    hl.next = 0;
+    hl->handles = PyMem_Calloc(size, sizeof(HPy *));
+    if (hl->handles == NULL) {
+        PyMem_Free(hl);
+        PyErr_NoMemory();
+        return NULL;
+    }
+    hl->size = size;
+    hl->next = 0;
     return hl;
 }
 
 HPyAPI_RUNTIME_FUNC(int)
 HList_Track(HPyContext ctx, HList hl, HPy h)
 {
-    if (hl.next == hl.size) {
+    if (hl->next == hl->size) {
         return -1;
     }
-    hl.handles[hl.next++] = h;
+    hl->handles[hl->next++] = h;
     return 0;
 }
 
@@ -69,8 +82,8 @@ HPyAPI_RUNTIME_FUNC(int)
 HList_CloseAll(HPyContext ctx, HList hl)
 {
     HPy_ssize_t i;
-    for (i=0; i<hl.next; i++) {
-        HPy_Close(ctx, hl.handles[i]);
+    for (i=0; i<hl->next; i++) {
+        HPy_Close(ctx, hl->handles[i]);
     }
     return 0;
 }
@@ -78,6 +91,7 @@ HList_CloseAll(HPyContext ctx, HList hl)
 HPyAPI_RUNTIME_FUNC(int)
 HList_Free(HPyContext ctx, HList hl)
 {
-    PyMem_Free(hl.handles);
+    PyMem_Free(hl->handles);
+    PyMem_Free(hl);
     return 0;
 }
