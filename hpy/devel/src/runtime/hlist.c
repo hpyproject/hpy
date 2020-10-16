@@ -2,6 +2,15 @@
  * A manager for a list of HPy handles, allowing handles to be tracked
  * and closed as a group.
  *
+ * Note::
+ *    HList always keeps space for one extra handle free so that
+ *    HList_Track can always store the handle being passed to it,
+ *    even if it fails to automatically create space for future
+ *    handles. This allows HList_Free to close all handles passed to
+ *    HList_Track.
+ *
+ *    As a consequence, the minimum size for an HList is one handle.
+ *
  * Example usage (inside an HPyDef_METH function)::
  *
  * long i;
@@ -20,12 +29,14 @@
  *     key = HPyLong_FromLong(ctx, i);
  *     if (HPy_IsNull(key))
  *         goto error;
- *     HList_Track(ctx, hl, key);
+ *     if (HList_Track(ctx, hl, key) < 0)
+ *         goto error;
  *     value = HPyLong_FromLong(ctx, i * i);
  *     if (HPy_IsNull(value)) {
  *         goto error;
  *     }
- *     HList_Track(ctx, hl, value);
+ *     if (HList_Track(ctx, hl, value) < 0)
+ *         goto error;
  *     result = HPy_SetItem(ctx, dict, key, value);
  *     if (result < 0)
  *         goto error;
@@ -45,7 +56,7 @@
 #include <Python.h>
 #include "hpy.h"
 
-#define _HLIST_INITIAL_SIZE 6
+#define _HLIST_INITIAL_SIZE (5 + 1)
 
 struct _HList_s {
     HPy_ssize_t size;
@@ -78,8 +89,9 @@ HPyAPI_RUNTIME_FUNC(int)
 HList_Resize(HPyContext ctx, HList hl, HPy_ssize_t size)
 {
     HPy *new_handles;
-    if (size < hl->next) {
-        // resizing would lose handles
+    if (size <= hl->next) {
+        // refuse a resize that would either 1) lose handles or  2) not leave
+        // space for one new handle
         return -2;
     }
     new_handles = PyMem_Realloc(hl->handles, size * sizeof(HPy));
@@ -95,11 +107,11 @@ HList_Resize(HPyContext ctx, HList hl, HPy_ssize_t size)
 HPyAPI_RUNTIME_FUNC(int)
 HList_Track(HPyContext ctx, HList hl, HPy h)
 {
-    if (hl->next >= hl->size) {
-        if (HList_Resize(ctx, hl, hl->size == 0 ? 1 : hl->size * 2) < 0)
+    hl->handles[hl->next++] = h;
+    if (hl->size <= hl->next) {
+        if (HList_Resize(ctx, hl, hl->size * 2) < 0)
             return -1;
     }
-    hl->handles[hl->next++] = h;
     return 0;
 }
 

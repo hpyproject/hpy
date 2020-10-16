@@ -63,37 +63,56 @@ class TestHList(HPyTest):
         """)
         assert mod.f() == 0
 
-    def test_resize_to_zero(self):
+    def test_resize_to_zero_fails(self):
         mod = self.hlist_module(ops="""
             int i;
-            i = HList_Resize(ctx, hl, 10);
+            i = HList_Resize(ctx, hl, 0);
+            result = HPyLong_FromLong(ctx, i);
+        """)
+        assert mod.f() == -2
+
+    def test_resize_to_one_succeeds(self):
+        mod = self.hlist_module(ops="""
+            int i;
+            i = HList_Resize(ctx, hl, 1);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f() == 0
 
-    def test_resize_to_last_handle_succeeds(self):
+    def test_resize_to_last_handle_plus_one_succeeds(self):
         mod = self.hlist_module(ops="""
             int i;
             HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
-            i = HList_Resize(ctx, hl, 1);
+            i = HList_Resize(ctx, hl, 2);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f(5) == 0
 
-    def test_resize_to_below_last_handle_fails(self):
+    def test_resize_to_below_last_handle_plus_one_fails(self):
         mod = self.hlist_module(ops="""
             int i;
-            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
             HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
             i = HList_Resize(ctx, hl, 1);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f(5) == -2
 
-    def test_resize_to_zero_and_track(self):
+    def test_resize_to_one_and_track(self):
         mod = self.hlist_module(ops="""
             int i;
+            HList_Resize(ctx, hl, 1);
+            i = HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            result = HPyLong_FromLong(ctx, i);
+        """)
+        assert mod.f(5) == 0
+
+    def test_crazy_resizes_and_track(self):
+        mod = self.hlist_module(ops="""
+            int i;
+            HList_Resize(ctx, hl, -5);
             HList_Resize(ctx, hl, 0);
+            HList_Resize(ctx, hl, 100);
+            HList_Resize(ctx, hl, 1);
             i = HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
             result = HPyLong_FromLong(ctx, i);
         """)
