@@ -17,13 +17,16 @@ class TestHList(HPyTest):
                               HPy *args, HPy_ssize_t nargs)
             {{
                 HList hl;
-                hl = HList_New(ctx, 3);
+                HPy result = HPy_NULL;
+                hl = HList_New(ctx);
                 if (hl == NULL) {{
                     return HPy_NULL;
                 }}
                 {ops}
                 HList_Free(ctx, hl);
-                return HPy_Dup(ctx, ctx->h_None);
+                if (HPy_IsNull(result))
+                    result = HPy_Dup(ctx, ctx->h_None);
+                return result;
             }}
             @EXPORT(f)
             @INIT
@@ -31,26 +34,70 @@ class TestHList(HPyTest):
 
     def test_new_and_free(self):
         mod = self.hlist_module(ops="")
+        mod.f()
+
+    def test_track_and_free(self):
+        mod = self.hlist_module(ops="""
+            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+        """)
         mod.f(5)
 
-    def test_track_without_closing(self):
+    def test_track_and_untrack_all(self):
         mod = self.hlist_module(ops="""
             HList_Track(ctx, hl, args[0]);
+            HList_UntrackAll(ctx, hl);
         """)
-        mod.f(5)
+        assert mod.f(5) is None
 
-    def test_track_and_closeall(self):
+    def test_untrack_all_on_nothing(self):
         mod = self.hlist_module(ops="""
-            HList_Track(ctx, hl, args[0]);
-            HList_CloseAll(ctx, hl);
+            HList_UntrackAll(ctx, hl);
         """)
-        mod.f(5)
+        assert mod.f() is None
 
-    def test_closeall_on_nothing(self):
+    def test_resize(self):
         mod = self.hlist_module(ops="""
-            HList_CloseAll(ctx, hl);
+            int i;
+            i = HList_Resize(ctx, hl, 10);
+            result = HPyLong_FromLong(ctx, i);
         """)
-        mod.f(5)
+        assert mod.f() == 0
+
+    def test_resize_to_zero(self):
+        mod = self.hlist_module(ops="""
+            int i;
+            i = HList_Resize(ctx, hl, 10);
+            result = HPyLong_FromLong(ctx, i);
+        """)
+        assert mod.f() == 0
+
+    def test_resize_to_last_handle_succeeds(self):
+        mod = self.hlist_module(ops="""
+            int i;
+            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            i = HList_Resize(ctx, hl, 1);
+            result = HPyLong_FromLong(ctx, i);
+        """)
+        assert mod.f(5) == 0
+
+    def test_resize_to_below_last_handle_fails(self):
+        mod = self.hlist_module(ops="""
+            int i;
+            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            i = HList_Resize(ctx, hl, 1);
+            result = HPyLong_FromLong(ctx, i);
+        """)
+        assert mod.f(5) == -2
+
+    def test_resize_to_zero_and_track(self):
+        mod = self.hlist_module(ops="""
+            int i;
+            HList_Resize(ctx, hl, 0);
+            i = HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            result = HPyLong_FromLong(ctx, i);
+        """)
+        assert mod.f(5) == 0
 
     def test_squares_example(self):
         import pytest
@@ -68,7 +115,7 @@ class TestHList(HPyTest):
                 if (!HPyArg_Parse(ctx, args, nargs, "l|l", &n, &n_err))
                     return HPy_NULL;
 
-                hl = HList_New(ctx, 2 * n);  // track n key-value pairs
+                hl = HList_New(ctx);  // track key-value pairs
                 if (hl == NULL)
                     return HPy_NULL;
 
@@ -82,22 +129,22 @@ class TestHList(HPyTest):
                     key = HPyLong_FromLong(ctx, i);
                     if (HPy_IsNull(key))
                         goto error;
-                    HList_Track(ctx, hl, key);
+                    if (HList_Track(ctx, hl, key) < 0)
+                        goto error;
                     value = HPyLong_FromLong(ctx, i * i);
                     if (HPy_IsNull(value))
                         goto error;
-                    HList_Track(ctx, hl, value);
+                    if (HList_Track(ctx, hl, value) < 0)
+                        goto error;
                     result = HPy_SetItem(ctx, dict, key, value);
                     if (result < 0)
                         goto error;
                 }
 
-                HList_CloseAll(ctx, hl);
                 HList_Free(ctx, hl);
                 return dict;
 
                 error:
-                    HList_CloseAll(ctx, hl);
                     HList_Free(ctx, hl);
                     HPy_Close(ctx, dict);
                     HPyErr_SetString(ctx, ctx->h_ValueError, "Failed!");
