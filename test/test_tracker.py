@@ -41,6 +41,14 @@ class TestHPyTracker(HPyTest):
             ops="", new="HPyTracker_NewWithSize(ctx, 10)")
         mod.f()
 
+    def test_new_with_size_zero_and_add(self):
+        mod = self.hpytracker_module(ops="""
+            int i;
+            i = HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
+            result = HPyLong_FromLong(ctx, i);
+        """, new="HPyTracker_NewWithSize(ctx, 0)")
+        assert mod.f(5) == 0
+
     def test_add_and_free(self):
         mod = self.hpytracker_module(ops="""
             HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
@@ -59,61 +67,6 @@ class TestHPyTracker(HPyTest):
             HPyTracker_RemoveAll(ctx, hl);
         """)
         assert mod.f() is None
-
-    def test_resize(self):
-        mod = self.hpytracker_module(ops="""
-            int i;
-            i = HPyTracker_Resize(ctx, hl, 10);
-            result = HPyLong_FromLong(ctx, i);
-        """)
-        assert mod.f() == 0
-
-    def test_resize_to_zero_succeeds(self):
-        mod = self.hpytracker_module(ops="""
-            int i;
-            i = HPyTracker_Resize(ctx, hl, 0);
-            result = HPyLong_FromLong(ctx, i);
-        """)
-        assert mod.f() == 0
-
-    def test_resize_to_last_handle_plus_one_succeeds(self):
-        mod = self.hpytracker_module(ops="""
-            int i;
-            HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
-            i = HPyTracker_Resize(ctx, hl, 1);
-            result = HPyLong_FromLong(ctx, i);
-        """)
-        assert mod.f(5) == 0
-
-    def test_resize_to_below_last_handle_fails(self):
-        mod = self.hpytracker_module(ops="""
-            int i;
-            HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
-            i = HPyTracker_Resize(ctx, hl, 0);
-            result = HPyLong_FromLong(ctx, i);
-        """)
-        assert mod.f(5) == -2
-
-    def test_resize_to_zero_and_add(self):
-        mod = self.hpytracker_module(ops="""
-            int i;
-            HPyTracker_Resize(ctx, hl, 0);
-            i = HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
-            result = HPyLong_FromLong(ctx, i);
-        """)
-        assert mod.f(5) == 0
-
-    def test_crazy_resizes_and_add(self):
-        mod = self.hpytracker_module(ops="""
-            int i;
-            HPyTracker_Resize(ctx, hl, -5);
-            HPyTracker_Resize(ctx, hl, 0);
-            HPyTracker_Resize(ctx, hl, 100);
-            HPyTracker_Resize(ctx, hl, 1);
-            i = HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
-            result = HPyLong_FromLong(ctx, i);
-        """)
-        assert mod.f(5) == 0
 
     def test_squares_example(self):
         import pytest

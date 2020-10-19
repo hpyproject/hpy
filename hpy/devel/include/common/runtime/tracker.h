@@ -12,9 +12,6 @@ HPyAPI_RUNTIME_FUNC(HPyTracker)
 HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size);
 
 HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size);
-
-HPyAPI_RUNTIME_FUNC(int)
 HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h);
 
 HPyAPI_RUNTIME_FUNC(int)

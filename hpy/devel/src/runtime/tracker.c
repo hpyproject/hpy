@@ -10,11 +10,11 @@
  *    HPyTracker_Add.
  *
  *    Space for this extra handle is created automatically, so
- *    HPyTracker_Resize(ctx, 0) will actually allocated space for one handle.
+ *    HPyTracker_NewWithSize(ctx, 0) will actually allocated space for one
+ *    handle.
  *
- *    Calling HPyTracker_Resize(ctx, n) or HPyTracker_NewWithSize(ctx, n) will
- *    ensure that at least n handles can be tracked without the need for a
- *    resize.
+ *    Calling HPyTracker_NewWithSize(ctx, n) will ensure that at least n handles
+ *    can be tracked without the need for a resize.
  *
  * Example usage (inside an HPyDef_METH function)::
  *
@@ -98,8 +98,8 @@ HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
     return hl;
 }
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size)
+static int
+_HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size)
 {
     HPy *new_handles;
     size++;
@@ -124,7 +124,7 @@ HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
 {
     hl->handles[hl->next++] = h;
     if (hl->size <= hl->next) {
-        if (HPyTracker_Resize(ctx, hl, hl->size * 2 - 1) < 0)
+        if (_HPyTracker_Resize(ctx, hl, hl->size * 2 - 1) < 0)
             return -1;
     }
     return 0;
