@@ -70,14 +70,14 @@ struct _HPyTracker_s {
 };
 
 
-HPyAPI_RUNTIME_FUNC(HPyTracker)
-HPyTracker_New(HPyContext ctx)
+_HPy_HIDDEN HPyTracker
+ctx_HPyTracker_New(HPyContext ctx)
 {
-    return HPyTracker_NewWithSize(ctx, HPYTRACKER_INITIAL_SIZE);
+    return ctx_HPyTracker_NewWithSize(ctx, HPYTRACKER_INITIAL_SIZE);
 }
 
-HPyAPI_RUNTIME_FUNC(HPyTracker)
-HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
+_HPy_HIDDEN HPyTracker
+ctx_HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
 {
     HPyTracker hl;
     size++;
@@ -119,8 +119,8 @@ _HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size)
     return 0;
 }
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
+_HPy_HIDDEN int
+ctx_HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
 {
     hl->handles[hl->next++] = h;
     if (hl->size <= hl->next) {
@@ -130,15 +130,15 @@ HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
     return 0;
 }
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl)
+_HPy_HIDDEN int
+ctx_HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl)
 {
     hl->next = 0;
     return 0;
 }
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_Free(HPyContext ctx, HPyTracker hl)
+_HPy_HIDDEN int
+ctx_HPyTracker_Free(HPyContext ctx, HPyTracker hl)
 {
     HPy_ssize_t i;
     for (i=0; i<hl->next; i++) {

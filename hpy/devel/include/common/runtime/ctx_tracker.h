@@ -5,19 +5,19 @@
 
 typedef struct _HPyTracker_s * HPyTracker;
 
-HPyAPI_RUNTIME_FUNC(HPyTracker)
-HPyTracker_New(HPyContext ctx);
+_HPy_HIDDEN HPyTracker
+ctx_HPyTracker_New(HPyContext ctx);
 
-HPyAPI_RUNTIME_FUNC(HPyTracker)
-HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size);
+_HPy_HIDDEN HPyTracker
+ctx_HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size);
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h);
+_HPy_HIDDEN int
+ctx_HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h);
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl);
+_HPy_HIDDEN int
+ctx_HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl);
 
-HPyAPI_RUNTIME_FUNC(int)
-HPyTracker_Free(HPyContext ctx, HPyTracker hl);
+_HPy_HIDDEN int
+ctx_HPyTracker_Free(HPyContext ctx, HPyTracker hl);
 
 #endif /* HPY_COMMON_RUNTIME_CTX_TRACKER_H */
