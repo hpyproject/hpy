@@ -8,6 +8,9 @@ typedef struct _HPyTracker_s * HPyTracker;
 HPyAPI_RUNTIME_FUNC(HPyTracker)
 HPyTracker_New(HPyContext ctx);
 
+HPyAPI_RUNTIME_FUNC(HPyTracker)
+HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size);
+
 HPyAPI_RUNTIME_FUNC(int)
 HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size);
 

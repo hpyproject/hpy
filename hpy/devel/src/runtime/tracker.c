@@ -3,13 +3,18 @@
  * and closed as a group.
  *
  * Note::
- *    HPyTracker always keeps space for one extra handle free so that
+ *    Internally, HPyTracker always keeps space for one extra handle so that
  *    HPyTracker_Add can always store the handle being passed to it,
  *    even if it fails to automatically create space for future
  *    handles. This allows HPyTracker_Free to close all handles passed to
  *    HPyTracker_Add.
  *
- *    As a consequence, the minimum size for an HPyTracker is one handle.
+ *    Space for this extra handle is created automatically, so
+ *    HPyTracker_Resize(ctx, 0) will actually allocated space for one handle.
+ *
+ *    Calling HPyTracker_Resize(ctx, n) or HPyTracker_NewWithSize(ctx, n) will
+ *    ensure that at least n handles can be tracked without the need for a
+ *    resize.
  *
  * Example usage (inside an HPyDef_METH function)::
  *
@@ -56,7 +61,7 @@
 #include <Python.h>
 #include "hpy.h"
 
-static const HPy_ssize_t HPYTRACKER_INITIAL_SIZE = (5 + 1);
+static const HPy_ssize_t HPYTRACKER_INITIAL_SIZE = 5;
 
 struct _HPyTracker_s {
     HPy_ssize_t size;
@@ -68,19 +73,27 @@ struct _HPyTracker_s {
 HPyAPI_RUNTIME_FUNC(HPyTracker)
 HPyTracker_New(HPyContext ctx)
 {
+    return HPyTracker_NewWithSize(ctx, HPYTRACKER_INITIAL_SIZE);
+}
+
+HPyAPI_RUNTIME_FUNC(HPyTracker)
+HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
+{
     HPyTracker hl;
+    size++;
+
     hl = PyMem_Malloc(sizeof(struct _HPyTracker_s));
     if (hl == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    hl->handles = PyMem_Calloc(HPYTRACKER_INITIAL_SIZE, sizeof(HPy));
+    hl->handles = PyMem_Calloc(size, sizeof(HPy));
     if (hl->handles == NULL) {
         PyMem_Free(hl);
         PyErr_NoMemory();
         return NULL;
     }
-    hl->size = HPYTRACKER_INITIAL_SIZE;
+    hl->size = size;
     hl->next = 0;
     return hl;
 }
@@ -89,6 +102,8 @@ HPyAPI_RUNTIME_FUNC(int)
 HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size)
 {
     HPy *new_handles;
+    size++;
+
     if (size <= hl->next) {
         // refuse a resize that would either 1) lose handles or  2) not leave
         // space for one new handle
@@ -109,7 +124,7 @@ HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
 {
     hl->handles[hl->next++] = h;
     if (hl->size <= hl->next) {
-        if (HPyTracker_Resize(ctx, hl, hl->size * 2) < 0)
+        if (HPyTracker_Resize(ctx, hl, hl->size * 2 - 1) < 0)
             return -1;
     }
     return 0;
