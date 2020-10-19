@@ -133,7 +133,6 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 
 #include "../common/macros.h"
 #include "../common/runtime/argparse.h"
-#include "../common/runtime/tracker.h"
 
 #include "../common/hpyfunc.h"
 #include "../common/hpydef.h"
@@ -142,6 +141,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #include "../common/runtime/ctx_module.h"
 #include "../common/runtime/ctx_type.h"
 #include "../common/runtime/ctx_listbuilder.h"
+#include "../common/runtime/ctx_tracker.h"
 #include "../common/runtime/ctx_tuple.h"
 #include "../common/runtime/ctx_tuplebuilder.h"
 

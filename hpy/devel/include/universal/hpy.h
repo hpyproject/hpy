@@ -55,7 +55,6 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 // include runtime functions
 #include "common/macros.h"
 #include "common/runtime/argparse.h"
-#include "common/runtime/tracker.h"
 
 #include "common/hpyfunc.h"
 #include "common/hpydef.h"
