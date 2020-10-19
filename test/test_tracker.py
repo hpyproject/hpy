@@ -9,21 +9,21 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 from .support import HPyTest
 
 
-class TestHList(HPyTest):
-    def hlist_module(self, ops):
+class TestHPyTracker(HPyTest):
+    def hpytracker_module(self, ops):
         return self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {{
-                HList hl;
+                HPyTracker hl;
                 HPy result = HPy_NULL;
-                hl = HList_New(ctx);
+                hl = HPyTracker_New(ctx);
                 if (hl == NULL) {{
                     return HPy_NULL;
                 }}
                 {ops}
-                HList_Free(ctx, hl);
+                HPyTracker_Free(ctx, hl);
                 if (HPy_IsNull(result))
                     result = HPy_Dup(ctx, ctx->h_None);
                 return result;
@@ -33,87 +33,87 @@ class TestHList(HPyTest):
         """.format(ops=ops))
 
     def test_new_and_free(self):
-        mod = self.hlist_module(ops="")
+        mod = self.hpytracker_module(ops="")
         mod.f()
 
-    def test_track_and_free(self):
-        mod = self.hlist_module(ops="""
-            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+    def test_add_and_free(self):
+        mod = self.hpytracker_module(ops="""
+            HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
         """)
         mod.f(5)
 
-    def test_track_and_untrack_all(self):
-        mod = self.hlist_module(ops="""
-            HList_Track(ctx, hl, args[0]);
-            HList_UntrackAll(ctx, hl);
+    def test_add_and_remove_all(self):
+        mod = self.hpytracker_module(ops="""
+            HPyTracker_Add(ctx, hl, args[0]);
+            HPyTracker_RemoveAll(ctx, hl);
         """)
         assert mod.f(5) is None
 
-    def test_untrack_all_on_nothing(self):
-        mod = self.hlist_module(ops="""
-            HList_UntrackAll(ctx, hl);
+    def test_remove_all_on_nothing(self):
+        mod = self.hpytracker_module(ops="""
+            HPyTracker_RemoveAll(ctx, hl);
         """)
         assert mod.f() is None
 
     def test_resize(self):
-        mod = self.hlist_module(ops="""
+        mod = self.hpytracker_module(ops="""
             int i;
-            i = HList_Resize(ctx, hl, 10);
+            i = HPyTracker_Resize(ctx, hl, 10);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f() == 0
 
     def test_resize_to_zero_fails(self):
-        mod = self.hlist_module(ops="""
+        mod = self.hpytracker_module(ops="""
             int i;
-            i = HList_Resize(ctx, hl, 0);
+            i = HPyTracker_Resize(ctx, hl, 0);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f() == -2
 
     def test_resize_to_one_succeeds(self):
-        mod = self.hlist_module(ops="""
+        mod = self.hpytracker_module(ops="""
             int i;
-            i = HList_Resize(ctx, hl, 1);
+            i = HPyTracker_Resize(ctx, hl, 1);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f() == 0
 
     def test_resize_to_last_handle_plus_one_succeeds(self):
-        mod = self.hlist_module(ops="""
+        mod = self.hpytracker_module(ops="""
             int i;
-            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
-            i = HList_Resize(ctx, hl, 2);
+            HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
+            i = HPyTracker_Resize(ctx, hl, 2);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f(5) == 0
 
     def test_resize_to_below_last_handle_plus_one_fails(self):
-        mod = self.hlist_module(ops="""
+        mod = self.hpytracker_module(ops="""
             int i;
-            HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
-            i = HList_Resize(ctx, hl, 1);
+            HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
+            i = HPyTracker_Resize(ctx, hl, 1);
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f(5) == -2
 
-    def test_resize_to_one_and_track(self):
-        mod = self.hlist_module(ops="""
+    def test_resize_to_one_and_add(self):
+        mod = self.hpytracker_module(ops="""
             int i;
-            HList_Resize(ctx, hl, 1);
-            i = HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            HPyTracker_Resize(ctx, hl, 1);
+            i = HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f(5) == 0
 
-    def test_crazy_resizes_and_track(self):
-        mod = self.hlist_module(ops="""
+    def test_crazy_resizes_and_add(self):
+        mod = self.hpytracker_module(ops="""
             int i;
-            HList_Resize(ctx, hl, -5);
-            HList_Resize(ctx, hl, 0);
-            HList_Resize(ctx, hl, 100);
-            HList_Resize(ctx, hl, 1);
-            i = HList_Track(ctx, hl, HPy_Dup(ctx, args[0]));
+            HPyTracker_Resize(ctx, hl, -5);
+            HPyTracker_Resize(ctx, hl, 0);
+            HPyTracker_Resize(ctx, hl, 100);
+            HPyTracker_Resize(ctx, hl, 1);
+            i = HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
             result = HPyLong_FromLong(ctx, i);
         """)
         assert mod.f(5) == 0
@@ -129,12 +129,12 @@ class TestHList(HPyTest):
                 long n_err = -1; // simulate an error at the given index
                 int result;
                 HPy key, value;
-                HList hl;
+                HPyTracker hl;
 
                 if (!HPyArg_Parse(ctx, args, nargs, "l|l", &n, &n_err))
                     return HPy_NULL;
 
-                hl = HList_New(ctx);  // track key-value pairs
+                hl = HPyTracker_New(ctx);  // track key-value pairs
                 if (hl == NULL)
                     return HPy_NULL;
 
@@ -148,23 +148,23 @@ class TestHList(HPyTest):
                     key = HPyLong_FromLong(ctx, i);
                     if (HPy_IsNull(key))
                         goto error;
-                    if (HList_Track(ctx, hl, key) < 0)
+                    if (HPyTracker_Add(ctx, hl, key) < 0)
                         goto error;
                     value = HPyLong_FromLong(ctx, i * i);
                     if (HPy_IsNull(value))
                         goto error;
-                    if (HList_Track(ctx, hl, value) < 0)
+                    if (HPyTracker_Add(ctx, hl, value) < 0)
                         goto error;
                     result = HPy_SetItem(ctx, dict, key, value);
                     if (result < 0)
                         goto error;
                 }
 
-                HList_Free(ctx, hl);
+                HPyTracker_Free(ctx, hl);
                 return dict;
 
                 error:
-                    HList_Free(ctx, hl);
+                    HPyTracker_Free(ctx, hl);
                     HPy_Close(ctx, dict);
                     HPyErr_SetString(ctx, ctx->h_ValueError, "Failed!");
                     return HPy_NULL;
