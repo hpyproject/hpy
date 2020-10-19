@@ -19,7 +19,7 @@ class TestHPyTracker(HPyTest):
                 HPyTracker hl;
                 HPy result = HPy_NULL;
                 hl = {new};
-                if (hl == NULL) {{
+                if HPyTracker_IsNull(hl) {{
                     return HPy_NULL;
                 }}
                 {ops}
@@ -85,7 +85,7 @@ class TestHPyTracker(HPyTest):
                     return HPy_NULL;
 
                 hl = HPyTracker_New(ctx);  // track key-value pairs
-                if (hl == NULL)
+                if HPyTracker_IsNull(hl)
                     return HPy_NULL;
 
                 HPy dict = HPyDict_New(ctx);

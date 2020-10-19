@@ -64,88 +64,91 @@
 
 static const HPy_ssize_t HPYTRACKER_INITIAL_SIZE = 5;
 
-struct _HPyTracker_s {
+typedef struct {
     HPy_ssize_t size;
     HPy_ssize_t next;
     HPy *handles;
-};
+} _HPyTracker_s;
 
 
 _HPy_HIDDEN HPyTracker
-ctx_HPyTracker_New(HPyContext ctx)
+ctx_Tracker_New(HPyContext ctx)
 {
-    return ctx_HPyTracker_NewWithSize(ctx, HPYTRACKER_INITIAL_SIZE);
+    return HPyTracker_NewWithSize(ctx, HPYTRACKER_INITIAL_SIZE);
 }
 
 _HPy_HIDDEN HPyTracker
-ctx_HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
+ctx_Tracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
 {
-    HPyTracker hl;
+    _HPyTracker_s *hp;
     size++;
 
-    hl = PyMem_Malloc(sizeof(struct _HPyTracker_s));
-    if (hl == NULL) {
+    hp = PyMem_Malloc(sizeof(_HPyTracker_s));
+    if (hp == NULL) {
         PyErr_NoMemory();
-        return NULL;
+        return (HPyTracker){(HPy_ssize_t) 0};
     }
-    hl->handles = PyMem_Calloc(size, sizeof(HPy));
-    if (hl->handles == NULL) {
-        PyMem_Free(hl);
+    hp->handles = PyMem_Calloc(size, sizeof(HPy));
+    if (hp->handles == NULL) {
+        PyMem_Free(hp);
         PyErr_NoMemory();
-        return NULL;
+        return (HPyTracker){(HPy_ssize_t) 0};
     }
-    hl->size = size;
-    hl->next = 0;
-    return hl;
+    hp->size = size;
+    hp->next = 0;
+    return (HPyTracker){(HPy_ssize_t) hp};
 }
 
 static int
-_HPyTracker_Resize(HPyContext ctx, HPyTracker hl, HPy_ssize_t size)
+tracker_resize(HPyContext ctx, _HPyTracker_s *hp, HPy_ssize_t size)
 {
     HPy *new_handles;
     size++;
 
-    if (size <= hl->next) {
+    if (size <= hp->next) {
         // refuse a resize that would either 1) lose handles or  2) not leave
         // space for one new handle
         return -2;
     }
-    new_handles = PyMem_Realloc(hl->handles, size * sizeof(HPy));
+    new_handles = PyMem_Realloc(hp->handles, size * sizeof(HPy));
     if (new_handles == NULL) {
         PyErr_NoMemory();
         return -1;
     }
-    hl->size = size;
-    hl->handles = new_handles;
+    hp->size = size;
+    hp->handles = new_handles;
     return 0;
 }
 
 _HPy_HIDDEN int
-ctx_HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
+ctx_Tracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
 {
-    hl->handles[hl->next++] = h;
-    if (hl->size <= hl->next) {
-        if (_HPyTracker_Resize(ctx, hl, hl->size * 2 - 1) < 0)
+    _HPyTracker_s *hp = (_HPyTracker_s *)hl._tracker;
+    hp->handles[hp->next++] = h;
+    if (hp->size <= hp->next) {
+        if (tracker_resize(ctx, hp, hp->size * 2 - 1) < 0)
             return -1;
     }
     return 0;
 }
 
 _HPy_HIDDEN int
-ctx_HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl)
+ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker hl)
 {
-    hl->next = 0;
+    _HPyTracker_s *hp = (_HPyTracker_s *)hl._tracker;
+    hp->next = 0;
     return 0;
 }
 
 _HPy_HIDDEN int
-ctx_HPyTracker_Free(HPyContext ctx, HPyTracker hl)
+ctx_Tracker_Free(HPyContext ctx, HPyTracker hl)
 {
+    _HPyTracker_s *hp = (_HPyTracker_s *)hl._tracker;
     HPy_ssize_t i;
-    for (i=0; i<hl->next; i++) {
-        HPy_Close(ctx, hl->handles[i]);
+    for (i=0; i<hp->next; i++) {
+        HPy_Close(ctx, hp->handles[i]);
     }
-    PyMem_Free(hl->handles);
-    PyMem_Free(hl);
+    PyMem_Free(hp->handles);
+    PyMem_Free(hp);
     return 0;
 }
