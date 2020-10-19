@@ -1,5 +1,5 @@
-#ifndef HPY_COMMON_RUNTIME_HPYTRACKER_H
-#define HPY_COMMON_RUNTIME_HPYTRACKER_H
+#ifndef HPY_COMMON_RUNTIME_CTX_TRACKER_H
+#define HPY_COMMON_RUNTIME_CTX_TRACKER_H
 
 #include "hpy.h"
 
@@ -20,4 +20,4 @@ HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl);
 HPyAPI_RUNTIME_FUNC(int)
 HPyTracker_Free(HPyContext ctx, HPyTracker hl);
 
-#endif /* HPY_COMMON_RUNTIME_HPYTRACKER_H */
+#endif /* HPY_COMMON_RUNTIME_CTX_TRACKER_H */
