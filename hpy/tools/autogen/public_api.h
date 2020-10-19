@@ -13,6 +13,7 @@ typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
 typedef int HPyListBuilder;
 typedef int HPyTupleBuilder;
+typedef int HPyTracker;
 
 
 /* HPy public API */
@@ -189,7 +190,13 @@ void HPyTupleBuilder_Set(HPyContext ctx, HPyTupleBuilder builder,
 HPy HPyTupleBuilder_Build(HPyContext ctx, HPyTupleBuilder builder);
 void HPyTupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder);
 
+/* Helper for correctly closing handles */
 
+HPyTracker HPyTracker_New(HPyContext ctx);
+HPyTracker HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size);
+int HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h);
+int HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl);
+int HPyTracker_Free(HPyContext ctx, HPyTracker hl);
 
 /* *******
    hpyfunc

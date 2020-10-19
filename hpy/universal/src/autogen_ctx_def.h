@@ -126,4 +126,9 @@ struct _HPyContext_s global_ctx = {
     .ctx_TupleBuilder_Set = &ctx_TupleBuilder_Set,
     .ctx_TupleBuilder_Build = &ctx_TupleBuilder_Build,
     .ctx_TupleBuilder_Cancel = &ctx_TupleBuilder_Cancel,
+    .ctx_Tracker_New = &ctx_Tracker_New,
+    .ctx_Tracker_NewWithSize = &ctx_Tracker_NewWithSize,
+    .ctx_Tracker_Add = &ctx_Tracker_Add,
+    .ctx_Tracker_RemoveAll = &ctx_Tracker_RemoveAll,
+    .ctx_Tracker_Free = &ctx_Tracker_Free,
 };
