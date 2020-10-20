@@ -250,16 +250,16 @@ HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
     return ctx_Tracker_Add(ctx, ht, h);
 }
 
-HPyAPI_FUNC(int)
+HPyAPI_FUNC(void)
 HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 {
-    return ctx_Tracker_RemoveAll(ctx, ht);
+    ctx_Tracker_RemoveAll(ctx, ht);
 }
 
-HPyAPI_FUNC(int)
+HPyAPI_FUNC(void)
 HPyTracker_Free(HPyContext ctx, HPyTracker ht)
 {
-    return ctx_Tracker_Free(ctx, ht);
+    ctx_Tracker_Free(ctx, ht);
 }
 
 #endif /* !HPy_CPYTHON_H */

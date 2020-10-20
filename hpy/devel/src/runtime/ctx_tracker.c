@@ -53,7 +53,7 @@
  * error:
  *    HPyTracker_Free(ctx, ht);
  *    HPy_Close(ctx, dict);
- *    HPyErr_SetString(ctx, ctx->h_ValueError, "Failed!");
+ *    // HPyErr will already have been set by the error that occurred.
  *    return HPy_NULL;
  */
 
@@ -112,7 +112,8 @@ tracker_resize(HPyContext ctx, _HPyTracker_s *hp, HPy_ssize_t size)
     if (size <= hp->next) {
         // refuse a resize that would either 1) lose handles or  2) not leave
         // space for one new handle
-        return -2;
+        PyErr_SetString(PyExc_ValueError, "HPyTracker resize would lose handles");
+        return -1;
     }
     new_handles = PyMem_Realloc(hp->handles, size * sizeof(HPy));
     if (new_handles == NULL) {
@@ -136,15 +137,14 @@ ctx_Tracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
     return 0;
 }
 
-_HPy_HIDDEN int
+_HPy_HIDDEN void
 ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 {
     _HPyTracker_s *hp = _ht2hp(ht);
     hp->next = 0;
-    return 0;
 }
 
-_HPy_HIDDEN int
+_HPy_HIDDEN void
 ctx_Tracker_Free(HPyContext ctx, HPyTracker ht)
 {
     _HPyTracker_s *hp = _ht2hp(ht);
@@ -154,5 +154,4 @@ ctx_Tracker_Free(HPyContext ctx, HPyTracker ht)
     }
     PyMem_Free(hp->handles);
     PyMem_Free(hp);
-    return 0;
 }
