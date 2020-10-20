@@ -33,10 +33,10 @@ jobs:
       pytest -n auto test/
     displayName: 'pytest'
 
-- job: ExampleTests
+- job: PofTests
   pool:
     vmImage: '$(imageName)'
-  displayName: 'Test usage examples'
+  displayName: 'proof-of-concept tests'
   strategy:
     matrix:
       py36:
@@ -59,11 +59,15 @@ jobs:
     parameters:
       pythonVersion: $(python.version)
 
-  - script: proof-of-concept/build_and_test.sh install_pof_wheel
-    displayName: 'Build and install pof wheel'
+  - script: proof-of-concept/test_pof.sh wheel
+    displayName: 'Test bdist_wheel'
 
-  - script: proof-of-concept/build_and_test.sh test_pof
-    displayName: 'Test pof'
+  - script: proof-of-concept/test_pof.sh setup_py_cpython
+    displayName: 'Test setup.py --hpy-abi=cpython install'
+
+  - script: proof-of-concept/test_pof.sh setup_py_universal
+    displayName: 'Test setup.py --hpy-abi=universal install'
+
 
 
 - job: CheckAutogen
