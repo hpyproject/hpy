@@ -240,15 +240,9 @@ HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n)
 }
 
 HPyAPI_FUNC(HPyTracker)
-HPyTracker_New(HPyContext ctx)
+HPyTracker_New(HPyContext ctx, HPy_ssize_t size)
 {
-    return ctx_Tracker_New(ctx);
-}
-
-HPyAPI_FUNC(HPyTracker)
-HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
-{
-    return ctx_Tracker_NewWithSize(ctx, size);
+    return ctx_Tracker_New(ctx, size);
 }
 
 HPyAPI_FUNC(int)

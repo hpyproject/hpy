@@ -420,12 +420,8 @@ static inline void HPyTupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builde
      ctx->ctx_TupleBuilder_Cancel ( ctx, builder ); 
 }
 
-static inline HPyTracker HPyTracker_New(HPyContext ctx) {
-     return ctx->ctx_Tracker_New ( ctx ); 
-}
-
-static inline HPyTracker HPyTracker_NewWithSize(HPyContext ctx, HPy_ssize_t size) {
-     return ctx->ctx_Tracker_NewWithSize ( ctx, size ); 
+static inline HPyTracker HPyTracker_New(HPyContext ctx, HPy_ssize_t size) {
+     return ctx->ctx_Tracker_New ( ctx, size ); 
 }
 
 static inline int HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h) {

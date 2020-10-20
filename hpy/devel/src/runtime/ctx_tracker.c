@@ -10,10 +10,10 @@
  *    HPyTracker_Add.
  *
  *    Space for this extra handle is created automatically, so
- *    HPyTracker_NewWithSize(ctx, 0) will actually allocated space for one
- *    handle.
+ *    HPyTracker_New(ctx, 2) will actually allocated space for three
+ *    handles.
  *
- *    Calling HPyTracker_NewWithSize(ctx, n) will ensure that at least n handles
+ *    Calling HPyTracker_New(ctx, n) will ensure that at least n handles
  *    can be tracked without the need for a resize.
  *
  * Example usage (inside an HPyDef_METH function)::
@@ -22,7 +22,7 @@
  * HPy key, value;
  * HPyTracker hl;
  *
- * hl = HPyTracker_New(ctx);  // track the key-value pairs
+ * hl = HPyTracker_New(ctx, 0);  // track the key-value pairs
  * if (hl == NULL)
  *     return HPy_NULL;
  *
@@ -72,15 +72,12 @@ typedef struct {
 
 
 _HPy_HIDDEN HPyTracker
-ctx_Tracker_New(HPyContext ctx)
-{
-    return HPyTracker_NewWithSize(ctx, HPYTRACKER_INITIAL_SIZE);
-}
-
-_HPy_HIDDEN HPyTracker
-ctx_Tracker_NewWithSize(HPyContext ctx, HPy_ssize_t size)
+ctx_Tracker_New(HPyContext ctx, HPy_ssize_t size)
 {
     _HPyTracker_s *hp;
+    if (size == 0) {
+        size = HPYTRACKER_INITIAL_SIZE;
+    }
     size++;
 
     hp = PyMem_Malloc(sizeof(_HPyTracker_s));

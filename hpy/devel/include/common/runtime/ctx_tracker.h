@@ -4,10 +4,7 @@
 #include "hpy.h"
 
 _HPy_HIDDEN HPyTracker
-ctx_Tracker_New(HPyContext ctx);
-
-_HPy_HIDDEN HPyTracker
-ctx_Tracker_NewWithSize(HPyContext ctx, HPy_ssize_t size);
+ctx_Tracker_New(HPyContext ctx, HPy_ssize_t size);
 
 _HPy_HIDDEN int
 ctx_Tracker_Add(HPyContext ctx, HPyTracker hl, HPy h);
