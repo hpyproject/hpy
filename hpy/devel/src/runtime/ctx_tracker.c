@@ -3,18 +3,17 @@
  * and closed as a group.
  *
  * Note::
- *    Internally, HPyTracker always keeps space for one extra handle so that
- *    HPyTracker_Add can always store the handle being passed to it,
- *    even if it fails to automatically create space for future
- *    handles. This allows HPyTracker_Free to close all handles passed to
- *    HPyTracker_Add.
- *
- *    Space for this extra handle is created automatically, so
- *    HPyTracker_New(ctx, 2) will actually allocated space for three
- *    handles.
- *
  *    Calling HPyTracker_New(ctx, n) will ensure that at least n handles
- *    can be tracked without the need for a resize.
+ *    can be tracked without a call to HPyTracker_Add failing.
+ *
+ *    If a call to HPyTracker_Add fails, the tracker still guarantees that
+ *    the handle passed to it has been tracked (internally it does this by
+ *    maintaining space for one more handle).
+ *
+ *    After HPyTracker_Add fails, HPyTracker_Free should be called without
+ *    any further calls to HPyTracker_Add. Calling HPyTracker_Free will close
+ *    all the tracked handles, including the handled passed to the failed call
+ *    to HPyTracker_Add.
  *
  * Example usage (inside an HPyDef_METH function)::
  *
