@@ -1,6 +1,7 @@
 import os.path
 from pathlib import Path
 from setuptools import Extension
+from distutils.errors import DistutilsSetupError
 
 # NOTE: this file is also imported by PyPy tests, so it must be compatible
 # with both Python 2.7 and Python 3.x
@@ -39,12 +40,61 @@ class HPyDevel:
         if hpy_abi == 'universal':
             ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
 
+    def collect_hpy_ext_names(self, dist, hpy_ext_modules):
+        """
+        This is sub-optimal but it should work in 99% of the cases, and complain
+        clearly in the others.
+
+        In order to implement build_hpy_ext, we need to know whether an
+        Extension was put inside hpy_ext_modules or ext_modules, and we need
+        to know it ONLY by looking at its name (because that's all we get when
+        distutils calls build_hpy_ext.get_ext_filename). So here we collect
+        and return all hpy_ext_names.
+
+        However, there is a problem: if the module is inside a package,
+        distutils' build_ext.get_ext_fullpath calls get_ext_filename with ONLY
+        the last part of the dotted name (see distutils/commands/build_ext.py).
+
+        This means that there is a risk of conflicts if we have two ext
+        modules with the same name in two different packages, of which one is
+        HPy and the other is legacy; e.g.::
+
+            setup(ext_modules     = [Extension(name='foo.mymod', ...)],
+                  hpy_ext_modules = [Extension(name='bar.mymod', ...)],)
+
+        In that case, we cannot know whether ``mymod`` is an HPy ext module or
+        not. If we detect such a problem, we exit early, and the only solution
+        is to rename one of them :(
+        """
+        def collect_ext_names(exts):
+            if exts is None:
+                return set()
+            names = set()
+            for ext in exts:
+                names.add(ext.name) # full name, e.g. 'foo.bar.baz'
+                names.add(ext.name.split('.')[-1]) # modname, e.g. 'baz'
+            return names
+
+        hpy_ext_names = collect_ext_names(hpy_ext_modules)
+        ext_names = collect_ext_names(dist.ext_modules)
+        conflicts = hpy_ext_names.intersection(ext_names)
+        if conflicts:
+            lines = ['\n']
+            lines.append('Name conflict between ext_modules and hpy_ext_modules:')
+            for name in conflicts:
+                lines.append('    - %s' % name)
+            lines.append('You can not have modules ending with the same name in both')
+            lines.append('ext_modules and hpy_ext_modules: this is a limitation of ')
+            lines.append('hpy.devel, please rename one of them.')
+            raise DistutilsSetupError('\n'.join(lines))
+        return hpy_ext_names
+
     def fix_distribution(self, dist, hpy_ext_modules):
         from setuptools.command.build_ext import build_ext
 
         def is_hpy_extension(ext_name):
             return ext_name in is_hpy_extension._ext_names
-        is_hpy_extension._ext_names = set([ext.name for ext in hpy_ext_modules])
+        is_hpy_extension._ext_names = self.collect_hpy_ext_names(dist, hpy_ext_modules)
 
         # add the hpy_extension modules to the normal ext_modules
         if dist.ext_modules is None:
