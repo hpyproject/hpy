@@ -20,10 +20,10 @@
  *
  * long i;
  * HPy key, value;
- * HPyTracker hl;
+ * HPyTracker ht;
  *
- * hl = HPyTracker_New(ctx, 0);  // track the key-value pairs
- * if (hl == NULL)
+ * ht = HPyTracker_New(ctx, 0);  // track the key-value pairs
+ * if (ht == NULL)
  *     return HPy_NULL;
  *
  * HPy dict = HPyDict_New(ctx);
@@ -34,13 +34,13 @@
  *     key = HPyLong_FromLong(ctx, i);
  *     if (HPy_IsNull(key))
  *         goto error;
- *     if (HPyTracker_Add(ctx, hl, key) < 0)
+ *     if (HPyTracker_Add(ctx, ht, key) < 0)
  *         goto error;
  *     value = HPyLong_FromLong(ctx, i * i);
  *     if (HPy_IsNull(value)) {
  *         goto error;
  *     }
- *     if (HPyTracker_Add(ctx, hl, value) < 0)
+ *     if (HPyTracker_Add(ctx, ht, value) < 0)
  *         goto error;
  *     result = HPy_SetItem(ctx, dict, key, value);
  *     if (result < 0)
@@ -48,11 +48,11 @@
  * }
  *
  * success:
- *    HPyTracker_Free(ctx, hl);
+ *    HPyTracker_Free(ctx, ht);
  *    return dict;
  *
  * error:
- *    HPyTracker_Free(ctx, hl);
+ *    HPyTracker_Free(ctx, ht);
  *    HPy_Close(ctx, dict);
  *    HPyErr_SetString(ctx, ctx->h_ValueError, "Failed!");
  *    return HPy_NULL;
@@ -118,9 +118,9 @@ tracker_resize(HPyContext ctx, _HPyTracker_s *hp, HPy_ssize_t size)
 }
 
 _HPy_HIDDEN int
-ctx_Tracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
+ctx_Tracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
 {
-    _HPyTracker_s *hp = (_HPyTracker_s *)hl._tracker;
+    _HPyTracker_s *hp = (_HPyTracker_s *)ht._tracker;
     hp->handles[hp->next++] = h;
     if (hp->size <= hp->next) {
         if (tracker_resize(ctx, hp, hp->size * 2 - 1) < 0)
@@ -130,17 +130,17 @@ ctx_Tracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
 }
 
 _HPy_HIDDEN int
-ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker hl)
+ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 {
-    _HPyTracker_s *hp = (_HPyTracker_s *)hl._tracker;
+    _HPyTracker_s *hp = (_HPyTracker_s *)ht._tracker;
     hp->next = 0;
     return 0;
 }
 
 _HPy_HIDDEN int
-ctx_Tracker_Free(HPyContext ctx, HPyTracker hl)
+ctx_Tracker_Free(HPyContext ctx, HPyTracker ht)
 {
-    _HPyTracker_s *hp = (_HPyTracker_s *)hl._tracker;
+    _HPyTracker_s *hp = (_HPyTracker_s *)ht._tracker;
     HPy_ssize_t i;
     for (i=0; i<hp->next; i++) {
         HPy_Close(ctx, hp->handles[i]);

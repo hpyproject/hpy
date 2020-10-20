@@ -246,21 +246,21 @@ HPyTracker_New(HPyContext ctx, HPy_ssize_t size)
 }
 
 HPyAPI_FUNC(int)
-HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h)
+HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
 {
-    return ctx_Tracker_Add(ctx, hl, h);
+    return ctx_Tracker_Add(ctx, ht, h);
 }
 
 HPyAPI_FUNC(int)
-HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl)
+HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 {
-    return ctx_Tracker_RemoveAll(ctx, hl);
+    return ctx_Tracker_RemoveAll(ctx, ht);
 }
 
 HPyAPI_FUNC(int)
-HPyTracker_Free(HPyContext ctx, HPyTracker hl)
+HPyTracker_Free(HPyContext ctx, HPyTracker ht)
 {
-    return ctx_Tracker_Free(ctx, hl);
+    return ctx_Tracker_Free(ctx, ht);
 }
 
 #endif /* !HPy_CPYTHON_H */

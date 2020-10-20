@@ -424,15 +424,15 @@ static inline HPyTracker HPyTracker_New(HPyContext ctx, HPy_ssize_t size) {
      return ctx->ctx_Tracker_New ( ctx, size ); 
 }
 
-static inline int HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h) {
-     return ctx->ctx_Tracker_Add ( ctx, hl, h ); 
+static inline int HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h) {
+     return ctx->ctx_Tracker_Add ( ctx, ht, h ); 
 }
 
-static inline int HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl) {
-     return ctx->ctx_Tracker_RemoveAll ( ctx, hl ); 
+static inline int HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht) {
+     return ctx->ctx_Tracker_RemoveAll ( ctx, ht ); 
 }
 
-static inline int HPyTracker_Free(HPyContext ctx, HPyTracker hl) {
-     return ctx->ctx_Tracker_Free ( ctx, hl ); 
+static inline int HPyTracker_Free(HPyContext ctx, HPyTracker ht) {
+     return ctx->ctx_Tracker_Free ( ctx, ht ); 
 }
 

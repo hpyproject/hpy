@@ -193,9 +193,9 @@ void HPyTupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder);
 /* Helper for correctly closing handles */
 
 HPyTracker HPyTracker_New(HPyContext ctx, HPy_ssize_t size);
-int HPyTracker_Add(HPyContext ctx, HPyTracker hl, HPy h);
-int HPyTracker_RemoveAll(HPyContext ctx, HPyTracker hl);
-int HPyTracker_Free(HPyContext ctx, HPyTracker hl);
+int HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h);
+int HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht);
+int HPyTracker_Free(HPyContext ctx, HPyTracker ht);
 
 /* *******
    hpyfunc

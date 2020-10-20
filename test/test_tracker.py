@@ -16,14 +16,14 @@ class TestHPyTracker(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {{
-                HPyTracker hl;
+                HPyTracker ht;
                 HPy result = HPy_NULL;
-                hl = {new};
-                if HPyTracker_IsNull(hl) {{
+                ht = {new};
+                if HPyTracker_IsNull(ht) {{
                     return HPy_NULL;
                 }}
                 {ops}
-                HPyTracker_Free(ctx, hl);
+                HPyTracker_Free(ctx, ht);
                 if (HPy_IsNull(result))
                     result = HPy_Dup(ctx, ctx->h_None);
                 return result;
@@ -43,20 +43,20 @@ class TestHPyTracker(HPyTest):
 
     def test_add_and_free(self):
         mod = self.hpytracker_module(ops="""
-            HPyTracker_Add(ctx, hl, HPy_Dup(ctx, args[0]));
+            HPyTracker_Add(ctx, ht, HPy_Dup(ctx, args[0]));
         """)
         mod.f(5)
 
     def test_add_and_remove_all(self):
         mod = self.hpytracker_module(ops="""
-            HPyTracker_Add(ctx, hl, args[0]);
-            HPyTracker_RemoveAll(ctx, hl);
+            HPyTracker_Add(ctx, ht, args[0]);
+            HPyTracker_RemoveAll(ctx, ht);
         """)
         assert mod.f(5) is None
 
     def test_remove_all_on_nothing(self):
         mod = self.hpytracker_module(ops="""
-            HPyTracker_RemoveAll(ctx, hl);
+            HPyTracker_RemoveAll(ctx, ht);
         """)
         assert mod.f() is None
 
@@ -71,13 +71,13 @@ class TestHPyTracker(HPyTest):
                 long n_err = -1; // simulate an error at the given index
                 int result;
                 HPy key, value;
-                HPyTracker hl;
+                HPyTracker ht;
 
                 if (!HPyArg_Parse(ctx, args, nargs, "l|l", &n, &n_err))
                     return HPy_NULL;
 
-                hl = HPyTracker_New(ctx, 0);  // track key-value pairs
-                if HPyTracker_IsNull(hl)
+                ht = HPyTracker_New(ctx, 0);  // track key-value pairs
+                if HPyTracker_IsNull(ht)
                     return HPy_NULL;
 
                 HPy dict = HPyDict_New(ctx);
@@ -90,23 +90,23 @@ class TestHPyTracker(HPyTest):
                     key = HPyLong_FromLong(ctx, i);
                     if (HPy_IsNull(key))
                         goto error;
-                    if (HPyTracker_Add(ctx, hl, key) < 0)
+                    if (HPyTracker_Add(ctx, ht, key) < 0)
                         goto error;
                     value = HPyLong_FromLong(ctx, i * i);
                     if (HPy_IsNull(value))
                         goto error;
-                    if (HPyTracker_Add(ctx, hl, value) < 0)
+                    if (HPyTracker_Add(ctx, ht, value) < 0)
                         goto error;
                     result = HPy_SetItem(ctx, dict, key, value);
                     if (result < 0)
                         goto error;
                 }
 
-                HPyTracker_Free(ctx, hl);
+                HPyTracker_Free(ctx, ht);
                 return dict;
 
                 error:
-                    HPyTracker_Free(ctx, hl);
+                    HPyTracker_Free(ctx, ht);
                     HPy_Close(ctx, dict);
                     HPyErr_SetString(ctx, ctx->h_ValueError, "Failed!");
                     return HPy_NULL;
