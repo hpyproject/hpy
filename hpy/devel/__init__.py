@@ -14,8 +14,8 @@ class HPyDevel:
         self.src_dir = self.base_dir.joinpath('src', 'runtime')
         # extra_sources are needed both in CPython and Universal mode
         self._extra_sources = [
-            self.src_dir.joinpath('argparse.c')
-            ]
+            self.src_dir.joinpath('argparse.c'),
+        ]
         # ctx_sources are needed only in Universal mode
         self._ctx_sources = list(self.src_dir.glob('ctx_*.c'))
 

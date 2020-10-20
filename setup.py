@@ -61,6 +61,7 @@ setup(
                    'hpy/devel/src/runtime/ctx_module.c',
                    'hpy/devel/src/runtime/ctx_type.c',
                    'hpy/devel/src/runtime/argparse.c',
+                   'hpy/devel/src/runtime/ctx_tracker.c',
                    'hpy/devel/src/runtime/ctx_listbuilder.c',
                    'hpy/devel/src/runtime/ctx_tuple.c',
                    'hpy/devel/src/runtime/ctx_tuplebuilder.c',
