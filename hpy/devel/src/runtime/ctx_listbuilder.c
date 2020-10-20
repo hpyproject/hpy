@@ -47,6 +47,9 @@ _HPy_HIDDEN void
 ctx_ListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder)
 {
     PyObject *lst = (PyObject *)builder._lst;
+    if (lst == NULL) {
+        return;
+    }
     builder._lst = 0;
     Py_XDECREF(lst);
 }

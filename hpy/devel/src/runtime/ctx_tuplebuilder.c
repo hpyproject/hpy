@@ -54,7 +54,9 @@ _HPy_HIDDEN void
 ctx_TupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder)
 {
     PyObject *tup = (PyObject *)builder._tup;
+    if (tup == NULL) {
+        return;
+    }
     builder._tup = 0;
     Py_XDECREF(tup);
 }
-
