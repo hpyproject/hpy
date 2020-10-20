@@ -58,14 +58,13 @@ jobs:
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)
-  - script: proof-of-concept/build_wheel_nodeps.sh
-    displayName: 'Build pof wheel'
-  - script: python -m pip install proof-of-concept/dist/*.whl
-    displayName: 'Install pof'
-  - script: python -m pip install pytest pytest-azurepipelines
-    displayName: 'Install test dependencies'
-  - script: python -m pytest proof-of-concept/
-    displayName: 'Run pof tests'
+
+  - script: proof-of-concept/build_and_test.sh install_pof_wheel
+    displayName: 'Build and install pof wheel'
+
+  - script: proof-of-concept/build_and_test.sh test_pof
+    displayName: 'Test pof'
+
 
 - job: CheckAutogen
   pool:
