@@ -23,7 +23,7 @@
  * HPyTracker ht;
  *
  * ht = HPyTracker_New(ctx, 0);  // track the key-value pairs
- * if (ht == NULL)
+ * if (HPy_IsNull(ht))
  *     return HPy_NULL;
  *
  * HPy dict = HPyDict_New(ctx);
@@ -62,6 +62,14 @@
 #include "hpy.h"
 #include "common/runtime/ctx_type.h"
 
+#ifdef HPY_UNIVERSAL_ABI
+#define _ht2hp(x) ((_HPyTracker_s *) (x)._i)
+#define _hp2ht(x) ((HPyTracker) {(HPy_ssize_t) (hp)})
+#else
+#define _ht2hp(x) ((_HPyTracker_s *) (x)._o)
+#define _hp2ht(x) ((HPyTracker) {(void *) (hp)})
+#endif
+
 static const HPy_ssize_t HPYTRACKER_INITIAL_SIZE = 5;
 
 typedef struct {
@@ -83,17 +91,17 @@ ctx_Tracker_New(HPyContext ctx, HPy_ssize_t size)
     hp = PyMem_Malloc(sizeof(_HPyTracker_s));
     if (hp == NULL) {
         PyErr_NoMemory();
-        return (HPyTracker){(HPy_ssize_t) 0};
+        return _hp2ht(0);
     }
     hp->handles = PyMem_Calloc(size, sizeof(HPy));
     if (hp->handles == NULL) {
         PyMem_Free(hp);
         PyErr_NoMemory();
-        return (HPyTracker){(HPy_ssize_t) 0};
+        return _hp2ht(0);
     }
     hp->size = size;
     hp->next = 0;
-    return (HPyTracker){(HPy_ssize_t) hp};
+    return _hp2ht(hp);
 }
 
 static int
@@ -120,7 +128,7 @@ tracker_resize(HPyContext ctx, _HPyTracker_s *hp, HPy_ssize_t size)
 _HPy_HIDDEN int
 ctx_Tracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
 {
-    _HPyTracker_s *hp = (_HPyTracker_s *)ht._tracker;
+    _HPyTracker_s *hp =  _ht2hp(ht);
     hp->handles[hp->next++] = h;
     if (hp->size <= hp->next) {
         if (tracker_resize(ctx, hp, hp->size * 2 - 1) < 0)
@@ -132,7 +140,7 @@ ctx_Tracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
 _HPy_HIDDEN int
 ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 {
-    _HPyTracker_s *hp = (_HPyTracker_s *)ht._tracker;
+    _HPyTracker_s *hp = _ht2hp(ht);
     hp->next = 0;
     return 0;
 }
@@ -140,7 +148,7 @@ ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 _HPy_HIDDEN int
 ctx_Tracker_Free(HPyContext ctx, HPyTracker ht)
 {
-    _HPyTracker_s *hp = (_HPyTracker_s *)ht._tracker;
+    _HPyTracker_s *hp = _ht2hp(ht);
     HPy_ssize_t i;
     for (i=0; i<hp->next; i++) {
         HPy_Close(ctx, hp->handles[i]);

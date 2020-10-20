@@ -35,7 +35,7 @@ typedef intptr_t HPy_hash_t;
 typedef struct _HPy_s { HPy_ssize_t _i; } HPy;
 typedef struct { HPy_ssize_t _lst; } HPyListBuilder;
 typedef struct { HPy_ssize_t _tup; } HPyTupleBuilder;
-typedef struct { HPy_ssize_t _tracker; } HPyTracker;
+typedef struct { HPy_ssize_t _i; } HPyTracker;
 
 typedef struct _HPyContext_s *HPyContext;
 
@@ -46,7 +46,6 @@ typedef struct _HPyContext_s *HPyContext;
 /* misc stuff, which should probably go in its own header */
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(x) ((x)._i == 0)
-#define HPyTracker_IsNull(x) ((x)._tracker == 0)
 
 // XXX: we need to decide whether these are part of the official API or not,
 // and maybe introduce a better naming convetion. For now, they are needed for

@@ -32,7 +32,7 @@
 typedef struct { PyObject *_o; } HPy;
 typedef struct { Py_ssize_t _lst; } HPyListBuilder;
 typedef struct { Py_ssize_t _tup; } HPyTupleBuilder;
-typedef struct { Py_ssize_t _tracker; } HPyTracker;
+typedef struct { void *_o; } HPyTracker;
 typedef Py_ssize_t HPy_ssize_t;
 typedef Py_hash_t HPy_hash_t;
 
@@ -62,7 +62,6 @@ static struct _HPyContext_s _global_ctx;
 
 #define HPy_NULL ((HPy){NULL})
 #define HPy_IsNull(x) ((x)._o == NULL)
-#define HPyTracker_IsNull(x) ((x)._tracker == 0)
 
 // XXX: we need to decide whether these are part of the official API or not,
 // and maybe introduce a better naming convetion. For now, they are needed for
