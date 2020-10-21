@@ -398,3 +398,28 @@ class TestSqSlots(HPyTest):
         tmp = p
         tmp *= 43
         assert tmp == (p, "sq_inplace_repeat", 43)
+
+    def test_sq_contains(self):
+        import pytest
+        mod = self.make_module("""
+            @DEFINE_PointObject
+
+            HPyDef_SLOT(Point_contains, Point_contains_impl, HPy_sq_contains);
+            static int Point_contains_impl(HPyContext ctx, HPy self, HPy other)
+            {
+                long val = HPyLong_AsLong(ctx, other);
+                if (HPyErr_Occurred(ctx))
+                    return -1;
+                if (val == 42)
+                    return 1;
+                return 0;
+            }
+
+            @EXPORT_POINT_TYPE(&Point_contains)
+            @INIT
+        """)
+        p = mod.Point()
+        assert 42 in p
+        assert 43 not in p
+        with pytest.raises(TypeError):
+            'hello' in p

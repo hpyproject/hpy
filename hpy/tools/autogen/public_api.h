@@ -238,6 +238,7 @@ typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy self,
                                 HPy *args, HPy_ssize_t nargs, HPy kw);
 typedef HPy (*HPyFunc_getter)(HPyContext ctx, HPy, void *);
 typedef int (*HPyFunc_setter)(HPyContext ctx, HPy, HPy, void *);
+typedef int (*HPyFunc_objobjproc)(HPyContext ctx, HPy, HPy);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
@@ -295,7 +296,7 @@ typedef enum {
     HPy_nb_xor = SLOT(38, HPyFunc_BINARYFUNC),
     HPy_sq_ass_item = SLOT(39, HPyFunc_SSIZEOBJARGPROC),
     HPy_sq_concat = SLOT(40, HPyFunc_BINARYFUNC),
-    //HPy_sq_contains = SLOT(41, HPyFunc_X),
+    HPy_sq_contains = SLOT(41, HPyFunc_OBJOBJPROC),
     HPy_sq_inplace_concat = SLOT(42, HPyFunc_BINARYFUNC),
     HPy_sq_inplace_repeat = SLOT(43, HPyFunc_SSIZEARGFUNC),
     HPy_sq_item = SLOT(44, HPyFunc_SSIZEARGFUNC),

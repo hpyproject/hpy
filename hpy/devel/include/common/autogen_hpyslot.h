@@ -44,6 +44,7 @@ typedef enum {
     HPy_nb_xor = 38,
     HPy_sq_ass_item = 39,
     HPy_sq_concat = 40,
+    HPy_sq_contains = 41,
     HPy_sq_inplace_concat = 42,
     HPy_sq_inplace_repeat = 43,
     HPy_sq_item = 44,
@@ -92,6 +93,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_xor HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_sq_ass_item HPyFunc_SSIZEOBJARGPROC
 #define _HPySlot_SIG__HPy_sq_concat HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_sq_contains HPyFunc_OBJOBJPROC
 #define _HPySlot_SIG__HPy_sq_inplace_concat HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_sq_inplace_repeat HPyFunc_SSIZEARGFUNC
 #define _HPySlot_SIG__HPy_sq_item HPyFunc_SSIZEARGFUNC
