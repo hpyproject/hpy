@@ -328,3 +328,37 @@ class TestSqSlots(HPyTest):
         assert p.y == 200
         with pytest.raises(IndexError):
             p[2] = 300
+
+    def test_sq_concat_and_sq_inplace_concat(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+
+            HPyDef_SLOT(Point_concat, Point_concat_impl, HPy_sq_concat);
+            static HPy Point_concat_impl(HPyContext ctx, HPy self, HPy other)
+            {
+                HPy s = HPyUnicode_FromString(ctx, "sq_concat");
+                HPy res = HPyTuple_Pack(ctx, 3, self, s, other);
+                HPy_Close(ctx, s);
+                return res;
+            }
+
+            HPyDef_SLOT(Point_inplace_concat, Point_inplace_concat_impl,
+                        HPy_sq_inplace_concat);
+            static HPy Point_inplace_concat_impl(HPyContext ctx, HPy self, HPy other)
+            {
+                HPy s = HPyUnicode_FromString(ctx, "sq_inplace_concat");
+                HPy res = HPyTuple_Pack(ctx, 3, self, s, other);
+                HPy_Close(ctx, s);
+                return res;
+            }
+
+            @EXPORT_POINT_TYPE(&Point_concat, &Point_inplace_concat)
+            @INIT
+        """)
+        p = mod.Point()
+        res = p + 42
+        assert res == (p, "sq_concat", 42)
+        #
+        tmp = p
+        tmp += 43
+        assert tmp == (p, "sq_inplace_concat", 43)
