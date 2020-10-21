@@ -33,10 +33,10 @@ jobs:
       pytest -n auto test/
     displayName: 'pytest'
 
-- job: ExampleTests
+- job: PofTests
   pool:
     vmImage: '$(imageName)'
-  displayName: 'Test usage examples'
+  displayName: 'proof-of-concept tests'
   strategy:
     matrix:
       py36:
@@ -58,14 +58,14 @@ jobs:
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)
-  - script: proof-of-concept/build_wheel_nodeps.sh
-    displayName: 'Build pof wheel'
-  - script: python -m pip install proof-of-concept/dist/*.whl
-    displayName: 'Install pof'
-  - script: python -m pip install pytest pytest-azurepipelines
-    displayName: 'Install test dependencies'
-  - script: python -m pytest proof-of-concept/
-    displayName: 'Run pof tests'
+  - script: proof-of-concept/test_pof.sh wheel
+    displayName: 'Test bdist_wheel'
+  - script: proof-of-concept/test_pof.sh setup_py_cpython
+    displayName: 'Test setup.py --hpy-abi=cpython install'
+  - script: proof-of-concept/test_pof.sh build_ext_inplace_universal
+    displayName: 'Test setup.py --hpy-abi=universal build_ext --inplace'
+
+
 
 - job: CheckAutogen
   pool:
