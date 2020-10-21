@@ -15,3 +15,6 @@ def test_add_ints_kw():
 def test_point():
     p = pof.Point(1, 2)
     assert repr(p) == 'Point(?, ?)' # fixme when we have HPyFloat_FromDouble
+
+def test_pofpackage():
+    assert pofpackage.foo.hello() == 'hello from pofpackage.foo'
