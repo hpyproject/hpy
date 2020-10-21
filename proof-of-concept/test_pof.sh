@@ -38,9 +38,32 @@ _build_wheel() {
     popd
 }
 
+_myrm() {
+    if [ -d "$1" ]
+    then
+        echo "rm $1"
+        rm -rf "$1"
+    else
+        echo "skipping $1"
+    fi
+}
+
+clean() {
+    echo "=== cleaning up old stuff ==="
+    _myrm ${ROOT}/venv/wheel_builder
+    _myrm ${ROOT}/venv/wheel_runner
+    _myrm ${ROOT}/venv/cpython_abi
+    _myrm ${ROOT}/venv/universal_abi
+    _myrm ${ROOT}/build
+    _myrm ${ROOT}/proof-of-concept/build
+    _myrm ${ROOT}/proof-of-concept/dist
+    echo
+}
+
 wheel() {
-    echo "=== testing setup.py bdist_wheel ==="
     # build a wheel, install and test
+    clean
+    echo "=== testing setup.py bdist_wheel ==="
     _build_wheel
     WHEEL=`ls proof-of-concept/dist/*.whl`
     echo "Wheel created: ${WHEEL}"
@@ -56,7 +79,8 @@ wheel() {
 
 setup_py_cpython() {
     # install using setup.py, CPython ABI
-    echo "=== testing setup.py --hpy-abi=cpython ==="
+    clean
+    echo "=== testing setup.py --hpy-abi=cpython install ==="
     echo "Create venv: cpython_abi"
     python3 -m venv venv/cpython_abi
     source venv/cpython_abi/bin/activate
@@ -70,9 +94,10 @@ setup_py_cpython() {
     _test_pof
 }
 
-setup_py_universal() {
-    # install using setup.py, CPython ABI
-    echo "=== testing setup.py --hpy-abi=universal ==="
+build_ext_inplace_universal() {
+    # install using setup.py build_ext -i, Universal ABI
+    clean
+    echo "=== testing setup.py --hpy-abi=universal build_ext -i ==="
     echo "Create venv: universal_abi"
     python3 -m venv venv/universal_abi
     source venv/universal_abi/bin/activate
@@ -80,9 +105,10 @@ setup_py_universal() {
     echo
     echo "Running setup.py"
     pushd proof-of-concept
-    python3 setup.py --hpy-abi=universal install
+    python3 setup.py --hpy-abi=universal build_ext --inplace
     popd
     echo
+    export HPY_UNIVERSAL=1
     _test_pof
 }
 

@@ -65,8 +65,8 @@ jobs:
   - script: proof-of-concept/test_pof.sh setup_py_cpython
     displayName: 'Test setup.py --hpy-abi=cpython install'
 
-  - script: proof-of-concept/test_pof.sh setup_py_universal
-    displayName: 'Test setup.py --hpy-abi=universal install'
+  - script: proof-of-concept/test_pof.sh build_ext_inplace_universal
+    displayName: 'Test setup.py --hpy-abi=universal build_ext --inplace'
 
 
 
