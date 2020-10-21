@@ -362,3 +362,39 @@ class TestSqSlots(HPyTest):
         tmp = p
         tmp += 43
         assert tmp == (p, "sq_inplace_concat", 43)
+
+    def test_sq_repeat_and_sq_inplace_repeat(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+
+            HPyDef_SLOT(Point_repeat, Point_repeat_impl, HPy_sq_repeat);
+            static HPy Point_repeat_impl(HPyContext ctx, HPy self, HPy_ssize_t t)
+            {
+                HPy s = HPyUnicode_FromString(ctx, "sq_repeat");
+                HPy other = HPyLong_FromLong(ctx, t);
+                HPy res = HPyTuple_Pack(ctx, 3, self, s, other);
+                HPy_Close(ctx, s);
+                return res;
+            }
+
+            HPyDef_SLOT(Point_inplace_repeat, Point_inplace_repeat_impl,
+                        HPy_sq_inplace_repeat);
+            static HPy Point_inplace_repeat_impl(HPyContext ctx, HPy self, HPy_ssize_t t)
+            {
+                HPy s = HPyUnicode_FromString(ctx, "sq_inplace_repeat");
+                HPy other = HPyLong_FromLong(ctx, t);
+                HPy res = HPyTuple_Pack(ctx, 3, self, s, other);
+                HPy_Close(ctx, s);
+                return res;
+            }
+
+            @EXPORT_POINT_TYPE(&Point_repeat, &Point_inplace_repeat)
+            @INIT
+        """)
+        p = mod.Point()
+        res = p * 42
+        assert res == (p, "sq_repeat", 42)
+        #
+        tmp = p
+        tmp *= 43
+        assert tmp == (p, "sq_inplace_repeat", 43)
