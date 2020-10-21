@@ -42,6 +42,7 @@ typedef enum {
     HPy_nb_subtract = 36,
     HPy_nb_true_divide = 37,
     HPy_nb_xor = 38,
+    HPy_sq_ass_item = 39,
     HPy_sq_item = 44,
     HPy_sq_length = 45,
     HPy_tp_init = 60,
@@ -85,6 +86,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_subtract HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_true_divide HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_xor HPyFunc_BINARYFUNC
+#define _HPySlot_SIG__HPy_sq_ass_item HPyFunc_SSIZEOBJARGPROC
 #define _HPySlot_SIG__HPy_sq_item HPyFunc_SSIZEARGFUNC
 #define _HPySlot_SIG__HPy_sq_length HPyFunc_LENFUNC
 #define _HPySlot_SIG__HPy_tp_init HPyFunc_INITPROC

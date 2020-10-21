@@ -21,8 +21,10 @@ typedef int HPyTracker;
 HPy h_None;
 HPy h_True;
 HPy h_False;
+HPy h_Exception;
 HPy h_ValueError;
 HPy h_TypeError;
+HPy h_IndexError;
 HPy h_BaseObjectType;   /* built-in 'object' */
 HPy h_TypeType;         /* built-in 'type' */
 HPy h_LongType;         /* built-in 'int' */
@@ -291,7 +293,7 @@ typedef enum {
     HPy_nb_subtract = SLOT(36, HPyFunc_BINARYFUNC),
     HPy_nb_true_divide = SLOT(37, HPyFunc_BINARYFUNC),
     HPy_nb_xor = SLOT(38, HPyFunc_BINARYFUNC),
-    //HPy_sq_ass_item = SLOT(39, HPyFunc_X),
+    HPy_sq_ass_item = SLOT(39, HPyFunc_SSIZEOBJARGPROC),
     //HPy_sq_concat = SLOT(40, HPyFunc_X),
     //HPy_sq_contains = SLOT(41, HPyFunc_X),
     //HPy_sq_inplace_concat = SLOT(42, HPyFunc_X),
