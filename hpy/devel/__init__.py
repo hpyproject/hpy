@@ -1,7 +1,7 @@
 import os.path
 from pathlib import Path
 from setuptools import Extension
-from distutils.errors import DistutilsSetupError
+from distutils.errors import DistutilsError, DistutilsSetupError
 
 # NOTE: this file is also imported by PyPy tests, so it must be compatible
 # with both Python 2.7 and Python 3.x
@@ -91,6 +91,7 @@ class HPyDevel:
 
     def fix_distribution(self, dist, hpy_ext_modules):
         from setuptools.command.build_ext import build_ext
+        from setuptools.command.install import install
 
         def is_hpy_extension(ext_name):
             return ext_name in is_hpy_extension._ext_names
@@ -102,8 +103,10 @@ class HPyDevel:
         dist.ext_modules += hpy_ext_modules
 
         hpy_devel = self
-        base_class = dist.cmdclass.get('build_ext', build_ext)
-        class build_hpy_ext(base_class):
+        base_build_ext = dist.cmdclass.get('build_ext', build_ext)
+        base_install = dist.cmdclass.get('install', install)
+
+        class build_hpy_ext(base_build_ext):
             """
             Custom distutils command which properly recognizes and handle hpy
             extensions:
@@ -119,7 +122,7 @@ class HPyDevel:
                 if is_hpy_extension(ext.name):
                     # add the required include_dirs, sources and macros
                     hpy_devel.fix_extension(ext, hpy_abi=self.distribution.hpy_abi)
-                return base_class.build_extension(self, ext)
+                return base_build_ext.build_extension(self, ext)
 
             def get_ext_filename(self, ext_name):
                 # this is needed to give the .hpy.so extension to universal extensions
@@ -127,9 +130,20 @@ class HPyDevel:
                     ext_path = ext_name.split('.')
                     ext_suffix = '.hpy.so' # XXX Windows?
                     return os.path.join(*ext_path) + ext_suffix
-                return base_class.get_ext_filename(self, ext_name)
+                return base_build_ext.get_ext_filename(self, ext_name)
+
+        class install_hpy(base_install):
+
+            def run(self):
+                if self.distribution.hpy_abi == 'universal':
+                    raise DistutilsError(
+                        'setup.py install is not supported for HPy universal modules.\n'
+                        '       At the moment, the only supported method is: \n'
+                        '           setup.py --hpy-abi-universal build_ext --inplace')
+                return base_install.run(self)
 
         dist.cmdclass['build_ext'] = build_hpy_ext
+        dist.cmdclass['install'] = install_hpy
 
 
 
