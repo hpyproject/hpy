@@ -50,15 +50,17 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_NONE] = Py_None;
         new_handles[CONSTANT_H_FALSE] = Py_False;
         new_handles[CONSTANT_H_TRUE] = Py_True;
+        new_handles[CONSTANT_H_EXCEPTION] = PyExc_Exception;
         new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
         new_handles[CONSTANT_H_TYPEERROR] = PyExc_TypeError;
+        new_handles[CONSTANT_H_INDEXERROR] = PyExc_IndexError;
         new_handles[CONSTANT_H_BASEOBJECTTYPE] = (PyObject *)&PyBaseObject_Type;
         new_handles[CONSTANT_H_TYPETYPE] = (PyObject *)&PyType_Type;
         new_handles[CONSTANT_H_LONGTYPE] = (PyObject *)&PyLong_Type;
         new_handles[CONSTANT_H_UNICODETYPE] = (PyObject *)&PyUnicode_Type;
         new_handles[CONSTANT_H_TUPLETYPE] = (PyObject *)&PyTuple_Type;
         new_handles[CONSTANT_H_LISTTYPE] = (PyObject *)&PyList_Type;
-        hpy_assert(CONSTANT_H__TOTAL == 12,
+        hpy_assert(CONSTANT_H__TOTAL == 14,
             "update handles.c with the list of constants");
     }
 

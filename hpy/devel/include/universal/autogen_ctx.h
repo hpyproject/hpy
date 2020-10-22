@@ -13,8 +13,10 @@ struct _HPyContext_s {
     HPy h_None;
     HPy h_True;
     HPy h_False;
+    HPy h_Exception;
     HPy h_ValueError;
     HPy h_TypeError;
+    HPy h_IndexError;
     HPy h_BaseObjectType;
     HPy h_TypeType;
     HPy h_LongType;

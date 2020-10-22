@@ -152,3 +152,9 @@
         a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1), a->arg2);
         return;
     }
+    case HPyFunc_OBJOBJPROC: {
+        HPyFunc_objobjproc f = (HPyFunc_objobjproc)func;
+        _HPyFunc_args_OBJOBJPROC *a = (_HPyFunc_args_OBJOBJPROC*)args;
+        a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1));
+        return;
+    }
