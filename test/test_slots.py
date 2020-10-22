@@ -303,10 +303,15 @@ class TestSqSlots(HPyTest):
             static int Point_setitem_impl(HPyContext ctx, HPy self, HPy_ssize_t idx,
                                           HPy h_value)
             {
+                long value;
+                if (HPy_IsNull(h_value))
+                    value = -123; // this is the del p[] case
+                else {
+                    value = HPyLong_AsLong(ctx, h_value);
+                    if (HPyErr_Occurred(ctx))
+                        return -1;
+                }
                 PointObject *point = HPy_CAST(ctx, PointObject, self);
-                long value = HPyLong_AsLong(ctx, h_value);
-                if (HPyErr_Occurred(ctx))
-                    return -1;
                 if (idx == 0)
                     point->x = value;
                 else if (idx == 1)
@@ -328,6 +333,11 @@ class TestSqSlots(HPyTest):
         assert p.y == 200
         with pytest.raises(IndexError):
             p[2] = 300
+        #
+        del p[0]
+        assert p.x == -123
+        del p[1]
+        assert p.y == -123
 
     def test_sq_concat_and_sq_inplace_concat(self):
         mod = self.make_module("""
