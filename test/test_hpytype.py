@@ -124,7 +124,7 @@ class TestType(HPyTest):
     def test_HPyDef_METH(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O)
+            HPyDef_METH(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O, .doc="hello")
             static HPy Dummy_foo_impl(HPyContext ctx, HPy self, HPy arg)
             {
                 return HPy_Add(ctx, arg, arg);
@@ -158,6 +158,8 @@ class TestType(HPyTest):
             @INIT
         """)
         d = mod.Dummy()
+        assert d.foo.__doc__ == 'hello'
+        assert d.bar.__doc__ is None
         assert d.foo(21) == 42
         assert d.bar() == 1234
         assert d.identity() is d
