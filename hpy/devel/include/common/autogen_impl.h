@@ -243,6 +243,11 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Err_NoMemory)(HPyContext ctx)
     return _py2h(PyErr_NoMemory());
 }
 
+HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_Clear)(HPyContext ctx)
+{
+    PyErr_Clear();
+}
+
 HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(IsTrue)(HPyContext ctx, HPy h)
 {
     return PyObject_IsTrue(_h2py(h));

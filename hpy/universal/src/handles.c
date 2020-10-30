@@ -61,7 +61,7 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_UNICODETYPE] = (PyObject *)&PyUnicode_Type;
         new_handles[CONSTANT_H_TUPLETYPE] = (PyObject *)&PyTuple_Type;
         new_handles[CONSTANT_H_LISTTYPE] = (PyObject *)&PyList_Type;
-        hpy_assert(CONSTANT_H__TOTAL == 14,
+        hpy_assert(CONSTANT_H__TOTAL == 15,
             "update handles.c with the list of constants");
     }
 
