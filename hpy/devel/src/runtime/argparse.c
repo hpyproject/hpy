@@ -114,7 +114,7 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
         break;
     }
     default:
-        HPyErr_SetString(ctx, ctx->h_ValueError, "XXX: Unknown arg format code");
+        HPyErr_SetString(ctx, ctx->h_SystemError, "XXX: Unknown arg format code");
         return 0;
     }
     return 1;
@@ -150,7 +150,6 @@ set_error(HPyContext ctx, HPy exc, const char *err_funcname, const char *err_mes
         }
         else {
             snprintf(err_buf, _MAX_ERR_STRING_LENGTH, "%.200s() %.256s", err_funcname, msg);
-            err_funcname = "XXX";
         }
     }
     HPyErr_SetString(ctx, exc, err_buf);
@@ -230,8 +229,8 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
     // then check and count the rest
     while (keywords[nkw] != NULL) {
         if (!*keywords[nkw]) {
-            set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
-                "Empty keyword parameter name");
+            set_error(ctx, ctx->h_SystemError, err_funcname, err_message,
+                "empty keyword parameter name");
             return 0;
         }
         nkw++;
@@ -253,10 +252,12 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             continue;
         }
         if (*fmt1 == 'O') {
-            set_error(ctx, ctx->h_ValueError, err_funcname, err_message,
+            set_error(ctx, ctx->h_SystemError, err_funcname, err_message,
                 "HPyArg_ParseKeywords cannot use the format character 'O'."
                 " Use 'N' instead and close the the returned handle if the call"
                 " returns successfully");
+            va_end(vl);
+            return 0;
         }
         if (i >= nkw) {
             set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
@@ -276,6 +277,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         }
         else if (!HPy_IsNull(kw) && *keywords[i]) {
             current_arg = HPy_GetItem_s(ctx, kw, keywords[i]);
+            HPyErr_Clear(ctx); // XXX: is this okay?
         }
         if (!HPy_IsNull(current_arg) || optional) {
             if (!parse_item(ctx, current_arg, &fmt1, &vl)) {
