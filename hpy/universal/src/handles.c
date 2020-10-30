@@ -54,6 +54,7 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
         new_handles[CONSTANT_H_TYPEERROR] = PyExc_TypeError;
         new_handles[CONSTANT_H_INDEXERROR] = PyExc_IndexError;
+        new_handles[CONSTANT_H_SYSTEMERROR] = PyExc_SystemError;
         new_handles[CONSTANT_H_BASEOBJECTTYPE] = (PyObject *)&PyBaseObject_Type;
         new_handles[CONSTANT_H_TYPETYPE] = (PyObject *)&PyType_Type;
         new_handles[CONSTANT_H_LONGTYPE] = (PyObject *)&PyLong_Type;

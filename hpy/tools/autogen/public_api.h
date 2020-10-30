@@ -25,6 +25,7 @@ HPy h_Exception;
 HPy h_ValueError;
 HPy h_TypeError;
 HPy h_IndexError;
+HPy h_SystemError;
 HPy h_BaseObjectType;   /* built-in 'object' */
 HPy h_TypeType;         /* built-in 'type' */
 HPy h_LongType;         /* built-in 'int' */

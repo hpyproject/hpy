@@ -52,6 +52,7 @@ typedef struct _HPyContext_s {
     HPy h_ValueError;
     HPy h_TypeError;
     HPy h_IndexError;
+    HPy h_SystemError;
     HPy h_BaseObjectType;
     HPy h_TypeType;
     HPy h_LongType;
@@ -86,6 +87,7 @@ _HPyGetContext(void) {
         ctx->h_ValueError = _py2h(PyExc_ValueError);
         ctx->h_TypeError = _py2h(PyExc_TypeError);
         ctx->h_IndexError = _py2h(PyExc_IndexError);
+        ctx->h_SystemError = _py2h(PyExc_SystemError);
         ctx->h_BaseObjectType = _py2h((PyObject *)&PyBaseObject_Type);
         ctx->h_TypeType = _py2h((PyObject *)&PyType_Type);
         ctx->h_LongType = _py2h((PyObject *)&PyLong_Type);

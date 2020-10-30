@@ -17,6 +17,7 @@ struct _HPyContext_s global_ctx = {
     .h_ValueError = {CONSTANT_H_VALUEERROR},
     .h_TypeError = {CONSTANT_H_TYPEERROR},
     .h_IndexError = {CONSTANT_H_INDEXERROR},
+    .h_SystemError = {CONSTANT_H_SYSTEMERROR},
     .h_BaseObjectType = {CONSTANT_H_BASEOBJECTTYPE},
     .h_TypeType = {CONSTANT_H_TYPETYPE},
     .h_LongType = {CONSTANT_H_LONGTYPE},

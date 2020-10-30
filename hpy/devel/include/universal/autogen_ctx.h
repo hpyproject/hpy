@@ -17,6 +17,7 @@ struct _HPyContext_s {
     HPy h_ValueError;
     HPy h_TypeError;
     HPy h_IndexError;
+    HPy h_SystemError;
     HPy h_BaseObjectType;
     HPy h_TypeType;
     HPy h_LongType;
