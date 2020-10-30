@@ -1,9 +1,73 @@
+/**
+ * Implementation of HPyArg_Parse and HPyArg_ParseKeywords.
+ *
+ * HPyArg_Parse parses positional arguments and replaces PyArg_ParseTuple.
+ * HPyArg_ParseKeywords parses positional and keyword arguments and
+ * replaces PyArg_ParseTupleAndKeywords.
+ *
+ * HPy intends to only support the simpler format string types (numbers, bools)
+ * and handles. More complex types (e.g. buffers) should be retrieved as
+ * handles and then processed further as needed.
+ *
+ * Supported formatting strings:
+ *
+ * Numbers
+ * -------
+ *
+ * i (int) [int]
+ *     Convert a Python integer to a plain C int.
+ *
+ * l (int) [long int]
+ *     Convert a Python integer to a C long int.
+ *
+ * d (float) [double]
+ *     Convert a Python floating point number to a C double.
+ *
+ * Handles
+ * -------
+ *
+ * O (object) [HPy *]
+ *     Returns an existing handle. Not supported by HPyArg_ParseKeywords as
+ *     retrieving an item from the keywords dictionary would require creating
+ *     a new handled. Use O+ instead for this case.
+ *
+ * O+ (object) [HPy *]
+ *     Returns a new handle. The new handle must be closed if the argument
+ *     parsing returns successfully.
+ *
+ * Options
+ * -------
+ *
+ * |
+ *     Indicates that the remaining arguments in the argument list are optional.
+ *     The C variables corresponding to optional arguments should be initialized
+ *     to their default value — when an optional argument is not specified, the
+ *     contents of the corresponding C variable is not modified.
+ *
+ * $
+ *     HPyArg_ParseKeywords() only: Indicates that the remaining arguments in
+ *     the argument list are keyword-only. Currently, all keyword-only arguments
+ *     must also be optional arguments, so | must always be specified before $
+ *     in the format string.
+ *
+ * :
+ *     The list of format units ends here; the string after the colon is used as
+ *     the function name in error messages. : and ; are mutually exclusive and
+ *     whichever occurs first takes precedence.
+ *
+ * ;
+ *     The list of format units ends here; the string after the semicolon is
+ *     used as the error message instead of the default error message. : and ;
+ *     are mutually exclusive and whichever occurs first takes precedence.
+ *
+ */
+
 #include "hpy.h"
 
 #define _BREAK_IF_OPTIONAL(current_arg) if (HPy_IsNull(current_arg)) break;
 
-static
-int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
+static int
+parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
 {
     switch (*(*fmt)++) {
     case 'i': {
@@ -39,12 +103,21 @@ int _HPyArg_ParseItem(HPyContext ctx, HPy current_arg, const char **fmt, va_list
         *output = current_arg;
         break;
     }
+    case 'N': {
+        HPy *output = va_arg(*vl, HPy *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        *output = HPy_Dup(ctx, current_arg);
+        if (HPy_IsNull(output))
+            return 0;
+        break;
+    }
     default:
         HPyErr_SetString(ctx, ctx->h_ValueError, "XXX: Unknown arg format code");
         return 0;
     }
     return 1;
 }
+
 
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
@@ -67,7 +140,7 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
           current_arg = args[i];
         }
         if (!HPy_IsNull(current_arg) || optional) {
-          if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, &vl)) {
+          if (!parse_item(ctx, current_arg, &fmt1, &vl)) {
             va_end(vl);
             return 0;
           }
@@ -127,6 +200,12 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         fmt1++;
         continue;
       }
+      if (*fmt1 == 'O') {
+        HPyErr_SetString(ctx, ctx->h_ValueError,
+            "XXX: HPyArg_ParseKeywords cannot use the format character 'O'."
+            " Use 'N' instead and close the the returned handle if the call"
+            " returns successfully");
+      }
       if (i >= nkw) {
         HPyErr_SetString(ctx, ctx->h_TypeError, "XXX: mismatched args (too few keywords for fmt)");
         va_end(vl);
@@ -142,10 +221,10 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         current_arg = args[i];
       }
       else if (!HPy_IsNull(kw) && *keywords[i]) {
-        current_arg = HPyDict_GetItem(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
+        current_arg = HPy_GetItem_s(ctx, kw, HPyUnicode_FromString(ctx, keywords[i]));
       }
       if (!HPy_IsNull(current_arg) || optional) {
-        if (!_HPyArg_ParseItem(ctx, current_arg, &fmt1, &vl)) {
+        if (!parse_item(ctx, current_arg, &fmt1, &vl)) {
           va_end(vl);
           return 0;
         }
