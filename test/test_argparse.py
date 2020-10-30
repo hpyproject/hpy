@@ -146,7 +146,7 @@ class TestArgParse(HPyTest):
 
 
 class TestArgParseKeywords(HPyTest):
-    def make_two_arg_add(self, fmt="OO"):
+    def make_two_arg_add(self, fmt="O+O+"):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext ctx, HPy self,
@@ -165,7 +165,7 @@ class TestArgParseKeywords(HPyTest):
         return mod
 
     def test_handle_two_arguments(self):
-        mod = self.make_two_arg_add("NN")
+        mod = self.make_two_arg_add("O+O+")
         assert mod.f("x", b="y") == "xy"
 
     def test_handle_reordered_arguments(self):
@@ -176,7 +176,7 @@ class TestArgParseKeywords(HPyTest):
             {
                 HPy a, b;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "NN", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O+O+", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPy_Add(ctx, a, b);
             }
@@ -195,7 +195,7 @@ class TestArgParseKeywords(HPyTest):
                 HPy b = HPy_NULL;
                 HPy res;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "N|N", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O+|O+", kwlist, &a, &b))
                     return HPy_NULL;
                 if (HPy_IsNull(b)) {{
                     b = HPyLong_FromLong(ctx, 5);
@@ -222,21 +222,21 @@ class TestArgParseKeywords(HPyTest):
 
     def test_missing_required_argument(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="NN:add_two")
+        mod = self.make_two_arg_add(fmt="O+O+:add_two")
         with pytest.raises(TypeError) as exc:
             mod.f(1)
         assert str(exc.value) == "add_two() no value for required argument"
 
     def test_mismatched_args_too_few_keywords(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="NNN:add_two")
+        mod = self.make_two_arg_add(fmt="O+O+O+:add_two")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "add_two() mismatched args (too few keywords for fmt)"
 
     def test_mismatched_args_too_many_keywords(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="N:add_two")
+        mod = self.make_two_arg_add(fmt="O+:add_two")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "add_two() mismatched args (too many keywords for fmt)"
@@ -273,7 +273,7 @@ class TestArgParseKeywords(HPyTest):
                 HPy b = HPy_NULL;
                 HPy res;
                 static const char *kwlist[] = { "", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "N|N", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O+|O+", kwlist, &a, &b))
                     return HPy_NULL;
                 if (HPy_IsNull(b)) {
                     b = HPyLong_FromLong(ctx, 5);
@@ -296,7 +296,7 @@ class TestArgParseKeywords(HPyTest):
 
     def test_keyword_only_argument(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="N$N")
+        mod = self.make_two_arg_add(fmt="O+$O+")
         assert mod.f(1, b=2) == 3
         assert mod.f(a=1, b=2) == 3
         with pytest.raises(TypeError) as exc:
@@ -306,14 +306,14 @@ class TestArgParseKeywords(HPyTest):
 
     def test_error_with_function_name(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="NNN:my_func")
+        mod = self.make_two_arg_add(fmt="O+O+O+:my_func")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "my_func() mismatched args (too few keywords for fmt)"
 
     def test_error_with_overridden_message(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="NNN;my-error-message")
+        mod = self.make_two_arg_add(fmt="O+O+O+;my-error-message")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "my-error-message"

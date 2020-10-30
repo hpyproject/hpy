@@ -100,17 +100,20 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
         break;
     }
     case 'O': {
-        HPy *output = va_arg(*vl, HPy *);
-        _BREAK_IF_OPTIONAL(current_arg);
-        *output = current_arg;
-        break;
-    }
-    case 'N': {
-        HPy *output = va_arg(*vl, HPy *);
-        _BREAK_IF_OPTIONAL(current_arg);
-        *output = HPy_Dup(ctx, current_arg);
-        if (HPy_IsNull(*output))
-            return 0;
+        if (**fmt == '+') {
+            (*fmt)++;
+            HPy *output = va_arg(*vl, HPy *);
+            _BREAK_IF_OPTIONAL(current_arg);
+            *output = HPy_Dup(ctx, current_arg);
+            if (HPy_IsNull(*output))
+                return 0;
+            break;
+        }
+        else {
+            HPy *output = va_arg(*vl, HPy *);
+            _BREAK_IF_OPTIONAL(current_arg);
+            *output = current_arg;
+        }
         break;
     }
     default:
@@ -251,10 +254,10 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             fmt1++;
             continue;
         }
-        if (*fmt1 == 'O') {
+        if (*fmt1 == 'O' && *(fmt1 + 1) != '+') {
             set_error(ctx, ctx->h_SystemError, err_funcname, err_message,
                 "HPyArg_ParseKeywords cannot use the format character 'O'."
-                " Use 'N' instead and close the the returned handle if the call"
+                " Use 'O+' instead and close the the returned handle if the call"
                 " returns successfully");
             va_end(vl);
             return 0;
