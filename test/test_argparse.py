@@ -303,3 +303,17 @@ class TestArgParseKeywords(HPyTest):
             mod.f(1, 2)
         assert str(exc.value) == (
             "XXX: keyword only argument passed as positional argument")
+
+    def test_error_with_function_name(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="iii:my_func")
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "my_func: mismatched args (too few keywords for fmt)"
+
+    def test_error_with_overridden_message(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="iii;my-error-message")
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "my-error-message"
