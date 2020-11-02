@@ -199,12 +199,14 @@ class TestBasic(HPyTest):
                     case 3: h = ctx->h_True; break;
                     case 4: h = ctx->h_ValueError; break;
                     case 5: h = ctx->h_TypeError; break;
-                    case 6: h = ctx->h_BaseObjectType; break;
-                    case 7: h = ctx->h_TypeType; break;
-                    case 8: h = ctx->h_LongType; break;
-                    case 9: h = ctx->h_UnicodeType; break;
-                    case 10: h = ctx->h_TupleType; break;
-                    case 11: h = ctx->h_ListType; break;
+                    case 6: h = ctx->h_IndexError; break;
+                    case 7: h = ctx->h_SystemError; break;
+                    case 8: h = ctx->h_BaseObjectType; break;
+                    case 9: h = ctx->h_TypeType; break;
+                    case 10: h = ctx->h_LongType; break;
+                    case 11: h = ctx->h_UnicodeType; break;
+                    case 12: h = ctx->h_TupleType; break;
+                    case 13: h = ctx->h_ListType; break;
                     default:
                         HPyErr_SetString(ctx, ctx->h_ValueError, "invalid choice");
                         return HPy_NULL;
@@ -214,8 +216,10 @@ class TestBasic(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        builtin_objs = ('<NULL>', None, False, True, ValueError, TypeError,
-                        object, type, int, str, tuple, list)
+        builtin_objs = (
+            '<NULL>', None, False, True, ValueError, TypeError, IndexError,
+            SystemError, object, type, int, str, tuple, list,
+        )
         for i, obj in enumerate(builtin_objs):
             if i == 0:
                 continue
