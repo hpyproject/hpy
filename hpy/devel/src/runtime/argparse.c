@@ -66,7 +66,7 @@
 #include "hpy.h"
 
 #define _BREAK_IF_OPTIONAL(current_arg) if (HPy_IsNull(current_arg)) break;
-#define _MAX_ERR_STRING_LENGTH 512
+#define _ERR_STRING_MAX_LENGTH 512
 
 static int
 parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
@@ -124,17 +124,13 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
 }
 
 static const char *
-parse_errstring(const char *fmt, const char **err_funcname, const char **err_message)
+parse_err_fmt(const char *fmt, const char **err_fmt)
 {
     const char *fmt1 = fmt;
 
     for (; *fmt1 != 0; fmt1++) {
-        if (*fmt1 == ':') {
-            *err_funcname = fmt1 + 1;
-            break;
-        }
-        if (*fmt1 == ';') {
-            *err_message = fmt1 + 1;
+        if (*fmt1 == ':' || *fmt1 == ';') {
+            *err_fmt = fmt1;
             break;
         }
     }
@@ -142,18 +138,16 @@ parse_errstring(const char *fmt, const char **err_funcname, const char **err_mes
 }
 
 static void
-set_error(HPyContext ctx, HPy exc, const char *err_funcname, const char *err_message, const char *msg) {
-    char err_buf[_MAX_ERR_STRING_LENGTH];
-    if (err_message != NULL) {
-        snprintf(err_buf, _MAX_ERR_STRING_LENGTH, "%s", err_message);
+set_error(HPyContext ctx, HPy exc, const char *err_fmt, const char *msg) {
+    char err_buf[_ERR_STRING_MAX_LENGTH];
+    if (err_fmt == NULL) {
+        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "function %.256s", msg);
+    }
+    else if (*err_fmt == ':') {
+        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%.200s() %.256s", err_fmt + 1, msg);
     }
     else {
-        if (err_funcname == NULL) {
-            snprintf(err_buf, _MAX_ERR_STRING_LENGTH, "function %.256s", msg);
-        }
-        else {
-            snprintf(err_buf, _MAX_ERR_STRING_LENGTH, "%.200s() %.256s", err_funcname, msg);
-        }
+          snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%s", err_fmt + 1);
     }
     HPyErr_SetString(ctx, exc, err_buf);
 }
@@ -162,15 +156,14 @@ HPyAPI_RUNTIME_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
 {
     const char *fmt1 = fmt;
-    const char *err_funcname = NULL;
-    const char *err_message = NULL;
+    const char *err_fmt = NULL;
     const char *fmt_end = NULL;
 
     int optional = 0;
     HPy_ssize_t i = 0;
     HPy current_arg;
 
-    fmt_end = parse_errstring(fmt, &err_funcname, &err_message);
+    fmt_end = parse_err_fmt(fmt, &err_fmt);
 
     va_list vl;
     va_start(vl, fmt);
@@ -192,7 +185,7 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
             }
         }
         else {
-            set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
+            set_error(ctx, ctx->h_TypeError, err_fmt,
                 "required positional argument missing");
             va_end(vl);
             return 0;
@@ -200,7 +193,7 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
         i++;
     }
     if (i < nargs) {
-        set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
+        set_error(ctx, ctx->h_TypeError, err_fmt,
             "mismatched args (too many arguments for fmt)");
         va_end(vl);
         return 0;
@@ -215,8 +208,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
                      const char *fmt, const char *keywords[], ...)
 {
     const char *fmt1 = fmt;
-    const char *err_funcname = NULL;
-    const char *err_message = NULL;
+    const char *err_fmt = NULL;
     const char *fmt_end = NULL;
 
     int optional = 0;
@@ -225,7 +217,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
     HPy_ssize_t nkw = 0;
     HPy current_arg;
 
-    fmt_end = parse_errstring(fmt, &err_funcname, &err_message);
+    fmt_end = parse_err_fmt(fmt, &err_fmt);
 
     // first count positional only arguments
     while (keywords[nkw] != NULL && !*keywords[nkw]) {
@@ -234,7 +226,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
     // then check and count the rest
     while (keywords[nkw] != NULL) {
         if (!*keywords[nkw]) {
-            set_error(ctx, ctx->h_SystemError, err_funcname, err_message,
+            set_error(ctx, ctx->h_SystemError, err_fmt,
                 "empty keyword parameter name");
             return 0;
         }
@@ -257,7 +249,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             continue;
         }
         if (*fmt1 == 'O' && *(fmt1 + 1) != '+') {
-            set_error(ctx, ctx->h_SystemError, err_funcname, err_message,
+            set_error(ctx, ctx->h_SystemError, err_fmt,
                 "HPyArg_ParseKeywords cannot use the format character 'O'."
                 " Use 'O+' instead and close the the returned handle if the call"
                 " returns successfully");
@@ -265,7 +257,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             return 0;
         }
         if (i >= nkw) {
-            set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
+            set_error(ctx, ctx->h_TypeError, err_fmt,
                 "mismatched args (too few keywords for fmt)");
             va_end(vl);
             return 0;
@@ -273,7 +265,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         current_arg = HPy_NULL;
         if (i < nargs) {
             if (keyword_only) {
-                set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
+                set_error(ctx, ctx->h_TypeError, err_fmt,
                     "keyword only argument passed as positional argument");
                 va_end(vl);
                 return 0;
@@ -291,7 +283,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             }
         }
         else {
-            set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
+            set_error(ctx, ctx->h_TypeError, err_fmt,
                 "no value for required argument");
             va_end(vl);
             return 0;
@@ -299,7 +291,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         i++;
     }
     if (i != nkw) {
-        set_error(ctx, ctx->h_TypeError, err_funcname, err_message,
+        set_error(ctx, ctx->h_TypeError, err_fmt,
             "mismatched args (too many keywords for fmt)");
         va_end(vl);
         return 0;
