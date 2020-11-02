@@ -68,8 +68,40 @@
 #define _BREAK_IF_OPTIONAL(current_arg) if (HPy_IsNull(current_arg)) break;
 #define _ERR_STRING_MAX_LENGTH 512
 
+
+static const char *
+parse_err_fmt(const char *fmt, const char **err_fmt)
+{
+    const char *fmt1 = fmt;
+
+    for (; *fmt1 != 0; fmt1++) {
+        if (*fmt1 == ':' || *fmt1 == ';') {
+            *err_fmt = fmt1;
+            break;
+        }
+    }
+    return fmt1;
+}
+
+
+static void
+set_error(HPyContext ctx, HPy exc, const char *err_fmt, const char *msg) {
+    char err_buf[_ERR_STRING_MAX_LENGTH];
+    if (err_fmt == NULL) {
+        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "function %.256s", msg);
+    }
+    else if (*err_fmt == ':') {
+        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%.200s() %.256s", err_fmt + 1, msg);
+    }
+    else {
+          snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%s", err_fmt + 1);
+    }
+    HPyErr_SetString(ctx, exc, err_buf);
+}
+
+
 static int
-parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
+parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl, const char *err_fmt)
 {
     switch (*(*fmt)++) {
     case 'i': {
@@ -117,40 +149,12 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
         break;
     }
     default:
-        HPyErr_SetString(ctx, ctx->h_SystemError, "XXX: Unknown arg format code");
+        set_error(ctx, ctx->h_SystemError, err_fmt, "unknown arg format code");
         return 0;
     }
     return 1;
 }
 
-static const char *
-parse_err_fmt(const char *fmt, const char **err_fmt)
-{
-    const char *fmt1 = fmt;
-
-    for (; *fmt1 != 0; fmt1++) {
-        if (*fmt1 == ':' || *fmt1 == ';') {
-            *err_fmt = fmt1;
-            break;
-        }
-    }
-    return fmt1;
-}
-
-static void
-set_error(HPyContext ctx, HPy exc, const char *err_fmt, const char *msg) {
-    char err_buf[_ERR_STRING_MAX_LENGTH];
-    if (err_fmt == NULL) {
-        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "function %.256s", msg);
-    }
-    else if (*err_fmt == ':') {
-        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%.200s() %.256s", err_fmt + 1, msg);
-    }
-    else {
-          snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%s", err_fmt + 1);
-    }
-    HPyErr_SetString(ctx, exc, err_buf);
-}
 
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
@@ -179,7 +183,7 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
             current_arg = args[i];
         }
         if (!HPy_IsNull(current_arg) || optional) {
-            if (!parse_item(ctx, current_arg, &fmt1, &vl)) {
+            if (!parse_item(ctx, current_arg, &fmt1, &vl, err_fmt)) {
                 va_end(vl);
                 return 0;
             }
@@ -202,6 +206,7 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
     va_end(vl);
     return 1;
 }
+
 
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
@@ -277,7 +282,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             HPyErr_Clear(ctx); // XXX: is this okay?
         }
         if (!HPy_IsNull(current_arg) || optional) {
-            if (!parse_item(ctx, current_arg, &fmt1, &vl)) {
+            if (!parse_item(ctx, current_arg, &fmt1, &vl, err_fmt)) {
                 va_end(vl);
                 return 0;
             }

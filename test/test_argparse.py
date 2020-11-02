@@ -113,10 +113,10 @@ class TestArgParse(HPyTest):
 
     def test_unsupported_fmt(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="ZZ")
+        mod = self.make_two_arg_add(fmt="ZZ:two_add")
         with pytest.raises(SystemError) as exc:
             mod.f("a")
-        assert str(exc.value) == "XXX: Unknown arg format code"
+        assert str(exc.value) == "two_add() unknown arg format code"
 
     def test_too_few_args(self):
         import pytest
@@ -139,10 +139,31 @@ class TestArgParse(HPyTest):
 
     def test_keyword_only_args_fails(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O$O")
+        mod = self.make_two_arg_add(fmt="O$O:two_add")
         with pytest.raises(SystemError) as exc:
             mod.f(1, 2)
-        assert str(exc.value) == "XXX: Unknown arg format code"
+        assert str(exc.value) == "two_add() unknown arg format code"
+
+    def test_error_default_message(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="OOO")
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "function required positional argument missing"
+
+    def test_error_with_function_name(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="OOO:my_func")
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "my_func() required positional argument missing"
+
+    def test_error_with_overridden_message(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="OOO;my-error-message")
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "my-error-message"
 
 
 class TestArgParseKeywords(HPyTest):
@@ -215,10 +236,10 @@ class TestArgParseKeywords(HPyTest):
 
     def test_unsupported_fmt(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="ZZ")
+        mod = self.make_two_arg_add(fmt="ZZ:two_add")
         with pytest.raises(SystemError) as exc:
             mod.f("a")
-        assert str(exc.value) == "XXX: Unknown arg format code"
+        assert str(exc.value) == "two_add() unknown arg format code"
 
     def test_missing_required_argument(self):
         import pytest
@@ -303,6 +324,13 @@ class TestArgParseKeywords(HPyTest):
             mod.f(1, 2)
         assert str(exc.value) == (
             "function keyword only argument passed as positional argument")
+
+    def test_error_default_message(self):
+        import pytest
+        mod = self.make_two_arg_add(fmt="O+O+O+")
+        with pytest.raises(TypeError) as exc:
+            mod.f(1, 2)
+        assert str(exc.value) == "function mismatched args (too few keywords for fmt)"
 
     def test_error_with_function_name(self):
         import pytest
