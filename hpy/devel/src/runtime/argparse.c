@@ -126,7 +126,9 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl)
 static const char *
 parse_errstring(const char *fmt, const char **err_funcname, const char **err_message)
 {
-    for (const char *fmt1 = fmt; *fmt1 != 0; fmt1++) {
+    const char *fmt1 = fmt;
+
+    for (; *fmt1 != 0; fmt1++) {
         if (*fmt1 == ':') {
             *err_funcname = fmt1 + 1;
             break;
