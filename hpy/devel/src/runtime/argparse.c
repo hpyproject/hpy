@@ -279,7 +279,11 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         }
         else if (!HPy_IsNull(kw) && *keywords[i]) {
             current_arg = HPy_GetItem_s(ctx, kw, keywords[i]);
-            HPyErr_Clear(ctx); // XXX: is this okay?
+            // Clear any KeyError that was raised. If an error was raised
+            // current_arg will be HPy_NULL and will be handled appropriately
+            // below depending on whether the current argument is optional or
+            // not
+            HPyErr_Clear(ctx);
         }
         if (!HPy_IsNull(current_arg) || optional) {
             if (!parse_item(ctx, current_arg, &fmt1, &vl, err_fmt)) {
