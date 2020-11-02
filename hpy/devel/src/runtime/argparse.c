@@ -226,7 +226,9 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
     fmt_end = parse_errstring(fmt, &err_funcname, &err_message);
 
     // first count positional only arguments
-    while (keywords[nkw] != NULL && !*keywords[nkw]) nkw++;
+    while (keywords[nkw] != NULL && !*keywords[nkw]) {
+        nkw++;
+    }
     // then check and count the rest
     while (keywords[nkw] != NULL) {
         if (!*keywords[nkw]) {
