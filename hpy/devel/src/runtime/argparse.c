@@ -147,7 +147,7 @@ set_error(HPyContext ctx, HPy exc, const char *err_funcname, const char *err_mes
     if (err_message != NULL) {
         snprintf(err_buf, _MAX_ERR_STRING_LENGTH, "%s", err_message);
     }
-    if (err_message == NULL) {
+    else {
         if (err_funcname == NULL) {
             snprintf(err_buf, _MAX_ERR_STRING_LENGTH, "function %.256s", msg);
         }
