@@ -185,6 +185,23 @@ class TestBasic(HPyTest):
             mod.f("not an integer")
         assert str(exc.value) == 'hello world'
 
+    def test_exception_cleared(self):
+        import pytest
+        import sys
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {
+                HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
+                HPyErr_Clear(ctx);
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f() is None
+        assert sys.exc_info() == (None, None, None)
+
     def test_builtin_handles(self):
         import pytest
         mod = self.make_module("""
