@@ -1,3 +1,8 @@
+"""
+These are not real tests, but microbenchmarks. The machinery to record the
+timing and display the results is inside conftest.py
+"""
+
 import time
 import cpy_simple
 
