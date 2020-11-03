@@ -34,6 +34,20 @@ class Timer(object):
         usec = (self.stop - self.start) * 1000
         return f'{usec:.2f} us'
 
+    def is_ok(self):
+        return self.start is not None and self.stop is not None
+
+# ====== colors ======
+RED = 31
+GREEN = 32
+YELLOW = 33
+BLUE = 34
+
+def color(col, s):
+    template = '\033[%02dm%s\033[0m'
+    return template % (col, s)
+
+# ====================
 
 class Runner:
 
@@ -73,10 +87,12 @@ class Runner:
                 timer = Timer()
                 bench.meth(timer)
                 outcome = str(timer)
+                col = GREEN if timer.is_ok() else RED
             else:
                 outcome = 'SKIP'
+                col = YELLOW
             #
-            print(f'{outcome:>14}')
+            print(color(col, f'{outcome:>14}'))
 
 
 def main():
