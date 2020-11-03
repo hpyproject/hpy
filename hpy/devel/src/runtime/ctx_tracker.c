@@ -138,7 +138,7 @@ ctx_Tracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
 }
 
 _HPy_HIDDEN void
-ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker ht)
+ctx_Tracker_ForgetAll(HPyContext ctx, HPyTracker ht)
 {
     _HPyTracker_s *hp = _ht2hp(ht);
     hp->next = 0;

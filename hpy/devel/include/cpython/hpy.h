@@ -258,9 +258,9 @@ HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
 }
 
 HPyAPI_FUNC(void)
-HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht)
+HPyTracker_ForgetAll(HPyContext ctx, HPyTracker ht)
 {
-    ctx_Tracker_RemoveAll(ctx, ht);
+    ctx_Tracker_ForgetAll(ctx, ht);
 }
 
 HPyAPI_FUNC(void)

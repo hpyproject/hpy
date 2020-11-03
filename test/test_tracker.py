@@ -50,13 +50,13 @@ class TestHPyTracker(HPyTest):
     def test_add_and_remove_all(self):
         mod = self.hpytracker_module(ops="""
             HPyTracker_Add(ctx, ht, args[0]);
-            HPyTracker_RemoveAll(ctx, ht);
+            HPyTracker_ForgetAll(ctx, ht);
         """)
         assert mod.f(5) is None
 
     def test_remove_all_on_nothing(self):
         mod = self.hpytracker_module(ops="""
-            HPyTracker_RemoveAll(ctx, ht);
+            HPyTracker_ForgetAll(ctx, ht);
         """)
         assert mod.f() is None
 
