@@ -1,6 +1,6 @@
 import time
 
-class Microbench:
+class BenchModule:
 
     def bench_a(self, timer):
         pass
@@ -14,4 +14,7 @@ class Microbench:
 
 
 
+class BenchType:
 
+    def bench_foo(self, timer):
+        pass

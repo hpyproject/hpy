@@ -7,7 +7,7 @@ Options:
 import time
 from dataclasses import dataclass
 import docopt
-from hpy.microbench.microbench import Microbench
+from hpy.microbench import microbench
 
 @dataclass
 class Benchmark:
@@ -39,18 +39,33 @@ class Runner:
 
     def __init__(self, match):
         self.match  = match
-        self.instance = Microbench()
 
-    def get_benchmarks(self):
-        names = [x for x in dir(self.instance) if x.startswith('bench_')]
-        benchmarks = [Benchmark(name, getattr(self.instance, name))
-                      for name in names]
+    def collect(self):
+        return self.collect_module(microbench)
+
+    def collect_module(self, mod):
+        benchmarks = []
+        for name in dir(mod):
+            obj = getattr(mod, name)
+            if isinstance(obj, type) and obj.__name__.startswith('Bench'):
+                benchmarks += self.collect_class(obj)
+        return benchmarks
+
+    def collect_class(self, cls):
+        instance = cls()
+        benchmarks = []
+        for name in dir(instance):
+            if not name.startswith('bench_'):
+                continue
+            fullname = f'{cls.__name__}::{name}'
+            meth = getattr(instance, name)
+            benchmarks.append(Benchmark(fullname, meth))
+        #
         benchmarks.sort(key = lambda b: b.meth.__code__.co_firstlineno)
         return benchmarks
 
-
     def run(self):
-        benchmarks = self.get_benchmarks()
+        benchmarks = self.collect()
         L = max([len(bench.name) for bench in benchmarks])
         for bench in benchmarks:
             print(f'{bench.name:{L}}', end='', flush=True)
