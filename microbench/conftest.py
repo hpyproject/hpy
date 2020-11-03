@@ -18,9 +18,9 @@ class Timer:
 
     def __str__(self):
         if self.start is None:
-            return '[NOT STARTED]'
+            return '[TIMER NOT USED]'
         if self.stop is None:
-            return '[IN PROGRESS]'
+            return '[TIMER IN-PROGRESS]'
         usec = (self.stop - self.start) * 1000
         return f'{usec:.2f} us'
 
@@ -49,14 +49,17 @@ def timer(request):
 def pytest_configure(config):
     config._timersession = TimerSession()
 
+LINE_LENGTH = 90
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_report_teststatus(report, config):
     outcome = yield
     category, letter, word = outcome.get_result()
     timer = config._timersession.get_timer(report.nodeid)
     if category == 'passed' and timer:
-        if timer.has_timing():
-            word = str(timer)
-        else:
-            word = (str(timer), {'red': True})
-        outcome.force_result((category, letter, word))
+        L = LINE_LENGTH - len(report.nodeid)
+        word = str(timer).rjust(L)
+        markup = None
+        if not timer.has_timing():
+            markup = {'yellow': True}
+        outcome.force_result((category, letter, (word, markup)))
