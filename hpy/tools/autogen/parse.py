@@ -215,8 +215,8 @@ SPECIAL_CASES = {
     'HPyTupleBuilder_Cancel': None,
     'HPyTracker_New': None,
     'HPyTracker_Add': None,
-    'HPyTracker_RemoveAll': None,
-    'HPyTracker_Free': None,
+    'HPyTracker_ForgetAll': None,
+    'HPyTracker_Close': None,
 }
 
 

@@ -432,11 +432,11 @@ static inline int HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h) {
      return ctx->ctx_Tracker_Add ( ctx, ht, h ); 
 }
 
-static inline void HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht) {
-     ctx->ctx_Tracker_RemoveAll ( ctx, ht ); 
+static inline void HPyTracker_ForgetAll(HPyContext ctx, HPyTracker ht) {
+     ctx->ctx_Tracker_ForgetAll ( ctx, ht ); 
 }
 
-static inline void HPyTracker_Free(HPyContext ctx, HPyTracker ht) {
-     ctx->ctx_Tracker_Free ( ctx, ht ); 
+static inline void HPyTracker_Close(HPyContext ctx, HPyTracker ht) {
+     ctx->ctx_Tracker_Close ( ctx, ht ); 
 }
 
