@@ -49,6 +49,11 @@ def timer(request):
 def pytest_configure(config):
     config._timersession = TimerSession()
 
+def pytest_collection_finish(session):
+    if not session.config.option.verbose:
+        print()
+        print('WARNING: You should use pytest -v to see the timings')
+
 LINE_LENGTH = 90
 
 @pytest.hookimpl(hookwrapper=True)
