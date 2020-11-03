@@ -25,6 +25,7 @@ HPy h_Exception;
 HPy h_ValueError;
 HPy h_TypeError;
 HPy h_IndexError;
+HPy h_SystemError;
 HPy h_BaseObjectType;   /* built-in 'object' */
 HPy h_TypeType;         /* built-in 'type' */
 HPy h_LongType;         /* built-in 'int' */
@@ -91,6 +92,7 @@ void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext ctx);
 HPy HPyErr_NoMemory(HPyContext ctx);
+void HPyErr_Clear(HPyContext ctx);
 
 /* object.h */
 int HPy_IsTrue(HPyContext ctx, HPy h);

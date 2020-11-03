@@ -17,6 +17,7 @@ struct _HPyContext_s {
     HPy h_ValueError;
     HPy h_TypeError;
     HPy h_IndexError;
+    HPy h_SystemError;
     HPy h_BaseObjectType;
     HPy h_TypeType;
     HPy h_LongType;
@@ -74,6 +75,7 @@ struct _HPyContext_s {
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     int (*ctx_Err_Occurred)(HPyContext ctx);
     HPy (*ctx_Err_NoMemory)(HPyContext ctx);
+    void (*ctx_Err_Clear)(HPyContext ctx);
     int (*ctx_IsTrue)(HPyContext ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext ctx, HPyType_Spec *spec, HPyType_SpecParam *params);
     HPy (*ctx_Type_GenericNew)(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
