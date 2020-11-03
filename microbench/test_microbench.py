@@ -1,5 +1,5 @@
 import time
-from hpy.microbench import cpy_simple
+import cpy_simple
 
 N = 1000000
 
