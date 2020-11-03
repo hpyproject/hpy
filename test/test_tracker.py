@@ -23,7 +23,7 @@ class TestHPyTracker(HPyTest):
                     return HPy_NULL;
                 }}
                 {ops}
-                HPyTracker_Free(ctx, ht);
+                HPyTracker_Close(ctx, ht);
                 if (HPy_IsNull(result))
                     result = HPy_Dup(ctx, ctx->h_None);
                 return result;
@@ -102,11 +102,11 @@ class TestHPyTracker(HPyTest):
                         goto error;
                 }
 
-                HPyTracker_Free(ctx, ht);
+                HPyTracker_Close(ctx, ht);
                 return dict;
 
                 error:
-                    HPyTracker_Free(ctx, ht);
+                    HPyTracker_Close(ctx, ht);
                     HPy_Close(ctx, dict);
                     HPyErr_SetString(ctx, ctx->h_ValueError, "Failed!");
                     return HPy_NULL;

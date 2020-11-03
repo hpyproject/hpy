@@ -436,7 +436,7 @@ static inline void HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht) {
      ctx->ctx_Tracker_RemoveAll ( ctx, ht ); 
 }
 
-static inline void HPyTracker_Free(HPyContext ctx, HPyTracker ht) {
-     ctx->ctx_Tracker_Free ( ctx, ht ); 
+static inline void HPyTracker_Close(HPyContext ctx, HPyTracker ht) {
+     ctx->ctx_Tracker_Close ( ctx, ht ); 
 }
 

@@ -133,5 +133,5 @@ struct _HPyContext_s {
     HPyTracker (*ctx_Tracker_New)(HPyContext ctx, HPy_ssize_t size);
     int (*ctx_Tracker_Add)(HPyContext ctx, HPyTracker ht, HPy h);
     void (*ctx_Tracker_RemoveAll)(HPyContext ctx, HPyTracker ht);
-    void (*ctx_Tracker_Free)(HPyContext ctx, HPyTracker ht);
+    void (*ctx_Tracker_Close)(HPyContext ctx, HPyTracker ht);
 };

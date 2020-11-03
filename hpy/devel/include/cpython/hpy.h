@@ -264,9 +264,9 @@ HPyTracker_RemoveAll(HPyContext ctx, HPyTracker ht)
 }
 
 HPyAPI_FUNC(void)
-HPyTracker_Free(HPyContext ctx, HPyTracker ht)
+HPyTracker_Close(HPyContext ctx, HPyTracker ht)
 {
-    ctx_Tracker_Free(ctx, ht);
+    ctx_Tracker_Close(ctx, ht);
 }
 
 #endif /* !HPy_CPYTHON_H */

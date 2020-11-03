@@ -13,6 +13,6 @@ _HPy_HIDDEN void
 ctx_Tracker_RemoveAll(HPyContext ctx, HPyTracker ht);
 
 _HPy_HIDDEN void
-ctx_Tracker_Free(HPyContext ctx, HPyTracker ht);
+ctx_Tracker_Close(HPyContext ctx, HPyTracker ht);
 
 #endif /* HPY_COMMON_RUNTIME_CTX_TRACKER_H */
