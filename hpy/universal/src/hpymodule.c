@@ -12,6 +12,10 @@
 #include "handles.h"
 #include "common/version.h"
 
+#ifdef PYPY_VERSION
+#  error "Cannot build hpy.univeral on top of PyPy. PyPy comes with its own version of it"
+#endif
+
 typedef HPy (*InitFuncPtr)(HPyContext ctx);
 
 static PyObject *set_debug(PyObject *self, PyObject *args)
