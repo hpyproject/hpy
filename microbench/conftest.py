@@ -93,10 +93,11 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "hpy: mark modules using the HPy API")
     config.addinivalue_line("markers", "cpy: mark modules using the old Python/C API")
 
-def pytest_collection_finish(session):
-    if not session.config.option.verbose:
-        print()
-        print('WARNING: You should use pytest -v to see the timings')
+def pytest_addoption(parser):
+    parser.addoption(
+        "--fast", action="store_true", default=False, help="run microbench faster"
+    )
+
 
 LINE_LENGTH = 90
 

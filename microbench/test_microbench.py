@@ -26,36 +26,43 @@ def simple(request, api):
     else:
         assert False, 'Unkown param: %s' % request.param
 
-N = 10000000
+
+@pytest.fixture
+def N(request):
+    n = 10000000
+    if request.config.option.fast:
+        n //= 100
+    return n
+
 
 class TestModule:
 
-    def test_noargs(self, simple, timer):
+    def test_noargs(self, simple, timer, N):
         with timer:
             for i in range(N):
                 simple.noargs()
 
-    def test_onearg_None(self, simple, timer):
+    def test_onearg_None(self, simple, timer, N):
         with timer:
             for i in range(N):
                 simple.onearg(None)
 
-    def test_onearg_int(self, simple, timer):
+    def test_onearg_int(self, simple, timer, N):
         with timer:
             for i in range(N):
                 simple.onearg(i)
 
-    def test_varargs(self, simple, timer):
+    def test_varargs(self, simple, timer, N):
         with timer:
             for i in range(N):
                 simple.varargs(None, None)
 
-    def test_allocate_int(self, simple, timer):
+    def test_allocate_int(self, simple, timer, N):
         with timer:
             for i in range(N):
                 simple.allocate_int()
 
-    def test_allocate_tuple(self, api, simple, timer):
+    def test_allocate_tuple(self, api, simple, timer, N):
         if api == 'hpy':
             pytest.skip('Missing HPy_BuildValue')
         with timer:
@@ -65,37 +72,37 @@ class TestModule:
 
 class TestType:
 
-    def test_noargs(self, simple, timer):
+    def test_noargs(self, simple, timer, N):
         obj = simple.Foo()
         with timer:
             for i in range(N):
                 obj.noargs()
 
-    def test_onearg_None(self, simple, timer):
+    def test_onearg_None(self, simple, timer, N):
         obj = simple.Foo()
         with timer:
             for i in range(N):
                 obj.onearg(None)
 
-    def test_onearg_int(self, simple, timer):
+    def test_onearg_int(self, simple, timer, N):
         obj = simple.Foo()
         with timer:
             for i in range(N):
                 obj.onearg(i)
 
-    def test_varargs(self, simple, timer):
+    def test_varargs(self, simple, timer, N):
         obj = simple.Foo()
         with timer:
             for i in range(N):
                 obj.varargs(None, None)
 
-    def test_len(self, simple, timer):
+    def test_len(self, simple, timer, N):
         obj = simple.Foo()
         with timer:
             for i in range(N):
                 len(obj)
 
-    def test_getitem(self, simple, timer):
+    def test_getitem(self, simple, timer, N):
         obj = simple.Foo()
         with timer:
             for i in range(N):
