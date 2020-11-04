@@ -55,7 +55,9 @@ class TestModule:
             for i in range(N):
                 simple.allocate_int()
 
-    def test_allocate_tuple(self, simple, timer):
+    def test_allocate_tuple(self, api, simple, timer):
+        if api == 'hpy':
+            pytest.skip('Missing HPy_BuildValue')
         with timer:
             for i in range(N):
                 simple.allocate_tuple()
