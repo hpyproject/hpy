@@ -27,7 +27,7 @@ static PyObject* allocate_tuple(PyObject* self, PyObject* args)
     return Py_BuildValue("ii", 2048, 2049);
 }
 
-static PyObject * Foo_getitem(PyObject *self, PyObject *key)
+static PyObject * Foo_getitem(PyObject *self, Py_ssize_t i)
 {
     Py_RETURN_NONE;
 }
@@ -47,9 +47,9 @@ static PyMethodDef SimpleMethods[] = {
 };
 
 
-static PyMappingMethods FooMapping = {
-	(lenfunc)Foo_len,
-	(binaryfunc)Foo_getitem,
+static PySequenceMethods FooSequence = {
+	.sq_length = (lenfunc)Foo_len,
+	.sq_item = (ssizeargfunc)Foo_getitem,
 	NULL,
 };
 
@@ -72,8 +72,8 @@ static PyTypeObject Foo_Type = {
     0,                         /* tp_compare */
     0,                         /* tp_repr */
     0,                         /* tp_as_number */
-    0,                         /* tp_as_sequence */
-    &FooMapping,               /* tp_as_mapping */
+    &FooSequence,              /* tp_as_sequence */
+    0,                         /* tp_as_mapping */
     0,                         /* tp_hash */
     0,                         /* tp_call */
     0,                         /* tp_str */
