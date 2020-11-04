@@ -6,7 +6,12 @@ timing and display the results is inside conftest.py
 import pytest
 import time
 
-@pytest.fixture(params=['cpy', 'hpy'])
+API_PARAMS = [
+    pytest.param('cpy', marks=pytest.mark.cpy),
+    pytest.param('hpy', marks=pytest.mark.hpy)
+    ]
+
+@pytest.fixture(params=API_PARAMS)
 def simple(request):
     if request.param == 'cpy':
         import cpy_simple

@@ -48,6 +48,8 @@ def timer(request):
 
 def pytest_configure(config):
     config._timersession = TimerSession()
+    config.addinivalue_line("markers", "hpy: mark modules using the HPy API")
+    config.addinivalue_line("markers", "cpy: mark modules using the old Python/C API")
 
 def pytest_collection_finish(session):
     if not session.config.option.verbose:
