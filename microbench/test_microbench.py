@@ -61,3 +61,42 @@ class TestModule:
         with timer:
             for i in range(N):
                 simple.allocate_tuple()
+
+
+class TestType:
+
+    def test_noargs(self, simple, timer):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                obj.noargs()
+
+    def test_onearg_None(self, simple, timer):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                obj.onearg(None)
+
+    def test_onearg_int(self, simple, timer):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                obj.onearg(i)
+
+    def test_varargs(self, simple, timer):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                obj.varargs(None, None)
+
+    def test_len(self, simple, timer):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                len(obj)
+
+    def test_getitem(self, simple, timer):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                obj[0]
