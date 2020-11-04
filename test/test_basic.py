@@ -271,7 +271,7 @@ class TestBasic(HPyTest):
             static HPy h_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 long a, b;
-                if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
@@ -281,7 +281,7 @@ class TestBasic(HPyTest):
             {
                 long a, b;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "ll", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "ll", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
