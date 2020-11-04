@@ -12,11 +12,15 @@ API_PARAMS = [
     ]
 
 @pytest.fixture(params=API_PARAMS)
-def simple(request):
-    if request.param == 'cpy':
+def api(request):
+    return request.param
+
+@pytest.fixture
+def simple(request, api):
+    if api == 'cpy':
         import cpy_simple
         return cpy_simple
-    elif request.param == 'hpy':
+    elif api == 'hpy':
         import hpy_simple
         return hpy_simple
     else:

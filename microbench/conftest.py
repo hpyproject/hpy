@@ -1,4 +1,6 @@
+import re
 import time
+from collections import defaultdict
 import pytest
 
 class Timer:
@@ -24,27 +26,67 @@ class Timer:
         usec = (self.stop - self.start) * 1000
         return f'{usec:.2f} us'
 
-    def has_timing(self):
-        return self.start is not None and self.stop is not None
+    @property
+    def elapsed(self):
+        if self.start is not None and self.stop is not None:
+            return self.stop - self.start
+        return None
 
 
 class TimerSession:
 
+    NODEID = re.compile(r'(.*)\[(.*)\]')
+
     def __init__(self):
-        self.timers = {} # nodeid -> Timer
+        self.apis = set() # ['cpy', 'hpy', ...]
+        self.table = defaultdict(dict)   # {shortid: {api: timer}}
+        self.timers = {}  # nodeid -> Timer
 
     def new_timer(self, nodeid):
+        shortid, api = self.split_nodeid(nodeid)
         timer = Timer(nodeid)
+        self.apis.add(api)
+        self.table[shortid][api] = timer
         self.timers[nodeid] = timer
         return timer
 
     def get_timer(self, nodeid):
         return self.timers.get(nodeid)
 
+    def split_nodeid(self, nodeid):
+        shortid = '::'.join(nodeid.split('::')[-2:]) # take only class::function
+        m = self.NODEID.match(shortid)
+        if not m:
+            return shortid, ''
+        return m.group(1), m.group(2)
+
+    def format_ratio(self, reference, value):
+        if reference and reference.elapsed and value and value.elapsed:
+            ratio = value.elapsed / reference.elapsed
+            return f'[{ratio:.2f}]'
+        return ''
+
+    def display_summary(self, tr):
+        w = tr.write_line
+        w('')
+        tr.write_sep('=', 'BENCHMARKS', cyan=True)
+        w(' '*40 + '             cpy                    hpy')
+        w(' '*40 + '---------------------------------------')
+        for shortid, timings in self.table.items():
+            cpy = timings.get('cpy')
+            hpy = timings.get('hpy')
+            hpy_ratio = self.format_ratio(cpy, hpy)
+            cpy = cpy or ''
+            hpy = hpy or ''
+            w(f'{shortid:<40} {cpy!s:>15} {hpy!s:>15} {hpy_ratio}')
+        w('')
+
+
 
 @pytest.fixture
-def timer(request):
-    return request.config._timersession.new_timer(request.node.nodeid)
+def timer(request, api):
+    nodeid = request.node.nodeid
+    return request.config._timersession.new_timer(nodeid)
 
 def pytest_configure(config):
     config._timersession = TimerSession()
@@ -67,6 +109,9 @@ def pytest_report_teststatus(report, config):
         L = LINE_LENGTH - len(report.nodeid)
         word = str(timer).rjust(L)
         markup = None
-        if not timer.has_timing():
+        if timer.elapsed is None:
             markup = {'yellow': True}
         outcome.force_result((category, letter, (word, markup)))
+
+def pytest_terminal_summary(terminalreporter, config):
+    config._timersession.display_summary(terminalreporter)
