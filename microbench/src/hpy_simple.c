@@ -35,6 +35,48 @@ static HPy allocate_tuple_impl(HPyContext ctx, HPy self)
 }
 
 
+/* Foo type */
+
+typedef struct {
+    HPyObject_HEAD
+} FooObject;
+
+HPyDef_SLOT(Foo_getitem, Foo_getitem_impl, HPy_sq_item)
+static HPy Foo_getitem_impl(HPyContext ctx, HPy self, HPy_ssize_t i)
+{
+    return HPy_Dup(ctx, ctx->h_None);
+}
+
+HPyDef_SLOT(Foo_len, Foo_len_impl, HPy_sq_length)
+static HPy_ssize_t Foo_len_impl(HPyContext ctx, HPy self)
+{
+    return 42;
+}
+
+
+// note that we can reuse the same HPyDef for both module-level and type-level
+// methods
+static HPyDef *foo_defines[] = {
+    &noargs,
+    &onearg,
+    &varargs,
+    &allocate_int,
+    &allocate_tuple,
+    &Foo_getitem,
+    &Foo_len,
+};
+
+
+static HPyType_Spec Foo_spec = {
+    .name = "hpy_simple.Foo",
+    .basicsize = sizeof(FooObject),
+    .flags = HPy_TPFLAGS_DEFAULT,
+    .defines = foo_defines
+};
+
+
+/* Module defines */
+
 static HPyDef *module_defines[] = {
     &noargs,
     &onearg,
@@ -59,5 +101,9 @@ static HPy init_hpy_simple_impl(HPyContext ctx)
     HPy m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
+    HPy h_Foo = HPyType_FromSpec(ctx, &Foo_spec, NULL);
+    if (HPy_IsNull(h_Foo))
+      return HPy_NULL;
+    HPy_SetAttr_s(ctx, m, "Foo", h_Foo);
     return m;
 }
