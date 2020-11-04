@@ -16,7 +16,7 @@ HPyDef_METH(add_ints, "add_ints", add_ints_impl, HPyFunc_VARARGS)
 static HPy add_ints_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     long a, b;
-    if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))
         return HPy_NULL;
     return HPyLong_FromLong(ctx, a+b);
 }
@@ -27,7 +27,7 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 {
     long a, b;
     const char* kwlist[] = {"a", "b", NULL};
-    if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "ll", kwlist, &a, &b))
+    if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "ll", kwlist, &a, &b))
         return HPy_NULL;
     return HPyLong_FromLong(ctx, a+b);
 }
@@ -44,7 +44,7 @@ static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
 {
     // FIXME: we should use double, but HPyArg_Parse does not support "d" yet
     long x, y;
-    if (!HPyArg_Parse(ctx, args, nargs, "ll", &x, &y))
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &x, &y))
         return HPy_NULL;
     HPy_Point *point;
     HPy h_point = HPy_New(ctx, cls, &point);
