@@ -151,12 +151,6 @@ int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 /* dictobject.h */
 int HPyDict_Check(HPyContext ctx, HPy h);
 HPy HPyDict_New(HPyContext ctx);
-// TODO: Move HPyDict_SetItem and _GetItem (we have HPy_SetItem and _GetItem)
-//       out of the base API.
-// TODO: Leave name as HPyDict_SetItem (it doesn't steal).
-// TODO: Rename to HPyDict_GetItem_NewHandle.
-int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
-HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key);
 
 /* pyerrors.h */
 void HPy_FatalError(HPyContext ctx, const char *message);

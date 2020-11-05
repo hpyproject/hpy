@@ -398,13 +398,3 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Dict_New)(HPyContext ctx)
     return _py2h(PyDict_New());
 }
 
-HPyAPI_STORAGE int _HPy_IMPL_NAME(Dict_SetItem)(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val)
-{
-    return PyDict_SetItem(_h2py(h_dict), _h2py(h_key), _h2py(h_val));
-}
-
-HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Dict_GetItem)(HPyContext ctx, HPy h_dict, HPy h_key)
-{
-    return _py2h(PyDict_GetItem(_h2py(h_dict), _h2py(h_key)));
-}
-
