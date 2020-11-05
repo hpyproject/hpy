@@ -1,3 +1,4 @@
+import sys
 import os
 from setuptools import setup, Extension
 
@@ -39,19 +40,9 @@ def get_scm_config():
 
     return {} # use the default config
 
-dev_requirements = [
-    "pytest",
-    "pytest-xdist",
-]
-
-setup(
-    name="hpy.devel",
-    packages = ['hpy.devel'],
-    include_package_data=True,
-    extras_require={
-        "dev": dev_requirements,
-    },
-    ext_modules = [
+EXT_MODULES = []
+if sys.implementation.name == 'cpython':
+    EXT_MODULES += [
         Extension('hpy.universal',
                   ['hpy/universal/src/hpymodule.c',
                    'hpy/universal/src/handles.c',
@@ -73,8 +64,24 @@ setup(
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
                   ] + EXTRA_COMPILE_ARGS
-        )],
-      entry_points={
+                  )
+        ]
+
+
+DEV_REQUIREMENTS = [
+    "pytest",
+    "pytest-xdist",
+]
+
+setup(
+    name="hpy.devel",
+    packages = ['hpy.devel'],
+    include_package_data=True,
+    extras_require={
+        "dev": DEV_REQUIREMENTS,
+    },
+    ext_modules = EXT_MODULES,
+    entry_points={
           "distutils.setup_keywords": [
               "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
           ],
