@@ -364,14 +364,6 @@ static inline HPy HPyDict_New(HPyContext ctx) {
      return ctx->ctx_Dict_New ( ctx ); 
 }
 
-static inline int HPyDict_SetItem(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val) {
-     return ctx->ctx_Dict_SetItem ( ctx, h_dict, h_key, h_val ); 
-}
-
-static inline HPy HPyDict_GetItem(HPyContext ctx, HPy h_dict, HPy h_key) {
-     return ctx->ctx_Dict_GetItem ( ctx, h_dict, h_key ); 
-}
-
 static inline HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n) {
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }

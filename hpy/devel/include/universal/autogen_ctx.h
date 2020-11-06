@@ -114,8 +114,6 @@ struct _HPyContext_s {
     int (*ctx_List_Append)(HPyContext ctx, HPy h_list, HPy h_item);
     int (*ctx_Dict_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Dict_New)(HPyContext ctx);
-    int (*ctx_Dict_SetItem)(HPyContext ctx, HPy h_dict, HPy h_key, HPy h_val);
-    HPy (*ctx_Dict_GetItem)(HPyContext ctx, HPy h_dict, HPy h_key);
     void (*ctx_FatalError)(HPyContext ctx, const char *message);
     HPy (*ctx_Tuple_FromArray)(HPyContext ctx, HPy items[], HPy_ssize_t n);
     HPy (*ctx_FromPyObject)(HPyContext ctx, cpy_PyObject *obj);
