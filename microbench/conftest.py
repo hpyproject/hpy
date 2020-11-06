@@ -100,6 +100,9 @@ def pytest_addoption(parser):
     parser.addoption(
         "--fast", action="store_true", default=False, help="run microbench faster"
     )
+    parser.addoption(
+        "--slow", action="store_true", default=False, help="run microbench slower"
+    )
 
 
 VERBOSE_TEST_NAME_LENGTH = 90

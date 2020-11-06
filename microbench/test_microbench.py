@@ -32,6 +32,8 @@ def N(request):
     n = 10000000
     if request.config.option.fast:
         n //= 100
+    if request.config.option.slow:
+        n *= 10
     if _valgrind.lib.is_running_on_valgrind():
         n //= 100
     return n
@@ -73,6 +75,14 @@ class TestModule:
 
 
 class TestType:
+
+    def test_method_lookup(self, simple, timer, N):
+        obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                # note: here we are NOT calling it, we want to measure just
+                # the lookup
+                obj.noargs
 
     def test_noargs(self, simple, timer, N):
         obj = simple.Foo()
