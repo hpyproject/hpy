@@ -84,6 +84,16 @@ class TestType:
                 # the lookup
                 obj.noargs
 
+    def test_method_lookup_ht(self, api, simple, timer, N):
+        if api != 'cpy':
+            pytest.skip('N/A')
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                # note: here we are NOT calling it, we want to measure just
+                # the lookup
+                obj.noargs
+
     def test_noargs(self, simple, timer, N):
         obj = simple.Foo()
         with timer:

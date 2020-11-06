@@ -91,6 +91,23 @@ static PyTypeObject Foo_Type = {
     SimpleMethods,             /* tp_methods, reuse the same functions */
 };
 
+
+static PyType_Slot HTFoo_slots[] = {
+    {Py_tp_doc, "HTFoo objects"},
+    {Py_tp_methods, SimpleMethods},
+    {Py_sq_item, Foo_getitem},
+    {Py_sq_length, Foo_len},
+    {0, 0}
+};
+
+static PyType_Spec HTFoo_Type_spec = {
+    .name = "cpy_simple.Foo",
+    .basicsize = sizeof(FooObject),
+    .itemsize = 0,
+    .flags = Py_TPFLAGS_DEFAULT,
+    .slots = HTFoo_slots
+};
+
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "cpy_simple",
@@ -115,5 +132,11 @@ PyInit_cpy_simple(void)
         return NULL;
     Py_INCREF(&Foo_Type);
     PyModule_AddObject(m, "Foo", (PyObject *)&Foo_Type);
+
+    PyObject *HTFoo_Type = PyType_FromSpec(&HTFoo_Type_spec);
+    if (HTFoo_Type == NULL)
+        return NULL;
+    PyModule_AddObject(m, "HTFoo", HTFoo_Type);
+
     return m;
 }
