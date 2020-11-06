@@ -70,7 +70,7 @@ static HPyDef *foo_defines[] = {
 static HPyType_Spec Foo_spec = {
     .name = "hpy_simple.Foo",
     .basicsize = sizeof(FooObject),
-    .flags = HPy_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_STACKLESS_EXTENSION | Py_TPFLAGS_HAVE_VERSION_TAG,
+    .flags = HPy_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_VERSION_TAG,
     .defines = foo_defines
 };
 
