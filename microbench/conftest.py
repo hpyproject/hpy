@@ -23,9 +23,9 @@ class Timer:
 
     def __str__(self):
         if self.start is None:
-            return '[TIMER NOT USED]'
+            return '[NO TIMING]'
         if self.stop is None:
-            return '[TIMER IN-PROGRESS]'
+            return '[IN-PROGRESS]'
         usec = (self.stop - self.start) * 1000
         return f'{usec:.2f} us'
 
@@ -74,7 +74,7 @@ class TimerSession:
         w('')
         tr.write_sep('=', 'BENCHMARKS', cyan=True)
         w(' '*40 + '             cpy                    hpy')
-        w(' '*40 + '---------------------------------------')
+        w(' '*40 + '----------------    -------------------')
         for shortid, timings in self.table.items():
             cpy = timings.get('cpy')
             hpy = timings.get('hpy')
