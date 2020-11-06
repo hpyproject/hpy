@@ -99,7 +99,7 @@ def pytest_addoption(parser):
     )
 
 
-LINE_LENGTH = 90
+VERBOSE_TEST_NAME_LENGTH = 90
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_report_teststatus(report, config):
@@ -107,7 +107,7 @@ def pytest_report_teststatus(report, config):
     category, letter, word = outcome.get_result()
     timer = config._timersession.get_timer(report.nodeid)
     if category == 'passed' and timer:
-        L = LINE_LENGTH - len(report.nodeid)
+        L = VERBOSE_TEST_NAME_LENGTH - len(report.nodeid)
         word = str(timer).rjust(L)
         markup = None
         if timer.elapsed is None:
