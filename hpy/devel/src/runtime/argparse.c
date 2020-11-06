@@ -27,9 +27,10 @@
  * -------
  *
  * O (object) [HPy *]
- *     Returns an existing handle. Not supported by HPyArg_ParseKeywords as
- *     retrieving an item from the keywords dictionary would require creating
- *     a new handled. Use O+ instead for this case.
+ *     Returns an handle. When using HPyArg_ParseKeywords, this might retrieve
+ *     a new handle from the keywords dictionary, so an HPyTracker pointer
+ *     must be passed and on successful return HPyTracker_Close must be called
+ *     to close any handles that were created.
  *
  * O+ (object) [HPy *]
  *     Returns a new handle. The new handle must be closed if the argument
@@ -94,14 +95,14 @@ set_error(HPyContext ctx, HPy exc, const char *err_fmt, const char *msg) {
         snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%.200s() %.256s", err_fmt + 1, msg);
     }
     else {
-          snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%s", err_fmt + 1);
+        snprintf(err_buf, _ERR_STRING_MAX_LENGTH, "%s", err_fmt + 1);
     }
     HPyErr_SetString(ctx, exc, err_buf);
 }
 
 
 static int
-parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl, const char *err_fmt)
+parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp, const char **fmt, va_list *vl, const char *err_fmt)
 {
     switch (*(*fmt)++) {
     case 'i': {
@@ -132,18 +133,13 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl, const
         break;
     }
     case 'O': {
-        if (**fmt == '+') {
-            (*fmt)++;
-            HPy *output = va_arg(*vl, HPy *);
-            _BREAK_IF_OPTIONAL(current_arg);
+        HPy *output = va_arg(*vl, HPy *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        if (current_arg_tmp) {
             *output = HPy_Dup(ctx, current_arg);
-            if (HPy_IsNull(*output))
-                return 0;
-            break;
+            HPyTracker_Add(ctx, *ht, *output);
         }
         else {
-            HPy *output = va_arg(*vl, HPy *);
-            _BREAK_IF_OPTIONAL(current_arg);
             *output = current_arg;
         }
         break;
@@ -157,7 +153,7 @@ parse_item(HPyContext ctx, HPy current_arg, const char **fmt, va_list *vl, const
 
 
 HPyAPI_RUNTIME_FUNC(int)
-HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
+HPyArg_Parse(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
 {
     const char *fmt1 = fmt;
     const char *err_fmt = NULL;
@@ -168,6 +164,13 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
     HPy current_arg;
 
     fmt_end = parse_err_fmt(fmt, &err_fmt);
+
+    if (ht != NULL) {
+        *ht = HPyTracker_New(ctx, 0);
+        if (HPy_IsNull(*ht)) {
+            return 0;
+        }
+    }
 
     va_list vl;
     va_start(vl, fmt);
@@ -183,33 +186,37 @@ HPyArg_Parse(HPyContext ctx, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
             current_arg = args[i];
         }
         if (!HPy_IsNull(current_arg) || optional) {
-            if (!parse_item(ctx, current_arg, &fmt1, &vl, err_fmt)) {
-                va_end(vl);
-                return 0;
+            if (!parse_item(ctx, ht, current_arg, 0, &fmt1, &vl, err_fmt)) {
+                goto error;
             }
         }
         else {
             set_error(ctx, ctx->h_TypeError, err_fmt,
                 "required positional argument missing");
-            va_end(vl);
-            return 0;
+            goto error;
         }
         i++;
     }
     if (i < nargs) {
         set_error(ctx, ctx->h_TypeError, err_fmt,
             "mismatched args (too many arguments for fmt)");
-        va_end(vl);
-        return 0;
+        goto error;
     }
 
     va_end(vl);
     return 1;
+
+    error:
+        va_end(vl);
+        if (ht != NULL) {
+            HPyTracker_Close(ctx, *ht);
+        }
+        return 0;
 }
 
 
 HPyAPI_RUNTIME_FUNC(int)
-HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
+HPyArg_ParseKeywords(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, HPy kw,
                      const char *fmt, const char *keywords[], ...)
 {
     const char *fmt1 = fmt;
@@ -221,6 +228,7 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
     HPy_ssize_t i = 0;
     HPy_ssize_t nkw = 0;
     HPy current_arg;
+    int current_arg_needs_closing = 0;
 
     fmt_end = parse_err_fmt(fmt, &err_fmt);
 
@@ -238,6 +246,13 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
         nkw++;
     }
 
+    if (ht != NULL) {
+        *ht = HPyTracker_New(ctx, 0);
+        if (HPy_IsNull(*ht)) {
+            return 0;
+        }
+    }
+
     va_list vl;
     va_start(vl, keywords);
 
@@ -253,59 +268,71 @@ HPyArg_ParseKeywords(HPyContext ctx, HPy *args, HPy_ssize_t nargs, HPy kw,
             fmt1++;
             continue;
         }
-        if (*fmt1 == 'O' && *(fmt1 + 1) != '+') {
+        if (*fmt1 == 'O' && ht == NULL) {
             set_error(ctx, ctx->h_SystemError, err_fmt,
-                "HPyArg_ParseKeywords cannot use the format character 'O'."
-                " Use 'O+' instead and close the the returned handle if the call"
-                " returns successfully");
-            va_end(vl);
-            return 0;
+                "HPyArg_ParseKeywords cannot use the format character 'O' unless"
+                " an HPyTracker is provided. Please supply an HPyTracker.");
+            goto error;
         }
         if (i >= nkw) {
             set_error(ctx, ctx->h_TypeError, err_fmt,
                 "mismatched args (too few keywords for fmt)");
-            va_end(vl);
-            return 0;
+            goto error;
         }
         current_arg = HPy_NULL;
         if (i < nargs) {
             if (keyword_only) {
                 set_error(ctx, ctx->h_TypeError, err_fmt,
                     "keyword only argument passed as positional argument");
-                va_end(vl);
-                return 0;
+                goto error;
             }
             current_arg = args[i];
         }
         else if (!HPy_IsNull(kw) && *keywords[i]) {
             current_arg = HPy_GetItem_s(ctx, kw, keywords[i]);
-            // Clear any KeyError that was raised. If an error was raised
-            // current_arg will be HPy_NULL and will be handled appropriately
-            // below depending on whether the current argument is optional or
-            // not
-            HPyErr_Clear(ctx);
+            // Track the handle or lear any KeyError that was raised. If an
+            // error was raised current_arg will be HPy_NULL and will be
+            // handled appropriately below depending on whether the current
+            // argument is optional or not
+            if (!HPy_IsNull(current_arg)) {
+                current_arg_needs_closing = 1;
+            }
+            else {
+                HPyErr_Clear(ctx);
+            }
         }
         if (!HPy_IsNull(current_arg) || optional) {
-            if (!parse_item(ctx, current_arg, &fmt1, &vl, err_fmt)) {
-                va_end(vl);
-                return 0;
+            if (!parse_item(ctx, ht, current_arg, 1, &fmt1, &vl, err_fmt)) {
+                goto error;
             }
         }
         else {
             set_error(ctx, ctx->h_TypeError, err_fmt,
                 "no value for required argument");
-            va_end(vl);
-            return 0;
+            goto error;
+        }
+        if (current_arg_needs_closing) {
+            HPy_Close(ctx, current_arg);
+            current_arg_needs_closing = 0;
         }
         i++;
     }
     if (i != nkw) {
         set_error(ctx, ctx->h_TypeError, err_fmt,
             "mismatched args (too many keywords for fmt)");
-        va_end(vl);
-        return 0;
+        goto error;
     }
 
     va_end(vl);
     return 1;
+
+    error:
+        va_end(vl);
+        if (ht != NULL) {
+            HPyTracker_Close(ctx, *ht);
+        }
+        if (current_arg_needs_closing) {
+            HPy_Close(ctx, current_arg);
+        }
+        return 0;
 }
