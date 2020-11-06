@@ -5,6 +5,7 @@ timing and display the results is inside conftest.py
 
 import pytest
 import time
+import _valgrind
 
 API_PARAMS = [
     pytest.param('cpy', marks=pytest.mark.cpy),
@@ -26,11 +27,12 @@ def simple(request, api):
     else:
         assert False, 'Unkown param: %s' % request.param
 
-
 @pytest.fixture
 def N(request):
     n = 10000000
     if request.config.option.fast:
+        n //= 100
+    if _valgrind.lib.is_running_on_valgrind():
         n //= 100
     return n
 

@@ -2,6 +2,7 @@ import re
 import time
 from collections import defaultdict
 import pytest
+import _valgrind
 
 class Timer:
 
@@ -13,10 +14,12 @@ class Timer:
     def __enter__(self):
         if self.start is not None:
             raise ValueError('You cannot use "with timer:" more than once')
+        _valgrind.lib.callgrind_start()
         self.start = time.time()
 
     def __exit__(self, etype, evalue, tb):
         self.stop = time.time()
+        _valgrind.lib.callgrind_stop()
 
     def __str__(self):
         if self.start is None:
