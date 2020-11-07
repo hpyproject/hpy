@@ -164,46 +164,7 @@ class TestBasic(HPyTest):
             mod.f(20)
         assert str(exc.value) == 'hello world'
 
-    def test_exception_occurred(self):
-        import pytest
-        mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPyLong_AsLong(ctx, arg);
-                if (HPyErr_Occurred(ctx)) {
-                    HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
-                    return HPy_NULL;
-                }
-                return HPyLong_FromLong(ctx, -1002);
-            }
-            @EXPORT(f)
-            @INIT
-        """)
-        assert mod.f(-10) == -1002
-        with pytest.raises(ValueError) as exc:
-            mod.f("not an integer")
-        assert str(exc.value) == 'hello world'
-
-    def test_exception_cleared(self):
-        import pytest
-        import sys
-        mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
-            {
-                HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
-                HPyErr_Clear(ctx);
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(f)
-            @INIT
-        """)
-        assert mod.f() is None
-        assert sys.exc_info() == (None, None, None)
-
     def test_builtin_handles(self):
-        import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
