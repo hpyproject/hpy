@@ -4,6 +4,7 @@ HPy API
 .. warning::
    HPy is still in the early stages of development and the API may change.
 
+
 Handles
 -------
 
@@ -29,15 +30,16 @@ Handles vs ``PyObject *``
 .. XXX I don't like this sentence, but I can't come up with anything better
    right now. Please rephrase/rewrite :)
 
-The biggest difference is that in the old Python/C API, multiple ``PyObject
-*`` references to the same objects are completely equivalent to each other,
-and they can be passed to Python/C API functions interchangeably. In
-particular, it does not matter which particular reference you call
-``Py_INCREF`` and ``Py_DECREF`` on, as long as the total number of increfs and
-decrefs to the underlying object is the same at the end of the object
+In the old Python/C API, multiple ``PyObject *`` references to the same object
+are completely equivalent to each other. Therefore they can be passed to Python/C
+API functions interchangeably. As a result, ``Py_INCREF`` an ``Py_DECREF`` can
+be called with any reference to an object as long as the total number of calls
+of `incref` is equal to the number of calls of `decref` at the end of the object
 lifetime.
 
-For example, the following is a perfectly valid piece of Python/C code::
+Whereas using HPy API, each handle must be closed independently.
+
+Thus, the following perfectly valid piece of Python/C code::
 
   void foo(void)
   {
@@ -49,7 +51,7 @@ For example, the following is a perfectly valid piece of Python/C code::
       Py_DECREF(x);                       // two DECREF on x
   }
 
-In HPy, each handle must be closed independently. The example above becomes::
+Becomes using HPy API::
 
   void foo(HPyContext ctx)
   {
@@ -62,8 +64,8 @@ In HPy, each handle must be closed independently. The example above becomes::
   }
 
 Calling any HPy function on a closed handle is an error. Calling
-``HPy_Close()`` on the same handle twice is an error.  Forgetting to call
-``HPy_Close()`` on a handle results in a memory leak.  When running in
+``HPy_Close()`` on the same handle twice is an error. Forgetting to call
+``HPy_Close()`` on a handle results in a memory leak. When running in
 :ref:`debug mode`, HPy actively checks that you that you don't close a handle
 twice and that you don't forget to close any.
 
