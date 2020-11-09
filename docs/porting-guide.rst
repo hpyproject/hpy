@@ -5,8 +5,8 @@ PyModule_AddObject
 ------------------
 
 ``PyModule_AddObject()`` is replaced with a regular ``HPy_SetAttr_s()``. There
-is no ``HPyModule_AddObject()`` because it has an unusual refcount behaviour (
-stealing a reference but only when it returns 0).
+is no ``HPyModule_AddObject()`` because it has an unusual refcount behaviour
+(stealing a reference but only when it returns 0).
 
 Py_tp_dealloc
 -------------

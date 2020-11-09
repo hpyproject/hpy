@@ -57,8 +57,8 @@ Hide internal details
   the ones used by CPython.  In particular, **reference counting is not part
   of the API**: we want a more generic way of managing resources which is
   possible to implement with different strategies, including the existing
-  reference counting and/or with a moving *Garbage Collector* (like the ones u
-  sed by PyPy or Java, for example).
+  reference counting and/or with a moving *Garbage Collector* (like the ones
+  used by PyPy or Java, for example).
 
   Moreover, we want to avoid exposing internal details of a specific
   implementation, so that each implementation can experiment with new memory
@@ -188,7 +188,7 @@ API:
 
   - Speed on PyPy and other alternative implementations: according to early
     :ref:`benchmarks`, an extension written in HPy can be ~3x faster than the
-    equivalent extension writting in Python/C.
+    equivalent extension written in Python/C.
 
   - Improved debugging: when you load extensions in :ref:`debugging mode`,
     many common mistakes are checked and reported automatically.
