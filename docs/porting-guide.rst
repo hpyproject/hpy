@@ -1,23 +1,35 @@
 Porting guide
 =============
 
-xxx
----------------------
+PyModule_AddObject
+------------------
 
-`PyModule_AddObject()`: replace with a regular `HPy_SetAttr_s()`.  There is no `HPyModule_AddObject()` because it has an unusual refcount behaviour (stealing a reference but only when it returns 0).
+``PyModule_AddObject()`` is replaced with a regular ``HPy_SetAttr_s()``. There
+is no ``HPyModule_AddObject()`` because it has an unusual refcount behaviour (
+stealing a reference but only when it returns 0).
 
-Py_tp_dealloc becomes HPy_tp_destroy.  We changed the name a little bit
-because only "lightweight" destructors are supported.  Use tp_finalize if
+Py_tp_dealloc
+-------------
+
+``Py_tp_dealloc`` becomes ``HPy_tp_destroy``. We changed the name a little bit
+because only "lightweight" destructors are supported. Use ``tp_finalize`` if
 you really need to do things with the context or with the handle of the
 object.
 
-Py_tp_methods, Py_tp_members and Py_tp_getset are no longer needed, because
-methods, members and getsets are specified "flatly" together with the other
-slots, using the standard mechanism of HPyDef_{METH,MEMBER,GETSET} and
-HPyType_Spec.defines
+
+Py_tp_methods, Py_tp_members and Py_tp_getset
+---------------------------------------------
+
+``Py_tp_methods``, ``Py_tp_members`` and ``Py_tp_getset`` are no longer needed.
+Methods, members and getsets are specified "flatly" together with the other
+slots, using the standard mechanism of ``HPyDef_{METH,MEMBER,GETSET}`` and
+``HPyType_Spec.defines``.
 
 
-PyList_New(5)/PyList_SET_ITEM() becomes::
+PyList_New/PyList_SET_ITEM
+---------------------------
+
+``PyList_New(5)``/``PyList_SET_ITEM()`` becomes::
 
     HPyListBuilder builder = HPyListBuilder_New(ctx, 5);
     HPyListBuilder_Set(ctx, builder, 0, h_item0);
