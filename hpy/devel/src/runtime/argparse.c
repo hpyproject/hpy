@@ -32,10 +32,6 @@
  *     must be passed and on successful return HPyTracker_Close must be called
  *     to close any handles that were created.
  *
- * O+ (object) [HPy *]
- *     Returns a new handle. The new handle must be closed if the argument
- *     parsing returns successfully.
- *
  * Options
  * -------
  *
