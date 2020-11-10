@@ -44,8 +44,8 @@
  * K (int) [unsigned long long]
  *     Convert a Python integer to a C unsigned long long without overflow checking.
  *
- * n (int) [Py_ssize_t]
- *     Convert a Python integer to a C Py_ssize_t.
+ * n (int) [HPy_ssize_t]
+ *     Convert a Python integer to a C HPy_ssize_t.
  *
  * f (float) [float]
  *     Convert a Python floating point number to a C float.
@@ -278,7 +278,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
         break;
     }
 
-    case 'n': { /* Py_ssize_t */
+    case 'n': { /* HPy_ssize_t */
         HPy_ssize_t *output = va_arg(*vl, HPy_ssize_t *);
         _BREAK_IF_OPTIONAL(current_arg);
         HPy_ssize_t value = HPyLong_AsSsize_t(ctx, current_arg);
