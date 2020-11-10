@@ -4,7 +4,6 @@ timing and display the results is inside conftest.py
 """
 
 import pytest
-import time
 import _valgrind
 
 API_PARAMS = [
@@ -75,17 +74,18 @@ class TestModule:
 
 
 class TestType:
+    """ Compares the performance of operations on types.
+
+        The kinds of type used are:
+
+        * cpy: a static type
+        * hpy: a heap type (HPy only has heap types)
+
+        The type is named `simple.Foo` in both cases.
+    """
 
     def test_method_lookup(self, simple, timer, N):
         obj = simple.Foo()
-        with timer:
-            for i in range(N):
-                # note: here we are NOT calling it, we want to measure just
-                # the lookup
-                obj.noargs
-
-    def test_method_lookup_ht(self, api, simple, timer, N):
-        obj = simple.HTFoo()
         with timer:
             for i in range(N):
                 # note: here we are NOT calling it, we want to measure just
@@ -124,6 +124,57 @@ class TestType:
 
     def test_getitem(self, simple, timer, N):
         obj = simple.Foo()
+        with timer:
+            for i in range(N):
+                obj[0]
+
+
+class TestHeapType:
+    """ Compares the performance of operations on heap types.
+
+        The type is named `simple.HTFoo` and is a heap type in all cases.
+    """
+
+    def test_method_lookup(self, simple, timer, N):
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                # note: here we are NOT calling it, we want to measure just
+                # the lookup
+                obj.noargs
+
+    def test_noargs(self, simple, timer, N):
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                obj.noargs()
+
+    def test_onearg_None(self, simple, timer, N):
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                obj.onearg(None)
+
+    def test_onearg_int(self, simple, timer, N):
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                obj.onearg(i)
+
+    def test_varargs(self, simple, timer, N):
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                obj.varargs(None, None)
+
+    def test_len(self, simple, timer, N):
+        obj = simple.HTFoo()
+        with timer:
+            for i in range(N):
+                len(obj)
+
+    def test_getitem(self, simple, timer, N):
+        obj = simple.HTFoo()
         with timer:
             for i in range(N):
                 obj[0]
