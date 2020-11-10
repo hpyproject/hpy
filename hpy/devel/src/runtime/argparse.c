@@ -14,11 +14,41 @@
  * Numbers
  * -------
  *
+ * b (int) [unsigned char]
+ *     Convert a nonnegative Python integer to an unsigned tiny int, stored in a C unsigned char.
+ *
+ * B (int) [unsigned char]
+ *     Convert a Python integer to a tiny int without overflow checking, stored in a C unsigned char.
+ *
+ * h (int) [short int]
+ *     Convert a Python integer to a C short int.
+ *
+ * H (int) [unsigned short int]
+ *     Convert a Python integer to a C unsigned short int, without overflow checking.
+ *
  * i (int) [int]
  *     Convert a Python integer to a plain C int.
  *
+ * I (int) [unsigned int]
+ *     Convert a Python integer to a C unsigned int, without overflow checking.
+ *
  * l (int) [long int]
  *     Convert a Python integer to a C long int.
+ *
+ * k (int) [unsigned long]
+ *     Convert a Python integer to a C unsigned long without overflow checking.
+ *
+ * L (int) [long long]
+ *     Convert a Python integer to a C long long.
+ *
+ * K (int) [unsigned long long]
+ *     Convert a Python integer to a C unsigned long long without overflow checking.
+ *
+ * n (int) [Py_ssize_t]
+ *     Convert a Python integer to a C Py_ssize_t.
+ *
+ * f (float) [float]
+ *     Convert a Python floating point number to a C float.
  *
  * d (float) [double]
  *     Convert a Python floating point number to a C double.
@@ -35,6 +65,14 @@
  *     returned handles are no longer needed. This will close all the handles
  *     created during argument parsing. There is no need to call
  *     `HPyTracker_Close` on failure -- the argument parser does this for you.
+ *
+ * p (bool) [int]
+ *     Tests the value passed in for truth (a boolean predicate) and converts
+ *     the result to its equivalent C true/false integer value. Sets the int to
+ *     1 if the expression was true and 0 if it was false. This accepts any
+ *     valid Python value. See
+ *     `Truth Value Testing <https://docs.python.org/3/library/stdtypes.html#truth>`_
+ *     for more information about how Python tests values for truth.
  *
  * Options
  * -------
@@ -63,6 +101,7 @@
  *
  */
 
+#include <limits.h>
 #include <stdio.h>
 #include "hpy.h"
 
@@ -105,15 +144,100 @@ static int
 parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp, const char **fmt, va_list *vl, const char *err_fmt)
 {
     switch (*(*fmt)++) {
-    case 'i': {
+
+    case 'b': { /* unsigned byte -- very short int */
+        char *output = va_arg(*vl, char *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        long value = HPyLong_AsLong(ctx, current_arg);
+        if (value == -1 && HPyErr_Occurred(ctx))
+            return 0;
+        if (value < 0) {
+            set_error(ctx, ctx->h_OverflowError, err_fmt,
+                "unsigned byte integer is less than minimum");
+            return 0;
+        }
+        if (value > UCHAR_MAX) {
+            set_error(ctx, ctx->h_OverflowError, err_fmt,
+                "unsigned byte integer is greater than maximum");
+            return 0;
+        }
+        *output = (char) value;
+        break;
+    }
+
+    case 'B': { /* byte sized bitfield - both signed and unsigned
+                   values allowed */
+        char *output = va_arg(*vl, char *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = (unsigned char) value;
+        break;
+    }
+
+    case 'h': { /* signed short int */
+        short *output = va_arg(*vl, short *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        long value = HPyLong_AsLong(ctx, current_arg);
+        if (value == -1 && HPyErr_Occurred(ctx))
+            return 0;
+        if (value < SHRT_MIN) {
+            set_error(ctx, ctx->h_OverflowError, err_fmt,
+                "signed short integer is less than minimum");
+            return 0;
+        }
+        if (value > SHRT_MAX) {
+            set_error(ctx, ctx->h_OverflowError, err_fmt,
+                "signed short integer is greater than maximum");
+            return 0;
+        }
+        *output = (short) value;
+        break;
+    }
+
+    case 'H': { /* short int sized bitfield, both signed and
+                   unsigned allowed */
+        short *output = va_arg(*vl, short *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = (unsigned short) value;
+        break;
+    }
+
+    case 'i': { /* signed int */
         int *output = va_arg(*vl, int *);
         _BREAK_IF_OPTIONAL(current_arg);
         long value = HPyLong_AsLong(ctx, current_arg);
         if (value == -1 && HPyErr_Occurred(ctx))
             return 0;
+        if (value > INT_MAX) {
+            set_error(ctx, ctx->h_OverflowError, err_fmt,
+                "signed integer is greater than maximum");
+            return 0;
+        }
+        if (value < INT_MIN) {
+            set_error(ctx, ctx->h_OverflowError, err_fmt,
+                "signed integer is less than minimum");
+            return 0;
+        }
         *output = (int)value;
         break;
     }
+
+    case 'I': { /* int sized bitfield, both signed and
+                   unsigned allowed */
+        unsigned int *output = va_arg(*vl, unsigned int *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = (unsigned int) value;
+        break;
+    }
+
     case 'l': {
         long *output = va_arg(*vl, long *);
         _BREAK_IF_OPTIONAL(current_arg);
@@ -123,7 +247,58 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
         *output = value;
         break;
     }
-    case 'd': {
+
+    case 'k': { /* long sized bitfield */
+        unsigned long *output = va_arg(*vl, unsigned long *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = value;
+        break;
+    }
+
+    case 'L': { /* long long */
+        long long *output = va_arg(*vl, long long *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        long long value = HPyLong_AsLongLong(ctx, current_arg);
+        if (value == (long long)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = value;
+        break;
+    }
+
+    case 'K': { /* long long sized bitfield */
+        unsigned long long *output = va_arg(*vl, unsigned long long *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        unsigned long long value = HPyLong_AsUnsignedLongLong(ctx, current_arg);
+        if (value == (unsigned long long)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = value;
+        break;
+    }
+
+    case 'n': { /* Py_ssize_t */
+        HPy_ssize_t *output = va_arg(*vl, HPy_ssize_t *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        HPy_ssize_t value = HPyLong_AsSsize_t(ctx, current_arg);
+        if (value == (HPy_ssize_t)-1 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = value;
+        break;
+    }
+
+    case 'f': { /* float */
+        float *output = va_arg(*vl, float *);
+        _BREAK_IF_OPTIONAL(current_arg);
+        double value = HPyFloat_AsDouble(ctx, current_arg);
+        if (value == -1.0 && HPyErr_Occurred(ctx))
+            return 0;
+        *output = (float) value;
+        break;
+    }
+
+    case 'd': { /* double */
         double* output = va_arg(*vl, double *);
         _BREAK_IF_OPTIONAL(current_arg);
         double value = HPyFloat_AsDouble(ctx, current_arg);
@@ -132,6 +307,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
         *output = value;
         break;
     }
+
     case 'O': {
         HPy *output = va_arg(*vl, HPy *);
         _BREAK_IF_OPTIONAL(current_arg);
@@ -144,10 +320,21 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
         }
         break;
     }
+
+    case 'p': { /* boolean *p*redicate */
+        int *output = va_arg(*vl, int *);
+        int value = HPy_IsTrue(ctx, current_arg);
+        if (value < 0)
+            return 0;
+        *output = (value > 0) ? 1 : 0;
+        break;
+    }
+
     default:
         set_error(ctx, ctx->h_SystemError, err_fmt, "unknown arg format code");
         return 0;
     }
+
     return 1;
 }
 
