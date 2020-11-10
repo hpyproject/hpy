@@ -48,6 +48,26 @@ static inline long HPyLong_AsLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsLong ( ctx, h ); 
 }
 
+static inline unsigned long HPyLong_AsUnsignedLong(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsUnsignedLong ( ctx, h ); 
+}
+
+static inline long long HPyLong_AsLongLong(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsLongLong ( ctx, h ); 
+}
+
+static inline unsigned long long HPyLong_AsUnsignedLongLong(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsUnsignedLongLong ( ctx, h ); 
+}
+
+static inline size_t HPyLong_AsSize_t(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsSize_t ( ctx, h ); 
+}
+
+static inline HPy_ssize_t HPyLong_AsSsize_t(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsSsize_t ( ctx, h ); 
+}
+
 static inline HPy HPyFloat_FromDouble(HPyContext ctx, double v) {
      return ctx->ctx_Float_FromDouble ( ctx, v ); 
 }

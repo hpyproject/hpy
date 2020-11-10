@@ -43,6 +43,31 @@ HPyAPI_STORAGE long _HPy_IMPL_NAME(Long_AsLong)(HPyContext ctx, HPy h)
     return PyLong_AsLong(_h2py(h));
 }
 
+HPyAPI_STORAGE unsigned long _HPy_IMPL_NAME(Long_AsUnsignedLong)(HPyContext ctx, HPy h)
+{
+    return PyLong_AsUnsignedLong(_h2py(h));
+}
+
+HPyAPI_STORAGE long long _HPy_IMPL_NAME(Long_AsLongLong)(HPyContext ctx, HPy h)
+{
+    return PyLong_AsLongLong(_h2py(h));
+}
+
+HPyAPI_STORAGE unsigned long long _HPy_IMPL_NAME(Long_AsUnsignedLongLong)(HPyContext ctx, HPy h)
+{
+    return PyLong_AsUnsignedLongLong(_h2py(h));
+}
+
+HPyAPI_STORAGE size_t _HPy_IMPL_NAME(Long_AsSize_t)(HPyContext ctx, HPy h)
+{
+    return PyLong_AsSize_t(_h2py(h));
+}
+
+HPyAPI_STORAGE HPy_ssize_t _HPy_IMPL_NAME(Long_AsSsize_t)(HPyContext ctx, HPy h)
+{
+    return PyLong_AsSsize_t(_h2py(h));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Float_FromDouble)(HPyContext ctx, double v)
 {
     return _py2h(PyFloat_FromDouble(v));

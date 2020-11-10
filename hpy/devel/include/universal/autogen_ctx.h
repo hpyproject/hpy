@@ -14,10 +14,11 @@ struct _HPyContext_s {
     HPy h_True;
     HPy h_False;
     HPy h_Exception;
-    HPy h_ValueError;
-    HPy h_TypeError;
     HPy h_IndexError;
+    HPy h_OverflowError;
     HPy h_SystemError;
+    HPy h_TypeError;
+    HPy h_ValueError;
     HPy h_BaseObjectType;
     HPy h_TypeType;
     HPy h_LongType;
@@ -34,6 +35,11 @@ struct _HPyContext_s {
     HPy (*ctx_Long_FromSize_t)(HPyContext ctx, size_t value);
     HPy (*ctx_Long_FromSsize_t)(HPyContext ctx, HPy_ssize_t value);
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
+    unsigned long (*ctx_Long_AsUnsignedLong)(HPyContext ctx, HPy h);
+    long long (*ctx_Long_AsLongLong)(HPyContext ctx, HPy h);
+    unsigned long long (*ctx_Long_AsUnsignedLongLong)(HPyContext ctx, HPy h);
+    size_t (*ctx_Long_AsSize_t)(HPyContext ctx, HPy h);
+    HPy_ssize_t (*ctx_Long_AsSsize_t)(HPyContext ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
     double (*ctx_Float_AsDouble)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Length)(HPyContext ctx, HPy h);
