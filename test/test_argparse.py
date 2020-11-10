@@ -41,9 +41,8 @@ class TestParseItem(HPyTest):
         mod = self.make_parse_item("d", "double", "HPyFloat_FromDouble")
         assert mod.f(1.) == 1.
         assert mod.f(-2) == -2.
-        with pytest.raises(TypeError) as err:
+        with pytest.raises(TypeError):
             mod.f("x")
-        assert str(err.value) == "must be real number, not str"
 
     def test_O(self):
         mod = self.make_parse_item("O", "HPy", "HPy_Dup")

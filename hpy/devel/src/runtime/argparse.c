@@ -27,14 +27,14 @@
  * -------
  *
  * O (object) [HPy *]
- *     Returns an handle. When using HPyArg_ParseKeywords, this might retrieve
- *     a new handle from the keywords dictionary, so an HPyTracker pointer
- *     must be passed and on successful return HPyTracker_Close must be called
- *     to close any handles that were created.
+ *     Store a handle pointing to a generic Python object.
  *
- * O+ (object) [HPy *]
- *     Returns a new handle. The new handle must be closed if the argument
- *     parsing returns successfully.
+ *     When using O with HPyArg_ParseKeywords, an HPyTracker is created and
+ *     returned via the parameter `ht`. If HPyArg_ParseKeywords returns
+ *     successfully, you must call HPyTracker_Close on `ht` once the
+ *     returned handles are no longer needed. This will close all the handles
+ *     created during argument parsing. There is no need to call
+ *     `HPyTracker_Close` on failure -- the argument parser does this for you.
  *
  * Options
  * -------

@@ -39,16 +39,16 @@ Incremental adoption
 Easy migration
   It should be easy to migrate existing C extensions to HPy. Thanks to an
   appropriate and regular naming convention it should be obvious what the
-  HPy equivalent of any existing Python/C API is.  When a perfect replacement
+  HPy equivalent of any existing Python/C API is. When a perfect replacement
   does not exist, the documentation explains what the alternative options are.
 
 
 Better debugging
   In debug mode, you get early and precise errors and warnings when you make
   some specific kind of mistakes and/or violate the API rules and
-  assumptions. For example, you get an error if you try to use a handle which
-  has already been closed. It is possible to turn on the debug mode at startup
-  time, *without needing to recompile*.
+  assumptions. For example, you get an error if you try to use a handle
+  (see :ref:`handles`) which has already been closed. It is possible to
+  turn on the debug mode at startup time, *without needing to recompile*.
 
 
 Hide internal details
@@ -57,8 +57,8 @@ Hide internal details
   the ones used by CPython.  In particular, **reference counting is not part
   of the API**: we want a more generic way of managing resources which is
   possible to implement with different strategies, including the existing
-  reference counting and/or with a moving GC (like the ones used by PyPy or
-  Java, for example).
+  reference counting and/or with a moving *Garbage Collector* (like the ones
+  used by PyPy or Java, for example).
 
   Moreover, we want to avoid exposing internal details of a specific
   implementation, so that each implementation can experiment with new memory
@@ -67,9 +67,9 @@ Hide internal details
 
 Simplicity
   The HPy API aims to be smaller and easier to study/use/manage than the
-  existing one. Sometimes there is a trade-off between this goal and the others
-  above, in particular *Performance on CPython* and *Easy migration*.  The
-  general approach is to have an API which is "as simple as possible" while
+  existing Python/C API. Sometimes there is a trade-off between this goal and
+  the others above, in particular *Performance on CPython* and *Easy migration*.
+  The general approach is to have an API which is "as simple as possible" while
   not violating the other goals.
 
 
@@ -90,7 +90,7 @@ Opt-in low level data structures
 API vs ABI
 -----------
 
-HPy defines *both* and API and an ABI. Before digging further into details,
+HPy defines *both* an API and an ABI. Before digging further into details,
 let's distinguish them:
 
   - The **API** works at the level of source code: it is the set of functions,
@@ -99,7 +99,7 @@ let's distinguish them:
     through one or more header files (``*.h``).
 
   - The **ABI** works at the level of compiled code: it is the interface between
-    the host interpreter and the compiled DLL.  Given a target CPU and
+    the host interpreter and the compiled DLL. Given a target CPU and
     operating system it defines things like the set of exported symbols, the
     precise memory layout of objects, the size of types, etc.
 
@@ -128,7 +128,7 @@ explained in its own section of the documentation.
 .. _hpy-target-abis:
 
 Target ABIs
-----------------
+-----------
 
 Depending on the compilation options, and HPy extension can target three
 different ABIs:
@@ -183,12 +183,12 @@ C extensions
 --------------
 
 If you are writing a Python extension in C, you are a consumer of the HPy
-API. There are two big advantages in using HPy instead of the old Python/C
+API. There are three big advantages in using HPy instead of the old Python/C
 API:
 
   - Speed on PyPy and other alternative implementations: according to early
     :ref:`benchmarks`, an extension written in HPy can be ~3x faster than the
-    equivalent extenson writting in Python/C.
+    equivalent extension written in Python/C.
 
   - Improved debugging: when you load extensions in :ref:`debugging mode`,
     many common mistakes are checked and reported automatically.
