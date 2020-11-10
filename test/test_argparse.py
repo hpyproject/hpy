@@ -17,7 +17,7 @@ class TestParseItem(HPyTest):
                               HPy *args, HPy_ssize_t nargs)
             {{
                 {type} a;
-                if (!HPyArg_Parse(ctx, args, nargs, "{fmt}", &a))
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "{fmt}", &a))
                     return HPy_NULL;
                 return {hpy_converter}(ctx, a);
             }}
@@ -60,7 +60,7 @@ class TestArgParse(HPyTest):
                 HPy a;
                 HPy b = HPy_NULL;
                 HPy res;
-                if (!HPyArg_Parse(ctx, args, nargs, "{fmt}", &a, &b))
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "{fmt}", &a, &b))
                     return HPy_NULL;
                 if (HPy_IsNull(b)) {{
                     b = HPyLong_FromLong(ctx, 5);
@@ -83,7 +83,7 @@ class TestArgParse(HPyTest):
                               HPy *args, HPy_ssize_t nargs)
             {
                 long a, b, c, d, e;
-                if (!HPyArg_Parse(ctx, args, nargs, "lllll",
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "lllll",
                                   &a, &b, &c, &d, &e))
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx,
@@ -101,7 +101,7 @@ class TestArgParse(HPyTest):
                               HPy *args, HPy_ssize_t nargs)
             {
                 HPy a, b;
-                if (!HPyArg_Parse(ctx, args, nargs, "OO", &a, &b))
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
                     return HPy_NULL;
                 return HPy_Add(ctx, a, b);
             }
@@ -172,12 +172,16 @@ class TestArgParseKeywords(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {{
-                HPy a, b;
+                HPy a, b, result;
+                HPyTracker ht;
                 static const char *kwlist[] = {{ "a", "b", NULL }};
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "{fmt}",
-                                          kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "{fmt}",
+                                          kwlist, &a, &b)) {{
                     return HPy_NULL;
-                return HPy_Add(ctx, a, b);
+                }}
+                result = HPy_Add(ctx, a, b);
+                HPyTracker_Close(ctx, ht);
+                return result;
             }}
             @EXPORT(f)
             @INIT
@@ -185,7 +189,7 @@ class TestArgParseKeywords(HPyTest):
         return mod
 
     def test_handle_two_arguments(self):
-        mod = self.make_two_arg_add("O+O+")
+        mod = self.make_two_arg_add("OO")
         assert mod.f("x", b="y") == "xy"
 
     def test_handle_reordered_arguments(self):
@@ -194,11 +198,15 @@ class TestArgParseKeywords(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
-                HPy a, b;
+                HPy a, b, result;
+                HPyTracker ht;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O+O+", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "OO", kwlist, &a, &b)) {
                     return HPy_NULL;
-                return HPy_Add(ctx, a, b);
+                }
+                result = HPy_Add(ctx, a, b);
+                HPyTracker_Close(ctx, ht);
+                return result;
             }
             @EXPORT(f)
             @INIT
@@ -213,16 +221,18 @@ class TestArgParseKeywords(HPyTest):
             {
                 HPy a;
                 HPy b = HPy_NULL;
+                HPyTracker ht;
                 HPy res;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O+|O+", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|O", kwlist, &a, &b)) {
                     return HPy_NULL;
-                if (HPy_IsNull(b)) {{
+                }
+                if (HPy_IsNull(b)) {
                     b = HPyLong_FromLong(ctx, 5);
-                }}
+                    HPyTracker_Add(ctx, ht, b);
+                }
                 res = HPy_Add(ctx, a, b);
-                HPy_Close(ctx, a);
-                HPy_Close(ctx, b);
+                HPyTracker_Close(ctx, ht);
                 return res;
             }
             @EXPORT(f)
@@ -242,21 +252,21 @@ class TestArgParseKeywords(HPyTest):
 
     def test_missing_required_argument(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+O+:add_two")
+        mod = self.make_two_arg_add(fmt="OO:add_two")
         with pytest.raises(TypeError) as exc:
             mod.f(1)
         assert str(exc.value) == "add_two() no value for required argument"
 
     def test_mismatched_args_too_few_keywords(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+O+O+:add_two")
+        mod = self.make_two_arg_add(fmt="OOO:add_two")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "add_two() mismatched args (too few keywords for fmt)"
 
     def test_mismatched_args_too_many_keywords(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+:add_two")
+        mod = self.make_two_arg_add(fmt="O:add_two")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "add_two() mismatched args (too many keywords for fmt)"
@@ -268,9 +278,9 @@ class TestArgParseKeywords(HPyTest):
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
-                HPy a, b, c;
+                long a, b, c;
                 static const char *kwlist[] = { "", "b", "", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "NNN", kwlist,
+                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "lll", kwlist,
                                           &a, &b, &c))
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
@@ -291,17 +301,18 @@ class TestArgParseKeywords(HPyTest):
             {
                 HPy a;
                 HPy b = HPy_NULL;
+                HPyTracker ht;
                 HPy res;
                 static const char *kwlist[] = { "", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, args, nargs, kw, "O+|O+", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|O", kwlist, &a, &b)) {
                     return HPy_NULL;
+                }
                 if (HPy_IsNull(b)) {
                     b = HPyLong_FromLong(ctx, 5);
-                } else {
-                    b = HPy_Dup(ctx, b);
+                    HPyTracker_Add(ctx, ht, b);
                 }
                 res = HPy_Add(ctx, a, b);
-                HPy_Close(ctx, b);
+                HPyTracker_Close(ctx, ht);
                 return res;
             }
             @EXPORT(f)
@@ -316,7 +327,7 @@ class TestArgParseKeywords(HPyTest):
 
     def test_keyword_only_argument(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+$O+")
+        mod = self.make_two_arg_add(fmt="O$O")
         assert mod.f(1, b=2) == 3
         assert mod.f(a=1, b=2) == 3
         with pytest.raises(TypeError) as exc:
@@ -326,21 +337,21 @@ class TestArgParseKeywords(HPyTest):
 
     def test_error_default_message(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+O+O+")
+        mod = self.make_two_arg_add(fmt="OOO")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "function mismatched args (too few keywords for fmt)"
 
     def test_error_with_function_name(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+O+O+:my_func")
+        mod = self.make_two_arg_add(fmt="OOO:my_func")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "my_func() mismatched args (too few keywords for fmt)"
 
     def test_error_with_overridden_message(self):
         import pytest
-        mod = self.make_two_arg_add(fmt="O+O+O+;my-error-message")
+        mod = self.make_two_arg_add(fmt="OOO;my-error-message")
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "my-error-message"
