@@ -199,11 +199,61 @@ class TestErr(HPyTest):
         check_exception(IOError)
 
     def test_h_unicode_exceptions(self):
-        #check_exception(UnicodeError)
-        #check_exception(UnicodeEncodeError)
-        #check_exception(UnicodeDecodeError)
-        #check_exception(UnicodeTranslateError)
-        pass
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy h_key, h_args, h_kw;
+                HPy h_dict, h_err, h_err_value;
+
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOO", &h_key, &h_args, &h_kw))
+                    return HPy_NULL;
+
+                h_dict = HPyDict_New(ctx);
+                if (HPy_IsNull(h_dict)) {
+                    return HPy_NULL;
+                }
+                HPy_SetItem_s(ctx, h_dict, "UnicodeError", ctx->h_UnicodeError);
+                HPy_SetItem_s(ctx, h_dict, "UnicodeEncodeError", ctx->h_UnicodeEncodeError);
+                HPy_SetItem_s(ctx, h_dict, "UnicodeDecodeError", ctx->h_UnicodeDecodeError);
+                HPy_SetItem_s(ctx, h_dict, "UnicodeTranslateError", ctx->h_UnicodeTranslateError);
+
+                h_err = HPy_GetItem(ctx, h_dict, h_key);
+                if (HPy_IsNull(h_err)) {
+                    HPy_Close(ctx, h_dict);
+                    return HPy_NULL;
+                }
+                h_err_value = HPy_Call(ctx, h_err, h_args, h_kw);
+                if (HPy_IsNull(h_err_value)) {
+                    HPy_Close(ctx, h_dict);
+                    HPy_Close(ctx, h_err);
+                    return HPy_NULL;
+                }
+
+                HPyErr_SetObject(ctx, h_err, h_err_value);
+                HPy_Close(ctx, h_dict);
+                HPy_Close(ctx, h_err);
+                HPy_Close(ctx, h_err_value);
+                return HPy_NULL;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+
+        def check_exception(cls, *args, **kw):
+            with pytest.raises(cls):
+                mod.f(cls.__name__, args, kw)
+
+        check_exception(UnicodeError)
+        check_exception(
+            UnicodeEncodeError, "utf-8", "object", 0, 2, "reason"
+        )
+        check_exception(
+            UnicodeDecodeError, "utf-8", b"object", 0, 2, "reason"
+        )
+        check_exception(UnicodeTranslateError, "object", 0, 2, "reason")
 
     def test_h_warnings(self):
         import pytest
