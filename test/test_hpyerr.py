@@ -70,35 +70,37 @@ class TestErr(HPyTest):
         assert mod.f() is None
         assert sys.exc_info() == (None, None, None)
 
-    def check_exception_constant(self, cls):
+    def test_h_exceptions(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
-            {{
-                HPyErr_SetString(ctx, ctx->h_{cls_name}, "error message");
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy h_dict, h_err;
+                h_dict = HPyDict_New(ctx);
+                HPy_SetItem_s(ctx, h_dict, "Exception", ctx->h_Exception);
+                HPy_SetItem_s(ctx, h_dict, "IndexError", ctx->h_IndexError);
+                HPy_SetItem_s(ctx, h_dict, "OverflowError", ctx->h_OverflowError);
+                HPy_SetItem_s(ctx, h_dict, "SystemError", ctx->h_SystemError);
+                HPy_SetItem_s(ctx, h_dict, "TypeError", ctx->h_TypeError);
+                HPy_SetItem_s(ctx, h_dict, "ValueError", ctx->h_ValueError);
+                h_err = HPy_GetItem(ctx, h_dict, arg);
+                HPyErr_SetString(ctx, h_err, "error message");
+                HPy_Close(ctx, h_dict);
+                HPy_Close(ctx, h_err);
                 return HPy_NULL;
-            }}
+            }
             @EXPORT(f)
             @INIT
-        """.format(cls_name=cls.__name__))
-        with pytest.raises(cls):
-            mod.f()
+        """)
 
-    def test_h_Exception(self):
-        self.check_exception_constant(Exception)
+        def check_exception(cls):
+            with pytest.raises(cls):
+                mod.f(cls.__name__)
 
-    def test_h_IndexError(self):
-        self.check_exception_constant(IndexError)
-
-    def test_h_OverflowError(self):
-        self.check_exception_constant(OverflowError)
-
-    def test_h_SystemError(self):
-        self.check_exception_constant(SystemError)
-
-    def test_h_TypeError(self):
-        self.check_exception_constant(TypeError)
-
-    def test_h_ValueError(self):
-        self.check_exception_constant(ValueError)
+        check_exception(Exception)
+        check_exception(IndexError)
+        check_exception(OverflowError)
+        check_exception(SystemError)
+        check_exception(TypeError)
+        check_exception(ValueError)
