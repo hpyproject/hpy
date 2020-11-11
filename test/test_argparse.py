@@ -178,6 +178,43 @@ class TestParseItem(HPyTest):
         assert mod.f(2**64) == 0
         assert mod.f(-2**64) == 0
 
+    def test_L(self):
+        import pytest
+        mod = self.make_parse_item("L", "long long", "HPyLong_FromLongLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(2**63 - 1) == 2**63 - 1
+        assert mod.f(-2**63) == -2**63
+        with pytest.raises(OverflowError):
+            mod.f(2**63)
+        with pytest.raises(OverflowError):
+            mod.f(-2**63 - 1)
+
+    def test_K_signed(self):
+        mod = self.make_parse_item("k", "long long", "HPyLong_FromLongLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(2**63 - 1) == 2**63 - 1
+        assert mod.f(-2**63) == -2**63
+        assert mod.f(2**64 - 1) == -1
+        assert mod.f(-2**64 + 1) == 1
+        assert mod.f(2**64) == 0
+        assert mod.f(-2**64) == 0
+
+    def test_K_unsigned(self):
+        mod = self.make_parse_item(
+            "k", "unsigned long long", "HPyLong_FromUnsignedLongLong"
+        )
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == 2**64 - 1
+        assert mod.f(2**64 - 1) == 2**64 - 1
+        assert mod.f(-2**64 + 1) == 1
+        assert mod.f(2**64) == 0
+        assert mod.f(-2**64) == 0
+
     def test_d(self):
         import pytest
         mod = self.make_parse_item("d", "double", "HPyFloat_FromDouble")
