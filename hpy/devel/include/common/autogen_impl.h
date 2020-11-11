@@ -273,6 +273,11 @@ HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetString)(HPyContext ctx, HPy h_type, co
     PyErr_SetString(_h2py(h_type), message);
 }
 
+HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetObject)(HPyContext ctx, HPy h_type, HPy h_value)
+{
+    PyErr_SetObject(_h2py(h_type), _h2py(h_value));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Err_NoMemory)(HPyContext ctx)
 {
     return _py2h(PyErr_NoMemory());
@@ -361,6 +366,11 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(RichCompareBool)(HPyContext ctx, HPy 
 HPyAPI_STORAGE HPy_hash_t _HPy_IMPL_NAME_NOPREFIX(Hash)(HPyContext ctx, HPy obj)
 {
     return PyObject_Hash(_h2py(obj));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Call)(HPyContext ctx, HPy callable, HPy args, HPy kwargs)
+{
+    return _py2h(PyObject_Call(_h2py(callable), _h2py(args), _h2py(kwargs)));
 }
 
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)

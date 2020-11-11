@@ -166,6 +166,7 @@ HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 
 /* pyerrors.h */
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
+void HPyErr_SetObject(HPyContext ctx, HPy h_type, HPy h_value);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext ctx);
 HPy HPyErr_NoMemory(HPyContext ctx);
@@ -206,6 +207,8 @@ HPy HPy_RichCompare(HPyContext ctx, HPy v, HPy w, int op);
 int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op);
 
 HPy_hash_t HPy_Hash(HPyContext ctx, HPy obj);
+
+HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kwargs);
 
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);

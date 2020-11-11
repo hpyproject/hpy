@@ -232,6 +232,10 @@ static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *mess
      ctx->ctx_Err_SetString ( ctx, h_type, message ); 
 }
 
+static inline void HPyErr_SetObject(HPyContext ctx, HPy h_type, HPy h_value) {
+     ctx->ctx_Err_SetObject ( ctx, h_type, h_value ); 
+}
+
 static inline int HPyErr_Occurred(HPyContext ctx) {
      return ctx->ctx_Err_Occurred ( ctx ); 
 }
@@ -334,6 +338,10 @@ static inline int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op) {
 
 static inline HPy_hash_t HPy_Hash(HPyContext ctx, HPy obj) {
      return ctx->ctx_Hash ( ctx, obj ); 
+}
+
+static inline HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kwargs) {
+     return ctx->ctx_Call ( ctx, callable, args, kwargs ); 
 }
 
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {

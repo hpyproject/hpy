@@ -141,6 +141,7 @@ struct _HPyContext_s {
     HPy (*ctx_InPlaceXor)(HPyContext ctx, HPy h1, HPy h2);
     HPy (*ctx_InPlaceOr)(HPyContext ctx, HPy h1, HPy h2);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
+    void (*ctx_Err_SetObject)(HPyContext ctx, HPy h_type, HPy h_value);
     int (*ctx_Err_Occurred)(HPyContext ctx);
     HPy (*ctx_Err_NoMemory)(HPyContext ctx);
     void (*ctx_Err_Clear)(HPyContext ctx);
@@ -168,6 +169,7 @@ struct _HPyContext_s {
     HPy (*ctx_RichCompare)(HPyContext ctx, HPy v, HPy w, int op);
     int (*ctx_RichCompareBool)(HPyContext ctx, HPy v, HPy w, int op);
     HPy_hash_t (*ctx_Hash)(HPyContext ctx, HPy obj);
+    HPy (*ctx_Call)(HPyContext ctx, HPy callable, HPy args, HPy kwargs);
     int (*ctx_Bytes_Check)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_Size)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext ctx, HPy h);
