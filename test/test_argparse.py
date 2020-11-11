@@ -36,10 +36,16 @@ class TestParseItem(HPyTest):
         assert mod.f(0) == b"\x00"
         assert mod.f(1) == b"\x01"
         assert mod.f(255) == b"\xff"
-        with pytest.raises(OverflowError):
+        with pytest.raises(OverflowError) as err:
             mod.f(256)
-        with pytest.raises(OverflowError):
+        assert str(err.value) == (
+            "function unsigned byte integer is greater than maximum"
+        )
+        with pytest.raises(OverflowError) as err:
             mod.f(-1)
+        assert str(err.value) == (
+            "function unsigned byte integer is less than minimum"
+        )
 
     def test_i(self):
         mod = self.make_parse_item("i", "int", "HPyLong_FromLong")
