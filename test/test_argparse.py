@@ -87,7 +87,9 @@ class TestParseItem(HPyTest):
         assert mod.f(-65536) == 0
 
     def test_H_unsigned_short(self):
-        mod = self.make_parse_item("H", "unsigned short", "HPyLong_FromLong")
+        mod = self.make_parse_item(
+            "H", "unsigned short", "HPyLong_FromUnsignedLong"
+        )
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == 65535
@@ -128,7 +130,9 @@ class TestParseItem(HPyTest):
         assert mod.f(-4294967296) == 0
 
     def test_I_unsigned(self):
-        mod = self.make_parse_item("I", "unsigned int", "HPyLong_FromLong")
+        mod = self.make_parse_item(
+            "I", "unsigned int", "HPyLong_FromUnsignedLong"
+        )
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == 4294967295
@@ -138,9 +142,41 @@ class TestParseItem(HPyTest):
         assert mod.f(-4294967296) == 0
 
     def test_l(self):
+        import pytest
         mod = self.make_parse_item("l", "long", "HPyLong_FromLong")
+        assert mod.f(0) == 0
         assert mod.f(1) == 1
-        assert mod.f(-2) == -2
+        assert mod.f(-1) == -1
+        assert mod.f(2**63 - 1) == 2**63 - 1
+        assert mod.f(-2**63) == -2**63
+        with pytest.raises(OverflowError):
+            mod.f(2**63)
+        with pytest.raises(OverflowError):
+            mod.f(-2**63 - 1)
+
+    def test_k_signed(self):
+        mod = self.make_parse_item("k", "long", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(2**63 - 1) == 2**63 - 1
+        assert mod.f(-2**63) == -2**63
+        assert mod.f(2**64 - 1) == -1
+        assert mod.f(-2**64 + 1) == 1
+        assert mod.f(2**64) == 0
+        assert mod.f(-2**64) == 0
+
+    def test_k_unsigned(self):
+        mod = self.make_parse_item(
+            "k", "unsigned long", "HPyLong_FromUnsignedLong"
+        )
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == 2**64 - 1
+        assert mod.f(2**64 - 1) == 2**64 - 1
+        assert mod.f(-2**64 + 1) == 1
+        assert mod.f(2**64) == 0
+        assert mod.f(-2**64) == 0
 
     def test_d(self):
         import pytest
