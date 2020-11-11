@@ -215,6 +215,19 @@ class TestParseItem(HPyTest):
         assert mod.f(2**64) == 0
         assert mod.f(-2**64) == 0
 
+    def test_n(self):
+        import pytest
+        mod = self.make_parse_item("n", "HPy_ssize_t", "HPyLong_FromSsize_t")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(2**63 - 1) == 2**63 - 1
+        assert mod.f(-2**63) == -2**63
+        with pytest.raises(OverflowError):
+            mod.f(2**63)
+        with pytest.raises(OverflowError):
+            mod.f(-2**63 - 1)
+
     def test_d(self):
         import pytest
         mod = self.make_parse_item("d", "double", "HPyFloat_FromDouble")
