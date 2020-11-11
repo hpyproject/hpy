@@ -51,8 +51,8 @@ class TestParseItem(HPyTest):
         mod = self.make_parse_item("B", "char", "CHAR_TO_HPYBYTES")
         assert mod.f(0) == b"\x00"
         assert mod.f(1) == b"\x01"
-        assert mod.f(255) == b"\xff"
-        assert mod.f(256) == b"\x00"
+        assert mod.f(2**8 - 1) == b"\xff"
+        assert mod.f(2**8) == b"\x00"
         assert mod.f(-1) == b"\xff"
 
     def test_h(self):
@@ -61,15 +61,15 @@ class TestParseItem(HPyTest):
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
-        assert mod.f(32767) == 32767
-        assert mod.f(-32768) == -32768
+        assert mod.f(2**15 - 1) == 2**15 - 1
+        assert mod.f(-2**15) == -2**15
         with pytest.raises(OverflowError) as err:
-            mod.f(32768)
+            mod.f(2**15)
         assert str(err.value) == (
             "function signed short integer is greater than maximum"
         )
         with pytest.raises(OverflowError) as err:
-            mod.f(-32769)
+            mod.f(-2**15 - 1)
         assert str(err.value) == (
             "function signed short integer is less than minimum"
         )
@@ -79,12 +79,12 @@ class TestParseItem(HPyTest):
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
-        assert mod.f(32767) == 32767
-        assert mod.f(-32768) == -32768
-        assert mod.f(65535) == -1
-        assert mod.f(-65535) == 1
-        assert mod.f(65536) == 0
-        assert mod.f(-65536) == 0
+        assert mod.f(2**15 - 1) == 2**15 - 1
+        assert mod.f(-2**15) == -2**15
+        assert mod.f(2**16 - 1) == -1
+        assert mod.f(-2**16 + 1) == 1
+        assert mod.f(2**16) == 0
+        assert mod.f(-2**16) == 0
 
     def test_H_unsigned_short(self):
         mod = self.make_parse_item(
@@ -92,11 +92,11 @@ class TestParseItem(HPyTest):
         )
         assert mod.f(0) == 0
         assert mod.f(1) == 1
-        assert mod.f(-1) == 65535
-        assert mod.f(65535) == 65535
-        assert mod.f(-65535) == 1
-        assert mod.f(65536) == 0
-        assert mod.f(-65536) == 0
+        assert mod.f(-1) == 2**16 - 1
+        assert mod.f(2**16 - 1) == 2**16 - 1
+        assert mod.f(-2**16 + 1) == 1
+        assert mod.f(2**16) == 0
+        assert mod.f(-2**16) == 0
 
     def test_i(self):
         import pytest
@@ -104,15 +104,15 @@ class TestParseItem(HPyTest):
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
-        assert mod.f(2147483647) == 2147483647
-        assert mod.f(-2147483648) == -2147483648
+        assert mod.f(2**31 - 1) == 2**31 - 1
+        assert mod.f(-2**31) == -2**31
         with pytest.raises(OverflowError) as err:
-            mod.f(2147483648)
+            mod.f(2**31)
         assert str(err.value) == (
             "function signed integer is greater than maximum"
         )
         with pytest.raises(OverflowError) as err:
-            mod.f(-2147483649)
+            mod.f(-2**31 - 1)
         assert str(err.value) == (
             "function signed integer is less than minimum"
         )
@@ -122,12 +122,12 @@ class TestParseItem(HPyTest):
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
-        assert mod.f(2147483647) == 2147483647
-        assert mod.f(-2147483648) == -2147483648
-        assert mod.f(4294967295) == -1
-        assert mod.f(-4294967295) == 1
-        assert mod.f(4294967296) == 0
-        assert mod.f(-4294967296) == 0
+        assert mod.f(2**31 - 1) == 2**31 - 1
+        assert mod.f(-2**31) == -2**31
+        assert mod.f(2**32 - 1) == -1
+        assert mod.f(-2**32 + 1) == 1
+        assert mod.f(2**32) == 0
+        assert mod.f(-2**32) == 0
 
     def test_I_unsigned(self):
         mod = self.make_parse_item(
@@ -135,11 +135,11 @@ class TestParseItem(HPyTest):
         )
         assert mod.f(0) == 0
         assert mod.f(1) == 1
-        assert mod.f(-1) == 4294967295
-        assert mod.f(4294967295) == 4294967295
-        assert mod.f(-4294967295) == 1
-        assert mod.f(4294967296) == 0
-        assert mod.f(-4294967296) == 0
+        assert mod.f(-1) == 2**32 - 1
+        assert mod.f(2**32 - 1) == 2**32 - 1
+        assert mod.f(-2**32 + 1) == 1
+        assert mod.f(2**32) == 0
+        assert mod.f(-2**32) == 0
 
     def test_l(self):
         import pytest
