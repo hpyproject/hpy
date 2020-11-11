@@ -249,6 +249,18 @@ class TestParseItem(HPyTest):
         assert mod.f("a") == "a"
         assert mod.f(5) == 5
 
+    def test_p(self):
+        mod = self.make_parse_item("p", "int", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == 1
+        assert mod.f(False) == 0
+        assert mod.f(True) == 1
+        assert mod.f([]) == 0
+        assert mod.f([0]) == 1
+        assert mod.f("") == 0
+        assert mod.f("0") == 1
+
 
 class TestArgParse(HPyTest):
     def make_two_arg_add(self, fmt="OO"):
