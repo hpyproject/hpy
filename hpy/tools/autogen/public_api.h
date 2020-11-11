@@ -144,6 +144,8 @@ HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy h);
 char* HPyBytes_AsString(HPyContext ctx, HPy h);
 char* HPyBytes_AS_STRING(HPyContext ctx, HPy h);
+HPy HPyBytes_FromString(HPyContext ctx, const char *v);
+HPy HPyBytes_FromStringAndSize(HPyContext ctx, const char *v, HPy_ssize_t len);
 
 /* unicodeobject.h */
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);

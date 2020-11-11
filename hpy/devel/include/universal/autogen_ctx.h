@@ -111,6 +111,8 @@ struct _HPyContext_s {
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext ctx, HPy h);
     char *(*ctx_Bytes_AsString)(HPyContext ctx, HPy h);
     char *(*ctx_Bytes_AS_STRING)(HPyContext ctx, HPy h);
+    HPy (*ctx_Bytes_FromString)(HPyContext ctx, const char *v);
+    HPy (*ctx_Bytes_FromStringAndSize)(HPyContext ctx, const char *v, HPy_ssize_t len);
     HPy (*ctx_Unicode_FromString)(HPyContext ctx, const char *utf8);
     int (*ctx_Unicode_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Unicode_AsUTF8String)(HPyContext ctx, HPy h);

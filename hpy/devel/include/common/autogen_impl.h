@@ -378,6 +378,16 @@ HPyAPI_STORAGE char *_HPy_IMPL_NAME(Bytes_AS_STRING)(HPyContext ctx, HPy h)
     return PyBytes_AS_STRING(_h2py(h));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Bytes_FromString)(HPyContext ctx, const char *v)
+{
+    return _py2h(PyBytes_FromString(v));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Bytes_FromStringAndSize)(HPyContext ctx, const char *v, HPy_ssize_t len)
+{
+    return _py2h(PyBytes_FromStringAndSize(v, len));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Unicode_FromString)(HPyContext ctx, const char *utf8)
 {
     return _py2h(PyUnicode_FromString(utf8));

@@ -348,6 +348,14 @@ static inline char *HPyBytes_AS_STRING(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_AS_STRING ( ctx, h ); 
 }
 
+static inline HPy HPyBytes_FromString(HPyContext ctx, const char *v) {
+     return ctx->ctx_Bytes_FromString ( ctx, v ); 
+}
+
+static inline HPy HPyBytes_FromStringAndSize(HPyContext ctx, const char *v, HPy_ssize_t len) {
+     return ctx->ctx_Bytes_FromStringAndSize ( ctx, v, len ); 
+}
+
 static inline HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8) {
      return ctx->ctx_Unicode_FromString ( ctx, utf8 ); 
 }
