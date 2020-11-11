@@ -108,17 +108,17 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_ENVIRONMENTERROR] = PyExc_EnvironmentError;
         new_handles[CONSTANT_H_IOERROR] = PyExc_IOError;
         /* Warnings */
-        new_handles[CONSTANT_H_WARNING] = NULL;
-        new_handles[CONSTANT_H_USERWARNING] = NULL;
-        new_handles[CONSTANT_H_DEPRECATIONWARNING] = NULL;
-        new_handles[CONSTANT_H_PENDINGDEPRECATIONWARNING] = NULL;
-        new_handles[CONSTANT_H_SYNTAXWARNING] = NULL;
-        new_handles[CONSTANT_H_RUNTIMEWARNING] = NULL;
-        new_handles[CONSTANT_H_FUTUREWARNING] = NULL;
-        new_handles[CONSTANT_H_IMPORTWARNING] = NULL;
-        new_handles[CONSTANT_H_UNICODEWARNING] = NULL;
-        new_handles[CONSTANT_H_BYTESWARNING] = NULL;
-        new_handles[CONSTANT_H_RESOURCEWARNING] = NULL;
+        new_handles[CONSTANT_H_WARNING] = PyExc_Warning;
+        new_handles[CONSTANT_H_USERWARNING] = PyExc_UserWarning;
+        new_handles[CONSTANT_H_DEPRECATIONWARNING] = PyExc_DeprecationWarning;
+        new_handles[CONSTANT_H_PENDINGDEPRECATIONWARNING] = PyExc_PendingDeprecationWarning;
+        new_handles[CONSTANT_H_SYNTAXWARNING] = PyExc_SyntaxWarning;
+        new_handles[CONSTANT_H_RUNTIMEWARNING] = PyExc_RuntimeWarning;
+        new_handles[CONSTANT_H_FUTUREWARNING] = PyExc_FutureWarning;
+        new_handles[CONSTANT_H_IMPORTWARNING] = PyExc_ImportWarning;
+        new_handles[CONSTANT_H_UNICODEWARNING] = PyExc_UnicodeWarning;
+        new_handles[CONSTANT_H_BYTESWARNING] = PyExc_BytesWarning;
+        new_handles[CONSTANT_H_RESOURCEWARNING] = PyExc_ResourceWarning;
         /* Types */
         new_handles[CONSTANT_H_BASEOBJECTTYPE] = (PyObject *)&PyBaseObject_Type;
         new_handles[CONSTANT_H_TYPETYPE] = (PyObject *)&PyType_Type;
