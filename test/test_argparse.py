@@ -12,6 +12,10 @@ from .support import HPyTest
 class TestParseItem(HPyTest):
     def make_parse_item(self, fmt, type, hpy_converter):
         mod = self.make_module("""
+            #define CHAR_TO_HPYBYTES(ctx, a) ( \
+                HPyBytes_FromStringAndSize(ctx, &a, 1) \
+            )
+
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
@@ -25,6 +29,17 @@ class TestParseItem(HPyTest):
             @INIT
         """.format(fmt=fmt, type=type, hpy_converter=hpy_converter))
         return mod
+
+    def test_b(self):
+        import pytest
+        mod = self.make_parse_item("b", "char", "CHAR_TO_HPYBYTES")
+        assert mod.f(0) == b"\x00"
+        assert mod.f(1) == b"\x01"
+        assert mod.f(255) == b"\xff"
+        with pytest.raises(OverflowError):
+            mod.f(256)
+        with pytest.raises(OverflowError):
+            mod.f(-1)
 
     def test_i(self):
         mod = self.make_parse_item("i", "int", "HPyLong_FromLong")
