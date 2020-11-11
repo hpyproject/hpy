@@ -22,10 +22,11 @@ HPy h_None;
 HPy h_True;
 HPy h_False;
 HPy h_Exception;
-HPy h_ValueError;
-HPy h_TypeError;
 HPy h_IndexError;
+HPy h_OverflowError;
 HPy h_SystemError;
+HPy h_TypeError;
+HPy h_ValueError;
 HPy h_BaseObjectType;   /* built-in 'object' */
 HPy h_TypeType;         /* built-in 'type' */
 HPy h_LongType;         /* built-in 'int' */
@@ -36,6 +37,7 @@ HPy h_ListType;         /* built-in 'list' */
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
+
 HPy HPyLong_FromLong(HPyContext ctx, long value);
 HPy HPyLong_FromUnsignedLong(HPyContext ctx, unsigned long value);
 HPy HPyLong_FromLongLong(HPyContext ctx, long long v);
@@ -44,6 +46,14 @@ HPy HPyLong_FromSize_t(HPyContext ctx, size_t value);
 HPy HPyLong_FromSsize_t(HPyContext ctx, HPy_ssize_t value);
 
 long HPyLong_AsLong(HPyContext ctx, HPy h);
+unsigned long HPyLong_AsUnsignedLong(HPyContext ctx, HPy h);
+unsigned long HPyLong_AsUnsignedLongMask(HPyContext ctx, HPy h);
+long long HPyLong_AsLongLong(HPyContext ctx, HPy h);
+unsigned long long HPyLong_AsUnsignedLongLong(HPyContext ctx, HPy h);
+unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext ctx, HPy h);
+size_t HPyLong_AsSize_t(HPyContext ctx, HPy h);
+HPy_ssize_t HPyLong_AsSsize_t(HPyContext ctx, HPy h);
+
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
@@ -136,6 +146,8 @@ HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy h);
 char* HPyBytes_AsString(HPyContext ctx, HPy h);
 char* HPyBytes_AS_STRING(HPyContext ctx, HPy h);
+HPy HPyBytes_FromString(HPyContext ctx, const char *v);
+HPy HPyBytes_FromStringAndSize(HPyContext ctx, const char *v, HPy_ssize_t len);
 
 /* unicodeobject.h */
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);

@@ -69,3 +69,36 @@ class TestErr(HPyTest):
         """)
         assert mod.f() is None
         assert sys.exc_info() == (None, None, None)
+
+    def check_exception_constant(self, cls):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext ctx, HPy self)
+            {{
+                HPyErr_SetString(ctx, ctx->h_{cls_name}, "error message");
+                return HPy_NULL;
+            }}
+            @EXPORT(f)
+            @INIT
+        """.format(cls_name=cls.__name__))
+        with pytest.raises(cls):
+            mod.f()
+
+    def test_h_Exception(self):
+        self.check_exception_constant(Exception)
+
+    def test_h_IndexError(self):
+        self.check_exception_constant(IndexError)
+
+    def test_h_OverflowError(self):
+        self.check_exception_constant(OverflowError)
+
+    def test_h_SystemError(self):
+        self.check_exception_constant(SystemError)
+
+    def test_h_TypeError(self):
+        self.check_exception_constant(TypeError)
+
+    def test_h_ValueError(self):
+        self.check_exception_constant(ValueError)
