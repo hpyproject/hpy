@@ -52,12 +52,20 @@ static inline unsigned long HPyLong_AsUnsignedLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsUnsignedLong ( ctx, h ); 
 }
 
+static inline unsigned long HPyLong_AsUnsignedLongMask(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsUnsignedLongMask ( ctx, h ); 
+}
+
 static inline long long HPyLong_AsLongLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsLongLong ( ctx, h ); 
 }
 
 static inline unsigned long long HPyLong_AsUnsignedLongLong(HPyContext ctx, HPy h) {
      return ctx->ctx_Long_AsUnsignedLongLong ( ctx, h ); 
+}
+
+static inline unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext ctx, HPy h) {
+     return ctx->ctx_Long_AsUnsignedLongLongMask ( ctx, h ); 
 }
 
 static inline size_t HPyLong_AsSize_t(HPyContext ctx, HPy h) {

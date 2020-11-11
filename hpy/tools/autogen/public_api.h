@@ -47,8 +47,10 @@ HPy HPyLong_FromSsize_t(HPyContext ctx, HPy_ssize_t value);
 
 long HPyLong_AsLong(HPyContext ctx, HPy h);
 unsigned long HPyLong_AsUnsignedLong(HPyContext ctx, HPy h);
+unsigned long HPyLong_AsUnsignedLongMask(HPyContext ctx, HPy h);
 long long HPyLong_AsLongLong(HPyContext ctx, HPy h);
 unsigned long long HPyLong_AsUnsignedLongLong(HPyContext ctx, HPy h);
+unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext ctx, HPy h);
 size_t HPyLong_AsSize_t(HPyContext ctx, HPy h);
 HPy_ssize_t HPyLong_AsSsize_t(HPyContext ctx, HPy h);
 

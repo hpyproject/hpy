@@ -36,8 +36,10 @@ struct _HPyContext_s {
     HPy (*ctx_Long_FromSsize_t)(HPyContext ctx, HPy_ssize_t value);
     long (*ctx_Long_AsLong)(HPyContext ctx, HPy h);
     unsigned long (*ctx_Long_AsUnsignedLong)(HPyContext ctx, HPy h);
+    unsigned long (*ctx_Long_AsUnsignedLongMask)(HPyContext ctx, HPy h);
     long long (*ctx_Long_AsLongLong)(HPyContext ctx, HPy h);
     unsigned long long (*ctx_Long_AsUnsignedLongLong)(HPyContext ctx, HPy h);
+    unsigned long long (*ctx_Long_AsUnsignedLongLongMask)(HPyContext ctx, HPy h);
     size_t (*ctx_Long_AsSize_t)(HPyContext ctx, HPy h);
     HPy_ssize_t (*ctx_Long_AsSsize_t)(HPyContext ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
