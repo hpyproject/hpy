@@ -47,6 +47,14 @@ class TestParseItem(HPyTest):
             "function unsigned byte integer is less than minimum"
         )
 
+    def test_B(self):
+        mod = self.make_parse_item("B", "char", "CHAR_TO_HPYBYTES")
+        assert mod.f(0) == b"\x00"
+        assert mod.f(1) == b"\x01"
+        assert mod.f(255) == b"\xff"
+        assert mod.f(256) == b"\x00"
+        assert mod.f(-1) == b"\xff"
+
     def test_i(self):
         mod = self.make_parse_item("i", "int", "HPyLong_FromLong")
         assert mod.f(1) == 1
