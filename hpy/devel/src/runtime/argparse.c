@@ -198,7 +198,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
 
     case 'H': { /* short int sized bitfield, both signed and
                    unsigned allowed */
-        short *output = va_arg(*vl, short *);
+        unsigned short *output = va_arg(*vl, unsigned short *);
         _BREAK_IF_OPTIONAL(current_arg);
         unsigned long value = HPyLong_AsUnsignedLongMask(ctx, current_arg);
         if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))

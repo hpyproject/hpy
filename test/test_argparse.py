@@ -55,6 +55,47 @@ class TestParseItem(HPyTest):
         assert mod.f(256) == b"\x00"
         assert mod.f(-1) == b"\xff"
 
+    def test_h(self):
+        import pytest
+        mod = self.make_parse_item("h", "short", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(32767) == 32767
+        assert mod.f(-32768) == -32768
+        with pytest.raises(OverflowError) as err:
+            mod.f(32768)
+        assert str(err.value) == (
+            "function signed short integer is greater than maximum"
+        )
+        with pytest.raises(OverflowError) as err:
+            mod.f(-32769)
+        assert str(err.value) == (
+            "function signed short integer is less than minimum"
+        )
+
+    def test_H_short(self):
+        mod = self.make_parse_item("H", "short", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(32767) == 32767
+        assert mod.f(-32768) == -32768
+        assert mod.f(65535) == -1
+        assert mod.f(-65535) == 1
+        assert mod.f(65536) == 0
+        assert mod.f(-65536) == 0
+
+    def test_H_unsigned_short(self):
+        mod = self.make_parse_item("H", "unsigned short", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == 65535
+        assert mod.f(65535) == 65535
+        assert mod.f(-65535) == 1
+        assert mod.f(65536) == 0
+        assert mod.f(-65536) == 0
+
     def test_i(self):
         mod = self.make_parse_item("i", "int", "HPyLong_FromLong")
         assert mod.f(1) == 1
