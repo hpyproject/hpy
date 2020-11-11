@@ -97,9 +97,45 @@ class TestParseItem(HPyTest):
         assert mod.f(-65536) == 0
 
     def test_i(self):
+        import pytest
         mod = self.make_parse_item("i", "int", "HPyLong_FromLong")
+        assert mod.f(0) == 0
         assert mod.f(1) == 1
-        assert mod.f(-2) == -2
+        assert mod.f(-1) == -1
+        assert mod.f(2147483647) == 2147483647
+        assert mod.f(-2147483648) == -2147483648
+        with pytest.raises(OverflowError) as err:
+            mod.f(2147483648)
+        assert str(err.value) == (
+            "function signed integer is greater than maximum"
+        )
+        with pytest.raises(OverflowError) as err:
+            mod.f(-2147483649)
+        assert str(err.value) == (
+            "function signed integer is less than minimum"
+        )
+
+    def test_I_signed(self):
+        mod = self.make_parse_item("I", "int", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == -1
+        assert mod.f(2147483647) == 2147483647
+        assert mod.f(-2147483648) == -2147483648
+        assert mod.f(4294967295) == -1
+        assert mod.f(-4294967295) == 1
+        assert mod.f(4294967296) == 0
+        assert mod.f(-4294967296) == 0
+
+    def test_I_unsigned(self):
+        mod = self.make_parse_item("I", "unsigned int", "HPyLong_FromLong")
+        assert mod.f(0) == 0
+        assert mod.f(1) == 1
+        assert mod.f(-1) == 4294967295
+        assert mod.f(4294967295) == 4294967295
+        assert mod.f(-4294967295) == 1
+        assert mod.f(4294967296) == 0
+        assert mod.f(-4294967296) == 0
 
     def test_l(self):
         mod = self.make_parse_item("l", "long", "HPyLong_FromLong")
