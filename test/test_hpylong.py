@@ -60,6 +60,22 @@ class TestLong(HPyTest):
         with pytest.raises(OverflowError):
             mod.f(-91)
 
+    def test_Long_AsUnsignedLongMask(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                unsigned long a = HPyLong_AsUnsignedLongMask(ctx, arg);
+                if ((a == (unsigned long) -1) && HPyErr_Occurred(ctx))
+                    return HPy_NULL;
+                return HPyLong_FromUnsignedLong(ctx, a);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(45) == 45
+        assert mod.f(-1) == 2**64 - 1
+
     def test_Long_FromLongLong(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
@@ -119,6 +135,22 @@ class TestLong(HPyTest):
         assert mod.f(4294967296) == 4294967296
         with pytest.raises(OverflowError):
             mod.f(-4294967296)
+
+    def test_Long_AsUnsignedLongLongMask(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                unsigned long long a = HPyLong_AsUnsignedLongLongMask(ctx, arg);
+                if ((a == (unsigned long) -1) && HPyErr_Occurred(ctx))
+                    return HPy_NULL;
+                return HPyLong_FromUnsignedLongLong(ctx, a);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(45) == 45
+        assert mod.f(-1) == 2**64 - 1
 
     def test_Long_FromSize_t(self):
         mod = self.make_module("""
