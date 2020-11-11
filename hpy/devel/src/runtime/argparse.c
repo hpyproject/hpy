@@ -169,7 +169,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
                    values allowed */
         char *output = va_arg(*vl, char *);
         _BREAK_IF_OPTIONAL(current_arg);
-        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        unsigned long value = HPyLong_AsUnsignedLongMask(ctx, current_arg);
         if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
             return 0;
         *output = (unsigned char) value;
@@ -200,7 +200,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
                    unsigned allowed */
         short *output = va_arg(*vl, short *);
         _BREAK_IF_OPTIONAL(current_arg);
-        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        unsigned long value = HPyLong_AsUnsignedLongMask(ctx, current_arg);
         if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
             return 0;
         *output = (unsigned short) value;
@@ -231,7 +231,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
                    unsigned allowed */
         unsigned int *output = va_arg(*vl, unsigned int *);
         _BREAK_IF_OPTIONAL(current_arg);
-        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        unsigned long value = HPyLong_AsUnsignedLongMask(ctx, current_arg);
         if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
             return 0;
         *output = (unsigned int) value;
@@ -251,7 +251,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
     case 'k': { /* long sized bitfield */
         unsigned long *output = va_arg(*vl, unsigned long *);
         _BREAK_IF_OPTIONAL(current_arg);
-        unsigned long value = HPyLong_AsUnsignedLong(ctx, current_arg);
+        unsigned long value = HPyLong_AsUnsignedLongMask(ctx, current_arg);
         if (value == (unsigned long)-1 && HPyErr_Occurred(ctx))
             return 0;
         *output = value;
@@ -271,7 +271,7 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
     case 'K': { /* long long sized bitfield */
         unsigned long long *output = va_arg(*vl, unsigned long long *);
         _BREAK_IF_OPTIONAL(current_arg);
-        unsigned long long value = HPyLong_AsUnsignedLongLong(ctx, current_arg);
+        unsigned long long value = HPyLong_AsUnsignedLongLongMask(ctx, current_arg);
         if (value == (unsigned long long)-1 && HPyErr_Occurred(ctx))
             return 0;
         *output = value;
