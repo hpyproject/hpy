@@ -208,8 +208,6 @@ int HPy_RichCompareBool(HPyContext ctx, HPy v, HPy w, int op);
 
 HPy_hash_t HPy_Hash(HPyContext ctx, HPy obj);
 
-HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kwargs);
-
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);

@@ -368,11 +368,6 @@ HPyAPI_STORAGE HPy_hash_t _HPy_IMPL_NAME_NOPREFIX(Hash)(HPyContext ctx, HPy obj)
     return PyObject_Hash(_h2py(obj));
 }
 
-HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Call)(HPyContext ctx, HPy callable, HPy args, HPy kwargs)
-{
-    return _py2h(PyObject_Call(_h2py(callable), _h2py(args), _h2py(kwargs)));
-}
-
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Bytes_Check)(HPyContext ctx, HPy h)
 {
     return PyBytes_Check(_h2py(h));

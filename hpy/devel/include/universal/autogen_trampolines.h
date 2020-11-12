@@ -340,10 +340,6 @@ static inline HPy_hash_t HPy_Hash(HPyContext ctx, HPy obj) {
      return ctx->ctx_Hash ( ctx, obj ); 
 }
 
-static inline HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kwargs) {
-     return ctx->ctx_Call ( ctx, callable, args, kwargs ); 
-}
-
 static inline int HPyBytes_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }
