@@ -109,7 +109,7 @@ class TestLong(HPyTest):
                 long long a = HPyLong_AsLongLong(ctx, arg);
                 if ((a == (long long) -1) && HPyErr_Occurred(ctx))
                     return HPy_NULL;
-                                return HPyLong_FromLongLong(ctx, a);
+                return HPyLong_FromLongLong(ctx, a);
             }
             @EXPORT(f)
             @INIT
