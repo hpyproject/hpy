@@ -200,6 +200,10 @@ class TestErr(HPyTest):
 
     def test_h_unicode_exceptions(self):
         import pytest
+        pytest.xfail(
+            "Creating the unicode exceptions requires something like HPyCall"
+            " and that isn't implemented yet."
+        )
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
