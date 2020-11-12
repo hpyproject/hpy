@@ -127,8 +127,6 @@ class TestErr(HPyTest):
                 HPy_SetItem_s(ctx, h_dict, "PermissionError", ctx->h_PermissionError);
                 HPy_SetItem_s(ctx, h_dict, "ProcessLookupError", ctx->h_ProcessLookupError);
                 HPy_SetItem_s(ctx, h_dict, "TimeoutError", ctx->h_TimeoutError);
-                HPy_SetItem_s(ctx, h_dict, "EnvironmentError", ctx->h_EnvironmentError);
-                HPy_SetItem_s(ctx, h_dict, "IOError", ctx->h_IOError);
                 h_err = HPy_GetItem(ctx, h_dict, arg);
                 if (HPy_IsNull(h_err)) {
                     HPy_FatalError(ctx, "missing exception type");
@@ -195,6 +193,8 @@ class TestErr(HPyTest):
         check_exception(PermissionError)
         check_exception(ProcessLookupError)
         check_exception(TimeoutError)
+        # EnvironmentError and IOError are not explicitly defined by HPy
+        # but they work because they are actually OSError.
         check_exception(EnvironmentError)
         check_exception(IOError)
 

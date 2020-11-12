@@ -66,8 +66,6 @@ struct _HPyContext_s {
     HPy h_PermissionError;
     HPy h_ProcessLookupError;
     HPy h_TimeoutError;
-    HPy h_EnvironmentError;
-    HPy h_IOError;
     HPy h_Warning;
     HPy h_UserWarning;
     HPy h_DeprecationWarning;

@@ -105,8 +105,6 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_PERMISSIONERROR] = PyExc_PermissionError;
         new_handles[CONSTANT_H_PROCESSLOOKUPERROR] = PyExc_ProcessLookupError;
         new_handles[CONSTANT_H_TIMEOUTERROR] = PyExc_TimeoutError;
-        new_handles[CONSTANT_H_ENVIRONMENTERROR] = PyExc_EnvironmentError;
-        new_handles[CONSTANT_H_IOERROR] = PyExc_IOError;
         /* Warnings */
         new_handles[CONSTANT_H_WARNING] = PyExc_Warning;
         new_handles[CONSTANT_H_USERWARNING] = PyExc_UserWarning;
@@ -127,7 +125,7 @@ allocate_more_handles(void)
         new_handles[CONSTANT_H_TUPLETYPE] = (PyObject *)&PyTuple_Type;
         new_handles[CONSTANT_H_LISTTYPE] = (PyObject *)&PyList_Type;
         /* Check total */
-        hpy_assert(CONSTANT_H__TOTAL == 76,
+        hpy_assert(CONSTANT_H__TOTAL == 74,
             "update handles.c with the list of constants");
     }
 

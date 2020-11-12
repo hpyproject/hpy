@@ -77,8 +77,8 @@ HPy h_NotADirectoryError;
 HPy h_PermissionError;
 HPy h_ProcessLookupError;
 HPy h_TimeoutError;
-HPy h_EnvironmentError;
-HPy h_IOError;
+// EnvironmentError, IOError and WindowsError are intentionally omitted (they
+// are all aliases of OSError since Python 3.3).
 
 /* Warnings */
 HPy h_Warning;

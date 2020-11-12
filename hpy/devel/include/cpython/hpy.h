@@ -103,8 +103,6 @@ typedef struct _HPyContext_s {
     HPy h_PermissionError;
     HPy h_ProcessLookupError;
     HPy h_TimeoutError;
-    HPy h_EnvironmentError;
-    HPy h_IOError;
     /* Warnings */
     HPy h_Warning;
     HPy h_UserWarning;
@@ -203,8 +201,6 @@ _HPyGetContext(void) {
         ctx->h_PermissionError = _py2h(PyExc_PermissionError);
         ctx->h_ProcessLookupError = _py2h(PyExc_ProcessLookupError);
         ctx->h_TimeoutError = _py2h(PyExc_TimeoutError);
-        ctx->h_EnvironmentError = _py2h(PyExc_EnvironmentError);
-        ctx->h_IOError = _py2h(PyExc_IOError);
         /* Warnings */
         ctx->h_Warning = _py2h(PyExc_Warning);
         ctx->h_UserWarning = _py2h(PyExc_UserWarning);
