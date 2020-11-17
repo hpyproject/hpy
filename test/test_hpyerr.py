@@ -1,3 +1,5 @@
+import pytest as pytest_collecting
+
 from .support import HPyTest
 
 
@@ -231,12 +233,12 @@ class TestErr(HPyTest):
         check_exception(EnvironmentError)
         check_exception(IOError)
 
+    @pytest_collecting.mark.xfail(True, reason=(
+        "Creating the unicode exceptions requires something like HPyCall"
+        " and that isn't implemented yet."
+    ))
     def test_h_unicode_exceptions(self):
         import pytest
-        pytest.xfail(
-            "Creating the unicode exceptions requires something like HPyCall"
-            " and that isn't implemented yet."
-        )
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext ctx, HPy self,
