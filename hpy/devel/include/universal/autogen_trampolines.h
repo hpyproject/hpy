@@ -232,6 +232,10 @@ static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *mess
      ctx->ctx_Err_SetString ( ctx, h_type, message ); 
 }
 
+static inline void HPyErr_SetObject(HPyContext ctx, HPy h_type, HPy h_value) {
+     ctx->ctx_Err_SetObject ( ctx, h_type, h_value ); 
+}
+
 static inline int HPyErr_Occurred(HPyContext ctx) {
      return ctx->ctx_Err_Occurred ( ctx ); 
 }

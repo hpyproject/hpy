@@ -47,22 +47,85 @@ allocate_more_handles(void)
 
     if (h_num_allocated == 0) {
         new_handles[CONSTANT_H_NULL] = NULL;
+        /* Constants */
         new_handles[CONSTANT_H_NONE] = Py_None;
-        new_handles[CONSTANT_H_FALSE] = Py_False;
         new_handles[CONSTANT_H_TRUE] = Py_True;
+        new_handles[CONSTANT_H_FALSE] = Py_False;
+        /* Exceptions */
+        new_handles[CONSTANT_H_BASEEXCEPTION] = PyExc_BaseException;
         new_handles[CONSTANT_H_EXCEPTION] = PyExc_Exception;
+        new_handles[CONSTANT_H_STOPASYNCITERATION] = PyExc_StopAsyncIteration;
+        new_handles[CONSTANT_H_STOPITERATION] = PyExc_StopIteration;
+        new_handles[CONSTANT_H_GENERATOREXIT] = PyExc_GeneratorExit;
+        new_handles[CONSTANT_H_ARITHMETICERROR] = PyExc_ArithmeticError;
+        new_handles[CONSTANT_H_LOOKUPERROR] = PyExc_LookupError;
+        new_handles[CONSTANT_H_ASSERTIONERROR] = PyExc_AssertionError;
+        new_handles[CONSTANT_H_ATTRIBUTEERROR] = PyExc_AttributeError;
+        new_handles[CONSTANT_H_BUFFERERROR] = PyExc_BufferError;
+        new_handles[CONSTANT_H_EOFERROR] = PyExc_EOFError;
+        new_handles[CONSTANT_H_FLOATINGPOINTERROR] = PyExc_FloatingPointError;
+        new_handles[CONSTANT_H_OSERROR] = PyExc_OSError;
+        new_handles[CONSTANT_H_IMPORTERROR] = PyExc_ImportError;
+        new_handles[CONSTANT_H_MODULENOTFOUNDERROR] = PyExc_ModuleNotFoundError;
         new_handles[CONSTANT_H_INDEXERROR] = PyExc_IndexError;
+        new_handles[CONSTANT_H_KEYERROR] = PyExc_KeyError;
+        new_handles[CONSTANT_H_KEYBOARDINTERRUPT] = PyExc_KeyboardInterrupt;
+        new_handles[CONSTANT_H_MEMORYERROR] = PyExc_MemoryError;
+        new_handles[CONSTANT_H_NAMEERROR] = PyExc_NameError;
         new_handles[CONSTANT_H_OVERFLOWERROR] = PyExc_OverflowError;
+        new_handles[CONSTANT_H_RUNTIMEERROR] = PyExc_RuntimeError;
+        new_handles[CONSTANT_H_RECURSIONERROR] = PyExc_RecursionError;
+        new_handles[CONSTANT_H_NOTIMPLEMENTEDERROR] = PyExc_NotImplementedError;
+        new_handles[CONSTANT_H_SYNTAXERROR] = PyExc_SyntaxError;
+        new_handles[CONSTANT_H_INDENTATIONERROR] = PyExc_IndentationError;
+        new_handles[CONSTANT_H_TABERROR] = PyExc_TabError;
+        new_handles[CONSTANT_H_REFERENCEERROR] = PyExc_ReferenceError;
         new_handles[CONSTANT_H_SYSTEMERROR] = PyExc_SystemError;
+        new_handles[CONSTANT_H_SYSTEMEXIT] = PyExc_SystemExit;
         new_handles[CONSTANT_H_TYPEERROR] = PyExc_TypeError;
+        new_handles[CONSTANT_H_UNBOUNDLOCALERROR] = PyExc_UnboundLocalError;
+        new_handles[CONSTANT_H_UNICODEERROR] = PyExc_UnicodeError;
+        new_handles[CONSTANT_H_UNICODEENCODEERROR] = PyExc_UnicodeEncodeError;
+        new_handles[CONSTANT_H_UNICODEDECODEERROR] = PyExc_UnicodeDecodeError;
+        new_handles[CONSTANT_H_UNICODETRANSLATEERROR] = PyExc_UnicodeTranslateError;
         new_handles[CONSTANT_H_VALUEERROR] = PyExc_ValueError;
+        new_handles[CONSTANT_H_ZERODIVISIONERROR] = PyExc_ZeroDivisionError;
+        new_handles[CONSTANT_H_BLOCKINGIOERROR] = PyExc_BlockingIOError;
+        new_handles[CONSTANT_H_BROKENPIPEERROR] = PyExc_BrokenPipeError;
+        new_handles[CONSTANT_H_CHILDPROCESSERROR] = PyExc_ChildProcessError;
+        new_handles[CONSTANT_H_CONNECTIONERROR] = PyExc_ConnectionError;
+        new_handles[CONSTANT_H_CONNECTIONABORTEDERROR] = PyExc_ConnectionAbortedError;
+        new_handles[CONSTANT_H_CONNECTIONREFUSEDERROR] = PyExc_ConnectionRefusedError;
+        new_handles[CONSTANT_H_CONNECTIONRESETERROR] = PyExc_ConnectionResetError;
+        new_handles[CONSTANT_H_FILEEXISTSERROR] = PyExc_FileExistsError;
+        new_handles[CONSTANT_H_FILENOTFOUNDERROR] = PyExc_FileNotFoundError;
+        new_handles[CONSTANT_H_INTERRUPTEDERROR] = PyExc_InterruptedError;
+        new_handles[CONSTANT_H_ISADIRECTORYERROR] = PyExc_IsADirectoryError;
+        new_handles[CONSTANT_H_NOTADIRECTORYERROR] = PyExc_NotADirectoryError;
+        new_handles[CONSTANT_H_PERMISSIONERROR] = PyExc_PermissionError;
+        new_handles[CONSTANT_H_PROCESSLOOKUPERROR] = PyExc_ProcessLookupError;
+        new_handles[CONSTANT_H_TIMEOUTERROR] = PyExc_TimeoutError;
+        /* Warnings */
+        new_handles[CONSTANT_H_WARNING] = PyExc_Warning;
+        new_handles[CONSTANT_H_USERWARNING] = PyExc_UserWarning;
+        new_handles[CONSTANT_H_DEPRECATIONWARNING] = PyExc_DeprecationWarning;
+        new_handles[CONSTANT_H_PENDINGDEPRECATIONWARNING] = PyExc_PendingDeprecationWarning;
+        new_handles[CONSTANT_H_SYNTAXWARNING] = PyExc_SyntaxWarning;
+        new_handles[CONSTANT_H_RUNTIMEWARNING] = PyExc_RuntimeWarning;
+        new_handles[CONSTANT_H_FUTUREWARNING] = PyExc_FutureWarning;
+        new_handles[CONSTANT_H_IMPORTWARNING] = PyExc_ImportWarning;
+        new_handles[CONSTANT_H_UNICODEWARNING] = PyExc_UnicodeWarning;
+        new_handles[CONSTANT_H_BYTESWARNING] = PyExc_BytesWarning;
+        new_handles[CONSTANT_H_RESOURCEWARNING] = PyExc_ResourceWarning;
+        /* Types */
         new_handles[CONSTANT_H_BASEOBJECTTYPE] = (PyObject *)&PyBaseObject_Type;
         new_handles[CONSTANT_H_TYPETYPE] = (PyObject *)&PyType_Type;
         new_handles[CONSTANT_H_LONGTYPE] = (PyObject *)&PyLong_Type;
         new_handles[CONSTANT_H_UNICODETYPE] = (PyObject *)&PyUnicode_Type;
         new_handles[CONSTANT_H_TUPLETYPE] = (PyObject *)&PyTuple_Type;
         new_handles[CONSTANT_H_LISTTYPE] = (PyObject *)&PyList_Type;
-        hpy_assert(CONSTANT_H__TOTAL == 16,
+        /* Check total */
+        hpy_assert(CONSTANT_H__TOTAL == 74,
             "update handles.c with the list of constants");
     }
 

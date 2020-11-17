@@ -273,6 +273,11 @@ HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetString)(HPyContext ctx, HPy h_type, co
     PyErr_SetString(_h2py(h_type), message);
 }
 
+HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetObject)(HPyContext ctx, HPy h_type, HPy h_value)
+{
+    PyErr_SetObject(_h2py(h_type), _h2py(h_value));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Err_NoMemory)(HPyContext ctx)
 {
     return _py2h(PyErr_NoMemory());
