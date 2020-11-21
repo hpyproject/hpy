@@ -9,10 +9,11 @@
  * and handles. More complex types (e.g. buffers) should be retrieved as
  * handles and then processed further as needed.
  *
- * Supported formatting strings:
+ * Supported Formatting Strings
+ * ----------------------------
  *
  * Numbers
- * -------
+ * ~~~~~~~
  *
  * b (int) [unsigned char]
  *     Convert a nonnegative Python integer to an unsigned tiny int, stored in a C unsigned char.
@@ -53,10 +54,10 @@
  * d (float) [double]
  *     Convert a Python floating point number to a C double.
  *
- * Handles
- * -------
+ * Handles (Python Objects)
+ * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * O (object) [HPy *]
+ * O (object) [HPy]
  *     Store a handle pointing to a generic Python object.
  *
  *     When using O with HPyArg_ParseKeywords, an HPyTracker is created and
@@ -65,6 +66,9 @@
  *     returned handles are no longer needed. This will close all the handles
  *     created during argument parsing. There is no need to call
  *     `HPyTracker_Close` on failure -- the argument parser does this for you.
+ *
+ * Miscellaneous
+ * ~~~~~~~~~~~~~
  *
  * p (bool) [int]
  *     Tests the value passed in for truth (a boolean predicate) and converts
@@ -75,7 +79,7 @@
  *     for more information about how Python tests values for truth.
  *
  * Options
- * -------
+ * ~~~~~~~
  *
  * |
  *     Indicates that the remaining arguments in the argument list are optional.
@@ -98,6 +102,9 @@
  *     The list of format units ends here; the string after the semicolon is
  *     used as the error message instead of the default error message. : and ;
  *     are mutually exclusive and whichever occurs first takes precedence.
+ *
+ * API
+ * ---
  *
  */
 
@@ -339,6 +346,36 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
 }
 
 
+/**
+ * Parse positional arguments.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param ht:
+ *     An optional pointer to an HPyTracker. If the format string never
+ *     results in new handles being created, `ht` may be `NULL`. Currently
+ *     no formatting options to this function require an HPyTracker.
+ * :param args:
+ *     The array of positional arguments to parse.
+ * :param nargs:
+ *     The number of elements in args.
+ * :param fmt:
+ *     The format string to use to parse the arguments.
+ * :param ...:
+ *     A va_list of references to variables in which to store the parsed
+ *     arguments. The number and types of the arguments should match the
+ *     the format strint, `fmt`.
+ *
+ * :returns: 0 on failure, 1 on success.
+ *
+ * If a `NULL` pointer is passed to `ht` and an `HPyTracker` is required by
+ * the format string, an exception will be raised.
+ *
+ * If a pointer is provided to `ht`, the `HPyTracker` will always be created
+ * and must be closed with `HPyTracker_Close` if parsing succeeds (after all
+ * handles returned are no longer needed). If parsing fails, this function
+ * will close the `HPyTracker` automatically.
+ */
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
 {
@@ -402,6 +439,43 @@ HPyArg_Parse(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, const
 }
 
 
+/**
+ * Parse positional and keyword arguments.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param ht:
+ *     An optional pointer to an HPyTracker. If the format string never
+ *     results in new handles being created, `ht` may be `NULL`. Currently
+ *     only the `O` formatting option to this function requires an HPyTracker.
+ * :param args:
+ *     The array of positional arguments to parse.
+ * :param nargs:
+ *     The number of elements in args.
+ * :param kw:
+ *     A handle to the dictionary of keyword arguments.
+ * :param fmt:
+ *     The format string to use to parse the arguments.
+ * :param keywords:
+ *     An `NULL` terminated array of argument names. The number of names
+ *     should match the format string provided. Positional only arguments
+ *     should have the name `""` (i.e. the null-terminated empty string).
+ *     Positional only arguments must preceded all other arguments.
+ * :param ...:
+ *     A va_list of references to variables in which to store the parsed
+ *     arguments. The number and types of the arguments should match the
+ *     the format strint, `fmt`.
+ *
+ * :returns: 0 on failure, 1 on success.
+ *
+ * If a `NULL` pointer is passed to `ht` and an `HPyTracker` is required by
+ * the format string, an exception will be raised.
+ *
+ * If a pointer is provided to `ht`, the `HPyTracker` will always be created
+ * and must be closed with `HPyTracker_Close` if parsing succeeds (after all
+ * handles returned are no longer needed). If parsing fails, this function
+ * will close the `HPyTracker` automatically.
+ */
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_ParseKeywords(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, HPy kw,
                      const char *fmt, const char *keywords[], ...)
