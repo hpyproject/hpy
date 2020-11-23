@@ -15,6 +15,7 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 import re
+import subprocess
 
 # -- Project information -----------------------------------------------------
 
@@ -63,6 +64,11 @@ def pre_process(app, filename, contents, *args):
 
 
 def setup(app):
+    import clang.cindex
+    llvm_libdir = subprocess.check_output([
+        "llvm-config", "--libdir"
+    ]).decode("utf-8").strip()
+    clang.cindex.conf.set_library_path(llvm_libdir)
     app.connect("c-autodoc-pre-process", pre_process)
 
 
