@@ -6,6 +6,7 @@ dependencies:
   - python=3.7
   - llvm=10.0.1
   - libclang=10.0.1
+  - clangdev=10.0.1
   - pip:
     - sphinx==3.3.1
     - sphinx-rtd-theme==0.5.0
