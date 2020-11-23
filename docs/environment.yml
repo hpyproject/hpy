@@ -1,5 +1,7 @@
 # Requirements for building the documentation with conda
 name: hpydocs
+channels:
+  - conda-forge
 dependencies:
   - python=3.7
   - libclang=11.0.0
