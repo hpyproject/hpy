@@ -8,5 +8,5 @@ dependencies:
   - pip:
     - sphinx==3.3.1
     - sphinx-rtd-theme==0.5.0
-    - sphinx-c-autodoc==0.3.1
-    - clang==10.0.1
+    - --nodeps sphinx-c-autodoc==0.3.1
+    - beautifulsoup4
