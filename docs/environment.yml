@@ -4,6 +4,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.7
+  - llvm=11.0.0
   - clang=11.0.0
   - libclang=11.0.0
   - python-clang=11.0.0
