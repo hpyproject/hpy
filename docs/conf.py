@@ -14,8 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
 import re
-import subprocess
 
 # -- Project information -----------------------------------------------------
 
@@ -64,13 +64,14 @@ def pre_process(app, filename, contents, *args):
 
 
 def setup(app):
-    import clang.cindex
-    llvm_libdir = subprocess.check_output([
-        "llvm-config", "--libdir"
-    ]).decode("utf-8").strip()
-    clang.cindex.conf.set_library_path(llvm_libdir)
     app.connect("c-autodoc-pre-process", pre_process)
 
+
+if 'READTHEDOCS' in os.environ:
+    from clang import cindex
+    cindex.Config.set_library_file(
+        "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
+    )
 
 # -- Options for HTML output -------------------------------------------------
 
