@@ -15,49 +15,49 @@
  * Numbers
  * ~~~~~~~
  *
- * b (int) [unsigned char]
+ * ``b (int) [unsigned char]``
  *     Convert a nonnegative Python integer to an unsigned tiny int, stored in a C unsigned char.
  *
- * B (int) [unsigned char]
+ * ``B (int) [unsigned char]``
  *     Convert a Python integer to a tiny int without overflow checking, stored in a C unsigned char.
  *
- * h (int) [short int]
+ * ``h (int) [short int]``
  *     Convert a Python integer to a C short int.
  *
- * H (int) [unsigned short int]
+ * ``H (int) [unsigned short int]``
  *     Convert a Python integer to a C unsigned short int, without overflow checking.
  *
- * i (int) [int]
+ * ``i (int) [int]``
  *     Convert a Python integer to a plain C int.
  *
- * I (int) [unsigned int]
+ * ``I (int) [unsigned int]``
  *     Convert a Python integer to a C unsigned int, without overflow checking.
  *
- * l (int) [long int]
+ * ``l (int) [long int]``
  *     Convert a Python integer to a C long int.
  *
- * k (int) [unsigned long]
+ * ``k (int) [unsigned long]``
  *     Convert a Python integer to a C unsigned long without overflow checking.
  *
- * L (int) [long long]
+ * ``L (int) [long long]``
  *     Convert a Python integer to a C long long.
  *
- * K (int) [unsigned long long]
+ * ``K (int) [unsigned long long]``
  *     Convert a Python integer to a C unsigned long long without overflow checking.
  *
- * n (int) [HPy_ssize_t]
+ * ``n (int) [HPy_ssize_t]``
  *     Convert a Python integer to a C HPy_ssize_t.
  *
- * f (float) [float]
+ * ``f (float) [float]``
  *     Convert a Python floating point number to a C float.
  *
- * d (float) [double]
+ * ``d (float) [double]``
  *     Convert a Python floating point number to a C double.
  *
  * Handles (Python Objects)
  * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * O (object) [HPy]
+ * ``O (object) [HPy]``
  *     Store a handle pointing to a generic Python object.
  *
  *     When using O with HPyArg_ParseKeywords, an HPyTracker is created and
@@ -70,7 +70,7 @@
  * Miscellaneous
  * ~~~~~~~~~~~~~
  *
- * p (bool) [int]
+ * ``p (bool) [int]``
  *     Tests the value passed in for truth (a boolean predicate) and converts
  *     the result to its equivalent C true/false integer value. Sets the int to
  *     1 if the expression was true and 0 if it was false. This accepts any
@@ -81,24 +81,24 @@
  * Options
  * ~~~~~~~
  *
- * |
+ * ``|``
  *     Indicates that the remaining arguments in the argument list are optional.
  *     The C variables corresponding to optional arguments should be initialized
  *     to their default value — when an optional argument is not specified, the
  *     contents of the corresponding C variable is not modified.
  *
- * $
+ * ``$``
  *     HPyArg_ParseKeywords() only: Indicates that the remaining arguments in
  *     the argument list are keyword-only. Currently, all keyword-only arguments
  *     must also be optional arguments, so | must always be specified before $
  *     in the format string.
  *
- * :
+ * ``:``
  *     The list of format units ends here; the string after the colon is used as
  *     the function name in error messages. : and ; are mutually exclusive and
  *     whichever occurs first takes precedence.
  *
- * ;
+ * ``;``
  *     The list of format units ends here; the string after the semicolon is
  *     used as the error message instead of the default error message. : and ;
  *     are mutually exclusive and whichever occurs first takes precedence.
