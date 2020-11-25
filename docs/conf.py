@@ -68,6 +68,9 @@ def setup(app):
 
 
 if 'READTHEDOCS' in os.environ:
+    # TODO: Hopefully we can remove this setting of the libclang path once
+    #       readthedocs updates its docker image to Ubuntu 20.04 which
+    #       supports clang-10 and clang-11.
     from clang import cindex
     cindex.Config.set_library_file(
         "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
