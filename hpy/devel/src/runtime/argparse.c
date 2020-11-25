@@ -375,6 +375,35 @@ parse_item(HPyContext ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp,
  * and must be closed with `HPyTracker_Close` if parsing succeeds (after all
  * handles returned are no longer needed). If parsing fails, this function
  * will close the `HPyTracker` automatically.
+ *
+ * Examples:
+ *
+ * Using `HPyArg_Parse` without an `HPyTracker`:
+ *
+ * .. code-block:: c
+ *
+ *     long a, b;
+ *     if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))
+ *         return HPy_NULL;
+ *     ...
+ *
+ * Using `HPyArg_Parse` with an `HPyTracker`:
+ *
+ * .. code-block:: c
+ *
+ *     long a, b;
+ *     HPyTracker ht;
+ *     if (!HPyArg_Parse(ctx, &ht, args, nargs, "ll", &a, &b))
+ *         return HPy_NULL;
+ *     ...
+ *     HPyTracker_Close(ctx, ht);
+ *     ...
+ *
+ * .. note::
+ *
+ *    Currently `HPyArg_Parse` never requires the use of an `HPyTracker`.
+ *    The option exists only to support releasing temporary storage used by
+ *    future format string codes (e.g. for character strings).
  */
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_Parse(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
@@ -475,6 +504,35 @@ HPyArg_Parse(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, const
  * and must be closed with `HPyTracker_Close` if parsing succeeds (after all
  * handles returned are no longer needed). If parsing fails, this function
  * will close the `HPyTracker` automatically.
+ *
+ * Examples:
+ *
+ * Using `HPyArg_ParseKeywords` without an `HPyTracker`:
+ *
+ * .. code-block:: c
+ *
+ *     long a, b;
+ *     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "ll", &a, &b))
+ *         return HPy_NULL;
+ *     ...
+ *
+ * Using `HPyArg_ParseKeywords` with an `HPyTracker`:
+ *
+ * .. code-block:: c
+ *
+ *     HPy a, b;
+ *     HPyTracker ht;
+ *     if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "OO", &a, &b))
+ *         return HPy_NULL;
+ *     ...
+ *     HPyTracker_Close(ctx, ht);
+ *     ...
+ *
+ * .. note::
+ *
+ *     Currently `HPyArg_ParseKeywords` only requires the use of an `HPyTracker`
+ *     when the `O` format is used. In future other new format string codes
+ *     (e.g. for character strings) may also require it.
  */
 HPyAPI_RUNTIME_FUNC(int)
 HPyArg_ParseKeywords(HPyContext ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, HPy kw,
