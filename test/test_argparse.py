@@ -323,6 +323,25 @@ class TestArgParse(HPyTest):
         """)
         assert mod.f("a", "b") == "ab"
 
+    def test_supplying_hpy_tracker(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy a, b, result;
+                HPyTracker ht;
+                if (!HPyArg_Parse(ctx, &ht, args, nargs, "OO", &a, &b))
+                    return HPy_NULL;
+                result = HPy_Add(ctx, a, b);
+                HPyTracker_Close(ctx, ht);
+                return result;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f("a", "b") == "ab"
+
     def test_unsupported_fmt(self):
         import pytest
         mod = self.make_two_arg_add(fmt="ZZ:two_add")
