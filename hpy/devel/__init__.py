@@ -40,6 +40,34 @@ class HPyDevel:
         """
         return list(map(str, self.src_dir.glob('ctx_*.c')))
 
+    def fix_distribution(self, dist):
+        """ Override build_ext to support hpy modules.
+
+            Used from both setup.py and hpy/test.
+        """
+        dist.hpydevel = self
+
+        base_build = dist.cmdclass.get("build", build)
+        base_build_ext = dist.cmdclass.get("build_ext", build_ext)
+
+        class build_hpy_ext(build_hpy_ext_mixin, base_build_ext):
+            _base_build_ext = base_build_ext
+
+        def dist_has_ext_modules(self):
+            if self.ext_modules or self.hpy_ext_modules:
+                return True
+            return False
+
+        def build_has_ext_modules(self):
+            return self.distribution.has_ext_modules()
+
+        # replace build_ext subcommand
+        dist.cmdclass['build_ext'] = build_hpy_ext
+        dist.__class__.has_ext_modules = dist_has_ext_modules
+        base_build.has_ext_modules = build_has_ext_modules
+        idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
+        base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
+
 
 def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
     """ Distuils hpy_ext_module setup(...) argument and --hpy-abi option.
@@ -49,31 +77,13 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
     """
     assert attr == 'hpy_ext_modules'
 
-    base_build = dist.cmdclass.get("build", build)
-    base_build_ext = dist.cmdclass.get("build_ext", build_ext)
-
-    class build_hpy_ext(build_hpy_ext_mixin, base_build_ext):
-        _base_build_ext = base_build_ext
-
-    def dist_has_ext_modules(self):
-        if self.ext_modules or self.hpy_ext_modules:
-            return True
-        return False
-
-    def build_has_ext_modules(self):
-        return self.distribution.has_ext_modules()
-
     # add a global option --hpy-abi to setup.py
     dist.__class__.hpy_abi = 'cpython'
     dist.__class__.global_options += [
         ('hpy-abi=', None, 'Specify the HPy ABI mode (default: cpython)')
     ]
-    # replace build_ext subcommand
-    dist.cmdclass['build_ext'] = build_hpy_ext
-    dist.__class__.has_ext_modules = dist_has_ext_modules
-    base_build.has_ext_modules = build_has_ext_modules
-    idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
-    base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
+    hpydevel = HPyDevel()
+    hpydevel.fix_distribution(dist)
 
 
 _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE = """
@@ -84,9 +94,9 @@ class Spec:
 
 
 def __bootstrap__():
-    import sys, pkg_resources
+    import os, sys
     from hpy.universal import load_from_spec
-    ext_filepath = pkg_resources.resource_filename(__name__, {ext_file!r})
+    ext_filepath = os.path.join(os.path.dirname(__file__), {ext_file!r})
     m = load_from_spec(Spec({module_name!r}, ext_filepath))
     m.__file__ = ext_filepath
     sys.modules[__name__] = m
@@ -118,7 +128,7 @@ class build_hpy_ext_mixin:
 
     def initialize_options(self):
         self._base_build_ext.initialize_options(self)
-        self.hpydevel = HPyDevel()
+        self.hpydevel = self.distribution.hpydevel
 
     def _finalize_hpy_ext(self, ext):
         if hasattr(ext, "hpy_abi"):
@@ -176,6 +186,8 @@ class build_hpy_ext_mixin:
         log.info(
             "writing hpy universal stub loader for %s to %s",
             ext._full_name, output_dir)
+        # ignore output_dir which points to completely the wrong place
+        output_dir = self.build_lib
         stub_file = (os.path.join(output_dir, *ext._full_name.split('.')) +
                      '.py')
         if compile and os.path.exists(stub_file):
