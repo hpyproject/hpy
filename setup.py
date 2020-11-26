@@ -85,6 +85,9 @@ setup(
           "distutils.setup_keywords": [
               "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
           ],
+          "distutils.commands": [
+              "build_hpy_ext = hpy.devel:build_hpy_ext",
+          ]
       },
     use_scm_version = get_scm_config,
     setup_requires=['setuptools_scm'],
