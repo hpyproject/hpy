@@ -2,7 +2,6 @@ import os.path
 from pathlib import Path
 from distutils import log
 from distutils.command.build import build
-from distutils.command.install_lib import install_lib
 from distutils.errors import DistutilsError
 from setuptools.command.build_ext import build_ext
 
@@ -51,105 +50,33 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
     assert attr == 'hpy_ext_modules'
 
     base_build = dist.cmdclass.get("build", build)
-    base_install_lib = dist.cmdclass.get("install_lib", install_lib)
-    orig_has_ext_modules = base_build.has_ext_modules
-    orig_get_outputs = base_install_lib.get_outputs
-    orig_get_inputs = base_install_lib.get_inputs
+    base_build_ext = dist.cmdclass.get("build_ext", build_ext)
 
-    def has_hpy_ext_modules(self):
-        return bool(self.distribution.hpy_ext_modules)
+    class build_hpy_ext(build_hpy_ext_mixin, base_build_ext):
+        _base_build_ext = base_build_ext
 
-    def has_any_ext_modules(self):
-        return has_hpy_ext_modules(self) or orig_has_ext_modules(self)
+    def dist_has_ext_modules(self):
+        if self.ext_modules or self.hpy_ext_modules:
+            return True
+        return False
 
-    def get_outputs(self):
-        outputs = orig_get_outputs(self)
-        hpy_ext_outputs = self._mutate_outputs(
-            self.distribution.has_hpy_ext_modules(),
-            'build_hpy_ext', 'build_lib',
-            self.install_dir)
-        outputs.extend(hpy_ext_outputs)
-        return outputs
+    def build_has_ext_modules(self):
+        return self.distribution.has_ext_modules()
 
-    def get_inputs(self):
-        inputs = orig_get_inputs(self)
-        if self.distribution.has_hpy_ext_modules():
-            build_hpy_ext = self.get_finalized_command('build_hpy_ext')
-            inputs.extend(build_hpy_ext.get_outputs())
-        return inputs
-
-    if not hasattr(dist.__class__, 'hpy_abi'):
-        # add a global option --hpy-abi to setup.py
-        dist.__class__.hpy_abi = 'cpython'
-        dist.__class__.global_options += [
-            ('hpy-abi=', None, 'Specify the HPy ABI mode (default: cpython)')
-        ]
-        # add build_hpy_ext subcommand
-        base_build.sub_commands.append(("build_hpy_ext", has_hpy_ext_modules))
-        base_build.has_ext_modules = has_any_ext_modules
-        base_install_lib.get_outputs = get_outputs
-        base_install_lib.get_inputs = get_inputs
+    # add a global option --hpy-abi to setup.py
+    dist.__class__.hpy_abi = 'cpython'
+    dist.__class__.global_options += [
+        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: cpython)')
+    ]
+    # replace build_ext subcommand
+    dist.cmdclass['build_ext'] = build_hpy_ext
+    dist.__class__.has_ext_modules = dist_has_ext_modules
+    base_build.has_ext_modules = build_has_ext_modules
+    idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
+    base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
 
 
-class build_hpy_ext(build_ext):
-    """ Distutils command for building HPy extensions.
-
-        See hpy's setup.py where this class is registered as an entry point.
-    """
-
-    description = "build HPy C extensions"
-
-    @property
-    def extensions(self):
-        return self.distribution.hpy_ext_modules
-
-    @extensions.setter
-    def extensions(self, value):
-        pass  # ignore any attempts to change the list of extensions
-
-    def initialize_options(self):
-        super(self.__class__, self).initialize_options()
-        self.hpydevel = HPyDevel()
-
-    def get_outputs(self):
-        outputs = super(self.__class__, self).get_outputs()
-        print(outputs)
-        return outputs
-
-    def build_extension(self, ext):
-        if not hasattr(ext, "hpy_abi"):
-            ext.hpy_abi = self.distribution.hpy_abi
-            ext.include_dirs += self.hpydevel.get_extra_include_dirs()
-            ext.sources += self.hpydevel.get_extra_sources()
-            if ext.hpy_abi == 'cpython':
-                ext.sources += self.hpydevel.get_ctx_sources()
-            if ext.hpy_abi == 'universal':
-                ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
-                ext._needs_stub = True
-        return super(self.__class__, self).build_extension(ext)
-
-    def get_ext_filename(self, ext_name):
-        # this is needed to give the .hpy.so extension to universal extensions
-        if self.distribution.hpy_abi == 'universal':
-            ext_path = ext_name.split('.')
-            ext_suffix = '.hpy.so'  # XXX Windows?
-            ext_filename = os.path.join(*ext_path) + ext_suffix
-            log.info("Building extension: %r" % ext_filename)
-            return ext_filename
-        return super(self.__class__, self).get_ext_filename(ext_name)
-
-    def write_stub(self, output_dir, ext, compile=False):
-        log.info("writing stub loader for %s to %s", ext._full_name,
-                 output_dir)
-        stub_file = (os.path.join(output_dir, *ext._full_name.split('.')) +
-                     '.py')
-        if compile and os.path.exists(stub_file):
-            raise DistutilsError(stub_file + " already exists! Please delete.")
-        ext_file = os.path.basename(ext._file_name)
-        module_name = ext_file.split(".")[0]
-        if not self.dry_run:
-            f = open(stub_file, 'w')
-            f.write("""
+_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE = """
 class Spec:
     def __init__(self, name, origin):
         self.name = name
@@ -157,13 +84,106 @@ class Spec:
 
 
 def __bootstrap__():
-    global __loader__, __file__
     import sys, pkg_resources
     from hpy.universal import load_from_spec
-    __file__ = pkg_resources.resource_filename(__name__, {ext_file!r})
-    m = load_from_spec(Spec({module_name!r}, __file__))
+    ext_filepath = pkg_resources.resource_filename(__name__, {ext_file!r})
+    m = load_from_spec(Spec({module_name!r}, ext_filepath))
+    m.__file__ = ext_filepath
     sys.modules[__name__] = m
 
 __bootstrap__()
-""".format(ext_file=ext_file, module_name=module_name))
-            f.close()
+"""
+
+
+class HPyExtensionName(str):
+    def split(self, *args, **kw):
+        result = str.split(self, *args, **kw)
+        return [self.__class__(s) for s in result]
+
+
+class build_hpy_ext_mixin:
+    """ A mixin class for setuptools build_ext to add support for buidling
+        HPy extensions.
+    """
+
+    _extensions = None
+
+    @property
+    def extensions(self):
+        return self._extensions
+
+    @extensions.setter
+    def extensions(self, value):
+        pass  # ignore any attempts to change the list of extensions directly
+
+    def initialize_options(self):
+        self._base_build_ext.initialize_options(self)
+        self.hpydevel = HPyDevel()
+
+    def _finalize_hpy_ext(self, ext):
+        if hasattr(ext, "hpy_abi"):
+            return
+        ext.name = HPyExtensionName(ext.name)
+        ext.hpy_abi = self.distribution.hpy_abi
+        ext.include_dirs += self.hpydevel.get_extra_include_dirs()
+        ext.sources += self.hpydevel.get_extra_sources()
+        if ext.hpy_abi == 'cpython':
+            ext.sources += self.hpydevel.get_ctx_sources()
+            ext._hpy_needs_stub = False
+        if ext.hpy_abi == 'universal':
+            ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
+            ext._hpy_needs_stub = True
+
+    def finalize_options(self):
+        self._extensions = self.distribution.ext_modules or []
+        hpy_ext_modules = self.distribution.hpy_ext_modules or []
+        for ext in hpy_ext_modules:
+            self._finalize_hpy_ext(ext)
+        self._extensions.extend(hpy_ext_modules)
+        self._base_build_ext.finalize_options(self)
+        for ext in hpy_ext_modules:
+            ext._needs_stub = ext._hpy_needs_stub
+
+    def get_ext_fullname(self, ext_name):
+        fullname = self._base_build_ext.get_ext_fullname(self, ext_name)
+        if isinstance(ext_name, HPyExtensionName):
+            fullname = HPyExtensionName(fullname)
+        return fullname
+
+    def get_ext_fullpath(self, ext_name):
+        fullpath = self._base_build_ext.get_ext_fullpath(self, ext_name)
+        if isinstance(ext_name, HPyExtensionName):
+            fullpath = HPyExtensionName(fullpath)
+        return fullpath
+
+    def get_ext_filename(self, ext_name):
+        if not isinstance(ext_name, HPyExtensionName):
+            return self._base_build_ext.get_ext_filename(self, ext_name)
+        if self.distribution.hpy_abi == 'universal':
+            ext_path = ext_name.split('.')
+            ext_suffix = '.hpy.so'  # XXX Windows?
+            ext_filename = os.path.join(*ext_path) + ext_suffix
+        else:
+            ext_filename = self._base_build_ext.get_ext_filename(
+                self, ext_name)
+        return HPyExtensionName(ext_filename)
+
+    def write_stub(self, output_dir, ext, compile=False):
+        if (not hasattr(ext, "hpy_abi") or
+                self.distribution.hpy_abi != 'universal'):
+            return self._base_build_ext.write_stub(
+                self, output_dir, ext, compile=compile)
+        log.info(
+            "writing hpy universal stub loader for %s to %s",
+            ext._full_name, output_dir)
+        stub_file = (os.path.join(output_dir, *ext._full_name.split('.')) +
+                     '.py')
+        if compile and os.path.exists(stub_file):
+            raise DistutilsError(stub_file + " already exists! Please delete.")
+        ext_file = os.path.basename(ext._file_name)
+        module_name = ext_file.split(".")[0]
+        if not self.dry_run:
+            with open(stub_file, 'w') as f:
+                f.write(_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
+                    ext_file=ext_file, module_name=module_name)
+                )
