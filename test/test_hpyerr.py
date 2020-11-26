@@ -37,7 +37,8 @@ class TestErr(HPyTest):
             @INIT
         """)
         result = subprocess.run([
-            sys.executable, "-c", f"import {mod.__name__} as mod; mod.f()"
+            sys.executable,
+            "-c", "import {} as mod; mod.f()".format(mod.__name__)
         ], env={
             "PYTHONPATH": os.path.dirname(mod.__file__),
         }, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
