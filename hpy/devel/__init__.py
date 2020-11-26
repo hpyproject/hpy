@@ -94,9 +94,9 @@ class Spec:
 
 
 def __bootstrap__():
-    import os, sys
+    import sys, pkg_resources
     from hpy.universal import load_from_spec
-    ext_filepath = os.path.join(os.path.dirname(__file__), {ext_file!r})
+    ext_filepath = pkg_resources.resource_filename(__name__, {ext_file!r})
     m = load_from_spec(Spec({module_name!r}, ext_filepath))
     m.__file__ = ext_filepath
     sys.modules[__name__] = m
