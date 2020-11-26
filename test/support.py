@@ -209,10 +209,12 @@ class ExtensionCompiler:
         # It is important to do the imports only here, because this file will
         # be imported also by PyPy tests which runs on Python2
         import importlib.util
+        import sys
         spec = importlib.util.spec_from_file_location(name, so_filename)
         module = importlib.util.module_from_spec(spec)
+        sys.modules[name] = module
         spec.loader.exec_module(module)
-        return module
+        return sys.modules.pop(name)
 
 
 @pytest.mark.usefixtures('initargs')
@@ -254,7 +256,8 @@ def c_compile(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
 def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
     # XXX compact but horrible :-(
     from distutils.core import Distribution
-    import distutils.errors, distutils.log
+    import distutils.errors
+    import distutils.log
     #
     dist = Distribution()
     dist.parse_config_files()
