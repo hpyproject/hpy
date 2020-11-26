@@ -20,6 +20,9 @@ class TestErr(HPyTest):
             mod.f()
 
     def test_FatalError(self):
+        import os
+        import subprocess
+        import sys
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
@@ -33,8 +36,14 @@ class TestErr(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        # Calling mod.f() gives a fatal error, ending in abort().
-        # How to check that?  For now we just check that the above compiles
+        result = subprocess.run([
+            sys.executable, "-c", f"import {mod.__name__} as mod; mod.f()"
+        ], env={
+            "PYTHONPATH": os.path.dirname(mod.__file__),
+        }, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        assert result.returncode == -6
+        assert result.stdout == b""
+        assert result.stderr.startswith(b"Fatal Python error: boom!\n")
 
     def test_HPyErr_Occurred(self):
         import pytest
