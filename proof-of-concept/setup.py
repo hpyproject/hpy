@@ -7,4 +7,5 @@ setup(
         Extension('pofpackage.foo', sources=['pofpackage/foo.c']),
     ],
     setup_requires=['hpy.devel'],
+    zip_safe=False,
 )
