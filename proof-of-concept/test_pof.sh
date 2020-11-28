@@ -58,7 +58,7 @@ clean() {
     _myrm ${ROOT}/venv/wheel_runner_cpython
     _myrm ${ROOT}/venv/wheel_runner_universal
     _myrm ${ROOT}/venv/setup_py_install_cpython
-    _myrm ${ROOT}/venv/setup_pu_install_universal
+    _myrm ${ROOT}/venv/setup_py_install_universal
     _myrm ${ROOT}/build
     _myrm ${ROOT}/proof-of-concept/build
     _myrm ${ROOT}/proof-of-concept/dist
