@@ -198,7 +198,7 @@ class ExtensionCompiler:
 
     def make_module(self, ExtensionTemplate, main_src, name, extra_sources):
         """
-        Compile & load a modulo into memory. This is NOT a proper import: e.g.
+        Compile & load a module. This is NOT a proper import: e.g.
         the module is not put into sys.modules
         """
         mod_filename = self.compile_module(
