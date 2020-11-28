@@ -3,6 +3,7 @@ from pathlib import Path
 from distutils import log
 from distutils.command.build import build
 from distutils.errors import DistutilsError
+from setuptools.command import bdist_egg as bdist_egg_mod
 from setuptools.command.build_ext import build_ext
 
 # NOTE: this file is also imported by PyPy tests, so it must be compatible
@@ -49,6 +50,7 @@ class HPyDevel:
 
         base_build = dist.cmdclass.get("build", build)
         base_build_ext = dist.cmdclass.get("build_ext", build_ext)
+        orig_bdist_egg_write_stub = bdist_egg_mod.write_stub
 
         class build_hpy_ext(build_hpy_ext_mixin, base_build_ext):
             _base_build_ext = base_build_ext
@@ -61,12 +63,19 @@ class HPyDevel:
         def build_has_ext_modules(self):
             return self.distribution.has_ext_modules()
 
+        def bdist_egg_write_stub(resource, pyfile):
+            if resource.endswith(".hpy.so"):
+                log.info("stub file already created for %s", resource)
+                return
+            orig_bdist_egg_write_stub(resource, pyfile)
+
         # replace build_ext subcommand
         dist.cmdclass['build_ext'] = build_hpy_ext
         dist.__class__.has_ext_modules = dist_has_ext_modules
         base_build.has_ext_modules = build_has_ext_modules
         idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
         base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
+        bdist_egg_mod.write_stub = bdist_egg_write_stub
 
 
 def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
