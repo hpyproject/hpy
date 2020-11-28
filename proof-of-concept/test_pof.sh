@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 ROOT=`pwd` # we expect this script to be run from the repo root
 
