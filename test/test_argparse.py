@@ -12,7 +12,10 @@ from .support import HPyTest
 class TestParseItem(HPyTest):
     def make_parse_item(self, fmt, type, hpy_converter):
         mod = self.make_module("""
-            __attribute__((unused)) static inline
+            #ifndef _MSC_VER
+            __attribute__((unused))
+            #endif
+            static inline
             HPy char_to_hpybytes(HPyContext ctx, char a) {{
                 return HPyBytes_FromStringAndSize(ctx, &a, 1);
             }}

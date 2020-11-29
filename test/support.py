@@ -182,14 +182,28 @@ class ExtensionCompiler:
             extra_filename = self._expand(ExtensionTemplate, 'extmod_%d' % i, src)
             sources.append(extra_filename)
         #
-        compile_args = [
-            '-g', '-O0',
-            '-Wfatal-errors',    # stop after one error (unrelated to warnings)
-            '-Werror',           # turn warnings into errors (all, for now)
-        ]
-        link_args = [
-            '-g',
-        ]
+        if sys.platform == 'win32':
+            # not strictly true, could be mingw
+            compile_args = [
+                '/Od',
+                '/WX',               # turn warnings into errors (all, for now)
+                # '/Wall',           # this is too aggresive, makes windows itself fail
+                '/Zi',
+                '-D_CRT_SECURE_NO_WARNINGS', # something about _snprintf and _snprintf_s
+            ]
+            link_args = [
+                '/DEBUG',
+                '/LTCG',
+            ]
+        else:
+            compile_args = [
+                '-g', '-O0',
+                '-Wfatal-errors',    # stop after one error (unrelated to warnings)
+                '-Werror',           # turn warnings into errors (all, for now)
+            ]
+            link_args = [
+                '-g',
+            ]
         #
         ext = Extension(
             name,

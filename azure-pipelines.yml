@@ -17,6 +17,9 @@ jobs:
       py38-macos:
         python.version: '3.8'
         imageName: 'macos-latest'
+      py38-win:
+        python.version: '3.8'
+        imageName: 'windows-latest'
   steps:
   - template: azure-templates/ccache.yml
     parameters:
@@ -51,6 +54,9 @@ jobs:
       py38-macos:
         python.version: '3.8'
         imageName: 'macos-latest'
+      py38-win:
+        python.version: '3.8'
+        imageName: 'windows-latest'
   steps:
   - template: azure-templates/ccache.yml
     parameters:
