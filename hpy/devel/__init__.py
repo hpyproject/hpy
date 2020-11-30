@@ -52,7 +52,7 @@ class HPyDevel:
         base_build_ext = dist.cmdclass.get("build_ext", build_ext)
         orig_bdist_egg_write_stub = bdist_egg_mod.write_stub
 
-        class build_hpy_ext(build_hpy_ext_mixin, base_build_ext):
+        class build_hpy_ext(build_hpy_ext_mixin, base_build_ext, object):
             _base_build_ext = base_build_ext
 
         def dist_has_ext_modules(self):
