@@ -14,6 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import re
 
 # -- Project information -----------------------------------------------------
 
@@ -30,7 +32,11 @@ release = "0.0.1"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = []
+extensions = [
+    "sphinx.ext.autosectionlabel",
+    "sphinx_c_autodoc",
+    "sphinx_c_autodoc.viewcode",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -40,6 +46,35 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+# -- sphinx_c_autodoc --------------------------------------------------------
+
+c_autodoc_roots = [
+    "../hpy/devel/include/common",
+    "../hpy/devel/src",
+]
+
+
+def pre_process(app, filename, contents, *args):
+    # remove HPyAPI_RUNTIME_FUNC so that the sphinx-c-autodoc and clang
+    # find and render the API functions
+    contents[:] = [
+        re.sub(r"HPyAPI_RUNTIME_FUNC\((.*)\)", r"\1", part)
+        for part in contents
+    ]
+
+
+def setup(app):
+    app.connect("c-autodoc-pre-process", pre_process)
+
+
+if 'READTHEDOCS' in os.environ:
+    # TODO: Hopefully we can remove this setting of the libclang path once
+    #       readthedocs updates its docker image to Ubuntu 20.04 which
+    #       supports clang-10 and clang-11.
+    from clang import cindex
+    cindex.Config.set_library_file(
+        "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
+    )
 
 # -- Options for HTML output -------------------------------------------------
 

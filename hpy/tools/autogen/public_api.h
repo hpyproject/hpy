@@ -18,14 +18,82 @@ typedef int HPyTracker;
 
 /* HPy public API */
 
+/* Constants */
 HPy h_None;
 HPy h_True;
 HPy h_False;
+
+/* Exceptions */
+HPy h_BaseException;
 HPy h_Exception;
-HPy h_ValueError;
-HPy h_TypeError;
+HPy h_StopAsyncIteration;
+HPy h_StopIteration;
+HPy h_GeneratorExit;
+HPy h_ArithmeticError;
+HPy h_LookupError;
+HPy h_AssertionError;
+HPy h_AttributeError;
+HPy h_BufferError;
+HPy h_EOFError;
+HPy h_FloatingPointError;
+HPy h_OSError;
+HPy h_ImportError;
+HPy h_ModuleNotFoundError;
 HPy h_IndexError;
+HPy h_KeyError;
+HPy h_KeyboardInterrupt;
+HPy h_MemoryError;
+HPy h_NameError;
+HPy h_OverflowError;
+HPy h_RuntimeError;
+HPy h_RecursionError;
+HPy h_NotImplementedError;
+HPy h_SyntaxError;
+HPy h_IndentationError;
+HPy h_TabError;
+HPy h_ReferenceError;
 HPy h_SystemError;
+HPy h_SystemExit;
+HPy h_TypeError;
+HPy h_UnboundLocalError;
+HPy h_UnicodeError;
+HPy h_UnicodeEncodeError;
+HPy h_UnicodeDecodeError;
+HPy h_UnicodeTranslateError;
+HPy h_ValueError;
+HPy h_ZeroDivisionError;
+HPy h_BlockingIOError;
+HPy h_BrokenPipeError;
+HPy h_ChildProcessError;
+HPy h_ConnectionError;
+HPy h_ConnectionAbortedError;
+HPy h_ConnectionRefusedError;
+HPy h_ConnectionResetError;
+HPy h_FileExistsError;
+HPy h_FileNotFoundError;
+HPy h_InterruptedError;
+HPy h_IsADirectoryError;
+HPy h_NotADirectoryError;
+HPy h_PermissionError;
+HPy h_ProcessLookupError;
+HPy h_TimeoutError;
+// EnvironmentError, IOError and WindowsError are intentionally omitted (they
+// are all aliases of OSError since Python 3.3).
+
+/* Warnings */
+HPy h_Warning;
+HPy h_UserWarning;
+HPy h_DeprecationWarning;
+HPy h_PendingDeprecationWarning;
+HPy h_SyntaxWarning;
+HPy h_RuntimeWarning;
+HPy h_FutureWarning;
+HPy h_ImportWarning;
+HPy h_UnicodeWarning;
+HPy h_BytesWarning;
+HPy h_ResourceWarning;
+
+/* Types */
 HPy h_BaseObjectType;   /* built-in 'object' */
 HPy h_TypeType;         /* built-in 'type' */
 HPy h_LongType;         /* built-in 'int' */
@@ -36,6 +104,7 @@ HPy h_ListType;         /* built-in 'list' */
 HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext ctx, HPy h);
 void HPy_Close(HPyContext ctx, HPy h);
+
 HPy HPyLong_FromLong(HPyContext ctx, long value);
 HPy HPyLong_FromUnsignedLong(HPyContext ctx, unsigned long value);
 HPy HPyLong_FromLongLong(HPyContext ctx, long long v);
@@ -44,6 +113,14 @@ HPy HPyLong_FromSize_t(HPyContext ctx, size_t value);
 HPy HPyLong_FromSsize_t(HPyContext ctx, HPy_ssize_t value);
 
 long HPyLong_AsLong(HPyContext ctx, HPy h);
+unsigned long HPyLong_AsUnsignedLong(HPyContext ctx, HPy h);
+unsigned long HPyLong_AsUnsignedLongMask(HPyContext ctx, HPy h);
+long long HPyLong_AsLongLong(HPyContext ctx, HPy h);
+unsigned long long HPyLong_AsUnsignedLongLong(HPyContext ctx, HPy h);
+unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext ctx, HPy h);
+size_t HPyLong_AsSize_t(HPyContext ctx, HPy h);
+HPy_ssize_t HPyLong_AsSsize_t(HPyContext ctx, HPy h);
+
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
@@ -89,6 +166,7 @@ HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 
 /* pyerrors.h */
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
+void HPyErr_SetObject(HPyContext ctx, HPy h_type, HPy h_value);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext ctx);
 HPy HPyErr_NoMemory(HPyContext ctx);
@@ -136,6 +214,8 @@ HPy_ssize_t HPyBytes_Size(HPyContext ctx, HPy h);
 HPy_ssize_t HPyBytes_GET_SIZE(HPyContext ctx, HPy h);
 char* HPyBytes_AsString(HPyContext ctx, HPy h);
 char* HPyBytes_AS_STRING(HPyContext ctx, HPy h);
+HPy HPyBytes_FromString(HPyContext ctx, const char *v);
+HPy HPyBytes_FromStringAndSize(HPyContext ctx, const char *v, HPy_ssize_t len);
 
 /* unicodeobject.h */
 HPy HPyUnicode_FromString(HPyContext ctx, const char *utf8);
