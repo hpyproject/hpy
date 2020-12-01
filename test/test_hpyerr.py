@@ -360,8 +360,6 @@ class TestErr(HPyTest):
                     HPyErr_Clear(ctx);
                     return HPyLong_FromLong(ctx, -42);
                 }
-
-                HPy_Close(ctx, b);
                 return res;
             }
             @EXPORT(f)
