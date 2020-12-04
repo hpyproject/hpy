@@ -21,6 +21,15 @@ class TestLong(HPyTest):
                 return v
         return MagicIndex()
 
+    def python_supports_magic_index(self):
+        """ Return True if the Python version is 3.8 or later and thus
+            should support calling __index__ in the various HPyLong_As...
+            methods.
+        """
+        import sys
+        vi = sys.version_info
+        return (vi.major > 3 or (vi.major == 3 and vi.minor >= 8))
+
     def test_Long_FromLong(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
@@ -52,7 +61,8 @@ class TestLong(HPyTest):
         with pytest.raises(TypeError):
             mod.f("this is not a number")
         assert mod.f(self.magic_int(2)) == 4
-        assert mod.f(self.magic_index(2)) == 4
+        if self.python_supports_magic_index():
+            assert mod.f(self.magic_index(2)) == 4
 
     def test_Long_FromUnsignedLong(self):
         mod = self.make_module("""
@@ -110,7 +120,8 @@ class TestLong(HPyTest):
         with pytest.raises(TypeError):
             mod.f("this is not a number")
         assert mod.f(self.magic_int(2)) == 2
-        assert mod.f(self.magic_index(2)) == 2
+        if self.python_supports_magic_index():
+            assert mod.f(self.magic_index(2)) == 2
 
     def test_Long_FromLongLong(self):
         mod = self.make_module("""
@@ -145,7 +156,8 @@ class TestLong(HPyTest):
         with pytest.raises(TypeError):
             mod.f("this is not a number")
         assert mod.f(self.magic_int(2)) == 2
-        assert mod.f(self.magic_index(2)) == 2
+        if self.python_supports_magic_index():
+            assert mod.f(self.magic_index(2)) == 2
 
     def test_Long_FromUnsignedLongLong(self):
         mod = self.make_module("""
@@ -204,7 +216,8 @@ class TestLong(HPyTest):
         with pytest.raises(TypeError):
             mod.f("this is not a number")
         assert mod.f(self.magic_int(2)) == 2
-        assert mod.f(self.magic_index(2)) == 2
+        if self.python_supports_magic_index():
+            assert mod.f(self.magic_index(2)) == 2
 
     def test_Long_FromSize_t(self):
         mod = self.make_module("""
