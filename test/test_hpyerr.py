@@ -36,6 +36,10 @@ class TestErr(HPyTest):
             @EXPORT(f)
             @INIT
         """)
+        if not hasattr(sys, "executable"):
+            # if sys.executable is not available (e.g. inside pypy app-level)
+            # tests, then skip the rest of this test
+            return
         result = subprocess.run([
             sys.executable,
             "-c", "import {} as mod; mod.f()".format(mod.__name__)
