@@ -210,11 +210,25 @@ class ExtensionCompiler:
         # be imported also by PyPy tests which runs on Python2
         import importlib.util
         import sys
+        if name in sys.modules:
+            raise ValueError(
+                "Test module {!r} already present in sys.modules".format(name))
         spec = importlib.util.spec_from_file_location(name, so_filename)
         module = importlib.util.module_from_spec(spec)
+        # the ordinary Python import machinery adds the module to sys.modules
+        # before executing the module, and pkg_resources (which is used in the
+        # universal module stub .py file) relies on this, so we do the same
+        # here.
         sys.modules[name] = module
-        spec.loader.exec_module(module)
-        return sys.modules.pop(name)
+        try:
+            spec.loader.exec_module(module)
+        finally:
+            # the universal module stub .py file places the newly loaded HPy
+            # extension module in sys.modules so we retrieve it from there
+            # (for cpython modules, the module was already placed in
+            # sys.modules earlier in this function)
+            module = sys.modules.pop(name)
+        return module
 
 
 @pytest.mark.usefixtures('initargs')
