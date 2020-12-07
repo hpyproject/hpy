@@ -73,6 +73,9 @@ class HPyDevel:
         dist.cmdclass['build_ext'] = build_hpy_ext
         dist.__class__.has_ext_modules = dist_has_ext_modules
         base_build.has_ext_modules = build_has_ext_modules
+        # setuptools / distutils store subcommands in .subcommands which
+        # is a list of tuples of (extension_name, extension_needs_to_run_func).
+        # The two lines below replace .subcommand entry for build_ext.
         idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
         base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
         bdist_egg_mod.write_stub = bdist_egg_write_stub
