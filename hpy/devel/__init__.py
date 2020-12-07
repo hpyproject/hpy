@@ -158,6 +158,13 @@ class build_hpy_ext_mixin:
         HPy extensions.
     """
 
+    # Ideally we would have simply added the HPy extensions to .extensions
+    # at the end of .initialize_options() but the setuptools build_ext
+    # .finalize_options both iterate over and needless overwrite the
+    # .extensions attribute, so we hide the full extension list in
+    # ._extensions and expose it as a settable property that ignores attempts
+    # to overwrite it:
+
     _extensions = None
 
     @property
