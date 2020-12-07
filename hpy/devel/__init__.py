@@ -14,9 +14,9 @@ from setuptools.command.build_ext import build_ext
 class HPyDevel:
     """ Extra sources for building HPy extensions with hpy.devel. """
 
-    _BASE_DIR = Path(__file__).parent
+    _DEFAULT_BASE_DIR = Path(__file__).parent
 
-    def __init__(self, base_dir=_BASE_DIR):
+    def __init__(self, base_dir=_DEFAULT_BASE_DIR):
         self.base_dir = Path(base_dir)
         self.include_dir = self.base_dir.joinpath('include')
         self.src_dir = self.base_dir.joinpath('src', 'runtime')
