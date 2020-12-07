@@ -268,26 +268,23 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
     options['force'] = ('ffiplatform', True)
     options['build_lib'] = ('ffiplatform', tmpdir)
     options['build_temp'] = ('ffiplatform', tmpdir)
-    #
+
     # this is the equivalent of passing --hpy-abi from setup.py's command line
     dist.hpy_abi = hpy_abi
     dist.hpy_ext_modules = [ext]
     hpy_devel.fix_distribution(dist)
-    #
+
     old_level = distutils.log.set_threshold(0) or 0
     try:
         distutils.log.set_verbosity(compiler_verbose)
         dist.run_command('build_ext')
         cmd_obj = dist.get_command_obj('build_ext')
+        outputs = cmd_obj.get_outputs()
         if hpy_abi == "cpython":
-            [mod_filename] = [
-                x for x in cmd_obj.get_outputs() if x.endswith(".so")
-            ]
+            [mod_filename] = [x for x in outputs if not x.endswith(".py")]
         else:
-            [mod_filename] = [
-                x for x in cmd_obj.get_outputs() if x.endswith(".py")
-            ]
+            [mod_filename] = [x for x in outputs if x.endswith(".py")]
     finally:
         distutils.log.set_threshold(old_level)
-    #
+
     return mod_filename
