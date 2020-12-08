@@ -21,7 +21,6 @@ class TestErr(HPyTest):
 
     def test_FatalError(self):
         import os
-        import subprocess
         import sys
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
@@ -40,6 +39,8 @@ class TestErr(HPyTest):
             # if sys.executable is not available (e.g. inside pypy app-level)
             # tests, then skip the rest of this test
             return
+        # subprocess is not importable in pypy app-level tests
+        import subprocess
         result = subprocess.run([
             sys.executable,
             "-c", "import {} as mod; mod.f()".format(mod.__name__)
