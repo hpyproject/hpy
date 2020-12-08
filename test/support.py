@@ -205,29 +205,23 @@ class ExtensionCompiler:
             ExtensionTemplate, main_src, name, extra_sources)
         return self.load_module(name, mod_filename)
 
-    def load_module(self, name, so_filename):
+    def load_module(self, name, mod_filename):
         # It is important to do the imports only here, because this file will
         # be imported also by PyPy tests which runs on Python2
-        import importlib.util
+        import importlib
         import sys
+        import os
         if name in sys.modules:
             raise ValueError(
                 "Test module {!r} already present in sys.modules".format(name))
-        spec = importlib.util.spec_from_file_location(name, so_filename)
-        module = importlib.util.module_from_spec(spec)
-        # the ordinary Python import machinery adds the module to sys.modules
-        # before executing the module, and pkg_resources (which is used in the
-        # universal module stub .py file) relies on this, so we do the same
-        # here.
-        sys.modules[name] = module
+        importlib.invalidate_caches()
         try:
-            spec.loader.exec_module(module)
+            sys.path.insert(0, os.path.dirname(mod_filename))
+            module = importlib.import_module(name)
         finally:
-            # the universal module stub .py file places the newly loaded HPy
-            # extension module in sys.modules so we retrieve it from there
-            # (for cpython modules, the module was already placed in
-            # sys.modules earlier in this function)
-            module = sys.modules.pop(name)
+            del sys.path[0]
+            if name in sys.modules:
+                del sys.modules[name]
         return module
 
 
