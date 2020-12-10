@@ -150,6 +150,14 @@ def remember_hpy_extension(f):
     """
     @functools.wraps(f)
     def wrapper(self, ext_name):
+        if self._only_hpy_extensions:
+            assert is_hpy_extension(ext_name), (
+                "Extension name %r is not marked as an HPyExtensionName"
+                " but only HPy extensions are present. This is almost"
+                " certainly a bug in HPy's overriding of setuptools"
+                " build_ext. Please report this error the HPy maintainers."
+                % (ext_name,)
+            )
         result = f(self, ext_name)
         if is_hpy_extension(ext_name):
             result = HPyExtensionName(result)
@@ -199,6 +207,7 @@ class build_hpy_ext_mixin:
 
     def finalize_options(self):
         self._extensions = self.distribution.ext_modules or []
+        self._only_hpy_extensions = not bool(self._extensions)
         hpy_ext_modules = self.distribution.hpy_ext_modules or []
         for ext in hpy_ext_modules:
             self._finalize_hpy_ext(ext)
