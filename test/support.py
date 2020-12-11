@@ -216,9 +216,10 @@ class ExtensionCompiler:
                 "Test module {!r} already present in sys.modules".format(name))
         importlib.invalidate_caches()
         mod_dir = os.path.dirname(mod_filename)
+        sys.path.insert(0, mod_dir)
         try:
-            sys.path.insert(0, mod_dir)
             module = importlib.import_module(name)
+            assert sys.modules[name] is module
         finally:
             # assert that the module import didn't change the sys.path entry
             # that was added above, then remove the entry.
