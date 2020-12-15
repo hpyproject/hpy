@@ -240,8 +240,9 @@ class build_hpy_ext_mixin:
             ext._full_name, output_dir)
         stub_file = (os.path.join(output_dir, *ext._full_name.split('.')) +
                      '.py')
-        if compile and os.path.exists(stub_file):
-            raise DistutilsError(stub_file + " already exists! Please delete.")
+        ## XXX uncomment this when we fix issue 140
+        ## if compile and os.path.exists(stub_file):
+        ##     raise DistutilsError(stub_file + " already exists! Please delete.")
         ext_file = os.path.basename(ext._file_name)
         module_name = ext_file.split(".")[0]
         if not self.dry_run:
