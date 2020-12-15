@@ -9,6 +9,8 @@
 */
 
 struct _HPyContext_s global_ctx = {
+    .name = "HPy Universal ABI (CPython backend)",
+    ._private = NULL,
     .ctx_version = 1,
     .h_None = {CONSTANT_H_NONE},
     .h_True = {CONSTANT_H_TRUE},

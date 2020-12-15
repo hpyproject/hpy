@@ -8,6 +8,8 @@ class autogen_ctx_h(AutoGenFile):
     PATH = 'hpy/devel/include/universal/autogen_ctx.h'
 
     ## struct _HPyContext_s {
+    ##     const char *name;
+    ##     void *_private;
     ##     int ctx_version;
     ##     HPy h_None;
     ##     ...
@@ -19,6 +21,8 @@ class autogen_ctx_h(AutoGenFile):
         lines = []
         w = lines.append
         w('struct _HPyContext_s {')
+        w('    const char *name; // used just to make debugging and testing easier')
+        w('    void *_private;   // used by implementations to store custom data')
         w('    int ctx_version;')
         for var in self.api.variables:
             w('    %s;' % self.declare_var(var))
@@ -46,6 +50,8 @@ class autogen_ctx_def_h(AutoGenFile):
     PATH = 'hpy/universal/src/autogen_ctx_def.h'
 
     ## struct _HPyContext_s global_ctx = {
+    ##     .name = "...",
+    ##     ._private = NULL,
     ##     .ctx_version = 1,
     ##     .h_None = {CONSTANT_H_NONE},
     ##     ...
@@ -57,6 +63,8 @@ class autogen_ctx_def_h(AutoGenFile):
         lines = []
         w = lines.append
         w('struct _HPyContext_s global_ctx = {')
+        w('    .name = "HPy Universal ABI (CPython backend)",')
+        w('    ._private = NULL,')
         w('    .ctx_version = 1,')
         for var in self.api.variables:
             w('    .%s = {CONSTANT_%s},' % (var.name, var.name.upper()))

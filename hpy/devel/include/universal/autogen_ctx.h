@@ -9,6 +9,8 @@
 */
 
 struct _HPyContext_s {
+    const char *name; // used just to make debugging and testing easier
+    void *_private;   // used by implementations to store custom data
     int ctx_version;
     HPy h_None;
     HPy h_True;
