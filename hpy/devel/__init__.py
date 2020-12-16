@@ -187,9 +187,12 @@ class build_hpy_ext_mixin:
         if ext.hpy_abi == 'cpython':
             ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
-        if ext.hpy_abi == 'universal':
+        elif ext.hpy_abi == 'universal':
             ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
             ext._hpy_needs_stub = True
+        else:
+            raise DistutilsError('Unknown HPy ABI: %s. Valid values are: '
+                                 'cpython, universal' % ext.hpy_abi)
 
     def finalize_options(self):
         self._extensions = self.distribution.ext_modules or []

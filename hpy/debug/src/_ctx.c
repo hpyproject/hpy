@@ -30,7 +30,7 @@ void debug_ctx_init(HPyContext original_ctx)
     // initialize debug_ctx: eventually we will autogen a static initializer
     // for debug_ctx. For now, just copy&fix
     memcpy(&debug_ctx, original_ctx, sizeof(struct _HPyContext_s));
-    debug_ctx.name = "HPy Debug Mode";
+    debug_ctx.name = "HPy Debug Mode ABI";
     debug_ctx._private = &debug_info;
     debug_ctx.ctx_Add = dbg_Add;
 }

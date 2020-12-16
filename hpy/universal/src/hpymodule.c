@@ -26,6 +26,43 @@ static PyObject *set_debug(PyObject *self, PyObject *args)
 
 static const char *prefix = "HPyInit";
 
+static HPyContext get_context(int debug)
+{
+    if (!debug)
+        // standard case, just return the plain universal ctx
+        return &g_universal_ctx;
+
+    // debug context: get it from hpy.debug._ctx.
+    // WARNING: if you try to call load("hpy.debug._ctx", ..., debug=True) you
+    // might get infinite recursion here
+    PyObject *mod = NULL;
+    PyObject *debug_ctx_addr = NULL;
+    HPyContext debug_ctx = NULL;
+    mod = PyImport_ImportModule("hpy.debug._ctx");
+    if (!mod)
+        goto error;
+
+    // XXX: maybe we should use a PyCapsule to export the ctx and/or the
+    // function which wraps the ctx?
+    debug_ctx_addr = PyObject_CallMethod(mod, "get_debug_ctx", "");
+    if (!debug_ctx_addr)
+        goto error;
+
+    debug_ctx = (HPyContext)PyLong_AsLong(debug_ctx_addr);
+    if (PyErr_Occurred())
+        goto error;
+
+    Py_DECREF(mod);
+    Py_DECREF(debug_ctx_addr);
+    return debug_ctx;
+
+ error:
+    Py_XDECREF(mod);
+    Py_XDECREF(debug_ctx_addr);
+    return NULL;
+}
+
+
 static PyObject *
 get_encoded_name(PyObject *name) {
     PyObject *tmp;
@@ -69,7 +106,7 @@ error:
     return NULL;
 }
 
-static PyObject *do_load(PyObject *name_unicode, PyObject *path)
+static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
 {
     PyObject *name = NULL;
     PyObject *pathbytes = NULL;
@@ -106,7 +143,8 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path)
         goto error;
     }
 
-    HPy mod = ((InitFuncPtr)initfn)(&g_universal_ctx);
+    HPyContext ctx = get_context(debug);
+    HPy mod = ((InitFuncPtr)initfn)(ctx);
     if (HPy_IsNull(mod))
         goto error;
     PyObject *py_mod = _h2py(mod);
@@ -123,14 +161,15 @@ error:
 
 static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = {"name", "path", NULL};
+    static char *kwlist[] = {"name", "path", "debug", NULL};
     PyObject *name_unicode;
     PyObject *path;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO", kwlist,
-                                     &name_unicode, &path)) {
+    int debug = 0;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|p", kwlist,
+                                     &name_unicode, &path, &debug)) {
         return NULL;
     }
-    return do_load(name_unicode, path);
+    return do_load(name_unicode, path, debug);
 }
 
 static PyObject *get_version(PyObject *self, PyObject *ignored)

@@ -21,6 +21,8 @@ class TestDebug(HPyTest):
             # this can be "HPy Universal ABI (CPython backend)" or
             # "... (PyPy backend)", etc.
             assert ctx_name.startswith('HPy Universal ABI')
+        elif hpy_abi == 'debug':
+            assert ctx_name.startswith('HPy Debug Mode ABI')
         else:
             assert False, 'unexpected hpy_abi: %s' % hpy_abi
 

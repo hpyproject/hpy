@@ -190,9 +190,14 @@ class ExtensionCompiler:
             extra_compile_args=compile_args,
             extra_link_args=link_args)
 
+        hpy_abi = self.hpy_abi
+        if hpy_abi == 'debug':
+            # there is no compile-time difference between universal and debug
+            # extensions. The only difference happens at load time
+            hpy_abi = 'universal'
         so_filename = c_compile(str(self.tmpdir), ext,
                                 hpy_devel=self.hpy_devel,
-                                hpy_abi=self.hpy_abi,
+                                hpy_abi=hpy_abi,
                                 compiler_verbose=self.compiler_verbose)
         return so_filename
 
@@ -209,16 +214,18 @@ class ExtensionCompiler:
         so_filename = self.compile_module(
             ExtensionTemplate, main_src, name, extra_sources)
         if self.hpy_abi == 'universal':
-            return self.load_universal_module(name, so_filename)
+            return self.load_universal_module(name, so_filename, debug=False)
+        elif self.hpy_abi == 'debug':
+            return self.load_universal_module(name, so_filename, debug=True)
         elif self.hpy_abi == 'cpython':
             return self.load_cpython_module(name, so_filename)
         else:
             assert False
 
-    def load_universal_module(self, name, so_filename):
-        assert self.hpy_abi == 'universal'
+    def load_universal_module(self, name, so_filename, debug):
+        assert self.hpy_abi in ('universal', 'debug')
         import hpy.universal
-        return hpy.universal.load(name, so_filename)
+        return hpy.universal.load(name, so_filename, debug=debug)
 
     def load_cpython_module(self, name, so_filename):
         assert self.hpy_abi == 'cpython'
