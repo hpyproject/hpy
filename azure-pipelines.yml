@@ -28,7 +28,7 @@ jobs:
     displayName: 'Install dependencies'
   - script: |
       python -m pip install .
-      python setup_hpy_debug.py install # there is no way to use pip with this :(
+      python setup_hpy_debug.py --hpy-abi=universal install # there is no way to use pip with this :(
     displayName: 'Build project'
   - script: |
       pip install pytest pytest-azurepipelines pytest-xdist
