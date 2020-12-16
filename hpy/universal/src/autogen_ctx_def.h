@@ -8,7 +8,7 @@
 
 */
 
-struct _HPyContext_s global_ctx = {
+struct _HPyContext_s g_universal_ctx = {
     .name = "HPy Universal ABI (CPython backend)",
     ._private = NULL,
     .ctx_version = 1,

@@ -49,7 +49,7 @@ class autogen_ctx_h(AutoGenFile):
 class autogen_ctx_def_h(AutoGenFile):
     PATH = 'hpy/universal/src/autogen_ctx_def.h'
 
-    ## struct _HPyContext_s global_ctx = {
+    ## struct _HPyContext_s g_universal_ctx = {
     ##     .name = "...",
     ##     ._private = NULL,
     ##     .ctx_version = 1,
@@ -62,7 +62,7 @@ class autogen_ctx_def_h(AutoGenFile):
     def generate(self):
         lines = []
         w = lines.append
-        w('struct _HPyContext_s global_ctx = {')
+        w('struct _HPyContext_s g_universal_ctx = {')
         w('    .name = "HPy Universal ABI (CPython backend)",')
         w('    ._private = NULL,')
         w('    .ctx_version = 1,')

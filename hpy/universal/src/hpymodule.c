@@ -115,7 +115,7 @@ static PyObject *load_from_spec(PyObject *self, PyObject *spec)
         goto error;
     }
 
-    HPy mod = ((InitFuncPtr)initfn)(&global_ctx);
+    HPy mod = ((InitFuncPtr)initfn)(&g_universal_ctx);
     if (HPy_IsNull(mod))
         goto error;
     PyObject *py_mod = _h2py(mod);
