@@ -26,7 +26,9 @@ jobs:
       pythonVersion: $(python.version)
   - script: python -m pip install --upgrade pip wheel
     displayName: 'Install dependencies'
-  - script: python -m pip install .
+  - script: |
+      python -m pip install .
+      python setup_hpy_debug.py install # there is no way to use pip with this :(
     displayName: 'Build project'
   - script: |
       pip install pytest pytest-azurepipelines pytest-xdist
