@@ -133,36 +133,6 @@ static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
     return do_load(name_unicode, path);
 }
 
-/*
-   I think we should eventually kill this. We introduced it to anticipate
-   using an import hook, but now that we are using a .py stub it seems no
-   longer necessary and makes it harder to pass additional params such as "debug"
-*/
-static PyObject *load_from_spec(PyObject *self, PyObject *spec)
-{
-    PyObject *name_unicode = NULL;
-    PyObject *path = NULL;
-
-    name_unicode = PyObject_GetAttrString(spec, "name");
-    if (name_unicode == NULL) {
-        goto error;
-    }
-    path = PyObject_GetAttrString(spec, "origin");
-    if (path == NULL)
-        goto error;
-
-    PyObject *py_mod = do_load(name_unicode, path);
-    Py_DECREF(name_unicode);
-    Py_DECREF(path);
-    return py_mod;
-
- error:
-    Py_XDECREF(name_unicode);
-    Py_XDECREF(path);
-    return NULL;
-}
-
-
 static PyObject *get_version(PyObject *self, PyObject *ignored)
 {
     return Py_BuildValue("ss", HPY_VERSION, HPY_GIT_REVISION);
@@ -171,7 +141,6 @@ static PyObject *get_version(PyObject *self, PyObject *ignored)
 static PyMethodDef HPyMethods[] = {
     {"set_debug", (PyCFunction)set_debug, METH_O, "TODO"},
     {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS, "Load a .hpy.so"},
-    {"load_from_spec", (PyCFunction)load_from_spec, METH_O, "Load a .hpy.so"},
     {"get_version", (PyCFunction)get_version, METH_NOARGS, "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}
 };

@@ -100,17 +100,11 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
 
 
 _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE = """
-class Spec:
-    def __init__(self, name, origin):
-        self.name = name
-        self.origin = origin
-
-
 def __bootstrap__():
     import sys, pkg_resources
-    from hpy.universal import load_from_spec
+    from hpy.universal import load
     ext_filepath = pkg_resources.resource_filename(__name__, {ext_file!r})
-    m = load_from_spec(Spec({module_name!r}, ext_filepath))
+    m = load({module_name!r}, ext_filepath)
     m.__file__ = ext_filepath
     sys.modules[__name__] = m
 
