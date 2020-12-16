@@ -69,17 +69,11 @@ error:
     return NULL;
 }
 
-
-static PyObject *load_from_spec(PyObject *self, PyObject *spec)
+static PyObject *do_load(PyObject *name_unicode, PyObject *path)
 {
-    PyObject *name_unicode, *name;
-    PyObject *path = NULL;
+    PyObject *name = NULL;
     PyObject *pathbytes = NULL;
 
-    name_unicode = PyObject_GetAttrString(spec, "name");
-    if (name_unicode == NULL) {
-        return NULL;
-    }
     name = get_encoded_name(name_unicode);
     if (name == NULL) {
         goto error;
@@ -89,9 +83,6 @@ static PyObject *load_from_spec(PyObject *self, PyObject *spec)
     PyOS_snprintf(init_name, sizeof(init_name), "%.20s_%.200s",
             prefix, shortname);
 
-    path = PyObject_GetAttrString(spec, "origin");
-    if (path == NULL)
-        goto error;
     pathbytes = PyUnicode_EncodeFSDefault(path);
     if (pathbytes == NULL)
         goto error;
@@ -121,18 +112,40 @@ static PyObject *load_from_spec(PyObject *self, PyObject *spec)
     PyObject *py_mod = _h2py(mod);
     // XXX close the handle
 
-    Py_DECREF(name_unicode);
     Py_XDECREF(name);
-    Py_XDECREF(path);
     Py_XDECREF(pathbytes);
     return py_mod;
 error:
-    Py_DECREF(name_unicode);
     Py_XDECREF(name);
-    Py_XDECREF(path);
     Py_XDECREF(pathbytes);
     return NULL;
 }
+
+static PyObject *load_from_spec(PyObject *self, PyObject *spec)
+{
+    PyObject *name_unicode = NULL;
+    PyObject *path = NULL;
+
+    name_unicode = PyObject_GetAttrString(spec, "name");
+    if (name_unicode == NULL) {
+        goto error;
+    }
+    path = PyObject_GetAttrString(spec, "origin");
+    if (path == NULL)
+        goto error;
+
+    PyObject *py_mod = do_load(name_unicode, path);
+    Py_DECREF(name_unicode);
+    Py_DECREF(path);
+    return py_mod;
+
+ error:
+    Py_XDECREF(name_unicode);
+    Py_XDECREF(path);
+    return NULL;
+}
+
+
 
 static PyObject *get_version(PyObject *self, PyObject *ignored)
 {
