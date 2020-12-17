@@ -7,8 +7,8 @@
 #include <assert.h>
 #include "hpy.h"
 
-// "deboff" is the closest to "debug" I could come up with :)
-static const long HPY_DEBUG_MAGIC = 0xDEB0FF;
+// "debooff" is the closest to "debug" I could come up with :)
+#define HPY_DEBUG_MAGIC 0xDEB00FF
 
 typedef struct {
     long magic_number; // used just for sanity checks
