@@ -3,7 +3,7 @@ import os
 from setuptools import setup, Extension
 
 if 'HPY_DEBUG' in os.environ:
-    EXTRA_COMPILE_ARGS = ['-g', '-O0']
+    EXTRA_COMPILE_ARGS = ['-g', '-O0', '-UNDEBUG']
 else:
     EXTRA_COMPILE_ARGS = []
 

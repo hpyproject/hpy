@@ -23,7 +23,7 @@ void debug_ctx_init(HPyContext original_ctx)
 {
     if (debug_ctx.name) {
         // already initialized
-        assert(get_info(debug_ctx)->original_ctx == original_ctx); // sanity check
+        assert(get_info(&debug_ctx)->original_ctx == original_ctx); // sanity check
         return;
     }
 
