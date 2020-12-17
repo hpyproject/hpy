@@ -56,10 +56,12 @@ if sys.implementation.name == 'cpython':
                    'hpy/devel/src/runtime/ctx_listbuilder.c',
                    'hpy/devel/src/runtime/ctx_tuple.c',
                    'hpy/devel/src/runtime/ctx_tuplebuilder.c',
+                   'hpy/debug/src/debug_ctx.c',
                   ],
                   include_dirs=[
                       'hpy/devel/include',
                       'hpy/universal/src',
+                      'hpy/debug/src',
                   ],
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',

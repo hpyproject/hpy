@@ -1,13 +1,9 @@
 .PHONY: all
-all: hpy.universal hpy.debug
+all: hpy.universal
 
 .PHONY: hpy.universal
 hpy.universal:
 	python3 setup.py build_ext -if
-
-.PHONY: hpy.debug
-hpy.debug:
-	python3 setup_hpy_debug.py --hpy-abi=universal build_ext -if
 
 debug:
 	HPY_DEBUG=1 make all

@@ -1,4 +1,5 @@
-#include "_ctx.h"
+#include "hpy_debug.h"
+#include "debug_ctx.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -11,7 +12,6 @@ static struct _HPyContext_s debug_ctx = {
     .name = NULL,
 };
 
-
 static HPy dbg_Add(HPyContext ctx, HPy a, HPy b)
 {
     printf("dbg_Add...\n");
@@ -21,8 +21,11 @@ static HPy dbg_Add(HPyContext ctx, HPy a, HPy b)
 
 void debug_ctx_init(HPyContext original_ctx)
 {
-    if (debug_ctx.name)
-        return; // already initialized
+    if (debug_ctx.name) {
+        // already initialized
+        assert(get_info(debug_ctx)->original_ctx == original_ctx); // sanity check
+        return;
+    }
 
     // initialize debug_info
     debug_info.original_ctx = original_ctx;
@@ -35,35 +38,8 @@ void debug_ctx_init(HPyContext original_ctx)
     debug_ctx.ctx_Add = dbg_Add;
 }
 
-
-HPyDef_METH(get_debug_ctx, "get_debug_ctx", get_debug_ctx_impl, HPyFunc_NOARGS)
-static HPy get_debug_ctx_impl(HPyContext ctx, HPy self)
+HPyContext hpy_debug_get_ctx(HPyContext original_ctx)
 {
-    assert(debug_ctx.name != NULL);
-    return HPyLong_FromLong(ctx, (long)&debug_ctx);
-}
-
-
-static HPyDef *module_defines[] = {
-    &get_debug_ctx,
-    NULL
-};
-
-static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "hpy.debug._ctx",
-    .m_doc = "HPy debug context",
-    .m_size = -1,
-    .defines = module_defines
-};
-
-
-HPy_MODINIT(_ctx)
-static HPy init__ctx_impl(HPyContext ctx)
-{
-    HPy m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    debug_ctx_init(ctx);
-    return m;
+    debug_ctx_init(original_ctx);
+    return &debug_ctx;
 }

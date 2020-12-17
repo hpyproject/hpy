@@ -25,28 +25,3 @@ class TestDebug(HPyTest):
             assert ctx_name.startswith('HPy Debug Mode ABI')
         else:
             assert False, 'unexpected hpy_abi: %s' % hpy_abi
-
-
-    def test_temp(self, hpy_abi):
-        import pytest
-        if hpy_abi != 'universal':
-            pytest.skip()
-        mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPyContext ctx2 = (HPyContext)HPyLong_AsLong(ctx, arg);
-                HPy a = HPyLong_FromLong(ctx, 4);
-                HPy b = HPyLong_FromLong(ctx, 5);
-                HPy res = HPy_Add(ctx2, a, b); // note, we are using ctx2!
-                HPy_Close(ctx, a);
-                HPy_Close(ctx, b);
-                return res;
-            }
-            @EXPORT(f)
-            @INIT
-        """)
-        from hpy.debug._ctx import get_debug_ctx
-        ctx2 = get_debug_ctx()
-        res = mod.f(ctx2)
-        assert res == 9

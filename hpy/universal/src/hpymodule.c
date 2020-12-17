@@ -11,6 +11,7 @@
 #include "api.h"
 #include "handles.h"
 #include "common/version.h"
+#include "hpy_debug.h"
 
 #ifdef PYPY_VERSION
 #  error "Cannot build hpy.univeral on top of PyPy. PyPy comes with its own version of it"
@@ -28,40 +29,11 @@ static const char *prefix = "HPyInit";
 
 static HPyContext get_context(int debug)
 {
-    if (!debug)
-        // standard case, just return the plain universal ctx
+    if (debug)
+        return hpy_debug_get_ctx(&g_universal_ctx);
+    else
         return &g_universal_ctx;
-
-    // debug context: get it from hpy.debug._ctx.
-    // WARNING: if you try to call load("hpy.debug._ctx", ..., debug=True) you
-    // might get infinite recursion here
-    PyObject *mod = NULL;
-    PyObject *debug_ctx_addr = NULL;
-    HPyContext debug_ctx = NULL;
-    mod = PyImport_ImportModule("hpy.debug._ctx");
-    if (!mod)
-        goto error;
-
-    // XXX: maybe we should use a PyCapsule to export the ctx and/or the
-    // function which wraps the ctx?
-    debug_ctx_addr = PyObject_CallMethod(mod, "get_debug_ctx", "");
-    if (!debug_ctx_addr)
-        goto error;
-
-    debug_ctx = (HPyContext)PyLong_AsLong(debug_ctx_addr);
-    if (PyErr_Occurred())
-        goto error;
-
-    Py_DECREF(mod);
-    Py_DECREF(debug_ctx_addr);
-    return debug_ctx;
-
- error:
-    Py_XDECREF(mod);
-    Py_XDECREF(debug_ctx_addr);
-    return NULL;
 }
-
 
 static PyObject *
 get_encoded_name(PyObject *name) {

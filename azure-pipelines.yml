@@ -26,9 +26,7 @@ jobs:
       pythonVersion: $(python.version)
   - script: python -m pip install --upgrade pip wheel
     displayName: 'Install dependencies'
-  - script: |
-      python -m pip install .
-      python setup_hpy_debug.py --hpy-abi=universal install # there is no way to use pip with this :(
+  - script: python -m pip install .
     displayName: 'Build project'
   - script: |
       pip install pytest pytest-azurepipelines pytest-xdist
