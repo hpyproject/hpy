@@ -225,7 +225,9 @@ class ExtensionCompiler:
     def load_universal_module(self, name, so_filename, debug):
         assert self.hpy_abi in ('universal', 'debug')
         import hpy.universal
-        return hpy.universal.load(name, so_filename, debug=debug)
+        mod = hpy.universal.load(name, so_filename, debug=debug)
+        mod.__file__ = so_filename
+        return mod
 
     def load_cpython_module(self, name, so_filename):
         assert self.hpy_abi == 'cpython'
