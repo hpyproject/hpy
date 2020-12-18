@@ -273,13 +273,15 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
     #
     dist = Distribution()
     dist.parse_config_files()
-    options = dist.get_option_dict('build_ext')
     if debug is None:
         debug = sys.flags.debug
-    options['debug'] = ('ffiplatform', debug)
-    options['force'] = ('ffiplatform', True)
-    options['build_lib'] = ('ffiplatform', tmpdir)
-    options['build_temp'] = ('ffiplatform', tmpdir)
+    options_build_ext = dist.get_option_dict('build_ext')
+    options_build_ext['debug'] = ('ffiplatform', debug)
+    options_build_ext['force'] = ('ffiplatform', True)
+    options_build_ext['build_lib'] = ('ffiplatform', tmpdir)
+    options_build_ext['build_temp'] = ('ffiplatform', tmpdir)
+    options_build_py = dist.get_option_dict('build_py')
+    options_build_py['build_lib'] = ('ffiplatform', tmpdir)
 
     # this is the equivalent of passing --hpy-abi from setup.py's command line
     dist.hpy_abi = hpy_abi

@@ -66,6 +66,10 @@ jobs:
     displayName: 'Test setup.py --hpy-abi=cpython install'
   - script: proof-of-concept/test_pof.sh setup_py_install universal
     displayName: 'Test setup.py --hpy-abi=universal install'
+  - script: proof-of-concept/test_pof.sh setup_py_build_ext_inplace cpython
+    displayName: 'Test setup.py --hpy-abi=cpython build_ext --inplace'
+  - script: proof-of-concept/test_pof.sh setup_py_build_ext_inplace universal
+    displayName: 'Test setup.py --hpy-abi=universal build_ext --inplace'
 
 
 
