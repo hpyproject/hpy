@@ -42,26 +42,30 @@ _build_wheel() {
 }
 
 _myrm() {
-    if [ -d "$1" ]
-    then
-        echo "rm $1"
-        rm -rf "$1"
-    else
-        echo "skipping $1"
-    fi
+    for path in "$@"
+    do
+        if [ -d "$path" -o -f "$path" ]
+        then
+            echo "rm $path"
+            rm -rf "$path"
+        else
+            echo "skipping $path"
+        fi
+    done
 }
 
 clean() {
     echo "=== cleaning up old stuff ==="
-    _myrm ${ROOT}/venv/wheel_builder_cpython
-    _myrm ${ROOT}/venv/wheel_builder_universal
-    _myrm ${ROOT}/venv/wheel_runner_cpython
-    _myrm ${ROOT}/venv/wheel_runner_universal
-    _myrm ${ROOT}/venv/setup_py_install_cpython
-    _myrm ${ROOT}/venv/setup_py_install_universal
+    _myrm ${ROOT}/venv/wheel_builder_{cpython,universal}
+    _myrm ${ROOT}/venv/wheel_runner_{cpython,universal}
+    _myrm ${ROOT}/venv/setup_py_install_{cpython,universal}
+    _myrm ${ROOT}/venv/setup_py_build_ext_inplace_{cpython,universal}
     _myrm ${ROOT}/build
     _myrm ${ROOT}/proof-of-concept/build
     _myrm ${ROOT}/proof-of-concept/dist
+    # remove files written by build_ext --inplace
+    _myrm ${ROOT}/proof-of-concept/pof*{.so,.py}
+    _myrm ${ROOT}/proof-of-concept/pofpackage/foo*{.so,.py}
     echo
 }
 
@@ -98,6 +102,25 @@ setup_py_install() {
     echo "Running setup.py"
     pushd proof-of-concept
     python3 setup.py --hpy-abi="$HPY_ABI" install
+    popd
+    echo
+    _test_pof
+}
+
+setup_py_build_ext_inplace() {
+    # install proof-of-concept using setup.py install and run tests
+    HPY_ABI="$1"
+    VENV="venv/setup_py_build_ext_inplace_$HPY_ABI"
+    clean
+    echo "=== testing setup.py --hpy-abi=$HPY_ABI build_ext --inplace ==="
+    echo "Create venv: $VENV"
+    python3 -m venv "$VENV"
+    source "$VENV/bin/activate"
+    _install_hpy python
+    echo
+    echo "Running setup.py"
+    pushd proof-of-concept
+    python3 setup.py --hpy-abi="$HPY_ABI" build_ext --inplace
     popd
     echo
     _test_pof
