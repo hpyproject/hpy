@@ -244,9 +244,34 @@ class HPyTest:
         return self.compiler.make_module(ExtensionTemplate, main_src, name,
                                          extra_sources)
 
-    def should_check_refcount(self):
-        # defaults to True on CPython, but is set to False by e.g. PyPy
-        return sys.implementation.name == 'cpython'
+    def supports_refcounts(self):
+        """ Returns True if the underlying Python implementation supports
+            reference counts.
+
+            By default returns True on CPython and False on other
+            implementations.
+        """
+        return sys.implementation.name == "cpython"
+
+    def supports_ordinary_make_module_imports(self):
+        """ Returns True if `.make_module(...)` loads modules using a
+            standard Python import mechanism (e.g. `importlib.import_module`).
+
+            By default returns True because the base implementation of
+            `.make_module(...)` uses an ordinary import. Sub-classes that
+            override `.make_module(...)` may also want to override this
+            method.
+        """
+        return True
+
+    def supports_sys_executable(self):
+        """ Returns True is `sys.executable` is set to a value that allows
+            a Python equivalent to the current Python to be launched via, e.g.,
+            `subprocess.run(...)`.
+
+            By default returns `True` if sys.executable is set to a true value.
+        """
+        return bool(getattr(sys, "executable", None))
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py

@@ -5,8 +5,7 @@ class TestImporting(HPyTest):
 
     def test_importing_attributes(self):
         import pytest
-        import sys
-        if not hasattr(sys, "executable"):
+        if not self.supports_ordinary_make_module_imports():
             pytest.skip()
         mod = self.make_module("""
             @INIT
