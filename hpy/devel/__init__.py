@@ -207,6 +207,9 @@ class build_hpy_ext_mixin:
 
     def finalize_options(self):
         self._extensions = self.distribution.ext_modules or []
+        # _only_hpy_extensions is used only as a sanity check that no
+        # hpy extensions are misidentified as legacy C API extensions in the
+        # case where only hpy extensions are present.
         self._only_hpy_extensions = not bool(self._extensions)
         hpy_ext_modules = self.distribution.hpy_ext_modules or []
         for ext in hpy_ext_modules:
