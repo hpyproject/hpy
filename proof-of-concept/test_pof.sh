@@ -128,6 +128,24 @@ setup_py_build_ext_inplace() {
 
 # ======== main code =======
 
+# validate arguments
+if [[ "$#" -lt 1  || ( "$#" -lt 2  && "$1" != "clean") ]]; then
+  echo "Usage: $0 COMMAND [TARGET_ABI]" >&2
+  echo "Commands:" >&2
+  echo "  wheel TARGET_ABI: build a wheel, install and test"
+  echo "  setup_py_install TARGET_ABI: install poc using 'setup.py install' & run tests" >&2
+  echo "  clean: clean build artifacts" >&2
+  echo "Target ABIs:" >&2
+  echo "  universal: Binary intended for any Python implementation" >&2
+  echo "  cpython : Binary optimized for CPython" >&2
+  exit 1
+fi
+
+if [ ! -d "proof-of-concept" ] ; then
+    echo "Script must be run in the repo root" >&2
+    exit 1
+fi
+
 # call the function mentioned as the first arg
 COMMAND="$1"
 shift
