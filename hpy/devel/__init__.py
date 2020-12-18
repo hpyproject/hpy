@@ -245,13 +245,19 @@ class build_hpy_ext_mixin:
                 self.distribution.hpy_abi != 'universal'):
             return self._base_build_ext.write_stub(
                 self, output_dir, ext, compile=compile)
-        # ignore output_dir which points to completely the wrong place
-        output_dir = self.build_lib
+        pkgs = ext._full_name.split('.')
+        if compile:
+            # compile is true when .write_stub is called while copying
+            # extensions to the source folder as part of build_ext --inplace.
+            # In this situation, output_dir includes the folders that make up
+            # the packages containing the module. When compile is false,
+            # output_dir does not include those folders (and is just the
+            # build_lib folder).
+            pkgs = [pkgs[-1]]
+        stub_file = os.path.join(output_dir, *pkgs) + '.py'
         log.info(
             "writing hpy universal stub loader for %s to %s",
-            ext._full_name, output_dir)
-        stub_file = (os.path.join(output_dir, *ext._full_name.split('.')) +
-                     '.py')
+            ext._full_name, stub_file)
         if compile and os.path.exists(stub_file):
             raise DistutilsError(stub_file + " already exists! Please delete.")
         ext_file = os.path.basename(ext._file_name)
