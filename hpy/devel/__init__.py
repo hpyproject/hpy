@@ -38,7 +38,7 @@ class HPyDevel:
         ]))
 
     def get_ctx_sources(self):
-        """ Extra sources needed only in Universal mode.
+        """ Extra sources needed only in the CPython ABI mode.
         """
         return list(map(str, self.src_dir.glob('ctx_*.c')))
 
