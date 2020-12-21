@@ -230,6 +230,18 @@ static inline HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2) {
      return ctx->ctx_InPlaceOr ( ctx, h1, h2 ); 
 }
 
+static inline int HPyCallable_Check(HPyContext ctx, HPy h) {
+     return ctx->ctx_Callable_Check ( ctx, h ); 
+}
+
+static inline HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kw) {
+     return ctx->ctx_Call ( ctx, callable, args, kw ); 
+}
+
+static inline HPy HPy_CallObject(HPyContext ctx, HPy callable, HPy args) {
+     return ctx->ctx_CallObject ( ctx, callable, args ); 
+}
+
 static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message) {
      ctx->ctx_Err_SetString ( ctx, h_type, message ); 
 }

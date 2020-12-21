@@ -140,6 +140,10 @@ struct _HPyContext_s {
     HPy (*ctx_InPlaceAnd)(HPyContext ctx, HPy h1, HPy h2);
     HPy (*ctx_InPlaceXor)(HPyContext ctx, HPy h1, HPy h2);
     HPy (*ctx_InPlaceOr)(HPyContext ctx, HPy h1, HPy h2);
+    int (*ctx_Callable_Check)(HPyContext ctx, HPy h);
+    HPy (*ctx_Call)(HPyContext ctx, HPy callable, HPy args, HPy kw);
+    HPy (*ctx_CallObject)(HPyContext ctx, HPy callable, HPy args);
+    void (*ctx_FatalError)(HPyContext ctx, const char *message);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     void (*ctx_Err_SetObject)(HPyContext ctx, HPy h_type, HPy h_value);
     int (*ctx_Err_Occurred)(HPyContext ctx);
@@ -185,7 +189,6 @@ struct _HPyContext_s {
     int (*ctx_List_Append)(HPyContext ctx, HPy h_list, HPy h_item);
     int (*ctx_Dict_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Dict_New)(HPyContext ctx);
-    void (*ctx_FatalError)(HPyContext ctx, const char *message);
     HPy (*ctx_Tuple_FromArray)(HPyContext ctx, HPy items[], HPy_ssize_t n);
     HPy (*ctx_FromPyObject)(HPyContext ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext ctx, HPy h);

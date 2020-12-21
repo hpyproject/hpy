@@ -270,6 +270,21 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(InPlaceOr)(HPyContext ctx, HPy h1, HP
     return _py2h(PyNumber_InPlaceOr(_h2py(h1), _h2py(h2)));
 }
 
+HPyAPI_STORAGE int _HPy_IMPL_NAME(Callable_Check)(HPyContext ctx, HPy h)
+{
+    return PyCallable_Check(_h2py(h));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Call)(HPyContext ctx, HPy callable, HPy args, HPy kw)
+{
+    return _py2h(PyObject_Call(_h2py(callable), _h2py(args), _h2py(kw)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(CallObject)(HPyContext ctx, HPy callable, HPy args)
+{
+    return _py2h(PyObject_CallObject(_h2py(callable), _h2py(args)));
+}
+
 HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_SetString)(HPyContext ctx, HPy h_type, const char *message)
 {
     PyErr_SetString(_h2py(h_type), message);
