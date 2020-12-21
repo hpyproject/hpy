@@ -35,7 +35,7 @@ class TestErr(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        if not hasattr(sys, "executable"):
+        if not self.supports_sys_executable():
             # if sys.executable is not available (e.g. inside pypy app-level)
             # tests, then skip the rest of this test
             return

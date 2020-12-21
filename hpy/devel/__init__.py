@@ -112,6 +112,9 @@ def __bootstrap__():
     ext_filepath = pkg_resources.resource_filename(__name__, {ext_file!r})
     m = load_from_spec(Spec({module_name!r}, ext_filepath))
     m.__file__ = ext_filepath
+    m.__loader__ = __loader__
+    m.__package__ = __package__
+    m.__spec__ = __spec__
     sys.modules[__name__] = m
 
 __bootstrap__()
