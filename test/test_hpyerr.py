@@ -248,10 +248,6 @@ class TestErr(HPyTest):
         check_exception(EnvironmentError)
         check_exception(IOError)
 
-    @pytest_collecting.mark.xfail(True, reason=(
-        "Creating the unicode exceptions requires something like HPyCall"
-        " and that isn't implemented yet."
-    ))
     def test_h_unicode_exceptions(self):
         import pytest
         mod = self.make_module("""
