@@ -224,7 +224,9 @@ class ExtensionCompiler:
 
     def load_universal_module(self, name, so_filename, debug):
         assert self.hpy_abi in ('universal', 'debug')
+        import sys
         import hpy.universal
+        assert name not in sys.modules
         mod = hpy.universal.load(name, so_filename, debug=debug)
         mod.__file__ = so_filename
         return mod
@@ -236,33 +238,16 @@ class ExtensionCompiler:
         # because this file will be imported also by PyPy tests which runs on
         # Python2
         import importlib.util
-        spec = importlib.util.spec_from_file_location(name, so_filename)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
-
-    def load_module(self, name, mod_filename):
-        # It is important to do the imports only here, because this file will
-        # be imported also by PyPy tests which runs on Python2
-        import importlib
         import sys
-        import os
-        if name in sys.modules:
-            raise ValueError(
-                "Test module {!r} already present in sys.modules".format(name))
-        importlib.invalidate_caches()
-        mod_dir = os.path.dirname(mod_filename)
-        sys.path.insert(0, mod_dir)
+        assert name not in sys.modules
+        spec = importlib.util.spec_from_file_location(name, so_filename)
         try:
-            module = importlib.import_module(name)
-            assert sys.modules[name] is module
+            # module_from_spec adds the module to sys.modules
+            module = importlib.util.module_from_spec(spec)
         finally:
-            # assert that the module import didn't change the sys.path entry
-            # that was added above, then remove the entry.
-            assert sys.path[0] == mod_dir
-            del sys.path[0]
             if name in sys.modules:
                 del sys.modules[name]
+        spec.loader.exec_module(module)
         return module
 
 
