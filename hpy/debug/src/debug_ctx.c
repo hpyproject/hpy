@@ -1,27 +1,33 @@
+#include <string.h>
+#include <stdio.h>
 #include "hpy_debug.h"
 #include "debug_ctx.h"
-#include <stdio.h>
-#include <string.h>
+#include "autogen_debug_ctx.h"
 
 static HPyDebugInfo debug_info = {
     .magic_number = HPY_DEBUG_MAGIC,
     .original_ctx = NULL,
 };
 
-static struct _HPyContext_s debug_ctx = {
-    .name = NULL,
-};
 
-static HPy dbg_Add(HPyContext ctx, HPy a, HPy b)
+void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
+                                              HPyFunc_Signature sig,
+                                              void *func, void *args)
 {
-    printf("dbg_Add...\n");
-    HPyDebugInfo *info = get_info(ctx);
-    return HPy_Add(info->original_ctx, a, b);
+    fprintf(stderr,
+            "FATAL ERROR! debug_ctx_CallRealFunctionFromTrampoline should never be "
+            "called! This probably means that the debug_ctx was not initialized "
+            "properly\n");
+    abort();
 }
 
-void debug_ctx_init(HPyContext original_ctx)
+// NOTE: at the moment this function assumes that original_ctx is always the
+// same. If/when we migrate to a system in which we can have multiple
+// independent contexts, this function should ensure to create a different
+// debug wrapper for each of them.
+static void debug_ctx_init(HPyContext original_ctx)
 {
-    if (debug_ctx.name) {
+    if (g_debug_ctx._private != NULL) {
         // already initialized
         assert(get_info(&debug_ctx)->original_ctx == original_ctx); // sanity check
         return;
@@ -29,17 +35,37 @@ void debug_ctx_init(HPyContext original_ctx)
 
     // initialize debug_info
     debug_info.original_ctx = original_ctx;
+    g_debug_ctx._private = &debug_info;
 
-    // initialize debug_ctx: eventually we will autogen a static initializer
-    // for debug_ctx. For now, just copy&fix
-    memcpy(&debug_ctx, original_ctx, sizeof(struct _HPyContext_s));
-    debug_ctx.name = "HPy Debug Mode ABI";
-    debug_ctx._private = &debug_info;
-    debug_ctx.ctx_Add = dbg_Add;
+    /* CallRealFunctionFromTrampoline is special, since it is responsible to
+       retrieve and pass the appropriate context to the HPy functions on
+       CPython. Note that this is used ONLY on CPython, other implementations
+       should be able to call HPy functions natively without any need for
+       trampolines.
+
+       Quick recap of what happens:
+
+       1. HPy_MODINIT defines a per-module _ctx_for_trampolines
+
+       2. universal.load(..., debug=True) passes g_debug_ctx to MODINIT, which
+          stores it in _ctx_for_trampolines
+
+       3. when CPython calls an HPy function, it goes through the trampoline
+          which calls CallRealFunctionFromTrampoline
+
+       4. the default implementation retrieves the ctx from
+          _ctx_for_trampolines (which will contain either g_universal_ctx or
+          g_debug_ctx depending on how the module was loaded) and passes it to
+          the HPy func.
+
+       5. So, the default implementation does exactly what we want! Let's just
+          copy it from original_ctx
+    */
+    g_debug_ctx.ctx_CallRealFunctionFromTrampoline = original_ctx->ctx_CallRealFunctionFromTrampoline;
 }
 
 HPyContext hpy_debug_get_ctx(HPyContext original_ctx)
 {
     debug_ctx_init(original_ctx);
-    return &debug_ctx;
+    return &g_debug_ctx;
 }

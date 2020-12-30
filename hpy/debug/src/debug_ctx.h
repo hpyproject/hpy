@@ -15,7 +15,7 @@ typedef struct {
     HPyContext original_ctx;
 } HPyDebugInfo;
 
-static HPyDebugInfo *get_info(HPyContext ctx)
+static inline HPyDebugInfo *get_info(HPyContext ctx)
 {
     HPyDebugInfo *info = (HPyDebugInfo*)ctx->_private;
     assert(info->magic_number == HPY_DEBUG_MAGIC); // sanity check
