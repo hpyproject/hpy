@@ -34,6 +34,8 @@ static void debug_ctx_init(HPyContext original_ctx)
 
     // initialize debug_info
     debug_info.original_ctx = original_ctx;
+    debug_info.open_handles = NULL;
+    debug_info.closed_handles = NULL;
     g_debug_ctx._private = &debug_info;
 
     /* CallRealFunctionFromTrampoline is special, since it is responsible to

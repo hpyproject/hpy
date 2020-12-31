@@ -39,6 +39,8 @@ struct DHPy_s {
 };
 typedef struct DHPy_s *DHPy; /* "Debug HPy" */
 
+DHPy DHPy_new(HPyContext ctx, HPy h);
+
 
 /* ======================================================== */
 /* These two functions should be used ONLY be the adapters! */
@@ -54,8 +56,8 @@ static inline DHPy _h2d(HPy h) {
 typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext original_ctx;
-    DHPy *open_handles;   // linked list
-    DHPy *closed_handles; // linked list
+    DHPy open_handles;   // linked list
+    DHPy closed_handles; // linked list
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext ctx)
