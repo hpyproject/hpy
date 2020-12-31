@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdio.h>
-#include "hpy_debug.h"
-#include "debug_ctx.h"
+#include "debug_internal.h"
 #include "autogen_debug_ctx.h"
 
 static HPyDebugInfo debug_info = {

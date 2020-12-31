@@ -1,11 +1,12 @@
-#ifndef HPY_DEBUG_CTX_H
-#define HPY_DEBUG_CTX_H
-
-// this header is for internal use. The public API of the debug mode is in
-// hpy_debug.h
+/* Internal header for all the files in hpy/debug/src. The public API is in
+   include/hpy_debug.h
+*/
+#ifndef HPY_DEBUG_INTERNAL_H
+#define HPY_DEBUG_INTERNAL_H
 
 #include <assert.h>
 #include "hpy.h"
+#include "hpy_debug.h"
 
 // "debooff" is the closest to "debug" I could come up with :)
 #define HPY_DEBUG_MAGIC 0xDEB00FF
@@ -23,4 +24,4 @@ static inline HPyDebugInfo *get_info(HPyContext ctx)
 }
 
 
-#endif /* HPY_DEBUG_CTX_H */
+#endif /* HPY_DEBUG_INTERNAL_H */

@@ -44,7 +44,7 @@ class autogen_debug_wrappers(AutoGenFile):
     def generate(self):
         lines = []
         w = lines.append
-        w('#include "debug_ctx.h"')
+        w('#include "debug_internal.h"')
         w('')
         for func in self.api.functions:
             debug_wrapper = self.gen_debug_wrapper(func)

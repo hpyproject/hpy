@@ -156,6 +156,11 @@ static PyMethodDef HPyMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+static int exec_module(PyObject *mod);
+static PyModuleDef_Slot hpymodule_slots[] = {
+    {Py_mod_exec, exec_module},
+    {0, NULL},
+};
 
 static struct PyModuleDef hpydef = {
     PyModuleDef_HEAD_INIT,
@@ -163,11 +168,28 @@ static struct PyModuleDef hpydef = {
     .m_doc = "HPy universal runtime for CPython",
     .m_size = 0,
     .m_methods = HPyMethods,
+    .m_slots = hpymodule_slots,
 };
 
+
+// module initialization function
+int exec_module(PyObject* mod) {
+    HPyContext ctx  = &g_universal_ctx;
+    HPy h_debug_mod = HPyInit__debug(ctx);
+    if (HPy_IsNull(h_debug_mod))
+        return -1;
+    PyObject *_debug_mod = HPy_AsPyObject(ctx, h_debug_mod);
+    HPy_Close(ctx, h_debug_mod);
+
+    if (PyModule_AddObject(mod, "_debug", _debug_mod) < 0)
+        return -1;
+
+    return 0;
+}
 
 PyMODINIT_FUNC
 PyInit_universal(void)
 {
-    return PyModuleDef_Init(&hpydef);
+    PyObject *mod = PyModuleDef_Init(&hpydef);
+    return mod;
 }

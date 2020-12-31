@@ -10,7 +10,7 @@
 
 */
 
-#include "debug_ctx.h"
+#include "debug_internal.h"
 
 HPy debug_ctx_Module_Create(HPyContext ctx, HPyModuleDef *def)
 {
