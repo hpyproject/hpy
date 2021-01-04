@@ -275,7 +275,7 @@ class TestErr(HPyTest):
                     HPy_Close(ctx, h_dict);
                     return HPy_NULL;
                 }
-                h_err_value = HPy_Call(ctx, h_err, h_args, h_kw);
+                h_err_value = HPy_CallTupleDict(ctx, h_err, h_args, h_kw);
                 if (HPy_IsNull(h_err_value)) {
                     HPy_Close(ctx, h_dict);
                     HPy_Close(ctx, h_err);
