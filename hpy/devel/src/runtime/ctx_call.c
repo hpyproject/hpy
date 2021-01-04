@@ -9,6 +9,20 @@
 _HPy_HIDDEN HPy
 ctx_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw)
 {
-    PyObject *obj = PyObject_Call(_h2py(callable), _h2py(args), _h2py(kw));
+    PyObject *obj;
+    if (HPy_IsNull(kw)) {
+      obj = PyObject_CallObject(_h2py(callable), _h2py(args));
+    }
+    else if (!HPy_IsNull(args)){
+      obj = PyObject_Call(_h2py(callable), _h2py(args), _h2py(kw));
+    }
+    else {
+      // args is null, but kw is not, so we need to create an empty args tuple
+      // for CPython's PyObject_Call
+      HPy items[] = {};
+      HPy empty_tuple = HPyTuple_FromArray(ctx, items, 0);
+      obj = PyObject_Call(_h2py(callable), _h2py(empty_tuple), _h2py(kw));
+      HPy_Close(ctx, empty_tuple);
+    }
     return _py2h(obj);
 }
