@@ -165,8 +165,7 @@ HPy HPy_InPlaceXor(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 
 int HPyCallable_Check(HPyContext ctx, HPy h);
-HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kw);
-HPy HPy_CallObject(HPyContext ctx, HPy callable, HPy args);
+HPy HPy_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw);
 
 /* pyerrors.h */
 void HPy_FatalError(HPyContext ctx, const char *message);

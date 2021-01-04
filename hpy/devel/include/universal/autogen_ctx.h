@@ -141,8 +141,7 @@ struct _HPyContext_s {
     HPy (*ctx_InPlaceXor)(HPyContext ctx, HPy h1, HPy h2);
     HPy (*ctx_InPlaceOr)(HPyContext ctx, HPy h1, HPy h2);
     int (*ctx_Callable_Check)(HPyContext ctx, HPy h);
-    HPy (*ctx_Call)(HPyContext ctx, HPy callable, HPy args, HPy kw);
-    HPy (*ctx_CallObject)(HPyContext ctx, HPy callable, HPy args);
+    HPy (*ctx_CallTupleDict)(HPyContext ctx, HPy callable, HPy args, HPy kw);
     void (*ctx_FatalError)(HPyContext ctx, const char *message);
     void (*ctx_Err_SetString)(HPyContext ctx, HPy h_type, const char *message);
     void (*ctx_Err_SetObject)(HPyContext ctx, HPy h_type, HPy h_value);

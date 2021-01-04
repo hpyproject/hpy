@@ -234,12 +234,8 @@ static inline int HPyCallable_Check(HPyContext ctx, HPy h) {
      return ctx->ctx_Callable_Check ( ctx, h ); 
 }
 
-static inline HPy HPy_Call(HPyContext ctx, HPy callable, HPy args, HPy kw) {
-     return ctx->ctx_Call ( ctx, callable, args, kw ); 
-}
-
-static inline HPy HPy_CallObject(HPyContext ctx, HPy callable, HPy args) {
-     return ctx->ctx_CallObject ( ctx, callable, args ); 
+static inline HPy HPy_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw) {
+     return ctx->ctx_CallTupleDict ( ctx, callable, args, kw ); 
 }
 
 static inline void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message) {
