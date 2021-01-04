@@ -1,6 +1,7 @@
 #include "hpy.h"
 #include "handles.h"
 
+#include "common/runtime/ctx_call.h"
 #include "common/runtime/ctx_type.h"
 #include "common/runtime/ctx_module.h"
 #include "common/runtime/ctx_listbuilder.h"
