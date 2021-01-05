@@ -237,6 +237,7 @@ int HPyDict_Check(HPyContext ctx, HPy h);
 HPy HPyDict_New(HPyContext ctx);
 
 /* tupleobject.h */
+int HPyTuple_Check(HPyContext ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 

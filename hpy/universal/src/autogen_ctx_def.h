@@ -188,6 +188,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_List_Append = &ctx_List_Append,
     .ctx_Dict_Check = &ctx_Dict_Check,
     .ctx_Dict_New = &ctx_Dict_New,
+    .ctx_Tuple_Check = &ctx_Tuple_Check,
     .ctx_Tuple_FromArray = &ctx_Tuple_FromArray,
     .ctx_FromPyObject = &ctx_FromPyObject,
     .ctx_AsPyObject = &ctx_AsPyObject,

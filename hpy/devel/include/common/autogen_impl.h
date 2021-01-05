@@ -455,3 +455,8 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Dict_New)(HPyContext ctx)
     return _py2h(PyDict_New());
 }
 
+HPyAPI_STORAGE int _HPy_IMPL_NAME(Tuple_Check)(HPyContext ctx, HPy h)
+{
+    return PyTuple_Check(_h2py(h));
+}
+

@@ -188,6 +188,7 @@ struct _HPyContext_s {
     int (*ctx_List_Append)(HPyContext ctx, HPy h_list, HPy h_item);
     int (*ctx_Dict_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Dict_New)(HPyContext ctx);
+    int (*ctx_Tuple_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Tuple_FromArray)(HPyContext ctx, HPy items[], HPy_ssize_t n);
     HPy (*ctx_FromPyObject)(HPyContext ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext ctx, HPy h);
