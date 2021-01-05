@@ -2,10 +2,11 @@ from .support import HPyTest
 
 
 class TestCall(HPyTest):
-    def argument_combinations(self, *items):
+    def argument_combinations(self, **items):
         """ Returns all possible ways of expressing the given items as
             arguments to a function.
         """
+        items = list(items.items())
         for i in range(len(items) + 1):
             args = tuple(item[1] for item in items[:i])
             kw = dict(items[i:])
@@ -50,9 +51,9 @@ class TestCall(HPyTest):
 
         # test passing arguments with handles of the correct type --
         # i.e. args is a tuple or a null handle, kw is a dict or a null handle.
-        for d in self.argument_combinations(("a", 1), ("b", 2)):
+        for d in self.argument_combinations(a=1, b=2):
             assert mod.call(f, **d) == 3
-        for d in self.argument_combinations(("a", 1)):
+        for d in self.argument_combinations(a=1):
             with pytest.raises(TypeError):
                 mod.call(f, **d)
         for d in self.argument_combinations():
@@ -60,12 +61,12 @@ class TestCall(HPyTest):
                 mod.call(f, **d)
         for d in self.argument_combinations():
             assert mod.call(g, **d) == "this is g"
-        for d in self.argument_combinations(("object", 2)):
+        for d in self.argument_combinations(object=2):
             assert mod.call(str, **d) == "2"
         for d in self.argument_combinations():
             with pytest.raises(TypeError):
                 mod.call("not callable", **d)
-        for d in self.argument_combinations(("unknown", 2)):
+        for d in self.argument_combinations(unknown=2):
             with pytest.raises(TypeError):
                 mod.call("not callable", **d)
 
