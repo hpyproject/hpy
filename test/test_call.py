@@ -2,6 +2,21 @@ from .support import HPyTest
 
 
 class TestCall(HPyTest):
+    def argument_combinations(self, *items):
+        """ Returns all possible ways of expressing the given items as
+            arguments to a function.
+        """
+        for i in range(len(items) + 1):
+            args = tuple(item[1] for item in items[:i])
+            kw = dict(items[i:])
+            yield {"args": args, "kw": kw}
+            if not args:
+                yield {"kw": kw}
+            if not kw:
+                yield {"args": args}
+            if not args and not kw:
+                yield {}
+
     def test_hpy_calltupledict(self):
         import pytest
         mod = self.make_module("""
@@ -33,26 +48,44 @@ class TestCall(HPyTest):
         def g():
             return "this is g"
 
-        # test calls with args (both with and without keywords)
-        assert mod.call(f, args=(1, 2)) == 3
-        assert mod.call(f, args=(), kw={"a": 2, "b": 3}) == 5
-        assert mod.call(g, (), {}) == "this is g"
-        assert mod.call(str, args=(2,)) == "2"
-        assert mod.call(str, args=(2,), kw={}) == "2"
-        with pytest.raises(TypeError):
-            mod.call(f, args=(1,))
-        with pytest.raises(TypeError):
-            mod.call(f, args=(), kw={"b": 2})
-        with pytest.raises(TypeError):
-            mod.call(f, args=(), kw={})
-        with pytest.raises(TypeError):
-            mod.call("not callable", args=(2,))
-        with pytest.raises(TypeError):
-            mod.call("not callable", args=(2,), kw={})
+        # test passing arguments with handles of the correct type --
+        # i.e. args is a tuple or a null handle, kw is a dict or a null handle.
+        for d in self.argument_combinations(("a", 1), ("b", 2)):
+            assert mod.call(f, **d) == 3
+        for d in self.argument_combinations(("a", 1)):
+            with pytest.raises(TypeError):
+                mod.call(f, **d)
+        for d in self.argument_combinations():
+            with pytest.raises(TypeError):
+                mod.call(f, **d)
+        for d in self.argument_combinations():
+            assert mod.call(g, **d) == "this is g"
+        for d in self.argument_combinations(("object", 2)):
+            assert mod.call(str, **d) == "2"
+        for d in self.argument_combinations():
+            with pytest.raises(TypeError):
+                mod.call("not callable", **d)
+        for d in self.argument_combinations(("unknown", 2)):
+            with pytest.raises(TypeError):
+                mod.call("not callable", **d)
 
-        # test calls without args (both and without keywords)
-        assert mod.call(g) == "this is g"
-        assert mod.call(g, kw={}) == "this is g"
+        # test passing handles of the incorrect type as arguments
+        with pytest.raises(TypeError):
+            mod.call(f, args=[1, 2])
+        with pytest.raises(TypeError):
+            mod.call(f, args="string")
+        with pytest.raises(TypeError):
+            mod.call(f, args=1)
+        with pytest.raises(TypeError):
+            mod.call(f, args=None)
+        with pytest.raises(TypeError):
+            mod.call(f, kw=[1, 2])
+        with pytest.raises(TypeError):
+            mod.call(f, kw="string")
+        with pytest.raises(TypeError):
+            mod.call(f, kw=1)
+        with pytest.raises(TypeError):
+            mod.call(f, kw=None)
 
     def test_hpycallable_check(self):
         mod = self.make_module("""
