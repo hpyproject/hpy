@@ -38,6 +38,9 @@ static void debug_ctx_init(HPyContext original_ctx)
     debug_info.closed_handles = NULL;
     g_debug_ctx._private = &debug_info;
 
+    // initialze ctx->h_None, etc.
+    debug_init_prebuilt_handles(&g_debug_ctx, original_ctx);
+
     /* CallRealFunctionFromTrampoline is special, since it is responsible to
        retrieve and pass the appropriate context to the HPy functions on
        CPython. Note that this is used ONLY on CPython, other implementations

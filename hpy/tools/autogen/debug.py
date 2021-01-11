@@ -24,7 +24,7 @@ def get_debug_wrapper_node(func):
     visitor.visit(newnode)
     return newnode
 
-class autogen_debug_ctx_def_h(AutoGenFile):
+class autogen_debug_ctx_h(AutoGenFile):
     PATH = 'hpy/debug/src/autogen_debug_ctx.h'
 
     def generate(self):
@@ -47,7 +47,7 @@ class autogen_debug_ctx_def_h(AutoGenFile):
         # emit the declarations and adapters for all the debug_ctx_* functions
         for func in self.api.functions:
             self.generate_adapter(w, func)
-
+        self.generate_init_prebuilt_handles(w)
         # emit a static ctx which uses the various debug_ctx_* functions
         w('')
         w('static struct _HPyContext_s g_debug_ctx = {')
@@ -92,6 +92,14 @@ class autogen_debug_ctx_def_h(AutoGenFile):
             w(f'    return {name}({params});')
         w('}')
         w('')
+
+    def generate_init_prebuilt_handles(self, w):
+        w('static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext original_ctx)')
+        w('{')
+        for var in self.api.variables:
+            name = var.name
+            w(f'    ctx->{name} = _d2h(DHPy_new(ctx, original_ctx->{name}));')
+        w('}')
 
 
 class autogen_debug_wrappers(AutoGenFile):
