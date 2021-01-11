@@ -164,7 +164,11 @@ HPy HPy_InPlaceAnd(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_InPlaceXor(HPyContext ctx, HPy h1, HPy h2);
 HPy HPy_InPlaceOr(HPyContext ctx, HPy h1, HPy h2);
 
+int HPyCallable_Check(HPyContext ctx, HPy h);
+HPy HPy_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw);
+
 /* pyerrors.h */
+void HPy_FatalError(HPyContext ctx, const char *message);
 void HPyErr_SetString(HPyContext ctx, HPy h_type, const char *message);
 void HPyErr_SetObject(HPyContext ctx, HPy h_type, HPy h_value);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
@@ -232,10 +236,8 @@ int HPyList_Append(HPyContext ctx, HPy h_list, HPy h_item);
 int HPyDict_Check(HPyContext ctx, HPy h);
 HPy HPyDict_New(HPyContext ctx);
 
-/* pyerrors.h */
-void HPy_FatalError(HPyContext ctx, const char *message);
-
 /* tupleobject.h */
+int HPyTuple_Check(HPyContext ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 

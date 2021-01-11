@@ -60,6 +60,22 @@ class TestModule:
             for i in range(N):
                 simple.varargs(None, None)
 
+    def test_call_with_tuple(self, simple, timer, N):
+        def f(a, b):
+            return a + b
+
+        with timer:
+            for i in range(N):
+                simple.call_with_tuple(f, (1, 2))
+
+    def test_call_with_tuple_and_dict(self, simple, timer, N):
+        def f(a, b):
+            return a + b
+
+        with timer:
+            for i in range(N):
+                simple.call_with_tuple_and_dict(f, (1,), {"b": 2})
+
     def test_allocate_int(self, simple, timer, N):
         with timer:
             for i in range(N):
