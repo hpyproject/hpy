@@ -76,6 +76,10 @@ global 'i' = 9657683
 Inspect `PyObject *` and `HPy` inside GDB
 ------------------------------------------
 
+**WARNING**: `py-dump` and `hpy-dump` prints to stderr, and this interacts
+badly with pytest's capturing. Make sure to run `py.test -s`, else you might
+not see the output. The included script `gdb-py.test` automatically pass `-s`.
+
 `python-gdb.py` installs a GDB pretty-printer for `PyObject *` variables,
 which sometimes can be confusing: often, it prints the Python repr of the
 variable:
