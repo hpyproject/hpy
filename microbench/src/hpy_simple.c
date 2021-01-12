@@ -20,6 +20,33 @@ static HPy varargs_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     return HPy_Dup(ctx, ctx->h_None);
 }
 
+HPyDef_METH(call_with_tuple, "call_with_tuple", call_with_tuple_impl, HPyFunc_VARARGS)
+static HPy call_with_tuple_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+{
+    HPy f, f_args;
+    if (nargs != 2) {
+        HPyErr_SetString(ctx, ctx->h_TypeError, "call_with_tuple requires two arguments");
+        return HPy_NULL;
+    }
+    f = args[0];
+    f_args = args[1];
+    return HPy_CallTupleDict(ctx, f, f_args, HPy_NULL);
+}
+
+HPyDef_METH(call_with_tuple_and_dict, "call_with_tuple_and_dict", call_with_tuple_and_dict_impl, HPyFunc_VARARGS)
+static HPy call_with_tuple_and_dict_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+{
+    HPy f, f_args, f_kw;
+    if (nargs != 3) {
+        HPyErr_SetString(ctx, ctx->h_TypeError, "call_with_tuple_and_dict requires three arguments");
+        return HPy_NULL;
+    }
+    f = args[0];
+    f_args = args[1];
+    f_kw = args[2];
+    return HPy_CallTupleDict(ctx, f, f_args, f_kw);
+}
+
 HPyDef_METH(allocate_int, "allocate_int", allocate_int_impl, HPyFunc_NOARGS)
 static HPy allocate_int_impl(HPyContext ctx, HPy self)
 {
@@ -81,6 +108,8 @@ static HPyDef *module_defines[] = {
     &noargs,
     &onearg,
     &varargs,
+    &call_with_tuple,
+    &call_with_tuple_and_dict,
     &allocate_int,
     &allocate_tuple,
     NULL

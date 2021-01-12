@@ -152,7 +152,7 @@ SPECIAL_CASES = {
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
     'HPy_Length': 'PyObject_Length',
-    'HPy_Call': 'PyObject_Call',
+    'HPy_CallTupleDict': None,
     '_HPy_Cast': None,
     'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
@@ -218,6 +218,7 @@ SPECIAL_CASES = {
     'HPyTracker_Add': None,
     'HPyTracker_ForgetAll': None,
     'HPyTracker_Close': None,
+    '_HPy_Dump': None,
 }
 
 

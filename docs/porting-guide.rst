@@ -46,3 +46,24 @@ For lists of (say) integers::
     HPy h_list = HPyListBuilder_i_Build(ctx, builder);
 
 And similar for building tuples or bytes
+
+
+PyObject_Call and PyObject_CallObject
+-------------------------------------
+
+Both ``PyObject_Call`` and ``PyObject_CallObject`` are replaced by
+``HPy_CallTupleDict(callable, args, kwargs)`` in which either or both of
+``args`` and ``kwargs`` may be null handles.
+
+``PyObject_Call(callable, args, kwargs)`` becomes:
+
+    HPy result = HPy_CallTupleDict(ctx, callable, args, kwargs);
+
+``PyObject_CallObject(callable, args)`` becomes:
+
+    HPy result = HPy_CallTupleDict(ctx, callable, args, HPy_NULL);
+
+If ``args`` is not a handle to a tuple or ``kwargs`` is not a handle to a
+dictionary, ``HPy_CallTupleDict`` will return ``HPy_NULL`` and raise a
+``TypeError``. This is different to ``PyObject_Call`` and
+``PyObject_CallObject`` which may segfault instead.

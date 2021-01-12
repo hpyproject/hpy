@@ -17,6 +17,36 @@ static PyObject* varargs(PyObject* self, PyObject* args)
     Py_RETURN_NONE;
 }
 
+static PyObject* call_with_tuple(PyObject* self, PyObject* args)
+{
+    PyObject* f;
+    PyObject* f_args;
+    f = PyTuple_GetItem(args, 0);
+    if (f == NULL)
+        Py_RETURN_NONE;
+    f_args = PyTuple_GetItem(args, 1);
+    if (f_args == NULL)
+        Py_RETURN_NONE;
+    return PyObject_CallObject(f, f_args);
+}
+
+static PyObject* call_with_tuple_and_dict(PyObject* self, PyObject* args)
+{
+    PyObject* f;
+    PyObject* f_args;
+    PyObject* f_kw;
+    f = PyTuple_GetItem(args, 0);
+    if (f == NULL)
+        Py_RETURN_NONE;
+    f_args = PyTuple_GetItem(args, 1);
+    if (f_args == NULL)
+        Py_RETURN_NONE;
+    f_kw = PyTuple_GetItem(args, 2);
+    if (f_kw == NULL)
+        Py_RETURN_NONE;
+    return PyObject_Call(f, f_args, f_kw);
+}
+
 static PyObject* allocate_int(PyObject* self, PyObject* args)
 {
     return PyLong_FromLong(2048);
@@ -41,6 +71,8 @@ static PyMethodDef SimpleMethods[] = {
     {"noargs", (PyCFunction)noargs, METH_NOARGS, ""},
     {"onearg", (PyCFunction)onearg, METH_O, ""},
     {"varargs", (PyCFunction)varargs, METH_VARARGS, ""},
+    {"call_with_tuple", (PyCFunction)call_with_tuple, METH_VARARGS, ""},
+    {"call_with_tuple_and_dict", (PyCFunction)call_with_tuple_and_dict, METH_VARARGS, ""},
     {"allocate_int", (PyCFunction)allocate_int, METH_NOARGS, ""},
     {"allocate_tuple", (PyCFunction)allocate_tuple, METH_NOARGS, ""},
     {NULL, NULL, 0, NULL}
