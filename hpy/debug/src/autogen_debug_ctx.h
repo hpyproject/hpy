@@ -354,6 +354,24 @@ HPy _adapter_debug_ctx_InPlaceOr(HPyContext ctx, HPy h1, HPy h2)
     return _d2h(debug_ctx_InPlaceOr(ctx, _h2d(h1), _h2d(h2)));
 }
 
+int debug_ctx_Callable_Check(HPyContext ctx, DHPy h);
+int _adapter_debug_ctx_Callable_Check(HPyContext ctx, HPy h)
+{
+    return debug_ctx_Callable_Check(ctx, _h2d(h));
+}
+
+DHPy debug_ctx_CallTupleDict(HPyContext ctx, DHPy callable, DHPy args, DHPy kw);
+HPy _adapter_debug_ctx_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw)
+{
+    return _d2h(debug_ctx_CallTupleDict(ctx, _h2d(callable), _h2d(args), _h2d(kw)));
+}
+
+void debug_ctx_FatalError(HPyContext ctx, const char *message);
+void _adapter_debug_ctx_FatalError(HPyContext ctx, const char *message)
+{
+    debug_ctx_FatalError(ctx, message);
+}
+
 void debug_ctx_Err_SetString(HPyContext ctx, DHPy h_type, const char *message);
 void _adapter_debug_ctx_Err_SetString(HPyContext ctx, HPy h_type, const char *message)
 {
@@ -624,10 +642,10 @@ HPy _adapter_debug_ctx_Dict_New(HPyContext ctx)
     return _d2h(debug_ctx_Dict_New(ctx));
 }
 
-void debug_ctx_FatalError(HPyContext ctx, const char *message);
-void _adapter_debug_ctx_FatalError(HPyContext ctx, const char *message)
+int debug_ctx_Tuple_Check(HPyContext ctx, DHPy h);
+int _adapter_debug_ctx_Tuple_Check(HPyContext ctx, HPy h)
 {
-    debug_ctx_FatalError(ctx, message);
+    return debug_ctx_Tuple_Check(ctx, _h2d(h));
 }
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext ctx, DHPy items[], HPy_ssize_t n);
@@ -730,6 +748,12 @@ void debug_ctx_Tracker_Close(HPyContext ctx, HPyTracker ht);
 void _adapter_debug_ctx_Tracker_Close(HPyContext ctx, HPyTracker ht)
 {
     debug_ctx_Tracker_Close(ctx, ht);
+}
+
+void debug_ctx_Dump(HPyContext ctx, DHPy h);
+void _adapter_debug_ctx_Dump(HPyContext ctx, HPy h)
+{
+    debug_ctx_Dump(ctx, _h2d(h));
 }
 
 static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext original_ctx)
@@ -941,6 +965,9 @@ static struct _HPyContext_s g_debug_ctx = {
     .ctx_InPlaceAnd = &_adapter_debug_ctx_InPlaceAnd,
     .ctx_InPlaceXor = &_adapter_debug_ctx_InPlaceXor,
     .ctx_InPlaceOr = &_adapter_debug_ctx_InPlaceOr,
+    .ctx_Callable_Check = &_adapter_debug_ctx_Callable_Check,
+    .ctx_CallTupleDict = &_adapter_debug_ctx_CallTupleDict,
+    .ctx_FatalError = &_adapter_debug_ctx_FatalError,
     .ctx_Err_SetString = &_adapter_debug_ctx_Err_SetString,
     .ctx_Err_SetObject = &_adapter_debug_ctx_Err_SetObject,
     .ctx_Err_Occurred = &_adapter_debug_ctx_Err_Occurred,
@@ -986,7 +1013,7 @@ static struct _HPyContext_s g_debug_ctx = {
     .ctx_List_Append = &_adapter_debug_ctx_List_Append,
     .ctx_Dict_Check = &_adapter_debug_ctx_Dict_Check,
     .ctx_Dict_New = &_adapter_debug_ctx_Dict_New,
-    .ctx_FatalError = &_adapter_debug_ctx_FatalError,
+    .ctx_Tuple_Check = &_adapter_debug_ctx_Tuple_Check,
     .ctx_Tuple_FromArray = &_adapter_debug_ctx_Tuple_FromArray,
     .ctx_FromPyObject = &_adapter_debug_ctx_FromPyObject,
     .ctx_AsPyObject = &_adapter_debug_ctx_AsPyObject,
@@ -1004,4 +1031,5 @@ static struct _HPyContext_s g_debug_ctx = {
     .ctx_Tracker_Add = &_adapter_debug_ctx_Tracker_Add,
     .ctx_Tracker_ForgetAll = &_adapter_debug_ctx_Tracker_ForgetAll,
     .ctx_Tracker_Close = &_adapter_debug_ctx_Tracker_Close,
+    .ctx_Dump = &_adapter_debug_ctx_Dump,
 };

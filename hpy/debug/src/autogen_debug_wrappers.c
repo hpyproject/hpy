@@ -287,6 +287,21 @@ DHPy debug_ctx_InPlaceOr(HPyContext ctx, DHPy h1, DHPy h2)
     return _h2d(HPy_InPlaceOr(get_info(ctx)->original_ctx, h1->h, h2->h));
 }
 
+int debug_ctx_Callable_Check(HPyContext ctx, DHPy h)
+{
+    return HPyCallable_Check(get_info(ctx)->original_ctx, h->h);
+}
+
+DHPy debug_ctx_CallTupleDict(HPyContext ctx, DHPy callable, DHPy args, DHPy kw)
+{
+    return _h2d(HPy_CallTupleDict(get_info(ctx)->original_ctx, callable->h, args->h, kw->h));
+}
+
+void debug_ctx_FatalError(HPyContext ctx, const char *message)
+{
+    HPy_FatalError(get_info(ctx)->original_ctx, message);
+}
+
 void debug_ctx_Err_SetString(HPyContext ctx, DHPy h_type, const char *message)
 {
     HPyErr_SetString(get_info(ctx)->original_ctx, h_type->h, message);
@@ -512,9 +527,9 @@ DHPy debug_ctx_Dict_New(HPyContext ctx)
     return _h2d(HPyDict_New(get_info(ctx)->original_ctx));
 }
 
-void debug_ctx_FatalError(HPyContext ctx, const char *message)
+int debug_ctx_Tuple_Check(HPyContext ctx, DHPy h)
 {
-    HPy_FatalError(get_info(ctx)->original_ctx, message);
+    return HPyTuple_Check(get_info(ctx)->original_ctx, h->h);
 }
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext ctx, DHPy items[], HPy_ssize_t n)
@@ -595,5 +610,10 @@ void debug_ctx_Tracker_ForgetAll(HPyContext ctx, HPyTracker ht)
 void debug_ctx_Tracker_Close(HPyContext ctx, HPyTracker ht)
 {
     HPyTracker_Close(get_info(ctx)->original_ctx, ht);
+}
+
+void debug_ctx_Dump(HPyContext ctx, DHPy h)
+{
+    _HPy_Dump(get_info(ctx)->original_ctx, h->h);
 }
 
