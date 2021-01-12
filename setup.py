@@ -3,7 +3,9 @@ import os
 from setuptools import setup, Extension
 
 if 'HPY_DEBUG' in os.environ:
-    EXTRA_COMPILE_ARGS = ['-g', '-O0']
+    # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
+    # functions are available to call inside GDB
+    EXTRA_COMPILE_ARGS = ['-g', '-O0', '-fkeep-inline-functions']
 else:
     EXTRA_COMPILE_ARGS = []
 
