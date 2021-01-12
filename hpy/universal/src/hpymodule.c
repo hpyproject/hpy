@@ -187,9 +187,98 @@ int exec_module(PyObject* mod) {
     return 0;
 }
 
+static void init_universal_ctx(HPyContext ctx)
+{
+    if (!HPy_IsNull(ctx->h_None))
+        // already initialized
+        return;
+
+    // XXX this code is basically the same as found in cpython/hpy.h. We
+    // should probably share and/or autogenerate both versions
+    /* Constants */
+    ctx->h_None = _py2h(Py_None);
+    ctx->h_True = _py2h(Py_True);
+    ctx->h_False = _py2h(Py_False);
+    /* Exceptions */
+    ctx->h_BaseException = _py2h(PyExc_BaseException);
+    ctx->h_Exception = _py2h(PyExc_Exception);
+    ctx->h_StopAsyncIteration = _py2h(PyExc_StopAsyncIteration);
+    ctx->h_StopIteration = _py2h(PyExc_StopIteration);
+    ctx->h_GeneratorExit = _py2h(PyExc_GeneratorExit);
+    ctx->h_ArithmeticError = _py2h(PyExc_ArithmeticError);
+    ctx->h_LookupError = _py2h(PyExc_LookupError);
+    ctx->h_AssertionError = _py2h(PyExc_AssertionError);
+    ctx->h_AttributeError = _py2h(PyExc_AttributeError);
+    ctx->h_BufferError = _py2h(PyExc_BufferError);
+    ctx->h_EOFError = _py2h(PyExc_EOFError);
+    ctx->h_FloatingPointError = _py2h(PyExc_FloatingPointError);
+    ctx->h_OSError = _py2h(PyExc_OSError);
+    ctx->h_ImportError = _py2h(PyExc_ImportError);
+    ctx->h_ModuleNotFoundError = _py2h(PyExc_ModuleNotFoundError);
+    ctx->h_IndexError = _py2h(PyExc_IndexError);
+    ctx->h_KeyError = _py2h(PyExc_KeyError);
+    ctx->h_KeyboardInterrupt = _py2h(PyExc_KeyboardInterrupt);
+    ctx->h_MemoryError = _py2h(PyExc_MemoryError);
+    ctx->h_NameError = _py2h(PyExc_NameError);
+    ctx->h_OverflowError = _py2h(PyExc_OverflowError);
+    ctx->h_RuntimeError = _py2h(PyExc_RuntimeError);
+    ctx->h_RecursionError = _py2h(PyExc_RecursionError);
+    ctx->h_NotImplementedError = _py2h(PyExc_NotImplementedError);
+    ctx->h_SyntaxError = _py2h(PyExc_SyntaxError);
+    ctx->h_IndentationError = _py2h(PyExc_IndentationError);
+    ctx->h_TabError = _py2h(PyExc_TabError);
+    ctx->h_ReferenceError = _py2h(PyExc_ReferenceError);
+    ctx->h_SystemError = _py2h(PyExc_SystemError);
+    ctx->h_SystemExit = _py2h(PyExc_SystemExit);
+    ctx->h_TypeError = _py2h(PyExc_TypeError);
+    ctx->h_UnboundLocalError = _py2h(PyExc_UnboundLocalError);
+    ctx->h_UnicodeError = _py2h(PyExc_UnicodeError);
+    ctx->h_UnicodeEncodeError = _py2h(PyExc_UnicodeEncodeError);
+    ctx->h_UnicodeDecodeError = _py2h(PyExc_UnicodeDecodeError);
+    ctx->h_UnicodeTranslateError = _py2h(PyExc_UnicodeTranslateError);
+    ctx->h_ValueError = _py2h(PyExc_ValueError);
+    ctx->h_ZeroDivisionError = _py2h(PyExc_ZeroDivisionError);
+    ctx->h_BlockingIOError = _py2h(PyExc_BlockingIOError);
+    ctx->h_BrokenPipeError = _py2h(PyExc_BrokenPipeError);
+    ctx->h_ChildProcessError = _py2h(PyExc_ChildProcessError);
+    ctx->h_ConnectionError = _py2h(PyExc_ConnectionError);
+    ctx->h_ConnectionAbortedError = _py2h(PyExc_ConnectionAbortedError);
+    ctx->h_ConnectionRefusedError = _py2h(PyExc_ConnectionRefusedError);
+    ctx->h_ConnectionResetError = _py2h(PyExc_ConnectionResetError);
+    ctx->h_FileExistsError = _py2h(PyExc_FileExistsError);
+    ctx->h_FileNotFoundError = _py2h(PyExc_FileNotFoundError);
+    ctx->h_InterruptedError = _py2h(PyExc_InterruptedError);
+    ctx->h_IsADirectoryError = _py2h(PyExc_IsADirectoryError);
+    ctx->h_NotADirectoryError = _py2h(PyExc_NotADirectoryError);
+    ctx->h_PermissionError = _py2h(PyExc_PermissionError);
+    ctx->h_ProcessLookupError = _py2h(PyExc_ProcessLookupError);
+    ctx->h_TimeoutError = _py2h(PyExc_TimeoutError);
+    /* Warnings */
+    ctx->h_Warning = _py2h(PyExc_Warning);
+    ctx->h_UserWarning = _py2h(PyExc_UserWarning);
+    ctx->h_DeprecationWarning = _py2h(PyExc_DeprecationWarning);
+    ctx->h_PendingDeprecationWarning = _py2h(PyExc_PendingDeprecationWarning);
+    ctx->h_SyntaxWarning = _py2h(PyExc_SyntaxWarning);
+    ctx->h_RuntimeWarning = _py2h(PyExc_RuntimeWarning);
+    ctx->h_FutureWarning = _py2h(PyExc_FutureWarning);
+    ctx->h_ImportWarning = _py2h(PyExc_ImportWarning);
+    ctx->h_UnicodeWarning = _py2h(PyExc_UnicodeWarning);
+    ctx->h_BytesWarning = _py2h(PyExc_BytesWarning);
+    ctx->h_ResourceWarning = _py2h(PyExc_ResourceWarning);
+    /* Types */
+    ctx->h_BaseObjectType = _py2h((PyObject *)&PyBaseObject_Type);
+    ctx->h_TypeType = _py2h((PyObject *)&PyType_Type);
+    ctx->h_LongType = _py2h((PyObject *)&PyLong_Type);
+    ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
+    ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
+    ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
+}
+
+
 PyMODINIT_FUNC
 PyInit_universal(void)
 {
+    init_universal_ctx(&g_universal_ctx);
     PyObject *mod = PyModuleDef_Init(&hpydef);
     return mod;
 }

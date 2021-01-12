@@ -66,8 +66,7 @@ class autogen_ctx_def_h(AutoGenFile):
         w('    .name = "HPy Universal ABI (CPython backend)",')
         w('    ._private = NULL,')
         w('    .ctx_version = 1,')
-        for var in self.api.variables:
-            w('    .%s = {CONSTANT_%s},' % (var.name, var.name.upper()))
+        w('    /* h_None & co. are initialized by init_universal_ctx() */')
         for func in self.api.functions:
             w('    .%s = &%s,' % (func.ctx_name(), func.ctx_name()))
         w('};')

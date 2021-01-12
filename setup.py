@@ -48,7 +48,6 @@ if sys.implementation.name == 'cpython':
     EXT_MODULES += [
         Extension('hpy.universal',
                   ['hpy/universal/src/hpymodule.c',
-                   'hpy/universal/src/handles.c',
                    'hpy/universal/src/ctx.c',
                    'hpy/universal/src/ctx_meth.c',
                    'hpy/universal/src/ctx_misc.c',
