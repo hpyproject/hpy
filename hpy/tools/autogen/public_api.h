@@ -277,6 +277,10 @@ int HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h);
 void HPyTracker_ForgetAll(HPyContext ctx, HPyTracker ht);
 void HPyTracker_Close(HPyContext ctx, HPyTracker ht);
 
+/* Debugging helpers */
+void _HPy_Dump(HPyContext ctx, HPy h);
+
+
 /* *******
    hpyfunc
    *******

@@ -3,7 +3,9 @@ import os
 from setuptools import setup, Extension
 
 if 'HPY_DEBUG' in os.environ:
-    EXTRA_COMPILE_ARGS = ['-g', '-O0']
+    # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
+    # functions are available to call inside GDB
+    EXTRA_COMPILE_ARGS = ['-g', '-O0', '-fkeep-inline-functions']
 else:
     EXTRA_COMPILE_ARGS = []
 
@@ -52,6 +54,7 @@ if sys.implementation.name == 'cpython':
                    'hpy/devel/src/runtime/argparse.c',
                    'hpy/devel/src/runtime/ctx_call.c',
                    'hpy/devel/src/runtime/ctx_module.c',
+                   'hpy/devel/src/runtime/ctx_object.c',
                    'hpy/devel/src/runtime/ctx_type.c',
                    'hpy/devel/src/runtime/ctx_tracker.c',
                    'hpy/devel/src/runtime/ctx_listbuilder.c',
