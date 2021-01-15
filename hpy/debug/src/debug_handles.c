@@ -1,12 +1,11 @@
 #include "debug_internal.h"
 
-DHPy DHPy_new(HPyContext ctx, HPy h)
+DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
 {
     HPyDebugInfo *info = get_info(ctx);
-    DHPy dh = malloc(sizeof(struct DHPy_s));
-    dh->h = h;
-    dh->next = info->open_handles;
-    info->open_handles = dh;
-    return dh;
+    DebugHandle *handle = malloc(sizeof(DebugHandle));
+    handle->uh = uh;
+    handle->next = info->open_handles;
+    info->open_handles = handle;
+    return as_DHPy(handle);
 }
-

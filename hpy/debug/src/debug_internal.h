@@ -11,53 +11,59 @@
 #define HPY_DEBUG_MAGIC 0xDEB00FF
 
 /* The Debug context is a wrapper around an underlying context, which we will
-   call Universal. The signatures of API functions are the same, but the HPy
-   types represents very different things:
+   call Universal. Inside the debug mode we manipulate handles which belongs
+   to both contexts, so to make things easier we create two typedefs to make
+   it clear what kind of handle we expect: UHPy and DHPy:
 
-     * HPys belonging by the Universal ctx are opaque (from our point of view)
-     * HPys belonging by the Debug ctx are pointers to a struct called DHPy_s
+     * UHPy are opaque from our point of view.
 
-   Every DHPy is a wrapper around an universal HPy. To get the underlying
-   universal HPy, you can use its ->h field.
+     * DHPy are actually DebugHandle* in disguise. DebugHandles are wrappers
+       around a UHPy, with a bunch of extra info.
 
-   To wrap an universal HPy into a DHPy, you need to call DHPy_new: this
-   function should be called only ONCE for each handle, and only if it
-   "fresh": it will record the DHPy into a list of open handles so that it can
-   be checked later.
+   To cast between DHPy and DebugHandle*, use as_DebugHandle and as_DHPy:
+   these are just no-op casts.
 
-   To avoid confusion and to prevent passing wrong handles by mistake, all the
-   various debug_ctx_* functions take and return DHPys. Inside
-   autogen_ctx_def.h there are no-op adapters which converts the DHPys into
-   HPys to make the C compiler happy. See also the corresponding comment
-   there. _d2h and _h2d "cast" a DHPy into an HPy, and they should be used
-   ONLY by the adapters.
+   To wrap a UHPy, call DHPy_wrap: this contains some actual logic, because it
+   malloc()s a new DebugHandle, which will be released at some point in the
+   future after we call HPy_Close on it.  Note that if you call DHPy_wrap
+   twice on the same UHPy, you get two different DHPy.
+
+   To unwrap a DHPy and get the underyling UHPy, call DHPy_unwrap. If you call
+   DHPy_unwrap multiple times on the same DHPy, you always get the same UHPy.
+
+   WARNING: both UHPy and DHPy are alias of HPy, so we need to take care of
+   not mixing them, because the compiler cannot help.
 */
 
-struct DHPy_s {
-    HPy h;
-    struct DHPy_s *next;
-};
-typedef struct DHPy_s *DHPy; /* "Debug HPy" */
+typedef HPy UHPy;
+typedef HPy DHPy;
 
-DHPy DHPy_new(HPyContext ctx, HPy h);
+typedef struct DebugHandle {
+    UHPy uh;
+    struct DebugHandle *next;
+} DebugHandle;
 
-
-/* ======================================================== */
-/* These two functions should be used ONLY be the adapters! */
-static inline HPy _d2h(DHPy dh) {
-    return (HPy){ ._i = (HPy_ssize_t)dh };
+static inline DebugHandle * as_DebugHandle(DHPy dh) {
+    return (DebugHandle *)dh._i;
 }
-static inline DHPy _h2d(HPy h) {
-    return (DHPy)h._i;
-}
-/* ======================================================== */
 
+static inline DHPy as_DHPy(DebugHandle *handle) {
+    return (DHPy){(HPy_ssize_t)handle};
+}
+
+DHPy DHPy_wrap(HPyContext ctx, UHPy uh);
+
+static inline UHPy DHPy_unwrap(DHPy dh) {
+    return as_DebugHandle(dh)->uh;
+}
+
+/* === HPyDebugInfo === */
 
 typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext original_ctx;
-    DHPy open_handles;   // linked list
-    DHPy closed_handles; // linked list
+    DebugHandle *open_handles;   // linked list
+    DebugHandle *closed_handles; // linked list
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext ctx)

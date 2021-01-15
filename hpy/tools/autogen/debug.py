@@ -24,29 +24,17 @@ def get_debug_wrapper_node(func):
     visitor.visit(newnode)
     return newnode
 
+
 class autogen_debug_ctx_h(AutoGenFile):
     PATH = 'hpy/debug/src/autogen_debug_ctx.h'
 
     def generate(self):
         lines = []
         w = lines.append
-        w(textwrap.dedent("""
-        /*
-        The debug_ctx_* functions contain the actualy logic: they receive and
-        return handles of type DHPy.
-
-        The _adapter_debug_* helpers cast DHPy into HPy and viceversa, to get
-        functions those signature is compatible to what is declared in the
-        HPyContext. Note that they are no-op, since the internal repr of DHPy
-        and HPy is the same (but the first is seen as a pointer to DHPy_s the
-        second as a small struct containining an integer), but the C standard
-        forbids casting function pointers whose arguments have nominally
-        different types, so we need to write the adapters manually.
-        */
-        """))
-        # emit the declarations and adapters for all the debug_ctx_* functions
+        # emit the declarations for all the debug_ctx_* functions
         for func in self.api.functions:
-            self.generate_adapter(w, func)
+            w(toC(get_debug_wrapper_node(func)) + ';')
+        w('')
         self.generate_init_prebuilt_handles(w)
         # emit a static ctx which uses the various debug_ctx_* functions
         w('')
@@ -57,48 +45,16 @@ class autogen_debug_ctx_h(AutoGenFile):
         for var in self.api.variables:
             w('    .%s = HPy_NULL,' % (var.name,))
         for func in self.api.functions:
-            w('    .%s = &_adapter_debug_%s,' % (func.ctx_name(), func.ctx_name()))
+            w('    .%s = &debug_%s,' % (func.ctx_name(), func.ctx_name()))
         w('};')
         return '\n'.join(lines)
-
-    def generate_adapter(self, w, func):
-        name = 'debug_%s' % func.ctx_name()
-        wrapper_node = get_debug_wrapper_node(func)
-        w(toC(wrapper_node) + ';') # signature of the debug_ctx_* function
-        #
-        # emit the adapter
-        node = funcnode_with_new_name(func.node, '_adapter_%s' % name)
-        signature = toC(node)
-        rettype = toC(node.type.type)
-        def get_params():
-            lst = []
-            for p in node.type.args.params:
-                if toC(p.type) == 'HPy':
-                    lst.append('_h2d(%s)' % p.name)
-                elif toC(p.type) in ('HPy *', 'HPy []'):
-                    lst.append('(DHPy *)%s' % p.name)
-                else:
-                    lst.append(p.name)
-            return ', '.join(lst)
-        params = get_params()
-
-        w(signature)
-        w('{')
-        if rettype == 'void':
-            w(f'    {name}({params});')
-        elif rettype == 'HPy':
-            w(f'    return _d2h({name}({params}));')
-        else:
-            w(f'    return {name}({params});')
-        w('}')
-        w('')
 
     def generate_init_prebuilt_handles(self, w):
         w('static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext original_ctx)')
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    ctx->{name} = _d2h(DHPy_new(ctx, original_ctx->{name}));')
+            w(f'    ctx->{name} = DHPy_wrap(ctx, original_ctx->{name});')
         w('}')
 
 
@@ -136,9 +92,10 @@ class autogen_debug_wrappers(AutoGenFile):
                 if p.name == 'ctx':
                     lst.append('get_info(ctx)->original_ctx')
                 elif toC(p.type) == 'DHPy':
-                    lst.append('%s->h' % p.name)
+                    lst.append('DHPy_unwrap(%s)' % p.name)
                 elif toC(p.type) in ('DHPy *', 'DHPy []'):
-                    lst.append('(HPy *)%s' % p.name)
+                    #lst.append('(HPy *)%s' % p.name)
+                    lst.append('NULL /* TODO */')
                 else:
                     lst.append(p.name)
             return ', '.join(lst)
@@ -151,7 +108,7 @@ class autogen_debug_wrappers(AutoGenFile):
         if rettype == 'void':
             w(f'    {func.name}({params});')
         elif rettype == 'DHPy':
-            w(f'    return _h2d({func.name}({params}));')
+            w(f'    return DHPy_wrap(ctx, {func.name}({params}));')
         else:
             w(f'    return {func.name}({params});')
         w('}')

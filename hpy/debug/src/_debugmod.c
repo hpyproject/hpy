@@ -10,16 +10,23 @@
 HPyDef_METH(_test_DHPy_new, "_test_DHPy_new", _test_DHPy_new_impl, HPyFunc_O)
 static HPy _test_DHPy_new_impl(HPyContext ctx, HPy self, HPy arg)
 {
+    HPyErr_SetString(ctx, ctx->h_NotImplementedError, "TODO");
+    return HPy_NULL;
+    /*
     HPyContext debug_ctx = hpy_debug_get_ctx(ctx);
     HPy h2 = HPy_Dup(ctx, arg);
     DHPy dh = DHPy_new(debug_ctx, h2);
     // return the numeric value of the pointer, although it's a bit useless
     return HPyLong_FromSsize_t(ctx, (HPy_ssize_t)dh);
+    */
 }
 
 HPyDef_METH(_test_get_open_handles, "_test_get_open_handles", _test_get_open_handles_impl, HPyFunc_NOARGS)
 static HPy _test_get_open_handles_impl(HPyContext ctx, HPy self)
 {
+    HPyErr_SetString(ctx, ctx->h_NotImplementedError, "TODO");
+    return HPy_NULL;
+    /*
     HPyContext debug_ctx = hpy_debug_get_ctx(ctx);
     HPyDebugInfo *info = get_info(debug_ctx);
     HPy hlist = HPyList_New(ctx, 0);
@@ -29,6 +36,7 @@ static HPy _test_get_open_handles_impl(HPyContext ctx, HPy self)
         dh = dh->next;
     }
     return hlist;
+    */
 }
 
 static HPyDef *module_defines[] = {

@@ -81,16 +81,16 @@ __attribute__((unused)) static void hpy_magic_dump(HPy h)
 {
     int universal = h._i & 1;
     if (universal)
-        fprintf(stderr, "Universal handle\n");
+        fprintf(stderr, "\nUniversal handle\n");
     else
-        fprintf(stderr, "Debug handle\n");
+        fprintf(stderr, "\nDebug handle\n");
 
     fprintf(stderr, "raw value: %lx (%ld)\n", h._i, h._i);
     if (universal)
         _HPy_Dump(&g_universal_ctx, h);
     else {
-        DHPy dh = (DHPy)h._i;
-        fprintf(stderr, "dh->h: %lx\n", dh->h._i);
-        _HPy_Dump(&g_universal_ctx, dh->h);
+        DebugHandle *dh = as_DebugHandle(h);
+        fprintf(stderr, "dh->uh: %lx\n", dh->uh._i);
+        _HPy_Dump(&g_universal_ctx, dh->uh);
     }
 }

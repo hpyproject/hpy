@@ -14,287 +14,287 @@
 
 DHPy debug_ctx_Module_Create(HPyContext ctx, HPyModuleDef *def)
 {
-    return _h2d(HPyModule_Create(get_info(ctx)->original_ctx, def));
+    return DHPy_wrap(ctx, HPyModule_Create(get_info(ctx)->original_ctx, def));
 }
 
 DHPy debug_ctx_Dup(HPyContext ctx, DHPy h)
 {
-    return _h2d(HPy_Dup(get_info(ctx)->original_ctx, h->h));
+    return DHPy_wrap(ctx, HPy_Dup(get_info(ctx)->original_ctx, DHPy_unwrap(h)));
 }
 
 void debug_ctx_Close(HPyContext ctx, DHPy h)
 {
-    HPy_Close(get_info(ctx)->original_ctx, h->h);
+    HPy_Close(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Long_FromLong(HPyContext ctx, long value)
 {
-    return _h2d(HPyLong_FromLong(get_info(ctx)->original_ctx, value));
+    return DHPy_wrap(ctx, HPyLong_FromLong(get_info(ctx)->original_ctx, value));
 }
 
 DHPy debug_ctx_Long_FromUnsignedLong(HPyContext ctx, unsigned long value)
 {
-    return _h2d(HPyLong_FromUnsignedLong(get_info(ctx)->original_ctx, value));
+    return DHPy_wrap(ctx, HPyLong_FromUnsignedLong(get_info(ctx)->original_ctx, value));
 }
 
 DHPy debug_ctx_Long_FromLongLong(HPyContext ctx, long long v)
 {
-    return _h2d(HPyLong_FromLongLong(get_info(ctx)->original_ctx, v));
+    return DHPy_wrap(ctx, HPyLong_FromLongLong(get_info(ctx)->original_ctx, v));
 }
 
 DHPy debug_ctx_Long_FromUnsignedLongLong(HPyContext ctx, unsigned long long v)
 {
-    return _h2d(HPyLong_FromUnsignedLongLong(get_info(ctx)->original_ctx, v));
+    return DHPy_wrap(ctx, HPyLong_FromUnsignedLongLong(get_info(ctx)->original_ctx, v));
 }
 
 DHPy debug_ctx_Long_FromSize_t(HPyContext ctx, size_t value)
 {
-    return _h2d(HPyLong_FromSize_t(get_info(ctx)->original_ctx, value));
+    return DHPy_wrap(ctx, HPyLong_FromSize_t(get_info(ctx)->original_ctx, value));
 }
 
 DHPy debug_ctx_Long_FromSsize_t(HPyContext ctx, HPy_ssize_t value)
 {
-    return _h2d(HPyLong_FromSsize_t(get_info(ctx)->original_ctx, value));
+    return DHPy_wrap(ctx, HPyLong_FromSsize_t(get_info(ctx)->original_ctx, value));
 }
 
 long debug_ctx_Long_AsLong(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsLong(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsLong(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 unsigned long debug_ctx_Long_AsUnsignedLong(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLong(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsUnsignedLong(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 unsigned long debug_ctx_Long_AsUnsignedLongMask(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLongMask(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsUnsignedLongMask(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 long long debug_ctx_Long_AsLongLong(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsLongLong(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsLongLong(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 unsigned long long debug_ctx_Long_AsUnsignedLongLong(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLongLong(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsUnsignedLongLong(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 unsigned long long debug_ctx_Long_AsUnsignedLongLongMask(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLongLongMask(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsUnsignedLongLongMask(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 size_t debug_ctx_Long_AsSize_t(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsSize_t(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsSize_t(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 HPy_ssize_t debug_ctx_Long_AsSsize_t(HPyContext ctx, DHPy h)
 {
-    return HPyLong_AsSsize_t(get_info(ctx)->original_ctx, h->h);
+    return HPyLong_AsSsize_t(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Float_FromDouble(HPyContext ctx, double v)
 {
-    return _h2d(HPyFloat_FromDouble(get_info(ctx)->original_ctx, v));
+    return DHPy_wrap(ctx, HPyFloat_FromDouble(get_info(ctx)->original_ctx, v));
 }
 
 double debug_ctx_Float_AsDouble(HPyContext ctx, DHPy h)
 {
-    return HPyFloat_AsDouble(get_info(ctx)->original_ctx, h->h);
+    return HPyFloat_AsDouble(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 HPy_ssize_t debug_ctx_Length(HPyContext ctx, DHPy h)
 {
-    return HPy_Length(get_info(ctx)->original_ctx, h->h);
+    return HPy_Length(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 int debug_ctx_Number_Check(HPyContext ctx, DHPy h)
 {
-    return HPyNumber_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyNumber_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Add(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Add(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Add(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Subtract(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Subtract(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Subtract(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Multiply(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Multiply(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Multiply(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_MatrixMultiply(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_MatrixMultiply(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_MatrixMultiply(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_FloorDivide(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_FloorDivide(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_FloorDivide(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_TrueDivide(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_TrueDivide(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_TrueDivide(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Remainder(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Remainder(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Remainder(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Divmod(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Divmod(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Divmod(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Power(HPyContext ctx, DHPy h1, DHPy h2, DHPy h3)
 {
-    return _h2d(HPy_Power(get_info(ctx)->original_ctx, h1->h, h2->h, h3->h));
+    return DHPy_wrap(ctx, HPy_Power(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2), DHPy_unwrap(h3)));
 }
 
 DHPy debug_ctx_Negative(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Negative(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Negative(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_Positive(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Positive(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Positive(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_Absolute(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Absolute(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Absolute(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_Invert(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Invert(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Invert(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_Lshift(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Lshift(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Lshift(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Rshift(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Rshift(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Rshift(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_And(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_And(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_And(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Xor(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Xor(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Xor(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Or(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_Or(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_Or(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_Index(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Index(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Index(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_Long(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Long(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Long(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_Float(HPyContext ctx, DHPy h1)
 {
-    return _h2d(HPy_Float(get_info(ctx)->original_ctx, h1->h));
+    return DHPy_wrap(ctx, HPy_Float(get_info(ctx)->original_ctx, DHPy_unwrap(h1)));
 }
 
 DHPy debug_ctx_InPlaceAdd(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceAdd(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceAdd(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceSubtract(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceSubtract(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceSubtract(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceMultiply(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceMultiply(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceMultiply(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceMatrixMultiply(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceMatrixMultiply(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceMatrixMultiply(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceFloorDivide(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceFloorDivide(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceFloorDivide(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceTrueDivide(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceTrueDivide(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceTrueDivide(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceRemainder(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceRemainder(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceRemainder(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlacePower(HPyContext ctx, DHPy h1, DHPy h2, DHPy h3)
 {
-    return _h2d(HPy_InPlacePower(get_info(ctx)->original_ctx, h1->h, h2->h, h3->h));
+    return DHPy_wrap(ctx, HPy_InPlacePower(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2), DHPy_unwrap(h3)));
 }
 
 DHPy debug_ctx_InPlaceLshift(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceLshift(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceLshift(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceRshift(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceRshift(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceRshift(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceAnd(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceAnd(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceAnd(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceXor(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceXor(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceXor(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 DHPy debug_ctx_InPlaceOr(HPyContext ctx, DHPy h1, DHPy h2)
 {
-    return _h2d(HPy_InPlaceOr(get_info(ctx)->original_ctx, h1->h, h2->h));
+    return DHPy_wrap(ctx, HPy_InPlaceOr(get_info(ctx)->original_ctx, DHPy_unwrap(h1), DHPy_unwrap(h2)));
 }
 
 int debug_ctx_Callable_Check(HPyContext ctx, DHPy h)
 {
-    return HPyCallable_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyCallable_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_CallTupleDict(HPyContext ctx, DHPy callable, DHPy args, DHPy kw)
 {
-    return _h2d(HPy_CallTupleDict(get_info(ctx)->original_ctx, callable->h, args->h, kw->h));
+    return DHPy_wrap(ctx, HPy_CallTupleDict(get_info(ctx)->original_ctx, DHPy_unwrap(callable), DHPy_unwrap(args), DHPy_unwrap(kw)));
 }
 
 void debug_ctx_FatalError(HPyContext ctx, const char *message)
@@ -304,12 +304,12 @@ void debug_ctx_FatalError(HPyContext ctx, const char *message)
 
 void debug_ctx_Err_SetString(HPyContext ctx, DHPy h_type, const char *message)
 {
-    HPyErr_SetString(get_info(ctx)->original_ctx, h_type->h, message);
+    HPyErr_SetString(get_info(ctx)->original_ctx, DHPy_unwrap(h_type), message);
 }
 
 void debug_ctx_Err_SetObject(HPyContext ctx, DHPy h_type, DHPy h_value)
 {
-    HPyErr_SetObject(get_info(ctx)->original_ctx, h_type->h, h_value->h);
+    HPyErr_SetObject(get_info(ctx)->original_ctx, DHPy_unwrap(h_type), DHPy_unwrap(h_value));
 }
 
 int debug_ctx_Err_Occurred(HPyContext ctx)
@@ -319,7 +319,7 @@ int debug_ctx_Err_Occurred(HPyContext ctx)
 
 DHPy debug_ctx_Err_NoMemory(HPyContext ctx)
 {
-    return _h2d(HPyErr_NoMemory(get_info(ctx)->original_ctx));
+    return DHPy_wrap(ctx, HPyErr_NoMemory(get_info(ctx)->original_ctx));
 }
 
 void debug_ctx_Err_Clear(HPyContext ctx)
@@ -329,222 +329,222 @@ void debug_ctx_Err_Clear(HPyContext ctx)
 
 int debug_ctx_IsTrue(HPyContext ctx, DHPy h)
 {
-    return HPy_IsTrue(get_info(ctx)->original_ctx, h->h);
+    return HPy_IsTrue(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *spec, HPyType_SpecParam *params)
 {
-    return _h2d(HPyType_FromSpec(get_info(ctx)->original_ctx, spec, params));
+    return DHPy_wrap(ctx, HPyType_FromSpec(get_info(ctx)->original_ctx, spec, params));
 }
 
 DHPy debug_ctx_Type_GenericNew(HPyContext ctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw)
 {
-    return _h2d(HPyType_GenericNew(get_info(ctx)->original_ctx, type->h, (HPy *)args, nargs, kw->h));
+    return DHPy_wrap(ctx, HPyType_GenericNew(get_info(ctx)->original_ctx, DHPy_unwrap(type), NULL /* TODO */, nargs, DHPy_unwrap(kw)));
 }
 
 DHPy debug_ctx_GetAttr(HPyContext ctx, DHPy obj, DHPy name)
 {
-    return _h2d(HPy_GetAttr(get_info(ctx)->original_ctx, obj->h, name->h));
+    return DHPy_wrap(ctx, HPy_GetAttr(get_info(ctx)->original_ctx, DHPy_unwrap(obj), DHPy_unwrap(name)));
 }
 
 DHPy debug_ctx_GetAttr_s(HPyContext ctx, DHPy obj, const char *name)
 {
-    return _h2d(HPy_GetAttr_s(get_info(ctx)->original_ctx, obj->h, name));
+    return DHPy_wrap(ctx, HPy_GetAttr_s(get_info(ctx)->original_ctx, DHPy_unwrap(obj), name));
 }
 
 int debug_ctx_HasAttr(HPyContext ctx, DHPy obj, DHPy name)
 {
-    return HPy_HasAttr(get_info(ctx)->original_ctx, obj->h, name->h);
+    return HPy_HasAttr(get_info(ctx)->original_ctx, DHPy_unwrap(obj), DHPy_unwrap(name));
 }
 
 int debug_ctx_HasAttr_s(HPyContext ctx, DHPy obj, const char *name)
 {
-    return HPy_HasAttr_s(get_info(ctx)->original_ctx, obj->h, name);
+    return HPy_HasAttr_s(get_info(ctx)->original_ctx, DHPy_unwrap(obj), name);
 }
 
 int debug_ctx_SetAttr(HPyContext ctx, DHPy obj, DHPy name, DHPy value)
 {
-    return HPy_SetAttr(get_info(ctx)->original_ctx, obj->h, name->h, value->h);
+    return HPy_SetAttr(get_info(ctx)->original_ctx, DHPy_unwrap(obj), DHPy_unwrap(name), DHPy_unwrap(value));
 }
 
 int debug_ctx_SetAttr_s(HPyContext ctx, DHPy obj, const char *name, DHPy value)
 {
-    return HPy_SetAttr_s(get_info(ctx)->original_ctx, obj->h, name, value->h);
+    return HPy_SetAttr_s(get_info(ctx)->original_ctx, DHPy_unwrap(obj), name, DHPy_unwrap(value));
 }
 
 DHPy debug_ctx_GetItem(HPyContext ctx, DHPy obj, DHPy key)
 {
-    return _h2d(HPy_GetItem(get_info(ctx)->original_ctx, obj->h, key->h));
+    return DHPy_wrap(ctx, HPy_GetItem(get_info(ctx)->original_ctx, DHPy_unwrap(obj), DHPy_unwrap(key)));
 }
 
 DHPy debug_ctx_GetItem_i(HPyContext ctx, DHPy obj, HPy_ssize_t idx)
 {
-    return _h2d(HPy_GetItem_i(get_info(ctx)->original_ctx, obj->h, idx));
+    return DHPy_wrap(ctx, HPy_GetItem_i(get_info(ctx)->original_ctx, DHPy_unwrap(obj), idx));
 }
 
 DHPy debug_ctx_GetItem_s(HPyContext ctx, DHPy obj, const char *key)
 {
-    return _h2d(HPy_GetItem_s(get_info(ctx)->original_ctx, obj->h, key));
+    return DHPy_wrap(ctx, HPy_GetItem_s(get_info(ctx)->original_ctx, DHPy_unwrap(obj), key));
 }
 
 int debug_ctx_SetItem(HPyContext ctx, DHPy obj, DHPy key, DHPy value)
 {
-    return HPy_SetItem(get_info(ctx)->original_ctx, obj->h, key->h, value->h);
+    return HPy_SetItem(get_info(ctx)->original_ctx, DHPy_unwrap(obj), DHPy_unwrap(key), DHPy_unwrap(value));
 }
 
 int debug_ctx_SetItem_i(HPyContext ctx, DHPy obj, HPy_ssize_t idx, DHPy value)
 {
-    return HPy_SetItem_i(get_info(ctx)->original_ctx, obj->h, idx, value->h);
+    return HPy_SetItem_i(get_info(ctx)->original_ctx, DHPy_unwrap(obj), idx, DHPy_unwrap(value));
 }
 
 int debug_ctx_SetItem_s(HPyContext ctx, DHPy obj, const char *key, DHPy value)
 {
-    return HPy_SetItem_s(get_info(ctx)->original_ctx, obj->h, key, value->h);
+    return HPy_SetItem_s(get_info(ctx)->original_ctx, DHPy_unwrap(obj), key, DHPy_unwrap(value));
 }
 
 void *debug_ctx_Cast(HPyContext ctx, DHPy h)
 {
-    return _HPy_Cast(get_info(ctx)->original_ctx, h->h);
+    return _HPy_Cast(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_New(HPyContext ctx, DHPy h_type, void **data)
 {
-    return _h2d(_HPy_New(get_info(ctx)->original_ctx, h_type->h, data));
+    return DHPy_wrap(ctx, _HPy_New(get_info(ctx)->original_ctx, DHPy_unwrap(h_type), data));
 }
 
 DHPy debug_ctx_Repr(HPyContext ctx, DHPy obj)
 {
-    return _h2d(HPy_Repr(get_info(ctx)->original_ctx, obj->h));
+    return DHPy_wrap(ctx, HPy_Repr(get_info(ctx)->original_ctx, DHPy_unwrap(obj)));
 }
 
 DHPy debug_ctx_Str(HPyContext ctx, DHPy obj)
 {
-    return _h2d(HPy_Str(get_info(ctx)->original_ctx, obj->h));
+    return DHPy_wrap(ctx, HPy_Str(get_info(ctx)->original_ctx, DHPy_unwrap(obj)));
 }
 
 DHPy debug_ctx_ASCII(HPyContext ctx, DHPy obj)
 {
-    return _h2d(HPy_ASCII(get_info(ctx)->original_ctx, obj->h));
+    return DHPy_wrap(ctx, HPy_ASCII(get_info(ctx)->original_ctx, DHPy_unwrap(obj)));
 }
 
 DHPy debug_ctx_Bytes(HPyContext ctx, DHPy obj)
 {
-    return _h2d(HPy_Bytes(get_info(ctx)->original_ctx, obj->h));
+    return DHPy_wrap(ctx, HPy_Bytes(get_info(ctx)->original_ctx, DHPy_unwrap(obj)));
 }
 
 DHPy debug_ctx_RichCompare(HPyContext ctx, DHPy v, DHPy w, int op)
 {
-    return _h2d(HPy_RichCompare(get_info(ctx)->original_ctx, v->h, w->h, op));
+    return DHPy_wrap(ctx, HPy_RichCompare(get_info(ctx)->original_ctx, DHPy_unwrap(v), DHPy_unwrap(w), op));
 }
 
 int debug_ctx_RichCompareBool(HPyContext ctx, DHPy v, DHPy w, int op)
 {
-    return HPy_RichCompareBool(get_info(ctx)->original_ctx, v->h, w->h, op);
+    return HPy_RichCompareBool(get_info(ctx)->original_ctx, DHPy_unwrap(v), DHPy_unwrap(w), op);
 }
 
 HPy_hash_t debug_ctx_Hash(HPyContext ctx, DHPy obj)
 {
-    return HPy_Hash(get_info(ctx)->original_ctx, obj->h);
+    return HPy_Hash(get_info(ctx)->original_ctx, DHPy_unwrap(obj));
 }
 
 int debug_ctx_Bytes_Check(HPyContext ctx, DHPy h)
 {
-    return HPyBytes_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyBytes_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 HPy_ssize_t debug_ctx_Bytes_Size(HPyContext ctx, DHPy h)
 {
-    return HPyBytes_Size(get_info(ctx)->original_ctx, h->h);
+    return HPyBytes_Size(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 HPy_ssize_t debug_ctx_Bytes_GET_SIZE(HPyContext ctx, DHPy h)
 {
-    return HPyBytes_GET_SIZE(get_info(ctx)->original_ctx, h->h);
+    return HPyBytes_GET_SIZE(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 char *debug_ctx_Bytes_AsString(HPyContext ctx, DHPy h)
 {
-    return HPyBytes_AsString(get_info(ctx)->original_ctx, h->h);
+    return HPyBytes_AsString(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 char *debug_ctx_Bytes_AS_STRING(HPyContext ctx, DHPy h)
 {
-    return HPyBytes_AS_STRING(get_info(ctx)->original_ctx, h->h);
+    return HPyBytes_AS_STRING(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Bytes_FromString(HPyContext ctx, const char *v)
 {
-    return _h2d(HPyBytes_FromString(get_info(ctx)->original_ctx, v));
+    return DHPy_wrap(ctx, HPyBytes_FromString(get_info(ctx)->original_ctx, v));
 }
 
 DHPy debug_ctx_Bytes_FromStringAndSize(HPyContext ctx, const char *v, HPy_ssize_t len)
 {
-    return _h2d(HPyBytes_FromStringAndSize(get_info(ctx)->original_ctx, v, len));
+    return DHPy_wrap(ctx, HPyBytes_FromStringAndSize(get_info(ctx)->original_ctx, v, len));
 }
 
 DHPy debug_ctx_Unicode_FromString(HPyContext ctx, const char *utf8)
 {
-    return _h2d(HPyUnicode_FromString(get_info(ctx)->original_ctx, utf8));
+    return DHPy_wrap(ctx, HPyUnicode_FromString(get_info(ctx)->original_ctx, utf8));
 }
 
 int debug_ctx_Unicode_Check(HPyContext ctx, DHPy h)
 {
-    return HPyUnicode_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyUnicode_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Unicode_AsUTF8String(HPyContext ctx, DHPy h)
 {
-    return _h2d(HPyUnicode_AsUTF8String(get_info(ctx)->original_ctx, h->h));
+    return DHPy_wrap(ctx, HPyUnicode_AsUTF8String(get_info(ctx)->original_ctx, DHPy_unwrap(h)));
 }
 
 DHPy debug_ctx_Unicode_FromWideChar(HPyContext ctx, const wchar_t *w, HPy_ssize_t size)
 {
-    return _h2d(HPyUnicode_FromWideChar(get_info(ctx)->original_ctx, w, size));
+    return DHPy_wrap(ctx, HPyUnicode_FromWideChar(get_info(ctx)->original_ctx, w, size));
 }
 
 int debug_ctx_List_Check(HPyContext ctx, DHPy h)
 {
-    return HPyList_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyList_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_List_New(HPyContext ctx, HPy_ssize_t len)
 {
-    return _h2d(HPyList_New(get_info(ctx)->original_ctx, len));
+    return DHPy_wrap(ctx, HPyList_New(get_info(ctx)->original_ctx, len));
 }
 
 int debug_ctx_List_Append(HPyContext ctx, DHPy h_list, DHPy h_item)
 {
-    return HPyList_Append(get_info(ctx)->original_ctx, h_list->h, h_item->h);
+    return HPyList_Append(get_info(ctx)->original_ctx, DHPy_unwrap(h_list), DHPy_unwrap(h_item));
 }
 
 int debug_ctx_Dict_Check(HPyContext ctx, DHPy h)
 {
-    return HPyDict_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyDict_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Dict_New(HPyContext ctx)
 {
-    return _h2d(HPyDict_New(get_info(ctx)->original_ctx));
+    return DHPy_wrap(ctx, HPyDict_New(get_info(ctx)->original_ctx));
 }
 
 int debug_ctx_Tuple_Check(HPyContext ctx, DHPy h)
 {
-    return HPyTuple_Check(get_info(ctx)->original_ctx, h->h);
+    return HPyTuple_Check(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext ctx, DHPy items[], HPy_ssize_t n)
 {
-    return _h2d(HPyTuple_FromArray(get_info(ctx)->original_ctx, (HPy *)items, n));
+    return DHPy_wrap(ctx, HPyTuple_FromArray(get_info(ctx)->original_ctx, NULL /* TODO */, n));
 }
 
 DHPy debug_ctx_FromPyObject(HPyContext ctx, cpy_PyObject *obj)
 {
-    return _h2d(HPy_FromPyObject(get_info(ctx)->original_ctx, obj));
+    return DHPy_wrap(ctx, HPy_FromPyObject(get_info(ctx)->original_ctx, obj));
 }
 
 cpy_PyObject *debug_ctx_AsPyObject(HPyContext ctx, DHPy h)
 {
-    return HPy_AsPyObject(get_info(ctx)->original_ctx, h->h);
+    return HPy_AsPyObject(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
 void debug_ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, cpy_PyObject *self)
@@ -559,12 +559,12 @@ HPyListBuilder debug_ctx_ListBuilder_New(HPyContext ctx, HPy_ssize_t initial_siz
 
 void debug_ctx_ListBuilder_Set(HPyContext ctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item)
 {
-    HPyListBuilder_Set(get_info(ctx)->original_ctx, builder, index, h_item->h);
+    HPyListBuilder_Set(get_info(ctx)->original_ctx, builder, index, DHPy_unwrap(h_item));
 }
 
 DHPy debug_ctx_ListBuilder_Build(HPyContext ctx, HPyListBuilder builder)
 {
-    return _h2d(HPyListBuilder_Build(get_info(ctx)->original_ctx, builder));
+    return DHPy_wrap(ctx, HPyListBuilder_Build(get_info(ctx)->original_ctx, builder));
 }
 
 void debug_ctx_ListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder)
@@ -579,12 +579,12 @@ HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext ctx, HPy_ssize_t initial_s
 
 void debug_ctx_TupleBuilder_Set(HPyContext ctx, HPyTupleBuilder builder, HPy_ssize_t index, DHPy h_item)
 {
-    HPyTupleBuilder_Set(get_info(ctx)->original_ctx, builder, index, h_item->h);
+    HPyTupleBuilder_Set(get_info(ctx)->original_ctx, builder, index, DHPy_unwrap(h_item));
 }
 
 DHPy debug_ctx_TupleBuilder_Build(HPyContext ctx, HPyTupleBuilder builder)
 {
-    return _h2d(HPyTupleBuilder_Build(get_info(ctx)->original_ctx, builder));
+    return DHPy_wrap(ctx, HPyTupleBuilder_Build(get_info(ctx)->original_ctx, builder));
 }
 
 void debug_ctx_TupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder)
@@ -599,7 +599,7 @@ HPyTracker debug_ctx_Tracker_New(HPyContext ctx, HPy_ssize_t size)
 
 int debug_ctx_Tracker_Add(HPyContext ctx, HPyTracker ht, DHPy h)
 {
-    return HPyTracker_Add(get_info(ctx)->original_ctx, ht, h->h);
+    return HPyTracker_Add(get_info(ctx)->original_ctx, ht, DHPy_unwrap(h));
 }
 
 void debug_ctx_Tracker_ForgetAll(HPyContext ctx, HPyTracker ht)
@@ -614,6 +614,6 @@ void debug_ctx_Tracker_Close(HPyContext ctx, HPyTracker ht)
 
 void debug_ctx_Dump(HPyContext ctx, DHPy h)
 {
-    _HPy_Dump(get_info(ctx)->original_ctx, h->h);
+    _HPy_Dump(get_info(ctx)->original_ctx, DHPy_unwrap(h));
 }
 
