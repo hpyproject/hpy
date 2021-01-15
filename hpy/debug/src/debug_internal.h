@@ -61,7 +61,7 @@ static inline UHPy DHPy_unwrap(DHPy dh) {
 
 typedef struct {
     long magic_number; // used just for sanity checks
-    HPyContext original_ctx;
+    HPyContext uctx;
     DebugHandle *open_handles;   // linked list
     DebugHandle *closed_handles; // linked list
 } HPyDebugInfo;

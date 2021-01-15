@@ -5,7 +5,7 @@
 
 static HPyDebugInfo debug_info = {
     .magic_number = HPY_DEBUG_MAGIC,
-    .original_ctx = NULL,
+    .uctx = NULL,
 };
 
 
@@ -20,26 +20,26 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
     abort();
 }
 
-// NOTE: at the moment this function assumes that original_ctx is always the
+// NOTE: at the moment this function assumes that uctx is always the
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
 // debug wrapper for each of them.
-static void debug_ctx_init(HPyContext original_ctx)
+static void debug_ctx_init(HPyContext uctx)
 {
     if (g_debug_ctx._private != NULL) {
         // already initialized
-        assert(get_info(&g_debug_ctx)->original_ctx == original_ctx); // sanity check
+        assert(get_info(&g_debug_ctx)->uctx == uctx); // sanity check
         return;
     }
 
     // initialize debug_info
-    debug_info.original_ctx = original_ctx;
+    debug_info.uctx = uctx;
     debug_info.open_handles = NULL;
     debug_info.closed_handles = NULL;
     g_debug_ctx._private = &debug_info;
 
     // initialze ctx->h_None, etc.
-    debug_init_prebuilt_handles(&g_debug_ctx, original_ctx);
+    debug_init_prebuilt_handles(&g_debug_ctx, uctx);
 
     /* CallRealFunctionFromTrampoline is special, since it is responsible to
        retrieve and pass the appropriate context to the HPy functions on
@@ -63,14 +63,14 @@ static void debug_ctx_init(HPyContext original_ctx)
           the HPy func.
 
        5. So, the default implementation does exactly what we want! Let's just
-          copy it from original_ctx
+          copy it from uctx
     */
-    g_debug_ctx.ctx_CallRealFunctionFromTrampoline = original_ctx->ctx_CallRealFunctionFromTrampoline;
+    g_debug_ctx.ctx_CallRealFunctionFromTrampoline = uctx->ctx_CallRealFunctionFromTrampoline;
 }
 
-HPyContext hpy_debug_get_ctx(HPyContext original_ctx)
+HPyContext hpy_debug_get_ctx(HPyContext uctx)
 {
-    debug_ctx_init(original_ctx);
+    debug_ctx_init(uctx);
     return &g_debug_ctx;
 }
 

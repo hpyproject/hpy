@@ -50,11 +50,11 @@ class autogen_debug_ctx_h(AutoGenFile):
         return '\n'.join(lines)
 
     def generate_init_prebuilt_handles(self, w):
-        w('static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext original_ctx)')
+        w('static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext uctx)')
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    ctx->{name} = DHPy_wrap(ctx, original_ctx->{name});')
+            w(f'    ctx->{name} = DHPy_wrap(ctx, uctx->{name});')
         w('}')
 
 
@@ -90,7 +90,7 @@ class autogen_debug_wrappers(AutoGenFile):
             lst = []
             for p in node.type.args.params:
                 if p.name == 'ctx':
-                    lst.append('get_info(ctx)->original_ctx')
+                    lst.append('get_info(ctx)->uctx')
                 elif toC(p.type) == 'DHPy':
                     lst.append('DHPy_unwrap(%s)' % p.name)
                 elif toC(p.type) in ('DHPy *', 'DHPy []'):
