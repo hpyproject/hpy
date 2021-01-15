@@ -25,6 +25,16 @@
 #include "debug_internal.h"
 #include "handles.h" // for _py2h and _h2py
 
+static inline DHPy _py2dh(HPyContext ctx, PyObject *obj)
+{
+    return DHPy_wrap(ctx, _py2h(obj));
+}
+
+static inline PyObject *_dh2py(DHPy dh)
+{
+    return _h2py(DHPy_unwrap(dh));
+}
+
 void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
                                               HPyFunc_Signature sig,
                                               void *func, void *args)
@@ -33,13 +43,20 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
     case HPyFunc_NOARGS: {
         HPyFunc_noargs f = (HPyFunc_noargs)func;
         _HPyFunc_args_NOARGS *a = (_HPyFunc_args_NOARGS*)args;
-        DHPy dh_self = DHPy_wrap(ctx, _py2h(a->self));
+        DHPy dh_self = _py2dh(ctx, a->self);
         DHPy dh_result = f(ctx, dh_self);
-        a->result = _h2py(DHPy_unwrap(dh_result));
+        a->result = _dh2py(dh_result);
+        // XXX: close dh_self
         return;
     }
     case HPyFunc_O: {
-        abort();
+        HPyFunc_o f = (HPyFunc_o)func;
+        _HPyFunc_args_O *a = (_HPyFunc_args_O*)args;
+        DHPy dh_self = _py2dh(ctx, a->self);
+        DHPy dh_arg = _py2dh(ctx, a->arg);
+        a->result = _dh2py(f(ctx, dh_self, dh_arg));
+        // XXX: close dh_self and dh_arg
+        return;
     }
     case HPyFunc_VARARGS: {
         abort();
