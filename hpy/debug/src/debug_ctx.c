@@ -8,18 +8,6 @@ static HPyDebugInfo debug_info = {
     .uctx = NULL,
 };
 
-
-void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
-                                              HPyFunc_Signature sig,
-                                              void *func, void *args)
-{
-    fprintf(stderr,
-            "FATAL ERROR! debug_ctx_CallRealFunctionFromTrampoline should never be "
-            "called! This probably means that the debug_ctx was not initialized "
-            "properly\n");
-    abort();
-}
-
 // NOTE: at the moment this function assumes that uctx is always the
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
@@ -40,32 +28,6 @@ static void debug_ctx_init(HPyContext uctx)
 
     // initialze ctx->h_None, etc.
     debug_init_prebuilt_handles(&g_debug_ctx, uctx);
-
-    /* CallRealFunctionFromTrampoline is special, since it is responsible to
-       retrieve and pass the appropriate context to the HPy functions on
-       CPython. Note that this is used ONLY on CPython, other implementations
-       should be able to call HPy functions natively without any need for
-       trampolines.
-
-       Quick recap of what happens:
-
-       1. HPy_MODINIT defines a per-module _ctx_for_trampolines
-
-       2. universal.load(..., debug=True) passes g_debug_ctx to MODINIT, which
-          stores it in _ctx_for_trampolines
-
-       3. when CPython calls an HPy function, it goes through the trampoline
-          which calls CallRealFunctionFromTrampoline
-
-       4. the default implementation retrieves the ctx from
-          _ctx_for_trampolines (which will contain either g_universal_ctx or
-          g_debug_ctx depending on how the module was loaded) and passes it to
-          the HPy func.
-
-       5. So, the default implementation does exactly what we want! Let's just
-          copy it from uctx
-    */
-    g_debug_ctx.ctx_CallRealFunctionFromTrampoline = uctx->ctx_CallRealFunctionFromTrampoline;
 }
 
 HPyContext hpy_debug_get_ctx(HPyContext uctx)

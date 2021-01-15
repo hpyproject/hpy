@@ -210,7 +210,7 @@ static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext uctx)
     ctx->h_ListType = DHPy_wrap(ctx, uctx->h_ListType);
 }
 
-static struct _HPyContext_s g_debug_ctx = {
+struct _HPyContext_s g_debug_ctx = {
     .name = "HPy Debug Mode ABI",
     ._private = NULL,
     .ctx_version = 1,
