@@ -116,11 +116,11 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
     }
 
     HPyContext ctx = get_context(debug);
-    HPy mod = ((InitFuncPtr)initfn)(ctx);
-    if (HPy_IsNull(mod))
+    HPy h_mod = ((InitFuncPtr)initfn)(ctx);
+    if (HPy_IsNull(h_mod))
         goto error;
-    PyObject *py_mod = _h2py(mod);
-    // XXX close the handle
+    PyObject *py_mod = HPy_AsPyObject(ctx, h_mod);
+    HPy_Close(ctx, h_mod);
 
     Py_XDECREF(name);
     Py_XDECREF(pathbytes);
