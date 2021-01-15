@@ -25,8 +25,8 @@ def get_debug_wrapper_node(func):
     return newnode
 
 
-class autogen_debug_ctx_h(AutoGenFile):
-    PATH = 'hpy/debug/src/autogen_debug_ctx.h'
+class autogen_debug_ctx_init_h(AutoGenFile):
+    PATH = 'hpy/debug/src/autogen_debug_ctx_init.h'
 
     def generate(self):
         lines = []
@@ -35,27 +35,17 @@ class autogen_debug_ctx_h(AutoGenFile):
         for func in self.api.functions:
             w(toC(get_debug_wrapper_node(func)) + ';')
         w('')
-        self.generate_init_prebuilt_handles(w)
-        # emit a static ctx which uses the various debug_ctx_* functions
-        w('')
-        w('static struct _HPyContext_s g_debug_ctx = {')
-        w('    .name = "HPy Debug Mode ABI",')
-        w('    ._private = NULL,')
-        w('    .ctx_version = 1,')
-        for var in self.api.variables:
-            w('    .%s = HPy_NULL,' % (var.name,))
-        for func in self.api.functions:
-            w('    .%s = &debug_%s,' % (func.ctx_name(), func.ctx_name()))
-        w('};')
-        return '\n'.join(lines)
-
-    def generate_init_prebuilt_handles(self, w):
-        w('static inline void debug_init_prebuilt_handles(HPyContext ctx, HPyContext uctx)')
+        w('static inline void debug_ctx_init_fields(HPyContext dctx, HPyContext uctx)')
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    ctx->{name} = DHPy_wrap(ctx, uctx->{name});')
+            w(f'    dctx->{name} = DHPy_wrap(dctx, uctx->{name});')
+        for func in self.api.functions:
+            name = func.ctx_name()
+            w(f'    dctx->{name} = &debug_{name};')
+
         w('}')
+        return '\n'.join(lines)
 
 
 class autogen_debug_wrappers(AutoGenFile):

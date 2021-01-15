@@ -1,39 +1,43 @@
 #include <string.h>
 #include <stdio.h>
 #include "debug_internal.h"
-#include "autogen_debug_ctx.h"
+#include "autogen_debug_ctx_init.h"
 
-static HPyDebugInfo debug_info = {
-    .magic_number = HPY_DEBUG_MAGIC,
-    .uctx = NULL,
+static struct _HPyContext_s g_debug_ctx = {
+    .name = "HPy Debug Mode ABI",
+    ._private = NULL,
+    .ctx_version = 1,
 };
+
 
 // NOTE: at the moment this function assumes that uctx is always the
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
 // debug wrapper for each of them.
-static void debug_ctx_init(HPyContext uctx)
+static void debug_ctx_init(HPyContext dctx, HPyContext uctx)
 {
-    if (g_debug_ctx._private != NULL) {
+    if (dctx->_private != NULL) {
         // already initialized
-        assert(get_info(&g_debug_ctx)->uctx == uctx); // sanity check
+        assert(get_info(dctx)->uctx == uctx); // sanity check
         return;
     }
-
     // initialize debug_info
-    debug_info.uctx = uctx;
-    debug_info.open_handles = NULL;
-    debug_info.closed_handles = NULL;
-    g_debug_ctx._private = &debug_info;
+    // XXX: currently we never free this malloc
+    HPyDebugInfo *info = malloc(sizeof(HPyDebugInfo));
+    info->magic_number = HPY_DEBUG_MAGIC;
+    info->uctx = uctx;
+    info->open_handles = NULL;
+    info->closed_handles = NULL;
+    dctx->_private = info;
 
-    // initialze ctx->h_None, etc.
-    debug_init_prebuilt_handles(&g_debug_ctx, uctx);
+    debug_ctx_init_fields(dctx, uctx);
 }
 
 HPyContext hpy_debug_get_ctx(HPyContext uctx)
 {
-    debug_ctx_init(uctx);
-    return &g_debug_ctx;
+    HPyContext dctx = &g_debug_ctx;
+    debug_ctx_init(dctx, uctx);
+    return dctx;
 }
 
 // this function is supposed to be called from gdb: it tries to determine
