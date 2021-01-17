@@ -5,12 +5,12 @@
 
 #include "debug_internal.h"
 
-void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
+void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
                                               HPyFunc_Signature sig,
                                               void *func, void *args)
 {
-    HPyContext original_ctx = get_info(ctx)->original_ctx;
-    HPy_FatalError(original_ctx,
+    HPyContext uctx = get_info(dctx)->uctx;
+    HPy_FatalError(uctx,
                    "Something is very wrong! _HPy_CallRealFunctionFromTrampoline() "
                    "should be used only by the CPython version of hpy.universal");
 }

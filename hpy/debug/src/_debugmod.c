@@ -66,9 +66,9 @@ static HPyModuleDef moduledef = {
 
 
 HPy_MODINIT(_debug)
-static HPy init__debug_impl(HPyContext ctx)
+static HPy init__debug_impl(HPyContext uctx)
 {
-    HPy m = HPyModule_Create(ctx, &moduledef);
+    HPy m = HPyModule_Create(uctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
     return m;

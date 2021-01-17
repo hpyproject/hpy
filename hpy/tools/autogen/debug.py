@@ -11,6 +11,11 @@ class HPy_2_DHPy_Visitor(c_ast.NodeVisitor):
         if node.names == ['HPy']:
             node.names = ['DHPy']
 
+    def visit_TypeDecl(self, node):
+        if node.declname == 'ctx':
+            node.declname = 'dctx'
+        self.generic_visit(node)
+
 def funcnode_with_new_name(node, name):
     newnode = deepcopy(node)
     typedecl = find_typedecl(newnode)
@@ -81,7 +86,7 @@ class autogen_debug_wrappers(AutoGenFile):
             lst = []
             for p in node.type.args.params:
                 if p.name == 'ctx':
-                    lst.append('get_info(ctx)->uctx')
+                    lst.append('get_info(dctx)->uctx')
                 elif toC(p.type) == 'DHPy':
                     lst.append('DHPy_unwrap(%s)' % p.name)
                 elif toC(p.type) in ('DHPy *', 'DHPy []'):
@@ -99,7 +104,7 @@ class autogen_debug_wrappers(AutoGenFile):
         if rettype == 'void':
             w(f'    {func.name}({params});')
         elif rettype == 'DHPy':
-            w(f'    return DHPy_wrap(ctx, {func.name}({params}));')
+            w(f'    return DHPy_wrap(dctx, {func.name}({params}));')
         else:
             w(f'    return {func.name}({params});')
         w('}')

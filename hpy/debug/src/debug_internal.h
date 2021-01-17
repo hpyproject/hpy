@@ -77,8 +77,8 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
     return (DHPy){(HPy_ssize_t)handle};
 }
 
-DHPy DHPy_wrap(HPyContext ctx, UHPy uh);
-void DHPy_close(HPyContext ctx, DHPy dh);
+DHPy DHPy_wrap(HPyContext dctx, UHPy uh);
+void DHPy_close(HPyContext dctx, DHPy dh);
 void DHPy_free(DHPy dh);
 
 static inline UHPy DHPy_unwrap(DHPy dh) {
@@ -97,9 +97,9 @@ typedef struct {
     //DebugHandle *closed_handles; // linked list
 } HPyDebugInfo;
 
-static inline HPyDebugInfo *get_info(HPyContext ctx)
+static inline HPyDebugInfo *get_info(HPyContext dctx)
 {
-    HPyDebugInfo *info = (HPyDebugInfo*)ctx->_private;
+    HPyDebugInfo *info = (HPyDebugInfo*)dctx->_private;
     assert(info->magic_number == HPY_DEBUG_MAGIC); // sanity check
     return info;
 }

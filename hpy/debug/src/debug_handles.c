@@ -1,11 +1,11 @@
 #include "debug_internal.h"
 
-DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
+DHPy DHPy_wrap(HPyContext dctx, UHPy uh)
 {
     UHPy_sanity_check(uh);
     if (HPy_IsNull(uh))
         return HPy_NULL;
-    HPyDebugInfo *info = get_info(ctx);
+    HPyDebugInfo *info = get_info(dctx);
     DebugHandle *handle = malloc(sizeof(DebugHandle));
     handle->uh = uh;
     handle->generation = info->current_generation;
@@ -17,12 +17,12 @@ DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
     return as_DHPy(handle);
 }
 
-void DHPy_close(HPyContext ctx, DHPy dh)
+void DHPy_close(HPyContext dctx, DHPy dh)
 {
     DHPy_sanity_check(dh);
     if (HPy_IsNull(dh))
         return;
-    HPyDebugInfo *info = get_info(ctx);
+    HPyDebugInfo *info = get_info(dctx);
     DebugHandle *handle = as_DebugHandle(dh);
 
     // remove the handle from the open_handles list
