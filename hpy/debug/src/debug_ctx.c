@@ -33,8 +33,9 @@ static void debug_ctx_init(HPyContext dctx, HPyContext uctx)
     HPyDebugInfo *info = malloc(sizeof(HPyDebugInfo));
     info->magic_number = HPY_DEBUG_MAGIC;
     info->uctx = uctx;
+    info->current_generation = 0;
     info->open_handles = NULL;
-    info->closed_handles = NULL;
+    //info->closed_handles = NULL;
     dctx->_private = info;
 
     debug_ctx_init_fields(dctx, uctx);

@@ -33,6 +33,9 @@
 
    WARNING: both UHPy and DHPy are alias of HPy, so we need to take care of
    not mixing them, because the compiler cannot help.
+
+   Each DebugHandle has a "generation", which is just a int to be able to get
+   only the handles which were created after a certain point.
 */
 
 typedef HPy UHPy;
@@ -40,6 +43,7 @@ typedef HPy DHPy;
 
 typedef struct DebugHandle {
     UHPy uh;
+    long generation;
     struct DebugHandle *prev;
     struct DebugHandle *next;
 } DebugHandle;
@@ -54,6 +58,7 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 
 DHPy DHPy_wrap(HPyContext ctx, UHPy uh);
 void DHPy_close(HPyContext ctx, DHPy dh);
+void DHPy_free(DHPy dh);
 
 static inline UHPy DHPy_unwrap(DHPy dh) {
     return as_DebugHandle(dh)->uh;
@@ -64,6 +69,7 @@ static inline UHPy DHPy_unwrap(DHPy dh) {
 typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext uctx;
+    long current_generation;
     DebugHandle *open_handles;   // linked list
     //DebugHandle *closed_handles; // linked list
 } HPyDebugInfo;

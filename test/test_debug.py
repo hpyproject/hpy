@@ -10,20 +10,24 @@ class TestDebug(HPyTest):
     def hpy_abi(self, request):
         return request.param
 
-    def test_open_handles(self):
+    def test_get_open_handles(self):
         from hpy.universal import _debug
         mod = self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_NOARGS)
-            static HPy leak_impl(HPyContext ctx, HPy self)
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
             {
-                HPyUnicode_FromString(ctx, "hello");
-                HPyUnicode_FromString(ctx, "world");
+                HPy_Dup(ctx, arg); // leak!
                 return HPy_Dup(ctx, ctx->h_None);
             }
             @EXPORT(leak)
             @INIT
         """)
-        n = len(_debug._get_open_handles())
-        mod.leak()
-        leaked_handles = _debug._get_open_handles()[:-n]
-        assert leaked_handles == ['world', 'hello']
+        gen1 = _debug.new_generation()
+        mod.leak('hello')
+        mod.leak('world')
+        gen2 = _debug.new_generation()
+        mod.leak('a younger leak')
+        leaks1 = _debug.get_open_handles(gen1)
+        leaks2 = _debug.get_open_handles(gen2)
+        assert leaks1 == ['a younger leak', 'world', 'hello']
+        assert leaks2 == ['a younger leak']

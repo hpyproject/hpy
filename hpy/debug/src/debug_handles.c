@@ -5,6 +5,7 @@ DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
     HPyDebugInfo *info = get_info(ctx);
     DebugHandle *handle = malloc(sizeof(DebugHandle));
     handle->uh = uh;
+    handle->generation = info->current_generation;
     handle->prev = NULL;
     handle->next = info->open_handles;
     if (info->open_handles)
