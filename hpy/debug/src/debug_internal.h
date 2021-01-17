@@ -61,6 +61,8 @@ void DHPy_close(HPyContext ctx, DHPy dh);
 void DHPy_free(DHPy dh);
 
 static inline UHPy DHPy_unwrap(DHPy dh) {
+    if (HPy_IsNull(dh))
+        return HPy_NULL;
     return as_DebugHandle(dh)->uh;
 }
 

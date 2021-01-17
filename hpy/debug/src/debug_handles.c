@@ -16,6 +16,8 @@ DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
 
 void DHPy_close(HPyContext ctx, DHPy dh)
 {
+    if (HPy_IsNull(dh))
+        return;
     HPyDebugInfo *info = get_info(ctx);
     DebugHandle *handle = as_DebugHandle(dh);
 
