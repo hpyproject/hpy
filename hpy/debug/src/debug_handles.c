@@ -2,6 +2,7 @@
 
 DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
 {
+    UHPy_sanity_check(uh);
     if (HPy_IsNull(uh))
         return HPy_NULL;
     HPyDebugInfo *info = get_info(ctx);
@@ -18,6 +19,7 @@ DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
 
 void DHPy_close(HPyContext ctx, DHPy dh)
 {
+    DHPy_sanity_check(dh);
     if (HPy_IsNull(dh))
         return;
     HPyDebugInfo *info = get_info(ctx);
@@ -38,6 +40,7 @@ void DHPy_close(HPyContext ctx, DHPy dh)
 
 void DHPy_free(DHPy dh)
 {
+    DHPy_sanity_check(dh);
     DebugHandle *handle = as_DebugHandle(dh);
     // this is not strictly necessary, but it increases the chances that you
     // get a clear segfault if you use a freed handle

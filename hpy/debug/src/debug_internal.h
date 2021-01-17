@@ -41,6 +41,26 @@
 typedef HPy UHPy;
 typedef HPy DHPy;
 
+/* Under CPython:
+     - UHPy always end with 1 (see hpy.universal's _py2h and _h2py)
+     - DHPy are pointers, so they always end with 0
+
+   DHPy_sanity_check is a minimal check to ensure that we are not treating a
+   UHPy as a DHPy. Note that DHPy_sanity_check works fine also on HPy_NULL.
+
+   NOTE: UHPy_sanity_check works ONLY with CPython's hpy.universal. If you
+   bundle the debug mode in an alternative Python implementation, you should
+   probably change/override UHPy_sanity_check, possibly with an #ifdef.
+*/
+static inline void DHPy_sanity_check(DHPy dh) {
+    assert( (dh._i & 1) == 0 );
+}
+
+static inline void UHPy_sanity_check(UHPy uh) {
+    if (!HPy_IsNull(uh))
+        assert( (uh._i & 1) == 1 );
+}
+
 typedef struct DebugHandle {
     UHPy uh;
     long generation;
@@ -49,6 +69,7 @@ typedef struct DebugHandle {
 } DebugHandle;
 
 static inline DebugHandle * as_DebugHandle(DHPy dh) {
+    DHPy_sanity_check(dh);
     return (DebugHandle *)dh._i;
 }
 
