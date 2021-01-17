@@ -2,6 +2,8 @@
 
 DHPy DHPy_wrap(HPyContext ctx, UHPy uh)
 {
+    if (HPy_IsNull(uh))
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(ctx);
     DebugHandle *handle = malloc(sizeof(DebugHandle));
     handle->uh = uh;
