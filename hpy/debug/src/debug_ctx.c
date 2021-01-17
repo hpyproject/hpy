@@ -9,6 +9,13 @@ static struct _HPyContext_s g_debug_ctx = {
     .ctx_version = 1,
 };
 
+void debug_ctx_Close(HPyContext ctx, DHPy dh)
+{
+    UHPy uh = DHPy_unwrap(dh);
+    DHPy_close(ctx, dh);
+    HPy_Close(get_info(ctx)->uctx, uh);
+}
+
 
 // NOTE: at the moment this function assumes that uctx is always the
 // same. If/when we migrate to a system in which we can have multiple

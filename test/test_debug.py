@@ -1,27 +1,29 @@
+import pytest
 from .support import HPyTest
 
 
 class TestDebug(HPyTest):
 
-    def test_ctx_name(self, hpy_abi):
-        mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
-            {
-                return HPyUnicode_FromString(ctx, ctx->name);
-            }
+    # these tests are run only with hpy_abi=='debug'. We will probably need to
+    # tweak the approach to make it working with PyPy's apptests
+    @pytest.fixture(params=['debug'])
+    def hpy_abi(self, request):
+        return request.param
 
-            @EXPORT(f)
+    def test_open_handles(self):
+        from hpy.universal import _debug
+        mod = self.make_module("""
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_NOARGS)
+            static HPy leak_impl(HPyContext ctx, HPy self)
+            {
+                HPyUnicode_FromString(ctx, "hello");
+                HPyUnicode_FromString(ctx, "world");
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(leak)
             @INIT
         """)
-        ctx_name = mod.f()
-        if hpy_abi == 'cpython':
-            assert ctx_name == 'HPy CPython ABI'
-        elif hpy_abi == 'universal':
-            # this can be "HPy Universal ABI (CPython backend)" or
-            # "... (PyPy backend)", etc.
-            assert ctx_name.startswith('HPy Universal ABI')
-        elif hpy_abi == 'debug':
-            assert ctx_name.startswith('HPy Debug Mode ABI')
-        else:
-            assert False, 'unexpected hpy_abi: %s' % hpy_abi
+        n = len(_debug._get_open_handles())
+        mod.leak()
+        leaked_handles = _debug._get_open_handles()[:-n]
+        assert leaked_handles == ['world', 'hello']

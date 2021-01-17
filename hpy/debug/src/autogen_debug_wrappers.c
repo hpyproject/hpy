@@ -22,11 +22,6 @@ DHPy debug_ctx_Dup(HPyContext ctx, DHPy h)
     return DHPy_wrap(ctx, HPy_Dup(get_info(ctx)->uctx, DHPy_unwrap(h)));
 }
 
-void debug_ctx_Close(HPyContext ctx, DHPy h)
-{
-    HPy_Close(get_info(ctx)->uctx, DHPy_unwrap(h));
-}
-
 DHPy debug_ctx_Long_FromLong(HPyContext ctx, long value)
 {
     return DHPy_wrap(ctx, HPyLong_FromLong(get_info(ctx)->uctx, value));

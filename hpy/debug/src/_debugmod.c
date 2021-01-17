@@ -1,47 +1,35 @@
 // Python-level interface for the _debug module. Written in HPy itself, the
 // idea is that it should be reusable by other implementations
 
+// NOTE: hpy.debug._debug is loaded using the UNIVERSAL ctx. To make it
+// clearer, we will use "uctx" and "dctx" to distinguish them.
+
 #include "hpy.h"
 #include "debug_internal.h"
 
-/* WARNING: all the functions called _test_* are used only for testing. They
-   are not supposed to be used outside tests */
-
-HPyDef_METH(_test_DHPy_new, "_test_DHPy_new", _test_DHPy_new_impl, HPyFunc_O)
-static HPy _test_DHPy_new_impl(HPyContext ctx, HPy self, HPy arg)
+HPyDef_METH(_get_open_handles, "_get_open_handles", _get_open_handles_impl, HPyFunc_NOARGS)
+static HPy _get_open_handles_impl(HPyContext uctx, HPy self)
 {
-    HPyErr_SetString(ctx, ctx->h_NotImplementedError, "TODO");
-    return HPy_NULL;
-    /*
-    HPyContext debug_ctx = hpy_debug_get_ctx(ctx);
-    HPy h2 = HPy_Dup(ctx, arg);
-    DHPy dh = DHPy_new(debug_ctx, h2);
-    // return the numeric value of the pointer, although it's a bit useless
-    return HPyLong_FromSsize_t(ctx, (HPy_ssize_t)dh);
-    */
-}
+    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
 
-HPyDef_METH(_test_get_open_handles, "_test_get_open_handles", _test_get_open_handles_impl, HPyFunc_NOARGS)
-static HPy _test_get_open_handles_impl(HPyContext ctx, HPy self)
-{
-    HPyErr_SetString(ctx, ctx->h_NotImplementedError, "TODO");
-    return HPy_NULL;
-    /*
-    HPyContext debug_ctx = hpy_debug_get_ctx(ctx);
-    HPyDebugInfo *info = get_info(debug_ctx);
-    HPy hlist = HPyList_New(ctx, 0);
-    DHPy dh = info->open_handles;
-    while (dh != NULL) {
-        HPyList_Append(ctx, hlist, dh->h);
+    UHPy u_result = HPyList_New(uctx, 0);
+    if (HPy_IsNull(u_result))
+        return HPy_NULL;
+
+    DebugHandle *dh = info->open_handles;
+    while(dh != NULL) {
+        if (HPyList_Append(uctx, u_result, dh->uh) == -1) {
+            HPy_Close(uctx, u_result);
+            return HPy_NULL;
+        }
         dh = dh->next;
     }
-    return hlist;
-    */
+    return u_result;
 }
 
 static HPyDef *module_defines[] = {
-    &_test_DHPy_new,
-    &_test_get_open_handles,
+    &_get_open_handles,
     NULL
 };
 

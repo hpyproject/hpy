@@ -40,6 +40,7 @@ typedef HPy DHPy;
 
 typedef struct DebugHandle {
     UHPy uh;
+    struct DebugHandle *prev;
     struct DebugHandle *next;
 } DebugHandle;
 
@@ -52,6 +53,7 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 }
 
 DHPy DHPy_wrap(HPyContext ctx, UHPy uh);
+void DHPy_close(HPyContext ctx, DHPy dh);
 
 static inline UHPy DHPy_unwrap(DHPy dh) {
     return as_DebugHandle(dh)->uh;
@@ -63,7 +65,7 @@ typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext uctx;
     DebugHandle *open_handles;   // linked list
-    DebugHandle *closed_handles; // linked list
+    //DebugHandle *closed_handles; // linked list
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext ctx)

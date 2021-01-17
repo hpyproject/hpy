@@ -53,6 +53,7 @@ class autogen_debug_wrappers(AutoGenFile):
 
     NO_WRAPPER = set([
         '_HPy_CallRealFunctionFromTrampoline',
+        'HPy_Close',
         ])
 
     def generate(self):

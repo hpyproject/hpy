@@ -46,7 +46,8 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
         DHPy dh_self = _py2dh(ctx, a->self);
         DHPy dh_result = f(ctx, dh_self);
         a->result = _dh2py(dh_result);
-        // XXX: close dh_self
+        DHPy_close(ctx, dh_self);
+        DHPy_close(ctx, dh_result);
         return;
     }
     case HPyFunc_O: {
@@ -54,8 +55,11 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
         _HPyFunc_args_O *a = (_HPyFunc_args_O*)args;
         DHPy dh_self = _py2dh(ctx, a->self);
         DHPy dh_arg = _py2dh(ctx, a->arg);
-        a->result = _dh2py(f(ctx, dh_self, dh_arg));
-        // XXX: close dh_self and dh_arg
+        DHPy dh_result = f(ctx, dh_self, dh_arg);
+        a->result = _dh2py(dh_result);
+        DHPy_close(ctx, dh_self);
+        DHPy_close(ctx, dh_arg);
+        DHPy_close(ctx, dh_result);
         return;
     }
     case HPyFunc_VARARGS: {
