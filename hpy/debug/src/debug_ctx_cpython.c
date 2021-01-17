@@ -63,7 +63,20 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext ctx,
         return;
     }
     case HPyFunc_VARARGS: {
-        abort();
+        HPyFunc_varargs f = (HPyFunc_varargs)func;
+        _HPyFunc_args_VARARGS *a = (_HPyFunc_args_VARARGS*)args;
+        DHPy dh_self = _py2dh(ctx, a->self);
+        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
+        DHPy dh_args[nargs * sizeof(DHPy)];
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            dh_args[i] = _py2dh(ctx, PyTuple_GET_ITEM(a->args, i));
+        }
+        a->result = _dh2py(f(ctx, dh_self, dh_args, nargs));
+        DHPy_close(ctx, dh_self);
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            DHPy_close(ctx, dh_args[i]);
+        }
+        return;
     }
     case HPyFunc_KEYWORDS: {
         abort();

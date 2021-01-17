@@ -164,6 +164,21 @@ class TestBasic(HPyTest):
             mod.f(20)
         assert str(exc.value) == 'hello world'
 
+    def test_varargs(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                long a, b;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx, 10*a + b);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(4, 5) == 45
+
     def test_builtin_handles(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
