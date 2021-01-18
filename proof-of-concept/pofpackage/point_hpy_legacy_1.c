@@ -31,8 +31,9 @@ typedef HPyPointObject PyPointObject;
 // handles to HPyPointObject structs. It is not used in this file, but
 // is provided so that methods can start to be ported (see
 // point_hpy_legacy_2.c). HPy_CastLegacy is used because PyObject_HEAD is still
-// present. 
+// present.
 #define HPyPointObject_CAST(ctx, h) ((HPyPointObject*)HPy_CastLegacy(ctx, h))
+// TODO: Use HPyCast_DEFINE_LEGACY(HPyPointObject_Cast, HPyPointObject);
 
 // this is a LEGACY method of Point
 PyObject* Point_norm(PyObject *self)

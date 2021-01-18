@@ -27,6 +27,7 @@ typedef struct {
 // handles to HPyPointObject structs. HPy_Cast is used because
 // PyObject_HEAD is no longer present.
 #define HPyPointObject_CAST(ctx, h) ((HPyPointObject*)HPy_Cast(ctx, h))
+// TODO: Use HPyCast_DEFINE(HPyPointObject_Cast, HPyPointObject);
 
 // an HPy method of Point
 HPyDef_METH(...)
