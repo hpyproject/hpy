@@ -72,7 +72,8 @@ PyObject* dot(PyObject *self, PyObject *args)
 }
 
 
-// Boiler plate for defining the type an
+// Method, type and module definitions. These will be updated to add HPy
+// module support in point_hpy_legacy_1.c.
 
 static PyMethodDef PointMethods[] = {
     {"norm", (PyCFunction)Point_norm, METH_NOARGS, "Distance from origin."},
