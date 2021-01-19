@@ -9,7 +9,9 @@ setup(
         Extension('pof', sources=['pof.c']),
         Extension('pofpackage.foo', sources=['pofpackage/foo.c']),
         Extension('pofpackage.point_hpy_legacy_1',
-                  sources=['pofpackage/point_hpy_legacy_1.c'])
+                  sources=['pofpackage/point_hpy_legacy_1.c']),
+        Extension('pofpackage.point_hpy_legacy_2',
+                  sources=['pofpackage/point_hpy_legacy_2.c']),
     ],
     setup_requires=['hpy.devel'],
 )
