@@ -101,7 +101,7 @@ static HPyDef *point_defines[] = {
 };
 
 static HPyType_Spec Point_Type_spec = {
-    .name = "point_capi.Point",
+    .name = "point_hpy_legacy_1.Point",
     .basicsize = sizeof(PyPointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
