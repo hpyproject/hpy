@@ -77,7 +77,7 @@ PyObject* dot(PyObject *self, PyObject *args)
 }
 
 
-// Method, type and module definitions. In this poring step, the module and
+// Method, type and module definitions. In this porting step, the module and
 // type definitions have been ported to HPy, but the methods themselves
 // remaining legacy methods.
 
