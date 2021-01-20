@@ -12,6 +12,8 @@ setup(
                   sources=['pofpackage/point_hpy_legacy_1.c']),
         Extension('pofpackage.point_hpy_legacy_2',
                   sources=['pofpackage/point_hpy_legacy_2.c']),
+        Extension('pofpackage.point_hpy_final',
+                  sources=['pofpackage/point_hpy_final.c']),
     ],
     setup_requires=['hpy.devel'],
 )
