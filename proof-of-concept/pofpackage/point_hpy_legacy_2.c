@@ -2,7 +2,7 @@
 #include <Python.h>
 #include <hpy.h>
 
-// Porting to HPy, Step 2: Some legacy methods remain
+// Porting to HPy, Step 2: Porting some methods
 //
 // An example of porting a C extension that implements a Point type
 // with a couple of simple methods (a norm and a dot product). It
@@ -48,7 +48,7 @@ int Point_init(PyObject *self, PyObject *args, PyObject *kw)
 }
 
 // an HPy method of Point
-HPyDef_METH(Point_norm, "noargs", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
+HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext ctx, HPy self)
 {
     HPyPointObject *p = HPyPointObject_CAST(ctx, self);
@@ -88,7 +88,7 @@ static PyMethodDef PointMethods[] = {
 
 // Legacy slots (all slots are still legacy slots)
 static PyType_Slot Point_legacy_slots[] = {
-    {Py_tp_doc, "Point (Step 1; All legacy methods)"},
+    {Py_tp_doc, "Point (Step 2; Porting some methods)"},
     {Py_tp_init, Point_init},
     {Py_tp_methods, PointMethods},
     {0, 0}
@@ -123,7 +123,7 @@ static HPyDef *module_defines[] = {
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
     .m_name = "point_hpy_legacy_2",
-    .m_doc = "Point module (Step 2; Some legacy methods remain)",
+    .m_doc = "Point module (Step 2; Porting some methods)",
     .m_size = -1,
     .legacy_methods = PointModuleLegacyMethods,
     .defines = module_defines,
