@@ -54,4 +54,8 @@ typedef struct {
 
 #define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
 
+// XXX: These are dummy implementations and will be replaced before merging!
+#define HPy_CastPure(ctx, h) (_HPy_Cast(ctx, h))
+#define HPy_CastLegacy(ctx, h) (_HPy_Cast(ctx, h))
+
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */
