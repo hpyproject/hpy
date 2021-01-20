@@ -38,7 +38,7 @@ typedef HPyPointObject PyPointObject;
 // this is a method for creating a Point
 int Point_init(PyObject *self, PyObject *args, PyObject *kw)
 {
-    static char *kwlist[] = {"x", "y", NULL};
+    static const char *kwlist[] = {"x", "y", NULL};
     PyPointObject *p = (PyPointObject *)self;
     p->x = 0.0;
     p->y = 0.0;
@@ -102,7 +102,7 @@ static HPyDef *point_defines[] = {
 
 static HPyType_Spec Point_Type_spec = {
     .name = "point_hpy_legacy_1.Point",
-    .basicsize = sizeof(PyPointObject),
+    .basicsize = sizeof(HPyPointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
     .legacy_slots = Point_legacy_slots,

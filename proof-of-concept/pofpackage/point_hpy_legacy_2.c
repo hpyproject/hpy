@@ -37,8 +37,8 @@ typedef HPyPointObject PyPointObject;
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
-    static char *kwlist[] = {"x", "y", NULL};
-    PyPointObject *p = HPyPointObject_CAST(ctx, self);
+    static const char *kwlist[] = {"x", "y", NULL};
+    HPyPointObject *p = HPyPointObject_CAST(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
@@ -102,7 +102,7 @@ static HPyDef *point_defines[] = {
 
 static HPyType_Spec Point_Type_spec = {
     .name = "point_hpy_legacy_2.Point",
-    .basicsize = sizeof(PyPointObject),
+    .basicsize = sizeof(HPyPointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
     .legacy_slots = Point_legacy_slots,
