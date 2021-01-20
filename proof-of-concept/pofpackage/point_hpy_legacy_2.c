@@ -34,15 +34,15 @@ typedef HPyPointObject PyPointObject;
 // TODO: Use HPyCast_DEFINE_LEGACY(HPyPointObject_Cast, HPyPointObject);
 
 // this is a method for creating a Point
-// XXX: Port this
-int Point_init(PyObject *self, PyObject *args, PyObject *kw)
+HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
+int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static char *kwlist[] = {"x", "y", NULL};
-    PyPointObject *p = (PyPointObject *)self;
+    PyPointObject *p = HPyPointObject_CAST(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "|dd", kwlist,
-                                     &p->x, &p->y))
+    if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
+                              &p->x, &p->y))
         return -1;
     return 0;
 }
@@ -89,13 +89,13 @@ static PyMethodDef PointMethods[] = {
 // Legacy slots (all slots are still legacy slots)
 static PyType_Slot Point_legacy_slots[] = {
     {Py_tp_doc, "Point (Step 2; Porting some methods)"},
-    {Py_tp_init, Point_init},
     {Py_tp_methods, PointMethods},
     {0, 0}
 };
 
 // HPy type methods and slots (no methods or slots have been ported yet)
 static HPyDef *point_defines[] = {
+    &Point_init,
     &Point_norm,
     NULL
 };
