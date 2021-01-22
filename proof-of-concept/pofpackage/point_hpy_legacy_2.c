@@ -14,30 +14,32 @@
 
 typedef struct {
     // PyObject_HEAD is required while legacy methods still access
-    // HPyPointObject and should be removed once the port to HPy is completed.
+    // PointObject and should be removed once the port to HPy is completed.
     PyObject_HEAD
     double x;
     double y;
-} HPyPointObject;
+} PointObject;
 
-// This defines PyPointObject as an alias of HPyPointObject so that existing
+// This defines PyPointObject as an alias of PointObject so that existing
 // code that still uses PyPointObject and expects PyObject_HEAD continues to
 // compile and run. Once PyObject_HEAD has been removed, this alias should be
 // removed so that code that still expects PyObject_HEAD will fail to compile.
-typedef HPyPointObject PyPointObject;
+typedef PointObject PyPointObject;
 
-// The HPyPointObject_CAST macro will allow non-legacy methods to convert HPy
-// handles to HPyPointObject structs. HPy_CastLegacy is used because
-// PyObject_HEAD is still present.
-#define HPyPointObject_CAST(ctx, h) ((HPyPointObject*)HPy_CastLegacy(ctx, h))
-// TODO: Use HPyCast_DEFINE_LEGACY(HPyPointObject_Cast, HPyPointObject);
+// The PointObject_Cast functoin allows non-legacy methods to convert HPy
+// handles to PointObject structs. It is not used in this file, but is provided
+// so that methods can start to be ported (see point_hpy_legacy_2.c).
+// HPy_CastLegacy is used because PyObject_HEAD is still present in PointObject.
+static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
+    return (PointObject*) HPy_CastLegacy(ctx, h);
+}
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", NULL};
-    HPyPointObject *p = HPyPointObject_CAST(ctx, self);
+    PointObject *p = PointObject_Cast(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
@@ -50,7 +52,7 @@ int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy 
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext ctx, HPy self)
 {
-    HPyPointObject *p = HPyPointObject_CAST(ctx, self);
+    PointObject *p = PointObject_Cast(ctx, self);
     double norm;
     HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);
@@ -101,10 +103,10 @@ static HPyDef *point_defines[] = {
 
 static HPyType_Spec Point_Type_spec = {
     .name = "point_hpy_legacy_2.Point",
-    .basicsize = sizeof(HPyPointObject),
+    .basicsize = sizeof(PointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
-    .legacy_headersize = offsetof(HPyPointObject, x),
+    .legacy_headersize = offsetof(PointObject, x),
     .legacy_slots = Point_legacy_slots,
     .defines = point_defines
 };

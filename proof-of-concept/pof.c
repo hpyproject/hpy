@@ -58,7 +58,7 @@ static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
 HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext ctx, HPy self)
 {
-    HPy_Point *point = HPy_CAST(ctx, HPy_Point, self);
+    HPy_Point *point = (HPy_Point*) HPy_Cast(ctx, self);
     return HPyUnicode_FromString(ctx, "Point(?, ?)");
     //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
 }

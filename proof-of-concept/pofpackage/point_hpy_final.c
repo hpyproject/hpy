@@ -12,31 +12,33 @@
 // have been converted to HPy methods and PyObject_HEAD has been removed.
 
 typedef struct {
-    // PyObject_HEAD is no longer available in HPyPointObject. In CPython,
+    // PyObject_HEAD is no longer available in PointObject. In CPython,
     // of course, it still exists but is inaccessible from HPy_CastPure. In
     // other Python implementations (e.g. PyPy) it might no longer exist at
     // all.
     double x;
     double  y;
-} HPyPointObject;
+} PointObject;
 
 // Code that used to cast PyObject to PyPointObject relied on PyObject_HEAD
 // as is no longer valid. The typedef below has been deleted to ensure that
 // such code is detected by the compiler and can be ported.
-// typedef HPyPointObject PyPointObject;
+// typedef PointObject PyPointObject;
 
-// The HPyPointObject_CAST macro will allow non-legacy methods to convert HPy
-// handles to HPyPointObject structs. HPy_Cast is used because
-// PyObject_HEAD is no longer present.
-#define HPyPointObject_CAST(ctx, h) ((HPyPointObject*)HPy_CastPure(ctx, h))
-// TODO: Use HPyCast_DEFINE(HPyPointObject_Cast, HPyPointObject);
+// The PointObject_Cast functoin allows non-legacy methods to convert HPy
+// handles to PointObject structs. It is not used in this file, but is provided
+// so that methods can start to be ported (see point_hpy_legacy_2.c).
+// HPy_CastLegacy is used because PyObject_HEAD is still present in PointObject.
+static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
+    return (PointObject*) HPy_Cast(ctx, h);
+}
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", NULL};
-    HPyPointObject *p = HPyPointObject_CAST(ctx, self);
+    PointObject *p = PointObject_Cast(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
@@ -49,7 +51,7 @@ int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy 
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext ctx, HPy self)
 {
-    HPyPointObject *p = HPyPointObject_CAST(ctx, self);
+    PointObject *p = PointObject_Cast(ctx, self);
     double norm;
     HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);
@@ -64,8 +66,8 @@ HPy dot_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     HPy point1, point2;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO",  &point1, &point2))
         return HPy_NULL;
-    HPyPointObject *p1 = HPyPointObject_CAST(ctx, point1);
-    HPyPointObject *p2 = HPyPointObject_CAST(ctx, point2);
+    PointObject *p1 = PointObject_Cast(ctx, point1);
+    PointObject *p2 = PointObject_Cast(ctx, point2);
     double dp;
     HPy result;
     dp = p1->x * p2->x + p1->y * p2->y;
@@ -95,7 +97,7 @@ static HPyDef *point_defines[] = {
 
 static HPyType_Spec Point_Type_spec = {
     .name = "point_hpy_legacy_2.Point",
-    .basicsize = sizeof(HPyPointObject),
+    .basicsize = sizeof(PointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
     .defines = point_defines

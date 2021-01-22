@@ -15,25 +15,25 @@
 
 typedef struct {
     // PyObject_HEAD is required while legacy methods still access
-    // HPyPointObject and should be removed once the port to HPy is completed.
+    // PointObject and should be removed once the port to HPy is completed.
     PyObject_HEAD
     double x;
     double y;
-} HPyPointObject;
+} PointObject;
 
-// This defines PyPointObject as an alias of HPyPointObject so that existing
+// This defines PyPointObject as an alias of PointObject so that existing
 // code that still uses PyPointObject and expects PyObject_HEAD continues to
 // compile and run. Once PyObject_HEAD has been removed, this alias should be
 // removed so that code that still expects PyObject_HEAD will fail to compile.
-typedef HPyPointObject PyPointObject;
+typedef PointObject PyPointObject;
 
-// The HPyPointObject_CAST macro will allow non-legacy methods to convert HPy
-// handles to HPyPointObject structs. It is not used in this file, but
-// is provided so that methods can start to be ported (see
-// point_hpy_legacy_2.c). HPy_CastLegacy is used because PyObject_HEAD is still
-// present.
-#define HPyPointObject_CAST(ctx, h) ((HPyPointObject*)HPy_CastLegacy(ctx, h))
-// TODO: Use HPyCast_DEFINE_LEGACY(HPyPointObject_Cast, HPyPointObject);
+// The PointObject_Cast functoin allows non-legacy methods to convert HPy
+// handles to PointObject structs. It is not used in this file, but is provided
+// so that methods can start to be ported (see point_hpy_legacy_2.c).
+// HPy_CastLegacy is used because PyObject_HEAD is still present in PointObject.
+static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
+    return (PointObject*) HPy_CastLegacy(ctx, h);
+}
 
 // this is a method for creating a Point
 int Point_init(PyObject *self, PyObject *args, PyObject *kw)
@@ -102,10 +102,10 @@ static HPyDef *point_defines[] = {
 
 static HPyType_Spec Point_Type_spec = {
     .name = "point_hpy_legacy_1.Point",
-    .basicsize = sizeof(HPyPointObject),
+    .basicsize = sizeof(PointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
-    .legacy_headersize = offsetof(HPyPointObject, x),
+    .legacy_headersize = offsetof(PointObject, x),
     .legacy_slots = Point_legacy_slots,
     .defines = point_defines
 };
