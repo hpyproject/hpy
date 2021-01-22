@@ -53,10 +53,7 @@ typedef struct {
 
 #define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
 
-#define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
-
-// XXX: These are dummy implementations and will be replaced before merging!
-#define HPy_CastPure(ctx, h) (_HPy_Cast(ctx, h) + sizeof(struct {HPyObject_HEAD}))
+#define HPy_Cast(ctx, h) (_HPy_Cast(ctx, h) + sizeof(struct {HPyObject_HEAD}))
 #define HPy_CastLegacy(ctx, h) (_HPy_Cast(ctx, h))
 
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */
