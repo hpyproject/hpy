@@ -14,7 +14,6 @@
 typedef struct {
     // PyObject_HEAD is no longer required and has been removed. It's
     // like free extra RAM!
-    PyObject_HEAD // XXX: REMOVE!
     double x;
     double  y;
 } HPyPointObject;

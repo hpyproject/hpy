@@ -400,8 +400,16 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         PyErr_NoMemory();
         return HPy_NULL;
     }
+    HPy_ssize_t basicsize;
+    if (hpyspec->legacy_headersize == 0) {
+        // XXX: How to handle alignment issues, if any?
+        basicsize = sizeof(struct {HPyObject_HEAD}) + hpyspec->basicsize;
+    }
+    else {
+        basicsize = hpyspec->basicsize;
+    }
     spec->name = hpyspec->name;
-    spec->basicsize = hpyspec->basicsize;
+    spec->basicsize = basicsize;
     spec->itemsize = hpyspec->itemsize;
     spec->flags = hpyspec->flags;
     spec->slots = create_slot_defs(hpyspec);

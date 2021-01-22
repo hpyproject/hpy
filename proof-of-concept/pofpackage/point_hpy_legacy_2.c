@@ -1,5 +1,4 @@
 #include <math.h>
-#include <Python.h>
 #include <hpy.h>
 
 // Porting to HPy, Step 2: Porting some methods
@@ -105,6 +104,7 @@ static HPyType_Spec Point_Type_spec = {
     .basicsize = sizeof(HPyPointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
+    .legacy_headersize = offsetof(HPyPointObject, x),
     .legacy_slots = Point_legacy_slots,
     .defines = point_defines
 };

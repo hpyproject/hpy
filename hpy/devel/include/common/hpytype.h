@@ -27,6 +27,7 @@ typedef struct {
     int basicsize;
     int itemsize;
     unsigned int flags;
+    int legacy_headersize;
     void *legacy_slots; // PyType_Slot *
     HPyDef **defines;   /* points to an array of 'HPyDef *' */
 } HPyType_Spec;
@@ -55,7 +56,7 @@ typedef struct {
 #define HPy_CAST(ctx, return_type, h) ((return_type *) _HPy_Cast(ctx, h))
 
 // XXX: These are dummy implementations and will be replaced before merging!
-#define HPy_CastPure(ctx, h) (_HPy_Cast(ctx, h))
+#define HPy_CastPure(ctx, h) (_HPy_Cast(ctx, h) + sizeof(struct {HPyObject_HEAD}))
 #define HPy_CastLegacy(ctx, h) (_HPy_Cast(ctx, h))
 
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */
