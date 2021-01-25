@@ -26,7 +26,7 @@ typedef struct {
     const char* name;
     int basicsize;
     int itemsize;
-    unsigned int flags;
+    unsigned long flags;
     int legacy_headersize;
     void *legacy_slots; // PyType_Slot *
     HPyDef **defines;   /* points to an array of 'HPyDef *' */
@@ -47,7 +47,7 @@ typedef struct {
 /* All types are dynamically allocated */
 #define _Py_TPFLAGS_HEAPTYPE (1UL << 9)
 #define _Py_TPFLAGS_HAVE_VERSION_TAG (1UL << 18)
-
+#define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
 
 /* HPy_TPFLAGS_LEGACY is set automatically on legacy types.
 
@@ -64,8 +64,6 @@ typedef struct {
 
 /* Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)
-
-#define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
 
 #define HPy_Cast(ctx, h) (_HPy_Cast(ctx, h) + sizeof(struct {HPyObject_HEAD}))
 #define HPy_CastLegacy(ctx, h) (_HPy_Cast(ctx, h))
