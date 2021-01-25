@@ -59,6 +59,8 @@ class autogen_debug_wrappers(AutoGenFile):
     NO_WRAPPER = set([
         '_HPy_CallRealFunctionFromTrampoline',
         'HPy_Close',
+        'HPyTuple_FromArray',
+        'HPyType_GenericNew',
         ])
 
     def generate(self):
@@ -90,8 +92,8 @@ class autogen_debug_wrappers(AutoGenFile):
                 elif toC(p.type) == 'DHPy':
                     lst.append('DHPy_unwrap(%s)' % p.name)
                 elif toC(p.type) in ('DHPy *', 'DHPy []'):
-                    #lst.append('(HPy *)%s' % p.name)
-                    lst.append('NULL /* TODO */')
+                    assert False, ('C type %s not supported, please write the wrapper '
+                                   'for %s by hand' % (toC(p.type), func.name))
                 else:
                     lst.append(p.name)
             return ', '.join(lst)

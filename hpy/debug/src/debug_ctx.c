@@ -9,14 +9,6 @@ static struct _HPyContext_s g_debug_ctx = {
     .ctx_version = 1,
 };
 
-void debug_ctx_Close(HPyContext dctx, DHPy dh)
-{
-    UHPy uh = DHPy_unwrap(dh);
-    DHPy_close(dctx, dh);
-    HPy_Close(get_info(dctx)->uctx, uh);
-}
-
-
 // NOTE: at the moment this function assumes that uctx is always the
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
@@ -67,4 +59,29 @@ __attribute__((unused)) static void hpy_magic_dump(HPy h)
         fprintf(stderr, "dh->uh: %lx\n", dh->uh._i);
         _HPy_Dump(&g_universal_ctx, dh->uh);
     }
+}
+
+/* ~~~~~~~~~~ manually written wrappers ~~~~~~~~~~ */
+
+void debug_ctx_Close(HPyContext dctx, DHPy dh)
+{
+    UHPy uh = DHPy_unwrap(dh);
+    DHPy_close(dctx, dh);
+    HPy_Close(get_info(dctx)->uctx, uh);
+}
+
+DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy dh_items[], HPy_ssize_t n)
+{
+    // NOTE: replace VLAs with alloca() once issue #157 is fixed
+    UHPy uh_items[n];
+    for(int i=0; i<n; i++) {
+        uh_items[i] = DHPy_unwrap(dh_items[i]);
+    }
+    return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
+}
+
+DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy type, DHPy *args, HPy_ssize_t nargs,
+                               DHPy kw)
+{
+    abort();
 }

@@ -332,11 +332,6 @@ DHPy debug_ctx_Type_FromSpec(HPyContext dctx, HPyType_Spec *spec, HPyType_SpecPa
     return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, params));
 }
 
-DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw)
-{
-    return DHPy_wrap(dctx, HPyType_GenericNew(get_info(dctx)->uctx, DHPy_unwrap(type), NULL /* TODO */, nargs, DHPy_unwrap(kw)));
-}
-
 DHPy debug_ctx_GetAttr(HPyContext dctx, DHPy obj, DHPy name)
 {
     return DHPy_wrap(dctx, HPy_GetAttr(get_info(dctx)->uctx, DHPy_unwrap(obj), DHPy_unwrap(name)));
@@ -525,11 +520,6 @@ DHPy debug_ctx_Dict_New(HPyContext dctx)
 int debug_ctx_Tuple_Check(HPyContext dctx, DHPy h)
 {
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(h));
-}
-
-DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy items[], HPy_ssize_t n)
-{
-    return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, NULL /* TODO */, n));
 }
 
 DHPy debug_ctx_FromPyObject(HPyContext dctx, cpy_PyObject *obj)
