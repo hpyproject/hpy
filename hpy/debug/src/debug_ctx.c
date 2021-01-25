@@ -80,8 +80,16 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy dh_items[], HPy_ssize_t n)
     return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
 }
 
-DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy type, DHPy *args, HPy_ssize_t nargs,
-                               DHPy kw)
+DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy dh_type, DHPy *dh_args,
+                               HPy_ssize_t nargs, DHPy dh_kw)
 {
-    abort();
+    UHPy uh_type = DHPy_unwrap(dh_type);
+    UHPy uh_kw = DHPy_unwrap(dh_kw);
+    // NOTE: replace VLAs with alloca() once issue #157 is fixed
+    UHPy uh_args[nargs];
+    for(int i=0; i<nargs; i++) {
+        uh_args[i] = DHPy_unwrap(dh_args[i]);
+    }
+    return DHPy_wrap(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
+                                              nargs, uh_kw));
 }
