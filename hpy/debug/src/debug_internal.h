@@ -61,6 +61,11 @@ static inline void UHPy_sanity_check(UHPy uh) {
         assert( (uh._i & 1) == 1 );
 }
 
+// NOTE: having a "generation" field is the easiest way to know when a handle
+// was created, but we waste 8 bytes per handle. Since all handles of the same
+// generation are stored sequentially in the open_handles list, a possible
+// alternative implementation is to put special placeholders inside the list
+// to mark the creation of a new generation
 typedef struct DebugHandle {
     UHPy uh;
     long generation;
