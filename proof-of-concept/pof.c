@@ -41,7 +41,7 @@ HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
 static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
                            HPy_ssize_t nargs, HPy Kw)
 {
-    long x, y;
+    double x, y;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "dd", &x, &y))
         return HPy_NULL;
     HPy_Point *point;
