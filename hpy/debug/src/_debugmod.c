@@ -7,8 +7,12 @@
 #include "hpy.h"
 #include "debug_internal.h"
 
+static UHPy new_DebugHandleObj(HPyContext uctx, UHPy u_DebugHandleType,
+                               DebugHandle *handle);
+
+
 HPyDef_METH(new_generation, "new_generation", new_generation_impl, HPyFunc_NOARGS)
-static HPy new_generation_impl(HPyContext uctx, HPy self)
+static UHPy new_generation_impl(HPyContext uctx, UHPy self)
 {
     HPyContext dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
@@ -17,17 +21,17 @@ static HPy new_generation_impl(HPyContext uctx, HPy self)
 }
 
 
-// TODO: eventually, we want to return Python-level views of DebugHandle, so
-// that we can retrieve additional infos from applevel (e.g., the C backtrace
-// at the moment of opening or so). For now, just return the Python objects
-// pointed by the handles.
 HPyDef_METH(get_open_handles, "get_open_handles", get_open_handles_impl, HPyFunc_O, .doc=
             "Return a list containing all the open handles whose generation is >= "
             "of the given arg")
-static HPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
+static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
 {
     HPyContext dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
+
+    UHPy u_DebugHandleType = HPy_GetAttr_s(uctx, u_self, "DebugHandle");
+    if (HPy_IsNull(u_DebugHandleType))
+        return HPy_NULL;
 
     long gen = HPyLong_AsLong(uctx, u_gen);
     if (HPyErr_Occurred(uctx))
@@ -40,15 +44,59 @@ static HPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
     DebugHandle *dh = info->open_handles;
     while(dh != NULL) {
         if (dh->generation >= gen) {
-            if (HPyList_Append(uctx, u_result, dh->uh) == -1) {
+            UHPy u_item = new_DebugHandleObj(uctx, u_DebugHandleType, dh);
+            if (HPy_IsNull(u_item))
+                return HPy_NULL;
+            if (HPyList_Append(uctx, u_result, u_item) == -1) {
+                HPy_Close(uctx, u_item);
                 HPy_Close(uctx, u_result);
                 return HPy_NULL;
             }
+            HPy_Close(uctx, u_item);
         }
         dh = dh->next;
     }
     return u_result;
 }
+
+/* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~ */
+
+typedef struct {
+    HPyObject_HEAD
+    DebugHandle *handle;
+} DebugHandleObject;
+
+HPyDef_GET(DebugHandle_obj, "obj", DebugHandle_obj_get)
+static UHPy DebugHandle_obj_get(HPyContext uctx, UHPy self, void *closure)
+{
+    DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
+    return HPy_Dup(uctx, dh->handle->uh);
+}
+
+static HPyDef *DebugHandleType_defs[] = {
+    &DebugHandle_obj,
+    NULL
+};
+
+static HPyType_Spec DebugHandleType_spec = {
+    .name = "hpy.debug._debug.DebugHandle",
+    .basicsize = sizeof(DebugHandleObject),
+    .flags = HPy_TPFLAGS_DEFAULT,
+    .defines = DebugHandleType_defs,
+};
+
+
+static UHPy new_DebugHandleObj(HPyContext uctx, UHPy u_DebugHandleType,
+                               DebugHandle *handle)
+{
+    DebugHandleObject *dhobj;
+    UHPy u_result = HPy_New(uctx, u_DebugHandleType, &dhobj);
+    dhobj->handle = handle;
+    return u_result;
+}
+
+
+/* ~~~~~~ definition of the module hpy.debug._debug ~~~~~~~ */
 
 static HPyDef *module_defines[] = {
     &new_generation,
@@ -66,10 +114,16 @@ static HPyModuleDef moduledef = {
 
 
 HPy_MODINIT(_debug)
-static HPy init__debug_impl(HPyContext uctx)
+static UHPy init__debug_impl(HPyContext uctx)
 {
-    HPy m = HPyModule_Create(uctx, &moduledef);
+    UHPy m = HPyModule_Create(uctx, &moduledef);
     if (HPy_IsNull(m))
         return HPy_NULL;
+
+    UHPy h_DebugHandleType = HPyType_FromSpec(uctx, &DebugHandleType_spec, NULL);
+    if (HPy_IsNull(h_DebugHandleType))
+        return HPy_NULL;
+    HPy_SetAttr_s(uctx, m, "DebugHandle", h_DebugHandleType);
+    HPy_Close(uctx, h_DebugHandleType);
     return m;
 }

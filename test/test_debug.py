@@ -29,5 +29,7 @@ class TestDebug(HPyTest):
         mod.leak('a younger leak')
         leaks1 = _debug.get_open_handles(gen1)
         leaks2 = _debug.get_open_handles(gen2)
+        leaks1 = [dh.obj for dh in leaks1]
+        leaks2 = [dh.obj for dh in leaks2]
         assert leaks1 == ['a younger leak', 'world', 'hello']
         assert leaks2 == ['a younger leak']
