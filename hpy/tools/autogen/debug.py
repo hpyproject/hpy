@@ -62,6 +62,7 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPy_Close',
         'HPyTuple_FromArray',
         'HPyType_GenericNew',
+        'HPyType_FromSpec',
         ])
 
     def generate(self):

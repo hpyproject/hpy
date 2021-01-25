@@ -327,11 +327,6 @@ int debug_ctx_IsTrue(HPyContext dctx, DHPy h)
     return HPy_IsTrue(get_info(dctx)->uctx, DHPy_unwrap(h));
 }
 
-DHPy debug_ctx_Type_FromSpec(HPyContext dctx, HPyType_Spec *spec, HPyType_SpecParam *params)
-{
-    return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, params));
-}
-
 DHPy debug_ctx_GetAttr(HPyContext dctx, DHPy obj, DHPy name)
 {
     return DHPy_wrap(dctx, HPy_GetAttr(get_info(dctx)->uctx, DHPy_unwrap(obj), DHPy_unwrap(name)));

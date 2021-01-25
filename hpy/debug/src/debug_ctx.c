@@ -93,3 +93,23 @@ DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy dh_type, DHPy *dh_args,
     return DHPy_wrap(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
                                               nargs, uh_kw));
 }
+
+DHPy debug_ctx_Type_FromSpec(HPyContext dctx, HPyType_Spec *spec, HPyType_SpecParam *dparams)
+{
+    // dparams might contain some hidden DHPy: we need to manually unwrap them.
+    if (dparams != NULL) {
+        // count the params
+        HPy_ssize_t n = 1;
+        for (HPyType_SpecParam *p = dparams; p->kind != 0; p++) {
+            n++;
+        }
+        // NOTE: replace VLAs with alloca() once issue #157 is fixed
+        HPyType_SpecParam uparams[n];
+        for (HPy_ssize_t i=0; i<n; i++) {
+            uparams[i].kind = dparams[i].kind;
+            uparams[i].object = DHPy_unwrap(dparams[i].object);
+        }
+        return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, uparams));
+    }
+    return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
+}
