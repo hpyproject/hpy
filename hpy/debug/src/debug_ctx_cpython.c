@@ -114,6 +114,7 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         DHPy_close(dctx, dh_kw);
         return;
     }
+#include "autogen_debug_ctx_call.i"
     default:
         abort();  // XXX
     }

@@ -3,6 +3,7 @@ import textwrap
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
+from .hpyfunc import SPECIAL_CASES
 
 class HPy_2_DHPy_Visitor(c_ast.NodeVisitor):
     "Visitor which renames all HPy types to DHPy"
@@ -110,4 +111,53 @@ class autogen_debug_wrappers(AutoGenFile):
         else:
             w(f'    return {func.name}({params});')
         w('}')
+        return '\n'.join(lines)
+
+
+class autogen_debug_ctx_call_i(AutoGenFile):
+    PATH = 'hpy/debug/src/autogen_debug_ctx_call.i'
+
+    def generate(self):
+        lines = []
+        w = lines.append
+        for hpyfunc in self.api.hpyfunc_typedefs:
+            name = hpyfunc.base_name()
+            NAME = name.upper()
+            if NAME in SPECIAL_CASES:
+                continue
+            #
+            c_ret_type = toC(hpyfunc.return_type())
+            args = ['dctx']
+            dhpys = []
+            for i, param in enumerate(hpyfunc.params()[1:]):
+                pname = param.name
+                if pname is None:
+                    pname = 'arg%d' % i
+                if toC(param.type) == 'HPy':
+                    dhpys.append(pname)
+                    args.append(f'dh_{pname}')
+                else:
+                    args.append(f'a->{pname}')
+            args = ', '.join(args)
+            #
+            w(f'    case HPyFunc_{NAME}: {{')
+            w(f'        HPyFunc_{name} f = (HPyFunc_{name})func;')
+            w(f'        _HPyFunc_args_{NAME} *a = (_HPyFunc_args_{NAME}*)args;')
+            for pname in dhpys:
+                w(f'        DHPy dh_{pname} = _py2dh(dctx, a->{pname});')
+            #
+            if c_ret_type == 'void':
+                w(f'        f({args});')
+            elif c_ret_type == 'HPy':
+                w(f'        DHPy dh_result = f({args});')
+                w(f'        a->result = _dh2py(dh_result);')
+                dhpys.append('result')
+            else:
+                w(f'        a->result = f({args});')
+            #
+            for pname in dhpys:
+                w(f'        DHPy_close(dctx, dh_{pname});')
+            #
+            w(f'        return;')
+            w(f'    }}')
         return '\n'.join(lines)
