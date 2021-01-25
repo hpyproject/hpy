@@ -401,17 +401,20 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     HPy_ssize_t basicsize;
+    unsigned int flags = hpyspec->flags;
     if (hpyspec->legacy_headersize == 0) {
         // XXX: How to handle alignment issues, if any?
         basicsize = sizeof(struct {HPyObject_HEAD}) + hpyspec->basicsize;
+        flags = flags & (!HPy_TPFLAGS_LEGACY);
     }
     else {
         basicsize = hpyspec->basicsize;
+        flags = flags | HPy_TPFLAGS_LEGACY;
     }
     spec->name = hpyspec->name;
     spec->basicsize = basicsize;
+    spec->flags = flags;
     spec->itemsize = hpyspec->itemsize;
-    spec->flags = hpyspec->flags;
     spec->slots = create_slot_defs(hpyspec);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
@@ -436,14 +439,14 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
 _HPy_HIDDEN HPy
 ctx_New(HPyContext ctx, HPy h_type, void **data)
 {
-    PyObject *tp = _h2py(h_type);
+    PyTypeObject *tp = (PyTypeObject*) _h2py(h_type);
     assert(tp != NULL);
     if (!PyType_Check(tp)) {
         PyErr_SetString(PyExc_TypeError, "HPy_New arg 1 must be a type");
         return HPy_NULL;
     }
 
-    PyObject *result = PyObject_New(PyObject, (PyTypeObject*)tp);
+    PyObject *result = PyObject_New(PyObject, tp);
     if (!result)
         return HPy_NULL;
 #if PY_VERSION_HEX < 0x03080000
@@ -452,7 +455,12 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     Py_INCREF(tp);
 #endif
 
-    *data = (void*)result;
+    if (tp->tp_flags & HPy_TPFLAGS_LEGACY) {
+        *data = (void*) result;
+    }
+    else {
+        *data = (void*) result + sizeof(struct {HPyObject_HEAD});
+    }
     return _py2h(result);
 }
 

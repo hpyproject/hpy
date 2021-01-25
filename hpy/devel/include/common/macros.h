@@ -27,8 +27,7 @@
 #define HPy_New(ctx, cls, data) (_HPy_New(                                    \
     (ctx),                                                                    \
     (cls),                                                                    \
-    ((void)sizeof((*data)->_ob_head._reserved0), /* ERROR: expected a variable of type T** with T a structure starting with HPyObject_HEAD */ \
-     (void**)data)                                                            \
+    ((void**)data)                                                            \
   ))
 
 
