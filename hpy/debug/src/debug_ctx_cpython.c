@@ -97,7 +97,22 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         return;
     }
     case HPyFunc_INITPROC: {
-        abort();
+        HPyFunc_initproc f = (HPyFunc_initproc)func;
+        _HPyFunc_args_INITPROC *a = (_HPyFunc_args_INITPROC*)args;
+        DHPy dh_self = _py2dh(dctx, a->self);
+        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
+        DHPy dh_args[nargs * sizeof(DHPy)];
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
+        }
+        DHPy dh_kw = _py2dh(dctx, a->kw);
+        a->result = f(dctx, dh_self, dh_args, nargs, dh_kw);
+        DHPy_close(dctx, dh_self);
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            DHPy_close(dctx, dh_args[i]);
+        }
+        DHPy_close(dctx, dh_kw);
+        return;
     }
     default:
         abort();  // XXX
