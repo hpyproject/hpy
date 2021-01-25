@@ -1,4 +1,5 @@
 #include <math.h>
+#include <Python.h>
 #include <hpy.h>
 
 // Porting to HPy, Step 2: Porting some methods
