@@ -33,7 +33,6 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 }
 
 typedef struct {
-    HPyObject_HEAD
     double x;
     double y;
 } HPy_Point;
@@ -42,9 +41,8 @@ HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
 static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
                            HPy_ssize_t nargs, HPy Kw)
 {
-    // FIXME: we should use double, but HPyArg_Parse does not support "d" yet
     long x, y;
-    if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &x, &y))
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "dd", &x, &y))
         return HPy_NULL;
     HPy_Point *point;
     HPy h_point = HPy_New(ctx, cls, &point);
