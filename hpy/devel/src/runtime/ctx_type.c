@@ -401,15 +401,15 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     HPy_ssize_t basicsize;
-    unsigned int flags = hpyspec->flags;
-    if (hpyspec->legacy_headersize == 0) {
+    unsigned long flags = hpyspec->flags;
+    if (hpyspec->legacy_headersize == 0 && hpyspec->legacy_slots == NULL) {
         // XXX: How to handle alignment issues, if any?
         basicsize = sizeof(struct {HPyObject_HEAD}) + hpyspec->basicsize;
-        flags = flags & (!HPy_TPFLAGS_LEGACY);
+        flags &= ~HPy_TPFLAGS_LEGACY;
     }
     else {
         basicsize = hpyspec->basicsize;
-        flags = flags | HPy_TPFLAGS_LEGACY;
+        flags |= HPy_TPFLAGS_LEGACY;
     }
     spec->name = hpyspec->name;
     spec->basicsize = basicsize;
