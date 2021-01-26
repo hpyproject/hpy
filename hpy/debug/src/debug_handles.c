@@ -7,6 +7,12 @@ DHPy DHPy_wrap(HPyContext dctx, UHPy uh)
         return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     DebugHandle *handle = malloc(sizeof(DebugHandle));
+    if (handle == NULL) {
+        HPyContext uctx = info->uctx;
+        HPyErr_SetString(uctx, uctx->h_MemoryError,
+                         "Cannot allocate memory for DebugHandle");
+        return HPy_NULL;
+    }
     handle->uh = uh;
     handle->generation = info->current_generation;
     handle->prev = NULL;

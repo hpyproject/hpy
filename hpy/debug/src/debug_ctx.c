@@ -13,16 +13,21 @@ static struct _HPyContext_s g_debug_ctx = {
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
 // debug wrapper for each of them.
-static void debug_ctx_init(HPyContext dctx, HPyContext uctx)
+static int debug_ctx_init(HPyContext dctx, HPyContext uctx)
 {
     if (dctx->_private != NULL) {
         // already initialized
         assert(get_info(dctx)->uctx == uctx); // sanity check
-        return;
+        return 0;
     }
     // initialize debug_info
     // XXX: currently we never free this malloc
     HPyDebugInfo *info = malloc(sizeof(HPyDebugInfo));
+    if (info == NULL) {
+        HPyErr_SetString(uctx, uctx->h_MemoryError,
+                         "Cannot allocate memory for HPyDebugInfo");
+        return -1;
+    }
     info->magic_number = HPY_DEBUG_MAGIC;
     info->uctx = uctx;
     info->current_generation = 0;
@@ -31,12 +36,14 @@ static void debug_ctx_init(HPyContext dctx, HPyContext uctx)
     dctx->_private = info;
 
     debug_ctx_init_fields(dctx, uctx);
+    return 0;
 }
 
 HPyContext hpy_debug_get_ctx(HPyContext uctx)
 {
     HPyContext dctx = &g_debug_ctx;
-    debug_ctx_init(dctx, uctx);
+    if (debug_ctx_init(dctx, uctx) < 0)
+        return NULL;
     return dctx;
 }
 
