@@ -318,6 +318,10 @@ static inline int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy va
      return ctx->ctx_SetItem_s ( ctx, obj, key, value ); 
 }
 
+static inline HPy HPy_Type(HPyContext ctx, HPy obj) {
+     return ctx->ctx_Type ( ctx, obj ); 
+}
+
 static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
      return ctx->ctx_Cast ( ctx, h ); 
 }

@@ -340,6 +340,11 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(SetItem)(HPyContext ctx, HPy obj, HPy
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Type)(HPyContext ctx, HPy obj)
+{
+    return _py2h(PyObject_Type(_h2py(obj)));
+}
+
 HPyAPI_STORAGE HPy _HPy_IMPL_NAME_NOPREFIX(Repr)(HPyContext ctx, HPy obj)
 {
     return _py2h(PyObject_Repr(_h2py(obj)));

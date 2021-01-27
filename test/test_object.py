@@ -477,3 +477,17 @@ class TestObject(HPyTest):
             @INIT
         """)
         mod.f('hello')
+
+    def test_type(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Type(ctx, arg);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f('hello') is str
+        assert mod.f(42) is int
+
