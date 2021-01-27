@@ -38,12 +38,6 @@ typedef struct {
 
 #define HPyPure_PyObject_HEAD_SIZE (offsetof(_HPyPure_FullyAlignedSpaceForPyObject_HEAD, payload))
 
-_HPy_HIDDEN void*
-ctx_Cast(HPyContext ctx, HPy h)
-{
-    return _h2py(h);
-}
-
 static int
 sig2flags(HPyFunc_Signature sig)
 {
@@ -66,6 +60,12 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
         if (defs[i]->kind == kind)
             res++;
     return res;
+}
+
+static int
+hpyspec_is_legacy(HPyType_Spec *hpyspec)
+{
+    return (hpyspec->legacy_headersize > 0) || (hpyspec->legacy_slots != NULL);
 }
 
 static void
@@ -163,7 +163,7 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 }
 
 static PyMemberDef *
-create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
+create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t base_member_offset)
 {
     HPy_ssize_t hpymember_count = HPyDef_count(hpydefs, HPyDef_Kind_Member);
     // count the legacy members
@@ -192,7 +192,7 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members)
                qualifier from src->member.{name,doc} */
             dst->name = (char *)src->member.name;
             dst->type = src->member.type;
-            dst->offset = src->member.offset;
+            dst->offset = src->member.offset + base_member_offset;
             dst->doc = (char *)src->member.doc;
             if (src->member.readonly)
                 dst->flags = READONLY;
@@ -253,9 +253,8 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
     return result;
 }
 
-
 static PyType_Slot *
-create_slot_defs(HPyType_Spec *hpyspec)
+create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
 {
     HPy_ssize_t hpyslot_count = HPyDef_count(hpyspec->defines, HPyDef_Kind_Slot);
     // add the legacy slots
@@ -313,7 +312,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
     result[dst_idx++] = (PyType_Slot){Py_tp_methods, pymethods};
 
     // add the "real" members
-    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs);
+    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset);
     if (pymembers == NULL) {
         PyMem_Free(pymethods);
         PyMem_Free(result);
@@ -429,22 +428,25 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     HPy_ssize_t basicsize;
+    HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
-    if (hpyspec->legacy_headersize == 0 && hpyspec->legacy_slots == NULL) {
-        // HPyPure_PyObject_HEAD_SIZE ensures that the custom struct is
-        // correctly aligned.
-        basicsize = HPyPure_PyObject_HEAD_SIZE + hpyspec->basicsize;
-        flags &= ~HPy_TPFLAGS_LEGACY;
+    if (hpyspec_is_legacy(hpyspec)) {
+        basicsize = hpyspec->basicsize;
+        base_member_offset = 0;
+        flags |= HPy_TPFLAGS_LEGACY;
     }
     else {
-        basicsize = hpyspec->basicsize;
-        flags |= HPy_TPFLAGS_LEGACY;
+        // HPyPure_PyObject_HEAD_SIZE ensures that the custom struct is
+        // correctly aligned.
+        basicsize = hpyspec->basicsize + HPyPure_PyObject_HEAD_SIZE;
+        base_member_offset = HPyPure_PyObject_HEAD_SIZE;
+        flags &= ~HPy_TPFLAGS_LEGACY;
     }
     spec->name = hpyspec->name;
     spec->basicsize = basicsize;
     spec->flags = flags;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec);
+    spec->slots = create_slot_defs(hpyspec, base_member_offset);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
@@ -507,4 +509,10 @@ ctx_Type_GenericNew(HPyContext ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HP
 
     PyObject *res = ((PyTypeObject*) tp)->tp_alloc((PyTypeObject*) tp, 0);
     return _py2h(res);
+}
+
+_HPy_HIDDEN void*
+ctx_Cast(HPyContext ctx, HPy h)
+{
+    return _h2py(h);
 }
