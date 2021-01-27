@@ -14,6 +14,7 @@ typedef int cpy_PyObject;
 typedef int HPyListBuilder;
 typedef int HPyTupleBuilder;
 typedef int HPyTracker;
+typedef int HPy_RichCmpOp;
 
 
 /* HPy public API */
@@ -311,7 +312,7 @@ typedef int (*HPyFunc_setattrfunc)(HPyContext ctx, HPy, char *, HPy);
 typedef int (*HPyFunc_setattrofunc)(HPyContext ctx, HPy, HPy, HPy);
 typedef HPy (*HPyFunc_reprfunc)(HPyContext ctx, HPy);
 typedef HPy_hash_t (*HPyFunc_hashfunc)(HPyContext ctx, HPy);
-typedef HPy (*HPyFunc_richcmpfunc)(HPyContext ctx, HPy, HPy, int);
+typedef HPy (*HPyFunc_richcmpfunc)(HPyContext ctx, HPy, HPy, HPy_RichCmpOp);
 typedef HPy (*HPyFunc_getiterfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_iternextfunc)(HPyContext ctx, HPy);
 typedef HPy (*HPyFunc_descrgetfunc)(HPyContext ctx, HPy, HPy, HPy);
@@ -404,7 +405,7 @@ typedef enum {
     //HPy_tp_methods = SLOT(64, HPyFunc_X),    NOT SUPPORTED
     HPy_tp_new = SLOT(65, HPyFunc_KEYWORDS),
     HPy_tp_repr = SLOT(66, HPyFunc_REPRFUNC),
-    //HPy_tp_richcompare = SLOT(67, HPyFunc_X),
+    HPy_tp_richcompare = SLOT(67, HPyFunc_RICHCMPFUNC),
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),
     //HPy_tp_setattro = SLOT(69, HPyFunc_X),
     //HPy_tp_str = SLOT(70, HPyFunc_X),

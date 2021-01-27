@@ -3,8 +3,8 @@ from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
 
-SPECIAL_CASES = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC',
-                 'DESTROYFUNC')
+NO_CALL = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC')
+NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
 class autogen_hpyfunc_declare_h(AutoGenFile):
     PATH = 'hpy/devel/include/common/autogen_hpyfunc_declare.h'
@@ -50,7 +50,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
         w = lines.append
         for hpyfunc in self.api.hpyfunc_typedefs:
             NAME = hpyfunc.base_name().upper()
-            if NAME in SPECIAL_CASES:
+            if NAME in NO_TRAMPOLINE:
                 continue
             #
             tramp_node = deepcopy(hpyfunc.node.type.type)
@@ -101,7 +101,7 @@ class autogen_ctx_call_i(AutoGenFile):
         for hpyfunc in self.api.hpyfunc_typedefs:
             name = hpyfunc.base_name()
             NAME = name.upper()
-            if NAME in SPECIAL_CASES:
+            if NAME in NO_CALL:
                 continue
             #
             c_ret_type = toC(hpyfunc.return_type())
@@ -139,7 +139,7 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
         for hpyfunc in self.api.hpyfunc_typedefs:
             name = hpyfunc.base_name()
             NAME = name.upper()
-            if NAME in SPECIAL_CASES:
+            if NAME in NO_TRAMPOLINE:
                 continue
             #
             tramp_node = deepcopy(hpyfunc.node.type.type)
