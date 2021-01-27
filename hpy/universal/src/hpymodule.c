@@ -116,6 +116,8 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
     }
 
     HPyContext ctx = get_context(debug);
+    if (ctx == NULL)
+        goto error;
     HPy h_mod = ((InitFuncPtr)initfn)(ctx);
     if (HPy_IsNull(h_mod))
         goto error;

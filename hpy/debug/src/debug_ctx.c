@@ -24,8 +24,7 @@ static int debug_ctx_init(HPyContext dctx, HPyContext uctx)
     // XXX: currently we never free this malloc
     HPyDebugInfo *info = malloc(sizeof(HPyDebugInfo));
     if (info == NULL) {
-        HPyErr_SetString(uctx, uctx->h_MemoryError,
-                         "Cannot allocate memory for HPyDebugInfo");
+        HPyErr_NoMemory(uctx);
         return -1;
     }
     info->magic_number = HPY_DEBUG_MAGIC;
