@@ -19,10 +19,14 @@ class PointTemplate(DefaultExtensionTemplate):
     def DEFINE_PointObject(self):
         return """
             typedef struct {
-                HPyObject_HEAD
                 long x;
                 long y;
             } PointObject;
+
+            static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h)
+            {
+                return (PointObject*) HPy_Cast(ctx, h);
+            }
         """
 
     def DEFINE_Point_new(self):
@@ -60,10 +64,33 @@ class PointTemplate(DefaultExtensionTemplate):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
+                .legacy_headersize = offsetof(PointObject, x),
                 .defines = Point_defines
             };
         """ % defines
 
+
+class LegacyPointTemplate(PointTemplate):
+    """
+    Override PointTemplate to instead define a legacy point type that
+    still provides access to PyObject_HEAD.
+    """
+
+    def DEFINE_PointObject(self):
+        return """
+            # include <Python.h>
+
+            typedef struct {
+                PyObject_HEAD
+                long x;
+                long y;
+            } PointObject;
+
+            static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h)
+            {
+                return (PointObject*) HPy_CastLegacy(ctx, h);
+            }
+        """
 
 
 class TestType(HPyTest):
@@ -177,7 +204,7 @@ class TestType(HPyTest):
             HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_Cast(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -584,7 +611,7 @@ class TestType(HPyTest):
             HPyDef_GET(Point_z, "z", Point_z_get)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_Cast(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -602,12 +629,12 @@ class TestType(HPyTest):
             HPyDef_GETSET(Point_z, "z", Point_z_get, Point_z_set, .closure=(void *)1000)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_Cast(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y + (long)closure);
             }
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_Cast(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
@@ -631,7 +658,7 @@ class TestType(HPyTest):
             HPyDef_SET(Point_z, "z", Point_z_set, .closure=(void *)1000)
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_Cast(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
@@ -719,3 +746,8 @@ class TestType(HPyTest):
         class Sub(mod.Dummy):
             pass
         assert isinstance(Sub(), mod.Dummy)
+
+
+class TestLegacyType(TestType):
+
+    ExtensionTemplate = LegacyPointTemplate
