@@ -218,6 +218,7 @@ SPECIAL_CASES = {
     'HPyTracker_Add': None,
     'HPyTracker_ForgetAll': None,
     'HPyTracker_Close': None,
+    '_HPy_Dump': None,
 }
 
 
