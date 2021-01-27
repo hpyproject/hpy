@@ -66,15 +66,25 @@ typedef struct {
     DebugHandle *handle;
 } DebugHandleObject;
 
-HPyDef_GET(DebugHandle_obj, "obj", DebugHandle_obj_get)
+HPyDef_GET(DebugHandle_obj, "obj", DebugHandle_obj_get,
+           .doc="The object which the handle points to")
 static UHPy DebugHandle_obj_get(HPyContext uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
     return HPy_Dup(uctx, dh->handle->uh);
 }
 
+HPyDef_GET(DebugHandle_id, "id", DebugHandle_id_get,
+           .doc="A numeric identifier representing the underlying universal handle")
+static UHPy DebugHandle_id_get(HPyContext uctx, UHPy self, void *closure)
+{
+    DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
+    return HPyLong_FromSsize_t(uctx, dh->handle->uh._i);
+}
+
 static HPyDef *DebugHandleType_defs[] = {
     &DebugHandle_obj,
+    &DebugHandle_id,
     NULL
 };
 
