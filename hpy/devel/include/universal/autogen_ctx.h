@@ -104,6 +104,7 @@ struct _HPyContext_s {
     HPy_ssize_t (*ctx_Long_AsSsize_t)(HPyContext ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext ctx, double v);
     double (*ctx_Float_AsDouble)(HPyContext ctx, HPy h);
+    HPy (*ctx_Bool_FromLong)(HPyContext ctx, long v);
     HPy_ssize_t (*ctx_Length)(HPyContext ctx, HPy h);
     int (*ctx_Number_Check)(HPyContext ctx, HPy h);
     HPy (*ctx_Add)(HPyContext ctx, HPy h1, HPy h2);

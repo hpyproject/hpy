@@ -104,6 +104,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_Long_AsSsize_t = &ctx_Long_AsSsize_t,
     .ctx_Float_FromDouble = &ctx_Float_FromDouble,
     .ctx_Float_AsDouble = &ctx_Float_AsDouble,
+    .ctx_Bool_FromLong = &ctx_Bool_FromLong,
     .ctx_Length = &ctx_Length,
     .ctx_Number_Check = &ctx_Number_Check,
     .ctx_Add = &ctx_Add,

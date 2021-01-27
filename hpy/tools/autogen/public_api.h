@@ -125,6 +125,9 @@ HPy_ssize_t HPyLong_AsSsize_t(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
+HPy HPyBool_FromLong(HPyContext ctx, long v);
+
+
 /* abstract.h */
 HPy_ssize_t HPy_Length(HPyContext ctx, HPy h);
 

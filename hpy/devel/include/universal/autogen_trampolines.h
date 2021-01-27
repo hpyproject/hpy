@@ -86,6 +86,10 @@ static inline double HPyFloat_AsDouble(HPyContext ctx, HPy h) {
      return ctx->ctx_Float_AsDouble ( ctx, h ); 
 }
 
+static inline HPy HPyBool_FromLong(HPyContext ctx, long v) {
+     return ctx->ctx_Bool_FromLong ( ctx, v ); 
+}
+
 static inline HPy_ssize_t HPy_Length(HPyContext ctx, HPy h) {
      return ctx->ctx_Length ( ctx, h ); 
 }
