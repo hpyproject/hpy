@@ -25,7 +25,7 @@ typedef struct {
 // such code is detected by the compiler and can be ported.
 // typedef PointObject PyPointObject;
 
-// The PointObject_Cast functoin allows non-legacy methods to convert HPy
+// The PointObject_Cast function allows non-legacy methods to convert HPy
 // handles to PointObject structs. It is not used in this file, but is provided
 // so that methods can start to be ported (see point_hpy_legacy_2.c).
 // HPy_CastLegacy is used because PyObject_HEAD is still present in PointObject.
