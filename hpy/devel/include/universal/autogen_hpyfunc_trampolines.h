@@ -372,3 +372,33 @@ typedef struct {
         return a.result; \
     }
 
+typedef struct {
+    cpy_PyObject *arg0;
+    HPy_buffer *arg1;
+    int arg2;
+    int result;
+} _HPyFunc_args_GETBUFFERPROC;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_GETBUFFERPROC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *arg0, HPy_buffer *arg1, int arg2) \
+    { \
+        _HPyFunc_args_GETBUFFERPROC a = { arg0, arg1, arg2 }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_GETBUFFERPROC, IMPL, &a); \
+        return a.result; \
+    }
+
+typedef struct {
+    cpy_PyObject *arg0;
+    HPy_buffer *arg1;
+} _HPyFunc_args_RELEASEBUFFERPROC;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_RELEASEBUFFERPROC(SYM, IMPL) \
+    static void SYM(cpy_PyObject *arg0, HPy_buffer *arg1) \
+    { \
+        _HPyFunc_args_RELEASEBUFFERPROC a = { arg0, arg1 }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_RELEASEBUFFERPROC, IMPL, &a); \
+        return; \
+    }
+

@@ -264,6 +264,49 @@ class TestSlots(HPyTest):
         tmp **= 42
         assert tmp == (p, 'inplace_power', 42, None)
 
+    def test_buffer(self):
+        mod = self.make_module("""
+            typedef struct {
+                HPyObject_HEAD
+            } FakeArrayObject;
+
+            static char static_mem[12] = {0,1,2,3,4,5,6,7,8,9,10,11};
+            static HPy_ssize_t _shape[1] = {12};
+            static HPy_ssize_t _strides[1] = {1};
+            static HPy_buffer fakebuf = {
+                .buf = static_mem,
+                .len = 12,
+                .itemsize = 1,
+                .readonly = 1,
+                .ndim = 1,
+                .format = "B",
+                .shape = _shape,
+                .strides = _strides,
+            };
+
+            HPyDef_SLOT(FakeArray_getbuffer, _getbuffer_impl, HPy_bf_getbuffer)
+            static int _getbuffer_impl(HPyContext ctx, HPy self, HPy_buffer* buf, int flags) {
+                *buf = fakebuf;
+                buf->obj = HPy_Dup(ctx, self);
+                return 0;
+            }
+
+            static HPyDef *FakeArray_defines[] = {
+                &FakeArray_getbuffer,
+                //&FakeArray_releasebuffer,
+                NULL
+            };
+
+            static HPyType_Spec FakeArray_Spec = {
+                .name = "mytest.FakeArray",
+                .basicsize = sizeof(FakeArrayObject),
+                .defines = FakeArray_defines,
+            };
+
+            @EXPORT_TYPE("FakeArray", FakeArray_Spec)
+            @INIT
+        """)
+
 
 class TestSqSlots(HPyTest):
 

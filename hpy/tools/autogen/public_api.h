@@ -15,7 +15,7 @@ typedef int HPyListBuilder;
 typedef int HPyTupleBuilder;
 typedef int HPyTracker;
 typedef int HPy_RichCmpOp;
-
+typedef int HPy_buffer;
 
 /* HPy public API */
 
@@ -329,6 +329,8 @@ typedef int (*HPyFunc_initproc)(HPyContext ctx, HPy self,
 typedef HPy (*HPyFunc_getter)(HPyContext ctx, HPy, void *);
 typedef int (*HPyFunc_setter)(HPyContext ctx, HPy, HPy, void *);
 typedef int (*HPyFunc_objobjproc)(HPyContext ctx, HPy, HPy);
+typedef int (*HPyFunc_getbufferproc)(HPyContext, HPy, HPy_buffer *, int);
+typedef void (*HPyFunc_releasebufferproc)(HPyContext, HPy, HPy_buffer *);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
@@ -348,6 +350,8 @@ typedef void (*HPyFunc_destroyfunc)(void *);
 
 /* Note that the magic numbers are the same as CPython */
 typedef enum {
+    HPy_bf_getbuffer = SLOT(1, HPyFunc_GETBUFFERPROC),
+    HPy_bf_releasebuffer = SLOT(2, HPyFunc_RELEASEBUFFERPROC),
     //HPy_mp_ass_subscript = SLOT(3, HPyFunc_X),
     //HPy_mp_length = SLOT(4, HPyFunc_X),
     //HPy_mp_subscript = SLOT(5, HPyFunc_X),

@@ -160,3 +160,15 @@
         a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1));
         return;
     }
+    case HPyFunc_GETBUFFERPROC: {
+        HPyFunc_getbufferproc f = (HPyFunc_getbufferproc)func;
+        _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;
+        a->result = f(ctx, _py2h(a->arg0), a->arg1, a->arg2);
+        return;
+    }
+    case HPyFunc_RELEASEBUFFERPROC: {
+        HPyFunc_releasebufferproc f = (HPyFunc_releasebufferproc)func;
+        _HPyFunc_args_RELEASEBUFFERPROC *a = (_HPyFunc_args_RELEASEBUFFERPROC*)args;
+        f(ctx, _py2h(a->arg0), a->arg1);
+        return;
+    }

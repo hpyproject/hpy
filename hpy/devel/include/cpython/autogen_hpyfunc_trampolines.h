@@ -130,3 +130,13 @@
     { \
         return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1))); \
     }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_GETBUFFERPROC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *arg0, HPy_buffer *arg1, int arg2) \
+    { \
+        return (IMPL(_HPyGetContext(), _py2h(arg0), arg1, arg2)); \
+    }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_RELEASEBUFFERPROC(SYM, IMPL) \
+    static void SYM(cpy_PyObject *arg0, HPy_buffer *arg1) \
+    { \
+        return (IMPL(_HPyGetContext(), _py2h(arg0), arg1)); \
+    }
