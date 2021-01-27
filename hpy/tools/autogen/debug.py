@@ -3,7 +3,7 @@ import textwrap
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
-from .hpyfunc import SPECIAL_CASES
+from .hpyfunc import NO_CALL
 
 class HPy_2_DHPy_Visitor(c_ast.NodeVisitor):
     "Visitor which renames all HPy types to DHPy"
@@ -124,7 +124,7 @@ class autogen_debug_ctx_call_i(AutoGenFile):
         for hpyfunc in self.api.hpyfunc_typedefs:
             name = hpyfunc.base_name()
             NAME = name.upper()
-            if NAME in SPECIAL_CASES:
+            if NAME in NO_CALL:
                 continue
             #
             c_ret_type = toC(hpyfunc.return_type())
