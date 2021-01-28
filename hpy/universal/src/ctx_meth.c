@@ -1,5 +1,6 @@
 #include <Python.h>
 #include "ctx_meth.h"
+#include "common/runtime/ctx_type.h"
 #include "handles.h"
 
 HPyAPI_STORAGE void
@@ -69,7 +70,7 @@ ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, PyObject *self)
      */
     void *obj = (void *)self;
     if (!(self->ob_type->tp_flags & HPy_TPFLAGS_LEGACY)) {
-        obj = obj + 16; /* XXX */
+        obj = obj + HPyPure_PyObject_HEAD_SIZE;
     }
     HPyFunc_destroyfunc f = (HPyFunc_destroyfunc)func;
     f(obj);
