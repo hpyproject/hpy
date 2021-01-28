@@ -39,10 +39,7 @@ class PointTemplate(DefaultExtensionTemplate):
                 long y;
             }} PointObject;
 
-            static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h)
-            {{
-                return (PointObject*) {cast_function}(ctx, h);
-            }}
+            HPy_CUSTOM_CAST(PointObject_Cast, PointObject, {cast_function})
         """.format(
             maybe_python_h=self.INCLUDE_PYTHON_H_IF_LEGACY(),
             maybe_pyobject_head=self.PREPEND_PYOBJECT_HEAD_IF_LEGACY(),
