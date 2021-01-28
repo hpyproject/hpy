@@ -201,6 +201,8 @@ static void init_universal_ctx(HPyContext ctx)
     ctx->h_None = _py2h(Py_None);
     ctx->h_True = _py2h(Py_True);
     ctx->h_False = _py2h(Py_False);
+    ctx->h_NotImplemented = _py2h(Py_NotImplemented);
+    ctx->h_Ellipsis = _py2h(Py_Ellipsis);
     /* Exceptions */
     ctx->h_BaseException = _py2h(PyExc_BaseException);
     ctx->h_Exception = _py2h(PyExc_Exception);

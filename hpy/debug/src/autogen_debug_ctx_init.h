@@ -141,6 +141,8 @@ static inline void debug_ctx_init_fields(HPyContext dctx, HPyContext uctx)
     dctx->h_None = DHPy_wrap(dctx, uctx->h_None);
     dctx->h_True = DHPy_wrap(dctx, uctx->h_True);
     dctx->h_False = DHPy_wrap(dctx, uctx->h_False);
+    dctx->h_NotImplemented = DHPy_wrap(dctx, uctx->h_NotImplemented);
+    dctx->h_Ellipsis = DHPy_wrap(dctx, uctx->h_Ellipsis);
     dctx->h_BaseException = DHPy_wrap(dctx, uctx->h_BaseException);
     dctx->h_Exception = DHPy_wrap(dctx, uctx->h_Exception);
     dctx->h_StopAsyncIteration = DHPy_wrap(dctx, uctx->h_StopAsyncIteration);

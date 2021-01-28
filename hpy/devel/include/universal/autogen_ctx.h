@@ -17,6 +17,8 @@ struct _HPyContext_s {
     HPy h_None;
     HPy h_True;
     HPy h_False;
+    HPy h_NotImplemented;
+    HPy h_Ellipsis;
     HPy h_BaseException;
     HPy h_Exception;
     HPy h_StopAsyncIteration;

@@ -50,6 +50,8 @@ typedef struct _HPyContext_s {
     HPy h_None;
     HPy h_True;
     HPy h_False;
+    HPy h_NotImplemented;
+    HPy h_Ellipsis;
     /* Exceptions */
     HPy h_BaseException;
     HPy h_Exception;
@@ -147,6 +149,8 @@ _HPyGetContext(void) {
         ctx->h_None = _py2h(Py_None);
         ctx->h_True = _py2h(Py_True);
         ctx->h_False = _py2h(Py_False);
+        ctx->h_NotImplemented = _py2h(Py_NotImplemented);
+        ctx->h_Ellipsis = _py2h(Py_Ellipsis);
         /* Exceptions */
         ctx->h_BaseException = _py2h(PyExc_BaseException);
         ctx->h_Exception = _py2h(PyExc_Exception);
