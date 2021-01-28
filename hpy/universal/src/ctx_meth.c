@@ -62,9 +62,15 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
 HPyAPI_STORAGE void
 ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, PyObject *self)
 {
-    /* this is _HPy_Cast(_py2h(self)), but this just returns self for now */
+    /* It would be more consistent to call HPy_Cast or HPy_CastLegacy on
+     * _py2h(self), but HPy_Cast calls _h2py(...) which checks whether
+     * the reference count of the object passed is non-zero, which it isn't
+     * at this point because the object is in the process of being destroyed.
+     */
     void *obj = (void *)self;
-
+    if (!(self->ob_type->tp_flags & HPy_TPFLAGS_LEGACY)) {
+        obj = obj + 16; /* XXX */
+    }
     HPyFunc_destroyfunc f = (HPyFunc_destroyfunc)func;
     f(obj);
 

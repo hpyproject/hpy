@@ -56,7 +56,11 @@
     static void                                                         \
     SYM(PyObject *self)                                                 \
     {                                                                   \
-        IMPL(self);                                                     \
+        void *data = (void*) self;                                      \
+        if (!(self->ob_type->tp_flags & HPy_TPFLAGS_LEGACY)) {          \
+            data = data + 16; /* XXX */                                 \
+        }                                                               \
+        IMPL(data);                                                     \
         Py_TYPE(self)->tp_free(self);                                   \
     }
 
