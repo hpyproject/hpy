@@ -102,6 +102,11 @@ double debug_ctx_Float_AsDouble(HPyContext dctx, DHPy h)
     return HPyFloat_AsDouble(get_info(dctx)->uctx, DHPy_unwrap(h));
 }
 
+DHPy debug_ctx_Bool_FromLong(HPyContext dctx, long v)
+{
+    return DHPy_wrap(dctx, HPyBool_FromLong(get_info(dctx)->uctx, v));
+}
+
 HPy_ssize_t debug_ctx_Length(HPyContext dctx, DHPy h)
 {
     return HPy_Length(get_info(dctx)->uctx, DHPy_unwrap(h));
@@ -385,6 +390,16 @@ int debug_ctx_SetItem_i(HPyContext dctx, DHPy obj, HPy_ssize_t idx, DHPy value)
 int debug_ctx_SetItem_s(HPyContext dctx, DHPy obj, const char *key, DHPy value)
 {
     return HPy_SetItem_s(get_info(dctx)->uctx, DHPy_unwrap(obj), key, DHPy_unwrap(value));
+}
+
+DHPy debug_ctx_Type(HPyContext dctx, DHPy obj)
+{
+    return DHPy_wrap(dctx, HPy_Type(get_info(dctx)->uctx, DHPy_unwrap(obj)));
+}
+
+int debug_ctx_TypeCheck(HPyContext dctx, DHPy obj, DHPy type)
+{
+    return HPy_TypeCheck(get_info(dctx)->uctx, DHPy_unwrap(obj), DHPy_unwrap(type));
 }
 
 void *debug_ctx_Cast(HPyContext dctx, DHPy h)
