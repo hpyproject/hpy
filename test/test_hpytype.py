@@ -268,7 +268,7 @@ class TestType(HPyTest):
                 ]:
             mod = self.make_module("""
             typedef struct {
-                HPyObject_HEAD
+                PyObject_HEAD
                 %(c_type)s member;
             } FooObject;
 
@@ -329,7 +329,7 @@ class TestType(HPyTest):
                 ]:
             mod = self.make_module("""
             typedef struct {
-                HPyObject_HEAD
+                PyObject_HEAD
                 %(c_type)s member;
             } FooObject;
 
@@ -376,7 +376,7 @@ class TestType(HPyTest):
         mod = self.make_module("""
             #include <string.h>
             typedef struct {
-                HPyObject_HEAD
+                PyObject_HEAD
                 float FLOAT_member;
                 double DOUBLE_member;
                 const char* STRING_member;
@@ -490,7 +490,7 @@ class TestType(HPyTest):
         mod = self.make_module("""
             #include <string.h>
             typedef struct {
-                HPyObject_HEAD
+                PyObject_HEAD
                 float FLOAT_member;
                 double DOUBLE_member;
                 const char* STRING_member;

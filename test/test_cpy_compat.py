@@ -297,7 +297,7 @@ class TestCPythonCompatibility(HPyTest):
             #include "structmember.h"
 
             typedef struct {
-                HPyObject_HEAD
+                PyObject_HEAD
                 long x;
                 long y;
             } PointObject;
@@ -360,7 +360,7 @@ class TestCPythonCompatibility(HPyTest):
             #include <Python.h>
 
             typedef struct {
-                HPyObject_HEAD
+                PyObject_HEAD
                 long x;
                 long y;
             } PointObject;
