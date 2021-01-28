@@ -70,7 +70,7 @@ ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, PyObject *self)
      */
     void *obj = (void *)self;
     if (!(self->ob_type->tp_flags & HPy_TPFLAGS_LEGACY)) {
-        obj = obj + HPyPure_PyObject_HEAD_SIZE;
+        obj = (void *) ((char *) obj + HPyPure_PyObject_HEAD_SIZE);
     }
     HPyFunc_destroyfunc f = (HPyFunc_destroyfunc)func;
     f(obj);

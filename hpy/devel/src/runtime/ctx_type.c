@@ -463,7 +463,7 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     else {
         // For pure HPy custom types, we return a pointer to only the custom
         // struct data, without the hidden PyObject header.
-        *data = (void*) result + HPyPure_PyObject_HEAD_SIZE;
+        *data = (void*) ((char*) result + HPyPure_PyObject_HEAD_SIZE);
     }
     return _py2h(result);
 }
@@ -485,7 +485,7 @@ ctx_Type_GenericNew(HPyContext ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HP
 _HPy_HIDDEN void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
-    return ((void *) _h2py(h)) + HPyPure_PyObject_HEAD_SIZE;
+    return (void *) ((char *) _h2py(h) + HPyPure_PyObject_HEAD_SIZE);
 }
 
 _HPy_HIDDEN void*
