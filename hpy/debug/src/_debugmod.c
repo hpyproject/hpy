@@ -59,7 +59,27 @@ static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
     return u_result;
 }
 
-/* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~ */
+/* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~
+
+   This is the applevel view of a DebugHandle/DHPy.
+
+   Note that there are two different ways to expose DebugHandle to applevel:
+
+   1. make DebugHandle itself a Python object: this is simple but means that
+      you have to pay the PyObject_HEAD overhead (16 bytes) for all of them
+
+   2. make DebugHandle a plain C struct, and expose them through a
+      Python-level wrapper.
+
+   We choose to implement solution 2 because we expect to have many
+   DebugHandle around, but to expose only few of them to applevel, when you
+   call get_open_handles. This way, we save 16 bytes per DebugHandle.
+
+   This means that you can have different DebugHandleObjects wrapping the same
+   DebugHandle. To make it easier to compare them, they expose the .id
+   attribute, which is the address of the wrapped DebugHandle. Also,
+   DebugHandleObjects compare equal if their .id is equal.
+*/
 
 typedef struct {
     HPyObject_HEAD
@@ -79,7 +99,7 @@ HPyDef_GET(DebugHandle_id, "id", DebugHandle_id_get,
 static UHPy DebugHandle_id_get(HPyContext uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
-    return HPyLong_FromSsize_t(uctx, dh->handle->uh._i);
+    return HPyLong_FromSsize_t(uctx, (HPy_ssize_t)dh->handle);
 }
 
 static HPyDef *DebugHandleType_defs[] = {

@@ -55,9 +55,8 @@ class TestDebug(HPyTest):
         assert b1.obj == b2.obj == 'b'
         #
         assert a1 is not a2
-        assert a1.id == a2.id
-        #
         assert b1 is not b2
-        assert b1.id == b2.id
         #
+        assert a1.id == a2.id
+        assert b1.id == b2.id
         assert a1.id != b1.id
