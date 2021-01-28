@@ -36,6 +36,22 @@
     ((void**)data)                                                            \
   ))
 
+/* A helper for creating cast functions for custom extension types.
+
+   Example for a pure HPy custom type:
+
+       HPy_CUSTOM_CAST(PointObject_Cast, PointObject, HPy_Cast)
+
+   Example for a legacy custom type:
+
+       HPy_CUSTOM_CAST(PointObject_Cast, PointObject, HPy_CastLegacy)
+*/
+
+#define HPy_CUSTOM_CAST(FUNCNAME, TYPE, CAST_FUNCTION) \
+static inline __attribute__((unused)) TYPE *FUNCNAME(HPyContext ctx, HPy h) \
+{ \
+    return (TYPE*) CAST_FUNCTION(ctx, h); \
+}
 
 /* ~~~ HPyTuple_Pack ~~~
 
