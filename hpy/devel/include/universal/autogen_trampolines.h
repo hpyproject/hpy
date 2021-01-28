@@ -326,6 +326,10 @@ static inline HPy HPy_Type(HPyContext ctx, HPy obj) {
      return ctx->ctx_Type ( ctx, obj ); 
 }
 
+static inline int HPy_TypeCheck(HPyContext ctx, HPy obj, HPy type) {
+     return ctx->ctx_TypeCheck ( ctx, obj, type ); 
+}
+
 static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
      return ctx->ctx_Cast ( ctx, h ); 
 }

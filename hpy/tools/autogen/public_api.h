@@ -204,6 +204,8 @@ int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
 int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
 
 HPy HPy_Type(HPyContext ctx, HPy obj);
+// WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
+int HPy_TypeCheck(HPyContext ctx, HPy obj, HPy type);
 
 void* _HPy_Cast(HPyContext ctx, HPy h);
 HPy _HPy_New(HPyContext ctx, HPy h_type, void **data);

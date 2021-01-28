@@ -165,6 +165,7 @@ struct _HPyContext_s {
     int (*ctx_SetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
     int (*ctx_SetItem_s)(HPyContext ctx, HPy obj, const char *key, HPy value);
     HPy (*ctx_Type)(HPyContext ctx, HPy obj);
+    int (*ctx_TypeCheck)(HPyContext ctx, HPy obj, HPy type);
     void *(*ctx_Cast)(HPyContext ctx, HPy h);
     HPy (*ctx_New)(HPyContext ctx, HPy h_type, void **data);
     HPy (*ctx_Repr)(HPyContext ctx, HPy obj);
