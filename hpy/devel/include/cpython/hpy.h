@@ -329,6 +329,12 @@ _HPy_Dump(HPyContext ctx, HPy h)
     return ctx_Dump(ctx, h);
 }
 
+HPyAPI_FUNC(int)
+HPy_TypeCheck(HPyContext ctx, HPy h_obj, HPy h_type)
+{
+    return ctx_TypeCheck(ctx, h_obj, h_type);
+}
+
 HPyAPI_FUNC(HPyListBuilder)
 HPyListBuilder_New(HPyContext ctx, HPy_ssize_t initial_size)
 {
