@@ -32,6 +32,7 @@ _HPy_HIDDEN int
 ctx_TypeCheck(HPyContext ctx, HPy h_obj, HPy h_type)
 {
     PyObject *type= _h2py(h_type);
+    assert(type != NULL);
     if (!PyType_Check(type)) {
         Py_FatalError("HPy_TypeCheck arg 2 must be a type");
     }
