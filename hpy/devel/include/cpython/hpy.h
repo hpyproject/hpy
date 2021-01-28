@@ -312,9 +312,15 @@ HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy k
 }
 
 HPyAPI_FUNC(void*)
-_HPy_Cast(HPyContext ctx, HPy h)
+HPy_Cast(HPyContext ctx, HPy h)
 {
     return ctx_Cast(ctx, h);
+}
+
+HPyAPI_FUNC(void*)
+HPy_CastLegacy(HPyContext ctx, HPy h)
+{
+    return ctx_CastLegacy(ctx, h);
 }
 
 HPyAPI_FUNC(HPy)

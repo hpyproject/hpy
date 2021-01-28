@@ -164,6 +164,7 @@ struct _HPyContext_s global_ctx = {
     .ctx_SetItem_i = &ctx_SetItem_i,
     .ctx_SetItem_s = &ctx_SetItem_s,
     .ctx_Cast = &ctx_Cast,
+    .ctx_CastLegacy = &ctx_CastLegacy,
     .ctx_New = &ctx_New,
     .ctx_Repr = &ctx_Repr,
     .ctx_Str = &ctx_Str,

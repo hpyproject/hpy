@@ -65,7 +65,4 @@ typedef struct {
 /* Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)
 
-#define HPy_Cast(ctx, h) (_HPy_Cast(ctx, h) + sizeof(struct {HPyObject_HEAD}))
-#define HPy_CastLegacy(ctx, h) (_HPy_Cast(ctx, h))
-
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */
