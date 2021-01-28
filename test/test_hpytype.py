@@ -267,6 +267,7 @@ class TestType(HPyTest):
                 ('HPYSSIZET', 'HPy_ssize_t'),
                 ]:
             mod = self.make_module("""
+            #include <Python.h>
             typedef struct {
                 PyObject_HEAD
                 %(c_type)s member;
@@ -328,6 +329,7 @@ class TestType(HPyTest):
                 ('HPYSSIZET', 'HPy_ssize_t'),
                 ]:
             mod = self.make_module("""
+            #include <Python.h>
             typedef struct {
                 PyObject_HEAD
                 %(c_type)s member;
@@ -375,6 +377,7 @@ class TestType(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <string.h>
+            #include <Python.h>
             typedef struct {
                 PyObject_HEAD
                 float FLOAT_member;
@@ -489,6 +492,7 @@ class TestType(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <string.h>
+            #include <Python.h>
             typedef struct {
                 PyObject_HEAD
                 float FLOAT_member;
