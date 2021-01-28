@@ -102,9 +102,30 @@ static UHPy DebugHandle_id_get(HPyContext uctx, UHPy self, void *closure)
     return HPyLong_FromSsize_t(uctx, (HPy_ssize_t)dh->handle);
 }
 
+HPyDef_SLOT(DebugHandle_cmp, DebugHandle_cmp_impl, HPy_tp_richcompare)
+static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmpOp op)
+{
+    UHPy T = HPy_Type(uctx, self);
+    if (!HPy_TypeCheck(uctx, o, T))
+        return HPy_Dup(uctx, uctx->h_NotImplemented);
+    DebugHandleObject *dh_self = HPy_CAST(uctx, DebugHandleObject, self);
+    DebugHandleObject *dh_o = HPy_CAST(uctx, DebugHandleObject, o);
+
+    switch(op) {
+    case HPy_EQ:
+        return HPyBool_FromLong(uctx, dh_self->handle == dh_o->handle);
+    case HPy_NE:
+        return HPyBool_FromLong(uctx, dh_self->handle != dh_o->handle);
+    default:
+        return HPy_Dup(uctx, uctx->h_NotImplemented);
+    }
+}
+
+
 static HPyDef *DebugHandleType_defs[] = {
     &DebugHandle_obj,
     &DebugHandle_id,
+    &DebugHandle_cmp,
     NULL
 };
 
