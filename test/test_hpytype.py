@@ -16,18 +16,38 @@ class PointTemplate(DefaultExtensionTemplate):
     of markers, to test different features.
     """
 
+    LEGACY = False
+
+    def INCLUDE_PYTHON_H_IF_LEGACY(self):
+        if self.LEGACY:
+            return "#include <Python.h>"
+        else:
+            return ""
+
+    def PREPEND_PYOBJECT_HEAD_IF_LEGACY(self):
+        if self.LEGACY:
+            return "PyObject_HEAD"
+        else:
+            return ""
+
     def DEFINE_PointObject(self):
         return """
-            typedef struct {
+            {maybe_python_h}
+            typedef struct {{
+                {maybe_pyobject_head}
                 long x;
                 long y;
-            } PointObject;
+            }} PointObject;
 
             static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h)
-            {
-                return (PointObject*) HPy_Cast(ctx, h);
-            }
-        """
+            {{
+                return (PointObject*) {cast_function}(ctx, h);
+            }}
+        """.format(
+            maybe_python_h=self.INCLUDE_PYTHON_H_IF_LEGACY(),
+            maybe_pyobject_head=self.PREPEND_PYOBJECT_HEAD_IF_LEGACY(),
+            cast_function=("HPy_CastLegacy" if self.LEGACY else "HPy_Cast"),
+        )
 
     def DEFINE_Point_new(self):
         return """
@@ -76,21 +96,7 @@ class LegacyPointTemplate(PointTemplate):
     still provides access to PyObject_HEAD.
     """
 
-    def DEFINE_PointObject(self):
-        return """
-            # include <Python.h>
-
-            typedef struct {
-                PyObject_HEAD
-                long x;
-                long y;
-            } PointObject;
-
-            static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h)
-            {
-                return (PointObject*) HPy_CastLegacy(ctx, h);
-            }
-        """
+    LEGACY = True
 
 
 class TestType(HPyTest):
@@ -267,9 +273,9 @@ class TestType(HPyTest):
                 ('HPYSSIZET', 'HPy_ssize_t'),
                 ]:
             mod = self.make_module("""
-            #include <Python.h>
+            @INCLUDE_PYTHON_H_IF_LEGACY
             typedef struct {
-                PyObject_HEAD
+                @PREPEND_PYOBJECT_HEAD_IF_LEGACY
                 %(c_type)s member;
             } FooObject;
 
@@ -296,6 +302,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy_headersize = offsetof(FooObject, member),
                 .defines = Foo_defines
             };
 
@@ -329,9 +336,9 @@ class TestType(HPyTest):
                 ('HPYSSIZET', 'HPy_ssize_t'),
                 ]:
             mod = self.make_module("""
-            #include <Python.h>
+            @INCLUDE_PYTHON_H_IF_LEGACY
             typedef struct {
-                PyObject_HEAD
+                @PREPEND_PYOBJECT_HEAD_IF_LEGACY
                 %(c_type)s member;
             } FooObject;
 
@@ -358,6 +365,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy_headersize = offsetof(FooObject, member),
                 .defines = Foo_defines
             };
 
@@ -377,9 +385,9 @@ class TestType(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <string.h>
-            #include <Python.h>
+            @INCLUDE_PYTHON_H_IF_LEGACY
             typedef struct {
-                PyObject_HEAD
+                @PREPEND_PYOBJECT_HEAD_IF_LEGACY
                 float FLOAT_member;
                 double DOUBLE_member;
                 const char* STRING_member;
@@ -433,6 +441,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy_headersize = offsetof(FooObject, FLOAT_member),
                 .defines = Foo_defines
             };
 
@@ -492,9 +501,9 @@ class TestType(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <string.h>
-            #include <Python.h>
+            @INCLUDE_PYTHON_H_IF_LEGACY
             typedef struct {
-                PyObject_HEAD
+                @PREPEND_PYOBJECT_HEAD_IF_LEGACY
                 float FLOAT_member;
                 double DOUBLE_member;
                 const char* STRING_member;
@@ -544,6 +553,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy_headersize = offsetof(FooObject, FLOAT_member),
                 .defines = Foo_defines
             };
 
