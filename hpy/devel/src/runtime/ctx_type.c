@@ -514,7 +514,7 @@ ctx_Type_GenericNew(HPyContext ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HP
 _HPy_HIDDEN void*
 ctx_Cast(HPyContext ctx, HPy h)
 {
-    return _h2py(h) + HPyPure_PyObject_HEAD_SIZE;
+    return ((void *) _h2py(h)) + HPyPure_PyObject_HEAD_SIZE;
 }
 
 _HPy_HIDDEN void*
