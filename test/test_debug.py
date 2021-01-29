@@ -117,3 +117,24 @@ class TestDebug(HPyTest):
         mod.leak('hello')
         h_hello, = _debug.get_open_handles(gen)
         assert repr(h_hello) == "<DebugHandle 0x%x for 'hello'>" % h_hello.id
+
+    def test_LeakDetector(self):
+        import pytest
+        from hpy.debug import LeakDetector, HPyLeak
+        mod = self.make_module("""
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(leak)
+            @INIT
+        """)
+        ld = LeakDetector()
+        ld.start()
+        mod.leak('hello')
+        mod.leak('world')
+        with pytest.raises(HPyLeak) as exc:
+            ld.stop()
+        assert str(exc.value).startswith('2 handles have not been closed properly:')
