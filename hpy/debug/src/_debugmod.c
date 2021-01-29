@@ -121,11 +121,43 @@ static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmp
     }
 }
 
+HPyDef_SLOT(DebugHandle_repr, DebugHandle_repr_impl, HPy_tp_repr)
+static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
+{
+    DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
+    UHPy uh_fmt = HPy_NULL;
+    UHPy uh_id = HPy_NULL;
+    UHPy uh_args = HPy_NULL;
+    UHPy uh_result = HPy_NULL;
+
+    uh_fmt = HPyUnicode_FromString(uctx, "<DebugHandle 0x%x for %r>");
+    if (HPy_IsNull(uh_fmt))
+        goto exit;
+
+    uh_id = HPyLong_FromSsize_t(uctx, (HPy_ssize_t)dh->handle);
+    if (HPy_IsNull(uh_id))
+        goto exit;
+
+    uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id, dh->handle->uh}, 2);
+    if (HPy_IsNull(uh_args))
+        goto exit;
+
+    uh_result = HPy_Remainder(uctx, uh_fmt, uh_args);
+
+ exit:
+    HPy_Close(uctx, uh_fmt);
+    HPy_Close(uctx, uh_id);
+    HPy_Close(uctx, uh_args);
+    return uh_result;
+}
+
+
 
 static HPyDef *DebugHandleType_defs[] = {
     &DebugHandle_obj,
     &DebugHandle_id,
     &DebugHandle_cmp,
+    &DebugHandle_repr,
     NULL
 };
 

@@ -99,3 +99,21 @@ class TestDebug(HPyTest):
         assert a1 != 'hello'
         with pytest.raises(TypeError):
             a1 < 'hello'
+
+    def test_DebugHandle_repr(self):
+        import pytest
+        from hpy.universal import _debug
+        mod = self.make_module("""
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(leak)
+            @INIT
+        """)
+        gen = _debug.new_generation()
+        mod.leak('hello')
+        h_hello, = _debug.get_open_handles(gen)
+        assert repr(h_hello) == "<DebugHandle 0x%x for 'hello'>" % h_hello.id
