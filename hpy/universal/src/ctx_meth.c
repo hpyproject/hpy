@@ -88,6 +88,10 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;
         HPy_buffer hbuf;
         a->result = f(ctx, _py2h(a->arg0), &hbuf, a->arg2);
+        if (a->result < 0) {
+            a->arg1->obj = NULL;
+            return;
+        }
         _buffer_h2py(ctx, &hbuf, a->arg1);
         HPy_Close(ctx, hbuf.obj);
         return;

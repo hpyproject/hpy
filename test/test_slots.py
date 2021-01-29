@@ -265,10 +265,13 @@ class TestSlots(HPyTest):
         assert tmp == (p, 'inplace_power', 42, None)
 
     def test_buffer(self):
+        import pytest
         import sys
+        import gc
         mod = self.make_module("""
             typedef struct {
                 HPyObject_HEAD
+                int exports;
             } FakeArrayObject;
 
             static char static_mem[12] = {0,1,2,3,4,5,6,7,8,9,10,11};
@@ -287,14 +290,28 @@ class TestSlots(HPyTest):
 
             HPyDef_SLOT(FakeArray_getbuffer, _getbuffer_impl, HPy_bf_getbuffer)
             static int _getbuffer_impl(HPyContext ctx, HPy self, HPy_buffer* buf, int flags) {
+                FakeArrayObject *arr = HPy_CAST(ctx, FakeArrayObject, self);
+                if (arr->exports > 0) {
+                    buf->obj = HPy_NULL;
+                    HPyErr_SetString(ctx, ctx->h_BufferError,
+                               "only one buffer allowed");
+                    return -1;
+                }
                 *buf = fakebuf;
+                arr->exports++;
                 buf->obj = HPy_Dup(ctx, self);
                 return 0;
             }
 
+            HPyDef_SLOT(FakeArray_releasebuffer, _relbuffer_impl, HPy_bf_releasebuffer)
+            static void _relbuffer_impl(HPyContext ctx, HPy h_obj, HPy_buffer* buf) {
+                FakeArrayObject *arr = HPy_CAST(ctx, FakeArrayObject, h_obj);
+                arr->exports--;
+            }
+
             static HPyDef *FakeArray_defines[] = {
                 &FakeArray_getbuffer,
-                //&FakeArray_releasebuffer,
+                &FakeArray_releasebuffer,
                 NULL
             };
 
@@ -311,13 +328,17 @@ class TestSlots(HPyTest):
         if self.supports_refcounts():
             init_refcount = sys.getrefcount(arr)
         mv = memoryview(arr)
+        with pytest.raises(BufferError):
+            mv2 = memoryview(arr)
         if self.supports_refcounts():
             assert sys.getrefcount(arr) == init_refcount + 1
         for i in range(12):
             assert mv[i] == i
         mv = None
+        gc.collect()
         if self.supports_refcounts():
             assert sys.getrefcount(arr) == init_refcount
+        mv2 = memoryview(arr)  # doesn't raise
 
 
 class TestSqSlots(HPyTest):
