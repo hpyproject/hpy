@@ -125,6 +125,9 @@ HPy_ssize_t HPyLong_AsSsize_t(HPyContext ctx, HPy h);
 HPy HPyFloat_FromDouble(HPyContext ctx, double v);
 double HPyFloat_AsDouble(HPyContext ctx, HPy h);
 
+HPy HPyBool_FromLong(HPyContext ctx, long v);
+
+
 /* abstract.h */
 HPy_ssize_t HPy_Length(HPyContext ctx, HPy h);
 
@@ -200,8 +203,13 @@ int HPy_SetItem(HPyContext ctx, HPy obj, HPy key, HPy value);
 int HPy_SetItem_i(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value);
 int HPy_SetItem_s(HPyContext ctx, HPy obj, const char *key, HPy value);
 
+HPy HPy_Type(HPyContext ctx, HPy obj);
+// WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
+int HPy_TypeCheck(HPyContext ctx, HPy obj, HPy type);
+
 void* HPy_Cast(HPyContext ctx, HPy h);
 void* HPy_CastLegacy(HPyContext ctx, HPy h);
+
 HPy _HPy_New(HPyContext ctx, HPy h_type, void **data);
 
 HPy HPy_Repr(HPyContext ctx, HPy obj);
