@@ -409,8 +409,17 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     else {
         // HPyPure_PyObject_HEAD_SIZE ensures that the custom struct is
         // correctly aligned.
-        basicsize = hpyspec->basicsize + HPyPure_PyObject_HEAD_SIZE;
-        base_member_offset = HPyPure_PyObject_HEAD_SIZE;
+        if (hpyspec->basicsize != 0) {
+            basicsize = hpyspec->basicsize + HPyPure_PyObject_HEAD_SIZE;
+            base_member_offset = HPyPure_PyObject_HEAD_SIZE;
+        }
+        else {
+            // If basicsize is 0, it is inherited from the parent type.
+            // Calling HPy_Cast on inherited type only makes sense if the
+            // parent type is already an HPy extension type.
+            basicsize = 0;
+            base_member_offset = 0;
+        }
         flags &= ~HPy_TPFLAGS_LEGACY;
     }
     spec->name = hpyspec->name;
