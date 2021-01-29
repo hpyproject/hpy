@@ -213,7 +213,7 @@ class TestBasic(HPyTest):
         """)
         builtin_objs = (
             '<NULL>', None, False, True, ValueError, TypeError, IndexError,
-            SystemError, object, type, int, str, tuple, list, NotImplemented, ...,
+            SystemError, object, type, int, str, tuple, list, NotImplemented, Ellipsis,
         )
         for i, obj in enumerate(builtin_objs):
             if i == 0:
