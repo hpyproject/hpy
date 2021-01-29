@@ -138,3 +138,16 @@ class TestDebug(HPyTest):
         with pytest.raises(HPyLeak) as exc:
             ld.stop()
         assert str(exc.value).startswith('2 handles have not been closed properly:')
+        #
+        with pytest.raises(HPyLeak) as exc:
+            with LeakDetector():
+                mod.leak('foo')
+                mod.leak('bar')
+                mod.leak('baz')
+        msg = str(exc.value)
+        assert msg.startswith('3 handles have not been closed properly:')
+        assert 'foo' in msg
+        assert 'bar' in msg
+        assert 'baz' in msg
+        assert 'hello' not in msg
+        assert 'world' not in msg

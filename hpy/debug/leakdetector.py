@@ -33,5 +33,9 @@ class LeakDetector:
         if leaks:
             raise HPyLeak(leaks)
 
+    def __enter__(self):
+        self.start()
+        return self
 
-
+    def __exit__(self, etype, evalue, tb):
+        self.stop()
