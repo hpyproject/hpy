@@ -265,6 +265,7 @@ class TestSlots(HPyTest):
         assert tmp == (p, 'inplace_power', 42, None)
 
     def test_buffer(self):
+        import sys
         mod = self.make_module("""
             typedef struct {
                 HPyObject_HEAD
@@ -306,6 +307,17 @@ class TestSlots(HPyTest):
             @EXPORT_TYPE("FakeArray", FakeArray_Spec)
             @INIT
         """)
+        arr = mod.FakeArray()
+        if self.supports_refcounts():
+            init_refcount = sys.getrefcount(arr)
+        mv = memoryview(arr)
+        if self.supports_refcounts():
+            assert sys.getrefcount(arr) == init_refcount + 1
+        for i in range(12):
+            assert mv[i] == i
+        mv = None
+        if self.supports_refcounts():
+            assert sys.getrefcount(arr) == init_refcount
 
 
 class TestSqSlots(HPyTest):
