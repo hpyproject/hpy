@@ -69,17 +69,17 @@
         return _h2py(IMPL(_HPyGetContext(), _py2h(self), _py2h(obj), op)); \
     }
 
-/* With the cpython ABI, the implicit casts from Py_buffer* to HPy_buffer*
+/* With the cpython ABI, the casts from Py_buffer* to HPy_buffer*
  * happen to Just Work, which makes things easier. */
 #define _HPyFunc_TRAMPOLINE_HPyFunc_GETBUFFERPROC(SYM, IMPL) \
-    static int SYM(cpy_PyObject *arg0, HPy_buffer *arg1, int arg2) \
+    static int SYM(PyObject *arg0, Py_buffer *arg1, int arg2) \
     { \
-        return (IMPL(_HPyGetContext(), _py2h(arg0), arg1, arg2)); \
+        return (IMPL(_HPyGetContext(), _py2h(arg0), (HPy_buffer*)arg1, arg2)); \
     }
 #define _HPyFunc_TRAMPOLINE_HPyFunc_RELEASEBUFFERPROC(SYM, IMPL) \
-    static void SYM(cpy_PyObject *arg0, HPy_buffer *arg1) \
+    static void SYM(PyObject *arg0, Py_buffer *arg1) \
     { \
-        return (IMPL(_HPyGetContext(), _py2h(arg0), arg1)); \
+        return (IMPL(_HPyGetContext(), _py2h(arg0), (HPy_buffer*)arg1)); \
     }
 
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
