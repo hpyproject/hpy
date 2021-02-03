@@ -267,7 +267,6 @@ class TestSlots(HPyTest):
     def test_buffer(self):
         import pytest
         import sys
-        import gc
         mod = self.make_module("""
             typedef struct {
                 HPyObject_HEAD
@@ -327,15 +326,13 @@ class TestSlots(HPyTest):
         arr = mod.FakeArray()
         if self.supports_refcounts():
             init_refcount = sys.getrefcount(arr)
-        mv = memoryview(arr)
-        with pytest.raises(BufferError):
-            mv2 = memoryview(arr)
-        if self.supports_refcounts():
-            assert sys.getrefcount(arr) == init_refcount + 1
-        for i in range(12):
-            assert mv[i] == i
-        mv = None
-        gc.collect()
+        with memoryview(arr) as mv:
+            with pytest.raises(BufferError):
+                mv2 = memoryview(arr)
+            if self.supports_refcounts():
+                assert sys.getrefcount(arr) == init_refcount + 1
+            for i in range(12):
+                assert mv[i] == i
         if self.supports_refcounts():
             assert sys.getrefcount(arr) == init_refcount
         mv2 = memoryview(arr)  # doesn't raise
