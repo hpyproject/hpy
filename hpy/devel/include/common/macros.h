@@ -36,21 +36,36 @@
     ((void**)data)                                                            \
   ))
 
-/* A helper for creating cast functions for custom extension types.
+/* A macro for creating (static inline) helper functions for custom types.
+
+   Two versions of the helper exist. One for legacy types and one for pure
+   HPy types.
 
    Example for a pure HPy custom type:
 
-       HPy_CUSTOM_CAST(PointObject_Cast, PointObject, HPy_Cast)
+       HPy_TYPE_HELPERS(PointObject)
+
+   This would generate a static inline function named HPy_AsPointObject that
+   uses HPy_Cast to return the PointObject struct associated with a given
+   handle.
 
    Example for a legacy custom type:
 
-       HPy_CUSTOM_CAST(PointObject_Cast, PointObject, HPy_CastLegacy)
+       HPy_LEGACY_TYPE_HELPERS(PointObject)
+
+   This would generate a similar function that used HPy_CastLegacy instead.
 */
 
-#define HPy_CUSTOM_CAST(FUNCNAME, TYPE, CAST_FUNCTION) \
-static inline __attribute__((unused)) TYPE *FUNCNAME(HPyContext ctx, HPy h) \
+#define HPy_TYPE_HELPERS(TYPE) \
+static inline __attribute__((unused)) TYPE *HPy_As ## TYPE(HPyContext ctx, HPy h) \
 { \
-    return (TYPE*) CAST_FUNCTION(ctx, h); \
+    return (TYPE*) HPy_Cast(ctx, h); \
+}
+
+#define HPy_LEGACY_TYPE_HELPERS(TYPE) \
+static inline __attribute__((unused)) TYPE *HPy_As ## TYPE(HPyContext ctx, HPy h) \
+{ \
+    return (TYPE*) HPy_CastLegacy(ctx, h); \
 }
 
 /* ~~~ HPyTuple_Pack ~~~

@@ -31,6 +31,10 @@ class PointTemplate(DefaultExtensionTemplate):
             return ""
 
     def DEFINE_PointObject(self):
+        if self.LEGACY:
+            hpy_type_helpers = "HPy_LEGACY_TYPE_HELPERS"
+        else:
+            hpy_type_helpers = "HPy_TYPE_HELPERS"
         return """
             {maybe_python_h}
             typedef struct {{
@@ -39,11 +43,11 @@ class PointTemplate(DefaultExtensionTemplate):
                 long y;
             }} PointObject;
 
-            HPy_CUSTOM_CAST(PointObject_Cast, PointObject, {cast_function})
+            {hpy_type_helpers}(PointObject)
         """.format(
             maybe_python_h=self.INCLUDE_PYTHON_H_IF_LEGACY(),
             maybe_pyobject_head=self.PREPEND_PYOBJECT_HEAD_IF_LEGACY(),
-            cast_function=("HPy_CastLegacy" if self.LEGACY else "HPy_Cast"),
+            hpy_type_helpers=hpy_type_helpers,
         )
 
     def DEFINE_Point_new(self):
@@ -207,7 +211,7 @@ class TestType(HPyTest):
             HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -622,7 +626,7 @@ class TestType(HPyTest):
             HPyDef_GET(Point_z, "z", Point_z_get)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -640,12 +644,12 @@ class TestType(HPyTest):
             HPyDef_GETSET(Point_z, "z", Point_z_get, Point_z_set, .closure=(void *)1000)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y + (long)closure);
             }
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
@@ -669,7 +673,7 @@ class TestType(HPyTest):
             HPyDef_SET(Point_z, "z", Point_z_set, .closure=(void *)1000)
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
