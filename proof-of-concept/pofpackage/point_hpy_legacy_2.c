@@ -27,20 +27,19 @@ typedef struct {
 // removed so that code that still expects PyObject_HEAD will fail to compile.
 typedef PointObject PyPointObject;
 
-// The PointObject_Cast function allows non-legacy methods to convert HPy
-// handles to PointObject structs. It is not used in this file, but is provided
-// so that methods can start to be ported (see point_hpy_legacy_2.c).
-// HPy_CastLegacy is used because PyObject_HEAD is still present in PointObject.
-static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
-    return (PointObject*) HPy_CastLegacy(ctx, h);
-}
+// The legacy type helper macro defines an HPy_AsPointObject function allows
+// non-legacy methods to convert HPy handles to PointObject structs. The legacy
+// type helper macro is used because PyObject_HEAD is still present in
+// PointObject. Once PyObject_HEAD has been removed (see point_hpy_final.c) we
+// will use HPy_TYPE_HELPERS instead.
+HPy_LEGACY_TYPE_HELPERS(PointObject)
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", NULL};
-    PointObject *p = PointObject_Cast(ctx, self);
+    PointObject *p = HPy_AsPointObject(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
@@ -53,7 +52,7 @@ int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy 
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext ctx, HPy self)
 {
-    PointObject *p = PointObject_Cast(ctx, self);
+    PointObject *p = HPy_AsPointObject(ctx, self);
     double norm;
     HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);

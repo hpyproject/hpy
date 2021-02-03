@@ -27,13 +27,13 @@ typedef struct {
 // removed so that code that still expects PyObject_HEAD will fail to compile.
 typedef PointObject PyPointObject;
 
-// The PointObject_Cast function allows non-legacy methods to convert HPy
-// handles to PointObject structs. It is not used in this file, but is provided
-// so that methods can start to be ported (see point_hpy_legacy_2.c).
-// HPy_CastLegacy is used because PyObject_HEAD is still present in PointObject.
-static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
-    return (PointObject*) HPy_CastLegacy(ctx, h);
-}
+// The legacy type helper macro defines an HPy_AsPointObject function allows
+// non-legacy methods to convert HPy handles to PointObject structs. It is not
+// used in this file, but is provided so that methods can start to be ported
+// (see point_hpy_legacy_2.c). The legacy type helper macro is used because
+// PyObject_HEAD is still present in PointObject. Once PyObject_HEAD has been
+// removed (see point_hpy_final.c) we will use HPy_TYPE_HELPERS instead.
+HPy_LEGACY_TYPE_HELPERS(PointObject)
 
 // this is a method for creating a Point
 int Point_init(PyObject *self, PyObject *args, PyObject *kw)
