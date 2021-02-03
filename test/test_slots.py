@@ -19,7 +19,7 @@ class TestSlots(HPyTest):
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &x, &y))
                     return -1;
 
-                PointObject *p = PointObject_Cast(ctx, self);
+                PointObject *p = HPy_AsPointObject(ctx, self);
                 p->x = x;
                 p->y = y;
                 return 0;
@@ -217,7 +217,7 @@ class TestSlots(HPyTest):
             HPyDef_SLOT(p_bool, p_bool_impl, HPy_nb_bool);
             static int p_bool_impl(HPyContext ctx, HPy self)
             {
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 return (point->x != 0);
             }
 
@@ -319,7 +319,7 @@ class TestSqSlots(HPyTest):
                     if (HPyErr_Occurred(ctx))
                         return -1;
                 }
-                PointObject *point = PointObject_Cast(ctx, self);
+                PointObject *point = HPy_AsPointObject(ctx, self);
                 if (idx == 0)
                     point->x = value;
                 else if (idx == 1)
@@ -462,8 +462,8 @@ class TestSqSlots(HPyTest):
             static HPy Point_cmp_impl(HPyContext ctx, HPy self, HPy o, HPy_RichCmpOp op)
             {
                 // XXX we should check the type of o
-                PointObject *p1 = PointObject_Cast(ctx, self);
-                PointObject *p2 = PointObject_Cast(ctx, o);
+                PointObject *p1 = HPy_AsPointObject(ctx, self);
+                PointObject *p2 = HPy_AsPointObject(ctx, o);
                 HPy_RETURN_RICHCOMPARE(ctx, p1->x, p2->x, op);
             }
 
