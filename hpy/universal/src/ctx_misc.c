@@ -21,7 +21,8 @@ ctx_AsPyObject(HPyContext ctx, HPy h)
 HPyAPI_STORAGE void
 ctx_Close(HPyContext ctx, HPy h)
 {
-    _hclose(h);
+    PyObject *obj = _h2py(h);
+    Py_XDECREF(obj);
 }
 
 HPyAPI_STORAGE HPy
