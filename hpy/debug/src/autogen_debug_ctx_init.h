@@ -92,6 +92,7 @@ int debug_ctx_SetItem_s(HPyContext dctx, DHPy obj, const char *key, DHPy value);
 DHPy debug_ctx_Type(HPyContext dctx, DHPy obj);
 int debug_ctx_TypeCheck(HPyContext dctx, DHPy obj, DHPy type);
 void *debug_ctx_Cast(HPyContext dctx, DHPy h);
+void *debug_ctx_CastLegacy(HPyContext dctx, DHPy h);
 DHPy debug_ctx_New(HPyContext dctx, DHPy h_type, void **data);
 DHPy debug_ctx_Repr(HPyContext dctx, DHPy obj);
 DHPy debug_ctx_Str(HPyContext dctx, DHPy obj);
@@ -295,6 +296,7 @@ static inline void debug_ctx_init_fields(HPyContext dctx, HPyContext uctx)
     dctx->ctx_Type = &debug_ctx_Type;
     dctx->ctx_TypeCheck = &debug_ctx_TypeCheck;
     dctx->ctx_Cast = &debug_ctx_Cast;
+    dctx->ctx_CastLegacy = &debug_ctx_CastLegacy;
     dctx->ctx_New = &debug_ctx_New;
     dctx->ctx_Repr = &debug_ctx_Repr;
     dctx->ctx_Str = &debug_ctx_Str;

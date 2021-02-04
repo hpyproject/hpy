@@ -404,7 +404,12 @@ int debug_ctx_TypeCheck(HPyContext dctx, DHPy obj, DHPy type)
 
 void *debug_ctx_Cast(HPyContext dctx, DHPy h)
 {
-    return _HPy_Cast(get_info(dctx)->uctx, DHPy_unwrap(h));
+    return HPy_Cast(get_info(dctx)->uctx, DHPy_unwrap(h));
+}
+
+void *debug_ctx_CastLegacy(HPyContext dctx, DHPy h)
+{
+    return HPy_CastLegacy(get_info(dctx)->uctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_New(HPyContext dctx, DHPy h_type, void **data)
