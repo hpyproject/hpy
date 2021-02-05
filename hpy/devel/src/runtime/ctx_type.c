@@ -330,12 +330,20 @@ create_buffer_procs(HPyType_Spec *hpyspec)
                 case HPy_bf_getbuffer:
                     if (buffer_procs == NULL) {
                         buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        if (buffer_procs == NULL) {
+                            PyErr_NoMemory();
+                            return NULL;
+                        }
                     }
                     buffer_procs->bf_getbuffer = src->slot.cpy_trampoline;
                     break;
                 case HPy_bf_releasebuffer:
                     if (buffer_procs == NULL) {
                         buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        if (buffer_procs == NULL) {
+                            PyErr_NoMemory();
+                            return NULL;
+                        }
                     }
                     buffer_procs->bf_releasebuffer = src->slot.cpy_trampoline;
                     break;
@@ -459,9 +467,16 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
+    if (result == NULL) {
+        return HPy_NULL;
+    }
     PyBufferProcs* buffer_procs = create_buffer_procs(hpyspec);
     if (buffer_procs) {
         ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
+    } else {
+        if (PyErr_Occurred()) {
+            return HPy_NULL;
+        }
     }
     return _py2h(result);
 }
