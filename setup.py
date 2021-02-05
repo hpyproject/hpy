@@ -5,7 +5,8 @@ from setuptools import setup, Extension
 if 'HPY_DEBUG' in os.environ:
     # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
     # functions are available to call inside GDB
-    EXTRA_COMPILE_ARGS = ['-g', '-O0', '-fkeep-inline-functions']
+    EXTRA_COMPILE_ARGS = ['-g', '-O0', '-UNDEBUG',
+                          '-fkeep-inline-functions']
 else:
     EXTRA_COMPILE_ARGS = []
 
@@ -47,7 +48,6 @@ if sys.implementation.name == 'cpython':
     EXT_MODULES += [
         Extension('hpy.universal',
                   ['hpy/universal/src/hpymodule.c',
-                   'hpy/universal/src/handles.c',
                    'hpy/universal/src/ctx.c',
                    'hpy/universal/src/ctx_meth.c',
                    'hpy/universal/src/ctx_misc.c',
@@ -60,10 +60,16 @@ if sys.implementation.name == 'cpython':
                    'hpy/devel/src/runtime/ctx_listbuilder.c',
                    'hpy/devel/src/runtime/ctx_tuple.c',
                    'hpy/devel/src/runtime/ctx_tuplebuilder.c',
+                   'hpy/debug/src/debug_ctx.c',
+                   'hpy/debug/src/debug_ctx_cpython.c',
+                   'hpy/debug/src/debug_handles.c',
+                   'hpy/debug/src/_debugmod.c',
+                   'hpy/debug/src/autogen_debug_wrappers.c',
                   ],
                   include_dirs=[
                       'hpy/devel/include',
                       'hpy/universal/src',
+                      'hpy/debug/src/include',
                   ],
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',

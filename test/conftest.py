@@ -11,7 +11,7 @@ def hpy_devel(request):
     from hpy.devel import HPyDevel
     return HPyDevel()
 
-@pytest.fixture(params=['cpython', 'universal'])
+@pytest.fixture(params=['cpython', 'universal', 'debug'])
 def hpy_abi(request):
     return request.param
 

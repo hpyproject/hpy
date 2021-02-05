@@ -23,6 +23,8 @@ typedef int HPy_buffer;
 HPy h_None;
 HPy h_True;
 HPy h_False;
+HPy h_NotImplemented;
+HPy h_Ellipsis;
 
 /* Exceptions */
 HPy h_BaseException;

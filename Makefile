@@ -1,8 +1,12 @@
-all:
+.PHONY: all
+all: hpy.universal
+
+.PHONY: hpy.universal
+hpy.universal:
 	python3 setup.py build_ext -if
 
 debug:
-	HPY_DEBUG=1 python3 setup.py build_ext -if
+	HPY_DEBUG=1 make all
 
 autogen:
 	python3 -m hpy.tools.autogen .
@@ -15,7 +19,7 @@ cppcheck: cppcheck-build-dir
 
 infer:
 	python3 setup.py build_ext -if -U NDEBUG | compiledb
-	@infer --fail-on-issue --compilation-database compile_commands.json
+	@infer --fail-on-issue --compilation-database compile_commands.json --report-blacklist-path-regex "hpy/debug/src/debug_ctx.c"
 
 valgrind:
 	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/

@@ -5,6 +5,10 @@ hpy/tools/autogen/autogen_pypy.txt
 hpy/devel/include/common/version.h
 hpy/devel/version.py
 
+# stubs created by setup.py when doing build_ext --inplace
+proof-of-concept/pof.py
+proof-of-concept/pofpackage/foo.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
