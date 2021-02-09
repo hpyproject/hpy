@@ -13,16 +13,17 @@
 
 typedef struct {
     // PyObject_HEAD is no longer available in PointObject. In CPython,
-    // of course, it still exists but is inaccessible from HPy_AsStructPure. In
+    // of course, it still exists but is inaccessible from HPy_AsStruct. In
     // other Python implementations (e.g. PyPy) it might no longer exist at
     // all.
     double x;
     double  y;
 } PointObject;
 
-// Code that used to cast PyObject to PyPointObject relied on PyObject_HEAD
-// as is no longer valid. The typedef below has been deleted to ensure that
-// such code is detected by the compiler and can be ported.
+// Code using PyPointObject relied on PyObject_HEAD and is no longer valid
+// (PyObject_HEAD has been removed from the PointObject struct above). The
+// typedef below has been deleted to ensure that such code is now generates
+// an error during compilation.
 // typedef PointObject PyPointObject;
 
 // The type helper macro defines an HPy_AsPointObject function allows
