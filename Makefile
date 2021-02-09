@@ -19,6 +19,7 @@ cppcheck: cppcheck-build-dir
 
 infer:
 	python3 setup.py build_ext -if -U NDEBUG | compiledb
+	# see commit cd8cd6e for why we need to ignore debug_ctx.c
 	@infer --fail-on-issue --compilation-database compile_commands.json --report-blacklist-path-regex "hpy/debug/src/debug_ctx.c"
 
 valgrind:
