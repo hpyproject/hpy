@@ -234,6 +234,7 @@ class TestCPythonCompatibility(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
+                .legacy = 1,
                 .legacy_slots = Dummy_type_slots,
                 .defines = Dummy_defines
             };
@@ -279,6 +280,7 @@ class TestCPythonCompatibility(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
+                .legacy = 1,
                 .legacy_slots = dummy_type_slots,
                 .defines = dummy_type_defines
             };
@@ -338,6 +340,7 @@ class TestCPythonCompatibility(HPyTest):
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
                 .defines = Point_defines,
+                .legacy = 1,
                 .legacy_slots = legacy_slots
             };
 
@@ -403,6 +406,7 @@ class TestCPythonCompatibility(HPyTest):
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
                 .defines = Point_defines,
+                .legacy = 1,
                 .legacy_slots = legacy_slots
             };
 
