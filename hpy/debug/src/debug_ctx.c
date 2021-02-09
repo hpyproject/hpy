@@ -41,6 +41,10 @@ static int debug_ctx_init(HPyContext dctx, HPyContext uctx)
 HPyContext hpy_debug_get_ctx(HPyContext uctx)
 {
     HPyContext dctx = &g_debug_ctx;
+    if (uctx == dctx) {
+        HPy_FatalError(uctx, "hpy_debug_get_ctx: expected an universal ctx, "
+                             "got a debug ctx");
+    }
     if (debug_ctx_init(dctx, uctx) < 0)
         return NULL;
     return dctx;
