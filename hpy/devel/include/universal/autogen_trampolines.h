@@ -330,12 +330,12 @@ static inline int HPy_TypeCheck(HPyContext ctx, HPy obj, HPy type) {
      return ctx->ctx_TypeCheck ( ctx, obj, type ); 
 }
 
-static inline void *HPy_Cast(HPyContext ctx, HPy h) {
-     return ctx->ctx_Cast ( ctx, h ); 
+static inline void *HPy_AsStruct(HPyContext ctx, HPy h) {
+     return ctx->ctx_AsStruct ( ctx, h ); 
 }
 
-static inline void *HPy_CastLegacy(HPyContext ctx, HPy h) {
-     return ctx->ctx_CastLegacy ( ctx, h ); 
+static inline void *HPy_AsStructLegacy(HPyContext ctx, HPy h) {
+     return ctx->ctx_AsStructLegacy ( ctx, h ); 
 }
 
 static inline HPy HPy_Repr(HPyContext ctx, HPy obj) {

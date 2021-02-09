@@ -209,8 +209,8 @@ HPy HPy_Type(HPyContext ctx, HPy obj);
 // WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
 int HPy_TypeCheck(HPyContext ctx, HPy obj, HPy type);
 
-void* HPy_Cast(HPyContext ctx, HPy h);
-void* HPy_CastLegacy(HPyContext ctx, HPy h);
+void* HPy_AsStruct(HPyContext ctx, HPy h);
+void* HPy_AsStructLegacy(HPyContext ctx, HPy h);
 
 HPy _HPy_New(HPyContext ctx, HPy h_type, void **data);
 

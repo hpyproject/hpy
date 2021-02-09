@@ -5,8 +5,8 @@
 #include "hpy.h"
 #include "common/hpytype.h"
 
-_HPy_HIDDEN void* ctx_Cast(HPyContext ctx, HPy h);
-_HPy_HIDDEN void* ctx_CastLegacy(HPyContext ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct(HPyContext ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStructLegacy(HPyContext ctx, HPy h);
 _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
                                   HPyType_SpecParam *params);
 _HPy_HIDDEN HPy ctx_New(HPyContext ctx, HPy h_type, void **data);

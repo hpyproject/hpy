@@ -45,11 +45,11 @@ class TestHPyAPI(BaseTestAutogen):
         api = self.parse("""
             HPy h_None;
             HPy HPy_Dup(HPyContext ctx, HPy h);
-            void* _HPy_Cast(HPyContext ctx, HPy h);
+            void* _HPy_AsStruct(HPyContext ctx, HPy h);
         """)
         assert api.get_var('h_None').ctx_name() == 'h_None'
         assert api.get_func('HPy_Dup').ctx_name() == 'ctx_Dup'
-        assert api.get_func('_HPy_Cast').ctx_name() == 'ctx_Cast'
+        assert api.get_func('_HPy_AsStruct').ctx_name() == 'ctx_AsStruct'
 
     def test_cpython_name(self):
         api = self.parse("""
@@ -113,7 +113,7 @@ class TestAutoGen(BaseTestAutogen):
         api = self.parse("""
             HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
             void HPy_Close(HPyContext ctx, HPy h);
-            void* _HPy_Cast(HPyContext ctx, HPy h);
+            void* _HPy_AsStruct(HPyContext ctx, HPy h);
         """)
         got = autogen_trampolines_h(api).generate()
         exp = """
@@ -125,8 +125,8 @@ class TestAutoGen(BaseTestAutogen):
                 ctx->ctx_Close ( ctx, h );
             }
 
-            static inline void *_HPy_Cast(HPyContext ctx, HPy h) {
-                return ctx->ctx_Cast ( ctx, h );
+            static inline void *_HPy_AsStruct(HPyContext ctx, HPy h) {
+                return ctx->ctx_AsStruct ( ctx, h );
             }
         """
         assert src_equal(got, exp)

@@ -46,21 +46,21 @@
        HPy_TYPE_HELPERS(PointObject)
 
    This would generate a static inline function named HPy_AsPointObject that
-   uses HPy_Cast to return the PointObject struct associated with a given
+   uses HPy_AsStruct to return the PointObject struct associated with a given
    handle.
 
    Example for a legacy custom type:
 
        HPy_LEGACY_TYPE_HELPERS(PointObject)
 
-   This would generate a similar function that used HPy_CastLegacy instead.
+   This would generate a similar function that used HPy_AsStructLegacy instead.
 */
 
 #define HPyType_HELPERS(TYPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, HPy_Cast, /* no struct header */, 0)
+    _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStruct, /* no struct header */, 0)
 
 #define HPyType_LEGACY_HELPERS(TYPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, HPy_CastLegacy, PyObject_HEAD, 1)
+    _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStructLegacy, PyObject_HEAD, 1)
 
 #define _HPyType_GENERIC_HELPERS(TYPE, CAST, STRUCT_HEADER, STRUCT_IS_LEGACY) \
                                                                      \

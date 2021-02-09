@@ -316,15 +316,15 @@ HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy k
 }
 
 HPyAPI_FUNC(void*)
-HPy_Cast(HPyContext ctx, HPy h)
+HPy_AsStruct(HPyContext ctx, HPy h)
 {
-    return ctx_Cast(ctx, h);
+    return ctx_AsStruct(ctx, h);
 }
 
 HPyAPI_FUNC(void*)
-HPy_CastLegacy(HPyContext ctx, HPy h)
+HPy_AsStructLegacy(HPyContext ctx, HPy h)
 {
-    return ctx_CastLegacy(ctx, h);
+    return ctx_AsStructLegacy(ctx, h);
 }
 
 HPyAPI_FUNC(HPy)

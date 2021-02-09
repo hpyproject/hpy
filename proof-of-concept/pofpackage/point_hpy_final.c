@@ -13,7 +13,7 @@
 
 typedef struct {
     // PyObject_HEAD is no longer available in PointObject. In CPython,
-    // of course, it still exists but is inaccessible from HPy_CastPure. In
+    // of course, it still exists but is inaccessible from HPy_AsStructPure. In
     // other Python implementations (e.g. PyPy) it might no longer exist at
     // all.
     double x;

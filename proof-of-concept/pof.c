@@ -38,7 +38,7 @@ typedef struct {
 } PointObject;
 
 static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
-    return (PointObject*) HPy_Cast(ctx, h);
+    return (PointObject*) HPy_AsStruct(ctx, h);
 }
 
 HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)

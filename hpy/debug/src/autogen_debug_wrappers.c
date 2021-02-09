@@ -402,14 +402,14 @@ int debug_ctx_TypeCheck(HPyContext dctx, DHPy obj, DHPy type)
     return HPy_TypeCheck(get_info(dctx)->uctx, DHPy_unwrap(obj), DHPy_unwrap(type));
 }
 
-void *debug_ctx_Cast(HPyContext dctx, DHPy h)
+void *debug_ctx_AsStruct(HPyContext dctx, DHPy h)
 {
-    return HPy_Cast(get_info(dctx)->uctx, DHPy_unwrap(h));
+    return HPy_AsStruct(get_info(dctx)->uctx, DHPy_unwrap(h));
 }
 
-void *debug_ctx_CastLegacy(HPyContext dctx, DHPy h)
+void *debug_ctx_AsStructLegacy(HPyContext dctx, DHPy h)
 {
-    return HPy_CastLegacy(get_info(dctx)->uctx, DHPy_unwrap(h));
+    return HPy_AsStructLegacy(get_info(dctx)->uctx, DHPy_unwrap(h));
 }
 
 DHPy debug_ctx_New(HPyContext dctx, DHPy h_type, void **data)
