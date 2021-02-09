@@ -29,7 +29,7 @@ typedef struct {
 // converting HPy handles to PointObject structs. We no longer need to use
 // the legacy type helper macro because PyObject_HEAD has been removed from
 // PointObject.
-HPy_TYPE_HELPERS(PointObject)
+HPyType_HELPERS(PointObject)
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)

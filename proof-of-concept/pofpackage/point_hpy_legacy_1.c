@@ -33,7 +33,7 @@ typedef PointObject PyPointObject;
 // (see point_hpy_legacy_2.c). The legacy type helper macro is used because
 // PyObject_HEAD is still present in PointObject. Once PyObject_HEAD has been
 // removed (see point_hpy_final.c) we will use HPy_TYPE_HELPERS instead.
-HPy_LEGACY_TYPE_HELPERS(PointObject)
+HPyType_LEGACY_HELPERS(PointObject)
 
 // this is a method for creating a Point
 int Point_init(PyObject *self, PyObject *args, PyObject *kw)
@@ -105,9 +105,9 @@ static HPyType_Spec Point_Type_spec = {
     .basicsize = sizeof(PointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
-    .legacy_headersize = offsetof(PointObject, x),
+    .legacy = PointObject_STRUCT_IS_LEGACY,
     .legacy_slots = Point_legacy_slots,
-    .defines = point_defines
+    .defines = point_defines,
 };
 
 // Legacy module methods (the "dot" method is still a PyCFunction)
