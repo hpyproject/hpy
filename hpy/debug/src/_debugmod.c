@@ -85,7 +85,7 @@ typedef struct {
     DebugHandle *handle;
 } DebugHandleObject;
 
-HPy_TYPE_HELPERS(DebugHandleObject)
+HPyType_HELPERS(DebugHandleObject)
 
 HPyDef_GET(DebugHandle_obj, "obj", DebugHandle_obj_get,
            .doc="The object which the handle points to")
