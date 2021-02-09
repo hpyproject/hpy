@@ -43,17 +43,28 @@
 
    Example for a pure HPy custom type:
 
-       HPy_TYPE_HELPERS(PointObject)
+       HPyType_HELPERS(PointObject)
 
-   This would generate a static inline function named HPy_AsPointObject that
-   uses HPy_AsStruct to return the PointObject struct associated with a given
-   handle.
+   This would generate the following:
+
+   * `PointObject * HPy_AsPointObject(HPyContext ctx, HPy h)`: a static inline
+     function that uses HPy_AsStruct to return the PointObject struct
+     associated with a given handle.
+
+   * `PointObject_STRUCT_IS_LEGACY`: static constant set to 0 so that in the
+     HPyType_Spec for PointObject one can write
+     `.legacy = PointObject_STRUCT_IS_LEGACY` and not have to remember to
+     update the spec when the helpers used changes.
 
    Example for a legacy custom type:
 
-       HPy_LEGACY_TYPE_HELPERS(PointObject)
+       HPyType_LEGACY_HELPERS(PointObject)
 
-   This would generate a similar function that used HPy_AsStructLegacy instead.
+   This would generate the same functions and constants as above, except:
+
+   * `HPy_AsStructLegacy` is used instead of `HPy_AsStruct`.
+
+   * `PointObject_STRUCT_IS_LEGACY` is set to 1.
 */
 
 #define HPyType_HELPERS(TYPE) \
