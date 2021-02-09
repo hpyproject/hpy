@@ -14,8 +14,8 @@
 // PyPointObject if they are instances of Point.
 
 typedef struct {
-    // PyObject_HEAD is required while legacy methods still access
-    // PointObject and should be removed once the port to HPy is completed.
+    // PyObject_HEAD is required while legacy_slots are still used
+    // but can (and should) be removed once the port to HPy is completed.
     PyObject_HEAD
     double x;
     double y;
