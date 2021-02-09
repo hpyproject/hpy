@@ -56,17 +56,23 @@
    This would generate a similar function that used HPy_CastLegacy instead.
 */
 
-#define HPy_TYPE_HELPERS(TYPE) \
-static inline __attribute__((unused)) TYPE *HPy_As ## TYPE(HPyContext ctx, HPy h) \
-{ \
-    return (TYPE*) HPy_Cast(ctx, h); \
+#define HPyType_HELPERS(TYPE) \
+    _HPyType_GENERIC_HELPERS(TYPE, HPy_Cast, /* no struct header */, 0)
+
+#define HPyType_LEGACY_HELPERS(TYPE) \
+    _HPyType_GENERIC_HELPERS(TYPE, HPy_CastLegacy, PyObject_HEAD, 1)
+
+#define _HPyType_GENERIC_HELPERS(TYPE, CAST, STRUCT_HEADER, STRUCT_IS_LEGACY) \
+                                                                     \
+static const int __attribute__((unused)) TYPE##_STRUCT_IS_LEGACY     \
+    = STRUCT_IS_LEGACY;                                              \
+                                                                     \
+static inline __attribute__((unused)) TYPE *                         \
+HPy_As##TYPE(HPyContext ctx, HPy h)                                  \
+{                                                                    \
+    return (TYPE*) CAST(ctx, h);                                     \
 }
 
-#define HPy_LEGACY_TYPE_HELPERS(TYPE) \
-static inline __attribute__((unused)) TYPE *HPy_As ## TYPE(HPyContext ctx, HPy h) \
-{ \
-    return (TYPE*) HPy_CastLegacy(ctx, h); \
-}
 
 /* ~~~ HPyTuple_Pack ~~~
 

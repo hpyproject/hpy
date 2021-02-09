@@ -33,12 +33,6 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     return res;
 }
 
-static int
-hpyspec_is_legacy(HPyType_Spec *hpyspec)
-{
-    return (hpyspec->legacy_headersize > 0) || (hpyspec->legacy_slots != NULL);
-}
-
 static void
 legacy_slots_count(PyType_Slot slots[], HPy_ssize_t *slot_count,
                    PyMethodDef **method_defs, PyMemberDef **member_defs,
@@ -344,6 +338,16 @@ static int check_unknown_params(HPyType_SpecParam *params, const char *name)
     return 0;
 }
 
+static int check_legacy_consistent(HPyType_Spec *hpyspec)
+{
+     if (hpyspec->legacy_slots && !hpyspec->legacy) {
+         PyErr_SetString(PyExc_TypeError,
+             "cannot specify .legacy_slots without setting .legacy=1");
+         return -1;
+     }
+     return 0;
+}
+
 static PyObject *build_bases_from_params(HPyType_SpecParam *params)
 {
     if (params == NULL)
@@ -393,6 +397,9 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     if (check_unknown_params(params, hpyspec->name) < 0) {
         return HPy_NULL;
     }
+    if (check_legacy_consistent(hpyspec) < 0) {
+        return HPy_NULL;
+    }
     PyType_Spec *spec = PyMem_Calloc(1, sizeof(PyType_Spec));
     if (spec == NULL) {
         PyErr_NoMemory();
@@ -401,7 +408,7 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     HPy_ssize_t basicsize;
     HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
-    if (hpyspec_is_legacy(hpyspec)) {
+    if (hpyspec->legacy != 0) {
         basicsize = hpyspec->basicsize;
         base_member_offset = 0;
         flags |= HPy_TPFLAGS_LEGACY;

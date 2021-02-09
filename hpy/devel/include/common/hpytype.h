@@ -8,7 +8,7 @@ typedef struct {
     int basicsize;
     int itemsize;
     unsigned long flags;
-    int legacy_headersize;
+    int legacy;
     void *legacy_slots; // PyType_Slot *
     HPyDef **defines;   /* points to an array of 'HPyDef *' */
 } HPyType_Spec;
