@@ -1,5 +1,5 @@
 import pytest
-from .support import HPyTest
+from test.support import HPyTest
 
 
 class TestDebug(HPyTest):
