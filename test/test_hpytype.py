@@ -30,11 +30,17 @@ class PointTemplate(DefaultExtensionTemplate):
         else:
             return ""
 
+    def TYPE_HELPERS(self, struct_name):
+        if self.LEGACY:
+            return "HPyType_LEGACY_HELPERS({})".format(struct_name)
+        else:
+            return "HPyType_HELPERS({})".format(struct_name)
+
     def DEFINE_PointObject(self):
         if self.LEGACY:
-            hpy_type_helpers = "HPy_LEGACY_TYPE_HELPERS"
+            hpy_type_helpers = "HPyType_LEGACY_HELPERS"
         else:
-            hpy_type_helpers = "HPy_TYPE_HELPERS"
+            hpy_type_helpers = "HPyType_HELPERS"
         return """
             {maybe_python_h}
             typedef struct {{
@@ -85,7 +91,7 @@ class PointTemplate(DefaultExtensionTemplate):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy_headersize = offsetof(PointObject, x),
+                .legacy = PointObject_STRUCT_IS_LEGACY,
                 .defines = Point_defines
             };
         """ % defines
@@ -280,6 +286,8 @@ class TestType(HPyTest):
                 %(c_type)s member;
             } FooObject;
 
+            @TYPE_HELPERS(FooObject)
+
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
@@ -303,7 +311,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy_headersize = offsetof(FooObject, member),
+                .legacy = FooObject_STRUCT_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -343,6 +351,8 @@ class TestType(HPyTest):
                 %(c_type)s member;
             } FooObject;
 
+            @TYPE_HELPERS(FooObject)
+
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
@@ -366,7 +376,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy_headersize = offsetof(FooObject, member),
+                .legacy = FooObject_STRUCT_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -397,6 +407,8 @@ class TestType(HPyTest):
                 char ISTRING_member[6];
                 char BOOL_member;
             } FooObject;
+
+            @TYPE_HELPERS(FooObject)
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
@@ -442,7 +454,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy_headersize = offsetof(FooObject, FLOAT_member),
+                .legacy = FooObject_STRUCT_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -513,6 +525,8 @@ class TestType(HPyTest):
                 char BOOL_member;
             } FooObject;
 
+            @TYPE_HELPERS(FooObject)
+
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
@@ -554,7 +568,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy_headersize = offsetof(FooObject, FLOAT_member),
+                .legacy = FooObject_STRUCT_IS_LEGACY,
                 .defines = Foo_defines
             };
 
