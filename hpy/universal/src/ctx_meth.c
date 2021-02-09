@@ -87,12 +87,12 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         HPyFunc_getbufferproc f = (HPyFunc_getbufferproc)func;
         _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;
         HPy_buffer hbuf;
-        a->result = f(ctx, _py2h(a->arg0), &hbuf, a->arg2);
+        a->result = f(ctx, _py2h(a->self), &hbuf, a->flags);
         if (a->result < 0) {
-            a->arg1->obj = NULL;
+            a->view->obj = NULL;
             return;
         }
-        _buffer_h2py(ctx, &hbuf, a->arg1);
+        _buffer_h2py(ctx, &hbuf, a->view);
         HPy_Close(ctx, hbuf.obj);
         return;
     }
@@ -100,8 +100,8 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         HPyFunc_releasebufferproc f = (HPyFunc_releasebufferproc)func;
         _HPyFunc_args_RELEASEBUFFERPROC *a = (_HPyFunc_args_RELEASEBUFFERPROC*)args;
         HPy_buffer hbuf;
-        _buffer_py2h(ctx, a->arg1, &hbuf);
-        f(ctx, _py2h(a->arg0), &hbuf);
+        _buffer_py2h(ctx, a->view, &hbuf);
+        f(ctx, _py2h(a->self), &hbuf);
         // XXX: copy back from hbuf?
         HPy_Close(ctx, hbuf.obj);
         return;

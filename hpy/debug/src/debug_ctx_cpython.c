@@ -35,10 +35,10 @@ static inline PyObject *_dh2py(DHPy dh)
     return _h2py(DHPy_unwrap(dh));
 }
 
-static void _buffer_h2py(HPyContext ctx, const HPy_buffer *src, Py_buffer *dest)
+static void _buffer_h2py(HPyContext dctx, const HPy_buffer *src, Py_buffer *dest)
 {
     dest->buf = src->buf;
-    dest->obj = HPy_AsPyObject(ctx, src->obj);
+    dest->obj = HPy_AsPyObject(dctx, src->obj);
     dest->len = src->len;
     dest->itemsize = src->itemsize;
     dest->readonly = src->readonly;
@@ -50,10 +50,10 @@ static void _buffer_h2py(HPyContext ctx, const HPy_buffer *src, Py_buffer *dest)
     dest->internal = src->internal;
 }
 
-static void _buffer_py2h(HPyContext ctx, const Py_buffer *src, HPy_buffer *dest)
+static void _buffer_py2h(HPyContext dctx, const Py_buffer *src, HPy_buffer *dest)
 {
     dest->buf = src->buf;
-    dest->obj = HPy_FromPyObject(ctx, src->obj);
+    dest->obj = HPy_FromPyObject(dctx, src->obj);
     dest->len = src->len;
     dest->itemsize = src->itemsize;
     dest->readonly = src->readonly;
@@ -148,13 +148,13 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         HPyFunc_getbufferproc f = (HPyFunc_getbufferproc)func;
         _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;
         HPy_buffer hbuf;
-        DHPy dh_self = _py2dh(dctx, a->arg0);
-        a->result = f(dctx, dh_self, &hbuf, a->arg2);
+        DHPy dh_self = _py2dh(dctx, a->self);
+        a->result = f(dctx, dh_self, &hbuf, a->flags);
         if (a->result < 0) {
-            a->arg1->obj = NULL;
+            a->view->obj = NULL;
             return;
         }
-        _buffer_h2py(dctx, &hbuf, a->arg1);
+        _buffer_h2py(dctx, &hbuf, a->view);
         HPy_Close(dctx, hbuf.obj);
         return;
     }
@@ -162,8 +162,8 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         HPyFunc_releasebufferproc f = (HPyFunc_releasebufferproc)func;
         _HPyFunc_args_RELEASEBUFFERPROC *a = (_HPyFunc_args_RELEASEBUFFERPROC*)args;
         HPy_buffer hbuf;
-        _buffer_py2h(dctx, a->arg1, &hbuf);
-        f(dctx, _py2dh(dctx, a->arg0), &hbuf);
+        _buffer_py2h(dctx, a->view, &hbuf);
+        f(dctx, _py2dh(dctx, a->self), &hbuf);
         // XXX: copy back from hbuf?
         HPy_Close(dctx, hbuf.obj);
         return;
