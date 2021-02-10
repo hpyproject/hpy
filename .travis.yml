@@ -1,11 +1,3 @@
 language: python
 
 script : true
-
-notifications:
-    irc: 
-        channels: "chat.freenode.net#hpy"
-        template:
-        - "[%{repository_slug}@%{branch}]: %{author} pushed %{commit}"
-        - "Changes: %{compare_url}"
-        - "%{commit_message}"
