@@ -32,8 +32,8 @@ typedef struct {
 
 /* HPy_TPFLAGS_LEGACY is set automatically on legacy types.
 
-   A custom type is a legacy type if its struct begins with PyObject_HEAD and
-   it must set .legacy = 1 in its HPyType_Spec.
+   A custom type is a legacy type if its struct begins with PyObject_HEAD.
+   A legacy type must set .legacy = 1 in its HPyType_Spec.
 
    A type with .legacy_slots not NULL is required to have .legacy = 1 and to
    include PyObject_HEAD at the start of its struct. It would be easy to
@@ -42,7 +42,7 @@ typedef struct {
    GraalPython) where a struct starting with PyObject_HEAD might not exist.
 
    Types that do not define a struct of their own, should set the value of
-   .legacy to the same value as the type they inheret from. If they inherit
+   .legacy to the same value as the type they inherit from. If they inherit
    from a built-in type, they may .legacy to either 0 or 1, depending on
    whether they still use .legacy_slots or not.
 
