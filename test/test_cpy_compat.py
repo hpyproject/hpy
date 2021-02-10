@@ -415,3 +415,38 @@ class TestCPythonCompatibility(HPyTest):
         """)
         p = mod.Point()
         assert p.z == 2073
+
+    def test_legacy_slots_fails_without_legacy(self):
+        import pytest
+        mod_src = """
+            #include <Python.h>
+
+            static PyObject *Dummy_foo(PyObject *self, PyObject *arg)
+            {
+                Py_INCREF(arg);
+                return arg;
+            }
+
+            static PyMethodDef dummy_methods[] = {
+               {"foo", Dummy_foo, METH_O},
+               {NULL, NULL}         /* Sentinel */
+            };
+
+            static PyType_Slot dummy_type_slots[] = {
+                {Py_tp_methods, dummy_methods},
+                {0, 0},
+            };
+
+            static HPyType_Spec dummy_type_spec = {
+                .name = "mytest.Dummy",
+                .legacy = 0,
+                .legacy_slots = dummy_type_slots,
+            };
+
+            @EXPORT_TYPE("Dummy", dummy_type_spec)
+            @INIT
+        """
+        with pytest.raises(TypeError) as err:
+            self.make_module(mod_src)
+        assert str(err.value) == (
+            "cannot specify .legacy_slots without setting .legacy=1")
