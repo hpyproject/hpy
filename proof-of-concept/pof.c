@@ -37,9 +37,7 @@ typedef struct {
     double y;
 } PointObject;
 
-static inline PointObject *PointObject_Cast(HPyContext ctx, HPy h) {
-    return (PointObject*) HPy_AsStruct(ctx, h);
-}
+HPyType_HELPERS(PointObject)
 
 HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
 static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
@@ -60,7 +58,7 @@ static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
 HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext ctx, HPy self)
 {
-    PointObject *point = PointObject_Cast(ctx, self);
+    PointObject *point = PointObject_AsStruct(ctx, self);
     return HPyUnicode_FromString(ctx, "Point(?, ?)");
     //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
 }
