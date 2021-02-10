@@ -18,6 +18,12 @@ class PointTemplate(DefaultExtensionTemplate):
 
     LEGACY = False
 
+    def IS_LEGACY(self):
+        if self.LEGACY:
+            return ".legacy = 1,"
+        else:
+            return ".legacy = 0,"
+
     def INCLUDE_PYTHON_H_IF_LEGACY(self):
         if self.LEGACY:
             return "#include <Python.h>"
@@ -116,6 +122,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -151,7 +158,8 @@ class TestType(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .defines = Dummy_defines
+                .defines = Dummy_defines,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -191,7 +199,8 @@ class TestType(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .defines = dummy_type_defines
+                .defines = dummy_type_defines,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", dummy_type_spec)
@@ -708,6 +717,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             static void make_Dummy(HPyContext ctx, HPy module)
@@ -743,6 +753,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             static void make_Dummy(HPyContext ctx, HPy module)
