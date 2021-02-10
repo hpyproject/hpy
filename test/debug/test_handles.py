@@ -1,7 +1,5 @@
 from test.support import HPyDebugTest
 
-from hpy.debug.pytest import hpy_debug
-
 class TestHandles(HPyDebugTest):
 
     def test_get_open_handles(self):
