@@ -27,7 +27,7 @@ typedef struct {
 // removed so that code that still expects PyObject_HEAD will fail to compile.
 typedef PointObject PyPointObject;
 
-// The legacy type helper macro defines an HPy_AsPointObject function allows
+// The legacy type helper macro defines an PointObject_AsStruct function allows
 // non-legacy methods to convert HPy handles to PointObject structs. It is not
 // used in this file, but is provided so that methods can start to be ported
 // (see point_hpy_legacy_2.c). The legacy type helper macro is used because

@@ -47,9 +47,10 @@
 
    This would generate the following:
 
-   * `PointObject * HPy_AsPointObject(HPyContext ctx, HPy h)`: a static inline
-     function that uses HPy_AsStruct to return the PointObject struct
-     associated with a given handle.
+   * `PointObject * PointObject_AsStruct(HPyContext ctx, HPy h)`: a static
+     inline function that uses HPy_AsStruct to return the PointObject struct
+     associated with a given handle. The behaviour is undefined if `h`
+     is associated with an object that is not an instance of PointObject.
 
    * `PointObject_STRUCT_IS_LEGACY`: an enum value set to 0 so that in the
      HPyType_Spec for PointObject one can write
@@ -78,7 +79,7 @@
 enum { TYPE##_STRUCT_IS_LEGACY = STRUCT_IS_LEGACY };                 \
                                                                      \
 static inline __attribute__((unused)) TYPE *                         \
-HPy_As##TYPE(HPyContext ctx, HPy h)                                  \
+TYPE##_AsStruct(HPyContext ctx, HPy h)                                  \
 {                                                                    \
     return (TYPE*) CAST(ctx, h);                                     \
 }

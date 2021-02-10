@@ -226,7 +226,7 @@ class TestType(HPyTest):
             HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
-                PointObject *point = HPy_AsPointObject(ctx, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -649,7 +649,7 @@ class TestType(HPyTest):
             HPyDef_GET(Point_z, "z", Point_z_get)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = HPy_AsPointObject(ctx, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -667,12 +667,12 @@ class TestType(HPyTest):
             HPyDef_GETSET(Point_z, "z", Point_z_get, Point_z_set, .closure=(void *)1000)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = HPy_AsPointObject(ctx, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y + (long)closure);
             }
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = HPy_AsPointObject(ctx, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
@@ -696,7 +696,7 @@ class TestType(HPyTest):
             HPyDef_SET(Point_z, "z", Point_z_set, .closure=(void *)1000)
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = HPy_AsPointObject(ctx, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;

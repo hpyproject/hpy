@@ -27,7 +27,7 @@ typedef struct {
 // removed so that code that still expects PyObject_HEAD will fail to compile.
 typedef PointObject PyPointObject;
 
-// The legacy type helper macro defines an HPy_AsPointObject function allows
+// The legacy type helper macro defines an PointObject_AsStruct function allows
 // non-legacy methods to convert HPy handles to PointObject structs. The legacy
 // type helper macro is used because PyObject_HEAD is still present in
 // PointObject. Once PyObject_HEAD has been removed (see point_hpy_final.c) we
@@ -39,7 +39,7 @@ HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", NULL};
-    PointObject *p = HPy_AsPointObject(ctx, self);
+    PointObject *p = PointObject_AsStruct(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
@@ -52,7 +52,7 @@ int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy 
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext ctx, HPy self)
 {
-    PointObject *p = HPy_AsPointObject(ctx, self);
+    PointObject *p = PointObject_AsStruct(ctx, self);
     double norm;
     HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);

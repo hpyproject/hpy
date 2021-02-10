@@ -26,7 +26,7 @@ typedef struct {
 // an error during compilation.
 // typedef PointObject PyPointObject;
 
-// The type helper macro defines an HPy_AsPointObject function allows
+// The type helper macro defines an PointObject_AsStruct function allows
 // converting HPy handles to PointObject structs. We no longer need to use
 // the legacy type helper macro because PyObject_HEAD has been removed from
 // PointObject.
@@ -37,7 +37,7 @@ HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", NULL};
-    PointObject *p = HPy_AsPointObject(ctx, self);
+    PointObject *p = PointObject_AsStruct(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
     if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
@@ -50,7 +50,7 @@ int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy 
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext ctx, HPy self)
 {
-    PointObject *p = HPy_AsPointObject(ctx, self);
+    PointObject *p = PointObject_AsStruct(ctx, self);
     double norm;
     HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);
@@ -65,8 +65,8 @@ HPy dot_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     HPy point1, point2;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO",  &point1, &point2))
         return HPy_NULL;
-    PointObject *p1 = HPy_AsPointObject(ctx, point1);
-    PointObject *p2 = HPy_AsPointObject(ctx, point2);
+    PointObject *p1 = PointObject_AsStruct(ctx, point1);
+    PointObject *p2 = PointObject_AsStruct(ctx, point2);
     double dp;
     HPy result;
     dp = p1->x * p2->x + p1->y * p2->y;
