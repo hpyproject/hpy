@@ -1,5 +1,7 @@
 from test.support import HPyDebugTest
 
+from hpy.debug.pytest import hpy_debug
+
 class TestHandles(HPyDebugTest):
 
     def test_get_open_handles(self):
@@ -76,23 +78,22 @@ class TestHandles(HPyDebugTest):
 
     def test_LeakDetector(self):
         import pytest
-        from hpy.debug import LeakDetector, HPyLeak
+        from hpy.debug import LeakDetector, HPyLeakError
         mod = self.make_leak_module()
         ld = LeakDetector()
         ld.start()
         mod.leak('hello')
-        mod.leak('world')
-        with pytest.raises(HPyLeak) as exc:
+        with pytest.raises(HPyLeakError) as exc:
             ld.stop()
-        assert str(exc.value).startswith('2 handles have not been closed properly:')
+        assert str(exc.value).startswith('1 unclosed handle:')
         #
-        with pytest.raises(HPyLeak) as exc:
+        with pytest.raises(HPyLeakError) as exc:
             with LeakDetector():
                 mod.leak('foo')
                 mod.leak('bar')
                 mod.leak('baz')
         msg = str(exc.value)
-        assert msg.startswith('3 handles have not been closed properly:')
+        assert msg.startswith('3 unclosed handles:')
         assert 'foo' in msg
         assert 'bar' in msg
         assert 'baz' in msg
