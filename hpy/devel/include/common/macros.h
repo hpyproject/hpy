@@ -51,7 +51,7 @@
      function that uses HPy_AsStruct to return the PointObject struct
      associated with a given handle.
 
-   * `PointObject_STRUCT_IS_LEGACY`: static constant set to 0 so that in the
+   * `PointObject_STRUCT_IS_LEGACY`: an enum value set to 0 so that in the
      HPyType_Spec for PointObject one can write
      `.legacy = PointObject_STRUCT_IS_LEGACY` and not have to remember to
      update the spec when the helpers used changes.
@@ -75,8 +75,7 @@
 
 #define _HPyType_GENERIC_HELPERS(TYPE, CAST, STRUCT_HEADER, STRUCT_IS_LEGACY) \
                                                                      \
-static const int __attribute__((unused)) TYPE##_STRUCT_IS_LEGACY     \
-    = STRUCT_IS_LEGACY;                                              \
+enum { TYPE##_STRUCT_IS_LEGACY = STRUCT_IS_LEGACY };                 \
                                                                      \
 static inline __attribute__((unused)) TYPE *                         \
 HPy_As##TYPE(HPyContext ctx, HPy h)                                  \
