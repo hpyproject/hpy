@@ -1,9 +1,9 @@
 from hpy.universal import _debug
 
-class HPyError(Exception):
+class HPyDebugError(Exception):
     pass
 
-class HPyLeak(HPyError):
+class HPyLeak(HPyDebugError):
     def __init__(self, leaks):
         super().__init__()
         self.leaks = leaks

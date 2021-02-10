@@ -295,6 +295,29 @@ class HPyTest:
         return bool(getattr(sys, "executable", None))
 
 
+
+class HPyDebugTest(HPyTest):
+    """
+    Like HPyTest, but force hpy_abi=='debug' and thus run only [debug] tests
+    """
+
+    @pytest.fixture(params=['debug'])
+    def hpy_abi(self, request):
+        return request.param
+
+    def make_leak_module(self):
+        # for convenience
+        return self.make_module("""
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(leak)
+            @INIT
+        """)
+
 # the few functions below are copied and adapted from cffi/ffiplatform.py
 
 def c_compile(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):

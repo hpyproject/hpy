@@ -1,26 +1,6 @@
-import pytest
-from test.support import HPyTest
+from test.support import HPyDebugTest
 
-
-class TestDebug(HPyTest):
-
-    # these tests are run only with hpy_abi=='debug'. We will probably need to
-    # tweak the approach to make it working with PyPy's apptests
-    @pytest.fixture(params=['debug'])
-    def hpy_abi(self, request):
-        return request.param
-
-    def make_leak_module(self):
-        return self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
+class TestHandles(HPyDebugTest):
 
     def test_get_open_handles(self):
         from hpy.universal import _debug
