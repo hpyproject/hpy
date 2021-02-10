@@ -265,6 +265,11 @@ class TestSlots(HPyTest):
         assert tmp == (p, 'inplace_power', 42, None)
 
 
+class TestLegacySlots(TestSlots):
+
+    ExtensionTemplate = LegacyPointTemplate
+
+
 class TestSqSlots(HPyTest):
 
     ExtensionTemplate = PointTemplate
@@ -491,6 +496,6 @@ class TestSqSlots(HPyTest):
         assert p1 >= p1
 
 
-class TestLegacySlots(TestSlots):
+class TestLegacySqSlots(TestSqSlots):
 
     ExtensionTemplate = LegacyPointTemplate
