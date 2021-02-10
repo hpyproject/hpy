@@ -19,11 +19,11 @@ _HPy_HIDDEN PyMethodDef *create_method_defs(HPyDef *hpydefs[],
 /* The C structs of pure HPy (i.e. non-legacy) custom types do NOT include
  * PyObject_HEAD. So, the CPython implementation of HPy_New must allocate a
  * memory region which is big enough to contain PyObject_HEAD + any eventual
- * extra padding + the actual user struct. We use the union_alignment to ensure
+ * extra padding + the actual user struct. We use union alignment to ensure
  * that the payload is correctly aligned for every possible struct.
  *
  * Legacy custom types already include PyObject_HEAD and so do not need to
- * PyObject_HEAD_SIZE.
+ * allocate extra memory region or use HPyPure_PyObject_HEAD_SIZE.
  */
 typedef struct {
     PyObject_HEAD
