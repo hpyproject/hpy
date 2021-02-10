@@ -27,7 +27,7 @@
      (void)sizeof((*data)->_ob_head._reserved0), / * ERROR: blah blah * /
 
    Unfortunately, HPy_New now supports non-legacy types which do not contain
-   PyObject_HEAD, so this check is no longer correct in call cases.
+   PyObject_HEAD, so this check is no longer correct in all cases.
 */
 
 #define HPy_New(ctx, cls, data) (_HPy_New(                                    \
@@ -69,17 +69,17 @@
 */
 
 #define HPyType_HELPERS(TYPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStruct, /* no struct header */, 0)
+    _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStruct, 0)
 
 #define HPyType_LEGACY_HELPERS(TYPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStructLegacy, PyObject_HEAD, 1)
+    _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStructLegacy, 1)
 
-#define _HPyType_GENERIC_HELPERS(TYPE, CAST, STRUCT_HEADER, STRUCT_IS_LEGACY) \
+#define _HPyType_GENERIC_HELPERS(TYPE, CAST, STRUCT_IS_LEGACY)       \
                                                                      \
 enum { TYPE##_STRUCT_IS_LEGACY = STRUCT_IS_LEGACY };                 \
                                                                      \
 static inline __attribute__((unused)) TYPE *                         \
-TYPE##_AsStruct(HPyContext ctx, HPy h)                                  \
+TYPE##_AsStruct(HPyContext ctx, HPy h)                               \
 {                                                                    \
     return (TYPE*) CAST(ctx, h);                                     \
 }
