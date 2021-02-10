@@ -71,11 +71,13 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         for (Py_ssize_t i = 0; i < nargs; i++) {
             dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
         }
-        a->result = _dh2py(f(dctx, dh_self, dh_args, nargs));
+        DHPy dh_result = f(dctx, dh_self, dh_args, nargs);
+        a->result = _dh2py(dh_result);
         DHPy_close(dctx, dh_self);
         for (Py_ssize_t i = 0; i < nargs; i++) {
             DHPy_close(dctx, dh_args[i]);
         }
+        DHPy_close(dctx, dh_result);
         return;
     }
     case HPyFunc_KEYWORDS: {
