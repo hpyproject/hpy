@@ -57,7 +57,6 @@
  *    return HPy_NULL;
  */
 
-#include <Python.h>
 #include "hpy.h"
 #include "common/runtime/ctx_type.h"
 
@@ -89,13 +88,13 @@ ctx_Tracker_New(HPyContext ctx, HPy_ssize_t capacity)
 
     hp = malloc(sizeof(_HPyTracker_s));
     if (hp == NULL) {
-        PyErr_NoMemory();
+        HPyErr_NoMemory(ctx);
         return _hp2ht(0);
     }
     hp->handles = calloc(capacity, sizeof(HPy));
     if (hp->handles == NULL) {
         free(hp);
-        PyErr_NoMemory();
+        HPyErr_NoMemory(ctx);
         return _hp2ht(0);
     }
     hp->capacity = capacity;
@@ -112,12 +111,12 @@ tracker_resize(HPyContext ctx, _HPyTracker_s *hp, HPy_ssize_t capacity)
     if (capacity <= hp->length) {
         // refuse a resize that would either 1) lose handles or  2) not leave
         // space for one new handle
-        PyErr_SetString(PyExc_ValueError, "HPyTracker resize would lose handles");
+        HPyErr_SetString(ctx, ctx->h_ValueError, "HPyTracker resize would lose handles");
         return -1;
     }
     new_handles = realloc(hp->handles, capacity * sizeof(HPy));
     if (new_handles == NULL) {
-        PyErr_NoMemory();
+        HPyErr_NoMemory(ctx);
         return -1;
     }
     hp->capacity = capacity;
