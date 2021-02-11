@@ -63,6 +63,10 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyTuple_FromArray',
         'HPyType_GenericNew',
         'HPyType_FromSpec',
+        'HPyTracker_New',
+        'HPyTracker_Add',
+        'HPyTracker_ForgetAll',
+        'HPyTracker_Close',
         ])
 
     def generate(self):
