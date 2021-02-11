@@ -403,7 +403,7 @@ typedef enum {
     //HPy_tp_del = SLOT(53, HPyFunc_X),
     //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
     //HPy_tp_descr_set = SLOT(55, HPyFunc_X),
-    //HPy_tp_doc = SLOT(56, HPyFunc_X),
+    HPy_tp_doc = SLOT(56, HPyFunc_DOCSTRING),
     //HPy_tp_getattr = SLOT(57, HPyFunc_X),
     //HPy_tp_getattro = SLOT(58, HPyFunc_X),
     //HPy_tp_hash = SLOT(59, HPyFunc_X),

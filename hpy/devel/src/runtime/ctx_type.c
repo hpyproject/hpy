@@ -226,6 +226,21 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
 }
 
 
+static const char *
+create_docstring(HPyDef *hpydefs[])
+{
+    const char *docstring = NULL;
+    if (hpydefs != NULL) {
+        for(int i=0; hpydefs[i] != NULL; i++) {
+          HPyDef *src = hpydefs[i];
+          if (src->kind != HPyDef_Kind_DocString)
+              continue;
+          docstring = src->docstring.docstring;
+        }
+    }
+    return docstring;
+}
+
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
@@ -302,6 +317,12 @@ create_slot_defs(HPyType_Spec *hpyspec)
         return NULL;
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
+
+    const char * docstring = create_docstring(hpyspec->defines);
+    if (docstring != NULL) {
+        total_slot_count++;
+        result[dst_idx++] = (PyType_Slot){Py_tp_doc, (char *) docstring};
+    }
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};

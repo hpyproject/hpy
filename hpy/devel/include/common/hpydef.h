@@ -70,11 +70,16 @@ typedef struct {
     void *closure;
 } HPyGetSet;
 
+typedef struct {
+    const char *docstring;  // the null-terminated UTF-8 docstring
+} HPyDocString;
+
 typedef enum {
     HPyDef_Kind_Slot = 1,
     HPyDef_Kind_Meth = 2,
     HPyDef_Kind_Member = 3,
     HPyDef_Kind_GetSet = 4,
+    HPyDef_Kind_DocString = 5,
 } HPyDef_Kind;
 
 typedef struct {
@@ -84,6 +89,7 @@ typedef struct {
         HPyMeth meth;
         HPyMember member;
         HPyGetSet getset;
+        HPyDocString docstring;
     };
 } HPyDef;
 
@@ -191,6 +197,14 @@ typedef struct {
             .getter_cpy_trampoline = SYM##_get_trampoline,                  \
             .setter_cpy_trampoline = SYM##_set_trampoline,                  \
             __VA_ARGS__                                                     \
+        }                                                                   \
+    };
+
+#define HPyDef_DOCSTRING(SYM, DOCSTRING)                                    \
+    HPyDef SYM = {                                                          \
+        .kind = HPyDef_Kind_DocString,                                      \
+        .docstring = {                                                      \
+            .docstring = DOCSTRING,                                         \
         }                                                                   \
     };
 
