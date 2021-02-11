@@ -65,6 +65,17 @@ class TestSlots(HPyTest):
         gc.collect()
         assert mod.get_destroyed_x() == 7
 
+    def test_tp_doc(self):
+        mod = self.make_module(r"""
+            @DEFINE_PointObject
+
+            HPyDef_DOCSTRING(point_doc, "A succinct docstring")
+
+            @EXPORT_POINT_TYPE(&point_doc)
+            @INIT
+        """)
+        assert mod.Point.__doc__ == "A succinct docstring"
+
     def test_nb_ops_binary(self):
         import operator
         mod = self.make_module(r"""
