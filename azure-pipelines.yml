@@ -72,6 +72,19 @@ jobs:
     displayName: 'Test setup.py --hpy-abi=universal build_ext --inplace'
 
 
+- job: PortingExampleTests
+  pool:
+    vmImage: '$(imageName)'
+  displayName: 'porting example tests'
+  strategy:
+    matrix:
+      py38:
+        python.version: '3.8'
+        imageName: 'ubuntu-latest'
+  steps:
+  - script: make porting-example-tests
+    displayName: 'Porting example tests'
+
 
 - job: CheckAutogen
   pool:
