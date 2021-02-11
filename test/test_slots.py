@@ -276,16 +276,6 @@ class TestSlots(HPyTest):
             static char static_mem[12] = {0,1,2,3,4,5,6,7,8,9,10,11};
             static HPy_ssize_t _shape[1] = {12};
             static HPy_ssize_t _strides[1] = {1};
-            static HPy_buffer fakebuf = {
-                .buf = static_mem,
-                .len = 12,
-                .itemsize = 1,
-                .readonly = 1,
-                .ndim = 1,
-                .format = "B",
-                .shape = _shape,
-                .strides = _strides,
-            };
 
             HPyDef_SLOT(FakeArray_getbuffer, _getbuffer_impl, HPy_bf_getbuffer)
             static int _getbuffer_impl(HPyContext ctx, HPy self, HPy_buffer* buf, int flags) {
@@ -296,8 +286,15 @@ class TestSlots(HPyTest):
                                "only one buffer allowed");
                     return -1;
                 }
-                *buf = fakebuf;
                 arr->exports++;
+                buf->buf = static_mem;
+                buf->len = 12;
+                buf->itemsize = 1;
+                buf->readonly = 1;
+                buf->ndim = 1;
+                buf->format = "B";
+                buf->shape = _shape;
+                buf->strides = _strides;
                 buf->obj = HPy_Dup(ctx, self);
                 return 0;
             }
