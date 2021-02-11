@@ -102,7 +102,7 @@ static PyMethodDef PointModuleMethods[] = {
 
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
-    "point_capi",
+    "step_00_c_api",
     "Point module (Step 0; C API implementation)",
     -1,
     PointModuleMethods,
