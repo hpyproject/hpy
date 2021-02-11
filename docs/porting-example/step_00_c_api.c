@@ -113,7 +113,7 @@ static struct PyModuleDef moduledef = {
 };
 
 PyMODINIT_FUNC
-PyInit_point_capi(void)
+PyInit_step_00_c_api(void)
 {
     PyObject* m;
     m = PyModule_Create(&moduledef);

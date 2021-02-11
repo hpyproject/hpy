@@ -130,8 +130,8 @@ static HPyModuleDef moduledef = {
     .defines = module_defines,
 };
 
-HPy_MODINIT(point_hpy_legacy_1)
-static HPy init_point_hpy_legacy_1_impl(HPyContext ctx)
+HPy_MODINIT(step_01_hpy_legacy)
+static HPy init_step_01_hpy_legacy_impl(HPyContext ctx)
 {
     HPy m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))

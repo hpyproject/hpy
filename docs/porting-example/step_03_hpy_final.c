@@ -116,8 +116,8 @@ static HPyModuleDef moduledef = {
     .defines = module_defines,
 };
 
-HPy_MODINIT(point_hpy_final)
-static HPy init_point_hpy_final_impl(HPyContext ctx)
+HPy_MODINIT(step_03_hpy_final)
+static HPy init_step_03_hpy_final_impl(HPyContext ctx)
 {
     HPy m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
