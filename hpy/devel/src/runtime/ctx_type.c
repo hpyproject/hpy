@@ -241,6 +241,7 @@ create_docstring(HPyDef *hpydefs[])
     return docstring;
 }
 
+
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec)
 {
@@ -254,8 +255,15 @@ create_slot_defs(HPyType_Spec *hpyspec)
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
 
+    // check for a docstring
+    const char * docstring = create_docstring(hpyspec->defines);
+
     // add slots to hold Py_tp_methods, Py_tp_members, Py_tp_getset
+    // and optionally Py_tp_doc
     hpyslot_count += 3;
+    if (docstring != NULL) {
+        hpyslot_count++;
+    }
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -318,9 +326,8 @@ create_slot_defs(HPyType_Spec *hpyspec)
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
 
-    const char * docstring = create_docstring(hpyspec->defines);
+    // add the docstring
     if (docstring != NULL) {
-        total_slot_count++;
         result[dst_idx++] = (PyType_Slot){Py_tp_doc, (char *) docstring};
     }
 
