@@ -15,7 +15,7 @@ cppcheck-build-dir:
 	mkdir -p $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)
 
 cppcheck: cppcheck-build-dir
-	cppcheck --error-exitcode=1 --cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) --enable=warning,performance,portability,information,missingInclude --report-progress -I hpy/devel/include/ -I hpy/devel/include/common/ -I hpy/devel/include/cpython/ -I hpy/devel/include/universal/ -I hpy/universal/src/ --force -D NULL=0 .
+	cppcheck --error-exitcode=1 --cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) --enable=warning,performance,portability,information,missingInclude -I hpy/devel/include/ -I hpy/devel/include/common/ -I hpy/devel/include/cpython/ -I hpy/devel/include/universal/ -I hpy/universal/src/ --force -D NULL=0 . 2>&1
 
 infer:
 	python3 setup.py build_ext -if -U NDEBUG | compiledb
