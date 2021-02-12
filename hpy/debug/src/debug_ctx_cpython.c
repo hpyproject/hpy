@@ -154,6 +154,7 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         HPy_buffer hbuf;
         DHPy dh_self = _py2dh(dctx, a->self);
         a->result = f(dctx, dh_self, &hbuf, a->flags);
+        DHPy_close(dctx, dh_self);
         if (a->result < 0) {
             a->view->obj = NULL;
             return;
@@ -167,7 +168,9 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         _HPyFunc_args_RELEASEBUFFERPROC *a = (_HPyFunc_args_RELEASEBUFFERPROC*)args;
         HPy_buffer hbuf;
         _buffer_py2h(dctx, a->view, &hbuf);
-        f(dctx, _py2dh(dctx, a->self), &hbuf);
+        DHPy dh_self = _py2dh(dctx, a->self);
+        f(dctx, dh_self, &hbuf);
+        DHPy_close(dctx, dh_self);
         // XXX: copy back from hbuf?
         HPy_Close(dctx, hbuf.obj);
         return;
