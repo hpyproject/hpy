@@ -60,14 +60,6 @@
 #include "hpy.h"
 #include "common/runtime/ctx_type.h"
 
-#ifdef HPY_UNIVERSAL_ABI
-#define _ht2hp(x) ((_HPyTracker_s *) (x)._i)
-#define _hp2ht(x) ((HPyTracker) {(HPy_ssize_t) (hp)})
-#else
-#define _ht2hp(x) ((_HPyTracker_s *) (x)._o)
-#define _hp2ht(x) ((HPyTracker) {(void *) (hp)})
-#endif
-
 static const HPy_ssize_t HPYTRACKER_INITIAL_CAPACITY = 5;
 
 typedef struct {
@@ -75,6 +67,23 @@ typedef struct {
     HPy_ssize_t length;    // used handles
     HPy *handles;
 } _HPyTracker_s;
+
+
+#ifdef HPY_UNIVERSAL_ABI
+static inline _HPyTracker_s *_ht2hp(HPyTracker ht) {
+    return (_HPyTracker_s *) (ht)._i;
+}
+static inline HPyTracker _hp2ht(_HPyTracker_s *hp) {
+    return (HPyTracker) {(HPy_ssize_t) (hp)};
+}
+#else
+static inline _HPyTracker_s *_ht2hp(HPyTracker ht) {
+    return (_HPyTracker_s *) (ht)._o;
+}
+static inline HPyTracker _hp2ht(_HPyTracker_s *hp) {
+    return (HPyTracker) {(void *) (hp)};
+}
+#endif
 
 
 _HPy_HIDDEN HPyTracker
