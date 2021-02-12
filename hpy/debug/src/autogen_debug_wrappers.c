@@ -592,26 +592,6 @@ void debug_ctx_TupleBuilder_Cancel(HPyContext dctx, HPyTupleBuilder builder)
     HPyTupleBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
-HPyTracker debug_ctx_Tracker_New(HPyContext dctx, HPy_ssize_t size)
-{
-    return HPyTracker_New(get_info(dctx)->uctx, size);
-}
-
-int debug_ctx_Tracker_Add(HPyContext dctx, HPyTracker ht, DHPy h)
-{
-    return HPyTracker_Add(get_info(dctx)->uctx, ht, DHPy_unwrap(h));
-}
-
-void debug_ctx_Tracker_ForgetAll(HPyContext dctx, HPyTracker ht)
-{
-    HPyTracker_ForgetAll(get_info(dctx)->uctx, ht);
-}
-
-void debug_ctx_Tracker_Close(HPyContext dctx, HPyTracker ht)
-{
-    HPyTracker_Close(get_info(dctx)->uctx, ht);
-}
-
 void debug_ctx_Dump(HPyContext dctx, DHPy h)
 {
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(h));

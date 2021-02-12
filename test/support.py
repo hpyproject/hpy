@@ -256,8 +256,9 @@ class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
 
     @pytest.fixture()
-    def initargs(self, compiler):
-        # compiler is a fixture defined in conftest
+    def initargs(self, compiler, hpy_debug):
+        # compiler and hpy_debug are fixtures defined/imported by conftest.py.
+        # By using hpy_debug we enable leak detection in debug mode
         self.compiler = compiler
 
     def make_module(self, main_src, name='mytest', extra_sources=()):
@@ -294,6 +295,35 @@ class HPyTest:
         """
         return bool(getattr(sys, "executable", None))
 
+
+
+class HPyDebugTest(HPyTest):
+    """
+    Like HPyTest, but force hpy_abi=='debug' and thus run only [debug] tests
+    """
+
+    # override initargs to avoid using hpy_debug (we don't want to detect
+    # leaks here, we make them on purpose!
+    @pytest.fixture()
+    def initargs(self, compiler):
+        self.compiler = compiler
+
+    @pytest.fixture(params=['debug'])
+    def hpy_abi(self, request):
+        return request.param
+
+    def make_leak_module(self):
+        # for convenience
+        return self.make_module("""
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(leak)
+            @INIT
+        """)
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
 
