@@ -1,16 +1,18 @@
 from hpy.universal import _debug
 
-class HPyError(Exception):
+class HPyDebugError(Exception):
     pass
 
-class HPyLeak(HPyError):
+class HPyLeakError(HPyDebugError):
     def __init__(self, leaks):
         super().__init__()
         self.leaks = leaks
 
     def __str__(self):
         lines = []
-        lines.append('%s handles have not been closed properly:' % len(self.leaks))
+        n = len(self.leaks)
+        s = 's' if n != 1 else ''
+        lines.append(f'{n} unclosed handle{s}:')
         for dh in self.leaks:
             lines.append('    %r' % dh)
         return '\n'.join(lines)
@@ -31,7 +33,7 @@ class LeakDetector:
             raise ValueError('LeakDetector not started yet')
         leaks = _debug.get_open_handles(self.generation)
         if leaks:
-            raise HPyLeak(leaks)
+            raise HPyLeakError(leaks)
 
     def __enter__(self):
         self.start()

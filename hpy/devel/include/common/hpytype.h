@@ -11,6 +11,7 @@ typedef struct {
     int legacy;
     void *legacy_slots; // PyType_Slot *
     HPyDef **defines;   /* points to an array of 'HPyDef *' */
+    const char* doc;    /* UTF-8 doc string or NULL */
 } HPyType_Spec;
 
 typedef enum {
