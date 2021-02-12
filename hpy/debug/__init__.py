@@ -1,1 +1,1 @@
-from .leakdetector import HPyError, HPyLeak, LeakDetector
+from .leakdetector import HPyDebugError, HPyLeakError, LeakDetector

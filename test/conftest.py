@@ -1,5 +1,6 @@
 import pytest
 from .support import ExtensionCompiler
+from hpy.debug.pytest import hpy_debug # make it available to all tests
 
 def pytest_addoption(parser):
     parser.addoption(

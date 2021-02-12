@@ -130,6 +130,7 @@ static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
     UHPy uh_args = HPy_NULL;
     UHPy uh_result = HPy_NULL;
 
+    // XXX: switch to HPyUnicode_FromFormat when we have it
     uh_fmt = HPyUnicode_FromString(uctx, "<DebugHandle 0x%x for %r>");
     if (HPy_IsNull(uh_fmt))
         goto exit;
