@@ -1,27 +1,10 @@
-import pytest
-from .support import HPyTest
+from test.support import HPyDebugTest
 
-
-class TestDebug(HPyTest):
-
-    # these tests are run only with hpy_abi=='debug'. We will probably need to
-    # tweak the approach to make it working with PyPy's apptests
-    @pytest.fixture(params=['debug'])
-    def hpy_abi(self, request):
-        return request.param
+class TestHandles(HPyDebugTest):
 
     def test_get_open_handles(self):
         from hpy.universal import _debug
-        mod = self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
+        mod = self.make_leak_module()
         gen1 = _debug.new_generation()
         mod.leak('hello')
         mod.leak('world')
@@ -36,16 +19,7 @@ class TestDebug(HPyTest):
 
     def test_DebugHandle_id(self):
         from hpy.universal import _debug
-        mod = self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
+        mod = self.make_leak_module()
         gen = _debug.new_generation()
         mod.leak('a')
         mod.leak('b')
@@ -64,16 +38,7 @@ class TestDebug(HPyTest):
     def test_DebugHandle_compare(self):
         import pytest
         from hpy.universal import _debug
-        mod = self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
+        mod = self.make_leak_module()
         gen = _debug.new_generation()
         mod.leak('a')
         mod.leak('a')
@@ -103,16 +68,7 @@ class TestDebug(HPyTest):
     def test_DebugHandle_repr(self):
         import pytest
         from hpy.universal import _debug
-        mod = self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
+        mod = self.make_leak_module()
         gen = _debug.new_generation()
         mod.leak('hello')
         h_hello, = _debug.get_open_handles(gen)
@@ -120,32 +76,22 @@ class TestDebug(HPyTest):
 
     def test_LeakDetector(self):
         import pytest
-        from hpy.debug import LeakDetector, HPyLeak
-        mod = self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
+        from hpy.debug import LeakDetector, HPyLeakError
+        mod = self.make_leak_module()
         ld = LeakDetector()
         ld.start()
         mod.leak('hello')
-        mod.leak('world')
-        with pytest.raises(HPyLeak) as exc:
+        with pytest.raises(HPyLeakError) as exc:
             ld.stop()
-        assert str(exc.value).startswith('2 handles have not been closed properly:')
+        assert str(exc.value).startswith('1 unclosed handle:')
         #
-        with pytest.raises(HPyLeak) as exc:
+        with pytest.raises(HPyLeakError) as exc:
             with LeakDetector():
                 mod.leak('foo')
                 mod.leak('bar')
                 mod.leak('baz')
         msg = str(exc.value)
-        assert msg.startswith('3 handles have not been closed properly:')
+        assert msg.startswith('3 unclosed handles:')
         assert 'foo' in msg
         assert 'bar' in msg
         assert 'baz' in msg
