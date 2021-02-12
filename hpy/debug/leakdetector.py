@@ -11,7 +11,7 @@ class HPyLeakError(HPyDebugError):
     def __str__(self):
         lines = []
         n = len(self.leaks)
-        s = 's' if n > 1 else ''
+        s = 's' if n != 1 else ''
         lines.append(f'{n} unclosed handle{s}:')
         for dh in self.leaks:
             lines.append('    %r' % dh)
