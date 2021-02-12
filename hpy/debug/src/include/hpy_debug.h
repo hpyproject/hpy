@@ -14,7 +14,7 @@
   If you call hpy_debug_get_ctx twice on the same uctx, you get the same
   result.
 
-  IMPLEMENTATION NOTE: at the moment of writing, the only knonw user of the
+  IMPLEMENTATION NOTE: at the moment of writing, the only known user of the
   debug mode is CPython's hpy.universal: in that module, the uctx is a
   statically allocated singleton, so for simplicity of implementation
   currently we do the same inside debug_ctx.c, with a sanity check to ensure
