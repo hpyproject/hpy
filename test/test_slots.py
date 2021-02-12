@@ -295,6 +295,8 @@ class TestSlots(HPyTest):
                 buf->format = "B";
                 buf->shape = _shape;
                 buf->strides = _strides;
+                buf->suboffsets = NULL;
+                buf->internal = NULL;
                 buf->obj = HPy_Dup(ctx, self);
                 return 0;
             }
