@@ -239,8 +239,9 @@ create_slot_defs(HPyType_Spec *hpyspec)
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
 
-    // add slots to hold Py_tp_methods, Py_tp_members, Py_tp_getset
+    // add slots to hold Py_tp_doc, Py_tp_methods, Py_tp_members, Py_tp_getset
     hpyslot_count += 3;
+    if (hpyspec->doc != NULL) hpyslot_count++;
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -261,6 +262,11 @@ create_slot_defs(HPyType_Spec *hpyspec)
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
             dst->pfunc = src->slot.cpy_trampoline;
         }
+    }
+
+    // add a slot for the doc string if present
+    if (hpyspec->doc != NULL) {
+        result[dst_idx++] = (PyType_Slot){Py_tp_doc, (void *) hpyspec->doc};
     }
 
     // add the legacy slots (non-methods, non-members, non-getsets)
