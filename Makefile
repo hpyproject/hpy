@@ -15,7 +15,20 @@ cppcheck-build-dir:
 	mkdir -p $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)
 
 cppcheck: cppcheck-build-dir
-	cppcheck --error-exitcode=1 --cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) --enable=warning,performance,portability,information,missingInclude -I hpy/devel/include/ -I hpy/devel/include/common/ -I hpy/devel/include/cpython/ -I hpy/devel/include/universal/ -I hpy/universal/src/ --force -D NULL=0 . 2>&1
+	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
+	cppcheck \
+		--error-exitcode=1 \
+		--cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) \
+		--output-file=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt \
+		--enable=warning,performance,portability,information,missingInclude \
+		-I hpy/devel/include/ \
+		-I hpy/devel/include/common/ \
+		-I hpy/devel/include/cpython/ \
+		-I hpy/devel/include/universal/ \
+		-I hpy/universal/src/ \
+		--force \
+		-D NULL=0 \
+		. || (cat $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt && false)
 
 infer:
 	python3 setup.py build_ext -if -U NDEBUG | compiledb
