@@ -26,6 +26,12 @@ class DefaultExtensionTemplate(object):
         .defines = moduledefs
     };
 
+    #define MODINIT_ERROR        \
+        do {                     \
+            HPy_Close(ctx, m);   \
+            return HPy_NULL;     \
+        } while (0)
+
     HPy_MODINIT(%(name)s)
     static HPy init_%(name)s_impl(HPyContext ctx)
     {
@@ -103,9 +109,11 @@ class DefaultExtensionTemplate(object):
         src = """
             HPy {h} = HPyType_FromSpec(ctx, &{spec}, NULL);
             if (HPy_IsNull({h}))
-                return HPy_NULL;
-            if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0)
-                return HPy_NULL;
+                MODINIT_ERROR;
+            if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0) {{
+                HPy_Close(ctx, {h});
+                MODINIT_ERROR;
+            }}
             HPy_Close(ctx, {h});
             """
         src = reindent(src, 4)
