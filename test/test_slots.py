@@ -1,5 +1,6 @@
-from .support import HPyTest, DefaultExtensionTemplate
-from .test_hpytype import PointTemplate, LegacyPointTemplate
+from .support import HPyTest
+from .test_hpytype import PointTemplate
+
 
 class TestSlots(HPyTest):
 
@@ -265,11 +266,6 @@ class TestSlots(HPyTest):
         assert tmp == (p, 'inplace_power', 42, None)
 
 
-class TestLegacySlots(TestSlots):
-
-    ExtensionTemplate = LegacyPointTemplate
-
-
 class TestSqSlots(HPyTest):
 
     ExtensionTemplate = PointTemplate
@@ -496,8 +492,3 @@ class TestSqSlots(HPyTest):
         #
         assert not p1 >= p2
         assert p1 >= p1
-
-
-class TestLegacySqSlots(TestSqSlots):
-
-    ExtensionTemplate = LegacyPointTemplate
