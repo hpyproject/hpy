@@ -348,7 +348,7 @@ static int check_legacy_consistent(HPyType_Spec *hpyspec)
 {
      if (hpyspec->legacy_slots && !hpyspec->legacy) {
          PyErr_SetString(PyExc_TypeError,
-             "cannot specify .legacy_slots without setting .legacy=1");
+             "cannot specify .legacy_slots without setting .legacy=true");
          return -1;
      }
      return 0;

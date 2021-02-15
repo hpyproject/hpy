@@ -32,14 +32,14 @@ typedef struct {
 #define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
 
 /* HPy_TPFLAGS_INTERNAL_PURE is set automatically on pure types created with
-   HPyType_FromSpec. This flag should not be used directly. Set `.legacy = 0`
-   or `.legacy = 1` instead.
+   HPyType_FromSpec. This flag should not be used directly. Set
+   `.legacy = false` or `.legacy = true` instead.
 
    A custom type is a pure type if its struct does not include PyObject_HEAD.
    A type whose struct does start with PyObject_HEAD is a legacy type. A
-   legacy type must set .legacy = 1 in its HPyType_Spec.
+   legacy type must set .legacy = true in its HPyType_Spec.
 
-   A type with .legacy_slots not NULL is required to have .legacy = 1 and to
+   A type with .legacy_slots not NULL is required to have .legacy = true and to
    include PyObject_HEAD at the start of its struct. It would be easy to
    relax this requirement on CPython (where the PyObject_HEAD fields are
    always present) but a large burden on other implementations (e.g. PyPy,
@@ -47,7 +47,7 @@ typedef struct {
 
    Types that do not define a struct of their own, should set the value of
    .legacy to the same value as the type they inherit from. If they inherit
-   from a built-in type, they may .legacy to either 0 or 1, depending on
+   from a built-in type, they may .legacy to either true or false, depending on
    whether they still use .legacy_slots or not.
 
    Types created via the old Python C API are automatically legacy types.

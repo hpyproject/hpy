@@ -234,7 +234,7 @@ class TestCPythonCompatibility(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .legacy = 1,
+                .legacy = true,
                 .legacy_slots = Dummy_type_slots,
                 .defines = Dummy_defines
             };
@@ -280,7 +280,7 @@ class TestCPythonCompatibility(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .legacy = 1,
+                .legacy = true,
                 .legacy_slots = dummy_type_slots,
                 .defines = dummy_type_defines
             };
@@ -340,7 +340,7 @@ class TestCPythonCompatibility(HPyTest):
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
                 .defines = Point_defines,
-                .legacy = 1,
+                .legacy = true,
                 .legacy_slots = legacy_slots
             };
 
@@ -406,7 +406,7 @@ class TestCPythonCompatibility(HPyTest):
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
                 .defines = Point_defines,
-                .legacy = 1,
+                .legacy = true,
                 .legacy_slots = legacy_slots
             };
 
@@ -439,7 +439,7 @@ class TestCPythonCompatibility(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .legacy = 0,
+                .legacy = false,
                 .legacy_slots = dummy_type_slots,
             };
 
@@ -449,4 +449,4 @@ class TestCPythonCompatibility(HPyTest):
         with pytest.raises(TypeError) as err:
             self.make_module(mod_src)
         assert str(err.value) == (
-            "cannot specify .legacy_slots without setting .legacy=1")
+            "cannot specify .legacy_slots without setting .legacy=true")

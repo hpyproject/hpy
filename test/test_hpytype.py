@@ -20,9 +20,9 @@ class PointTemplate(DefaultExtensionTemplate):
 
     def IS_LEGACY(self):
         if self.LEGACY:
-            return ".legacy = 1,"
+            return ".legacy = true,"
         else:
-            return ".legacy = 0,"
+            return ".legacy = false,"
 
     def INCLUDE_PYTHON_H_IF_LEGACY(self):
         if self.LEGACY:
