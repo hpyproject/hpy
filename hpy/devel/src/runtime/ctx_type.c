@@ -323,6 +323,8 @@ create_slot_defs(HPyType_Spec *hpyspec)
     return result;
 }
 
+// XXX: This is a hack to work-around the missing Py_bf_getbuffer and
+// Py_bf_releasebuffer before 3.9. We shouldn't use it on 3.9+.
 static PyBufferProcs*
 create_buffer_procs(HPyType_Spec *hpyspec)
 {
