@@ -56,7 +56,7 @@
     SYM(PyObject *self)                                                 \
     {                                                                   \
         void *data = (void *) self;                                     \
-        if (!(self->ob_type->tp_flags & HPy_TPFLAGS_LEGACY)) {          \
+        if (self->ob_type->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {      \
             data = ((char *) data) + HPyPure_PyObject_HEAD_SIZE;        \
         }                                                               \
         IMPL(data);                                                     \

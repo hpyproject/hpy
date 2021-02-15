@@ -417,7 +417,7 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     if (hpyspec->legacy != 0) {
         basicsize = hpyspec->basicsize;
         base_member_offset = 0;
-        flags |= HPy_TPFLAGS_LEGACY;
+        flags &= ~HPy_TPFLAGS_INTERNAL_PURE;
     }
     else {
         // HPyPure_PyObject_HEAD_SIZE ensures that the custom struct is
@@ -433,7 +433,7 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
             basicsize = 0;
             base_member_offset = 0;
         }
-        flags &= ~HPy_TPFLAGS_LEGACY;
+        flags |= HPy_TPFLAGS_INTERNAL_PURE;
     }
     spec->name = hpyspec->name;
     spec->basicsize = basicsize;
@@ -479,13 +479,13 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     Py_INCREF(tp);
 #endif
 
-    if (tp->tp_flags & HPy_TPFLAGS_LEGACY) {
-        *data = (void*) result;
-    }
-    else {
+    if (tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
         // For pure HPy custom types, we return a pointer to only the custom
         // struct data, without the hidden PyObject header.
         *data = (void*) ((char*) result + HPyPure_PyObject_HEAD_SIZE);
+    }
+    else {
+        *data = (void*) result;
     }
     return _py2h(result);
 }

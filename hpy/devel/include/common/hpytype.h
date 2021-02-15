@@ -31,10 +31,13 @@ typedef struct {
 #define _Py_TPFLAGS_HAVE_VERSION_TAG (1UL << 18)
 #define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
 
-/* HPy_TPFLAGS_LEGACY is set automatically on legacy types.
+/* HPy_TPFLAGS_INTERNAL_PURE is set automatically on pure types created with
+   HPyType_FromSpec. This flag should not be used directly. Set `.legacy = 0`
+   or `.legacy = 1` instead.
 
-   A custom type is a legacy type if its struct begins with PyObject_HEAD.
-   A legacy type must set .legacy = 1 in its HPyType_Spec.
+   A custom type is a pure type if its struct does not include PyObject_HEAD.
+   A type whose struct does start with PyObject_HEAD is a legacy type. A
+   legacy type must set .legacy = 1 in its HPyType_Spec.
 
    A type with .legacy_slots not NULL is required to have .legacy = 1 and to
    include PyObject_HEAD at the start of its struct. It would be easy to
@@ -47,12 +50,14 @@ typedef struct {
    from a built-in type, they may .legacy to either 0 or 1, depending on
    whether they still use .legacy_slots or not.
 
+   Types created via the old Python C API are automatically legacy types.
+
    Note on the choice of bit 8: Bit 8 looks likely to be the last free TPFLAG
    bit that C Python will allocate. Bits 0 to 8 were dropped in Python 3.0 and
    are being re-allocated slowly from 0 towards 8. As of 3.10, only bit 0 has
    been re-allocated.
 */
-#define HPy_TPFLAGS_LEGACY (1UL << 8)
+#define HPy_TPFLAGS_INTERNAL_PURE (1UL << 8)
 
 /* Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)
