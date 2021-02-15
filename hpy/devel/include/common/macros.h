@@ -7,27 +7,6 @@
    If we call _HPy_New directly, we get a warning because we are implicitly
    casting a PointObject** into a void**. The following macro explicitly
    casts the third argument to a void**.
-
-   Note: Previously this macro used a trick to cast to void** in a safer
-   way by doing the following:
-
-       (void)sizeof((*data)->_ob_head._reserved0), (void**)data / * Error: blah blah * /
-
-   The left operand of the comma operator is ignored, but it ensures that
-   p is really a pointer to a pointer to a structure with a PyObject_HEAD.
-   The sizeof() ensures that the expression is not actually evaluated at all.
-   The cast to (void) is needed to convince GCC not to emit a warning about
-   the unused result.
-
-   The goal of the comment inside the macro is to be displayed in case of
-   error. If you pass a non compatible type (e.g. a PointObject* instead of a
-   PointObject**), GCC will complain with an error like this:
-
-     ...macros.h:28:19: error: invalid type argument of unary ‘*’ (...)
-     (void)sizeof((*data)->_ob_head._reserved0), / * ERROR: blah blah * /
-
-   Unfortunately, HPy_New now supports non-legacy types which do not contain
-   PyObject_HEAD, so this check is no longer correct in all cases.
 */
 
 #define HPy_New(ctx, cls, data) (_HPy_New(                                    \
