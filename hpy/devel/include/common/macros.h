@@ -31,9 +31,9 @@
      associated with a given handle. The behaviour is undefined if `h`
      is associated with an object that is not an instance of PointObject.
 
-   * `PointObject_STRUCT_IS_LEGACY`: an enum value set to 0 so that in the
+   * `PointObject_IS_LEGACY`: an enum value set to 0 so that in the
      HPyType_Spec for PointObject one can write
-     `.legacy = PointObject_STRUCT_IS_LEGACY` and not have to remember to
+     `.legacy = PointObject_IS_LEGACY` and not have to remember to
      update the spec when the helpers used changes.
 
    Example for a legacy custom type:
@@ -44,7 +44,7 @@
 
    * `HPy_AsStructLegacy` is used instead of `HPy_AsStruct`.
 
-   * `PointObject_STRUCT_IS_LEGACY` is set to 1.
+   * `PointObject_IS_LEGACY` is set to 1.
 */
 
 #define HPyType_HELPERS(TYPE) \
@@ -53,9 +53,9 @@
 #define HPyType_LEGACY_HELPERS(TYPE) \
     _HPyType_GENERIC_HELPERS(TYPE, HPy_AsStructLegacy, 1)
 
-#define _HPyType_GENERIC_HELPERS(TYPE, CAST, STRUCT_IS_LEGACY)       \
+#define _HPyType_GENERIC_HELPERS(TYPE, CAST, IS_LEGACY)              \
                                                                      \
-enum { TYPE##_STRUCT_IS_LEGACY = STRUCT_IS_LEGACY };                 \
+enum { TYPE##_IS_LEGACY = IS_LEGACY };                               \
                                                                      \
 static inline __attribute__((unused)) TYPE *                         \
 TYPE##_AsStruct(HPyContext ctx, HPy h)                               \
