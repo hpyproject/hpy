@@ -351,6 +351,12 @@ static int check_legacy_consistent(HPyType_Spec *hpyspec)
              "cannot specify .legacy_slots without setting .legacy=true");
          return -1;
      }
+     if (hpyspec->flags & HPy_TPFLAGS_INTERNAL_PURE) {
+         PyErr_SetString(PyExc_TypeError,
+             "HPy_TPFLAGS_INTERNAL_PURE should not be used directly,"
+             " set .legacy=true instead");
+         return -1;
+     }
      return 0;
 }
 
@@ -428,8 +434,8 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         }
         else {
             // If basicsize is 0, it is inherited from the parent type.
-            // Calling HPy_AsStruct on inherited type only makes sense if the
-            // parent type is already an HPy extension type.
+            // Calling HPy_AsStruct on an inherited type only makes sense if
+            // the parent type is already an HPy extension type.
             basicsize = 0;
             base_member_offset = 0;
         }
