@@ -346,18 +346,46 @@ static int check_unknown_params(HPyType_SpecParam *params, const char *name)
 
 static int check_legacy_consistent(HPyType_Spec *hpyspec)
 {
-     if (hpyspec->legacy_slots && !hpyspec->legacy) {
-         PyErr_SetString(PyExc_TypeError,
-             "cannot specify .legacy_slots without setting .legacy=true");
-         return -1;
-     }
-     if (hpyspec->flags & HPy_TPFLAGS_INTERNAL_PURE) {
-         PyErr_SetString(PyExc_TypeError,
-             "HPy_TPFLAGS_INTERNAL_PURE should not be used directly,"
-             " set .legacy=true instead");
-         return -1;
-     }
-     return 0;
+    if (hpyspec->legacy_slots && !hpyspec->legacy) {
+        PyErr_SetString(PyExc_TypeError,
+            "cannot specify .legacy_slots without setting .legacy=true");
+        return -1;
+    }
+    if (hpyspec->flags & HPy_TPFLAGS_INTERNAL_PURE) {
+        PyErr_SetString(PyExc_TypeError,
+            "HPy_TPFLAGS_INTERNAL_PURE should not be used directly,"
+            " set .legacy=true instead");
+        return -1;
+    }
+    return 0;
+}
+
+
+static int check_inheritance_constraints(PyTypeObject *tp)
+{
+    int tp_pure = tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE;
+    int tp_base_pure = tp->tp_base->tp_flags & HPy_TPFLAGS_INTERNAL_PURE;
+    if (tp_pure) {
+        // Pure types may inherit from:
+        //
+        // * pure types, or
+        // * PyBaseObject_Type, or
+        // * other builtin or legacy types as long as long as they do not
+        //   access the struct layout (e.g. by using HPy_AsStruct or defining
+        //   a deallocator with HPy_tp_destroy).
+        //
+        // It would be nice to relax these restrictions or check them here.
+        // See https://github.com/hpyproject/hpy/issues/169 for details.
+    }
+    else {
+        if (tp_base_pure) {
+            PyErr_SetString(PyExc_TypeError,
+                "A legacy type should not inherit its memory layout from a"
+                " pure type");
+            return -1;
+        }
+    }
+    return 0;
 }
 
 static PyObject *build_bases_from_params(HPyType_SpecParam *params)
@@ -463,6 +491,11 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
+    if ((result != NULL) &&
+        (check_inheritance_constraints((PyTypeObject *) result) < 0)) {
+        Py_DECREF(result);
+        return HPy_NULL;
+    }
     return _py2h(result);
 }
 
