@@ -126,7 +126,7 @@ class DefaultExtensionTemplate(object):
         src = """
             {func}(ctx, m);
             if (HPyErr_Occurred(ctx))
-                return HPy_NULL;
+                goto MODINIT_ERROR;
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(func=func))

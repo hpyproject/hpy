@@ -75,3 +75,45 @@ class TestCustomLegacyFeatures(HPyTest):
         assert mod.g(45) == 90
         assert mod.h(4, 5, 6) == 456
         assert mod.k(c=6, b=5, a=4) == 456
+
+    def test_legacy_inherits_from_pure_raises(self):
+        import pytest
+        mod_src = """
+            static HPyType_Spec PureType_spec = {
+                .name = "mytest.PureType",
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+            };
+
+            static HPyType_Spec LegacyType_spec = {
+                .name = "mytest.LegacyType",
+                .legacy = true,
+            };
+
+            static void make_Types(HPyContext ctx, HPy module)
+            {
+                HPy h_PureType = HPyType_FromSpec(ctx, &PureType_spec, NULL);
+                if (HPy_IsNull(h_PureType)) {
+                    return;
+                }
+
+                HPyType_SpecParam LegacyType_param[] = {
+                    { HPyType_SpecParam_Base, h_PureType },
+                    { 0 }
+                };
+                HPy h_LegacyType = HPyType_FromSpec(
+                    ctx, &LegacyType_spec, LegacyType_param);
+                if (HPy_IsNull(h_LegacyType)) {
+                    HPy_Close(ctx, h_PureType);
+                    return;
+                }
+                HPy_Close(ctx, h_LegacyType);
+                HPy_Close(ctx, h_PureType);
+            }
+            @EXTRA_INIT_FUNC(make_Types)
+            @INIT
+        """
+        with pytest.raises(TypeError) as err:
+            self.make_module(mod_src)
+        assert str(err.value) == (
+            "A legacy type should not inherit its memory layout from a"
+            " pure type")
