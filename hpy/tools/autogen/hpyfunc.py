@@ -3,7 +3,8 @@ from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
 
-NO_CALL = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC')
+NO_CALL = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
+    'GETBUFFERPROC', 'RELEASEBUFFERPROC')
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
 class autogen_hpyfunc_declare_h(AutoGenFile):

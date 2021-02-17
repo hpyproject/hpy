@@ -28,6 +28,13 @@ sig2flags(HPyFunc_Signature sig)
     }
 }
 
+static inline int
+is_bf_slot(HPyDef* def)
+{
+    return def->kind == HPyDef_Kind_Slot && (
+        def->slot.slot == HPy_bf_getbuffer || def->slot.slot == HPy_bf_releasebuffer);
+}
+
 static HPy_ssize_t
 HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
 {
@@ -35,7 +42,7 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     if (defs == NULL)
         return res;
     for(int i=0; defs[i] != NULL; i++)
-        if (defs[i]->kind == kind)
+        if (defs[i]->kind == kind && !is_bf_slot(defs[i]))
             res++;
     return res;
 }
@@ -256,7 +263,7 @@ create_slot_defs(HPyType_Spec *hpyspec)
     if (hpyspec->defines != NULL) {
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *src = hpyspec->defines[i];
-            if (src->kind != HPyDef_Kind_Slot)
+            if (src->kind != HPyDef_Kind_Slot || is_bf_slot(src))
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
@@ -314,6 +321,46 @@ create_slot_defs(HPyType_Spec *hpyspec)
     if (dst_idx != total_slot_count + 1)
         Py_FatalError("bogus slot count in create_slot_defs");
     return result;
+}
+
+// XXX: This is a hack to work-around the missing Py_bf_getbuffer and
+// Py_bf_releasebuffer before 3.9. We shouldn't use it on 3.9+.
+static PyBufferProcs*
+create_buffer_procs(HPyType_Spec *hpyspec)
+{
+    PyBufferProcs *buffer_procs = NULL;
+    if (hpyspec->defines != NULL) {
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *src = hpyspec->defines[i];
+            if (src->kind != HPyDef_Kind_Slot)
+                continue;
+            switch (src->slot.slot) {
+                case HPy_bf_getbuffer:
+                    if (buffer_procs == NULL) {
+                        buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        if (buffer_procs == NULL) {
+                            PyErr_NoMemory();
+                            return NULL;
+                        }
+                    }
+                    buffer_procs->bf_getbuffer = src->slot.cpy_trampoline;
+                    break;
+                case HPy_bf_releasebuffer:
+                    if (buffer_procs == NULL) {
+                        buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        if (buffer_procs == NULL) {
+                            PyErr_NoMemory();
+                            return NULL;
+                        }
+                    }
+                    buffer_procs->bf_releasebuffer = src->slot.cpy_trampoline;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    return buffer_procs;
 }
 
 static int check_unknown_params(HPyType_SpecParam *params, const char *name)
@@ -428,6 +475,17 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
+    if (result == NULL) {
+        return HPy_NULL;
+    }
+    PyBufferProcs* buffer_procs = create_buffer_procs(hpyspec);
+    if (buffer_procs) {
+        ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
+    } else {
+        if (PyErr_Occurred()) {
+            return HPy_NULL;
+        }
+    }
     return _py2h(result);
 }
 
