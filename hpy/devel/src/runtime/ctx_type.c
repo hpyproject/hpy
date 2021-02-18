@@ -483,6 +483,7 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
     } else {
         if (PyErr_Occurred()) {
+            Py_DECREF(result);
             return HPy_NULL;
         }
     }
