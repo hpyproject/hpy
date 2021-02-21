@@ -54,7 +54,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         HPyFunc_varargs f = (HPyFunc_varargs)func;
         _HPyFunc_args_VARARGS *a = (_HPyFunc_args_VARARGS*)args;
         Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        HPy h_args[nargs * sizeof(HPy)]; // VLA, should be killed by #157
+        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
         for (Py_ssize_t i = 0; i < nargs; i++) {
             h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
         }
@@ -65,7 +65,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         HPyFunc_keywords f = (HPyFunc_keywords)func;
         _HPyFunc_args_KEYWORDS *a = (_HPyFunc_args_KEYWORDS*)args;
         Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        HPy h_args[nargs * sizeof(HPy)]; // VLA, should be killed by #157
+        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
         for (Py_ssize_t i = 0; i < nargs; i++) {
             h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
         }
@@ -76,7 +76,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         HPyFunc_initproc f = (HPyFunc_initproc)func;
         _HPyFunc_args_INITPROC *a = (_HPyFunc_args_INITPROC*)args;
         Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        HPy h_args[nargs * sizeof(HPy)]; // VLA, should be killed by #157
+        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
         for (Py_ssize_t i = 0; i < nargs; i++) {
             h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
         }

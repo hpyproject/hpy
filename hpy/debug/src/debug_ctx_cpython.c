@@ -97,7 +97,7 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         _HPyFunc_args_VARARGS *a = (_HPyFunc_args_VARARGS*)args;
         DHPy dh_self = _py2dh(dctx, a->self);
         Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        DHPy dh_args[nargs * sizeof(DHPy)]; // VLA, should be killed by #157
+        DHPy *dh_args = (DHPy *)alloca(nargs * sizeof(DHPy));
         for (Py_ssize_t i = 0; i < nargs; i++) {
             dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
         }
@@ -115,7 +115,7 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         _HPyFunc_args_KEYWORDS *a = (_HPyFunc_args_KEYWORDS*)args;
         DHPy dh_self = _py2dh(dctx, a->self);
         Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        DHPy dh_args[nargs * sizeof(DHPy)]; // VLA, should be killed by #157
+        DHPy *dh_args = (DHPy *)alloca(nargs * sizeof(DHPy));
         for (Py_ssize_t i = 0; i < nargs; i++) {
             dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
         }
@@ -135,7 +135,7 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
         _HPyFunc_args_INITPROC *a = (_HPyFunc_args_INITPROC*)args;
         DHPy dh_self = _py2dh(dctx, a->self);
         Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        DHPy dh_args[nargs * sizeof(DHPy)]; // VLA, should be killed by #157
+        DHPy *dh_args = (DHPy *)alloca(nargs * sizeof(DHPy));
         for (Py_ssize_t i = 0; i < nargs; i++) {
             dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
         }

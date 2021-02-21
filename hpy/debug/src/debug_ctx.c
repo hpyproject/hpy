@@ -83,8 +83,7 @@ void debug_ctx_Close(HPyContext dctx, DHPy dh)
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy dh_items[], HPy_ssize_t n)
 {
-    // NOTE: replace VLAs with alloca() once issue #157 is fixed
-    UHPy uh_items[n];
+    UHPy *uh_items = (UHPy *)alloca(n * sizeof(uh_items));
     for(int i=0; i<n; i++) {
         uh_items[i] = DHPy_unwrap(dh_items[i]);
     }
@@ -96,8 +95,7 @@ DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy dh_type, DHPy *dh_args,
 {
     UHPy uh_type = DHPy_unwrap(dh_type);
     UHPy uh_kw = DHPy_unwrap(dh_kw);
-    // NOTE: replace VLAs with alloca() once issue #157 is fixed
-    UHPy uh_args[nargs];
+    UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(uh_args));
     for(int i=0; i<nargs; i++) {
         uh_args[i] = DHPy_unwrap(dh_args[i]);
     }
@@ -114,8 +112,7 @@ DHPy debug_ctx_Type_FromSpec(HPyContext dctx, HPyType_Spec *spec, HPyType_SpecPa
         for (HPyType_SpecParam *p = dparams; p->kind != 0; p++) {
             n++;
         }
-        // NOTE: replace VLAs with alloca() once issue #157 is fixed
-        HPyType_SpecParam uparams[n];
+        HPyType_SpecParam *uparams = (HPyType_SpecParam *)alloca(n * sizeof(HPyType_SpecParam));
         for (HPy_ssize_t i=0; i<n; i++) {
             uparams[i].kind = dparams[i].kind;
             uparams[i].object = DHPy_unwrap(dparams[i].object);
