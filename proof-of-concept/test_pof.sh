@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 ROOT=`pwd` # we expect this script to be run from the repo root
 
 _install_hpy() {
@@ -17,9 +17,9 @@ _test_pof() {
     echo "==== testing pof ===="
     # this assumes that pof is already installed, e.g. after calling
     # wheel or setup_py_install
-    python3 -m pip install pytest pytest-azurepipelines
+    python -m pip install pytest pytest-azurepipelines
     cd proof-of-concept
-    python3 -m pytest
+    python -m pytest
 }
 
 _build_wheel() {
@@ -28,16 +28,16 @@ _build_wheel() {
     # we use this venv just to build the wheel, and then we install the wheel
     # in the currently active virtualenv
     echo "Create venv: $VENV"
-    python3 -m venv "$VENV"
-    PY_BUILDER="`pwd`/$VENV/bin/python3"
+    python -m venv "$VENV"
+    source "$VENV/bin/activate"
     echo
     echo "Installing hpy and requirements"
     _install_hpy ${PY_BUILDER}
     pushd proof-of-concept
-    ${PY_BUILDER} -m pip install -r requirements.txt
+    python3 -m pip install -r requirements.txt
     echo
     echo "Building wheel"
-    ${PY_BUILDER} setup.py --hpy-abi="$HPY_ABI" bdist_wheel
+    python3 setup.py --hpy-abi="$HPY_ABI" bdist_wheel
     popd
 }
 
@@ -80,7 +80,7 @@ wheel() {
     echo "Wheel created: ${WHEEL}"
     echo
     echo "Create venv: $VENV"
-    python3 -m venv "$VENV"
+    python -m venv "$VENV"
     source "$VENV/bin/activate"
     echo "Installing wheel"
     python3 -m pip install $WHEEL
@@ -95,7 +95,7 @@ setup_py_install() {
     clean
     echo "=== testing setup.py --hpy-abi=$HPY_ABI install ==="
     echo "Create venv: $VENV"
-    python3 -m venv "$VENV"
+    python -m venv "$VENV"
     source "$VENV/bin/activate"
     _install_hpy python
     echo
@@ -114,7 +114,7 @@ setup_py_build_ext_inplace() {
     clean
     echo "=== testing setup.py --hpy-abi=$HPY_ABI build_ext --inplace ==="
     echo "Create venv: $VENV"
-    python3 -m venv "$VENV"
+    python -m venv "$VENV"
     source "$VENV/bin/activate"
     _install_hpy python
     echo
