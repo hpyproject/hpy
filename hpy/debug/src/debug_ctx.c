@@ -83,7 +83,7 @@ void debug_ctx_Close(HPyContext dctx, DHPy dh)
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy dh_items[], HPy_ssize_t n)
 {
-    UHPy *uh_items = (UHPy *)alloca(n * sizeof(uh_items));
+    UHPy *uh_items = (UHPy *)alloca(n * sizeof(UHPy));
     for(int i=0; i<n; i++) {
         uh_items[i] = DHPy_unwrap(dh_items[i]);
     }
@@ -95,7 +95,7 @@ DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy dh_type, DHPy *dh_args,
 {
     UHPy uh_type = DHPy_unwrap(dh_type);
     UHPy uh_kw = DHPy_unwrap(dh_kw);
-    UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(uh_args));
+    UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(UHPy));
     for(int i=0; i<nargs; i++) {
         uh_args[i] = DHPy_unwrap(dh_args[i]);
     }
