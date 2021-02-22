@@ -269,10 +269,9 @@ class TestSlots(HPyTest):
         import pytest
         import sys
         mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
+            @TYPE_STRUCT_BEGIN(FakeArrayObject)
                 int exports;
-            } FakeArrayObject;
+            @TYPE_STRUCT_END
 
             static char static_mem[12] = {0,1,2,3,4,5,6,7,8,9,10,11};
             static HPy_ssize_t _shape[1] = {12};
@@ -280,7 +279,7 @@ class TestSlots(HPyTest):
 
             HPyDef_SLOT(FakeArray_getbuffer, _getbuffer_impl, HPy_bf_getbuffer)
             static int _getbuffer_impl(HPyContext ctx, HPy self, HPy_buffer* buf, int flags) {
-                FakeArrayObject *arr = HPy_CAST(ctx, FakeArrayObject, self);
+                FakeArrayObject *arr = FakeArrayObject_AsStruct(ctx, self);
                 if (arr->exports > 0) {
                     buf->obj = HPy_NULL;
                     HPyErr_SetString(ctx, ctx->h_BufferError,
@@ -304,7 +303,7 @@ class TestSlots(HPyTest):
 
             HPyDef_SLOT(FakeArray_releasebuffer, _relbuffer_impl, HPy_bf_releasebuffer)
             static void _relbuffer_impl(HPyContext ctx, HPy h_obj, HPy_buffer* buf) {
-                FakeArrayObject *arr = HPy_CAST(ctx, FakeArrayObject, h_obj);
+                FakeArrayObject *arr = FakeArrayObject_AsStruct(ctx, h_obj);
                 arr->exports--;
             }
 
@@ -318,6 +317,7 @@ class TestSlots(HPyTest):
                 .name = "mytest.FakeArray",
                 .basicsize = sizeof(FakeArrayObject),
                 .defines = FakeArray_defines,
+                .legacy = FakeArrayObject_IS_LEGACY,
             };
 
             @EXPORT_TYPE("FakeArray", FakeArray_Spec)
