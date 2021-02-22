@@ -54,7 +54,10 @@ HPyContext hpy_debug_get_ctx(HPyContext uctx)
 // this function is supposed to be called from gdb: it tries to determine
 // whether a handle is universal or debug by looking at the last bit
 extern struct _HPyContext_s g_universal_ctx;
-__attribute__((unused)) static void hpy_magic_dump(HPy h)
+#ifndef _MSC_VER
+__attribute__((unused))
+#endif
+static void hpy_magic_dump(HPy h)
 {
     int universal = h._i & 1;
     if (universal)
