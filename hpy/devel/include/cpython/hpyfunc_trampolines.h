@@ -1,7 +1,6 @@
 #ifndef HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 #define HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 
-
 #define _HPyFunc_TRAMPOLINE_HPyFunc_NOARGS(SYM, IMPL)                   \
     static PyObject *                                                   \
     SYM(PyObject *self, PyObject *noargs)                               \
@@ -56,7 +55,11 @@
     static void                                                         \
     SYM(PyObject *self)                                                 \
     {                                                                   \
-        IMPL(self);                                                     \
+        void *data = (void *) self;                                     \
+        if (self->ob_type->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {      \
+            data = ((char *) data) + HPyPure_PyObject_HEAD_SIZE;        \
+        }                                                               \
+        IMPL(data);                                                     \
         Py_TYPE(self)->tp_free(self);                                   \
     }
 

@@ -33,20 +33,20 @@ static HPy add_ints_kw_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nar
 }
 
 typedef struct {
-    HPyObject_HEAD
     double x;
     double y;
-} HPy_Point;
+} PointObject;
+
+HPyType_HELPERS(PointObject)
 
 HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
 static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
                            HPy_ssize_t nargs, HPy Kw)
 {
-    // FIXME: we should use double, but HPyArg_Parse does not support "d" yet
-    long x, y;
-    if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &x, &y))
+    double x, y;
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "dd", &x, &y))
         return HPy_NULL;
-    HPy_Point *point;
+    PointObject *point;
     HPy h_point = HPy_New(ctx, cls, &point);
     if (HPy_IsNull(h_point))
         return HPy_NULL;
@@ -58,7 +58,7 @@ static HPy Point_new_impl (HPyContext ctx, HPy cls, HPy *args,
 HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext ctx, HPy self)
 {
-    HPy_Point *point = HPy_CAST(ctx, HPy_Point, self);
+    PointObject *point = PointObject_AsStruct(ctx, self);
     return HPyUnicode_FromString(ctx, "Point(?, ?)");
     //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
 }
@@ -71,7 +71,7 @@ static HPyDef *point_type_defines[] = {
 };
 static HPyType_Spec point_type_spec = {
     .name = "pof.Point",
-    .basicsize = sizeof(HPy_Point),
+    .basicsize = sizeof(PointObject),
     .flags = HPy_TPFLAGS_DEFAULT,
     .defines = point_type_defines
 };

@@ -37,8 +37,8 @@ typedef Py_ssize_t HPy_ssize_t;
 typedef Py_hash_t HPy_hash_t;
 
 /* For internal usage only. These should be #undef at the end of this header.
-   If you need to convert HPy to PyObject* and vice-versa, you should use the
-   official way to do it (not implemented yet :)
+   If you need to convert HPy to PyObject* and vice-versa, you should use
+   HPy_AsPyObject and HPy_FromPyObject.
 */
 #define _h2py(x) (x._o)
 #define _py2h(o) ((HPy){o})
@@ -316,9 +316,15 @@ HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy k
 }
 
 HPyAPI_FUNC(void*)
-_HPy_Cast(HPyContext ctx, HPy h)
+HPy_AsStruct(HPyContext ctx, HPy h)
 {
-    return ctx_Cast(ctx, h);
+    return ctx_AsStruct(ctx, h);
+}
+
+HPyAPI_FUNC(void*)
+HPy_AsStructLegacy(HPyContext ctx, HPy h)
+{
+    return ctx_AsStructLegacy(ctx, h);
 }
 
 HPyAPI_FUNC(HPy)

@@ -16,14 +16,42 @@ class PointTemplate(DefaultExtensionTemplate):
     of markers, to test different features.
     """
 
+    _CURRENT_STRUCT = None
+
+    _STRUCT_BEGIN_FORMAT = """
+        typedef struct {{
+    """
+
+    _STRUCT_END_FORMAT = """
+        }} {struct_name};
+        HPyType_HELPERS({struct_name})
+    """
+
+    _IS_LEGACY = "/* not a legacy type */"
+
+    def TYPE_STRUCT_BEGIN(self, struct_name):
+        assert self._CURRENT_STRUCT is None
+        self._CURRENT_STRUCT = struct_name
+        return self._STRUCT_BEGIN_FORMAT.format(struct_name=struct_name)
+
+    def TYPE_STRUCT_END(self):
+        assert self._CURRENT_STRUCT is not None
+        struct_name = self._CURRENT_STRUCT
+        self._CURRENT_STRUCT = None
+        return self._STRUCT_END_FORMAT.format(struct_name=struct_name)
+
+    def IS_LEGACY(self):
+        return self._IS_LEGACY
+
     def DEFINE_PointObject(self):
+        type_begin = self.TYPE_STRUCT_BEGIN("PointObject")
+        type_end = self.TYPE_STRUCT_END()
         return """
-            typedef struct {
-                HPyObject_HEAD
+            {type_begin}
                 long x;
                 long y;
-            } PointObject;
-        """
+            {type_end}
+        """.format(type_begin=type_begin, type_end=type_end)
 
     def DEFINE_Point_new(self):
         return """
@@ -53,17 +81,16 @@ class PointTemplate(DefaultExtensionTemplate):
     def EXPORT_POINT_TYPE(self, *defines):
         defines += ('NULL',)
         defines = ', '.join(defines)
-        #
         self.EXPORT_TYPE('"Point"', "Point_spec")
         return """
             static HPyDef *Point_defines[] = { %s };
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
+                .legacy = PointObject_IS_LEGACY,
                 .defines = Point_defines
             };
         """ % defines
-
 
 
 class TestType(HPyTest):
@@ -76,6 +103,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -97,6 +125,7 @@ class TestType(HPyTest):
                 .doc = "A succinct description.",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -125,7 +154,8 @@ class TestType(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .defines = Dummy_defines
+                .defines = Dummy_defines,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -165,7 +195,8 @@ class TestType(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .defines = dummy_type_defines
+                .defines = dummy_type_defines,
+                @IS_LEGACY
             };
 
             @EXPORT_TYPE("Dummy", dummy_type_spec)
@@ -191,7 +222,7 @@ class TestType(HPyTest):
             HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext ctx, HPy self)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -254,10 +285,9 @@ class TestType(HPyTest):
                 ('HPYSSIZET', 'HPy_ssize_t'),
                 ]:
             mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
+            @TYPE_STRUCT_BEGIN(FooObject)
                 %(c_type)s member;
-            } FooObject;
+            @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
@@ -282,6 +312,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy = FooObject_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -315,10 +346,9 @@ class TestType(HPyTest):
                 ('HPYSSIZET', 'HPy_ssize_t'),
                 ]:
             mod = self.make_module("""
-            typedef struct {
-                HPyObject_HEAD
+            @TYPE_STRUCT_BEGIN(FooObject)
                 %(c_type)s member;
-            } FooObject;
+            @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
@@ -343,6 +373,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy = FooObject_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -362,8 +393,7 @@ class TestType(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <string.h>
-            typedef struct {
-                HPyObject_HEAD
+            @TYPE_STRUCT_BEGIN(FooObject)
                 float FLOAT_member;
                 double DOUBLE_member;
                 const char* STRING_member;
@@ -371,7 +401,7 @@ class TestType(HPyTest):
                 char CHAR_member;
                 char ISTRING_member[6];
                 char BOOL_member;
-            } FooObject;
+            @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
@@ -417,6 +447,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy = FooObject_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -476,15 +507,14 @@ class TestType(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <string.h>
-            typedef struct {
-                HPyObject_HEAD
+            @TYPE_STRUCT_BEGIN(FooObject)
                 float FLOAT_member;
                 double DOUBLE_member;
                 const char* STRING_member;
                 char CHAR_member;
                 char ISTRING_member[6];
                 char BOOL_member;
-            } FooObject;
+            @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext ctx, HPy cls, HPy *args,
@@ -527,6 +557,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
+                .legacy = FooObject_IS_LEGACY,
                 .defines = Foo_defines
             };
 
@@ -598,7 +629,7 @@ class TestType(HPyTest):
             HPyDef_GET(Point_z, "z", Point_z_get)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y);
             }
 
@@ -616,12 +647,12 @@ class TestType(HPyTest):
             HPyDef_GETSET(Point_z, "z", Point_z_get, Point_z_set, .closure=(void *)1000)
             static HPy Point_z_get(HPyContext ctx, HPy self, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 return HPyLong_FromLong(ctx, point->x*10 + point->y + (long)closure);
             }
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
@@ -645,7 +676,7 @@ class TestType(HPyTest):
             HPyDef_SET(Point_z, "z", Point_z_set, .closure=(void *)1000)
             static int Point_z_set(HPyContext ctx, HPy self, HPy value, void *closure)
             {
-                PointObject *point = HPy_CAST(ctx, PointObject, self);
+                PointObject *point = PointObject_AsStruct(ctx, self);
                 long current = point->x*10 + point->y + (long)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
@@ -666,6 +697,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             static void make_Dummy(HPyContext ctx, HPy module)
@@ -701,6 +733,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @IS_LEGACY
             };
 
             static void make_Dummy(HPyContext ctx, HPy module)
@@ -733,3 +766,22 @@ class TestType(HPyTest):
         class Sub(mod.Dummy):
             pass
         assert isinstance(Sub(), mod.Dummy)
+
+    def test_directly_setting_hpy_tpflags_internal_pure_raises(self):
+        import pytest
+        mod_src = """
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_INTERNAL_PURE,
+                @IS_LEGACY
+            };
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @INIT
+        """
+        with pytest.raises(TypeError) as err:
+            self.make_module(mod_src)
+        assert str(err.value) == (
+            "HPy_TPFLAGS_INTERNAL_PURE should not be used directly,"
+            " set .legacy=true instead")

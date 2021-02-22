@@ -82,15 +82,16 @@ static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
 */
 
 typedef struct {
-    HPyObject_HEAD
     DebugHandle *handle;
 } DebugHandleObject;
+
+HPyType_HELPERS(DebugHandleObject)
 
 HPyDef_GET(DebugHandle_obj, "obj", DebugHandle_obj_get,
            .doc="The object which the handle points to")
 static UHPy DebugHandle_obj_get(HPyContext uctx, UHPy self, void *closure)
 {
-    DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
+    DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     return HPy_Dup(uctx, dh->handle->uh);
 }
 
@@ -98,7 +99,7 @@ HPyDef_GET(DebugHandle_id, "id", DebugHandle_id_get,
            .doc="A numeric identifier representing the underlying universal handle")
 static UHPy DebugHandle_id_get(HPyContext uctx, UHPy self, void *closure)
 {
-    DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
+    DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     return HPyLong_FromSsize_t(uctx, (HPy_ssize_t)dh->handle);
 }
 
@@ -108,8 +109,8 @@ static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmp
     UHPy T = HPy_Type(uctx, self);
     if (!HPy_TypeCheck(uctx, o, T))
         return HPy_Dup(uctx, uctx->h_NotImplemented);
-    DebugHandleObject *dh_self = HPy_CAST(uctx, DebugHandleObject, self);
-    DebugHandleObject *dh_o = HPy_CAST(uctx, DebugHandleObject, o);
+    DebugHandleObject *dh_self = DebugHandleObject_AsStruct(uctx, self);
+    DebugHandleObject *dh_o = DebugHandleObject_AsStruct(uctx, o);
 
     switch(op) {
     case HPy_EQ:
@@ -124,7 +125,7 @@ static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmp
 HPyDef_SLOT(DebugHandle_repr, DebugHandle_repr_impl, HPy_tp_repr)
 static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
 {
-    DebugHandleObject *dh = HPy_CAST(uctx, DebugHandleObject, self);
+    DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     UHPy uh_fmt = HPy_NULL;
     UHPy uh_id = HPy_NULL;
     UHPy uh_args = HPy_NULL;
