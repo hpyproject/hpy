@@ -19,7 +19,7 @@ class PortingStep:
 
 PORTING_STEPS = [
     PortingStep(src) for src in sorted(
-        glob.glob(os.path.join(os.path.dirname(__file__), "step_*.c")))
+        glob.glob(os.path.join(os.path.dirname(__file__), "steps", "step_*.c")))
 ]
 
 
