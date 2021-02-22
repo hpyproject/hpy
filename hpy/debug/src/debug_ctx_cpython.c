@@ -23,8 +23,10 @@
 
 #include <Python.h>
 #include "debug_internal.h"
-#include <malloc.h>  // for alloca
 #include "handles.h" // for _py2h and _h2py
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#endif
 
 static inline DHPy _py2dh(HPyContext dctx, PyObject *obj)
 {

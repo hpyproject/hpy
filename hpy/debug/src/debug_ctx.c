@@ -1,9 +1,11 @@
 #include <string.h>
 #include <stdio.h>
-#include <malloc.h>
 #include "debug_internal.h"
 #include "autogen_debug_ctx_init.h"
 #include "common/runtime/ctx_tracker.h"
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#endif
 
 static struct _HPyContext_s g_debug_ctx = {
     .name = "HPy Debug Mode ABI",
