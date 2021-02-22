@@ -6,10 +6,9 @@ _install_hpy() {
     echo "Installing hpy"
     # at the moment this install hpy.devel and hpy.universal. Eventually, we
     # will want to split those into two separate packages
-    PYTHON="$1"
     pushd ${ROOT}
-    ${PYTHON} -m pip install wheel
-    ${PYTHON} -m pip install .
+    python3 -m pip install wheel
+    python3 -m pip install .
     popd
 }
 
