@@ -3,6 +3,37 @@
 #include "common/runtime/ctx_type.h"
 #include "handles.h"
 
+static void _buffer_h2py(HPyContext ctx, const HPy_buffer *src, Py_buffer *dest)
+{
+    dest->buf = src->buf;
+    dest->obj = HPy_AsPyObject(ctx, src->obj);
+    dest->len = src->len;
+    dest->itemsize = src->itemsize;
+    dest->readonly = src->readonly;
+    dest->ndim = src->ndim;
+    dest->format = src->format;
+    dest->shape = src->shape;
+    dest->strides = src->strides;
+    dest->suboffsets = src->suboffsets;
+    dest->internal = src->internal;
+}
+
+static void _buffer_py2h(HPyContext ctx, const Py_buffer *src, HPy_buffer *dest)
+{
+    dest->buf = src->buf;
+    dest->obj = HPy_FromPyObject(ctx, src->obj);
+    dest->len = src->len;
+    dest->itemsize = src->itemsize;
+    dest->readonly = src->readonly;
+    dest->ndim = src->ndim;
+    dest->format = src->format;
+    dest->shape = src->shape;
+    dest->strides = src->strides;
+    dest->suboffsets = src->suboffsets;
+    dest->internal = src->internal;
+}
+
+
 HPyAPI_STORAGE void
 ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
                                    void *func, void *args)
@@ -53,6 +84,29 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
         a->result = f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw));
         return;
     }
+    case HPyFunc_GETBUFFERPROC: {
+        HPyFunc_getbufferproc f = (HPyFunc_getbufferproc)func;
+        _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;
+        HPy_buffer hbuf;
+        a->result = f(ctx, _py2h(a->self), &hbuf, a->flags);
+        if (a->result < 0) {
+            a->view->obj = NULL;
+            return;
+        }
+        _buffer_h2py(ctx, &hbuf, a->view);
+        HPy_Close(ctx, hbuf.obj);
+        return;
+    }
+    case HPyFunc_RELEASEBUFFERPROC: {
+        HPyFunc_releasebufferproc f = (HPyFunc_releasebufferproc)func;
+        _HPyFunc_args_RELEASEBUFFERPROC *a = (_HPyFunc_args_RELEASEBUFFERPROC*)args;
+        HPy_buffer hbuf;
+        _buffer_py2h(ctx, a->view, &hbuf);
+        f(ctx, _py2h(a->self), &hbuf);
+        // XXX: copy back from hbuf?
+        HPy_Close(ctx, hbuf.obj);
+        return;
+    }
 #include "autogen_ctx_call.i"
     default:
         abort();  // XXX
@@ -69,7 +123,7 @@ ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, PyObject *self)
      * at this point because the object is in the process of being destroyed.
      */
     void *obj = (void *)self;
-    if (!(self->ob_type->tp_flags & HPy_TPFLAGS_LEGACY)) {
+    if (self->ob_type->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
         obj = (void *) ((char *) obj + HPyPure_PyObject_HEAD_SIZE);
     }
     HPyFunc_destroyfunc f = (HPyFunc_destroyfunc)func;

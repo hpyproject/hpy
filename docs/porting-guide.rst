@@ -55,11 +55,11 @@ Both ``PyObject_Call`` and ``PyObject_CallObject`` are replaced by
 ``HPy_CallTupleDict(callable, args, kwargs)`` in which either or both of
 ``args`` and ``kwargs`` may be null handles.
 
-``PyObject_Call(callable, args, kwargs)`` becomes:
+``PyObject_Call(callable, args, kwargs)`` becomes::
 
     HPy result = HPy_CallTupleDict(ctx, callable, args, kwargs);
 
-``PyObject_CallObject(callable, args)`` becomes:
+``PyObject_CallObject(callable, args)`` becomes::
 
     HPy result = HPy_CallTupleDict(ctx, callable, args, HPy_NULL);
 
@@ -67,3 +67,30 @@ If ``args`` is not a handle to a tuple or ``kwargs`` is not a handle to a
 dictionary, ``HPy_CallTupleDict`` will return ``HPy_NULL`` and raise a
 ``TypeError``. This is different to ``PyObject_Call`` and
 ``PyObject_CallObject`` which may segfault instead.
+
+Buffers
+-------
+
+The buffer API in HPy is implemented using the ``HPy_buffer`` struct, which looks
+very similar to ``Py_buffer`` (refer to the `CPython documentation
+<https://docs.python.org/3.6/c-api/buffer.html#buffer-structure>`_ for the
+meaning of the fields)::
+
+    typedef struct {
+        void *buf;
+        HPy obj;
+        HPy_ssize_t len;
+        HPy_ssize_t itemsize;
+        int readonly;
+        int ndim;
+        char *format;
+        HPy_ssize_t *shape;
+        HPy_ssize_t *strides;
+        HPy_ssize_t *suboffsets;
+        void *internal;
+    } HPy_buffer;
+
+Buffer slots for HPy types are specified using slots ``HPy_bf_getbuffer`` and
+``HPy_bf_releasebuffer`` on all supported Python versions, even though the
+matching PyType_Spec slots, ``Py_bf_getbuffer`` and ``Py_bf_releasebuffer``, are
+only available starting from CPython 3.9.

@@ -29,12 +29,18 @@ class DefaultExtensionTemplate(object):
     HPy_MODINIT(%(name)s)
     static HPy init_%(name)s_impl(HPyContext ctx)
     {
-        HPy m;
+        HPy m = HPy_NULL;
         m = HPyModule_Create(ctx, &moduledef);
         if (HPy_IsNull(m))
-            return HPy_NULL;
+            goto MODINIT_ERROR;
         %(init_types)s
         return m;
+
+        MODINIT_ERROR:
+
+        if (!HPy_IsNull(m))
+            HPy_Close(ctx, m);
+        return HPy_NULL;
     }
     """)
 
@@ -103,9 +109,11 @@ class DefaultExtensionTemplate(object):
         src = """
             HPy {h} = HPyType_FromSpec(ctx, &{spec}, NULL);
             if (HPy_IsNull({h}))
-                return HPy_NULL;
-            if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0)
-                return HPy_NULL;
+                goto MODINIT_ERROR;
+            if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0) {{
+                HPy_Close(ctx, {h});
+                goto MODINIT_ERROR;
+            }}
             HPy_Close(ctx, {h});
             """
         src = reindent(src, 4)
@@ -118,7 +126,7 @@ class DefaultExtensionTemplate(object):
         src = """
             {func}(ctx, m);
             if (HPyErr_Occurred(ctx))
-                return HPy_NULL;
+                goto MODINIT_ERROR;
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(func=func))

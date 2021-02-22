@@ -21,6 +21,13 @@ sig2flags(HPyFunc_Signature sig)
     }
 }
 
+static inline int
+is_bf_slot(HPyDef* def)
+{
+    return def->kind == HPyDef_Kind_Slot && (
+        def->slot.slot == HPy_bf_getbuffer || def->slot.slot == HPy_bf_releasebuffer);
+}
+
 static HPy_ssize_t
 HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
 {
@@ -28,7 +35,7 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     if (defs == NULL)
         return res;
     for(int i=0; defs[i] != NULL; i++)
-        if (defs[i]->kind == kind)
+        if (defs[i]->kind == kind && !is_bf_slot(defs[i]))
             res++;
     return res;
 }
@@ -248,7 +255,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
     if (hpyspec->defines != NULL) {
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *src = hpyspec->defines[i];
-            if (src->kind != HPyDef_Kind_Slot)
+            if (src->kind != HPyDef_Kind_Slot || is_bf_slot(src))
                 continue;
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
@@ -308,6 +315,46 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
     return result;
 }
 
+// XXX: This is a hack to work-around the missing Py_bf_getbuffer and
+// Py_bf_releasebuffer before 3.9. We shouldn't use it on 3.9+.
+static PyBufferProcs*
+create_buffer_procs(HPyType_Spec *hpyspec)
+{
+    PyBufferProcs *buffer_procs = NULL;
+    if (hpyspec->defines != NULL) {
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *src = hpyspec->defines[i];
+            if (src->kind != HPyDef_Kind_Slot)
+                continue;
+            switch (src->slot.slot) {
+                case HPy_bf_getbuffer:
+                    if (buffer_procs == NULL) {
+                        buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        if (buffer_procs == NULL) {
+                            PyErr_NoMemory();
+                            return NULL;
+                        }
+                    }
+                    buffer_procs->bf_getbuffer = src->slot.cpy_trampoline;
+                    break;
+                case HPy_bf_releasebuffer:
+                    if (buffer_procs == NULL) {
+                        buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        if (buffer_procs == NULL) {
+                            PyErr_NoMemory();
+                            return NULL;
+                        }
+                    }
+                    buffer_procs->bf_releasebuffer = src->slot.cpy_trampoline;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    return buffer_procs;
+}
+
 static int check_unknown_params(HPyType_SpecParam *params, const char *name)
 {
     if (params == NULL)
@@ -346,12 +393,46 @@ static int check_unknown_params(HPyType_SpecParam *params, const char *name)
 
 static int check_legacy_consistent(HPyType_Spec *hpyspec)
 {
-     if (hpyspec->legacy_slots && !hpyspec->legacy) {
-         PyErr_SetString(PyExc_TypeError,
-             "cannot specify .legacy_slots without setting .legacy=1");
-         return -1;
-     }
-     return 0;
+    if (hpyspec->legacy_slots && !hpyspec->legacy) {
+        PyErr_SetString(PyExc_TypeError,
+            "cannot specify .legacy_slots without setting .legacy=true");
+        return -1;
+    }
+    if (hpyspec->flags & HPy_TPFLAGS_INTERNAL_PURE) {
+        PyErr_SetString(PyExc_TypeError,
+            "HPy_TPFLAGS_INTERNAL_PURE should not be used directly,"
+            " set .legacy=true instead");
+        return -1;
+    }
+    return 0;
+}
+
+
+static int check_inheritance_constraints(PyTypeObject *tp)
+{
+    int tp_pure = tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE;
+    int tp_base_pure = tp->tp_base->tp_flags & HPy_TPFLAGS_INTERNAL_PURE;
+    if (tp_pure) {
+        // Pure types may inherit from:
+        //
+        // * pure types, or
+        // * PyBaseObject_Type, or
+        // * other builtin or legacy types as long as long as they do not
+        //   access the struct layout (e.g. by using HPy_AsStruct or defining
+        //   a deallocator with HPy_tp_destroy).
+        //
+        // It would be nice to relax these restrictions or check them here.
+        // See https://github.com/hpyproject/hpy/issues/169 for details.
+    }
+    else {
+        if (tp_base_pure) {
+            PyErr_SetString(PyExc_TypeError,
+                "A legacy type should not inherit its memory layout from a"
+                " pure type");
+            return -1;
+        }
+    }
+    return 0;
 }
 
 static PyObject *build_bases_from_params(HPyType_SpecParam *params)
@@ -417,7 +498,7 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     if (hpyspec->legacy != 0) {
         basicsize = hpyspec->basicsize;
         base_member_offset = 0;
-        flags |= HPy_TPFLAGS_LEGACY;
+        flags &= ~HPy_TPFLAGS_INTERNAL_PURE;
     }
     else {
         // HPyPure_PyObject_HEAD_SIZE ensures that the custom struct is
@@ -428,12 +509,12 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
         }
         else {
             // If basicsize is 0, it is inherited from the parent type.
-            // Calling HPy_AsStruct on inherited type only makes sense if the
-            // parent type is already an HPy extension type.
+            // Calling HPy_AsStruct on an inherited type only makes sense if
+            // the parent type is already an HPy extension type.
             basicsize = 0;
             base_member_offset = 0;
         }
-        flags &= ~HPy_TPFLAGS_LEGACY;
+        flags |= HPy_TPFLAGS_INTERNAL_PURE;
     }
     spec->name = hpyspec->name;
     spec->basicsize = basicsize;
@@ -457,6 +538,22 @@ ctx_Type_FromSpec(HPyContext ctx, HPyType_Spec *hpyspec,
     Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
+    if (result == NULL) {
+        return HPy_NULL;
+    }
+    PyBufferProcs* buffer_procs = create_buffer_procs(hpyspec);
+    if (buffer_procs) {
+        ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
+    } else {
+        if (PyErr_Occurred()) {
+            Py_DECREF(result);
+            return HPy_NULL;
+        }
+    }
+    if (check_inheritance_constraints((PyTypeObject *) result) < 0) {
+        Py_DECREF(result);
+        return HPy_NULL;
+    }
     return _py2h(result);
 }
 
@@ -479,13 +576,13 @@ ctx_New(HPyContext ctx, HPy h_type, void **data)
     Py_INCREF(tp);
 #endif
 
-    if (tp->tp_flags & HPy_TPFLAGS_LEGACY) {
-        *data = (void*) result;
-    }
-    else {
+    if (tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
         // For pure HPy custom types, we return a pointer to only the custom
         // struct data, without the hidden PyObject header.
         *data = (void*) ((char*) result + HPyPure_PyObject_HEAD_SIZE);
+    }
+    else {
+        *data = (void*) result;
     }
     return _py2h(result);
 }
