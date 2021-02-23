@@ -169,7 +169,7 @@ class ExtensionCompiler:
             filename.write(source, mode='wb')
         else:
             filename.write(source)
-        return str(filename)
+        return name + '.c'
 
     def compile_module(self, ExtensionTemplate, main_src, name, extra_sources):
         """
@@ -389,7 +389,9 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
     hpy_devel.fix_distribution(dist)
 
     old_level = distutils.log.set_threshold(0) or 0
+    old_dir = os.getcwd()
     try:
+        os.chdir(tmpdir)
         distutils.log.set_verbosity(compiler_verbose)
         dist.run_command('build_ext')
         cmd_obj = dist.get_command_obj('build_ext')
@@ -399,6 +401,7 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
         assert len(sonames) == 1, 'build_ext is not supposed to return multiple DLLs'
         soname = sonames[0]
     finally:
+        os.chdir(old_dir)
         distutils.log.set_threshold(old_level)
 
     return soname
