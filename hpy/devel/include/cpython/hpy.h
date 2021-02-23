@@ -336,7 +336,7 @@ HPy_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw)
 HPyAPI_FUNC(void)
 _HPy_Dump(HPyContext ctx, HPy h)
 {
-    return ctx_Dump(ctx, h);
+    ctx_Dump(ctx, h);
 }
 
 HPyAPI_FUNC(int)
