@@ -41,6 +41,7 @@ _build_wheel() {
     echo
     echo "Building wheel"
     python3 setup.py --hpy-abi="$HPY_ABI" bdist_wheel
+    deactivate
     popd
 }
 
@@ -75,11 +76,11 @@ clean() {
 wheel() {
     # build a wheel, install and test
     HPY_ABI="$1"
-    VENV="venv/wheel_runner_$HPY_ABI"
     clean
     echo "=== testing setup.py bdist_wheel ==="
     _build_wheel "$HPY_ABI"
     WHEEL=`ls proof-of-concept/dist/*.whl`
+    VENV="venv/wheel_runner_$HPY_ABI"
     echo "Wheel created: ${WHEEL}"
     echo
     echo "Create venv: $VENV"
