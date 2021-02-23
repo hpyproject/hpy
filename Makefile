@@ -22,6 +22,7 @@ cppcheck: cppcheck-build-dir
 		--output-file=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt \
 		--enable=warning,performance,portability,information,missingInclude \
 		--inline-suppr \
+		--suppress=allocaCalled \
 		-I hpy/devel/include/ \
 		-I hpy/devel/include/common/ \
 		-I hpy/devel/include/cpython/ \
