@@ -276,6 +276,6 @@ class build_hpy_ext_mixin:
             Only relevant on Windows, where the .pyd file (DLL) must export the
             module "HPyInit_" function.
         """
-        exports = self.base_build_ext.get_export_symbols(self, ext)
+        exports = self._base_build_ext.get_export_symbols(self, ext)
         exports = [re.sub(r"^PyInit_", "HPyInit_", name) for name in exports]
         return exports
