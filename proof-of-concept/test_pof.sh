@@ -28,7 +28,11 @@ _build_wheel() {
     # in the currently active virtualenv
     echo "Create venv: $VENV"
     python -m venv "$VENV"
-    source "$VENV/bin/activate"
+    if [ -e "$VENV/bin/activate" ] ; then
+        source "$VENV/bin/activate"
+    else
+        source "$VENV/Scripts/activate"
+    fi
     echo
     echo "Installing hpy and requirements"
     _install_hpy ${PY_BUILDER}
@@ -80,7 +84,11 @@ wheel() {
     echo
     echo "Create venv: $VENV"
     python -m venv "$VENV"
-    source "$VENV/bin/activate"
+    if [ -e "$VENV/bin/activate" ] ; then
+        source "$VENV/bin/activate"
+    else
+        source "$VENV/Scripts/activate"
+    fi
     echo "Installing wheel"
     python3 -m pip install $WHEEL
     echo
@@ -95,7 +103,11 @@ setup_py_install() {
     echo "=== testing setup.py --hpy-abi=$HPY_ABI install ==="
     echo "Create venv: $VENV"
     python -m venv "$VENV"
-    source "$VENV/bin/activate"
+    if [ -e "$VENV/bin/activate" ] ; then
+        source "$VENV/bin/activate"
+    else
+        source "$VENV/Scripts/activate"
+    fi
     _install_hpy python
     echo
     echo "Running setup.py"
@@ -114,7 +126,11 @@ setup_py_build_ext_inplace() {
     echo "=== testing setup.py --hpy-abi=$HPY_ABI build_ext --inplace ==="
     echo "Create venv: $VENV"
     python -m venv "$VENV"
-    source "$VENV/bin/activate"
+    if [ -e "$VENV/bin/activate" ] ; then
+        source "$VENV/bin/activate"
+    else
+        source "$VENV/Scripts/activate"
+    fi
     _install_hpy python
     echo
     echo "Running setup.py"
