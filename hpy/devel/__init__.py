@@ -1,5 +1,6 @@
 import os.path
 import functools
+import re
 from pathlib import Path
 from distutils import log
 from distutils.command.build import build
@@ -267,3 +268,14 @@ class build_hpy_ext_mixin:
                 f.write(_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
                     ext_file=ext_file, module_name=module_name)
                 )
+
+    def get_export_symbols(self, ext):
+        """ Override .get_export_symbols to replace "PyInit_<module_name>"
+            with "HPyInit_<module_name>.
+
+            Only relevant on Windows, where the .pyd file (DLL) must export the
+            module "HPyInit_" function.
+        """
+        exports = self.base_build_ext.get_export_symbols(self, ext)
+        exports = [re.sub(r"^PyInit_", "HPyInit_", name) for name in exports]
+        return exports
