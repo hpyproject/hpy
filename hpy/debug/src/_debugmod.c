@@ -74,6 +74,17 @@ static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
     return build_list_of_handles(uctx, u_self, info->open_handles, gen);
 }
 
+HPyDef_METH(get_closed_handles, "get_closed_handles", get_closed_handles_impl,
+            HPyFunc_NOARGS, .doc=
+            "Return a list of all the closed handle in the cache")
+static UHPy get_closed_handles_impl(HPyContext uctx, UHPy u_self)
+{
+    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    return build_list_of_handles(uctx, u_self, info->closed_handles_head, 0);
+}
+
+
 /* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~
 
    This is the applevel view of a DebugHandle/DHPy.
@@ -220,6 +231,7 @@ static UHPy new_DebugHandleObj(HPyContext uctx, UHPy u_DebugHandleType,
 static HPyDef *module_defines[] = {
     &new_generation,
     &get_open_handles,
+    &get_closed_handles,
     NULL
 };
 
