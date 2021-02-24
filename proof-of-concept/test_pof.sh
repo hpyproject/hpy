@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 ROOT=`pwd` # we expect this script to be run from the repo root
 
 _install_hpy() {
@@ -16,6 +16,7 @@ _test_pof() {
     echo "==== testing pof ===="
     # this assumes that pof is already installed, e.g. after calling
     # wheel or setup_py_install
+    echo python is $(which python)
     python -m pip install pytest pytest-azurepipelines
     cd proof-of-concept
     python -m pytest
@@ -77,7 +78,7 @@ wheel() {
     # build a wheel, install and test
     HPY_ABI="$1"
     clean
-    echo "=== testing setup.py bdist_wheel ==="
+    echo "=== testing setup.py bdist_wheel" $HPY_ABI "==="
     _build_wheel "$HPY_ABI"
     WHEEL=`ls proof-of-concept/dist/*.whl`
     VENV="venv/wheel_runner_$HPY_ABI"
@@ -90,8 +91,9 @@ wheel() {
     else
         source "$VENV/Scripts/activate"
     fi
+    echo python is $(which python)
     echo "Installing wheel"
-    python3 -m pip install $WHEEL
+    python -m pip install $WHEEL
     echo
     _test_pof
 }
@@ -136,7 +138,8 @@ setup_py_build_ext_inplace() {
     echo
     echo "Running setup.py"
     pushd proof-of-concept
-    python3 setup.py --hpy-abi="$HPY_ABI" build_ext --inplace
+    echo python is $(which python)
+    python setup.py --hpy-abi="$HPY_ABI" build_ext --inplace
     popd
     echo
     _test_pof
