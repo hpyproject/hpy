@@ -3,7 +3,10 @@
 
 #include <stddef.h> /* to make sure "offsetof" is available for our users */
 
+typedef struct HPyDef HPyDef;
+
 #include "common/hpyfunc.h"
+#include "common/hpytype.h"
 #include "common/autogen_hpyslot.h"
 
 typedef struct {
@@ -70,22 +73,29 @@ typedef struct {
     void *closure;
 } HPyGetSet;
 
+typedef struct {
+    const char *name;
+    HPyType_Spec typespec;
+} HPyTypeSpecDef;
+
 typedef enum {
     HPyDef_Kind_Slot = 1,
     HPyDef_Kind_Meth = 2,
     HPyDef_Kind_Member = 3,
     HPyDef_Kind_GetSet = 4,
+    HPyDef_Kind_TypeSpecDef = 5,
 } HPyDef_Kind;
 
-typedef struct {
+struct HPyDef {
     HPyDef_Kind kind;
     union {
         HPySlot slot;
         HPyMeth meth;
         HPyMember member;
         HPyGetSet getset;
+        HPyTypeSpecDef type;
     };
-} HPyDef;
+};
 
 // macros to automatically define HPyDefs of various kinds
 
@@ -191,6 +201,15 @@ typedef struct {
             .getter_cpy_trampoline = SYM##_get_trampoline,                  \
             .setter_cpy_trampoline = SYM##_set_trampoline,                  \
             __VA_ARGS__                                                     \
+        }                                                                   \
+    };
+
+#define HPyDef_TYPE(SYM, NAME, TYPESPEC)                                    \
+    HPyDef SYM = {                                                          \
+        .kind = HPyDef_Kind_TypeSpecDef,                                    \
+        .type = {                                                           \
+            .name = NAME,                                                   \
+            .typespec = TYPESPEC,                                           \
         }                                                                   \
     };
 
