@@ -20,6 +20,44 @@ static UHPy new_generation_impl(HPyContext uctx, UHPy self)
     return HPyLong_FromLong(uctx, info->current_generation);
 }
 
+static UHPy build_list_of_handles(HPyContext uctx, UHPy u_self, DebugHandle *head,
+                                  long gen)
+{
+    UHPy u_DebugHandleType = HPy_NULL;
+    UHPy u_result = HPy_NULL;
+    UHPy u_item = HPy_NULL;
+
+    u_DebugHandleType = HPy_GetAttr_s(uctx, u_self, "DebugHandle");
+    if (HPy_IsNull(u_DebugHandleType))
+        goto error;
+
+    u_result = HPyList_New(uctx, 0);
+    if (HPy_IsNull(u_result))
+        goto error;
+
+    DebugHandle *dh = head;
+    while(dh != NULL) {
+        if (dh->generation >= gen) {
+            UHPy u_item = new_DebugHandleObj(uctx, u_DebugHandleType, dh);
+            if (HPy_IsNull(u_item))
+                goto error;
+            if (HPyList_Append(uctx, u_result, u_item) == -1)
+                goto error;
+            HPy_Close(uctx, u_item);
+        }
+        dh = dh->next;
+    }
+
+    HPy_Close(uctx, u_DebugHandleType);
+    return u_result;
+
+ error:
+    HPy_Close(uctx, u_DebugHandleType);
+    HPy_Close(uctx, u_result);
+    HPy_Close(uctx, u_item);
+    return HPy_NULL;
+}
+
 
 HPyDef_METH(get_open_handles, "get_open_handles", get_open_handles_impl, HPyFunc_O, .doc=
             "Return a list containing all the open handles whose generation is >= "
@@ -29,34 +67,11 @@ static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
     HPyContext dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
 
-    UHPy u_DebugHandleType = HPy_GetAttr_s(uctx, u_self, "DebugHandle");
-    if (HPy_IsNull(u_DebugHandleType))
-        return HPy_NULL;
-
     long gen = HPyLong_AsLong(uctx, u_gen);
     if (HPyErr_Occurred(uctx))
         return HPy_NULL;
 
-    UHPy u_result = HPyList_New(uctx, 0);
-    if (HPy_IsNull(u_result))
-        return HPy_NULL;
-
-    DebugHandle *dh = info->open_handles;
-    while(dh != NULL) {
-        if (dh->generation >= gen) {
-            UHPy u_item = new_DebugHandleObj(uctx, u_DebugHandleType, dh);
-            if (HPy_IsNull(u_item))
-                return HPy_NULL;
-            if (HPyList_Append(uctx, u_result, u_item) == -1) {
-                HPy_Close(uctx, u_item);
-                HPy_Close(uctx, u_result);
-                return HPy_NULL;
-            }
-            HPy_Close(uctx, u_item);
-        }
-        dh = dh->next;
-    }
-    return u_result;
+    return build_list_of_handles(uctx, u_self, info->open_handles, gen);
 }
 
 /* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~
