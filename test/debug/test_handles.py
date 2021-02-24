@@ -140,5 +140,10 @@ class TestHandles(HPyDebugTest):
             mod.f('ccc')
             n4 = len(_debug.get_closed_handles())
             assert n4 == n1+7
+            #
+            # same as before
+            mod.f('ddd')
+            n5 = len(_debug.get_closed_handles())
+            assert n5 == n1+7
         finally:
             _debug.set_closed_handles_queue_max_size(old_size)

@@ -40,11 +40,15 @@ void DHPy_close(HPyContext dctx, DHPy dh)
         info->open_handles = handle->next;
 
     // put the handle in the closed_handles queue
-    // XXX: we should check the size of the queue and free the tail if we have
-    // reached the max size
     handle->is_closed = true;
     closed_handles_append(info, handle);
-    //DHPy_free(dh);
+    if (info->closed_handles_queue_size > info->closed_handles_queue_max_size) {
+        // we have too many closed handles. Let's free the oldest one
+        DebugHandle *oldest = info->closed_handles_head;
+        info->closed_handles_head = oldest->next;
+        info->closed_handles_queue_size--;
+        DHPy_free(as_DHPy(oldest));
+    }
 }
 
 static void closed_handles_append(HPyDebugInfo *info, DebugHandle *handle)
@@ -65,7 +69,7 @@ static void closed_handles_append(HPyDebugInfo *info, DebugHandle *handle)
     handle->prev = tail;
     handle->next = NULL;
     info->closed_handles_tail = handle;
-    info->closed_handles_queue_size += 1;
+    info->closed_handles_queue_size++;
 }
 
 void DHPy_free(DHPy dh)
