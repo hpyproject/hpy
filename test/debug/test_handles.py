@@ -108,3 +108,37 @@ class TestHandles(HPyDebugTest):
         assert h_hello.is_closed
         assert _debug.get_open_handles(gen) == []
         assert h_hello in _debug.get_closed_handles()
+
+    def test_closed_handles_queue_max_size(self):
+        from hpy.universal import _debug
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        old_size = _debug.get_closed_handles_queue_max_size()
+        try:
+            # by calling "f" we open and close 3 handles: 1 for self, 1 for arg
+            # and 1 for the result. So, every call to f() increases the size of
+            # closed_handles() by 3
+            n1 = len(_debug.get_closed_handles())
+            _debug.set_closed_handles_queue_max_size(n1+7)
+            assert _debug.get_closed_handles_queue_max_size() == n1+7
+            #
+            mod.f('aaa')
+            n2 = len(_debug.get_closed_handles())
+            assert n2 == n1+3
+            #
+            mod.f('bbb')
+            n3 = len(_debug.get_closed_handles())
+            assert n3 == n2+3
+            # with the next call we reach the maximum size of the queue
+            mod.f('ccc')
+            n4 = len(_debug.get_closed_handles())
+            assert n4 == n1+7
+        finally:
+            _debug.set_closed_handles_queue_max_size(old_size)

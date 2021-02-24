@@ -84,6 +84,29 @@ static UHPy get_closed_handles_impl(HPyContext uctx, UHPy u_self)
     return build_list_of_handles(uctx, u_self, info->closed_handles_head, 0);
 }
 
+HPyDef_METH(get_closed_handles_queue_max_size, "get_closed_handles_queue_max_size",
+            get_closed_handles_queue_max_size_impl, HPyFunc_NOARGS, .doc=
+            "Return the maximum size of the closed handles queue")
+static UHPy get_closed_handles_queue_max_size_impl(HPyContext uctx, UHPy u_self)
+{
+    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    return HPyLong_FromSsize_t(uctx, info->closed_handles_queue_max_size);
+}
+
+HPyDef_METH(set_closed_handles_queue_max_size, "set_closed_handles_queue_max_size",
+            set_closed_handles_queue_max_size_impl, HPyFunc_O, .doc=
+            "Set the maximum size of the closed handles queue")
+static UHPy set_closed_handles_queue_max_size_impl(HPyContext uctx, UHPy u_self, UHPy u_size)
+{
+    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    HPy_ssize_t size = HPyLong_AsSize_t(uctx, u_size);
+    if (HPyErr_Occurred(uctx))
+        return HPy_NULL;
+    info->closed_handles_queue_max_size = size;
+    return HPy_Dup(uctx, uctx->h_None);
+}
 
 /* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~
 
@@ -232,6 +255,8 @@ static HPyDef *module_defines[] = {
     &new_generation,
     &get_open_handles,
     &get_closed_handles,
+    &get_closed_handles_queue_max_size,
+    &set_closed_handles_queue_max_size,
     NULL
 };
 
