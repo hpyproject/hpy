@@ -34,6 +34,38 @@ class TestBasic(HPyTest):
         """, name="foo")
         assert mod.__name__ == "foo"
 
+    def test_module_typespec(self):
+        mod = self.make_module("""
+            static const HPyType_Spec Foo_spec = {
+                .name = "mytest.Foo",
+            };
+            HPyDef_TYPE(Foo_def, "Foo", Foo_spec)
+            @EXPORT(Foo_def)
+            @INIT
+        """)
+        assert isinstance(mod.Foo, type)
+        assert isinstance(mod.Foo(), mod.Foo)
+
+    def test_module_typespec_error(self):
+        import pytest
+        src = """
+            // set .legacy to false and pass a non-NULL value for .legacy_slots
+            // to trigger a type creation error without including Python.h.
+            static int x = 5;
+            static const HPyType_Spec Foo_spec = {
+                .name = "mytest.Foo",
+                .legacy = false,
+                .legacy_slots = &x,
+            };
+            HPyDef_TYPE(Foo_def, "Foo", Foo_spec)
+            @EXPORT(Foo_def)
+            @INIT
+        """
+        with pytest.raises(TypeError) as err:
+            self.make_module(src)
+        assert str(err.value) == (
+            "cannot specify .legacy_slots without setting .legacy=true")
+
     def test_noop_function(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS, .doc="hello world")
