@@ -103,6 +103,14 @@ static UHPy DebugHandle_id_get(HPyContext uctx, UHPy self, void *closure)
     return HPyLong_FromSsize_t(uctx, (HPy_ssize_t)dh->handle);
 }
 
+HPyDef_GET(DebugHandle_is_closed, "is_closed", DebugHandle_is_closed_get,
+           .doc="Self-explanatory")
+static UHPy DebugHandle_is_closed_get(HPyContext uctx, UHPy self, void *closure)
+{
+    DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
+    return HPyBool_FromLong(uctx, dh->handle->is_closed);
+}
+
 HPyDef_SLOT(DebugHandle_cmp, DebugHandle_cmp_impl, HPy_tp_richcompare)
 static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmpOp op)
 {
@@ -154,12 +162,23 @@ static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
 }
 
 
+HPyDef_METH(DebugHandle__force_close, "_force_close", DebugHandle__force_close_impl,
+            HPyFunc_NOARGS, .doc="Close the underyling handle. FOR TESTS ONLY.")
+static UHPy DebugHandle__force_close_impl(HPyContext uctx, UHPy self)
+{
+    DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
+    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPy_Close(dctx, as_DHPy(dh->handle));
+    return HPy_Dup(uctx, uctx->h_None);
+}
 
 static HPyDef *DebugHandleType_defs[] = {
     &DebugHandle_obj,
     &DebugHandle_id,
+    &DebugHandle_is_closed,
     &DebugHandle_cmp,
     &DebugHandle_repr,
+    &DebugHandle__force_close,
     NULL
 };
 

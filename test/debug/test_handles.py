@@ -66,7 +66,6 @@ class TestHandles(HPyDebugTest):
             a1 < 'hello'
 
     def test_DebugHandle_repr(self):
-        import pytest
         from hpy.universal import _debug
         mod = self.make_leak_module()
         gen = _debug.new_generation()
@@ -97,3 +96,14 @@ class TestHandles(HPyDebugTest):
         assert 'baz' in msg
         assert 'hello' not in msg
         assert 'world' not in msg
+
+    def test_DebugHandle_is_closed(self):
+        from hpy.universal import _debug
+        mod = self.make_leak_module()
+        gen = _debug.new_generation()
+        mod.leak('hello')
+        h_hello, = _debug.get_open_handles(gen)
+        assert not h_hello.is_closed
+        h_hello._force_close()
+        assert h_hello.is_closed
+        assert _debug.get_open_handles(gen) == []

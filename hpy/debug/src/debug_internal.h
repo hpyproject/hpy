@@ -69,6 +69,7 @@ static inline void UHPy_sanity_check(UHPy uh) {
 typedef struct DebugHandle {
     UHPy uh;
     long generation;
+    bool is_closed;
     struct DebugHandle *prev;
     struct DebugHandle *next;
 } DebugHandle;
@@ -94,12 +95,17 @@ static inline UHPy DHPy_unwrap(DHPy dh) {
 
 /* === HPyDebugInfo === */
 
+static const HPy_ssize_t DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE = 1024;
+
 typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext uctx;
     long current_generation;
-    DebugHandle *open_handles;   // linked list
-    //DebugHandle *closed_handles; // linked list
+    DebugHandle *open_handles;   // double-linked list
+    DebugHandle *closed_handles_head; // double-linked list, used as a queue
+    DebugHandle *closed_handles_tail; 
+    HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
+    HPy_ssize_t closed_handles_queue_size;
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext dctx)
