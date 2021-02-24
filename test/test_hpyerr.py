@@ -49,7 +49,12 @@ class TestErr(HPyTest):
         ], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         assert result.returncode == -6
         assert result.stdout == b""
-        assert result.stderr.startswith(b"Fatal Python error: boom!\n")
+        # In Python 3.9, the Py_FatalError() function was replaced with a macro
+        # which automatically prepends the name of the current function, so
+        # we have to allow for that difference here:
+        stderr_msg = result.stderr.splitlines()[0]
+        assert stderr_msg.startswith(b"Fatal Python error: ")
+        assert stderr_msg.endswith(b": boom!")
 
     def test_HPyErr_Occurred(self):
         import pytest
