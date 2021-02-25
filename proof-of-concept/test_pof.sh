@@ -86,6 +86,7 @@ wheel() {
     else
         source "$VENV/Scripts/activate"
     fi
+    _install_hpy python
     echo "Installing wheel"
     python -m pip install $WHEEL
     echo
