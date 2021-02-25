@@ -14,8 +14,11 @@ jobs:
       py38:
         python.version: '3.8'
         imageName: 'ubuntu-latest'
-      py38-macos:
-        python.version: '3.8'
+      py39:
+        python.version: '3.9'
+        imageName: 'ubuntu-latest'
+      py39-macos:
+        python.version: '3.9'
         imageName: 'macos-latest'
   steps:
   - template: azure-templates/ccache.yml
@@ -48,8 +51,11 @@ jobs:
       py38:
         python.version: '3.8'
         imageName: 'ubuntu-latest'
-      py38-macos:
-        python.version: '3.8'
+      py39:
+        python.version: '3.9'
+        imageName: 'ubuntu-latest'
+      py39-macos:
+        python.version: '3.9'
         imageName: 'macos-latest'
   steps:
   - template: azure-templates/ccache.yml
