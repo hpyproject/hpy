@@ -124,7 +124,7 @@ class TestParseItem(HPyTest):
         with pytest.raises(OverflowError) as err:
             mod.f(-2**31 - 1)
         assert str(err.value) in (
-            "function signed integer is greater than maximum",
+            "function signed integer is less than minimum",
             "Python int too large to convert to C long",  # where sizeof(long) == 4
         )
 
