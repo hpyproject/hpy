@@ -6,9 +6,10 @@ _install_hpy() {
     echo "Installing hpy"
     # at the moment this install hpy.devel and hpy.universal. Eventually, we
     # will want to split those into two separate packages
+    local PYTHON="$1"
     pushd ${ROOT}
-    python3 -m pip install wheel
-    python3 -m pip install .
+    ${PYTHON} -m pip install wheel
+    ${PYTHON} -m pip install .
     popd
 }
 
@@ -16,7 +17,6 @@ _test_pof() {
     echo "==== testing pof ===="
     # this assumes that pof is already installed, e.g. after calling
     # wheel or setup_py_install
-    echo python is $(which python)
     python -m pip install pytest pytest-azurepipelines
     cd proof-of-concept
     python -m pytest
@@ -24,25 +24,20 @@ _test_pof() {
 
 _build_wheel() {
     HPY_ABI="$1"
-    VENV="venv/wheel_builder_$HPY_ABI"
+    local VENV="venv/wheel_builder_$HPY_ABI"
     # we use this venv just to build the wheel, and then we install the wheel
     # in the currently active virtualenv
     echo "Create venv: $VENV"
     python -m venv "$VENV"
-    if [ -e "$VENV/bin/activate" ] ; then
-        source "$VENV/bin/activate"
-    else
-        source "$VENV/Scripts/activate"
-    fi
+    local PY_BUILDER="`pwd`/$VENV/bin/python3"
     echo
     echo "Installing hpy and requirements"
     _install_hpy ${PY_BUILDER}
     pushd proof-of-concept
-    python3 -m pip install -r requirements.txt
+    ${PY_BUILDER} -m pip install -r requirements.txt
     echo
     echo "Building wheel"
-    python3 setup.py --hpy-abi="$HPY_ABI" bdist_wheel
-    deactivate
+    ${PY_BUILDER} setup.py --hpy-abi="$HPY_ABI" bdist_wheel
     popd
 }
 
@@ -77,11 +72,11 @@ clean() {
 wheel() {
     # build a wheel, install and test
     HPY_ABI="$1"
+    local VENV="venv/wheel_runner_$HPY_ABI"
     clean
     echo "=== testing setup.py bdist_wheel" $HPY_ABI "==="
     _build_wheel "$HPY_ABI"
     WHEEL=`ls proof-of-concept/dist/*.whl`
-    VENV="venv/wheel_runner_$HPY_ABI"
     echo "Wheel created: ${WHEEL}"
     echo
     echo "Create venv: $VENV"
@@ -91,7 +86,6 @@ wheel() {
     else
         source "$VENV/Scripts/activate"
     fi
-    echo python is $(which python)
     echo "Installing wheel"
     python -m pip install $WHEEL
     echo
@@ -115,7 +109,7 @@ setup_py_install() {
     echo
     echo "Running setup.py"
     pushd proof-of-concept
-    python3 setup.py --hpy-abi="$HPY_ABI" install
+    python setup.py --hpy-abi="$HPY_ABI" install
     popd
     echo
     _test_pof
