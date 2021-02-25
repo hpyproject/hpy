@@ -188,8 +188,14 @@ static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
     UHPy uh_args = HPy_NULL;
     UHPy uh_result = HPy_NULL;
 
+    const char *fmt = NULL;
+    if (dh->handle->is_closed)
+        fmt = "<DebugHandle 0x%x CLOSED>";
+    else
+        fmt = "<DebugHandle 0x%x for %r>";
+
     // XXX: switch to HPyUnicode_FromFormat when we have it
-    uh_fmt = HPyUnicode_FromString(uctx, "<DebugHandle 0x%x for %r>");
+    uh_fmt = HPyUnicode_FromString(uctx, fmt);
     if (HPy_IsNull(uh_fmt))
         goto exit;
 
@@ -197,7 +203,10 @@ static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
     if (HPy_IsNull(uh_id))
         goto exit;
 
-    uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id, dh->handle->uh}, 2);
+    if (dh->handle->is_closed)
+        uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id}, 1);
+    else
+        uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id, dh->handle->uh}, 2);
     if (HPy_IsNull(uh_args))
         goto exit;
 
