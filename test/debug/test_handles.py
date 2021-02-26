@@ -110,7 +110,7 @@ class TestHandles(HPyDebugTest):
         assert h_hello in _debug.get_closed_handles()
         assert repr(h_hello) == "<DebugHandle 0x%x CLOSED>" % h_hello.id
 
-    def xtest_closed_handles_queue_max_size(self):
+    def test_closed_handles_queue_max_size(self):
         from hpy.universal import _debug
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
