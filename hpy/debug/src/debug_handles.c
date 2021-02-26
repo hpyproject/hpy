@@ -1,7 +1,5 @@
 #include "debug_internal.h"
 
-#include <stdio.h>
-
 static void closed_handles_append(HPyDebugInfo *info, DebugHandle *handle);
 static DebugHandle *closed_handles_popfront(HPyDebugInfo *info);
 

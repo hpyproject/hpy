@@ -93,6 +93,17 @@ static inline UHPy DHPy_unwrap(DHPy dh) {
     return as_DebugHandle(dh)->uh;
 }
 
+/* === DHQueue === */
+
+typedef struct {
+    DebugHandle *head;
+    DebugHandle *tail;
+    HPy_ssize_t size;
+} DHQueue;
+
+void DHQueue_init(DHQueue *q);
+
+
 /* === HPyDebugInfo === */
 
 static const HPy_ssize_t DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE = 1024;
