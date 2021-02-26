@@ -43,8 +43,45 @@ DebugHandle *DHQueue_popfront(DHQueue *q)
     return head;
 }
 
+void DHQueue_remove(DHQueue *q, DebugHandle *h)
+{
+#ifndef NDEBUG
+    // if we are debugging, let's check that h it's effectively in the queue
+    DebugHandle *it = q->head;
+    bool found = false;
+    while(it != NULL) {
+        if (it == h) {
+            found = true;
+            break;
+        }
+        it = it->next;
+    }
+    assert(found);
+#endif
+    if (q->size == 1) {
+        q->head = NULL;
+        q->tail = NULL;
+    } else if (h == q->head) {
+        assert(h->prev == NULL);
+        q->head = h->next;
+        q->head->prev = NULL;
+    } else if (h == q->tail) {
+        assert(h->next == NULL);
+        q->tail = h->prev;
+        q->tail->next = NULL;
+    }
+    else {
+        h->prev->next = h->next;
+        h->next->prev = h->prev;
+    }
+    q->size--;
+    h->next = NULL;
+    h->prev = NULL;
+}
 
-static void linked_item_sanity_check(DebugHandle *h) {
+
+static void linked_item_sanity_check(DebugHandle *h)
+{
     if (h == NULL)
         return;
     if (h->next != NULL)
@@ -53,7 +90,8 @@ static void linked_item_sanity_check(DebugHandle *h) {
         assert(h->prev->next == h);
 }
 
-void DHQueue_sanity_check(DHQueue *q) {
+void DHQueue_sanity_check(DHQueue *q)
+{
 #ifndef NDEBUG
     if (q->head == NULL || q->tail == NULL) {
         assert(q->head == NULL);

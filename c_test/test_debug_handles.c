@@ -62,6 +62,31 @@ void test_DHQueue_popfront(void)
 }
 
 
+void test_DHQueue_remove(void)
+{
+    DHQueue q;
+    DebugHandle h1;
+    DebugHandle h2;
+    DebugHandle h3;
+    DebugHandle h4;
+    DHQueue_init(&q);
+    DHQueue_append(&q, &h1);
+    DHQueue_append(&q, &h2);
+    DHQueue_append(&q, &h3);
+    DHQueue_append(&q, &h4);
+
+    DHQueue_remove(&q, &h3); // try to remove something in the middle
+    check_DHQueue(&q, 3, &h1, &h2, &h4);
+
+    DHQueue_remove(&q, &h1); // try to remove the head
+    check_DHQueue(&q, 2, &h2, &h4);
+
+    DHQueue_remove(&q, &h4); // try to remove the tail
+    check_DHQueue(&q, 1, &h2);
+
+    DHQueue_remove(&q, &h2); // try to remove the only element
+    check_DHQueue(&q, 0);
+}
 
 #define MYTEST(X) { #X, X }
 
@@ -69,5 +94,6 @@ TEST_LIST = {
     MYTEST(test_DHQueue_init),
     MYTEST(test_DHQueue_append),
     MYTEST(test_DHQueue_popfront),
+    MYTEST(test_DHQueue_remove),
     { NULL, NULL }
 };

@@ -104,6 +104,7 @@ typedef struct {
 void DHQueue_init(DHQueue *q);
 void DHQueue_append(DHQueue *q, DebugHandle *h);
 DebugHandle *DHQueue_popfront(DHQueue *q);
+void DHQueue_remove(DHQueue *q, DebugHandle *h);
 void DHQueue_sanity_check(DHQueue *q);
 
 /* === HPyDebugInfo === */
