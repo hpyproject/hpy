@@ -3,50 +3,6 @@
 static void closed_handles_append(HPyDebugInfo *info, DebugHandle *handle);
 static DebugHandle *closed_handles_popfront(HPyDebugInfo *info);
 
-static void linked_item_sanity_check(DebugHandle *h) {
-    if (h == NULL)
-        return;
-    if (h->next != NULL)
-        assert(h->next->prev == h);
-    if (h->prev != NULL)
-        assert(h->prev->next == h);
-}
-
-static void debug_info_sanity_check(HPyDebugInfo *info) {
-#ifndef NDEBUG
-    // check that the open_handles list is sane
-    if (info->open_handles != NULL)
-        assert(info->open_handles->prev == NULL);
-    DebugHandle *h = info->open_handles;
-    while(h != NULL) {
-        linked_item_sanity_check(h);
-        h = h->next;
-    }
-    // check that the closed_handles queue is sane
-    if (info->closed_handles_head == NULL || info->closed_handles_tail == NULL) {
-        assert(info->closed_handles_head == NULL);
-        assert(info->closed_handles_tail == NULL);
-        assert(info->closed_handles_queue_size == 0);
-    }
-    else {
-        assert(info->closed_handles_head->prev == NULL);
-        assert(info->closed_handles_tail->next == NULL);
-        assert(info->closed_handles_queue_size > 0);
-        h = info->closed_handles_head;
-        HPy_ssize_t size = 0;
-        while(h != NULL) {
-            linked_item_sanity_check(h);
-            if (h->next == NULL)
-                assert(h == info->closed_handles_tail);
-            h = h->next;
-            size++;
-        }
-        assert(info->closed_handles_queue_size == size);
-    }
-#endif
-}
-
-
 DHPy DHPy_wrap(HPyContext dctx, UHPy uh)
 {
     UHPy_sanity_check(uh);
