@@ -21,6 +21,29 @@ void DHQueue_append(DHQueue *q, DebugHandle *h) {
     q->size++;
 }
 
+DebugHandle *DHQueue_popfront(DHQueue *q)
+{
+    assert(q->size > 0);
+    assert(q->head != NULL);
+    DebugHandle *head = q->head;
+    if (q->size == 1) {
+        q->head = NULL;
+        q->tail = NULL;
+        q->size = 0;
+    }
+    else {
+        q->head = head->next;
+        q->head->prev = NULL;
+        q->size--;
+    }
+    // the following is not strictly necessary, but it makes thing much easier
+    // to debug in case of bugs
+    head->next = NULL;
+    head->prev = NULL;
+    return head;
+}
+
+
 static void linked_item_sanity_check(DebugHandle *h) {
     if (h == NULL)
         return;
