@@ -148,3 +148,32 @@ class TestHandles(HPyDebugTest):
             assert n5 == n1+7
         finally:
             _debug.set_closed_handles_queue_max_size(old_size)
+
+    def test_reuse_closed_handles(self):
+        from hpy.universal import _debug
+        old_size = _debug.get_closed_handles_queue_max_size()
+        try:
+            mod = self.make_leak_module()
+            gen = _debug.new_generation()
+            mod.leak('h1')
+            mod.leak('h2')
+            h1, h2 = _debug.get_open_handles(gen)
+            n = len(_debug.get_closed_handles())
+            h1._force_close()
+            h2._force_close()
+            closed_handles = _debug.get_closed_handles()
+            assert closed_handles[n:n+2] == [h1, h2]
+            #
+            # make sure that the closed_handles queue will be considered full
+            _debug.set_closed_handles_queue_max_size(1)
+            mod.leak('h3')
+            mod.leak('h4')
+            mod.leak('h5')
+            h3, h4 = _debug.get_open_handles(gen)
+            print(closed_handles.index(h3))
+            print(closed_handles.index(h4))
+            print(closed_handles.index(h5))
+            import pdb;pdb.set_trace()
+
+        finally:
+            _debug.set_closed_handles_queue_max_size(old_size)
