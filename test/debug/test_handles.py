@@ -149,31 +149,53 @@ class TestHandles(HPyDebugTest):
         finally:
             _debug.set_closed_handles_queue_max_size(old_size)
 
-    def xtest_reuse_closed_handles(self):
+    def test_reuse_closed_handles(self):
         from hpy.universal import _debug
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(f)
+            @EXPORT(leak)
+            @INIT
+        """)
+
         old_size = _debug.get_closed_handles_queue_max_size()
         try:
-            mod = self.make_leak_module()
             gen = _debug.new_generation()
-            mod.leak('h1')
-            mod.leak('h2')
-            h1, h2 = _debug.get_open_handles(gen)
-            n = len(_debug.get_closed_handles())
-            h1._force_close()
-            h2._force_close()
-            closed_handles = _debug.get_closed_handles()
-            assert closed_handles[n:n+2] == [h1, h2]
+            # call f twice to open/closes a bunch of handles
+            mod.f('hello')
+            mod.f('world')
             #
-            # make sure that the closed_handles queue will be considered full
+            # make sure that the closed_handles queue is considered full: this
+            # will force the reuse of existing closed handles
             _debug.set_closed_handles_queue_max_size(1)
-            mod.leak('h3')
-            mod.leak('h4')
-            mod.leak('h5')
-            h3, h4 = _debug.get_open_handles(gen)
-            print(closed_handles.index(h3))
-            print(closed_handles.index(h4))
-            print(closed_handles.index(h5))
-            import pdb;pdb.set_trace()
+            # during the call to leak, we create handles for:
+            #   1. self
+            #   2. arg
+            #   3. HPy_Dup(arg) (leaking)
+            #   4. result
+            # So the leaked handle will be 3rd in the old closed_handles queue
+            closed_handles = _debug.get_closed_handles()
+            mod.leak('foo')
+            assert not closed_handles[2].is_closed
+            assert closed_handles[2].obj == 'foo'
 
+            closed_handles = _debug.get_closed_handles()
+            mod.leak('bar')
+            assert not closed_handles[2].is_closed
+            assert closed_handles[2].obj == 'bar'
+
+            leaks = _debug.get_open_handles(gen)
+            for h in leaks:
+                h._force_close()
         finally:
             _debug.set_closed_handles_queue_max_size(old_size)
