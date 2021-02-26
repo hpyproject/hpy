@@ -20,7 +20,7 @@ static UHPy new_generation_impl(HPyContext uctx, UHPy self)
     return HPyLong_FromLong(uctx, info->current_generation);
 }
 
-static UHPy build_list_of_handles(HPyContext uctx, UHPy u_self, DebugHandle *head,
+static UHPy build_list_of_handles(HPyContext uctx, UHPy u_self, DHQueue *q,
                                   long gen)
 {
     UHPy u_DebugHandleType = HPy_NULL;
@@ -35,7 +35,7 @@ static UHPy build_list_of_handles(HPyContext uctx, UHPy u_self, DebugHandle *hea
     if (HPy_IsNull(u_result))
         goto error;
 
-    DebugHandle *dh = head;
+    DebugHandle *dh = q->head;
     while(dh != NULL) {
         if (dh->generation >= gen) {
             UHPy u_item = new_DebugHandleObj(uctx, u_DebugHandleType, dh);
@@ -71,7 +71,7 @@ static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
     if (HPyErr_Occurred(uctx))
         return HPy_NULL;
 
-    return build_list_of_handles(uctx, u_self, info->open_handles, gen);
+    return build_list_of_handles(uctx, u_self, &info->open_handles, gen);
 }
 
 HPyDef_METH(get_closed_handles, "get_closed_handles", get_closed_handles_impl,
@@ -81,7 +81,9 @@ static UHPy get_closed_handles_impl(HPyContext uctx, UHPy u_self)
 {
     HPyContext dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
-    return build_list_of_handles(uctx, u_self, info->closed_handles_head, 0);
+    HPyErr_SetString(uctx, uctx->h_NotImplementedError, "TODO");
+    return HPy_NULL;
+    //return build_list_of_handles(uctx, u_self, &info->closed_handles, 0);
 }
 
 HPyDef_METH(get_closed_handles_queue_max_size, "get_closed_handles_queue_max_size",

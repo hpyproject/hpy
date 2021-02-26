@@ -31,13 +31,10 @@ static int debug_ctx_init(HPyContext dctx, HPyContext uctx)
     info->magic_number = HPY_DEBUG_MAGIC;
     info->uctx = uctx;
     info->current_generation = 0;
-    info->open_handles = NULL;
-    info->closed_handles_head = NULL;
-    info->closed_handles_tail = NULL;
     info->closed_handles_queue_max_size = DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE;
-    info->closed_handles_queue_size = 0;
+    DHQueue_init(&info->open_handles);
+    //DHQueue_init(&info->closed_handles);
     dctx->_private = info;
-
     debug_ctx_init_fields(dctx, uctx);
     return 0;
 }

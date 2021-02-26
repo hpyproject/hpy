@@ -115,11 +115,9 @@ typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext uctx;
     long current_generation;
-    DebugHandle *open_handles;   // double-linked list
-    DebugHandle *closed_handles_head; // double-linked list, used as a queue
-    DebugHandle *closed_handles_tail; 
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
-    HPy_ssize_t closed_handles_queue_size;
+    DHQueue open_handles;
+    //DHQueue closed_handles;
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext dctx)
