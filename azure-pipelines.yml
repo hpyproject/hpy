@@ -33,7 +33,7 @@ jobs:
       pytest -n auto test/
     displayName: 'pytest'
 
-- job: C-tests
+- job: c_test
   pool:
     vmImage: 'ubuntu-latest'
   displayName: "Run C tests"
