@@ -117,7 +117,7 @@ typedef struct {
     long current_generation;
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
     DHQueue open_handles;
-    //DHQueue closed_handles;
+    DHQueue closed_handles;
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext dctx)

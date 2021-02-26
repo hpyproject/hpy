@@ -81,9 +81,7 @@ static UHPy get_closed_handles_impl(HPyContext uctx, UHPy u_self)
 {
     HPyContext dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
-    HPyErr_SetString(uctx, uctx->h_NotImplementedError, "TODO");
-    return HPy_NULL;
-    //return build_list_of_handles(uctx, u_self, &info->closed_handles, 0);
+    return build_list_of_handles(uctx, u_self, &info->closed_handles, 0);
 }
 
 HPyDef_METH(get_closed_handles_queue_max_size, "get_closed_handles_queue_max_size",

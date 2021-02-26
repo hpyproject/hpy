@@ -38,10 +38,11 @@ void DHPy_close(HPyContext dctx, DHPy dh)
 
     DHQueue_remove(&info->open_handles, handle);
 
-    /*
     // put the handle in the closed_handles queue
     handle->is_closed = true;
-    closed_handles_append(info, handle);
+    DHQueue_append(&info->closed_handles, handle);
+
+    /*
     if (info->closed_handles_queue_size > info->closed_handles_queue_max_size) {
         // we have too many closed handles. Let's free the oldest one
         DebugHandle *oldest = info->closed_handles_head;
