@@ -13,7 +13,7 @@ static HPyDef *module_defines[] = {
 };
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
-    .m_name = "pofpackage.foo",
+    .m_name = "foo",
     .m_doc = "HPy Proof of Concept",
     .m_size = -1,
     .defines = module_defines

@@ -116,6 +116,7 @@ def __bootstrap__():
     m = load({module_name!r}, ext_filepath)
     m.__file__ = ext_filepath
     m.__loader__ = __loader__
+    m.__name__ = __name__
     m.__package__ = __package__
     m.__spec__ = __spec__
     sys.modules[__name__] = m
