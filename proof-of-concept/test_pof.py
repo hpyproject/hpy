@@ -19,5 +19,5 @@ def test_point():
     assert repr(p) == 'Point(?, ?)' # fixme when we have HPyFloat_FromDouble
 
 def test_pofpackage():
-    assert pofpackage.__name__ == "pofpackage.foo"
+    assert pofpackage.foo.__name__ == "pofpackage.foo"
     assert pofpackage.foo.hello() == 'hello from pofpackage.foo'
