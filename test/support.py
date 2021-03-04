@@ -105,22 +105,15 @@ class DefaultExtensionTemplate(object):
         self.legacy_methods = pymethoddef
 
     def EXPORT_TYPE(self, name, spec):
-        i = len(self.type_table)
         src = """
-            HPy {h} = HPyType_FromSpec(ctx, &{spec}, NULL);
-            if (HPy_IsNull({h}))
-                goto MODINIT_ERROR;
-            if (HPy_SetAttr_s(ctx, m, {name}, {h}) != 0) {{
-                HPy_Close(ctx, {h});
+            if (!HPyModule_AddType(ctx, m, {name}, &{spec}, NULL)) {{
                 goto MODINIT_ERROR;
             }}
-            HPy_Close(ctx, {h});
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(
-            h = 'h_type_%d' % i,
-            name = name,
-            spec = spec))
+            name=name,
+            spec=spec))
 
     def EXTRA_INIT_FUNC(self, func):
         src = """
