@@ -52,6 +52,7 @@ if sys.implementation.name == 'cpython':
                    'hpy/universal/src/ctx_meth.c',
                    'hpy/universal/src/ctx_misc.c',
                    'hpy/devel/src/runtime/argparse.c',
+                   'hpy/devel/src/runtime/module_helpers.c',
                    'hpy/devel/src/runtime/ctx_call.c',
                    'hpy/devel/src/runtime/ctx_module.c',
                    'hpy/devel/src/runtime/ctx_object.c',
