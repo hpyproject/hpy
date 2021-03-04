@@ -124,11 +124,8 @@ class TestBytes(HPyTest):
         with pytest.raises(SystemError):
             # negative size passed to HPyBytes_FromStringAndSize
             mod.f(b"abc", -1)
-        with pytest.raises(ValueError):
-            mod.f_null(0)
-        with pytest.raises(ValueError):
-            mod.f_null(1)
-        with pytest.raises(SystemError):
-            # NULL pointer and negative size passed to
-            # HPyBytes_FromStringAndSize
-            mod.f_null(-1)
+        for i in (-1, 0, 1):
+            with pytest.raises(ValueError) as err:
+                mod.f_null(i)
+            assert str(err.value) == (
+                "NULL char * passed to HPyBytes_FromStringAndSize")
