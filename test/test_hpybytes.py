@@ -68,3 +68,67 @@ class TestBytes(HPyTest):
             @INIT
         """)
         assert mod.f(b'ABC') == 100*ord('A') + 10*ord('B') + ord('C')
+
+    def test_FromString(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            {
+                char *buf;
+                buf = HPyBytes_AsString(ctx, arg);
+                return HPyBytes_FromString(ctx, buf);
+            }
+
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(b"aaa") == b"aaa"
+        assert mod.f(b"") == b""
+
+    def test_FromStringAndSize(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext ctx, HPy self, HPy *args,
+                              HPy_ssize_t nargs)
+            {
+                HPy src;
+                long len;
+                char *buf;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Ol", &src, &len)) {
+                    return HPy_NULL;
+                }
+                buf = HPyBytes_AsString(ctx, src);
+                return HPyBytes_FromStringAndSize(ctx, buf, len);
+            }
+
+            HPyDef_METH(f_null, "f_null", f_null_impl, HPyFunc_VARARGS)
+            static HPy f_null_impl(HPyContext ctx, HPy self, HPy *args,
+                                   HPy_ssize_t nargs)
+            {
+                long len;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "l", &len)) {
+                    return HPy_NULL;
+                }
+
+                return HPyBytes_FromStringAndSize(ctx, NULL, len);
+            }
+
+            @EXPORT(f)
+            @EXPORT(f_null)
+            @INIT
+        """)
+        assert mod.f(b"aaa", 3) == b"aaa"
+        assert mod.f(b"abc", 2) == b"ab"
+        assert mod.f(b"", 0) == b""
+        with pytest.raises(SystemError):
+            # negative size passed to HPyBytes_FromStringAndSize
+            mod.f(b"abc", -1)
+        with pytest.raises(ValueError):
+            mod.f_null(0)
+        with pytest.raises(ValueError):
+            mod.f_null(1)
+        with pytest.raises(SystemError):
+            # NULL pointer and negative size passed to
+            # HPyBytes_FromStringAndSize
+            mod.f_null(-1)
