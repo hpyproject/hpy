@@ -285,7 +285,7 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #include "../common/runtime/ctx_tuplebuilder.h"
 
 #include "../common/runtime/argparse.h"
-#include "../common/runtime/module_helpers.h"
+#include "../common/runtime/helpers.h"
 
 HPyAPI_FUNC(HPy)
 HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef)

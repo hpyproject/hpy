@@ -1,8 +1,8 @@
 /**
- * Implementation of HPyModule_AddType.
+ * Runtime helper functions.
  *
- * HPyModule_AddType adds a type to a module, given an HPyType_Spec and
- * an optional list of HPyType_SpecParams.
+ * These are not part of the HPy context or ABI, but are available for
+ * HPy extensions to incorporate at compile time.  
  *
  * API
  * ---

@@ -62,7 +62,7 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #include "common/hpymodule.h"
 
 #include "common/runtime/argparse.h"
-#include "common/runtime/module_helpers.h"
+#include "common/runtime/helpers.h"
 
 #include "autogen_ctx.h"
 #include "autogen_trampolines.h"

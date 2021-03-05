@@ -35,7 +35,7 @@ class HPyDevel:
         """
         return list(map(str, [
             self.src_dir.joinpath('argparse.c'),
-            self.src_dir.joinpath('module_helpers.c'),
+            self.src_dir.joinpath('helpers.c'),
         ]))
 
     def get_ctx_sources(self):
