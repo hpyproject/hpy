@@ -3,7 +3,7 @@
 #include "common/runtime/ctx_type.h"
 #include "handles.h"
 
-static void _buffer_h2py(HPyContext ctx, const HPy_buffer *src, Py_buffer *dest)
+static void _buffer_h2py(HPyContext *ctx, const HPy_buffer *src, Py_buffer *dest)
 {
     dest->buf = src->buf;
     dest->obj = HPy_AsPyObject(ctx, src->obj);
@@ -18,7 +18,7 @@ static void _buffer_h2py(HPyContext ctx, const HPy_buffer *src, Py_buffer *dest)
     dest->internal = src->internal;
 }
 
-static void _buffer_py2h(HPyContext ctx, const Py_buffer *src, HPy_buffer *dest)
+static void _buffer_py2h(HPyContext *ctx, const Py_buffer *src, HPy_buffer *dest)
 {
     dest->buf = src->buf;
     dest->obj = HPy_FromPyObject(ctx, src->obj);
@@ -35,7 +35,7 @@ static void _buffer_py2h(HPyContext ctx, const Py_buffer *src, HPy_buffer *dest)
 
 
 HPyAPI_STORAGE void
-ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
+ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
                                    void *func, void *args)
 {
     switch (sig) {
@@ -115,7 +115,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext ctx, HPyFunc_Signature sig,
 
 
 HPyAPI_STORAGE void
-ctx_CallDestroyAndThenDealloc(HPyContext ctx, void *func, PyObject *self)
+ctx_CallDestroyAndThenDealloc(HPyContext *ctx, void *func, PyObject *self)
 {
     /* It would be more consistent to call HPy_AsStruct or HPy_AsStructLegacy on
      * _py2h(self), but HPy_AsStruct calls _h2py(...) which checks whether

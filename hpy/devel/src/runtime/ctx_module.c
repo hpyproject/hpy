@@ -12,7 +12,7 @@ static PyModuleDef empty_moduledef = {
 };
 
 _HPy_HIDDEN HPy
-ctx_Module_Create(HPyContext ctx, HPyModuleDef *hpydef)
+ctx_Module_Create(HPyContext *ctx, HPyModuleDef *hpydef)
 {
     // create a new PyModuleDef
 

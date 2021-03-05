@@ -53,7 +53,7 @@ Thus, the following perfectly valid piece of Python/C code::
 
 Becomes using HPy API::
 
-  void foo(HPyContext ctx)
+  void foo(HPyContext *ctx)
   {
       HPy x = HPyLong_FromLong(ctx, 42);
       HPy y = HPy_Dup(ctx, x);
@@ -99,7 +99,7 @@ two handles directly is ill-defined.  To prevent this kind of common error
 and the C compiler actively forbids comparisons between them.  To check for
 identity, you can use ``HPy_Is()``::
 
-    void is_same_object(HPyContext ctx, HPy x, HPy y)
+    void is_same_object(HPyContext *ctx, HPy x, HPy y)
     {
         // return x == y; // compilation error!
         return HPy_Is(ctx, x, y);
@@ -155,7 +155,7 @@ computes its absolute value::
     #include "hpy.h"
 
     HPy_DEF_METH_O(myabs)
-    static HPy myabs_impl(HPyContext ctx, HPy self, HPy obj)
+    static HPy myabs_impl(HPyContext *ctx, HPy self, HPy obj)
     {
         return HPy_Absolute(ctx, obj);
     }
@@ -246,7 +246,7 @@ If we want to receive more than a single arguments, we need the
 which adds two integers::
 
     HPy_DEF_METH_VARARGS(add_ints)
-    static HPy add_ints_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+    static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     {
         long a, b;
         if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))

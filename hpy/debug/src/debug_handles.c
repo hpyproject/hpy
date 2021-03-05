@@ -18,7 +18,7 @@ static void debug_handles_sanity_check(HPyDebugInfo *info)
 #endif
 }
 
-DHPy DHPy_wrap(HPyContext dctx, UHPy uh)
+DHPy DHPy_wrap(HPyContext *dctx, UHPy uh)
 {
     UHPy_sanity_check(uh);
     if (HPy_IsNull(uh))
@@ -45,7 +45,7 @@ DHPy DHPy_wrap(HPyContext dctx, UHPy uh)
     return as_DHPy(handle);
 }
 
-void DHPy_close(HPyContext dctx, DHPy dh)
+void DHPy_close(HPyContext *dctx, DHPy dh)
 {
     DHPy_sanity_check(dh);
     if (HPy_IsNull(dh))

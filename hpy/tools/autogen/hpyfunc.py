@@ -11,7 +11,7 @@ class autogen_hpyfunc_declare_h(AutoGenFile):
     PATH = 'hpy/devel/include/common/autogen_hpyfunc_declare.h'
 
     ## #define _HPyFunc_DECLARE_HPyFunc_NOARGS(SYM)  \
-    ##     static HPy SYM(HPyContext ctx, HPy self)
+    ##     static HPy SYM(HPyContext *ctx, HPy self)
 
     def generate(self):
         lines = []
@@ -57,7 +57,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             tramp_node = deepcopy(hpyfunc.node.type.type)
             tramp_node.type.declname = 'SYM'
             tramp_node = hpy_to_cpy(tramp_node)
-            assert toC(tramp_node.args.params[0].type) == 'HPyContext'
+            assert toC(tramp_node.args.params[0].type) == 'HPyContext *'
             tramp_node.args.params = [hpy_to_cpy(p)
                                       for p in tramp_node.args.params[1:]]
             for i, param in enumerate(tramp_node.args.params):

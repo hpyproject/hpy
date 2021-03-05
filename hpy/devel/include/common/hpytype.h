@@ -74,7 +74,7 @@ typedef struct {
 
    This would generate the following:
 
-   * `PointObject * PointObject_AsStruct(HPyContext ctx, HPy h)`: a static
+   * `PointObject * PointObject_AsStruct(HPyContext *ctx, HPy h)`: a static
      inline function that uses HPy_AsStruct to return the PointObject struct
      associated with a given handle. The behaviour is undefined if `h`
      is associated with an object that is not an instance of PointObject.
@@ -106,7 +106,7 @@ typedef struct {
 enum { TYPE##_IS_LEGACY = IS_LEGACY };                               \
                                                                      \
 static inline __attribute__((unused)) TYPE *                         \
-TYPE##_AsStruct(HPyContext ctx, HPy h)                               \
+TYPE##_AsStruct(HPyContext *ctx, HPy h)                               \
 {                                                                    \
     return (TYPE*) CAST(ctx, h);                                     \
 }

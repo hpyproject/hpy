@@ -17,7 +17,7 @@
 #  error "Cannot build hpy.univeral on top of PyPy. PyPy comes with its own version of it"
 #endif
 
-typedef HPy (*InitFuncPtr)(HPyContext ctx);
+typedef HPy (*InitFuncPtr)(HPyContext *ctx);
 
 static PyObject *set_debug(PyObject *self, PyObject *args)
 {
@@ -27,7 +27,7 @@ static PyObject *set_debug(PyObject *self, PyObject *args)
 
 static const char *prefix = "HPyInit";
 
-static HPyContext get_context(int debug)
+static HPyContext * get_context(int debug)
 {
     if (debug)
         return hpy_debug_get_ctx(&g_universal_ctx);
@@ -115,7 +115,7 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
         goto error;
     }
 
-    HPyContext ctx = get_context(debug);
+    HPyContext *ctx = get_context(debug);
     if (ctx == NULL)
         goto error;
     HPy h_mod = ((InitFuncPtr)initfn)(ctx);
@@ -176,7 +176,7 @@ static struct PyModuleDef hpydef = {
 
 // module initialization function
 int exec_module(PyObject* mod) {
-    HPyContext ctx  = &g_universal_ctx;
+    HPyContext *ctx  = &g_universal_ctx;
     HPy h_debug_mod = HPyInit__debug(ctx);
     if (HPy_IsNull(h_debug_mod))
         return -1;
@@ -189,7 +189,7 @@ int exec_module(PyObject* mod) {
     return 0;
 }
 
-static void init_universal_ctx(HPyContext ctx)
+static void init_universal_ctx(HPyContext *ctx)
 {
     if (!HPy_IsNull(ctx->h_None))
         // already initialized

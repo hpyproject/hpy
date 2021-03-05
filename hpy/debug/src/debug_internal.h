@@ -83,8 +83,8 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
     return (DHPy){(HPy_ssize_t)handle};
 }
 
-DHPy DHPy_wrap(HPyContext dctx, UHPy uh);
-void DHPy_close(HPyContext dctx, DHPy dh);
+DHPy DHPy_wrap(HPyContext *dctx, UHPy uh);
+void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_free(DHPy dh);
 
 static inline UHPy DHPy_unwrap(DHPy dh) {
@@ -113,14 +113,14 @@ static const HPy_ssize_t DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE = 1024;
 
 typedef struct {
     long magic_number; // used just for sanity checks
-    HPyContext uctx;
+    HPyContext *uctx;
     long current_generation;
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
     DHQueue open_handles;
     DHQueue closed_handles;
 } HPyDebugInfo;
 
-static inline HPyDebugInfo *get_info(HPyContext dctx)
+static inline HPyDebugInfo *get_info(HPyContext *dctx)
 {
     HPyDebugInfo *info = (HPyDebugInfo*)dctx->_private;
     assert(info->magic_number == HPY_DEBUG_MAGIC); // sanity check
