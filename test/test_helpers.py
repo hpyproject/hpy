@@ -29,9 +29,8 @@ class TestHPyModuleAddType(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        assert getattr(mod, "Dummy", None) is None
+        assert not hasattr(mod, "Dummy")
         mod.f()
-        print(dir(mod))
         assert isinstance(mod.Dummy, type)
         assert mod.Dummy.__name__ == "Dummy"
         assert isinstance(mod.Dummy(), mod.Dummy)
@@ -59,7 +58,7 @@ class TestHPyModuleAddType(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        assert getattr(mod, "Dummy", None) is None
+        assert not hasattr(mod, "Dummy")
         mod.f()
         assert isinstance(mod.Dummy, type)
         assert mod.Dummy.__name__ == "Dummy"
