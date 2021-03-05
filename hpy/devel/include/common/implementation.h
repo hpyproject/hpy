@@ -3,7 +3,7 @@
 /* object.h */
 
 HPyAPI_STORAGE HPy
-_HPy_IMPL_NAME_NOPREFIX(GetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
+_HPy_IMPL_NAME_NOPREFIX(GetItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
     PyObject* key = PyLong_FromSsize_t(idx);
     if (key == NULL)
         return HPy_NULL;
@@ -13,7 +13,7 @@ _HPy_IMPL_NAME_NOPREFIX(GetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx) {
 }
 
 HPyAPI_STORAGE HPy
-_HPy_IMPL_NAME_NOPREFIX(GetItem_s)(HPyContext ctx, HPy obj, const char *key) {
+_HPy_IMPL_NAME_NOPREFIX(GetItem_s)(HPyContext *ctx, HPy obj, const char *key) {
     PyObject* key_o = PyUnicode_FromString(key);
     if (key_o == NULL)
         return HPy_NULL;
@@ -23,7 +23,7 @@ _HPy_IMPL_NAME_NOPREFIX(GetItem_s)(HPyContext ctx, HPy obj, const char *key) {
 }
 
 HPyAPI_STORAGE int
-_HPy_IMPL_NAME_NOPREFIX(SetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy value) {
+_HPy_IMPL_NAME_NOPREFIX(SetItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value) {
     PyObject* key = PyLong_FromSsize_t(idx);
     if (key == NULL)
         return -1;
@@ -33,7 +33,7 @@ _HPy_IMPL_NAME_NOPREFIX(SetItem_i)(HPyContext ctx, HPy obj, HPy_ssize_t idx, HPy
 }
 
 HPyAPI_STORAGE int
-_HPy_IMPL_NAME_NOPREFIX(SetItem_s)(HPyContext ctx, HPy obj, const char *key, HPy value) {
+_HPy_IMPL_NAME_NOPREFIX(SetItem_s)(HPyContext *ctx, HPy obj, const char *key, HPy value) {
     PyObject* key_o = PyUnicode_FromString(key);
     if (key_o == NULL)
         return -1;
@@ -43,6 +43,6 @@ _HPy_IMPL_NAME_NOPREFIX(SetItem_s)(HPyContext ctx, HPy obj, const char *key, HPy
 }
 
 HPyAPI_STORAGE int
-_HPy_IMPL_NAME(Err_Occurred)(HPyContext ctx) {
+_HPy_IMPL_NAME(Err_Occurred)(HPyContext *ctx) {
     return PyErr_Occurred() ? 1 : 0;
 }

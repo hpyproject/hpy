@@ -13,7 +13,7 @@ class autogen_ctx_h(AutoGenFile):
     ##     int ctx_version;
     ##     HPy h_None;
     ##     ...
-    ##     HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def);
+    ##     HPy (*ctx_Module_Create)(HPyContext *ctx, HPyModuleDef *def);
     ##     ...
     ## }
 
@@ -35,7 +35,7 @@ class autogen_ctx_h(AutoGenFile):
         return toC(var.node)
 
     def declare_func(self, func):
-        # e.g. "HPy (*ctx_Module_Create)(HPyContext ctx, HPyModuleDef *def)"
+        # e.g. "HPy (*ctx_Module_Create)(HPyContext *ctx, HPyModuleDef *def)"
         #
         # turn the function declaration into a function POINTER declaration
         newnode = deepcopy(func.node)

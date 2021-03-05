@@ -125,7 +125,7 @@ typedef struct _HPyContext_s {
     HPy h_UnicodeType;
     HPy h_TupleType;
     HPy h_ListType;
-} *HPyContext;
+} HPyContext;
 
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx;
@@ -140,9 +140,9 @@ static inline HPy HPy_FromVoidP(void *p) { return (HPy){(PyObject*)p}; }
 static inline void* HPy_AsVoidP(HPy h) { return (void*)h._o; }
 
 
-HPyAPI_FUNC(HPyContext)
+HPyAPI_FUNC(HPyContext *)
 _HPyGetContext(void) {
-    HPyContext ctx = &_global_ctx;
+    HPyContext *ctx = &_global_ctx;
     if (!ctx->name) {
         ctx->name = "HPy CPython ABI",
         /* Constants */
@@ -230,27 +230,27 @@ _HPyGetContext(void) {
 
 
 HPyAPI_FUNC(HPy)
-HPy_Dup(HPyContext ctx, HPy handle)
+HPy_Dup(HPyContext *ctx, HPy handle)
 {
     Py_XINCREF(_h2py(handle));
     return handle;
 }
 
 HPyAPI_FUNC(void)
-HPy_Close(HPyContext ctx, HPy handle)
+HPy_Close(HPyContext *ctx, HPy handle)
 {
     Py_XDECREF(_h2py(handle));
 }
 
 HPyAPI_FUNC(HPy)
-HPy_FromPyObject(HPyContext ctx, PyObject *obj)
+HPy_FromPyObject(HPyContext *ctx, PyObject *obj)
 {
     Py_XINCREF(obj);
     return _py2h(obj);
 }
 
 HPyAPI_FUNC(PyObject *)
-HPy_AsPyObject(HPyContext ctx, HPy h)
+HPy_AsPyObject(HPyContext *ctx, HPy h)
 {
     PyObject *result = _h2py(h);
     Py_XINCREF(result);
@@ -288,141 +288,141 @@ HPy_AsPyObject(HPyContext ctx, HPy h)
 #include "../common/runtime/helpers.h"
 
 HPyAPI_FUNC(HPy)
-HPyModule_Create(HPyContext ctx, HPyModuleDef *mdef)
+HPyModule_Create(HPyContext *ctx, HPyModuleDef *mdef)
 {
     return ctx_Module_Create(ctx, mdef);
 }
 
 HPyAPI_FUNC(HPy)
-HPyType_FromSpec(HPyContext ctx, HPyType_Spec *spec, HPyType_SpecParam *params)
+HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec, HPyType_SpecParam *params)
 {
     return ctx_Type_FromSpec(ctx, spec, params);
 }
 
 HPyAPI_FUNC(HPy)
-_HPy_New(HPyContext ctx, HPy h, void **data)
+_HPy_New(HPyContext *ctx, HPy h, void **data)
 {
     return ctx_New(ctx, h, data);
 }
 
 HPyAPI_FUNC(void) _Py_NO_RETURN
-HPy_FatalError(HPyContext ctx, const char *message)
+HPy_FatalError(HPyContext *ctx, const char *message)
 {
     Py_FatalError(message);
 }
 
 HPyAPI_FUNC(HPy)
-HPyType_GenericNew(HPyContext ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
+HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     return ctx_Type_GenericNew(ctx, type, args, nargs, kw);
 }
 
 HPyAPI_FUNC(void*)
-HPy_AsStruct(HPyContext ctx, HPy h)
+HPy_AsStruct(HPyContext *ctx, HPy h)
 {
     return ctx_AsStruct(ctx, h);
 }
 
 HPyAPI_FUNC(void*)
-HPy_AsStructLegacy(HPyContext ctx, HPy h)
+HPy_AsStructLegacy(HPyContext *ctx, HPy h)
 {
     return ctx_AsStructLegacy(ctx, h);
 }
 
 HPyAPI_FUNC(HPy)
-HPy_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw)
+HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
 {
     return ctx_CallTupleDict(ctx, callable, args, kw);
 }
 
 HPyAPI_FUNC(void)
-_HPy_Dump(HPyContext ctx, HPy h)
+_HPy_Dump(HPyContext *ctx, HPy h)
 {
     return ctx_Dump(ctx, h);
 }
 
 HPyAPI_FUNC(int)
-HPy_TypeCheck(HPyContext ctx, HPy h_obj, HPy h_type)
+HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 {
     return ctx_TypeCheck(ctx, h_obj, h_type);
 }
 
 HPyAPI_FUNC(HPyListBuilder)
-HPyListBuilder_New(HPyContext ctx, HPy_ssize_t initial_size)
+HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)
 {
     return ctx_ListBuilder_New(ctx, initial_size);
 }
 
 HPyAPI_FUNC(void)
-HPyListBuilder_Set(HPyContext ctx, HPyListBuilder builder,
+HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                    HPy_ssize_t index, HPy h_item)
 {
     ctx_ListBuilder_Set(ctx, builder, index, h_item);
 }
 
 HPyAPI_FUNC(HPy)
-HPyListBuilder_Build(HPyContext ctx, HPyListBuilder builder)
+HPyListBuilder_Build(HPyContext *ctx, HPyListBuilder builder)
 {
     return ctx_ListBuilder_Build(ctx, builder);
 }
 
 HPyAPI_FUNC(void)
-HPyListBuilder_Cancel(HPyContext ctx, HPyListBuilder builder)
+HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder)
 {
     ctx_ListBuilder_Cancel(ctx, builder);
 }
 
 HPyAPI_FUNC(HPyTupleBuilder)
-HPyTupleBuilder_New(HPyContext ctx, HPy_ssize_t initial_size)
+HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)
 {
     return ctx_TupleBuilder_New(ctx, initial_size);
 }
 
 HPyAPI_FUNC(void)
-HPyTupleBuilder_Set(HPyContext ctx, HPyTupleBuilder builder,
+HPyTupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,
                     HPy_ssize_t index, HPy h_item)
 {
     ctx_TupleBuilder_Set(ctx, builder, index, h_item);
 }
 
 HPyAPI_FUNC(HPy)
-HPyTupleBuilder_Build(HPyContext ctx, HPyTupleBuilder builder)
+HPyTupleBuilder_Build(HPyContext *ctx, HPyTupleBuilder builder)
 {
     return ctx_TupleBuilder_Build(ctx, builder);
 }
 
 HPyAPI_FUNC(void)
-HPyTupleBuilder_Cancel(HPyContext ctx, HPyTupleBuilder builder)
+HPyTupleBuilder_Cancel(HPyContext *ctx, HPyTupleBuilder builder)
 {
     ctx_TupleBuilder_Cancel(ctx, builder);
 }
 
 HPyAPI_FUNC(HPy)
-HPyTuple_FromArray(HPyContext ctx, HPy items[], HPy_ssize_t n)
+HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n)
 {
     return ctx_Tuple_FromArray(ctx, items, n);
 }
 
 HPyAPI_FUNC(HPyTracker)
-HPyTracker_New(HPyContext ctx, HPy_ssize_t size)
+HPyTracker_New(HPyContext *ctx, HPy_ssize_t size)
 {
     return ctx_Tracker_New(ctx, size);
 }
 
 HPyAPI_FUNC(int)
-HPyTracker_Add(HPyContext ctx, HPyTracker ht, HPy h)
+HPyTracker_Add(HPyContext *ctx, HPyTracker ht, HPy h)
 {
     return ctx_Tracker_Add(ctx, ht, h);
 }
 
 HPyAPI_FUNC(void)
-HPyTracker_ForgetAll(HPyContext ctx, HPyTracker ht)
+HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht)
 {
     ctx_Tracker_ForgetAll(ctx, ht);
 }
 
 HPyAPI_FUNC(void)
-HPyTracker_Close(HPyContext ctx, HPyTracker ht)
+HPyTracker_Close(HPyContext *ctx, HPyTracker ht)
 {
     ctx_Tracker_Close(ctx, ht);
 }
