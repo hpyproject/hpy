@@ -8,7 +8,7 @@
 
 
 _HPy_HIDDEN void
-ctx_Dump(HPyContext ctx, HPy h)
+ctx_Dump(HPyContext *ctx, HPy h)
 {
     // just use _PyObject_Dump for now, but we might want to add more info
     // about the handle itself in the future.
@@ -29,7 +29,7 @@ ctx_Dump(HPyContext ctx, HPy h)
    do the check only in debug mode.
 */
 _HPy_HIDDEN int
-ctx_TypeCheck(HPyContext ctx, HPy h_obj, HPy h_type)
+ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 {
     PyObject *type= _h2py(h_type);
     assert(type != NULL);

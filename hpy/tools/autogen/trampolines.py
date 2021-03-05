@@ -22,7 +22,7 @@ class autogen_trampolines_h(AutoGenFile):
         return '\n'.join(lines)
 
     def gen_trampoline(self, func):
-        # static inline HPy HPyModule_Create(HPyContext ctx, HPyModuleDef *def) {
+        # static inline HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
         if func.name in self.NO_TRAMPOLINES:
@@ -64,7 +64,7 @@ class autogen_impl_h(AutoGenFile):
 
     def gen_implementation(self, func):
         def signature(base_name):
-            # HPy _HPy_API_NAME(Number_Add)(HPyContext ctx, HPy x, HPy y)
+            # HPy _HPy_API_NAME(Number_Add)(HPyContext *ctx, HPy x, HPy y)
             newnode = deepcopy(func.node)
             typedecl = find_typedecl(newnode)
             # rename the function
@@ -78,7 +78,7 @@ class autogen_impl_h(AutoGenFile):
             # return _py2h(PyNumber_Add(_h2py(x), _h2py(y)))
             args = []
             for p in func.node.type.args.params:
-                if toC(p.type) == 'HPyContext':
+                if toC(p.type) == 'HPyContext *':
                     continue
                 elif toC(p.type) == 'HPy':
                     arg = '_h2py(%s)' % p.name

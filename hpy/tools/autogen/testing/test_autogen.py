@@ -44,8 +44,8 @@ class TestHPyAPI(BaseTestAutogen):
     def test_ctx_name(self):
         api = self.parse("""
             HPy h_None;
-            HPy HPy_Dup(HPyContext ctx, HPy h);
-            void* _HPy_AsStruct(HPyContext ctx, HPy h);
+            HPy HPy_Dup(HPyContext *ctx, HPy h);
+            void* _HPy_AsStruct(HPyContext *ctx, HPy h);
         """)
         assert api.get_var('h_None').ctx_name() == 'h_None'
         assert api.get_func('HPy_Dup').ctx_name() == 'ctx_Dup'
@@ -53,9 +53,9 @@ class TestHPyAPI(BaseTestAutogen):
 
     def test_cpython_name(self):
         api = self.parse("""
-            HPy HPy_Dup(HPyContext ctx, HPy h);
-            long HPyLong_AsLong(HPyContext ctx, HPy h);
-            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+            HPy HPy_Dup(HPyContext *ctx, HPy h);
+            long HPyLong_AsLong(HPyContext *ctx, HPy h);
+            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
         """)
         assert api.get_func('HPy_Dup').cpython_name is None
         assert api.get_func('HPyLong_AsLong').cpython_name == 'PyLong_AsLong'
@@ -82,14 +82,14 @@ class TestAutoGen(BaseTestAutogen):
     def test_autogen_ctx_h(self):
         api = self.parse("""
             HPy h_None;
-            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
         """)
         got = autogen_ctx_h(api).generate()
         exp = """
             struct _HPyContext_s {
                 int ctx_version;
                 HPy h_None;
-                HPy (*ctx_Add)(HPyContext ctx, HPy h1, HPy h2);
+                HPy (*ctx_Add)(HPyContext *ctx, HPy h1, HPy h2);
             };
         """
         assert src_equal(exp, got)
@@ -97,7 +97,7 @@ class TestAutoGen(BaseTestAutogen):
     def test_autogen_ctx_def_h(self):
         api = self.parse("""
             HPy h_None;
-            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
+            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
         """)
         got = autogen_ctx_def_h(api).generate()
         exp = """
@@ -111,21 +111,21 @@ class TestAutoGen(BaseTestAutogen):
 
     def test_autogen_trampolines_h(self):
         api = self.parse("""
-            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
-            void HPy_Close(HPyContext ctx, HPy h);
-            void* _HPy_AsStruct(HPyContext ctx, HPy h);
+            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            void HPy_Close(HPyContext *ctx, HPy h);
+            void* _HPy_AsStruct(HPyContext *ctx, HPy h);
         """)
         got = autogen_trampolines_h(api).generate()
         exp = """
-            static inline HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2) {
+            static inline HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2) {
                 return ctx->ctx_Add ( ctx, h1, h2 );
             }
 
-            static inline void HPy_Close(HPyContext ctx, HPy h) {
+            static inline void HPy_Close(HPyContext *ctx, HPy h) {
                 ctx->ctx_Close ( ctx, h );
             }
 
-            static inline void *_HPy_AsStruct(HPyContext ctx, HPy h) {
+            static inline void *_HPy_AsStruct(HPyContext *ctx, HPy h) {
                 return ctx->ctx_AsStruct ( ctx, h );
             }
         """
@@ -133,27 +133,27 @@ class TestAutoGen(BaseTestAutogen):
 
     def test_autogen_impl_h(self):
         api = self.parse("""
-            HPy HPy_Dup(HPyContext ctx, HPy h);
-            HPy HPy_Add(HPyContext ctx, HPy h1, HPy h2);
-            HPy HPyLong_FromLong(HPyContext ctx, long value);
-            char* HPyBytes_AsString(HPyContext ctx, HPy h);
+            HPy HPy_Dup(HPyContext *ctx, HPy h);
+            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            HPy HPyLong_FromLong(HPyContext *ctx, long value);
+            char* HPyBytes_AsString(HPyContext *ctx, HPy h);
         """)
         got = autogen_impl_h(api).generate()
         exp = """
             HPyAPI_STORAGE
-            HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext ctx, HPy h1, HPy h2)
+            HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext *ctx, HPy h1, HPy h2)
             {
                 return _py2h(PyNumber_Add(_h2py(h1), _h2py(h2)));
             }
 
             HPyAPI_STORAGE
-            HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext ctx, long value)
+            HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext *ctx, long value)
             {
                 return _py2h(PyLong_FromLong(value));
             }
 
             HPyAPI_STORAGE
-            char *_HPy_IMPL_NAME(Bytes_AsString)(HPyContext ctx, HPy h)
+            char *_HPy_IMPL_NAME(Bytes_AsString)(HPyContext *ctx, HPy h)
             {
                 return PyBytes_AsString(_h2py(h));
             }

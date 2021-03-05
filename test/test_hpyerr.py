@@ -9,7 +9,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 return HPyErr_NoMemory(ctx);
             }
@@ -24,7 +24,7 @@ class TestErr(HPyTest):
         import sys
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 HPy_FatalError(ctx, "boom!");
                 // note: no 'return' statement.  This also tests that
@@ -60,7 +60,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPyLong_AsLong(ctx, arg);
                 if (HPyErr_Occurred(ctx)) {
@@ -81,7 +81,7 @@ class TestErr(HPyTest):
         import sys
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
                 HPyErr_Clear(ctx);
@@ -97,7 +97,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 HPyErr_SetString(ctx, ctx->h_ValueError, "error message");
                 return HPy_NULL;
@@ -113,7 +113,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPyErr_SetObject(ctx, ctx->h_ValueError, arg);
                 return HPy_NULL;
@@ -129,7 +129,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy h_dict, h_err;
                 h_dict = HPyDict_New(ctx);
@@ -257,7 +257,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext ctx, HPy self,
+            static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
                 HPy h_key, h_args, h_kw;
@@ -314,7 +314,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy h_dict, h_err;
                 h_dict = HPyDict_New(ctx);
@@ -361,7 +361,7 @@ class TestErr(HPyTest):
     def test_errorval_returned_by_api_functions_hpy(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy a = HPy_NULL;
                 HPy b = HPy_NULL;
@@ -387,7 +387,7 @@ class TestErr(HPyTest):
     def test_errorval_returned_by_api_functions_int(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 int length = HPy_Length(ctx, arg);
                 if (length == -1) {
