@@ -55,12 +55,14 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 // include runtime functions
 #include "common/macros.h"
-#include "common/runtime/argparse.h"
 
 #include "common/hpyfunc.h"
 #include "common/hpydef.h"
 #include "common/hpytype.h"
 #include "common/hpymodule.h"
+
+#include "common/runtime/argparse.h"
+#include "common/runtime/helpers.h"
 
 #include "autogen_ctx.h"
 #include "autogen_trampolines.h"
