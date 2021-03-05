@@ -7,7 +7,7 @@
 #endif
 
 _HPy_HIDDEN HPy
-ctx_CallTupleDict(HPyContext ctx, HPy callable, HPy args, HPy kw)
+ctx_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
 {
     PyObject *obj;
     if (!HPy_IsNull(args) && !HPyTuple_Check(ctx, args)) {

@@ -1,13 +1,13 @@
 #include "hpy.h"
 
 HPy_DEF_METH_O(myabs)
-static HPy myabs_impl(HPyContext ctx, HPy self, HPy obj)
+static HPy myabs_impl(HPyContext *ctx, HPy self, HPy obj)
 {
     return HPy_Absolute(ctx, obj);
 }
 
 HPy_DEF_METH_VARARGS(add_ints)
-static HPy add_ints_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     long a, b;
     if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
@@ -31,7 +31,7 @@ static HPyModuleDef moduledef = {
 
 
 HPy_MODINIT(simple)
-static HPy init_simple_impl(HPyContext ctx)
+static HPy init_simple_impl(HPyContext *ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);

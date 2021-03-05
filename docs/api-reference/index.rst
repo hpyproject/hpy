@@ -5,3 +5,4 @@ API Reference
    :maxdepth: 2
 
    argument-parsing
+   module-helpers

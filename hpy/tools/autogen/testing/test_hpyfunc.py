@@ -9,7 +9,7 @@ class TestHPyFunc(BaseTestAutogen):
     def test_parse(self):
         api = self.parse("""
             typedef int HPyFunc_Signature;
-            typedef HPy (*HPyFunc_noargs)(HPyContext ctx, HPy self);
+            typedef HPy (*HPyFunc_noargs)(HPyContext *ctx, HPy self);
         """)
         assert len(api.hpyfunc_typedefs) == 1
         hpyfunc = api.get_hpyfunc_typedef('HPyFunc_noargs')
@@ -18,24 +18,24 @@ class TestHPyFunc(BaseTestAutogen):
 
     def test_autogen_hpyfunc_declare_h(self):
         api = self.parse("""
-            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy self);
-            typedef HPy (*HPyFunc_bar)(HPyContext ctx, HPy, int);
+            typedef HPy (*HPyFunc_foo)(HPyContext *ctx, HPy self);
+            typedef HPy (*HPyFunc_bar)(HPyContext *ctx, HPy, int);
         """)
         got = autogen_hpyfunc_declare_h(api).generate()
         exp = """
-            #define _HPyFunc_DECLARE_HPyFunc_FOO(SYM) static HPy SYM(HPyContext ctx, HPy self)
-            #define _HPyFunc_DECLARE_HPyFunc_BAR(SYM) static HPy SYM(HPyContext ctx, HPy, int)
+            #define _HPyFunc_DECLARE_HPyFunc_FOO(SYM) static HPy SYM(HPyContext *ctx, HPy self)
+            #define _HPyFunc_DECLARE_HPyFunc_BAR(SYM) static HPy SYM(HPyContext *ctx, HPy, int)
 
-            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy self);
-            typedef HPy (*HPyFunc_bar)(HPyContext ctx, HPy, int);
+            typedef HPy (*HPyFunc_foo)(HPyContext *ctx, HPy self);
+            typedef HPy (*HPyFunc_bar)(HPyContext *ctx, HPy, int);
         """
         assert src_equal(got, exp)
 
     def test_autogen_hpyfunc_trampoline_h(self):
         api = self.parse("""
-            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
-            typedef HPy (*HPyFunc_bar)(HPyContext, HPy, int);
-            typedef void (*HPyFunc_proc)(HPyContext ctx, int x);
+            typedef HPy (*HPyFunc_foo)(HPyContext *ctx, HPy arg, int xy);
+            typedef HPy (*HPyFunc_bar)(HPyContext *ctx, HPy, int);
+            typedef void (*HPyFunc_proc)(HPyContext *ctx, int x);
         """)
         got = autogen_hpyfunc_trampoline_h(api).generate()
         exp = r"""
@@ -86,10 +86,10 @@ class TestHPyFunc(BaseTestAutogen):
 
     def test_autogen_ctx_call_i(self):
         api = self.parse("""
-            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
-            typedef int (*HPyFunc_bar)(HPyContext ctx);
-            typedef int (*HPyFunc_baz)(HPyContext ctx, HPy, int);
-            typedef void (*HPyFunc_proc)(HPyContext ctx, int x);
+            typedef HPy (*HPyFunc_foo)(HPyContext *ctx, HPy arg, int xy);
+            typedef int (*HPyFunc_bar)(HPyContext *ctx);
+            typedef int (*HPyFunc_baz)(HPyContext *ctx, HPy, int);
+            typedef void (*HPyFunc_proc)(HPyContext *ctx, int x);
         """)
         got = autogen_ctx_call_i(api).generate()
         exp = r"""
@@ -122,8 +122,8 @@ class TestHPyFunc(BaseTestAutogen):
 
     def test_autogen_cpython_hpyfunc_trampoline_h(self):
         api = self.parse("""
-            typedef HPy (*HPyFunc_foo)(HPyContext ctx, HPy arg, int xy);
-            typedef HPy (*HPyFunc_bar)(HPyContext ctx, HPy, int);
+            typedef HPy (*HPyFunc_foo)(HPyContext *ctx, HPy arg, int xy);
+            typedef HPy (*HPyFunc_bar)(HPyContext *ctx, HPy, int);
         """)
         got = autogen_cpython_hpyfunc_trampoline_h(api).generate()
         exp = r"""

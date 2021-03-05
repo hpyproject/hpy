@@ -4,14 +4,14 @@
 #include "ctx_misc.h"
 
 HPyAPI_STORAGE HPy
-ctx_FromPyObject(HPyContext ctx, cpy_PyObject *obj)
+ctx_FromPyObject(HPyContext *ctx, cpy_PyObject *obj)
 {
     Py_INCREF(obj);
     return _py2h(obj);
 }
 
 HPyAPI_STORAGE cpy_PyObject *
-ctx_AsPyObject(HPyContext ctx, HPy h)
+ctx_AsPyObject(HPyContext *ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
     Py_INCREF(obj);
@@ -19,14 +19,14 @@ ctx_AsPyObject(HPyContext ctx, HPy h)
 }
 
 HPyAPI_STORAGE void
-ctx_Close(HPyContext ctx, HPy h)
+ctx_Close(HPyContext *ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
     Py_XDECREF(obj);
 }
 
 HPyAPI_STORAGE HPy
-ctx_Dup(HPyContext ctx, HPy h)
+ctx_Dup(HPyContext *ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
     Py_XINCREF(obj);
@@ -34,7 +34,7 @@ ctx_Dup(HPyContext ctx, HPy h)
 }
 
 HPyAPI_STORAGE void
-ctx_FatalError(HPyContext ctx, const char *message)
+ctx_FatalError(HPyContext *ctx, const char *message)
 {
     Py_FatalError(message);
 }

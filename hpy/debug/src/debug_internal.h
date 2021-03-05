@@ -82,8 +82,8 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
     return (DHPy){(HPy_ssize_t)handle};
 }
 
-DHPy DHPy_wrap(HPyContext dctx, UHPy uh);
-void DHPy_close(HPyContext dctx, DHPy dh);
+DHPy DHPy_wrap(HPyContext *dctx, UHPy uh);
+void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_free(DHPy dh);
 
 static inline UHPy DHPy_unwrap(DHPy dh) {
@@ -96,13 +96,13 @@ static inline UHPy DHPy_unwrap(DHPy dh) {
 
 typedef struct {
     long magic_number; // used just for sanity checks
-    HPyContext uctx;
+    HPyContext *uctx;
     long current_generation;
     DebugHandle *open_handles;   // linked list
     //DebugHandle *closed_handles; // linked list
 } HPyDebugInfo;
 
-static inline HPyDebugInfo *get_info(HPyContext dctx)
+static inline HPyDebugInfo *get_info(HPyContext *dctx)
 {
     HPyDebugInfo *info = (HPyDebugInfo*)dctx->_private;
     assert(info->magic_number == HPY_DEBUG_MAGIC); // sanity check

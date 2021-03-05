@@ -28,7 +28,7 @@
 # include <malloc.h>   /* for alloca() */
 #endif
 
-static inline DHPy _py2dh(HPyContext dctx, PyObject *obj)
+static inline DHPy _py2dh(HPyContext *dctx, PyObject *obj)
 {
     return DHPy_wrap(dctx, _py2h(obj));
 }
@@ -38,7 +38,7 @@ static inline PyObject *_dh2py(DHPy dh)
     return _h2py(DHPy_unwrap(dh));
 }
 
-static void _buffer_h2py(HPyContext dctx, const HPy_buffer *src, Py_buffer *dest)
+static void _buffer_h2py(HPyContext *dctx, const HPy_buffer *src, Py_buffer *dest)
 {
     dest->buf = src->buf;
     dest->obj = HPy_AsPyObject(dctx, src->obj);
@@ -53,7 +53,7 @@ static void _buffer_h2py(HPyContext dctx, const HPy_buffer *src, Py_buffer *dest
     dest->internal = src->internal;
 }
 
-static void _buffer_py2h(HPyContext dctx, const Py_buffer *src, HPy_buffer *dest)
+static void _buffer_py2h(HPyContext *dctx, const Py_buffer *src, HPy_buffer *dest)
 {
     dest->buf = src->buf;
     dest->obj = HPy_FromPyObject(dctx, src->obj);
@@ -68,7 +68,7 @@ static void _buffer_py2h(HPyContext dctx, const Py_buffer *src, HPy_buffer *dest
     dest->internal = src->internal;
 }
 
-void debug_ctx_CallRealFunctionFromTrampoline(HPyContext dctx,
+void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
                                               HPyFunc_Signature sig,
                                               void *func, void *args)
 {

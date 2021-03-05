@@ -24,7 +24,7 @@
   have per-subinterpreter uctxs.
 */
 
-HPyContext hpy_debug_get_ctx(HPyContext uctx);
+HPyContext * hpy_debug_get_ctx(HPyContext *uctx);
 
 // this is the HPy init function created by HPy_MODINIT. In CPython's version
 // of hpy.universal the code is embedded inside the extension, so we can call
@@ -41,6 +41,6 @@ HPyContext hpy_debug_get_ctx(HPyContext uctx);
     #endif
 #endif
 Py_EXPORTED_SYMBOL
-HPy HPyInit__debug(HPyContext uctx);
+HPy HPyInit__debug(HPyContext *uctx);
 
 #endif /* HPY_DEBUG_H */

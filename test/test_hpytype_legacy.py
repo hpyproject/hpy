@@ -89,7 +89,7 @@ class TestCustomLegacyFeatures(HPyTest):
                 .legacy = true,
             };
 
-            static void make_Types(HPyContext ctx, HPy module)
+            static void make_Types(HPyContext *ctx, HPy module)
             {
                 HPy h_PureType = HPyType_FromSpec(ctx, &PureType_spec, NULL);
                 if (HPy_IsNull(h_PureType)) {

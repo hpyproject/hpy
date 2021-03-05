@@ -41,7 +41,7 @@ class autogen_debug_ctx_init_h(AutoGenFile):
         for func in self.api.functions:
             w(toC(get_debug_wrapper_node(func)) + ';')
         w('')
-        w('static inline void debug_ctx_init_fields(HPyContext dctx, HPyContext uctx)')
+        w('static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)')
         w('{')
         for var in self.api.variables:
             name = var.name

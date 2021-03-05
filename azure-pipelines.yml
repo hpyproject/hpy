@@ -14,8 +14,11 @@ jobs:
       py38:
         python.version: '3.8'
         imageName: 'ubuntu-latest'
-      py38-macos:
-        python.version: '3.8'
+      py39:
+        python.version: '3.9'
+        imageName: 'ubuntu-latest'
+      py39-macos:
+        python.version: '3.9'
         imageName: 'macos-latest'
       py38-win:
         python.version: '3.8'
@@ -51,8 +54,11 @@ jobs:
       py38:
         python.version: '3.8'
         imageName: 'ubuntu-latest'
-      py38-macos:
-        python.version: '3.8'
+      py39:
+        python.version: '3.9'
+        imageName: 'ubuntu-latest'
+      py39-macos:
+        python.version: '3.9'
         imageName: 'macos-latest'
       py38-win:
         python.version: '3.8'

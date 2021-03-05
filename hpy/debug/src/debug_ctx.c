@@ -17,7 +17,7 @@ static struct _HPyContext_s g_debug_ctx = {
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
 // debug wrapper for each of them.
-static int debug_ctx_init(HPyContext dctx, HPyContext uctx)
+static int debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
 {
     if (dctx->_private != NULL) {
         // already initialized
@@ -42,9 +42,9 @@ static int debug_ctx_init(HPyContext dctx, HPyContext uctx)
     return 0;
 }
 
-HPyContext hpy_debug_get_ctx(HPyContext uctx)
+HPyContext * hpy_debug_get_ctx(HPyContext *uctx)
 {
-    HPyContext dctx = &g_debug_ctx;
+    HPyContext *dctx = &g_debug_ctx;
     if (uctx == dctx) {
         HPy_FatalError(uctx, "hpy_debug_get_ctx: expected an universal ctx, "
                              "got a debug ctx");
@@ -88,14 +88,14 @@ static void hpy_magic_dump(HPy h)
 
 /* ~~~~~~~~~~ manually written wrappers ~~~~~~~~~~ */
 
-void debug_ctx_Close(HPyContext dctx, DHPy dh)
+void debug_ctx_Close(HPyContext *dctx, DHPy dh)
 {
     UHPy uh = DHPy_unwrap(dh);
     DHPy_close(dctx, dh);
     HPy_Close(get_info(dctx)->uctx, uh);
 }
 
-DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy dh_items[], HPy_ssize_t n)
+DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
 {
     UHPy *uh_items = (UHPy *)alloca(n * sizeof(UHPy));
     for(int i=0; i<n; i++) {
@@ -104,7 +104,7 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext dctx, DHPy dh_items[], HPy_ssize_t n)
     return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
 }
 
-DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy dh_type, DHPy *dh_args,
+DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, DHPy *dh_args,
                                HPy_ssize_t nargs, DHPy dh_kw)
 {
     UHPy uh_type = DHPy_unwrap(dh_type);
@@ -117,7 +117,7 @@ DHPy debug_ctx_Type_GenericNew(HPyContext dctx, DHPy dh_type, DHPy *dh_args,
                                               nargs, uh_kw));
 }
 
-DHPy debug_ctx_Type_FromSpec(HPyContext dctx, HPyType_Spec *spec, HPyType_SpecParam *dparams)
+DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecParam *dparams)
 {
     // dparams might contain some hidden DHPy: we need to manually unwrap them.
     if (dparams != NULL) {
@@ -171,22 +171,22 @@ DHPy debug_ctx_Type_FromSpec(HPyContext dctx, HPyType_Spec *spec, HPyType_SpecPa
    compile ctx_tracker.c
 */
 
-HPyTracker debug_ctx_Tracker_New(HPyContext dctx, HPy_ssize_t size)
+HPyTracker debug_ctx_Tracker_New(HPyContext *dctx, HPy_ssize_t size)
 {
     return ctx_Tracker_New(dctx, size);
 }
 
-int debug_ctx_Tracker_Add(HPyContext dctx, HPyTracker ht, DHPy dh)
+int debug_ctx_Tracker_Add(HPyContext *dctx, HPyTracker ht, DHPy dh)
 {
     return ctx_Tracker_Add(dctx, ht, dh);
 }
 
-void debug_ctx_Tracker_ForgetAll(HPyContext dctx, HPyTracker ht)
+void debug_ctx_Tracker_ForgetAll(HPyContext *dctx, HPyTracker ht)
 {
     ctx_Tracker_ForgetAll(dctx, ht);
 }
 
-void debug_ctx_Tracker_Close(HPyContext dctx, HPyTracker ht)
+void debug_ctx_Tracker_Close(HPyContext *dctx, HPyTracker ht)
 {
     // note: ctx_Tracker_Close internally calls HPy_Close() to close each
     // handle: since we are calling it with the dctx, it will end up calling

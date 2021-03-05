@@ -36,6 +36,7 @@ class HPyDevel:
         """
         return list(map(str, [
             self.src_dir.joinpath('argparse.c'),
+            self.src_dir.joinpath('helpers.c'),
         ]))
 
     def get_ctx_sources(self):
@@ -53,6 +54,15 @@ class HPyDevel:
         base_build = dist.cmdclass.get("build", build)
         base_build_ext = dist.cmdclass.get("build_ext", build_ext)
         orig_bdist_egg_write_stub = bdist_egg_mod.write_stub
+
+        assert ('setuptools.command.build_ext', 'build_ext') in [
+            (c.__module__, c.__name__) for c in base_build_ext.__mro__
+        ], (
+            "dist.cmdclass['build_ext'] does not inherit from"
+            " setuptools.command.build_ext.build_ext. The HPy build"
+            " system does not currently support any other build_ext"
+            " classes."
+        )
 
         class build_hpy_ext(build_hpy_ext_mixin, base_build_ext, object):
             _base_build_ext = base_build_ext
@@ -108,6 +118,7 @@ def __bootstrap__():
     m = load({module_name!r}, ext_filepath)
     m.__file__ = ext_filepath
     m.__loader__ = __loader__
+    m.__name__ = __name__
     m.__package__ = __package__
     m.__spec__ = __spec__
     sys.modules[__name__] = m
