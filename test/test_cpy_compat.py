@@ -16,7 +16,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
                 Py_ssize_t initial_refcount = o->ob_refcnt;
@@ -42,7 +42,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 PyObject *o = HPy_AsPyObject(ctx, arg);
                 long val = PyLong_AsLong(o);
@@ -58,7 +58,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 PyObject *o = HPy_AsPyObject(ctx, arg);
                 PyObject *o_res = PyObject_CallMethod(o, "foo", "");
@@ -80,7 +80,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 
@@ -104,7 +104,7 @@ class TestCPythonCompatibility(HPyTest):
         mod = self.make_module("""
             #include <Python.h>
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 
@@ -132,7 +132,7 @@ class TestCPythonCompatibility(HPyTest):
             #define NUM_HANDLES  10000
 
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
-            static HPy f_impl(HPyContext ctx, HPy self)
+            static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
 

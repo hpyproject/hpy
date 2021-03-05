@@ -5,7 +5,7 @@ class TestBytes(HPyTest):
     def test_Check(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 if (HPyBytes_Check(ctx, arg))
                     return HPy_Dup(ctx, ctx->h_True);
@@ -24,7 +24,7 @@ class TestBytes(HPyTest):
     def test_Size(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t a = HPyBytes_Size(ctx, arg);
                 HPy_ssize_t b = HPyBytes_GET_SIZE(ctx, arg);
@@ -38,7 +38,7 @@ class TestBytes(HPyTest):
     def test_AsString(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 long res = 0;
                 HPy_ssize_t n = HPyBytes_Size(ctx, arg);
@@ -55,7 +55,7 @@ class TestBytes(HPyTest):
     def test_AS_STRING(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 long res = 0;
                 HPy_ssize_t n = HPyBytes_Size(ctx, arg);
