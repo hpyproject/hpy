@@ -72,7 +72,7 @@ class TestBytes(HPyTest):
     def test_FromString(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 char *buf;
                 buf = HPyBytes_AsString(ctx, arg);
@@ -89,7 +89,7 @@ class TestBytes(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy *args,
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args,
                               HPy_ssize_t nargs)
             {
                 HPy src;
@@ -103,7 +103,7 @@ class TestBytes(HPyTest):
             }
 
             HPyDef_METH(f_null, "f_null", f_null_impl, HPyFunc_VARARGS)
-            static HPy f_null_impl(HPyContext ctx, HPy self, HPy *args,
+            static HPy f_null_impl(HPyContext *ctx, HPy self, HPy *args,
                                    HPy_ssize_t nargs)
             {
                 long len;
