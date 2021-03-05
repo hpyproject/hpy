@@ -50,7 +50,7 @@ _HPy_IMPL_NAME(Err_Occurred)(HPyContext *ctx) {
 /* bytes.h */
 
 HPyAPI_STORAGE HPy
-_HPy_IMPL_NAME(Bytes_FromStringAndSize)(HPyContext ctx, const char *v, HPy_ssize_t len)
+_HPy_IMPL_NAME(Bytes_FromStringAndSize)(HPyContext *ctx, const char *v, HPy_ssize_t len)
 {
     if (v == NULL) {
         // The CPython API allows passing a null pointer to
