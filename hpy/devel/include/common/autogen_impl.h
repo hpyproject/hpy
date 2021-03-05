@@ -469,4 +469,3 @@ HPyAPI_STORAGE int _HPy_IMPL_NAME(Tuple_Check)(HPyContext *ctx, HPy h)
 {
     return PyTuple_Check(_h2py(h));
 }
-
