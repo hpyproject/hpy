@@ -19,7 +19,7 @@ class TestHPyModuleAddType(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext ctx, HPy self)
             {
-                if (!HPyModule_AddType(ctx, self, "Dummy", &dummy_spec, NULL))
+                if (!HPyHelpers_AddType(ctx, self, "Dummy", &dummy_spec, NULL))
                 {
                     return HPy_NULL;
                 }
@@ -48,7 +48,7 @@ class TestHPyModuleAddType(HPyTest):
                     { HPyType_SpecParam_Base, ctx->h_LongType },
                     { 0 }
                 };
-                if (!HPyModule_AddType(ctx, self, "Dummy", &dummy_spec, param))
+                if (!HPyHelpers_AddType(ctx, self, "Dummy", &dummy_spec, param))
                 {
                     return HPy_NULL;
                 }

@@ -106,7 +106,7 @@ class DefaultExtensionTemplate(object):
 
     def EXPORT_TYPE(self, name, spec):
         src = """
-            if (!HPyModule_AddType(ctx, m, {name}, &{spec}, NULL)) {{
+            if (!HPyHelpers_AddType(ctx, m, {name}, &{spec}, NULL)) {{
                 goto MODINIT_ERROR;
             }}
             """

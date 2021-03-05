@@ -30,11 +30,11 @@
  *
  * Examples:
  *
- * Using `HPyModule_AddType` without any `HPyType_SpecParam` parameters:
+ * Using `HPyHelpers_AddType` without any `HPyType_SpecParam` parameters:
  *
  * .. code-block:: c
  *
- *     if (!HPyModule_AddType(ctx, module, "MyType", hpyspec, NULL))
+ *     if (!HPyHelpers_AddType(ctx, module, "MyType", hpyspec, NULL))
  *         return HPy_NULL;
  *     ...
  *
@@ -47,12 +47,12 @@
  *         { 0 }
  *     };
  *
- *     if (!HPyModule_AddType(ctx, module, "MyType", hpyspec, params))
+ *     if (!HPyHelpers_AddType(ctx, module, "MyType", hpyspec, params))
  *         return HPy_NULL;
  *     ...
  */
 HPyAPI_RUNTIME_FUNC(int)
-HPyModule_AddType(HPyContext ctx, HPy module, const char *name,
+HPyHelpers_AddType(HPyContext ctx, HPy module, const char *name,
                   HPyType_Spec *hpyspec, HPyType_SpecParam *params)
 {
     HPy h_type = HPyType_FromSpec(ctx, hpyspec, params);
