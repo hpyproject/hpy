@@ -53,7 +53,7 @@
  *     ...
  */
 HPyAPI_RUNTIME_FUNC(int)
-HPyHelpers_AddType(HPyContext ctx, HPy obj, const char *name,
+HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
                   HPyType_Spec *hpyspec, HPyType_SpecParam *params)
 {
     HPy h_type = HPyType_FromSpec(ctx, hpyspec, params);

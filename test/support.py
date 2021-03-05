@@ -27,7 +27,7 @@ class DefaultExtensionTemplate(object):
     };
 
     HPy_MODINIT(%(name)s)
-    static HPy init_%(name)s_impl(HPyContext ctx)
+    static HPy init_%(name)s_impl(HPyContext *ctx)
     {
         HPy m = HPy_NULL;
         m = HPyModule_Create(ctx, &moduledef);
@@ -317,7 +317,7 @@ class HPyDebugTest(HPyTest):
         # for convenience
         return self.make_module("""
             HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy leak_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_Dup(ctx, arg); // leak!
                 return HPy_Dup(ctx, ctx->h_None);

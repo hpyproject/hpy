@@ -7,14 +7,14 @@
 #include "hpy.h"
 #include "debug_internal.h"
 
-static UHPy new_DebugHandleObj(HPyContext uctx, UHPy u_DebugHandleType,
+static UHPy new_DebugHandleObj(HPyContext *uctx, UHPy u_DebugHandleType,
                                DebugHandle *handle);
 
 
 HPyDef_METH(new_generation, "new_generation", new_generation_impl, HPyFunc_NOARGS)
-static UHPy new_generation_impl(HPyContext uctx, UHPy self)
+static UHPy new_generation_impl(HPyContext *uctx, UHPy self)
 {
-    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
     info->current_generation++;
     return HPyLong_FromLong(uctx, info->current_generation);
@@ -24,9 +24,9 @@ static UHPy new_generation_impl(HPyContext uctx, UHPy self)
 HPyDef_METH(get_open_handles, "get_open_handles", get_open_handles_impl, HPyFunc_O, .doc=
             "Return a list containing all the open handles whose generation is >= "
             "of the given arg")
-static UHPy get_open_handles_impl(HPyContext uctx, UHPy u_self, UHPy u_gen)
+static UHPy get_open_handles_impl(HPyContext *uctx, UHPy u_self, UHPy u_gen)
 {
-    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
 
     UHPy u_DebugHandleType = HPy_GetAttr_s(uctx, u_self, "DebugHandle");
@@ -89,7 +89,7 @@ HPyType_HELPERS(DebugHandleObject)
 
 HPyDef_GET(DebugHandle_obj, "obj", DebugHandle_obj_get,
            .doc="The object which the handle points to")
-static UHPy DebugHandle_obj_get(HPyContext uctx, UHPy self, void *closure)
+static UHPy DebugHandle_obj_get(HPyContext *uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     return HPy_Dup(uctx, dh->handle->uh);
@@ -97,14 +97,14 @@ static UHPy DebugHandle_obj_get(HPyContext uctx, UHPy self, void *closure)
 
 HPyDef_GET(DebugHandle_id, "id", DebugHandle_id_get,
            .doc="A numeric identifier representing the underlying universal handle")
-static UHPy DebugHandle_id_get(HPyContext uctx, UHPy self, void *closure)
+static UHPy DebugHandle_id_get(HPyContext *uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     return HPyLong_FromSsize_t(uctx, (HPy_ssize_t)dh->handle);
 }
 
 HPyDef_SLOT(DebugHandle_cmp, DebugHandle_cmp_impl, HPy_tp_richcompare)
-static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmpOp op)
+static UHPy DebugHandle_cmp_impl(HPyContext *uctx, UHPy self, UHPy o, HPy_RichCmpOp op)
 {
     UHPy T = HPy_Type(uctx, self);
     if (!HPy_TypeCheck(uctx, o, T))
@@ -123,7 +123,7 @@ static UHPy DebugHandle_cmp_impl(HPyContext uctx, UHPy self, UHPy o, HPy_RichCmp
 }
 
 HPyDef_SLOT(DebugHandle_repr, DebugHandle_repr_impl, HPy_tp_repr)
-static UHPy DebugHandle_repr_impl(HPyContext uctx, UHPy self)
+static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     UHPy uh_fmt = HPy_NULL;
@@ -171,7 +171,7 @@ static HPyType_Spec DebugHandleType_spec = {
 };
 
 
-static UHPy new_DebugHandleObj(HPyContext uctx, UHPy u_DebugHandleType,
+static UHPy new_DebugHandleObj(HPyContext *uctx, UHPy u_DebugHandleType,
                                DebugHandle *handle)
 {
     DebugHandleObject *dhobj;
@@ -199,7 +199,7 @@ static HPyModuleDef moduledef = {
 
 
 HPy_MODINIT(_debug)
-static UHPy init__debug_impl(HPyContext uctx)
+static UHPy init__debug_impl(HPyContext *uctx)
 {
     UHPy m = HPyModule_Create(uctx, &moduledef);
     if (HPy_IsNull(m))
