@@ -60,7 +60,8 @@ class HPyDevel:
             "dist.cmdclass['build_ext'] does not inherit from"
             " setuptools.command.build_ext.build_ext. The HPy build"
             " system does not currently support any other build_ext"
-            " classes."
+            " classes. If you are using distutils.commands.build_ext,"
+            " please use setuptools.commands.build_ext instead."
         )
 
         class build_hpy_ext(build_hpy_ext_mixin, base_build_ext, object):
