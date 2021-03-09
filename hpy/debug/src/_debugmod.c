@@ -77,9 +77,9 @@ static UHPy get_open_handles_impl(HPyContext *uctx, UHPy u_self, UHPy u_gen)
 HPyDef_METH(get_closed_handles, "get_closed_handles", get_closed_handles_impl,
             HPyFunc_NOARGS, .doc=
             "Return a list of all the closed handle in the cache")
-static UHPy get_closed_handles_impl(HPyContext uctx, UHPy u_self)
+static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self)
 {
-    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
     return build_list_of_handles(uctx, u_self, &info->closed_handles, 0);
 }
@@ -87,9 +87,9 @@ static UHPy get_closed_handles_impl(HPyContext uctx, UHPy u_self)
 HPyDef_METH(get_closed_handles_queue_max_size, "get_closed_handles_queue_max_size",
             get_closed_handles_queue_max_size_impl, HPyFunc_NOARGS, .doc=
             "Return the maximum size of the closed handles queue")
-static UHPy get_closed_handles_queue_max_size_impl(HPyContext uctx, UHPy u_self)
+static UHPy get_closed_handles_queue_max_size_impl(HPyContext *uctx, UHPy u_self)
 {
-    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
     return HPyLong_FromSsize_t(uctx, info->closed_handles_queue_max_size);
 }
@@ -97,9 +97,9 @@ static UHPy get_closed_handles_queue_max_size_impl(HPyContext uctx, UHPy u_self)
 HPyDef_METH(set_closed_handles_queue_max_size, "set_closed_handles_queue_max_size",
             set_closed_handles_queue_max_size_impl, HPyFunc_O, .doc=
             "Set the maximum size of the closed handles queue")
-static UHPy set_closed_handles_queue_max_size_impl(HPyContext uctx, UHPy u_self, UHPy u_size)
+static UHPy set_closed_handles_queue_max_size_impl(HPyContext *uctx, UHPy u_self, UHPy u_size)
 {
-    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
     HPy_ssize_t size = HPyLong_AsSize_t(uctx, u_size);
     if (HPyErr_Occurred(uctx))
@@ -154,7 +154,7 @@ static UHPy DebugHandle_id_get(HPyContext *uctx, UHPy self, void *closure)
 
 HPyDef_GET(DebugHandle_is_closed, "is_closed", DebugHandle_is_closed_get,
            .doc="Self-explanatory")
-static UHPy DebugHandle_is_closed_get(HPyContext uctx, UHPy self, void *closure)
+static UHPy DebugHandle_is_closed_get(HPyContext *uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     return HPyBool_FromLong(uctx, dh->handle->is_closed);
@@ -222,10 +222,10 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
 
 HPyDef_METH(DebugHandle__force_close, "_force_close", DebugHandle__force_close_impl,
             HPyFunc_NOARGS, .doc="Close the underyling handle. FOR TESTS ONLY.")
-static UHPy DebugHandle__force_close_impl(HPyContext uctx, UHPy self)
+static UHPy DebugHandle__force_close_impl(HPyContext *uctx, UHPy self)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
-    HPyContext dctx = hpy_debug_get_ctx(uctx);
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPy_Close(dctx, as_DHPy(dh->handle));
     return HPy_Dup(uctx, uctx->h_None);
 }

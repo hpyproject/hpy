@@ -114,7 +114,7 @@ class TestHandles(HPyDebugTest):
         from hpy.universal import _debug
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
@@ -153,12 +153,12 @@ class TestHandles(HPyDebugTest):
         from hpy.universal import _debug
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPy_Dup(ctx, ctx->h_None);
             }
             HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext ctx, HPy self, HPy arg)
+            static HPy leak_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_Dup(ctx, arg); // leak!
                 return HPy_Dup(ctx, ctx->h_None);
