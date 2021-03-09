@@ -74,6 +74,8 @@ void debug_ctx_Err_SetObject(HPyContext *dctx, DHPy h_type, DHPy h_value);
 int debug_ctx_Err_Occurred(HPyContext *dctx);
 DHPy debug_ctx_Err_NoMemory(HPyContext *dctx);
 void debug_ctx_Err_Clear(HPyContext *dctx);
+DHPy debug_ctx_Err_NewException(HPyContext *dctx, const char *name, DHPy base, DHPy dict);
+DHPy debug_ctx_Err_NewExceptionWithDoc(HPyContext *dctx, const char *name, const char *doc, DHPy base, DHPy dict);
 int debug_ctx_IsTrue(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecParam *params);
 DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw);
@@ -278,6 +280,8 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Err_Occurred = &debug_ctx_Err_Occurred;
     dctx->ctx_Err_NoMemory = &debug_ctx_Err_NoMemory;
     dctx->ctx_Err_Clear = &debug_ctx_Err_Clear;
+    dctx->ctx_Err_NewException = &debug_ctx_Err_NewException;
+    dctx->ctx_Err_NewExceptionWithDoc = &debug_ctx_Err_NewExceptionWithDoc;
     dctx->ctx_IsTrue = &debug_ctx_IsTrue;
     dctx->ctx_Type_FromSpec = &debug_ctx_Type_FromSpec;
     dctx->ctx_Type_GenericNew = &debug_ctx_Type_GenericNew;

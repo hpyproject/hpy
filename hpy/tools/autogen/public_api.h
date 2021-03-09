@@ -181,6 +181,8 @@ void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 int HPyErr_Occurred(HPyContext *ctx);
 HPy HPyErr_NoMemory(HPyContext *ctx);
 void HPyErr_Clear(HPyContext *ctx);
+HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
+HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
 
 /* object.h */
 int HPy_IsTrue(HPyContext *ctx, HPy h);

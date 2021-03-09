@@ -153,6 +153,8 @@ struct _HPyContext_s {
     int (*ctx_Err_Occurred)(HPyContext *ctx);
     HPy (*ctx_Err_NoMemory)(HPyContext *ctx);
     void (*ctx_Err_Clear)(HPyContext *ctx);
+    HPy (*ctx_Err_NewException)(HPyContext *ctx, const char *name, HPy base, HPy dict);
+    HPy (*ctx_Err_NewExceptionWithDoc)(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
     int (*ctx_IsTrue)(HPyContext *ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext *ctx, HPyType_Spec *spec, HPyType_SpecParam *params);
     HPy (*ctx_Type_GenericNew)(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);

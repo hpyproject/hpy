@@ -327,6 +327,16 @@ void debug_ctx_Err_Clear(HPyContext *dctx)
     HPyErr_Clear(get_info(dctx)->uctx);
 }
 
+DHPy debug_ctx_Err_NewException(HPyContext *dctx, const char *name, DHPy base, DHPy dict)
+{
+    return DHPy_wrap(dctx, HPyErr_NewException(get_info(dctx)->uctx, name, DHPy_unwrap(base), DHPy_unwrap(dict)));
+}
+
+DHPy debug_ctx_Err_NewExceptionWithDoc(HPyContext *dctx, const char *name, const char *doc, DHPy base, DHPy dict)
+{
+    return DHPy_wrap(dctx, HPyErr_NewExceptionWithDoc(get_info(dctx)->uctx, name, doc, DHPy_unwrap(base), DHPy_unwrap(dict)));
+}
+
 int debug_ctx_IsTrue(HPyContext *dctx, DHPy h)
 {
     return HPy_IsTrue(get_info(dctx)->uctx, DHPy_unwrap(h));

@@ -262,6 +262,14 @@ static inline void HPyErr_Clear(HPyContext *ctx) {
      ctx->ctx_Err_Clear ( ctx ); 
 }
 
+static inline HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict) {
+     return ctx->ctx_Err_NewException ( ctx, name, base, dict ); 
+}
+
+static inline HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict) {
+     return ctx->ctx_Err_NewExceptionWithDoc ( ctx, name, doc, base, dict ); 
+}
+
 static inline int HPy_IsTrue(HPyContext *ctx, HPy h) {
      return ctx->ctx_IsTrue ( ctx, h ); 
 }
