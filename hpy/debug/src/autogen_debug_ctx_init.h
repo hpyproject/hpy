@@ -121,6 +121,7 @@ int debug_ctx_Dict_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Dict_New(HPyContext *dctx);
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy items[], HPy_ssize_t n);
+DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name);
 DHPy debug_ctx_FromPyObject(HPyContext *dctx, cpy_PyObject *obj);
 cpy_PyObject *debug_ctx_AsPyObject(HPyContext *dctx, DHPy h);
 void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx, HPyFunc_Signature sig, void *func, void *args);
@@ -327,6 +328,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Dict_New = &debug_ctx_Dict_New;
     dctx->ctx_Tuple_Check = &debug_ctx_Tuple_Check;
     dctx->ctx_Tuple_FromArray = &debug_ctx_Tuple_FromArray;
+    dctx->ctx_Import_ImportModule = &debug_ctx_Import_ImportModule;
     dctx->ctx_FromPyObject = &debug_ctx_FromPyObject;
     dctx->ctx_AsPyObject = &debug_ctx_AsPyObject;
     dctx->ctx_CallRealFunctionFromTrampoline = &debug_ctx_CallRealFunctionFromTrampoline;

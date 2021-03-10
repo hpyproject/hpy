@@ -547,6 +547,11 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(h));
 }
 
+DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name)
+{
+    return DHPy_wrap(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, name));
+}
+
 DHPy debug_ctx_FromPyObject(HPyContext *dctx, cpy_PyObject *obj)
 {
     return DHPy_wrap(dctx, HPy_FromPyObject(get_info(dctx)->uctx, obj));

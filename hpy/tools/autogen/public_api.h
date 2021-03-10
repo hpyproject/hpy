@@ -255,6 +255,8 @@ int HPyTuple_Check(HPyContext *ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
+/* import.h */
+HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);

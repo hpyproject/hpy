@@ -200,6 +200,7 @@ struct _HPyContext_s {
     HPy (*ctx_Dict_New)(HPyContext *ctx);
     int (*ctx_Tuple_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Tuple_FromArray)(HPyContext *ctx, HPy items[], HPy_ssize_t n);
+    HPy (*ctx_Import_ImportModule)(HPyContext *ctx, const char *name);
     HPy (*ctx_FromPyObject)(HPyContext *ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext *ctx, HPy h);
     void (*ctx_CallRealFunctionFromTrampoline)(HPyContext *ctx, HPyFunc_Signature sig, void *func, void *args);

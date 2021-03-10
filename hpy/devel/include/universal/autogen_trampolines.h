@@ -446,6 +446,10 @@ static inline HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }
 
+static inline HPy HPyImport_ImportModule(HPyContext *ctx, const char *name) {
+     return ctx->ctx_Import_ImportModule ( ctx, name ); 
+}
+
 static inline HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj) {
      return ctx->ctx_FromPyObject ( ctx, obj ); 
 }
