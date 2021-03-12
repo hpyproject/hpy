@@ -108,6 +108,22 @@ static UHPy set_closed_handles_queue_max_size_impl(HPyContext *uctx, UHPy u_self
     return HPy_Dup(uctx, uctx->h_None);
 }
 
+HPyDef_METH(set_on_invalid_handle, "set_on_invalid_handle", set_on_invalid_handle_impl,
+            HPyFunc_O, .doc=
+            "Set the function to call when we detect the usage of an invalid handle")
+static UHPy set_on_invalid_handle_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg)
+{
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    if (!HPyCallable_Check(uctx, u_arg)) {
+        HPyErr_SetString(uctx, uctx->h_TypeError, "Expected a callable object");
+        return HPy_NULL;
+    }
+    info->uh_on_invalid_handle = HPy_Dup(uctx, u_arg);
+    return HPy_Dup(uctx, uctx->h_None);
+}
+
+
 /* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~
 
    This is the applevel view of a DebugHandle/DHPy.
@@ -266,6 +282,7 @@ static HPyDef *module_defines[] = {
     &get_closed_handles,
     &get_closed_handles_queue_max_size,
     &set_closed_handles_queue_max_size,
+    &set_on_invalid_handle,
     NULL
 };
 

@@ -86,11 +86,16 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 DHPy DHPy_wrap(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_free(DHPy dh);
+void DHPy_invalid_handle(HPyContext *dctx, DHPy dh);
 
-static inline UHPy DHPy_unwrap(DHPy dh) {
+static inline UHPy DHPy_unwrap(HPyContext *dctx, DHPy dh)
+{
     if (HPy_IsNull(dh))
         return HPy_NULL;
-    return as_DebugHandle(dh)->uh;
+    DebugHandle *handle = as_DebugHandle(dh);
+    if (handle->is_closed)
+        DHPy_invalid_handle(dctx, dh);
+    return handle->uh;
 }
 
 /* === DHQueue === */
@@ -115,6 +120,7 @@ typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext *uctx;
     long current_generation;
+    UHPy uh_on_invalid_handle; // should be an HPyField, when we have it
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
     DHQueue open_handles;
     DHQueue closed_handles;
