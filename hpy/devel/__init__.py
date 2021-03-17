@@ -115,7 +115,7 @@ def __bootstrap__():
     import sys, pkg_resources
     from hpy.universal import load
     ext_filepath = pkg_resources.resource_filename(__name__, {ext_file!r})
-    m = load({module_name!r}, ext_filepath)
+    m = load(__name__, ext_filepath)
     m.__file__ = ext_filepath
     m.__loader__ = __loader__
     m.__name__ = __name__
@@ -273,9 +273,8 @@ class build_hpy_ext_mixin:
         if compile and os.path.exists(stub_file):
             raise DistutilsError(stub_file + " already exists! Please delete.")
         ext_file = os.path.basename(ext._file_name)
-        module_name = ext_file.split(".")[0]
         if not self.dry_run:
             with open(stub_file, 'w') as f:
                 f.write(_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
-                    ext_file=ext_file, module_name=module_name)
+                    ext_file=ext_file)
                 )
