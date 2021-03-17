@@ -270,3 +270,21 @@
         DHPy_close(dctx, dh_arg1);
         return;
     }
+    case HPyFunc_CREATEMODULEFUNC: {
+        HPyFunc_createmodulefunc f = (HPyFunc_createmodulefunc)func;
+        _HPyFunc_args_CREATEMODULEFUNC *a = (_HPyFunc_args_CREATEMODULEFUNC*)args;
+        DHPy dh_spec = _py2dh(dctx, a->spec);
+        DHPy dh_result = f(dctx, dh_spec, a->def);
+        a->result = _dh2py(dh_result);
+        DHPy_close(dctx, dh_spec);
+        DHPy_close(dctx, dh_result);
+        return;
+    }
+    case HPyFunc_EXECUTEMODULEFUNC: {
+        HPyFunc_executemodulefunc f = (HPyFunc_executemodulefunc)func;
+        _HPyFunc_args_EXECUTEMODULEFUNC *a = (_HPyFunc_args_EXECUTEMODULEFUNC*)args;
+        DHPy dh_mod = _py2dh(dctx, a->mod);
+        a->result = f(dctx, dh_mod);
+        DHPy_close(dctx, dh_mod);
+        return;
+    }

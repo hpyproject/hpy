@@ -160,3 +160,15 @@
         a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1));
         return;
     }
+    case HPyFunc_CREATEMODULEFUNC: {
+        HPyFunc_createmodulefunc f = (HPyFunc_createmodulefunc)func;
+        _HPyFunc_args_CREATEMODULEFUNC *a = (_HPyFunc_args_CREATEMODULEFUNC*)args;
+        a->result = _h2py(f(ctx, _py2h(a->spec), a->def));
+        return;
+    }
+    case HPyFunc_EXECUTEMODULEFUNC: {
+        HPyFunc_executemodulefunc f = (HPyFunc_executemodulefunc)func;
+        _HPyFunc_args_EXECUTEMODULEFUNC *a = (_HPyFunc_args_EXECUTEMODULEFUNC*)args;
+        a->result = f(ctx, _py2h(a->mod));
+        return;
+    }

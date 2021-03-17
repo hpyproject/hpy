@@ -43,6 +43,8 @@
 #define _HPyFunc_DECLARE_HPyFunc_GETBUFFERPROC(SYM) static int SYM(HPyContext *ctx, HPy, HPy_buffer *, int)
 #define _HPyFunc_DECLARE_HPyFunc_RELEASEBUFFERPROC(SYM) static void SYM(HPyContext *ctx, HPy, HPy_buffer *)
 #define _HPyFunc_DECLARE_HPyFunc_DESTROYFUNC(SYM) static void SYM(void *)
+#define _HPyFunc_DECLARE_HPyFunc_CREATEMODULEFUNC(SYM) static HPy SYM(HPyContext *ctx, HPy spec, HPyModuleDef def)
+#define _HPyFunc_DECLARE_HPyFunc_EXECUTEMODULEFUNC(SYM) static int SYM(HPyContext *ctx, HPy mod)
 
 typedef HPy (*HPyFunc_noargs)(HPyContext *ctx, HPy self);
 typedef HPy (*HPyFunc_o)(HPyContext *ctx, HPy self, HPy arg);
@@ -77,3 +79,5 @@ typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
 typedef int (*HPyFunc_getbufferproc)(HPyContext *ctx, HPy, HPy_buffer *, int);
 typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
 typedef void (*HPyFunc_destroyfunc)(void *);
+typedef HPy (*HPyFunc_createmodulefunc)(HPyContext *ctx, HPy spec, HPyModuleDef def);
+typedef int (*HPyFunc_executemodulefunc)(HPyContext *ctx, HPy mod);

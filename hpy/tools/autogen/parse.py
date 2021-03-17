@@ -64,6 +64,7 @@ class HPyFunc:
     def return_type(self):
         return self.node.type.type.type
 
+
 @attr.s
 class HPySlot:
     # represent a declaration contained inside enum HPySlot_Slot, such as:
@@ -72,6 +73,16 @@ class HPySlot:
     name = attr.ib()      # "HPy_nb_add"
     value = attr.ib()     # "7"
     hpyfunc = attr.ib()   # "HPyFunc_BINARYFUNC"
+
+
+@attr.s
+class HPyModuleSlot(HPySlot):
+    # represent a declaration contained inside enum HPyModule_Slot, such as:
+    #        HPy_mod_create = SLOT(1, HPyFunc_CREATEMODULEFUNC)
+
+    name = attr.ib()      # "HPy_mod_create"
+    value = attr.ib()     # "1"
+    hpyfunc = attr.ib()   # "HPyFunc_CREATEMODULEFUNC"
 
 
 class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
@@ -95,6 +106,8 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
             self._visit_hpyfunc_typedef(node)
         elif node.name == 'HPySlot_Slot':
             self._visit_hpyslot_slot(node)
+        elif node.name == 'HPyModule_Slot':
+            self._visit_hpymodule_slot(node)
 
     def _visit_function(self, node):
         name = node.name
@@ -133,6 +146,18 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
             value = const_value.value
             hpyfunc = id_hpyfunc.name
             self.api.hpyslots.append(HPySlot(e.name, value, hpyfunc))
+
+    def _visit_hpymodule_slot(self, node):
+        for e in node.type.type.values.enumerators:
+            call = e.value
+            assert isinstance(call, c_ast.FuncCall) and call.name.name == 'SLOT'
+            assert len(call.args.exprs) == 2
+            const_value, id_hpyfunc = call.args.exprs
+            assert isinstance(const_value, c_ast.Constant) and const_value.type == 'int'
+            assert isinstance(id_hpyfunc, c_ast.ID)
+            value = const_value.value
+            hpyfunc = id_hpyfunc.name
+            self.api.hpymoduleslots.append(HPyModuleSlot(e.name, value, hpyfunc))
 
 
 SPECIAL_CASES = {
@@ -264,6 +289,9 @@ class HPyAPI:
     def get_slot(self, name):
         return self._lookup(name, self.hpyslots)
 
+    def get_module_slot(self, name):
+        return self._lookup(name, self.hpymoduleslots)
+
     def _lookup(self, name, collection):
         for x in collection:
             if x.name == name:
@@ -275,5 +303,6 @@ class HPyAPI:
         self.variables = []
         self.hpyfunc_typedefs = []
         self.hpyslots = []
+        self.hpymoduleslots = []
         v = HPyAPIVisitor(self, convert_name)
         v.visit(self.ast)

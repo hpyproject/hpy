@@ -98,6 +98,9 @@ typedef struct {
 #define HPySlot_SIG(SLOT) _HPySlot_SIG__##SLOT
 // Macros such as _HPySlot_SIG__HPy_tp_add &co. are defined in autogen_hpyslot.h
 
+#define HPyModuleSlot_SIG(SLOT) _HPyModuleSlot_SIG__##SLOT
+// Macros such as _HPyModuleSlot_SIG__HPy_mod_exec &co. are defined in
+// autogen_hpyslot.h
 
 
 /* ~~~ HPyDef_SLOT ~~~
