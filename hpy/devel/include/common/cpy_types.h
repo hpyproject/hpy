@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_CPY_TYPES_H
-#define HPY_UNIVERSAL_CPY_TYPES_H
+#ifndef HPY_COMMON_CPY_TYPES_H
+#define HPY_COMMON_CPY_TYPES_H
 
 /* generally speaking, we can't #include Python.h, but there are a bunch of
  * types defined there that we need to use.  Here, we redefine all the types
@@ -12,4 +12,4 @@ typedef struct PyMethodDef cpy_PyMethodDef;
 typedef struct bufferinfo cpy_Py_buffer;
 
 
-#endif /* HPY_UNIVERSAL_CPY_TYPES_H */
+#endif /* HPY_COMMON_CPY_TYPES_H */

@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_HPYDEF_H
-#define HPY_UNIVERSAL_HPYDEF_H
+#ifndef HPY_COMMON_HPYDEF_H
+#define HPY_COMMON_HPYDEF_H
 
 #include <stddef.h> /* to make sure "offsetof" is available for our users */
 
@@ -70,11 +70,18 @@ typedef struct {
     void *closure;
 } HPyGetSet;
 
+typedef struct {
+    HPyModule_Slot slot;   // The slot to fill
+    void *impl;            // Function pointer to the implementation
+    void *cpy_trampoline;  // Used by CPython to call impl
+} HPyModuleSlot;
+
 typedef enum {
     HPyDef_Kind_Slot = 1,
     HPyDef_Kind_Meth = 2,
     HPyDef_Kind_Member = 3,
     HPyDef_Kind_GetSet = 4,
+    HPyDef_Kind_ModuleSlot = 5,
 } HPyDef_Kind;
 
 typedef struct {
@@ -84,6 +91,7 @@ typedef struct {
         HPyMeth meth;
         HPyMember member;
         HPyGetSet getset;
+        HPyModuleSlot module_slot;
     };
 } HPyDef;
 
@@ -197,4 +205,4 @@ typedef struct {
         }                                                                   \
     };
 
-#endif /* HPY_UNIVERSAL_HPYDEF_H */
+#endif /* HPY_COMMON_HPYDEF_H */

@@ -11,6 +11,55 @@ static PyModuleDef empty_moduledef = {
     PyModuleDef_HEAD_INIT
 };
 
+static HPy_ssize_t
+HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
+{
+    HPy_ssize_t res = 0;
+    if (defs == NULL)
+        return res;
+    for(int i=0; defs[i] != NULL; i++)
+        if (defs[i]->kind == kind)
+            res++;
+    return res;
+}
+
+static int
+hpy_module_slot_to_cpy_slot(HPyModule_Slot src)
+{
+    return src;        /* same numeric value by default */
+}
+
+static PyModuleDef_Slot *
+create_moduleslot_defs(HPyDef *hpydefs[])
+{
+    HPy_ssize_t hpymoduleslot_count = HPyDef_count(hpydefs,
+                                                   HPyDef_Kind_ModuleSlot);
+
+    PyModuleDef_Slot *result = PyMem_Calloc(hpymoduleslot_count + 1,
+                                            sizeof(PyModuleDef_Slot));
+    if (result == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+
+    int dst_idx = 0;
+    if (hpydefs != NULL) {
+        for (int i = 0; hpydefs[i] != NULL; i++) {
+            HPyDef *src = hpydefs[i];
+            if (src->kind != HPyDef_Kind_ModuleSlot)
+                continue;
+            PyModuleDef_Slot *dst = &result[dst_idx++];
+            dst->slot = hpy_module_slot_to_cpy_slot(src->module_slot.slot);
+            dst->value = src->module_slot.cpy_trampoline;
+        }
+    }
+
+    // add the NULL sentinel at the end
+    result[dst_idx++] = (PyModuleDef_Slot){0, NULL};
+
+    return result;
+}
+
 _HPy_HIDDEN HPy
 ctx_Module_Create(HPyContext *ctx, HPyModuleDef *hpydef)
 {
@@ -33,6 +82,13 @@ ctx_Module_Create(HPyContext *ctx, HPyModuleDef *hpydef)
         PyMem_Free(def);
         return HPy_NULL;
     }
+    def->m_slots = create_moduleslot_defs(hpydef->defines);
+
+    // XXX: Add a check that the isn't anything in hpydef->defines other than
+    //      method defs and module slots. E.g.
+    // if (dst_idx != total_slot_count + 1)
+    //      Py_FatalError("bogus slot count in create_slot_defs");
+
     PyObject *result = PyModule_Create(def);
     return _py2h(result);
 }

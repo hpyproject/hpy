@@ -60,6 +60,7 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 #include "common/hpydef.h"
 #include "common/hpytype.h"
 #include "common/hpymodule.h"
+#include "common/hpyfunc_trampolines.h"
 
 #include "common/runtime/argparse.h"
 #include "common/runtime/helpers.h"
