@@ -164,6 +164,7 @@ SPECIAL_CASES = {
     'HPy_Dup': None,
     'HPy_Close': None,
     'HPyModule_Create': None,
+    'HPyModuleDef_Init': None,
     'HPy_GetAttr': 'PyObject_GetAttr',
     'HPy_GetAttr_s': 'PyObject_GetAttrString',
     'HPy_HasAttr': 'PyObject_HasAttr',

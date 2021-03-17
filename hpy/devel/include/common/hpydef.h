@@ -205,4 +205,30 @@ typedef struct {
         }                                                                   \
     };
 
+
+/* ~~~ HPyDef_MODULESLOT ~~~
+
+   This is the official version of HPyDef_MODULE_SLOT, which automatically
+   determines the SIG from the MODULE_SLOT. The anonymous enum is needed to get
+   a nice compile-time error in case we pass a MODULE_SLOT which does not exist,
+   see the more detailed explanation in the comments around HPyFunc_DECLARE in
+   hpyfunc.h
+*/
+#define HPyDef_MODULE_SLOT(SYM, IMPL, SLOT)                        \
+    enum { SYM##_slot = SLOT };                                    \
+    _HPyDef_MODULE_SLOT(SYM, IMPL, SLOT, HPyModuleSlot_SIG(SLOT))
+
+// this is the actual implementation, after we determined the SIG
+#define _HPyDef_MODULE_SLOT(SYM, IMPL, SLOT, SIG)                       \
+    HPyFunc_DECLARE(IMPL, SIG);                                         \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
+    HPyDef SYM = {                                                      \
+        .kind = HPyDef_Kind_ModuleSlot,                                 \
+        .slot = {                                                       \
+            .slot = SLOT,                                               \
+            .impl = IMPL,                                               \
+            .cpy_trampoline = SYM##_trampoline                          \
+        }                                                               \
+    };
+
 #endif /* HPY_COMMON_HPYDEF_H */

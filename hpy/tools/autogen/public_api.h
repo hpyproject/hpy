@@ -105,6 +105,7 @@ HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */
 
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
+HPy HPyModuleDef_Init(HPyContext *ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext *ctx, HPy h);
 void HPy_Close(HPyContext *ctx, HPy h);
 

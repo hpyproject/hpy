@@ -14,6 +14,10 @@ static inline HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
      return ctx->ctx_Module_Create ( ctx, def ); 
 }
 
+static inline HPy HPyModuleDef_Init(HPyContext *ctx, HPyModuleDef *def) {
+     return ctx->ctx_ModuleDef_Init ( ctx, def ); 
+}
+
 static inline HPy HPy_Dup(HPyContext *ctx, HPy h) {
      return ctx->ctx_Dup ( ctx, h ); 
 }

@@ -17,6 +17,11 @@ DHPy debug_ctx_Module_Create(HPyContext *dctx, HPyModuleDef *def)
     return DHPy_wrap(dctx, HPyModule_Create(get_info(dctx)->uctx, def));
 }
 
+DHPy debug_ctx_ModuleDef_Init(HPyContext *dctx, HPyModuleDef *def)
+{
+    return DHPy_wrap(dctx, HPyModuleDef_Init(get_info(dctx)->uctx, def));
+}
+
 DHPy debug_ctx_Dup(HPyContext *dctx, DHPy h)
 {
     return DHPy_wrap(dctx, HPy_Dup(get_info(dctx)->uctx, DHPy_unwrap(h)));

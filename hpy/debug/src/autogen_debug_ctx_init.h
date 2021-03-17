@@ -11,6 +11,7 @@
 */
 
 DHPy debug_ctx_Module_Create(HPyContext *dctx, HPyModuleDef *def);
+DHPy debug_ctx_ModuleDef_Init(HPyContext *dctx, HPyModuleDef *def);
 DHPy debug_ctx_Dup(HPyContext *dctx, DHPy h);
 void debug_ctx_Close(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Long_FromLong(HPyContext *dctx, long value);
@@ -215,6 +216,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->h_TupleType = DHPy_wrap(dctx, uctx->h_TupleType);
     dctx->h_ListType = DHPy_wrap(dctx, uctx->h_ListType);
     dctx->ctx_Module_Create = &debug_ctx_Module_Create;
+    dctx->ctx_ModuleDef_Init = &debug_ctx_ModuleDef_Init;
     dctx->ctx_Dup = &debug_ctx_Dup;
     dctx->ctx_Close = &debug_ctx_Close;
     dctx->ctx_Long_FromLong = &debug_ctx_Long_FromLong;
