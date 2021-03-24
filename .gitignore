@@ -16,6 +16,8 @@ __pycache__/
 
 # C extensions
 *.so
+*.o
+c_test/test_debug_handles
 
 # Distribution / packaging
 .Python

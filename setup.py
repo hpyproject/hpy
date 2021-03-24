@@ -64,6 +64,7 @@ if sys.implementation.name == 'cpython':
                    'hpy/debug/src/debug_ctx.c',
                    'hpy/debug/src/debug_ctx_cpython.c',
                    'hpy/debug/src/debug_handles.c',
+                   'hpy/debug/src/dhqueue.c',
                    'hpy/debug/src/_debugmod.c',
                    'hpy/debug/src/autogen_debug_wrappers.c',
                   ],

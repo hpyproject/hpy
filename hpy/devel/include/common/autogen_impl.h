@@ -300,6 +300,16 @@ HPyAPI_STORAGE void _HPy_IMPL_NAME(Err_Clear)(HPyContext *ctx)
     PyErr_Clear();
 }
 
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Err_NewException)(HPyContext *ctx, const char *name, HPy base, HPy dict)
+{
+    return _py2h(PyErr_NewException(name, _h2py(base), _h2py(dict)));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Err_NewExceptionWithDoc)(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict)
+{
+    return _py2h(PyErr_NewExceptionWithDoc(name, doc, _h2py(base), _h2py(dict)));
+}
+
 HPyAPI_STORAGE int _HPy_IMPL_NAME_NOPREFIX(IsTrue)(HPyContext *ctx, HPy h)
 {
     return PyObject_IsTrue(_h2py(h));
@@ -463,5 +473,10 @@ HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Dict_New)(HPyContext *ctx)
 HPyAPI_STORAGE int _HPy_IMPL_NAME(Tuple_Check)(HPyContext *ctx, HPy h)
 {
     return PyTuple_Check(_h2py(h));
+}
+
+HPyAPI_STORAGE HPy _HPy_IMPL_NAME(Import_ImportModule)(HPyContext *ctx, const char *name)
+{
+    return _py2h(PyImport_ImportModule(name));
 }
 

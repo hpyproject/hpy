@@ -36,6 +36,14 @@ jobs:
       pytest -n auto test/
     displayName: 'pytest'
 
+- job: c_test
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: "Run C tests"
+  steps:
+  - script: make -C c_test
+    displayName: Run C tests
+
 - job: PofTests
   pool:
     vmImage: '$(imageName)'

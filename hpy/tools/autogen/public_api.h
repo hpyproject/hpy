@@ -181,6 +181,8 @@ void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 int HPyErr_Occurred(HPyContext *ctx);
 HPy HPyErr_NoMemory(HPyContext *ctx);
 void HPyErr_Clear(HPyContext *ctx);
+HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
+HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
 
 /* object.h */
 int HPy_IsTrue(HPyContext *ctx, HPy h);
@@ -253,6 +255,8 @@ int HPyTuple_Check(HPyContext *ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
+/* import.h */
+HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);
