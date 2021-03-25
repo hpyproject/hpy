@@ -401,3 +401,65 @@ class TestErr(HPyTest):
         """)
         assert mod.f([100, 200, 300]) == 3
         assert mod.f(None) == -42
+
+    def test_HPyErr_NewException(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                static HPy h_FooError = HPy_NULL;
+                if (!HPy_IsTrue(ctx, arg)) {
+                    // cleanup and close the FooError which we created earlier
+                    if (!HPy_IsNull(h_FooError))
+                        HPy_Close(ctx, h_FooError);
+                    return HPy_Dup(ctx, ctx->h_None);
+                }
+                h_FooError = HPyErr_NewException(ctx, "mytest.FooError",
+                                                 HPy_NULL, HPy_NULL);
+                if (HPy_IsNull(h_FooError))
+                    return HPy_NULL;
+                HPyErr_SetString(ctx, h_FooError, "hello");
+                return HPy_NULL;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        with pytest.raises(Exception) as exc:
+            mod.f(True)
+        assert issubclass(exc.type, Exception)
+        assert exc.type.__name__ == 'FooError'
+        assert exc.type.__module__ == 'mytest'
+        assert exc.type.__doc__ is None
+        mod.f(False) # cleanup
+
+    def test_HPyErr_NewExceptionWithDoc(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                static HPy h_FooError = HPy_NULL;
+                if (!HPy_IsTrue(ctx, arg)) {
+                    // cleanup and close the FooError which we created earlier
+                    if (!HPy_IsNull(h_FooError))
+                        HPy_Close(ctx, h_FooError);
+                    return HPy_Dup(ctx, ctx->h_None);
+                }
+                h_FooError = HPyErr_NewExceptionWithDoc(ctx, "mytest.FooError", "mydoc",
+                                                        HPy_NULL, HPy_NULL);
+                if (HPy_IsNull(h_FooError))
+                    return HPy_NULL;
+                HPyErr_SetString(ctx, h_FooError, "hello");
+                return HPy_NULL;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        with pytest.raises(Exception) as exc:
+            mod.f(True)
+        assert issubclass(exc.type, Exception)
+        assert exc.type.__name__ == 'FooError'
+        assert exc.type.__module__ == 'mytest'
+        assert exc.type.__doc__ == 'mydoc'
+        mod.f(False) # cleanup

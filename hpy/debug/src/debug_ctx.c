@@ -31,10 +31,11 @@ static int debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
     info->magic_number = HPY_DEBUG_MAGIC;
     info->uctx = uctx;
     info->current_generation = 0;
-    info->open_handles = NULL;
-    //info->closed_handles = NULL;
+    info->uh_on_invalid_handle = HPy_NULL;
+    info->closed_handles_queue_max_size = DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE;
+    DHQueue_init(&info->open_handles);
+    DHQueue_init(&info->closed_handles);
     dctx->_private = info;
-
     debug_ctx_init_fields(dctx, uctx);
     return 0;
 }
@@ -76,7 +77,7 @@ __attribute__((unused)) static void hpy_magic_dump(HPy h)
 
 void debug_ctx_Close(HPyContext *dctx, DHPy dh)
 {
-    UHPy uh = DHPy_unwrap(dh);
+    UHPy uh = DHPy_unwrap(dctx, dh);
     DHPy_close(dctx, dh);
     HPy_Close(get_info(dctx)->uctx, uh);
 }
@@ -85,7 +86,7 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
 {
     UHPy *uh_items = (UHPy *)alloca(n * sizeof(UHPy));
     for(int i=0; i<n; i++) {
-        uh_items[i] = DHPy_unwrap(dh_items[i]);
+        uh_items[i] = DHPy_unwrap(dctx, dh_items[i]);
     }
     return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
 }
@@ -93,11 +94,11 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
 DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, DHPy *dh_args,
                                HPy_ssize_t nargs, DHPy dh_kw)
 {
-    UHPy uh_type = DHPy_unwrap(dh_type);
-    UHPy uh_kw = DHPy_unwrap(dh_kw);
+    UHPy uh_type = DHPy_unwrap(dctx, dh_type);
+    UHPy uh_kw = DHPy_unwrap(dctx, dh_kw);
     UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(UHPy));
     for(int i=0; i<nargs; i++) {
-        uh_args[i] = DHPy_unwrap(dh_args[i]);
+        uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
     }
     return DHPy_wrap(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
                                               nargs, uh_kw));
@@ -115,7 +116,7 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
         HPyType_SpecParam *uparams = (HPyType_SpecParam *)alloca(n * sizeof(HPyType_SpecParam));
         for (HPy_ssize_t i=0; i<n; i++) {
             uparams[i].kind = dparams[i].kind;
-            uparams[i].object = DHPy_unwrap(dparams[i].object);
+            uparams[i].object = DHPy_unwrap(dctx, dparams[i].object);
         }
         return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, uparams));
     }
