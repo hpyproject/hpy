@@ -35,6 +35,10 @@ create_moduleslot_defs(HPyDef *hpydefs[])
     HPy_ssize_t hpymoduleslot_count = HPyDef_count(hpydefs,
                                                    HPyDef_Kind_ModuleSlot);
 
+    if (hpymoduleslot_count == 0) {
+        return NULL;
+    }
+
     PyModuleDef_Slot *result = PyMem_Calloc(hpymoduleslot_count + 1,
                                             sizeof(PyModuleDef_Slot));
     if (result == NULL) {
