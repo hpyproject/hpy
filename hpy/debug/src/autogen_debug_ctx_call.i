@@ -275,7 +275,7 @@
         _HPyFunc_args_CREATEMODULEFUNC *a = (_HPyFunc_args_CREATEMODULEFUNC*)args;
         DHPy dh_spec = _py2dh(dctx, a->spec);
         DHPy dh_result = f(dctx, dh_spec, a->def);
-        a->result = _dh2py(dh_result);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_spec);
         DHPy_close(dctx, dh_result);
         return;
