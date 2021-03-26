@@ -1,5 +1,7 @@
 #include "debug_internal.h"
 
+// TODO: we need to make DHQueue thread-safe if we want to use the same
+// context in multiple threads
 void DHQueue_init(DHQueue *q) {
     q->head = NULL;
     q->tail = NULL;
@@ -46,7 +48,7 @@ DebugHandle *DHQueue_popfront(DHQueue *q)
 void DHQueue_remove(DHQueue *q, DebugHandle *h)
 {
 #ifndef NDEBUG
-    // if we are debugging, let's check that h it's effectively in the queue
+    // if we are debugging, let's check that h is effectively in the queue
     DebugHandle *it = q->head;
     bool found = false;
     while(it != NULL) {
