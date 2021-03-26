@@ -129,15 +129,15 @@ jobs:
       python test/check_py27_compat.py
     displayName: 'check_py27_compat.py'
 
-- job: CPPCheck
-  pool:
-    vmImage: 'ubuntu-latest'
-  displayName: "Run CPPCheck"
-  steps:
-  - template: azure-templates/cppcheck.yml
-  - template: azure-templates/python.yml
-  - script: make cppcheck
-    displayName: Run CPPCheck
+# - job: CPPCheck
+#   pool:
+#     vmImage: 'ubuntu-latest'
+#   displayName: "Run CPPCheck"
+#   steps:
+#   - template: azure-templates/cppcheck.yml
+#   - template: azure-templates/python.yml
+#   - script: make cppcheck
+#     displayName: Run CPPCheck
 
 - job: infer
   pool:
