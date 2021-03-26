@@ -16,13 +16,13 @@ cppcheck-build-dir:
 
 cppcheck: cppcheck-build-dir
 	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
+	cppcheck --version
 	cppcheck \
 		--error-exitcode=1 \
 		--cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) \
 		--output-file=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt \
 		--enable=warning,performance,portability,information,missingInclude \
 		--inline-suppr \
-		--suppress=allocaCalled \
 		-I hpy/devel/include/ \
 		-I hpy/devel/include/common/ \
 		-I hpy/devel/include/cpython/ \
