@@ -78,6 +78,7 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
     uh_res = HPy_CallTupleDict(uctx, info->uh_on_invalid_handle, HPy_NULL, HPy_NULL);
     if (HPy_IsNull(uh_res))
         print_error(uctx, "Error when executing the on_invalid_handle callback");
+    HPy_Close(uctx, uh_res);
 }
 
 void DHPy_close(HPyContext *dctx, DHPy dh)
