@@ -74,23 +74,10 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
        the callback and let the execution to continue, so that people
        can fix the warnings one by one.
     */
-    // XXX: so far the only call API that we have is CallTupleDict, we
-    // should use a more C-friendly variant as soon as we have it.
-    UHPy uh_args = HPy_NULL;
     UHPy uh_res = HPy_NULL;
-    uh_args = HPyTuple_Pack(uctx, 0);
-    if (HPy_IsNull(uh_args)) {
-        print_error(uctx, "Error when preparing args to call the on_invalid_handle callback");
-        goto exit;
-    }
-    uh_res = HPy_CallTupleDict(uctx, info->uh_on_invalid_handle, uh_args, HPy_NULL);
-    if (HPy_IsNull(uh_res)) {
+    uh_res = HPy_CallTupleDict(uctx, info->uh_on_invalid_handle, HPy_NULL, HPy_NULL);
+    if (HPy_IsNull(uh_res))
         print_error(uctx, "Error when executing the on_invalid_handle callback");
-        goto exit;
-    }
- exit:
-    HPy_Close(uctx, uh_args);
-    HPy_Close(uctx, uh_res);
 }
 
 void DHPy_close(HPyContext *dctx, DHPy dh)
