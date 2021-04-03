@@ -10,6 +10,7 @@ if 'HPY_DEBUG' in os.environ:
 else:
     EXTRA_COMPILE_ARGS = []
 
+
 def get_scm_config():
     """
     We use this function as a hook to generate version.h before building.
@@ -41,7 +42,8 @@ def get_scm_config():
         __git_revision__ = "{gitrev}"
     """))
 
-    return {} # use the default config
+    return {}  # use the default config
+
 
 EXT_MODULES = []
 if sys.implementation.name == 'cpython':
@@ -67,18 +69,17 @@ if sys.implementation.name == 'cpython':
                    'hpy/debug/src/dhqueue.c',
                    'hpy/debug/src/_debugmod.c',
                    'hpy/debug/src/autogen_debug_wrappers.c',
-                  ],
+                   ],
                   include_dirs=[
                       'hpy/devel/include',
                       'hpy/universal/src',
                       'hpy/debug/src/include',
                   ],
                   extra_compile_args=[
-                      '-DHPY_UNIVERSAL_ABI',
-                  ] + EXTRA_COMPILE_ARGS
+                                         '-DHPY_UNIVERSAL_ABI',
+                                     ] + EXTRA_COMPILE_ARGS
                   )
-        ]
-
+    ]
 
 DEV_REQUIREMENTS = [
     "pytest",
@@ -87,17 +88,17 @@ DEV_REQUIREMENTS = [
 
 setup(
     name="hpy.devel",
-    packages = ['hpy.devel'],
+    packages=['hpy.devel'],
     include_package_data=True,
     extras_require={
         "dev": DEV_REQUIREMENTS,
     },
-    ext_modules = EXT_MODULES,
+    ext_modules=EXT_MODULES,
     entry_points={
-          "distutils.setup_keywords": [
-              "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
-          ],
-      },
-    use_scm_version = get_scm_config,
+        "distutils.setup_keywords": [
+            "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
+        ],
+    },
+    use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
 )
