@@ -6,5 +6,6 @@
 
 _HPy_HIDDEN void ctx_Dump(HPyContext *ctx, HPy h);
 _HPy_HIDDEN int ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type);
+_HPy_HIDDEN int ctx_Is(HPyContext *ctx, HPy h_obj, HPy h_other);
 
 #endif /* HPY_COMMON_RUNTIME_CTX_OBJECT_H */
