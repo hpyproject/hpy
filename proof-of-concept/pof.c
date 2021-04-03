@@ -55,6 +55,11 @@ static HPy Point_new_impl (HPyContext *ctx, HPy cls, HPy *args,
     return h_point;
 }
 
+HPyDef_SLOT(Point_destroy, Point_destroy_impl, HPy_tp_destroy)
+static void Point_destroy_impl (void *func)
+{
+}
+
 HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext *ctx, HPy self)
 {
@@ -64,9 +69,55 @@ static HPy Point_repr_impl(HPyContext *ctx, HPy self)
 }
 
 
+HPyDef_SLOT(Point_richcompare, Point_richcompare_impl, HPy_tp_richcompare)
+static HPy Point_richcompare_impl(HPyContext *ctx, HPy self, HPy h_other, HPy_RichCmpOp op)
+{
+    PointObject *point = PointObject_AsStruct(ctx, self);
+    PointObject *other = PointObject_AsStruct(ctx, h_other);
+
+    HPy T = HPy_Type(ctx, self);
+    if (!HPy_TypeCheck(ctx, h_other, T)) {
+        HPyErr_SetString(ctx, ctx->h_TypeError, "instance must be Point");
+        return HPy_NULL;
+    }
+
+    if (op != HPy_EQ)
+        return HPy_Dup(ctx, ctx->h_NotImplemented);
+
+    if(point->x == other->x && point->y == other->y) {
+        return HPy_Dup(ctx, ctx->h_True);
+    }
+    return HPy_Dup(ctx, ctx->h_False);
+}
+
+
+HPyDef_METH(Point_sum, "sum", Point_sum_impl, HPyFunc_NOARGS)
+static HPy Point_sum_impl(HPyContext *ctx, HPy self)
+{
+    PointObject *point = PointObject_AsStruct(ctx, self);
+    return HPyLong_FromLong(ctx, point->x + point->y);
+}
+
+HPyDef_METH(Point_multiply, "multiply", Point_multiply_impl, HPyFunc_VARARGS)
+static HPy Point_multiply_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+{
+    double x, y;
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "dd", &x, &y))
+        return HPy_NULL;
+
+    PointObject *point = PointObject_AsStruct(ctx, self);
+    point->x *= x;
+    point->y *= y;
+    return HPy_Dup(ctx, ctx->h_None);
+}
+
 static HPyDef *point_type_defines[] = {
     &Point_new,
+    &Point_destroy,
+    &Point_richcompare,
     &Point_repr,
+    &Point_sum,
+    &Point_multiply,
     NULL
 };
 static HPyType_Spec point_type_spec = {
