@@ -121,6 +121,7 @@ def __bootstrap__():
     m.__name__ = __name__
     m.__package__ = __package__
     m.__spec__ = __spec__
+    m.__spec__.origin = ext_filepath
     sys.modules[__name__] = m
 
 __bootstrap__()
