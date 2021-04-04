@@ -412,6 +412,11 @@ int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type)
     return HPy_TypeCheck(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, type));
 }
 
+int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other)
+{
+    return HPy_Is(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, other));
+}
+
 void *debug_ctx_AsStruct(HPyContext *dctx, DHPy h)
 {
     return HPy_AsStruct(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
