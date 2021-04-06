@@ -93,7 +93,7 @@ Why should I care about this stuff?
     CPython C API
 
 See also [Python Performance: Past, Present,
-Future](https://github.com/vstinner/talks/blob/main/2019-EuroPython/python_performance.pdf)
+Future](https://github.com/vstinner/talks/raw/main/2019-EuroPython/python_performance.pdf)
 by Victor Stinner.
 
 
