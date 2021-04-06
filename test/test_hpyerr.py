@@ -405,49 +405,42 @@ class TestErr(HPyTest):
     def test_HPyErr_NewException(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 static HPy h_FooError = HPy_NULL;
-                if (!HPy_IsTrue(ctx, arg)) {
-                    // cleanup and close the FooError which we created earlier
-                    if (!HPy_IsNull(h_FooError))
-                        HPy_Close(ctx, h_FooError);
-                    return HPy_Dup(ctx, ctx->h_None);
-                }
-                h_FooError = HPyErr_NewException(ctx, "mytest.FooError",
-                                                 HPy_NULL, HPy_NULL);
-                if (HPy_IsNull(h_FooError))
-                    return HPy_NULL;
-                HPyErr_SetString(ctx, h_FooError, "hello");
-                return HPy_NULL;
-            }
-            @EXPORT(f)
-            @INIT
-        """)
-        with pytest.raises(Exception) as exc:
-            mod.f(True)
-        assert issubclass(exc.type, Exception)
-        assert exc.type.__name__ == 'FooError'
-        assert exc.type.__module__ == 'mytest'
-        assert exc.type.__doc__ is None
-        mod.f(False) # cleanup
+                HPy arg,
+                    h_base = HPy_NULL,
+                    h_dict = HPy_NULL,
+                    h_doc = HPy_NULL;
 
-    def test_HPyErr_NewExceptionWithDoc(self):
-        import pytest
-        mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                static HPy h_FooError = HPy_NULL;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|OOO", &arg, &h_base, &h_dict, &h_doc)) {
+                    return HPy_NULL;
+                }
+
                 if (!HPy_IsTrue(ctx, arg)) {
                     // cleanup and close the FooError which we created earlier
                     if (!HPy_IsNull(h_FooError))
                         HPy_Close(ctx, h_FooError);
                     return HPy_Dup(ctx, ctx->h_None);
                 }
-                h_FooError = HPyErr_NewExceptionWithDoc(ctx, "mytest.FooError", "mydoc",
-                                                        HPy_NULL, HPy_NULL);
+
+                if(HPy_Is(ctx, h_base, ctx->h_None)) {
+                    h_base = HPy_NULL;
+                }
+
+                if(HPy_Is(ctx, h_dict, ctx->h_None)) {
+                    h_dict = HPy_NULL;
+                }
+
+                if(HPy_Is(ctx, h_doc, ctx->h_None)) {
+                    h_FooError = HPyErr_NewException(ctx, "mytest.FooError", h_base, h_dict);
+                } else {
+                    // we use bytes because ATM we don't have HPyUnicode_AsUTF8 or similar
+                    h_FooError = HPyErr_NewExceptionWithDoc(ctx, "mytest.FooError",
+                                                            HPyBytes_AsString(ctx, h_doc), h_base, h_dict);
+                }
+
                 if (HPy_IsNull(h_FooError))
                     return HPy_NULL;
                 HPyErr_SetString(ctx, h_FooError, "hello");
@@ -456,10 +449,27 @@ class TestErr(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        with pytest.raises(Exception) as exc:
-            mod.f(True)
-        assert issubclass(exc.type, Exception)
-        assert exc.type.__name__ == 'FooError'
-        assert exc.type.__module__ == 'mytest'
-        assert exc.type.__doc__ == 'mydoc'
-        mod.f(False) # cleanup
+
+        def check(base, dict_, doc):
+            with pytest.raises(Exception) as exc:
+                mod.f(True, base, dict_, doc)
+            assert issubclass(exc.type, RuntimeError if base else Exception)
+            assert exc.type.__name__ == 'FooError', exc.value
+            assert exc.type.__module__ == 'mytest'
+            if doc is None:
+                assert exc.type.__doc__ is None
+            else:
+                assert exc.type.__doc__ == doc.decode("utf-8")
+
+            if dict_:
+                assert exc.type.__dict__["test"] == "pass"
+            mod.f(False, None, None, None) # cleanup
+
+        check(base=None, dict_=None, doc=None)
+        check(base=None, dict_=None, doc=b'mytest')
+        check(base=None, dict_={"test": "pass"}, doc=None)
+        check(base=None, dict_={"test": "pass"}, doc=b'mytest')
+        check(base=RuntimeError, dict_=None, doc=None)
+        check(base=RuntimeError, dict_=None, doc=b'mytest')
+        check(base=RuntimeError, dict_={"test": "pass"}, doc=None)
+        check(base=RuntimeError, dict_={"test": "pass"}, doc=b'mytest')
