@@ -31,6 +31,7 @@
 
 typedef struct { PyObject *_o; } HPy;
 typedef struct { Py_ssize_t _lst; } HPyListBuilder;
+typedef struct { Py_ssize_t _lst; } HPyStringBuilder;
 typedef struct { Py_ssize_t _tup; } HPyTupleBuilder;
 typedef struct { void *_o; } HPyTracker;
 typedef Py_ssize_t HPy_ssize_t;
@@ -280,6 +281,7 @@ HPy_AsPyObject(HPyContext *ctx, HPy h)
 #include "../common/runtime/ctx_object.h"
 #include "../common/runtime/ctx_type.h"
 #include "../common/runtime/ctx_listbuilder.h"
+#include "../common/runtime/ctx_stringbuilder.h"
 #include "../common/runtime/ctx_tracker.h"
 #include "../common/runtime/ctx_tuple.h"
 #include "../common/runtime/ctx_tuplebuilder.h"
@@ -376,6 +378,31 @@ HPyAPI_FUNC(void)
 HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder)
 {
     ctx_ListBuilder_Cancel(ctx, builder);
+}
+
+HPyAPI_FUNC(HPyStringBuilder)
+HPyStringBuilder_New(HPyContext *ctx)
+{
+    return ctx_StringBuilder_New(ctx);
+}
+
+HPyAPI_FUNC(void)
+HPyStringBuilder_Append(HPyContext *ctx, HPyStringBuilder builder,
+                        HPy h_item)
+{
+    ctx_StringBuilder_Append(ctx, builder, h_item);
+}
+
+HPyAPI_FUNC(HPy)
+HPyStringBuilder_Build(HPyContext *ctx, HPyStringBuilder builder)
+{
+    return ctx_StringBuilder_Build(ctx, builder);
+}
+
+HPyAPI_FUNC(void)
+HPyStringBuilder_Cancel(HPyContext *ctx, HPyStringBuilder builder)
+{
+    ctx_StringBuilder_Cancel(ctx, builder);
 }
 
 HPyAPI_FUNC(HPyTupleBuilder)

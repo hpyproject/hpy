@@ -486,6 +486,22 @@ static inline void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder
      ctx->ctx_ListBuilder_Cancel ( ctx, builder ); 
 }
 
+static inline HPyStringBuilder HPyStringBuilder_New(HPyContext *ctx) {
+     return ctx->ctx_StringBuilder_New ( ctx ); 
+}
+
+static inline void HPyStringBuilder_Append(HPyContext *ctx, HPyStringBuilder builder, HPy h_item) {
+     ctx->ctx_StringBuilder_Append ( ctx, builder, h_item ); 
+}
+
+static inline HPy HPyStringBuilder_Build(HPyContext *ctx, HPyStringBuilder builder) {
+     return ctx->ctx_StringBuilder_Build ( ctx, builder ); 
+}
+
+static inline void HPyStringBuilder_Cancel(HPyContext *ctx, HPyStringBuilder builder) {
+     ctx->ctx_StringBuilder_Cancel ( ctx, builder ); 
+}
+
 static inline HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size) {
      return ctx->ctx_TupleBuilder_New ( ctx, initial_size ); 
 }

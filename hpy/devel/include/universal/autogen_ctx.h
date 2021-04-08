@@ -210,6 +210,10 @@ struct _HPyContext_s {
     void (*ctx_ListBuilder_Set)(HPyContext *ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item);
     HPy (*ctx_ListBuilder_Build)(HPyContext *ctx, HPyListBuilder builder);
     void (*ctx_ListBuilder_Cancel)(HPyContext *ctx, HPyListBuilder builder);
+    HPyStringBuilder (*ctx_StringBuilder_New)(HPyContext *ctx);
+    void (*ctx_StringBuilder_Append)(HPyContext *ctx, HPyStringBuilder builder, HPy h_item);
+    HPy (*ctx_StringBuilder_Build)(HPyContext *ctx, HPyStringBuilder builder);
+    void (*ctx_StringBuilder_Cancel)(HPyContext *ctx, HPyStringBuilder builder);
     HPyTupleBuilder (*ctx_TupleBuilder_New)(HPyContext *ctx, HPy_ssize_t initial_size);
     void (*ctx_TupleBuilder_Set)(HPyContext *ctx, HPyTupleBuilder builder, HPy_ssize_t index, HPy h_item);
     HPy (*ctx_TupleBuilder_Build)(HPyContext *ctx, HPyTupleBuilder builder);

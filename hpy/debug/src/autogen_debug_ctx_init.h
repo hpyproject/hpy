@@ -131,6 +131,10 @@ HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_s
 void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder builder);
 void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder);
+HPyStringBuilder debug_ctx_StringBuilder_New(HPyContext *dctx);
+void debug_ctx_StringBuilder_Append(HPyContext *dctx, HPyStringBuilder builder, DHPy h_item);
+DHPy debug_ctx_StringBuilder_Build(HPyContext *dctx, HPyStringBuilder builder);
+void debug_ctx_StringBuilder_Cancel(HPyContext *dctx, HPyStringBuilder builder);
 HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);
 void debug_ctx_TupleBuilder_Set(HPyContext *dctx, HPyTupleBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_TupleBuilder_Build(HPyContext *dctx, HPyTupleBuilder builder);
@@ -339,6 +343,10 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_ListBuilder_Set = &debug_ctx_ListBuilder_Set;
     dctx->ctx_ListBuilder_Build = &debug_ctx_ListBuilder_Build;
     dctx->ctx_ListBuilder_Cancel = &debug_ctx_ListBuilder_Cancel;
+    dctx->ctx_StringBuilder_New = &debug_ctx_StringBuilder_New;
+    dctx->ctx_StringBuilder_Append = &debug_ctx_StringBuilder_Append;
+    dctx->ctx_StringBuilder_Build = &debug_ctx_StringBuilder_Build;
+    dctx->ctx_StringBuilder_Cancel = &debug_ctx_StringBuilder_Cancel;
     dctx->ctx_TupleBuilder_New = &debug_ctx_TupleBuilder_New;
     dctx->ctx_TupleBuilder_Set = &debug_ctx_TupleBuilder_Set;
     dctx->ctx_TupleBuilder_Build = &debug_ctx_TupleBuilder_Build;

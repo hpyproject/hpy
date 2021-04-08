@@ -592,6 +592,26 @@ void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder)
     HPyListBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
+HPyStringBuilder debug_ctx_StringBuilder_New(HPyContext *dctx)
+{
+    return HPyStringBuilder_New(get_info(dctx)->uctx);
+}
+
+void debug_ctx_StringBuilder_Append(HPyContext *dctx, HPyStringBuilder builder, DHPy h_item)
+{
+    HPyStringBuilder_Append(get_info(dctx)->uctx, builder, DHPy_unwrap(dctx, h_item));
+}
+
+DHPy debug_ctx_StringBuilder_Build(HPyContext *dctx, HPyStringBuilder builder)
+{
+    return DHPy_wrap(dctx, HPyStringBuilder_Build(get_info(dctx)->uctx, builder));
+}
+
+void debug_ctx_StringBuilder_Cancel(HPyContext *dctx, HPyStringBuilder builder)
+{
+    HPyStringBuilder_Cancel(get_info(dctx)->uctx, builder);
+}
+
 HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size)
 {
     return HPyTupleBuilder_New(get_info(dctx)->uctx, initial_size);
