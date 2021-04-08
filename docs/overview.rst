@@ -18,7 +18,6 @@ low-level data structure layouts. This has two important consequences:
   2. CPython developers cannot experiment with new designs or refactoring
      without breaking compatibility with existing extensions.
 
-
 Over the years, it has become evident that emulating the Python/C
 API in an efficient way is `challenging, if not impossible
 <https://morepypy.blogspot.com/2018/09/inside-cpyext-why-emulating-cpython-c.html>`_.
@@ -58,7 +57,7 @@ Hide internal details
   of the API**: we want a more generic way of managing resources which is
   possible to implement with different strategies, including the existing
   reference counting and/or with a moving *Garbage Collector* (like the ones
-  used by PyPy or Java, for example).
+  used by PyPy, GraalPython or Java, for example).
 
   Moreover, we want to avoid exposing internal details of a specific
   implementation, so that each implementation can experiment with new memory
@@ -180,15 +179,15 @@ CPython.
 
 
 C extensions
---------------
+------------
 
 If you are writing a Python extension in C, you are a consumer of the HPy
 API. There are three big advantages in using HPy instead of the old Python/C
 API:
 
-  - Speed on PyPy and other alternative implementations: according to early
-    :ref:`benchmarks`, an extension written in HPy can be ~3x faster than the
-    equivalent extension written in Python/C.
+  - Speed on PyPy, GraalPython and other alternative implementations: according
+    to early :ref:`benchmarks`, an extension written in HPy can be ~3x faster
+    than the equivalent extension written in Python/C.
 
   - Improved debugging: when you load extensions in :ref:`debugging mode`,
     many common mistakes are checked and reported automatically.
@@ -207,7 +206,7 @@ will get the benefits of HPy automatically.
 
 
 Extensions in other languages
-------------------------------
+-----------------------------
 
 On the API side, HPy is designed with C in mind, so it is not directly useful
 if you want to write an extension in a language other than C.
@@ -220,7 +219,7 @@ supports it.  This is the route taken, for example, by `Rust
 
 
 Benefits for alternative Python implementations
-------------------------------------------------
+-----------------------------------------------
 
 If you are writing an alternative Python implementation, there is a good
 chance that you already know how painful it is to support the Python/C
@@ -238,55 +237,53 @@ You have two choices:
 Current status and roadmap
 --------------------------
 
-At the moment of writing, HPy is still in its early stages of development. The
-following milestones have been reached:
+HPy is still in the early stages of development, but many big pieces are
+already in place. As on April 2021, the following milestones have been reached:
 
-  - it is possible to write extensions which expose module-level functions,
-    with all the various kinds of calling conventions
+  - one can write extensions which expose module-level functions, with all
+    the various kinds of calling conventions.
 
-  - there is a limited support for argument parsing (only a couple of basic
-    types actually work)
+  - there is support for argument parsing (i.e. the equivalents of
+    `PyArg_ParseTuple` and `PyArg_ParseTupleAndKeywords`).
 
-  - there is support for raising and catching exceptions
+  - one can implement custom types.
+
+  - there is support for raising and catching exceptions.
+
+  - debug mode has been implemented and can be activated at run-time without
+    recompiling. It can detect leaked handles or handles used after
+    being closed.
+
+  - wheels can be build for HPy extensions with `python setup.py bdist_wheel`
+    and can be installed with `pip install`.
 
   - it is possible to choose between the :term:`CPython ABI` and the
-    :term:`HPy Universal ABI` when compiling an extension module
+    :term:`HPy Universal ABI` when compiling an extension module.
 
   - extensions compiled with the CPython ABI work out of the box on
-    CPython
+    CPython.
 
   - it is possible to load HPy Universal extensions on CPython, thanks to the
-    ``hpy.universal`` package
+    ``hpy.universal`` package.
 
   - it is possible to load HPy Universal extensions on
-    PyPy (using the PyPy `hpy branch <https://foss.heptapod.net/pypy/pypy/tree/branch/hpy>`_)
+    PyPy (using the PyPy `hpy branch <https://foss.heptapod.net/pypy/pypy/tree/branch/hpy>`_).
 
   - it is possible to load HPy Universal extensions on `GraalPython
-    <https://github.com/graalvm/graalpython>`_
+    <https://github.com/graalvm/graalpython>`_.
 
 
 However, there is still a long road before HPy is usable for the general
 public. In particular, the following features are on our roadmap but have not
 been implemented yet:
 
-  - it is not possible to write custom types (like NumPy's ndarray)
-    in C. There is already a WIP branch to address this issue
-
-  - only a handful of the original Python/C functions have been ported to
-    HPy. Porting most of them is straighforward, so for now the priority is to
-    work on the "hard" features to prove that the HPy approach works, and we
-    will port new functions as needed
-
-  - the debug mode simply does not exist (yet!)
-
-  - there is no standard/easy way to integrate HPy into a
-    ``distutils/setuptools`` based workflow. The only way to compile HPy
-    extensions right now is to manually clone the git repo and tweak your
-    ``setup.py``. Eventually, we plan to offer a workflow which integrates
-    seamlessly with ``pip``, ``setuptools``, etc.
+  - mnay of the original Python/C functions have not been ported to
+    HPy yet. Porting most of them is straighforward, so for now the priority
+    is to work on the "hard" features to prove that the HPy approach works, and
+    we will port new functions as needed
 
   - there is no integration with Cython. The medium-term plan is to extend
-    Cython to automatically generate HPy-compatible C code
+    Cython to automatically generate HPy-compatible C code.
 
 
 .. _benchmarks:
