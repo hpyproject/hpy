@@ -277,7 +277,7 @@ However, there is still a long road before HPy is usable for the general
 public. In particular, the following features are on our roadmap but have not
 been implemented yet:
 
-  - mnay of the original Python/C functions have not been ported to
+  - many of the original Python/C functions have not been ported to
     HPy yet. Porting most of them is straighforward, so for now the priority
     is to work on the "hard" features to prove that the HPy approach works, and
     we will port new functions as needed
