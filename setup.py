@@ -73,6 +73,7 @@ if sys.implementation.name == 'cpython':
                   ],
                   extra_compile_args=[
                       '-DHPY_UNIVERSAL_ABI',
+                      '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
                   ] + EXTRA_COMPILE_ARGS
                   )
         ]
