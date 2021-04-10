@@ -82,6 +82,7 @@ void DHQueue_remove(DHQueue *q, DebugHandle *h)
 }
 
 
+#ifndef NDEBUG
 static void linked_item_sanity_check(DebugHandle *h)
 {
     if (h == NULL)
@@ -91,6 +92,7 @@ static void linked_item_sanity_check(DebugHandle *h)
     if (h->prev != NULL)
         assert(h->prev->next == h);
 }
+#endif
 
 void DHQueue_sanity_check(DHQueue *q)
 {
