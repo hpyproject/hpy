@@ -9,17 +9,17 @@
 
 #include <stdio.h>
 
-_HPy_HIDDEN HPyStringBuilder
-ctx_StringBuilder_New(HPyContext *ctx)
+_HPy_HIDDEN HPyUnicodeBuilder
+ctx_UnicodeBuilder_New(HPyContext *ctx)
 {
     PyObject *lst = PyList_New(0);
     if (lst == NULL)
         PyErr_Clear();   /* delay the MemoryError */
-    return (HPyStringBuilder){(HPy_ssize_t)lst };
+    return (HPyUnicodeBuilder){(HPy_ssize_t)lst };
 }
 
 _HPy_HIDDEN void
-ctx_StringBuilder_Append(HPyContext *ctx, HPyStringBuilder builder, HPy h_item)
+ctx_UnicodeBuilder_Append(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item)
 {
     PyObject *lst = (PyObject *)builder._lst;
     if (lst != NULL) {
@@ -29,7 +29,7 @@ ctx_StringBuilder_Append(HPyContext *ctx, HPyStringBuilder builder, HPy h_item)
 }
 
 _HPy_HIDDEN HPy
-ctx_StringBuilder_Build(HPyContext *ctx, HPyStringBuilder builder)
+ctx_UnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder)
 {
     PyObject *lst = (PyObject *)builder._lst;
     if (lst == NULL) {
@@ -49,7 +49,7 @@ ctx_StringBuilder_Build(HPyContext *ctx, HPyStringBuilder builder)
 }
 
 _HPy_HIDDEN void
-ctx_StringBuilder_Cancel(HPyContext *ctx, HPyStringBuilder builder)
+ctx_UnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder)
 {
     PyObject *lst = (PyObject *)builder._lst;
     if (lst == NULL) {

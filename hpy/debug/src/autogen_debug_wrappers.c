@@ -592,24 +592,24 @@ void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder)
     HPyListBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
-HPyStringBuilder debug_ctx_StringBuilder_New(HPyContext *dctx)
+HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx)
 {
-    return HPyStringBuilder_New(get_info(dctx)->uctx);
+    return HPyUnicodeBuilder_New(get_info(dctx)->uctx);
 }
 
-void debug_ctx_StringBuilder_Append(HPyContext *dctx, HPyStringBuilder builder, DHPy h_item)
+void debug_ctx_UnicodeBuilder_Append(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item)
 {
-    HPyStringBuilder_Append(get_info(dctx)->uctx, builder, DHPy_unwrap(dctx, h_item));
+    HPyUnicodeBuilder_Append(get_info(dctx)->uctx, builder, DHPy_unwrap(dctx, h_item));
 }
 
-DHPy debug_ctx_StringBuilder_Build(HPyContext *dctx, HPyStringBuilder builder)
+DHPy debug_ctx_UnicodeBuilder_Build(HPyContext *dctx, HPyUnicodeBuilder builder)
 {
-    return DHPy_wrap(dctx, HPyStringBuilder_Build(get_info(dctx)->uctx, builder));
+    return DHPy_wrap(dctx, HPyUnicodeBuilder_Build(get_info(dctx)->uctx, builder));
 }
 
-void debug_ctx_StringBuilder_Cancel(HPyContext *dctx, HPyStringBuilder builder)
+void debug_ctx_UnicodeBuilder_Cancel(HPyContext *dctx, HPyUnicodeBuilder builder)
 {
-    HPyStringBuilder_Cancel(get_info(dctx)->uctx, builder);
+    HPyUnicodeBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
 HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size)

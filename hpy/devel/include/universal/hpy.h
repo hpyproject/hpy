@@ -34,7 +34,7 @@ typedef intptr_t HPy_hash_t;
    the HPy structure contains an index in a global array. */
 typedef struct _HPy_s { HPy_ssize_t _i; } HPy;
 typedef struct { HPy_ssize_t _lst; } HPyListBuilder;
-typedef struct { HPy_ssize_t _lst; } HPyStringBuilder;
+typedef struct { HPy_ssize_t _lst; } HPyUnicodeBuilder;
 typedef struct { HPy_ssize_t _tup; } HPyTupleBuilder;
 typedef struct { HPy_ssize_t _i; } HPyTracker;
 
