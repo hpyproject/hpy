@@ -131,8 +131,8 @@ HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_s
 void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder builder);
 void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder);
-HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx);
-void debug_ctx_UnicodeBuilder_Append(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item);
+HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx, HPy_ssize_t size);
+int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item);
 DHPy debug_ctx_UnicodeBuilder_Build(HPyContext *dctx, HPyUnicodeBuilder builder);
 void debug_ctx_UnicodeBuilder_Cancel(HPyContext *dctx, HPyUnicodeBuilder builder);
 HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);
@@ -344,7 +344,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_ListBuilder_Build = &debug_ctx_ListBuilder_Build;
     dctx->ctx_ListBuilder_Cancel = &debug_ctx_ListBuilder_Cancel;
     dctx->ctx_UnicodeBuilder_New = &debug_ctx_UnicodeBuilder_New;
-    dctx->ctx_UnicodeBuilder_Append = &debug_ctx_UnicodeBuilder_Append;
+    dctx->ctx_UnicodeBuilder_Add = &debug_ctx_UnicodeBuilder_Add;
     dctx->ctx_UnicodeBuilder_Build = &debug_ctx_UnicodeBuilder_Build;
     dctx->ctx_UnicodeBuilder_Cancel = &debug_ctx_UnicodeBuilder_Cancel;
     dctx->ctx_TupleBuilder_New = &debug_ctx_TupleBuilder_New;

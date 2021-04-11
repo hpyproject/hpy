@@ -592,14 +592,14 @@ void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder)
     HPyListBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
-HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx)
+HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx, HPy_ssize_t size)
 {
-    return HPyUnicodeBuilder_New(get_info(dctx)->uctx);
+    return HPyUnicodeBuilder_New(get_info(dctx)->uctx, size);
 }
 
-void debug_ctx_UnicodeBuilder_Append(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item)
+int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item)
 {
-    HPyUnicodeBuilder_Append(get_info(dctx)->uctx, builder, DHPy_unwrap(dctx, h_item));
+    return HPyUnicodeBuilder_Add(get_info(dctx)->uctx, builder, DHPy_unwrap(dctx, h_item));
 }
 
 DHPy debug_ctx_UnicodeBuilder_Build(HPyContext *dctx, HPyUnicodeBuilder builder)

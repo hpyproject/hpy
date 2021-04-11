@@ -31,9 +31,9 @@
 
 typedef struct { PyObject *_o; } HPy;
 typedef struct { Py_ssize_t _lst; } HPyListBuilder;
-typedef struct { Py_ssize_t _lst; } HPyUnicodeBuilder;
 typedef struct { Py_ssize_t _tup; } HPyTupleBuilder;
 typedef struct { void *_o; } HPyTracker;
+typedef struct { void *_o; } HPyUnicodeBuilder;
 typedef Py_ssize_t HPy_ssize_t;
 typedef Py_hash_t HPy_hash_t;
 
@@ -380,31 +380,6 @@ HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder)
     ctx_ListBuilder_Cancel(ctx, builder);
 }
 
-HPyAPI_FUNC(HPyUnicodeBuilder)
-HPyUnicodeBuilder_New(HPyContext *ctx)
-{
-    return ctx_UnicodeBuilder_New(ctx);
-}
-
-HPyAPI_FUNC(void)
-HPyUnicodeBuilder_Append(HPyContext *ctx, HPyUnicodeBuilder builder,
-                        HPy h_item)
-{
-    ctx_UnicodeBuilder_Append(ctx, builder, h_item);
-}
-
-HPyAPI_FUNC(HPy)
-HPyUnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder)
-{
-    return ctx_UnicodeBuilder_Build(ctx, builder);
-}
-
-HPyAPI_FUNC(void)
-HPyUnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder)
-{
-    ctx_UnicodeBuilder_Cancel(ctx, builder);
-}
-
 HPyAPI_FUNC(HPyTupleBuilder)
 HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)
 {
@@ -458,6 +433,30 @@ HPyAPI_FUNC(void)
 HPyTracker_Close(HPyContext *ctx, HPyTracker ht)
 {
     ctx_Tracker_Close(ctx, ht);
+}
+
+HPyAPI_FUNC(HPyUnicodeBuilder)
+HPyUnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t size)
+{
+    return ctx_UnicodeBuilder_New(ctx, size);
+}
+
+HPyAPI_FUNC(int)
+HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item)
+{
+    return ctx_UnicodeBuilder_Add(ctx, builder, h_item);
+}
+
+HPyAPI_FUNC(HPy)
+HPyUnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder)
+{
+    return ctx_UnicodeBuilder_Build(ctx, builder);
+}
+
+HPyAPI_FUNC(void)
+HPyUnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder)
+{
+    ctx_UnicodeBuilder_Cancel(ctx, builder);
 }
 
 #endif /* !HPy_CPYTHON_H */

@@ -283,9 +283,8 @@ void HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
 HPy HPyListBuilder_Build(HPyContext *ctx, HPyListBuilder builder);
 void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder);
 
-HPyUnicodeBuilder HPyUnicodeBuilder_New(HPyContext *ctx);
-void HPyUnicodeBuilder_Append(HPyContext *ctx, HPyUnicodeBuilder builder,
-                             HPy h_item);
+HPyUnicodeBuilder HPyUnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t size);
+int HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item);
 HPy HPyUnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder);
 void HPyUnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder);
 

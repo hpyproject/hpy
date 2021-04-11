@@ -486,12 +486,12 @@ static inline void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder
      ctx->ctx_ListBuilder_Cancel ( ctx, builder ); 
 }
 
-static inline HPyUnicodeBuilder HPyUnicodeBuilder_New(HPyContext *ctx) {
-     return ctx->ctx_UnicodeBuilder_New ( ctx ); 
+static inline HPyUnicodeBuilder HPyUnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t size) {
+     return ctx->ctx_UnicodeBuilder_New ( ctx, size ); 
 }
 
-static inline void HPyUnicodeBuilder_Append(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item) {
-     ctx->ctx_UnicodeBuilder_Append ( ctx, builder, h_item ); 
+static inline int HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item) {
+     return ctx->ctx_UnicodeBuilder_Add ( ctx, builder, h_item ); 
 }
 
 static inline HPy HPyUnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder) {
