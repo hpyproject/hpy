@@ -21,8 +21,8 @@ def get_scm_config():
 
     version = setuptools_scm.get_version()
     try:
-        gitrev = subprocess.check_output('git describe --abbrev=7 --dirty '
-                                         '--always --tags --long'.split(), encoding='utf-8')
+        gitrev = subprocess.check_output('git rev-parse --short HEAD'.split(),
+                                         encoding='utf-8')
         gitrev = gitrev.strip()
     except subprocess.CalledProcessError:
         gitrev = "__UNKNOWN__"
