@@ -69,15 +69,15 @@ if sys.implementation.name == 'cpython':
                    'hpy/debug/src/dhqueue.c',
                    'hpy/debug/src/_debugmod.c',
                    'hpy/debug/src/autogen_debug_wrappers.c',
-                   ],
+                  ],
                   include_dirs=[
                       'hpy/devel/include',
                       'hpy/universal/src',
                       'hpy/debug/src/include',
                   ],
                   extra_compile_args=[
-                                         '-DHPY_UNIVERSAL_ABI',
-                                     ] + EXTRA_COMPILE_ARGS
+                      '-DHPY_UNIVERSAL_ABI',
+                  ] + EXTRA_COMPILE_ARGS
                   )
     ]
 
