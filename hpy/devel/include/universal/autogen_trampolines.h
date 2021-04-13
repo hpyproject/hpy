@@ -486,6 +486,22 @@ static inline void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder
      ctx->ctx_ListBuilder_Cancel ( ctx, builder ); 
 }
 
+static inline HPyUnicodeBuilder HPyUnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t size) {
+     return ctx->ctx_UnicodeBuilder_New ( ctx, size ); 
+}
+
+static inline int HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, const char *item) {
+     return ctx->ctx_UnicodeBuilder_Add ( ctx, builder, item ); 
+}
+
+static inline HPy HPyUnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder) {
+     return ctx->ctx_UnicodeBuilder_Build ( ctx, builder ); 
+}
+
+static inline void HPyUnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder) {
+     ctx->ctx_UnicodeBuilder_Cancel ( ctx, builder ); 
+}
+
 static inline HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size) {
      return ctx->ctx_TupleBuilder_New ( ctx, initial_size ); 
 }

@@ -12,6 +12,7 @@ typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
 typedef int HPyListBuilder;
+typedef int HPyUnicodeBuilder;
 typedef int HPyTupleBuilder;
 typedef int HPyTracker;
 typedef int HPy_RichCmpOp;
@@ -281,6 +282,11 @@ void HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                         HPy_ssize_t index, HPy h_item);
 HPy HPyListBuilder_Build(HPyContext *ctx, HPyListBuilder builder);
 void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder);
+
+HPyUnicodeBuilder HPyUnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t size);
+int HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, const char *item);
+HPy HPyUnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder);
+void HPyUnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder);
 
 HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size);
 void HPyTupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,

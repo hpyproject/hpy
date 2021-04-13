@@ -592,6 +592,26 @@ void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder)
     HPyListBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
+HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx, HPy_ssize_t size)
+{
+    return HPyUnicodeBuilder_New(get_info(dctx)->uctx, size);
+}
+
+int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, const char *item)
+{
+    return HPyUnicodeBuilder_Add(get_info(dctx)->uctx, builder, item);
+}
+
+DHPy debug_ctx_UnicodeBuilder_Build(HPyContext *dctx, HPyUnicodeBuilder builder)
+{
+    return DHPy_wrap(dctx, HPyUnicodeBuilder_Build(get_info(dctx)->uctx, builder));
+}
+
+void debug_ctx_UnicodeBuilder_Cancel(HPyContext *dctx, HPyUnicodeBuilder builder)
+{
+    HPyUnicodeBuilder_Cancel(get_info(dctx)->uctx, builder);
+}
+
 HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size)
 {
     return HPyTupleBuilder_New(get_info(dctx)->uctx, initial_size);

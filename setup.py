@@ -63,6 +63,7 @@ if sys.implementation.name == 'cpython':
                    'hpy/devel/src/runtime/ctx_listbuilder.c',
                    'hpy/devel/src/runtime/ctx_tuple.c',
                    'hpy/devel/src/runtime/ctx_tuplebuilder.c',
+                   'hpy/devel/src/runtime/ctx_unicodebuilder.c',
                    'hpy/debug/src/debug_ctx.c',
                    'hpy/debug/src/debug_ctx_cpython.c',
                    'hpy/debug/src/debug_handles.c',
