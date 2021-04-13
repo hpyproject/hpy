@@ -132,7 +132,7 @@ void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssi
 DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder builder);
 void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder);
 HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx, HPy_ssize_t size);
-int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item);
+int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, const char *item);
 DHPy debug_ctx_UnicodeBuilder_Build(HPyContext *dctx, HPyUnicodeBuilder builder);
 void debug_ctx_UnicodeBuilder_Cancel(HPyContext *dctx, HPyUnicodeBuilder builder);
 HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);

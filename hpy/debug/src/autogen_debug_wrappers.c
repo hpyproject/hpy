@@ -597,9 +597,9 @@ HPyUnicodeBuilder debug_ctx_UnicodeBuilder_New(HPyContext *dctx, HPy_ssize_t siz
     return HPyUnicodeBuilder_New(get_info(dctx)->uctx, size);
 }
 
-int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, DHPy h_item)
+int debug_ctx_UnicodeBuilder_Add(HPyContext *dctx, HPyUnicodeBuilder builder, const char *item)
 {
-    return HPyUnicodeBuilder_Add(get_info(dctx)->uctx, builder, DHPy_unwrap(dctx, h_item));
+    return HPyUnicodeBuilder_Add(get_info(dctx)->uctx, builder, item);
 }
 
 DHPy debug_ctx_UnicodeBuilder_Build(HPyContext *dctx, HPyUnicodeBuilder builder)

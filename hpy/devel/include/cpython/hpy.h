@@ -442,9 +442,9 @@ HPyUnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t size)
 }
 
 HPyAPI_FUNC(int)
-HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item)
+HPyUnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, const char *item)
 {
-    return ctx_UnicodeBuilder_Add(ctx, builder, h_item);
+    return ctx_UnicodeBuilder_Add(ctx, builder, item);
 }
 
 HPyAPI_FUNC(HPy)

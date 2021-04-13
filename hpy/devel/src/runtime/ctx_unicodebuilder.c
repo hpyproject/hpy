@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <string.h>
 #include <Python.h>
 #include "hpy.h"
 
@@ -7,12 +8,12 @@
 #  include "handles.h"
 #endif
 
-static const Py_ssize_t HPYUNICODEBUILDER_INITIAL_CAPACITY = 5;
+static const Py_ssize_t HPYUNICODEBUILDER_INITIAL_CAPACITY = 1024;
 
 typedef struct {
     Py_ssize_t capacity;  // allocated handles
-    Py_ssize_t length;    // used handles
-    PyObject *list;
+    Py_ssize_t length;
+    char *buf;
 } _PyUnicodeBuilder_s;
 
 #ifdef HPY_UNIVERSAL_ABI
@@ -36,9 +37,10 @@ ctx_UnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t capacity)
 {
     _PyUnicodeBuilder_s *bp;
     if (capacity == 0) {
+        // TODO: default value or raise a ValueError?
         capacity = HPYUNICODEBUILDER_INITIAL_CAPACITY;
     }
-    capacity++; // always reserve space for an extra handle, see the docs, analogue to HPyTracker
+    capacity++; // always reserve space for the trailing 0
 
     bp = malloc(sizeof(_PyUnicodeBuilder_s));
     if (bp == NULL) {
@@ -46,34 +48,37 @@ ctx_UnicodeBuilder_New(HPyContext *ctx, HPy_ssize_t capacity)
         return _pb2hb(0);
     }
 
-    bp->list = PyList_New(capacity);
-    if (bp->list == NULL) {
+    bp->buf = calloc(1, capacity);
+    if (bp == NULL) {
         free(bp);
         HPyErr_NoMemory(ctx);
         return _pb2hb(0);
     }
+
     bp->capacity = capacity;
     bp->length = 0;
     return _pb2hb(bp);
 }
 
 _HPy_HIDDEN int
-ctx_UnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, HPy h_item)
+ctx_UnicodeBuilder_Add(HPyContext *ctx, HPyUnicodeBuilder builder, const char *item)
 {
-    if(!HPyUnicode_Check(ctx, h_item)) {
-        HPyErr_SetString(ctx, ctx->h_TypeError, "Argument must be of type HPyUnicode");
-        return -1;
-    }
-
     _PyUnicodeBuilder_s *bp = _hb2pb(builder);
-    PyObject *item = _h2py(h_item);
-
-    // XXX: For the initial PoC we don't care about reallocation
-    if (bp->capacity <= bp->length) {
-        return -1;
+    // TODO: Should we trust the user to submit a 0 terminated string?
+    // The alternative would be to use strnlen and have a maximum allowed length for s
+    int len = strlen(item);
+    if(bp->length + len >= bp->capacity) {
+        // TODO: Have a better reallocation strategy
+        int new_size = bp->capacity + len + 1;
+        bp->buf = realloc(bp->buf, new_size);
+        if(bp->buf == NULL) {
+            free(bp);
+            HPyErr_NoMemory(ctx);
+            return -1;
+        }
     }
-    Py_INCREF(item);
-    PyList_SET_ITEM(bp->list, bp->length++, item);
+    strncpy((bp->buf + bp->length), item, (bp->capacity - bp->length));
+    bp->length += len;
     return 0;
 }
 
@@ -81,27 +86,16 @@ _HPy_HIDDEN HPy
 ctx_UnicodeBuilder_Build(HPyContext *ctx, HPyUnicodeBuilder builder)
 {
     _PyUnicodeBuilder_s *bp = _hb2pb(builder);
-    PyObject *list = PyList_GetSlice(bp->list, 0, bp->length);
-
-    PyObject *sep = PyUnicode_FromString("");
-    PyObject *str = PyUnicode_Join(sep, list);
-    Py_XDECREF(sep);
-
-    if(str == NULL) {
-        PyErr_NoMemory();
-        return HPy_NULL;
-    }
-
-    Py_XDECREF(bp->list);
-    Py_XDECREF(list);
+    HPy h_result = HPyUnicode_FromString(ctx, bp->buf);
+    free(bp->buf);
     free(bp);
-    return _py2h(str);
+    return h_result;
 }
 
 _HPy_HIDDEN void
 ctx_UnicodeBuilder_Cancel(HPyContext *ctx, HPyUnicodeBuilder builder)
 {
     _PyUnicodeBuilder_s *bp = _hb2pb(builder);
-    Py_XDECREF(bp->list);
+    free(bp->buf);
     free(bp);
 }
