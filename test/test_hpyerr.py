@@ -42,7 +42,10 @@ class TestErr(HPyTest):
         # subprocess is not importable in pypy app-level tests
         import subprocess
         env = os.environ.copy()
-        env["PYTHONPATH"] = os.path.dirname(mod.__file__)
+        pythonpath = [os.path.dirname(mod.__file__)]
+        if 'PYTHONPATH' in env:
+            pythonpath.append(env['PYTHONPATH'])
+        env["PYTHONPATH"] = os.pathsep.join(pythonpath)
         result = subprocess.run([
             sys.executable,
             "-c", "import {} as mod; mod.f()".format(mod.__name__)
