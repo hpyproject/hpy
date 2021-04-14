@@ -204,7 +204,7 @@ class TestParseItem(HPyTest):
             mod.f(-2**63 - 1)
 
     def test_K_signed(self):
-        mod = self.make_parse_item("k", "long long", "HPyLong_FromLongLong")
+        mod = self.make_parse_item("K", "long long", "HPyLong_FromLongLong")
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
@@ -217,7 +217,7 @@ class TestParseItem(HPyTest):
 
     def test_K_unsigned(self):
         mod = self.make_parse_item(
-            "k", "unsigned long long", "HPyLong_FromUnsignedLongLong"
+            "K", "unsigned long long", "HPyLong_FromUnsignedLongLong"
         )
         assert mod.f(0) == 0
         assert mod.f(1) == 1
