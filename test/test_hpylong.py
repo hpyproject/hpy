@@ -204,7 +204,7 @@ class TestLong(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 unsigned long long a = HPyLong_AsUnsignedLongLongMask(ctx, arg);
-                if ((a == (unsigned long) -1) && HPyErr_Occurred(ctx))
+                if ((a == (unsigned long long) -1) && HPyErr_Occurred(ctx))
                     return HPy_NULL;
                 return HPyLong_FromUnsignedLongLong(ctx, a);
             }
