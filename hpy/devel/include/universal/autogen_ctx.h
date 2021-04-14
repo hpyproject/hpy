@@ -153,6 +153,8 @@ struct _HPyContext_s {
     int (*ctx_Err_Occurred)(HPyContext *ctx);
     HPy (*ctx_Err_NoMemory)(HPyContext *ctx);
     void (*ctx_Err_Clear)(HPyContext *ctx);
+    HPy (*ctx_Err_NewException)(HPyContext *ctx, const char *name, HPy base, HPy dict);
+    HPy (*ctx_Err_NewExceptionWithDoc)(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
     int (*ctx_IsTrue)(HPyContext *ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext *ctx, HPyType_Spec *spec, HPyType_SpecParam *params);
     HPy (*ctx_Type_GenericNew)(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
@@ -170,6 +172,7 @@ struct _HPyContext_s {
     int (*ctx_SetItem_s)(HPyContext *ctx, HPy obj, const char *key, HPy value);
     HPy (*ctx_Type)(HPyContext *ctx, HPy obj);
     int (*ctx_TypeCheck)(HPyContext *ctx, HPy obj, HPy type);
+    int (*ctx_Is)(HPyContext *ctx, HPy obj, HPy other);
     void *(*ctx_AsStruct)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStructLegacy)(HPyContext *ctx, HPy h);
     HPy (*ctx_New)(HPyContext *ctx, HPy h_type, void **data);
@@ -198,6 +201,7 @@ struct _HPyContext_s {
     HPy (*ctx_Dict_New)(HPyContext *ctx);
     int (*ctx_Tuple_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Tuple_FromArray)(HPyContext *ctx, HPy items[], HPy_ssize_t n);
+    HPy (*ctx_Import_ImportModule)(HPyContext *ctx, const char *name);
     HPy (*ctx_FromPyObject)(HPyContext *ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext *ctx, HPy h);
     void (*ctx_CallRealFunctionFromTrampoline)(HPyContext *ctx, HPyFunc_Signature sig, void *func, void *args);

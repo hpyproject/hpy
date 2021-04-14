@@ -347,6 +347,12 @@ HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
     return ctx_TypeCheck(ctx, h_obj, h_type);
 }
 
+HPyAPI_FUNC(int)
+HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
+{
+    return ctx_Is(ctx, h_obj, h_other);
+}
+
 HPyAPI_FUNC(HPyListBuilder)
 HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)
 {

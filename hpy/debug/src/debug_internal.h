@@ -69,6 +69,7 @@ static inline void UHPy_sanity_check(UHPy uh) {
 typedef struct DebugHandle {
     UHPy uh;
     long generation;
+    bool is_closed;
     struct DebugHandle *prev;
     struct DebugHandle *next;
 } DebugHandle;
@@ -85,21 +86,44 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 DHPy DHPy_wrap(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_free(DHPy dh);
+void DHPy_invalid_handle(HPyContext *dctx, DHPy dh);
 
-static inline UHPy DHPy_unwrap(DHPy dh) {
+static inline UHPy DHPy_unwrap(HPyContext *dctx, DHPy dh)
+{
     if (HPy_IsNull(dh))
         return HPy_NULL;
-    return as_DebugHandle(dh)->uh;
+    DebugHandle *handle = as_DebugHandle(dh);
+    if (handle->is_closed)
+        DHPy_invalid_handle(dctx, dh);
+    return handle->uh;
 }
 
+/* === DHQueue === */
+
+typedef struct {
+    DebugHandle *head;
+    DebugHandle *tail;
+    HPy_ssize_t size;
+} DHQueue;
+
+void DHQueue_init(DHQueue *q);
+void DHQueue_append(DHQueue *q, DebugHandle *h);
+DebugHandle *DHQueue_popfront(DHQueue *q);
+void DHQueue_remove(DHQueue *q, DebugHandle *h);
+void DHQueue_sanity_check(DHQueue *q);
+
 /* === HPyDebugInfo === */
+
+static const HPy_ssize_t DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE = 1024;
 
 typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext *uctx;
     long current_generation;
-    DebugHandle *open_handles;   // linked list
-    //DebugHandle *closed_handles; // linked list
+    UHPy uh_on_invalid_handle; // should be an HPyField, when we have it
+    HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
+    DHQueue open_handles;
+    DHQueue closed_handles;
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext *dctx)

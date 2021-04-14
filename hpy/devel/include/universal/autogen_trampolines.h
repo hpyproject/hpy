@@ -262,6 +262,14 @@ static inline void HPyErr_Clear(HPyContext *ctx) {
      ctx->ctx_Err_Clear ( ctx ); 
 }
 
+static inline HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict) {
+     return ctx->ctx_Err_NewException ( ctx, name, base, dict ); 
+}
+
+static inline HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict) {
+     return ctx->ctx_Err_NewExceptionWithDoc ( ctx, name, doc, base, dict ); 
+}
+
 static inline int HPy_IsTrue(HPyContext *ctx, HPy h) {
      return ctx->ctx_IsTrue ( ctx, h ); 
 }
@@ -328,6 +336,10 @@ static inline HPy HPy_Type(HPyContext *ctx, HPy obj) {
 
 static inline int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type) {
      return ctx->ctx_TypeCheck ( ctx, obj, type ); 
+}
+
+static inline int HPy_Is(HPyContext *ctx, HPy obj, HPy other) {
+     return ctx->ctx_Is ( ctx, obj, other ); 
 }
 
 static inline void *HPy_AsStruct(HPyContext *ctx, HPy h) {
@@ -436,6 +448,10 @@ static inline int HPyTuple_Check(HPyContext *ctx, HPy h) {
 
 static inline HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n) {
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
+}
+
+static inline HPy HPyImport_ImportModule(HPyContext *ctx, const char *name) {
+     return ctx->ctx_Import_ImportModule ( ctx, name ); 
 }
 
 static inline HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj) {
