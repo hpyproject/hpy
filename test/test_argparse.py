@@ -8,13 +8,19 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 """
 from .support import HPyTest
 
-import struct
-if len(struct.pack('l', 0)) == 4:
-    long_base = 31
-else:
-    long_base = 63
+
+def unsigned_long_bits():
+    """ Return the number of bits in an unsigned long. """
+    import struct
+    unsigned_long_bytes = len(struct.pack('l', 0))
+    return 8 * unsigned_long_bytes
+
 
 class TestParseItem(HPyTest):
+
+    ULONG_BITS = unsigned_long_bits()
+    LONG_BITS = ULONG_BITS - 1
+
     def make_parse_item(self, fmt, type, hpy_converter):
         mod = self.make_module("""
             #ifndef _MSC_VER
@@ -158,37 +164,36 @@ class TestParseItem(HPyTest):
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
-        assert mod.f(2**long_base - 1) == 2**long_base - 1
-        assert mod.f(-2**long_base) == -2**long_base
+        assert mod.f(2**self.LONG_BITS - 1) == 2**self.LONG_BITS - 1
+        assert mod.f(-2**self.LONG_BITS) == -2**self.LONG_BITS
         with pytest.raises(OverflowError):
-            mod.f(2**long_base)
+            mod.f(2**self.LONG_BITS)
         with pytest.raises(OverflowError):
-            mod.f(-2**long_base - 1)
+            mod.f(-2**self.LONG_BITS - 1)
 
     def test_k_signed(self):
         mod = self.make_parse_item("k", "long", "HPyLong_FromLong")
         assert mod.f(0) == 0
         assert mod.f(1) == 1
         assert mod.f(-1) == -1
-        assert mod.f(2**long_base - 1) == 2**long_base - 1
-        assert mod.f(-2**long_base) == -2**long_base
-        assert mod.f(2**(long_base + 1) - 1) == -1
-        assert mod.f(-2**(long_base + 1) + 1) == 1
-        assert mod.f(2**(long_base + 1)) == 0
-        assert mod.f(-2**(long_base + 1)) == 0
+        assert mod.f(2**self.LONG_BITS - 1) == 2**self.LONG_BITS - 1
+        assert mod.f(-2**self.LONG_BITS) == -2**self.LONG_BITS
+        assert mod.f(2**(self.LONG_BITS + 1) - 1) == -1
+        assert mod.f(-2**(self.LONG_BITS + 1) + 1) == 1
+        assert mod.f(2**(self.LONG_BITS + 1)) == 0
+        assert mod.f(-2**(self.LONG_BITS + 1)) == 0
 
     def test_k_unsigned(self):
         mod = self.make_parse_item(
             "k", "unsigned long", "HPyLong_FromUnsignedLong"
         )
-        lb1 = long_base + 1
         assert mod.f(0) == 0
         assert mod.f(1) == 1
-        assert mod.f(-1) == 2**lb1 - 1
-        assert mod.f(2**lb1 - 1) == 2**lb1 - 1
-        assert mod.f(-2**lb1 + 1) == 1
-        assert mod.f(2**lb1) == 0
-        assert mod.f(-2**lb1) == 0
+        assert mod.f(-1) == 2**self.ULONG_BITS - 1
+        assert mod.f(2**self.ULONG_BITS - 1) == 2**self.ULONG_BITS - 1
+        assert mod.f(-2**self.ULONG_BITS + 1) == 1
+        assert mod.f(2**self.ULONG_BITS) == 0
+        assert mod.f(-2**self.ULONG_BITS) == 0
 
     def test_L(self):
         import pytest
