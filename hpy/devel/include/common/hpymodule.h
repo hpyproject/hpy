@@ -30,7 +30,7 @@ typedef struct {
 
 // module initialization in the universal case
 #define HPy_MODINIT(modname)                                   \
-    _HPy_HIDDEN HPyContext _ctx_for_trampolines;               \
+    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;              \
     static HPy init_##modname##_impl(HPyContext *ctx);         \
     Py_EXPORTED_SYMBOL                                         \
     HPy HPyInit_##modname(HPyContext *ctx)                     \
