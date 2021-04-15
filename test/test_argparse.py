@@ -7,13 +7,7 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
 from .support import HPyTest
-
-
-def unsigned_long_bits():
-    """ Return the number of bits in an unsigned long. """
-    import struct
-    unsigned_long_bytes = len(struct.pack('l', 0))
-    return 8 * unsigned_long_bytes
+from .test_hpylong import unsigned_long_bits
 
 
 class TestParseItem(HPyTest):
