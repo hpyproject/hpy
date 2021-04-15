@@ -392,7 +392,7 @@ class TestErr(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                int length = HPy_Length(ctx, arg);
+                HPy_ssize_t length = HPy_Length(ctx, arg);
                 if (length == -1) {
                     HPyErr_Clear(ctx);
                     return HPyLong_FromLong(ctx, -42);
