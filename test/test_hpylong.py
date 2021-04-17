@@ -287,7 +287,7 @@ class TestLong(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t a = HPyLong_AsSsize_t(ctx, arg);
-                if ((a == (ssize_t) -1) && HPyErr_Occurred(ctx))
+                if ((a == (HPy_ssize_t) -1) && HPyErr_Occurred(ctx))
                     return HPy_NULL;
                 return HPyLong_FromSsize_t(ctx, a);
             }
