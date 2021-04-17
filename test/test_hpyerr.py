@@ -397,7 +397,7 @@ class TestErr(HPyTest):
                     HPyErr_Clear(ctx);
                     return HPyLong_FromLong(ctx, -42);
                 }
-                return HPyLong_FromLong(ctx, length);
+                return HPyLong_FromLong(ctx, (long) length);
             }
             @EXPORT(f)
             @INIT
