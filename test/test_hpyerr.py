@@ -415,7 +415,7 @@ class TestErr(HPyTest):
                 HPy arg;
                 HPy h_base = HPy_NULL;
                 HPy h_dict = HPy_NULL;
-                HPY h_doc = HPy_NULL;
+                HPy h_doc = HPy_NULL;
 
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|OOO", &arg, &h_base, &h_dict, &h_doc)) {
                     return HPy_NULL;
