@@ -648,12 +648,12 @@ class TestType(HPyTest):
             static HPy Point_z_get(HPyContext *ctx, HPy self, void *closure)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
-                return HPyLong_FromLong(ctx, point->x*10 + point->y + (long)closure);
+                return HPyLong_FromLong(ctx, point->x*10 + point->y + (HPy_ssize_t)closure);
             }
             static int Point_z_set(HPyContext *ctx, HPy self, HPy value, void *closure)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
-                long current = point->x*10 + point->y + (long)closure;
+                long current = point->x*10 + point->y + (HPy_ssize_t)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
                 return 0;
@@ -677,7 +677,7 @@ class TestType(HPyTest):
             static int Point_z_set(HPyContext *ctx, HPy self, HPy value, void *closure)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
-                long current = point->x*10 + point->y + (long)closure;
+                long current = point->x*10 + point->y + (HPy_ssize_t)closure;
                 long target = HPyLong_AsLong(ctx, value);  // assume no exception
                 point->y += target - current;
                 return 0;
