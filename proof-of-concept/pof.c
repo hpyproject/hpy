@@ -76,31 +76,35 @@ static HPyType_Spec point_type_spec = {
     .defines = point_type_defines
 };
 
+HPyDef_MODULE_SLOT(pof_mod_init, pof_mod_init_impl, HPy_mod_exec)
+static int pof_mod_init_impl(HPyContext *ctx, HPy mod)
+{
+    HPy h_point_type;
+    h_point_type = HPyType_FromSpec(ctx, &point_type_spec, NULL);
+    if (HPy_IsNull(h_point_type))
+      return -1;
+    HPy_SetAttr_s(ctx, mod, "Point", h_point_type);
+    return 0;
+}
+
 static HPyDef *module_defines[] = {
     &do_nothing,
     &double_obj,
     &add_ints,
     &add_ints_kw,
+    &pof_mod_init,
     NULL
 };
+
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
     .m_name = "pof",
     .m_doc = "HPy Proof of Concept",
-    .m_size = -1,
     .defines = module_defines
 };
 
 HPy_MODINIT(pof)
 static HPy init_pof_impl(HPyContext *ctx)
 {
-    HPy m, h_point_type;
-    m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    h_point_type = HPyType_FromSpec(ctx, &point_type_spec, NULL);
-    if (HPy_IsNull(h_point_type))
-      return HPy_NULL;
-    HPy_SetAttr_s(ctx, m, "Point", h_point_type);
-    return m;
+    return HPyModuleDef_Init(ctx, &moduledef);
 }

@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_HPYFUNC_H
-#define HPY_UNIVERSAL_HPYFUNC_H
+#ifndef HPY_COMMON_HPYFUNC_H
+#define HPY_COMMON_HPYFUNC_H
 
 typedef enum {
     HPyFunc_VARARGS  = 1,  // METH_VARARGS
@@ -38,6 +38,8 @@ typedef enum {
     HPyFunc_SETTER,
     HPyFunc_OBJOBJPROC,
 
+    HPyFunc_CREATEMODULEFUNC,
+    HPyFunc_EXECUTEMODULEFUNC,
 } HPyFunc_Signature;
 
 /* The typedefs corresponding to the various HPyFunc_Signature members
@@ -86,14 +88,4 @@ typedef struct {
     void *internal;
 } HPy_buffer;
 
-#include "autogen_hpyfunc_declare.h"
-
-#ifdef HPY_UNIVERSAL_ABI
-#  include "universal/hpyfunc_trampolines.h"
-#  include "universal/autogen_hpyfunc_trampolines.h"
-#else
-#  include "cpython/hpyfunc_trampolines.h"
-#  include "cpython/autogen_hpyfunc_trampolines.h"
-#endif // HPY_UNIVERSAL_ABI
-
-#endif /* HPY_UNIVERSAL_HPYFUNC_H */
+#endif /* HPY_COMMON_HPYFUNC_H */

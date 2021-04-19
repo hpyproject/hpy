@@ -105,6 +105,7 @@ HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */
 
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
+HPy HPyModuleDef_Init(HPyContext *ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext *ctx, HPy h);
 void HPy_Close(HPyContext *ctx, HPy h);
 
@@ -344,12 +345,16 @@ typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
+typedef HPy (*HPyFunc_createmodulefunc)(HPyContext *ctx, HPy spec,
+                                        HPyModuleDef def);
+typedef int (*HPyFunc_executemodulefunc)(HPyContext *ctx, HPy mod);
 
-/* ~~~ HPySlot_Slot ~~~
+
+/* ~~~ HPySlot_Slot and HPyModule_Slot ~~~
 
    The following enum is used to generate autogen_hpyslot.h, which contains:
 
-     - The real definition of the enum HPySlot_Slot
+     - The real definitions of the enum HPySlot_Slot and HPyModule_Slot
 
      - the macros #define _HPySlot_SIGNATURE_*
 
@@ -445,3 +450,10 @@ typedef enum {
     HPy_tp_destroy = SLOT(1000, HPyFunc_DESTROYFUNC),
 
 } HPySlot_Slot;
+
+
+/* Note that the magic numbers are the same as CPython */
+typedef enum {
+    HPy_mod_create = SLOT(1, HPyFunc_CREATEMODULEFUNC),
+    HPy_mod_exec = SLOT(2, HPyFunc_EXECUTEMODULEFUNC),
+} HPyModule_Slot;

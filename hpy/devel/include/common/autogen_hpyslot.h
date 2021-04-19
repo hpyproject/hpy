@@ -113,3 +113,11 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_matrix_multiply HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_matrix_multiply HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_tp_destroy HPyFunc_DESTROYFUNC
+
+typedef enum {
+    HPy_mod_create = 1,
+    HPy_mod_exec = 2,
+} HPyModule_Slot;
+
+#define _HPyModuleSlot_SIG__HPy_mod_create HPyFunc_CREATEMODULEFUNC
+#define _HPyModuleSlot_SIG__HPy_mod_exec HPyFunc_EXECUTEMODULEFUNC

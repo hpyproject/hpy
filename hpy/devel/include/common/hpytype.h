@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_HPYTYPE_H
-#define HPY_UNIVERSAL_HPYTYPE_H
+#ifndef HPY_COMMON_HPYTYPE_H
+#define HPY_COMMON_HPYTYPE_H
 
 #include <stdbool.h>
 
@@ -111,4 +111,4 @@ TYPE##_AsStruct(HPyContext *ctx, HPy h)                               \
     return (TYPE*) CAST(ctx, h);                                     \
 }
 
-#endif /* HPY_UNIVERSAL_HPYTYPE_H */
+#endif /* HPY_COMMON_HPYTYPE_H */

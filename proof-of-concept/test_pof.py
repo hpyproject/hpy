@@ -20,4 +20,5 @@ def test_point():
 
 def test_pofpackage():
     assert pofpackage.foo.__name__ == "pofpackage.foo"
+    assert pofpackage.foo.hello.__module__ == "pofpackage.foo"
     assert pofpackage.foo.hello() == 'hello from pofpackage.foo'

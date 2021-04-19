@@ -372,3 +372,32 @@ typedef struct {
         return a.result; \
     }
 
+typedef struct {
+    cpy_PyObject *spec;
+    HPyModuleDef def;
+    cpy_PyObject * result;
+} _HPyFunc_args_CREATEMODULEFUNC;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_CREATEMODULEFUNC(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *spec, HPyModuleDef def) \
+    { \
+        _HPyFunc_args_CREATEMODULEFUNC a = { spec, def }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_CREATEMODULEFUNC, IMPL, &a); \
+        return a.result; \
+    }
+
+typedef struct {
+    cpy_PyObject *mod;
+    int result;
+} _HPyFunc_args_EXECUTEMODULEFUNC;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_EXECUTEMODULEFUNC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *mod) \
+    { \
+        _HPyFunc_args_EXECUTEMODULEFUNC a = { mod }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_EXECUTEMODULEFUNC, IMPL, &a); \
+        return a.result; \
+    }
+

@@ -76,6 +76,21 @@ class TestHPyAPI(BaseTestAutogen):
         assert tp_repr.value == '66'
         assert tp_repr.hpyfunc == 'HPyFunc_REPRFUNC'
 
+    def test_hpymodule_slot(self):
+        api = self.parse("""
+            typedef enum {
+                HPy_mod_create = SLOT(1, HPyFunc_CREATEMODULEFUNC),
+                HPy_mod_exec = SLOT(2, HPyFunc_EXECUTEMODULEFUNC),
+            } HPyModule_Slot;
+        """)
+        mod_create = api.get_module_slot('HPy_mod_create')
+        assert mod_create.value == '1'
+        assert mod_create.hpyfunc == 'HPyFunc_CREATEMODULEFUNC'
+        #
+        mod_exec = api.get_module_slot('HPy_mod_exec')
+        assert mod_exec.value == '2'
+        assert mod_exec.hpyfunc == 'HPyFunc_EXECUTEMODULEFUNC'
+
 
 class TestAutoGen(BaseTestAutogen):
 

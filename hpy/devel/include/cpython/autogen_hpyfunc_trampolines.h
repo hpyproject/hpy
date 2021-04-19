@@ -130,3 +130,13 @@
     { \
         return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1))); \
     }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_CREATEMODULEFUNC(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *spec, HPyModuleDef def) \
+    { \
+        return _h2py(IMPL(_HPyGetContext(), _py2h(spec), def)); \
+    }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_EXECUTEMODULEFUNC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *mod) \
+    { \
+        return (IMPL(_HPyGetContext(), _py2h(mod))); \
+    }

@@ -1,5 +1,5 @@
-#ifndef HPY_UNIVERSAL_HPYDEF_H
-#define HPY_UNIVERSAL_HPYDEF_H
+#ifndef HPY_COMMON_HPYDEF_H
+#define HPY_COMMON_HPYDEF_H
 
 #include <stddef.h> /* to make sure "offsetof" is available for our users */
 
@@ -70,11 +70,18 @@ typedef struct {
     void *closure;
 } HPyGetSet;
 
+typedef struct {
+    HPyModule_Slot slot;   // The slot to fill
+    void *impl;            // Function pointer to the implementation
+    void *cpy_trampoline;  // Used by CPython to call impl
+} HPyModuleSlot;
+
 typedef enum {
     HPyDef_Kind_Slot = 1,
     HPyDef_Kind_Meth = 2,
     HPyDef_Kind_Member = 3,
     HPyDef_Kind_GetSet = 4,
+    HPyDef_Kind_ModuleSlot = 5,
 } HPyDef_Kind;
 
 typedef struct {
@@ -84,6 +91,7 @@ typedef struct {
         HPyMeth meth;
         HPyMember member;
         HPyGetSet getset;
+        HPyModuleSlot module_slot;
     };
 } HPyDef;
 
@@ -98,6 +106,9 @@ typedef struct {
 #define HPySlot_SIG(SLOT) _HPySlot_SIG__##SLOT
 // Macros such as _HPySlot_SIG__HPy_tp_add &co. are defined in autogen_hpyslot.h
 
+#define HPyModuleSlot_SIG(SLOT) _HPyModuleSlot_SIG__##SLOT
+// Macros such as _HPyModuleSlot_SIG__HPy_mod_exec &co. are defined in
+// autogen_hpyslot.h
 
 
 /* ~~~ HPyDef_SLOT ~~~
@@ -194,4 +205,30 @@ typedef struct {
         }                                                                   \
     };
 
-#endif /* HPY_UNIVERSAL_HPYDEF_H */
+
+/* ~~~ HPyDef_MODULESLOT ~~~
+
+   This is the official version of HPyDef_MODULE_SLOT, which automatically
+   determines the SIG from the MODULE_SLOT. The anonymous enum is needed to get
+   a nice compile-time error in case we pass a MODULE_SLOT which does not exist,
+   see the more detailed explanation in the comments around HPyFunc_DECLARE in
+   hpyfunc.h
+*/
+#define HPyDef_MODULE_SLOT(SYM, IMPL, SLOT)                        \
+    enum { SYM##_slot = SLOT };                                    \
+    _HPyDef_MODULE_SLOT(SYM, IMPL, SLOT, HPyModuleSlot_SIG(SLOT))
+
+// this is the actual implementation, after we determined the SIG
+#define _HPyDef_MODULE_SLOT(SYM, IMPL, SLOT, SIG)                       \
+    HPyFunc_DECLARE(IMPL, SIG);                                         \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
+    HPyDef SYM = {                                                      \
+        .kind = HPyDef_Kind_ModuleSlot,                                 \
+        .slot = {                                                       \
+            .slot = SLOT,                                               \
+            .impl = IMPL,                                               \
+            .cpy_trampoline = SYM##_trampoline                          \
+        }                                                               \
+    };
+
+#endif /* HPY_COMMON_HPYDEF_H */
