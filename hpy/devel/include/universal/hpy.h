@@ -44,7 +44,7 @@ typedef struct _HPyContext_s HPyContext;
 
 
 /* misc stuff, which should probably go in its own header */
-#define HPy_NULL ((const HPy){0})
+#define HPy_NULL ((HPy){0})
 #define HPy_IsNull(x) ((x)._i == 0)
 
 // XXX: we need to decide whether these are part of the official API or not,

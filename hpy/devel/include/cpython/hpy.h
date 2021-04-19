@@ -130,7 +130,7 @@ typedef struct _HPyContext_s {
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx;
 
-#define HPy_NULL ((const HPy){NULL})
+#define HPy_NULL ((HPy){NULL})
 #define HPy_IsNull(x) ((x)._o == NULL)
 
 // XXX: we need to decide whether these are part of the official API or not,
