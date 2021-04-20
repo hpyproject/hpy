@@ -419,10 +419,10 @@ class TestErr(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 static HPy h_FooError = HPy_NULL;
-                HPy arg;
-                HPy h_base = HPy_NULL;
-                HPy h_dict = HPy_NULL;
-                HPy h_doc = HPy_NULL;
+                HPy arg, h_base, h_dict, h_doc;
+                h_base = HPy_NULL;
+                h_dict = HPy_NULL;
+                h_doc = HPy_NULL;
 
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|OOO", &arg, &h_base, &h_dict, &h_doc)) {
                     return HPy_NULL;
