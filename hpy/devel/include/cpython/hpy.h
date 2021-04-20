@@ -130,7 +130,14 @@ typedef struct _HPyContext_s {
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx;
 
-#define HPy_NULL ((HPy){NULL})
+// MSC doesn't treat the cast of a constant expression as a constant expression
+// so casting HPy_NULL to an HPy will cause variable assignments such as
+// HPy x = HPy_NULL to generate compilation errors.
+#if defined(_MSC_VER)
+# define HPy_NULL ({NULL})
+#else
+# define HPy_NULL ((HPy){NULL})
+#endif
 #define HPy_IsNull(x) ((x)._o == NULL)
 
 // XXX: we need to decide whether these are part of the official API or not,

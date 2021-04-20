@@ -44,7 +44,14 @@ typedef struct _HPyContext_s HPyContext;
 
 
 /* misc stuff, which should probably go in its own header */
-#define HPy_NULL ((HPy){0})
+// MSC doesn't treat the cast of a constant expression as a constant expression
+// so casting HPy_NULL to an HPy will cause variable assignments such as
+// HPy x = HPy_NULL to generate compilation errors.
+#if defined(_MSC_VER)
+# define HPy_NULL ({0})
+#else
+# define HPy_NULL ((HPy){0})
+#endif
 #define HPy_IsNull(x) ((x)._i == 0)
 
 // XXX: we need to decide whether these are part of the official API or not,
