@@ -45,6 +45,7 @@ class TestImporting(HPyTest):
             from sysconfig import get_config_var
             ext = get_config_var('EXT_SUFFIX')
         else:
-            ext ='.hpy.so'
+            ext = '.hpy.so'
 
-        assert repr(mod) == '<module \'mytest\' from \'{}\'>'.format(tmpdir.join('mytest' + ext))
+        assert repr(mod) == '<module \'mytest\' from {}>'.format(
+            repr(str(tmpdir.join('mytest' + ext))))
