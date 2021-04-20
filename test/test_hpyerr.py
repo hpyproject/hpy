@@ -22,6 +22,13 @@ class TestErr(HPyTest):
     def test_FatalError(self):
         import os
         import sys
+        fatal_exit_code = {
+            "linux": -6,  # SIGABRT
+            # See https://bugs.python.org/issue36116#msg336782 -- the
+            # return code from abort on Windows 8+ is a stack buffer overrun.
+            # :|
+            "win32": 0xC0000409,  # STATUS_STACK_BUFFER_OVERRUN
+        }.get(sys.platform, -6)
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
@@ -50,7 +57,7 @@ class TestErr(HPyTest):
             sys.executable,
             "-c", "import {} as mod; mod.f()".format(mod.__name__)
         ], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        assert result.returncode == -6
+        assert result.returncode == fatal_exit_code
         assert result.stdout == b""
         # In Python 3.9, the Py_FatalError() function was replaced with a macro
         # which automatically prepends the name of the current function, so
