@@ -30,6 +30,11 @@ _build_wheel() {
     echo "Create venv: $VENV"
     python -m venv "$VENV"
     local PY_BUILDER="`pwd`/$VENV/bin/python3"
+    if [ -x "`pwd`/$VENV/bin/python.exe" ]
+    then
+        # Set the correct python executable for Windows
+        PY_BUILDER="`pwd`/$VENV/bin/python.exe"
+    fi
     echo
     echo "Installing hpy and requirements"
     _install_hpy ${PY_BUILDER}
