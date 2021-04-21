@@ -418,11 +418,19 @@ class TestErr(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
-                static HPy h_FooError = HPy_NULL;
+                // MSVC doesn't allow "static HPy h_FooErr = HPy_NULL"
+                // so we do an initialization dance instead.
+                static int foo_error_initialized = 0;
+                static HPy h_FooError;
                 HPy arg;
                 HPy h_base = HPy_NULL;
                 HPy h_dict = HPy_NULL;
                 HPy h_doc = HPy_NULL;
+
+                if (!foo_error_initialized) {
+                    foo_error_initialized = 1;
+                    h_FooError = HPy_NULL;
+                }
 
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|OOO", &arg, &h_base, &h_dict, &h_doc)) {
                     return HPy_NULL;
