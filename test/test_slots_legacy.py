@@ -197,7 +197,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
 
             static PyObject *z_get(PointObject *point, void *closure)
             {
-                long z = point->x*10 + point->y + (long)closure;
+                long z = point->x*10 + point->y + (long)(HPy_ssize_t)closure;
                 return PyLong_FromLong(z);
             }
 

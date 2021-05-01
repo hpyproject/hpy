@@ -83,7 +83,8 @@
 #define _HPyFunc_TRAMPOLINE_HPyFunc_RELEASEBUFFERPROC(SYM, IMPL) \
     static void SYM(PyObject *arg0, Py_buffer *arg1) \
     { \
-        return (IMPL(_HPyGetContext(), _py2h(arg0), (HPy_buffer*)arg1)); \
+        IMPL(_HPyGetContext(), _py2h(arg0), (HPy_buffer*)arg1); \
+        return; \
     }
 
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H

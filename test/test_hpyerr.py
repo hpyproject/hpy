@@ -22,6 +22,13 @@ class TestErr(HPyTest):
     def test_FatalError(self):
         import os
         import sys
+        fatal_exit_code = {
+            "linux": -6,  # SIGABRT
+            # See https://bugs.python.org/issue36116#msg336782 -- the
+            # return code from abort on Windows 8+ is a stack buffer overrun.
+            # :|
+            "win32": 0xC0000409,  # STATUS_STACK_BUFFER_OVERRUN
+        }.get(sys.platform, -6)
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
@@ -50,7 +57,7 @@ class TestErr(HPyTest):
             sys.executable,
             "-c", "import {} as mod; mod.f()".format(mod.__name__)
         ], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        assert result.returncode == -6
+        assert result.returncode == fatal_exit_code
         assert result.stdout == b""
         # In Python 3.9, the Py_FatalError() function was replaced with a macro
         # which automatically prepends the name of the current function, so
@@ -392,12 +399,12 @@ class TestErr(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                int length = HPy_Length(ctx, arg);
+                HPy_ssize_t length = HPy_Length(ctx, arg);
                 if (length == -1) {
                     HPyErr_Clear(ctx);
                     return HPyLong_FromLong(ctx, -42);
                 }
-                return HPyLong_FromLong(ctx, length);
+                return HPyLong_FromLong(ctx, (long) length);
             }
             @EXPORT(f)
             @INIT
@@ -411,11 +418,19 @@ class TestErr(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
-                static HPy h_FooError = HPy_NULL;
-                HPy arg,
-                    h_base = HPy_NULL,
-                    h_dict = HPy_NULL,
-                    h_doc = HPy_NULL;
+                // MSVC doesn't allow "static HPy h_FooErr = HPy_NULL"
+                // so we do an initialization dance instead.
+                static int foo_error_initialized = 0;
+                static HPy h_FooError;
+                HPy arg;
+                HPy h_base = HPy_NULL;
+                HPy h_dict = HPy_NULL;
+                HPy h_doc = HPy_NULL;
+
+                if (!foo_error_initialized) {
+                    foo_error_initialized = 1;
+                    h_FooError = HPy_NULL;
+                }
 
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|OOO", &arg, &h_base, &h_dict, &h_doc)) {
                     return HPy_NULL;

@@ -3,6 +3,9 @@
 #include "debug_internal.h"
 #include "autogen_debug_ctx_init.h"
 #include "common/runtime/ctx_tracker.h"
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#endif
 
 static struct _HPyContext_s g_debug_ctx = {
     .name = "HPy Debug Mode ABI",
@@ -55,7 +58,10 @@ HPyContext * hpy_debug_get_ctx(HPyContext *uctx)
 // this function is supposed to be called from gdb: it tries to determine
 // whether a handle is universal or debug by looking at the last bit
 extern struct _HPyContext_s g_universal_ctx;
-__attribute__((unused)) static void hpy_magic_dump(HPy h)
+#ifndef _MSC_VER
+__attribute__((unused))
+#endif
+static void hpy_magic_dump(HPy h)
 {
     int universal = h._i & 1;
     if (universal)
@@ -63,12 +69,20 @@ __attribute__((unused)) static void hpy_magic_dump(HPy h)
     else
         fprintf(stderr, "\nDebug handle\n");
 
+#ifdef _MSC_VER
+    fprintf(stderr, "raw value: %Ix (%Id)\n", h._i, h._i);
+#else
     fprintf(stderr, "raw value: %lx (%ld)\n", h._i, h._i);
+#endif
     if (universal)
         _HPy_Dump(&g_universal_ctx, h);
     else {
         DebugHandle *dh = as_DebugHandle(h);
+#ifdef _MSC_VER
+        fprintf(stderr, "dh->uh: %Ix\n", dh->uh._i);
+#else
         fprintf(stderr, "dh->uh: %lx\n", dh->uh._i);
+#endif
         _HPy_Dump(&g_universal_ctx, dh->uh);
     }
 }

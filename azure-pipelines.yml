@@ -20,6 +20,9 @@ jobs:
       py39-macos:
         python.version: '3.9'
         imageName: 'macos-latest'
+      py38-win:
+        python.version: '3.8'
+        imageName: 'windows-latest'
   steps:
   - template: azure-templates/ccache.yml
     parameters:
@@ -65,6 +68,9 @@ jobs:
       py39-macos:
         python.version: '3.9'
         imageName: 'macos-latest'
+      py38-win:
+        python.version: '3.8'
+        imageName: 'windows-latest'
   steps:
   - template: azure-templates/ccache.yml
     parameters:
@@ -72,17 +78,17 @@ jobs:
   - template: azure-templates/python.yml
     parameters:
       pythonVersion: $(python.version)
-  - script: proof-of-concept/test_pof.sh wheel cpython
+  - bash: proof-of-concept/test_pof.sh wheel cpython
     displayName: 'Test setup.py --hpy-abi=cpython bdist_wheel'
-  - script: proof-of-concept/test_pof.sh wheel universal
+  - bash: proof-of-concept/test_pof.sh wheel universal
     displayName: 'Test setup.py --hpy-abi=universal bdist_wheel'
-  - script: proof-of-concept/test_pof.sh setup_py_install cpython
+  - bash: proof-of-concept/test_pof.sh setup_py_install cpython
     displayName: 'Test setup.py --hpy-abi=cpython install'
-  - script: proof-of-concept/test_pof.sh setup_py_install universal
+  - bash: proof-of-concept/test_pof.sh setup_py_install universal
     displayName: 'Test setup.py --hpy-abi=universal install'
-  - script: proof-of-concept/test_pof.sh setup_py_build_ext_inplace cpython
+  - bash: proof-of-concept/test_pof.sh setup_py_build_ext_inplace cpython
     displayName: 'Test setup.py --hpy-abi=cpython build_ext --inplace'
-  - script: proof-of-concept/test_pof.sh setup_py_build_ext_inplace universal
+  - bash: proof-of-concept/test_pof.sh setup_py_build_ext_inplace universal
     displayName: 'Test setup.py --hpy-abi=universal build_ext --inplace'
 
 
