@@ -45,7 +45,7 @@ class autogen_debug_ctx_init_h(AutoGenFile):
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    dctx->{name} = DHPy_wrap(dctx, uctx->{name});')
+            w(f'    dctx->{name} = DHPy_open(dctx, uctx->{name});')
         for func in self.api.functions:
             name = func.ctx_name()
             w(f'    dctx->{name} = &debug_{name};')
@@ -112,7 +112,7 @@ class autogen_debug_wrappers(AutoGenFile):
         if rettype == 'void':
             w(f'    {func.name}({params});')
         elif rettype == 'DHPy':
-            w(f'    return DHPy_wrap(dctx, {func.name}({params}));')
+            w(f'    return DHPy_open(dctx, {func.name}({params}));')
         else:
             w(f'    return {func.name}({params});')
         w('}')
