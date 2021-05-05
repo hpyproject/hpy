@@ -102,7 +102,7 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
     for(int i=0; i<n; i++) {
         uh_items[i] = DHPy_unwrap(dctx, dh_items[i]);
     }
-    return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
+    return DHPy_open(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
 }
 
 DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, DHPy *dh_args,
@@ -114,7 +114,7 @@ DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, DHPy *dh_args,
     for(int i=0; i<nargs; i++) {
         uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
     }
-    return DHPy_wrap(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
+    return DHPy_open(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
                                               nargs, uh_kw));
 }
 
@@ -132,9 +132,9 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
             uparams[i].kind = dparams[i].kind;
             uparams[i].object = DHPy_unwrap(dctx, dparams[i].object);
         }
-        return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, uparams));
+        return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, uparams));
     }
-    return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
+    return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
 }
 
 /* ~~~ debug mode implementation of HPyTracker ~~~
