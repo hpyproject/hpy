@@ -46,10 +46,10 @@
 
      - to allocate memory for a new DHPy, DHPy_open() does the following:
 
-         * if closed_handles is empty, it malloc()s memory for a new DHPy
+         * if closed_handles is full, it reuses the memory of the oldest DHPy
+           in the queue
 
-         * if it's not empty, it reuses the memory of the oldest DHPy in the
-           queue
+         * else, it malloc()s memory for a new DHPy
 */
 
 typedef HPy UHPy;
