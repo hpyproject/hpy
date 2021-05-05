@@ -34,6 +34,7 @@ void hpy_debug_set_ctx(HPyContext dctx);
 // implementation details.
 HPy hpy_debug_open_handle(HPyContext dctx, HPy uh);
 HPy hpy_debug_unwrap_handle(HPy dh);
+void hpy_debug_close_handle(HPyContext dctx, HPy dh);
 
 // this is the HPy init function created by HPy_MODINIT. In CPython's version
 // of hpy.universal the code is embedded inside the extension, so we can call

@@ -66,6 +66,11 @@ HPy hpy_debug_unwrap_handle(HPy dh)
     return DHPy_unwrap(dh);
 }
 
+void hpy_debug_close_handle(HPyContext dctx, HPy dh)
+{
+    DHPy_close(dctx, dh);
+}
+
 // this function is supposed to be called from gdb: it tries to determine
 // whether a handle is universal or debug by looking at the last bit
 extern struct _HPyContext_s g_universal_ctx;
