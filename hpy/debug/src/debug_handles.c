@@ -19,7 +19,7 @@ static void debug_handles_sanity_check(HPyDebugInfo *info)
 #endif
 }
 
-DHPy DHPy_wrap(HPyContext *dctx, UHPy uh)
+DHPy DHPy_open(HPyContext *dctx, UHPy uh)
 {
     UHPy_sanity_check(uh);
     if (HPy_IsNull(uh))
