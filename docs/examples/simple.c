@@ -1,24 +1,24 @@
 #include "hpy.h"
 
-HPy_DEF_METH_O(myabs)
+HPyDef_METH(myabs, "myabs", myabs_impl, HPyFunc_O)
 static HPy myabs_impl(HPyContext *ctx, HPy self, HPy obj)
 {
     return HPy_Absolute(ctx, obj);
 }
 
-HPy_DEF_METH_VARARGS(add_ints)
+HPyDef_METH(add_ints, "add_ints", add_ints_impl, HPyFunc_VARARGS)
 static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     long a, b;
-    if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))
         return HPy_NULL;
     return HPyLong_FromLong(ctx, a+b);
 }
 
-static HPyMethodDef SimpleMethods[] = {
-    {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
-    {"add_ints", add_ints, HPy_METH_VARARGS, "Add two integers"},
-    {NULL, NULL, 0, NULL}
+static HPyDef *module_defines[] = {
+    &myabs,
+    &add_ints,
+    NULL
 };
 
 static HPyModuleDef moduledef = {
@@ -26,7 +26,7 @@ static HPyModuleDef moduledef = {
     .m_name = "simple",
     .m_doc = "HPy Example",
     .m_size = -1,
-    .m_methods = SimpleMethods
+    .defines = module_defines
 };
 
 
