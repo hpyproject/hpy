@@ -342,6 +342,10 @@ static inline int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type) {
      return ctx->ctx_TypeCheck ( ctx, obj, type ); 
 }
 
+static inline int HPy_Is(HPyContext *ctx, HPy obj, HPy other) {
+     return ctx->ctx_Is ( ctx, obj, other ); 
+}
+
 static inline void *HPy_AsStruct(HPyContext *ctx, HPy h) {
      return ctx->ctx_AsStruct ( ctx, h ); 
 }

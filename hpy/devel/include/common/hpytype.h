@@ -2,6 +2,11 @@
 #define HPY_COMMON_HPYTYPE_H
 
 #include <stdbool.h>
+#ifdef __GNUC__
+#define HPyAPI_UNUSED __attribute__((unused)) static inline
+#else
+#define HPyAPI_UNUSED static inline
+#endif /* __GNUC__ */
 
 typedef struct {
     const char* name;
@@ -105,8 +110,8 @@ typedef struct {
                                                                      \
 enum { TYPE##_IS_LEGACY = IS_LEGACY };                               \
                                                                      \
-static inline __attribute__((unused)) TYPE *                         \
-TYPE##_AsStruct(HPyContext *ctx, HPy h)                               \
+HPyAPI_UNUSED TYPE *                                                 \
+TYPE##_AsStruct(HPyContext *ctx, HPy h)                              \
 {                                                                    \
     return (TYPE*) CAST(ctx, h);                                     \
 }

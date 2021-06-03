@@ -492,7 +492,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         PyErr_NoMemory();
         return HPy_NULL;
     }
-    HPy_ssize_t basicsize;
+    int basicsize;
     HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
     if (hpyspec->legacy != 0) {

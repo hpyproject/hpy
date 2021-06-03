@@ -345,13 +345,19 @@ HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
 HPyAPI_FUNC(void)
 _HPy_Dump(HPyContext *ctx, HPy h)
 {
-    return ctx_Dump(ctx, h);
+    ctx_Dump(ctx, h);
 }
 
 HPyAPI_FUNC(int)
 HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 {
     return ctx_TypeCheck(ctx, h_obj, h_type);
+}
+
+HPyAPI_FUNC(int)
+HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
+{
+    return ctx_Is(ctx, h_obj, h_other);
 }
 
 HPyAPI_FUNC(HPyListBuilder)

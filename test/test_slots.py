@@ -472,7 +472,7 @@ class TestSqSlots(HPyTest):
             static HPy Point_repeat_impl(HPyContext *ctx, HPy self, HPy_ssize_t t)
             {
                 HPy s = HPyUnicode_FromString(ctx, "sq_repeat");
-                HPy other = HPyLong_FromLong(ctx, t);
+                HPy other = HPyLong_FromLong(ctx, (long) t);
                 HPy res = HPyTuple_Pack(ctx, 3, self, s, other);
                 HPy_Close(ctx, other);
                 HPy_Close(ctx, s);
@@ -484,7 +484,7 @@ class TestSqSlots(HPyTest):
             static HPy Point_inplace_repeat_impl(HPyContext *ctx, HPy self, HPy_ssize_t t)
             {
                 HPy s = HPyUnicode_FromString(ctx, "sq_inplace_repeat");
-                HPy other = HPyLong_FromLong(ctx, t);
+                HPy other = HPyLong_FromLong(ctx, (long) t);
                 HPy res = HPyTuple_Pack(ctx, 3, self, s, other);
                 HPy_Close(ctx, other);
                 HPy_Close(ctx, s);

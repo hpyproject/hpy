@@ -38,3 +38,9 @@ ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
     }
     return PyObject_TypeCheck(_h2py(h_obj), (PyTypeObject*)type);
 }
+
+_HPy_HIDDEN int
+ctx_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
+{
+    return _h2py(h_obj) == _h2py(h_other);
+}

@@ -16,6 +16,7 @@ cppcheck-build-dir:
 
 cppcheck: cppcheck-build-dir
 	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
+	cppcheck --version
 	cppcheck \
 		--error-exitcode=1 \
 		--cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) \

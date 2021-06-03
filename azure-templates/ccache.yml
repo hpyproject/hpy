@@ -4,6 +4,9 @@
 # Steps:
 # - Install ccache
 # - Cache cache folder
+#
+# This script currently only supports ccache on Linux and Darwin OSes.
+# Other OSes (i.e. Windows) currently don't use ccache.
 
 parameters:
   - name: pythonVersion
@@ -35,3 +38,4 @@ steps:
       key: 'ccache | "$(Agent.OS)" | "${{ parameters.pythonVersion }}"'
       path: ${{ parameters.CCACHE_DIR }}
     displayName: Cache C compilation with ccache
+    condition: in( variables['Agent.OS'], 'Linux', 'Darwin' )

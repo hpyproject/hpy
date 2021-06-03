@@ -17,6 +17,7 @@ __pycache__/
 # C extensions
 *.so
 *.o
+vc140.pdb
 c_test/test_debug_handles
 
 # Distribution / packaging
@@ -53,6 +54,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+test-output.xml
 *.cover
 *.py,cover
 .hypothesis/

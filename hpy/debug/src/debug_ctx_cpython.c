@@ -24,10 +24,13 @@
 #include <Python.h>
 #include "debug_internal.h"
 #include "handles.h" // for _py2h and _h2py
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#endif
 
 static inline DHPy _py2dh(HPyContext *dctx, PyObject *obj)
 {
-    return DHPy_wrap(dctx, _py2h(obj));
+    return DHPy_open(dctx, _py2h(obj));
 }
 
 static inline PyObject *_dh2py(HPyContext *dctx, DHPy dh)
