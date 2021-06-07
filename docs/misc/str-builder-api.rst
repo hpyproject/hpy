@@ -150,3 +150,57 @@ the kind.
     ``_WRITE``. However, it is worth noting that I could not find any code
     using it outside CPython itself, so it's probably something which we don't
     need to care of for HPy.
+
+
+Raw-buffer vs Opaque API
+---------------------------
+
+There are two ways to initialize a non-initialized string object:
+
+- **Raw-buffer API**: get a C pointer to the memory and fill it directly:
+  ``PyBytes_AsString``, ``PyUnicode_1BYTE_DATA``, etc.
+
+- **Opaque API**: call special functions API to fill the content, without
+  accessing the buffer directly: e.g., ``PyUnicode_WriteChar``.
+
+From the point of view of the implementation, a completely opaque API gives
+the most flexibility in terms of how to implement a builder and/or a string.
+A good example is PyPy's ``str`` type, which uses UTF-8 as the internal
+representation. A completely opaque ``HPyStrBuilder`` could allow PyPy to fill
+directly its internal UTF-8 buffer (at least in simple cases). On the other
+hand, a raw-buffer API would force PyPy to store the UCS{1,2,4} bytes in a
+temporary buffer and convert them to UTF-8 during the ``build()`` phase.
+
+On the other hand, from the point of view of the C programmer it is easier to
+have direct access the memory. This allows to:
+
+- use ``memcpy()`` to copy data into the buffer
+
+- pass the buffer directly to other C functions which write into it (e.g.,
+  ``read()``)
+
+- use standard C patterns such as ``*p++ = ...`` or similar.
+
+
+Problems and constraints
+------------------------
+
+``bytes`` and ``str`` are objects are immutable: the biggest problem of the
+current API boils down to the fact that the API allows to construct objects
+which are not fully initialized and to mutate them during a
+not-well-specificed "initialization phase".
+
+Problems for alternative implementations:
+
+1. it assumes that the underlying buffer **can** be mutated. This might not be
+   always the case, e.g. if you want to use a Java string or an RPython string
+   as the data buffer. This might also lead to unnecessary copies.
+
+2. It makes harder to optimize the code: e.g. a JIT cannot safely assume that
+   a string is actually immutable.
+
+3. It interacts badly with a moving GC, because we need to ensure that ``buf``
+   doesn't move.
+
+Introducing a builder solves most of the problems, because it introduces a
+clear separation between the mutable and immutable phases.
