@@ -204,3 +204,49 @@ Problems for alternative implementations:
 
 Introducing a builder solves most of the problems, because it introduces a
 clear separation between the mutable and immutable phases.
+
+
+Real world usage
+-----------------
+
+In the following section we analyze the usage of some string building API in
+real world code, as found in the `Top 4000 PyPI packages
+<https://github.com/hpyproject/top4000-pypi-packages>`_.
+
+PyUnicode_New
+~~~~~~~~~~~~~
+
+This is the recommended "modern" way to create ``str`` objects but it's not
+widely used outside CPython. A simple ``grep`` found only 17 matches in the
+4000 packages, although some are in very important packages such as
+`cffi <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0021-cffi-1.14.5/c/wchar_helper_3.h#L36>`_
+
+``markupsafe`` (
+`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L106>`_,
+`[2] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L132>`_,
+`[3] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L158>`_)
+and ``simplejson`` (
+`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L517>`_,
+`[2] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L3330>_`)
+
+In all the examples linked above, ``maxchar`` is hard-coded and known at
+compile time.
+
+There are only four usage of ``PyUnicode_New`` in which ``maxchar`` is
+actually unknown until runtime, and it is curious to note that the first three
+are in runtime libraries used by code generators:
+
+  1. `mypyc <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0277-mypy-0.812/mypyc/lib-rt/str_ops.c#L22>`_
+
+  2. `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L829>`_
+
+  3. `siplib <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1236-PyQt5_sip-12.9.0/siplib.c#L12808>`_
+
+  4. `PyICU <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/2601-PyICU-2.7.3/common.cpp#L213>`_:
+     this is the only non-runtime library usage of it, and it's used to
+     implement a routine to create a ``str`` object from an UTF-16 buffer.
+
+For HPy, we should at lest consider the opportunity to design special APIs for
+the cases in which ``maxchar`` is known in advance,
+e.g. ``HPyStrBuilder_ASCII``, ``HPyStrBuilder_UCS1``, etc., and evaluate
+whether this would be beneficial for alternative implementations.
