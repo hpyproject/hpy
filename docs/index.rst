@@ -41,6 +41,7 @@ There are several advantages to write your C extension in HPy:
    porting-guide
    API <api>
    api-reference/index
+   misc/index
 
 
 Indices and tables
