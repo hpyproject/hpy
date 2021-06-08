@@ -71,7 +71,6 @@ The following functions are used to initialize an uninitialed object, but I
 could not find any usage of them outside CPython itself, so I think they can
 be safely ignored for now:
 
-
 .. code-block:: c
 
     Py_ssize_t PyUnicode_Fill(PyObject *unicode, Py_ssize_t start, Py_ssize_t length, Py_UCS4 fill_char);
@@ -85,10 +84,10 @@ account. The deprecated functions include but are not limited to:
 
 .. code-block:: c
 
+    PyUnicode_FromUnicode
     PyUnicode_FromStringAndSize(NULL,...) // use PyUnicode_New instead
     PyUnicode_AS_UNICODE
     PyUnicode_AS_DATA
-    PyUnicode_FromUnicode
     PyUnicode_READY
 
 
@@ -219,15 +218,14 @@ PyUnicode_New
 This is the recommended "modern" way to create ``str`` objects but it's not
 widely used outside CPython. A simple ``grep`` found only 17 matches in the
 4000 packages, although some are in very important packages such as
-`cffi <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0021-cffi-1.14.5/c/wchar_helper_3.h#L36>`_
-
-``markupsafe`` (
-`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L106>`_,
-`[2] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L132>`_,
-`[3] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L158>`_)
-and ``simplejson`` (
-`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L517>`_,
-`[2] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L3330>_`)
+`cffi <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0021-cffi-1.14.5/c/wchar_helper_3.h#L36>`_,
+``markupsafe``
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L106>`_,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L132>`_,
+`3 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L158>`_)
+and ``simplejson``
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L517>`_,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L3330>`_).
 
 In all the examples linked above, ``maxchar`` is hard-coded and known at
 compile time.
@@ -250,3 +248,60 @@ For HPy, we should at lest consider the opportunity to design special APIs for
 the cases in which ``maxchar`` is known in advance,
 e.g. ``HPyStrBuilder_ASCII``, ``HPyStrBuilder_UCS1``, etc., and evaluate
 whether this would be beneficial for alternative implementations.
+
+Create empty strings
+~~~~~~~~~~~~~~~~~~~~~
+
+A special case is ``PyUnicode_New(0, 0)``, which contructs an empty ``str``
+object.  CPython special-cases it to always return a prebuilt object.
+
+This pattern is used a lot inside CPython but only once in 3rd-party extensions, in the ``regex`` library (
+`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19486>`_,
+`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19516>`_).
+
+Other ways to build empty strings are ``PyUnicode_FromString("")`` which is used 27 times and ``PyUnicode_FromStringAndSize("", 0)`` which is used only `once
+<https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0268-pyodbc-4.0.30/src/textenc.cpp#L144>`_.
+
+For HPy, maybe we should just have a ``ctx->h_EmptyStr`` and
+``ctx->h_EmptyBytes``?
+
+PyUnicode_From*, PyUnicode_Decode*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Functions of the ``PyUnicode_From*`` and ``PyUnicode_Decode*`` families should
+be easy to adapt to HPy, so we won't discuss them in detail. However, here is
+the of matches found by grep for each function, to get an idea of how much
+each is used:
+
+``PyUnicode_From*`` family::
+
+  Documented:
+    964 PyUnicode_FromString
+    259 PyUnicode_FromFormat
+    125 PyUnicode_FromStringAndSize
+     58 PyUnicode_FromWideChar
+     48 PyUnicode_FromEncodedObject
+     17 PyUnicode_FromKindAndData
+      9 PyUnicode_FromFormatV
+
+  Undocumented:
+      7 PyUnicode_FromOrdinal
+
+  Deprecated:
+     66 PyUnicode_FromObject
+     45 PyUnicode_FromUnicode
+
+``PyUnicode_Decode*`` family::
+
+    143 PyUnicode_DecodeFSDefault
+    114 PyUnicode_DecodeUTF8
+     99 PyUnicode_Decode
+     64 PyUnicode_DecodeLatin1
+     51 PyUnicode_DecodeASCII
+     12 PyUnicode_DecodeFSDefaultAndSize
+     10 PyUnicode_DecodeUTF16
+      8 PyUnicode_DecodeLocale
+      6 PyUnicode_DecodeRawUnicodeEscape
+      3 PyUnicode_DecodeUTF8Stateful
+      2 PyUnicode_DecodeUTF32
+      2 PyUnicode_DecodeUnicodeEscape
