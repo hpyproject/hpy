@@ -305,3 +305,44 @@ each is used:
       3 PyUnicode_DecodeUTF8Stateful
       2 PyUnicode_DecodeUTF32
       2 PyUnicode_DecodeUnicodeEscape
+
+
+Typed vs untyped raw-buffer writing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To initialize a ``str`` object using the raw-buffer interface, you need to get
+a pointer to the buffer.  The vast majority of code uses
+``PyUnicode_{1,2,4}BYTE_DATA`` to get a buffer of type ``Py_UCS{1,2,4}*`` and
+write directly to it:
+
+.. code-block:: c
+
+    PyObject *s = PyUnicode_New(size, 127);
+    Py_UCS1 *buf = PyUnicode_1BYTE_DATA(s);
+    buf[0] = 'H';
+    buf[1] = 'e';
+    buf[2] = 'l';
+    ...
+
+Another way to get a pointer to the raw-buffer is to call
+``PyUnicode_DATA()``, which returns a ``void *``. However, since the type and
+kind of the buffer is unknown, you can't write directly into it, so there are
+basically two options:
+
+1. use ``PyUnicode_WRITE()``: this seems to be used only by code emitted by
+   Cython and sip.
+
+2. ``memcpy()`` memory from another ``str`` buffer of the same kind. This
+   technique is used for example by
+   `CPython's textio.c <https://github.com/antocuni/cpython/blob/7b3ab5921fa25ed8b97b6296f97c5c78aacf5447/Modules/_io/textio.c#L344>`_. Outside CPython, the only usage I
+   could find is by
+   `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/etop1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L857>`_.
+
+In addition to the Cython code linked above, there are 29 usages of
+``PyUnicode_DATA`` in the Top 4000 packages, all of them using it to call
+``PyUnicode_READ``.
+
+This probably means that we don't need to offer untyped raw-buffer writing for
+HPy. If we really need to support the ``memcpy`` use case, we can probably
+just offer a special function in the builder API.
+
