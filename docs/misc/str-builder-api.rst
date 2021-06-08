@@ -350,4 +350,39 @@ Considering that Cython will need special support for HPy anyway, this means
 that we don't need an equivalent of ``PyUnicode_WRITE`` for HPy.
 
 Similarly, ``PyUnicode_WriteChar()`` is used only once, inside
-`JPype <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/etop1000/0546-JPype1-1.2.1/native/python/jp_pythontypes.cpp#L196>`_.
+`JPype <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0546-JPype1-1.2.1/native/python/jp_pythontypes.cpp#L196>`_.
+
+
+PyUnicode_Join
+~~~~~~~~~~~~~~
+
+All the API functions listed above require the user to know in advance the
+size of the string: ``PyUnicode_Join()`` is the only native API call which
+allows to build a string whose size is not known in advance.
+
+Examples of usage are found in ``simplejson``
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L779>`_,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L1033>`_),
+`pycairo <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0759-pycairo-1.20.0/cairo/path.c#L156>`_,
+``regex``
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19492>`_,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22674>`_,
+`3 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22768>`_,
+`4 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19440>`_,
+`5 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22495>`_,
+`6 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22589>`_)
+and others, for a total of 25 grep matches.
+
+
+.. note::
+   Contrarily to its unicode equivalent, ``PyBytes_Join()`` does not
+   exist. There is ``_PyBytes_Join()`` which is private and undocumented, but
+   some extensions rely on it anyway:
+   `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L795>`_,
+   `regex <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19501>`_,
+   `dulwich <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1424-dulwich-0.20.23/dulwich/_pack.c#L62>`_.
+
+In theory, alternative implementaions should be able to provide a more
+efficient way to achieve the goal. E.g. for pure Python code PyPy offers
+``__pypy__.builders.StringBuilder`` which is faster than both ``StringIO`` and
+``''.join``, so maybe it might make sense to offer a way to use it from C.
