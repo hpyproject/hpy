@@ -324,25 +324,30 @@ write directly to it:
     buf[2] = 'l';
     ...
 
-Another way to get a pointer to the raw-buffer is to call
-``PyUnicode_DATA()``, which returns a ``void *``. However, since the type and
-kind of the buffer is unknown, you can't write directly into it, so there are
-basically two options:
+The other way to get a pointer to the raw-buffer is to call
+``PyUnicode_DATA()``, which returns a ``void *``: the only reasonable way to
+write something in this buffer is to ``memcpy()`` the data from another
+``str`` buffer of the same kind. This technique is used for example by
+`CPython's textio.c
+<https://github.com/antocuni/cpython/blob/7b3ab5921fa25ed8b97b6296f97c5c78aacf5447/Modules/_io/textio.c#L344>`_.
 
-1. use ``PyUnicode_WRITE()``: this seems to be used only by code emitted by
-   Cython and sip.
-
-2. ``memcpy()`` memory from another ``str`` buffer of the same kind. This
-   technique is used for example by
-   `CPython's textio.c <https://github.com/antocuni/cpython/blob/7b3ab5921fa25ed8b97b6296f97c5c78aacf5447/Modules/_io/textio.c#L344>`_. Outside CPython, the only usage I
-   could find is by
-   `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/etop1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L857>`_.
-
-In addition to the Cython code linked above, there are 29 usages of
-``PyUnicode_DATA`` in the Top 4000 packages, all of them using it to call
-``PyUnicode_READ``.
+Outside CPython, the only usage of this technique is inside cython's helper
+function `__Pyx_PyUnicode_Join
+<https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L857>`_.
 
 This probably means that we don't need to offer untyped raw-buffer writing for
 HPy. If we really need to support the ``memcpy`` use case, we can probably
 just offer a special function in the builder API.
 
+PyUnicode_WRITE, PyUnicode_WriteChar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Outside CPython, ``PyUnicode_WRITE()`` is used only inside Cython's helper
+functions
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L865>`_,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L914-L926>`_).
+Considering that Cython will need special support for HPy anyway, this means
+that we don't need an equivalent of ``PyUnicode_WRITE`` for HPy.
+
+Similarly, ``PyUnicode_WriteChar()`` is used only once, inside
+`JPype <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/etop1000/0546-JPype1-1.2.1/native/python/jp_pythontypes.cpp#L196>`_.
