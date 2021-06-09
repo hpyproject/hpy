@@ -14,7 +14,7 @@ any proposal, it is useful to understand:
 
 Some terminology:
 
-    * "string" indicates either ``bytes`` or ``str`` objects aaa
+    * "string" means both ``bytes`` and ``str`` objects
     * "unicode" or "unicode string" indicates ``str``
 
 .. note::
@@ -57,7 +57,7 @@ Similarly to ``bytes``, there are several ways to build a ``str``:
 
 .. code-block:: c
 
-    PyObject *PyUnicode_FromString(const char *u);
+    PyObject* PyUnicode_FromString(const char *u);
     PyObject* PyUnicode_FromStringAndSize(const char *u, Py_ssize_t size);
     PyObject* PyUnicode_FromKindAndData(int kind, const void *buffer, Py_ssize_t size);
     PyObject* PyUnicode_FromFormat(const char *format, ...);
