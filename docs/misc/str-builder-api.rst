@@ -18,7 +18,7 @@ Some terminology:
     * "unicode" or "unicode string" indicates ``str``
 
 .. note::
-   In this issue we are translating ``PyUnicode_*`` functions into
+   In this document we are translating ``PyUnicode_*`` functions into
    ``HPyStr_*``. See issue #xxx for more discussion about the naming convention.
 
 Current CPython API
@@ -67,7 +67,7 @@ Similarly to ``bytes``, there are several ways to build a ``str``:
 .. note::
    ``PyUnicode_FromString{,AndSize}`` take an UTF-8 string in input
 
-The following functions are used to initialize an uninitialed object, but I
+The following functions are used to initialize an uninitialized object, but I
 could not find any usage of them outside CPython itself, so I think they can
 be safely ignored for now:
 
@@ -110,10 +110,10 @@ function depending on the kind, returning buffers of different types:
 
 
 Uninitialized unicode objects are created by calling ``PyUnicode_New(size,
-maxchar)``, where ``maxchar`` is the maximum allowed value of each
-character. So, in cases in which ``maxchar`` is known in advance, we can
-predict at compile time what will be the kind of the string and write code
-accordingly. E.g.:
+maxchar)``, where ``maxchar`` is the maximum allowed value of a character
+inside the string, and determines the kind. So, in cases in which ``maxchar``
+is known in advance, we can predict at compile time what will be the kind of
+the string and write code accordingly. E.g.:
 
 .. code-block:: c
 
@@ -208,7 +208,7 @@ clear separation between the mutable and immutable phases.
 Real world usage
 -----------------
 
-In the following section we analyze the usage of some string building API in
+In this section we analyze the usage of some string building API in
 real world code, as found in the `Top 4000 PyPI packages
 <https://github.com/hpyproject/top4000-pypi-packages>`_.
 
@@ -256,8 +256,8 @@ A special case is ``PyUnicode_New(0, 0)``, which contructs an empty ``str``
 object.  CPython special-cases it to always return a prebuilt object.
 
 This pattern is used a lot inside CPython but only once in 3rd-party extensions, in the ``regex`` library (
-`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19486>`_,
-`[1] <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19516>`_).
+`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19486>`_,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19516>`_).
 
 Other ways to build empty strings are ``PyUnicode_FromString("")`` which is used 27 times and ``PyUnicode_FromStringAndSize("", 0)`` which is used only `once
 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0268-pyodbc-4.0.30/src/textenc.cpp#L144>`_.
@@ -386,3 +386,5 @@ In theory, alternative implementaions should be able to provide a more
 efficient way to achieve the goal. E.g. for pure Python code PyPy offers
 ``__pypy__.builders.StringBuilder`` which is faster than both ``StringIO`` and
 ``''.join``, so maybe it might make sense to offer a way to use it from C.
+
+
