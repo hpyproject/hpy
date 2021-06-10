@@ -230,7 +230,7 @@ and ``simplejson``
 In all the examples linked above, ``maxchar`` is hard-coded and known at
 compile time.
 
-There are only four usage of ``PyUnicode_New`` in which ``maxchar`` is
+There are only four usages of ``PyUnicode_New`` in which ``maxchar`` is
 actually unknown until runtime, and it is curious to note that the first three
 are in runtime libraries used by code generators:
 
@@ -305,6 +305,53 @@ each is used:
       3 PyUnicode_DecodeUTF8Stateful
       2 PyUnicode_DecodeUTF32
       2 PyUnicode_DecodeUnicodeEscape
+
+
+Raw-buffer access
+~~~~~~~~~~~~~~~~~
+
+Most of the real world packages use the raw-buffer API to initialize ``str``
+objects, and very often in a way which can't be easily replaced by a fully
+opaque API.
+
+Example 1, ``markupsafe``: the
+`DO_ESCAPE <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L35>`_
+macro takes a parameter called ``outp`` which is obtained by calling
+``PyUnicode*BYTE_DATA``
+(`1BYTE <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L112>`_,
+(`2BYTE <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L137>`_,
+(`4BYTE <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L163>`_).
+``DO_ESCAPE`` contains code like this, which would be hard to port to a fully-opaque API:
+
+.. code-block:: c
+    memcpy(outp, inp-ncopy, sizeof(*outp)*ncopy); \
+    outp += ncopy; ncopy = 0; \
+    *outp++ = '&'; \
+    *outp++ = '#'; \
+    *outp++ = '3'; \
+    *outp++ = '4'; \
+    *outp++ = ';'; \
+    break; \
+
+Another interesting example is
+`pybase64 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1925-pybase64-1.1.4/pybase64/_pybase64.c#L320-349`_.
+After removing the unnecessary stuff, the logic boils down to this:
+
+.. code-block:: c
+    out_len = (size_t)(((buffer.len + 2) / 3) * 4);
+    out_object = PyUnicode_New((Py_ssize_t)out_len, 127);
+    dst = (char*)PyUnicode_1BYTE_DATA(out_object);
+    ...
+    base64_encode(buffer.buf, buffer.len, dst, &out_len, libbase64_simd_flag);
+
+Note that ``base64_encode`` is an external C function which writes stuff into
+a ``char *`` buffer, so in this case it is **required** to use the raw-buffer
+API, unless you want to allocate a temporary buffer and copy chars one-by-one
+later.
+
+There are other examples similar to these, but I think there is already enough
+evidence that HPy **must** offer a raw-buffer API in addition to a
+fully-opaque one.
 
 
 Typed vs untyped raw-buffer writing
