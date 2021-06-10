@@ -19,7 +19,14 @@ Some terminology:
 
 .. note::
    In this document we are translating ``PyUnicode_*`` functions into
-   ``HPyStr_*``. See issue #xxx for more discussion about the naming convention.
+   ``HPyStr_*``. See `issue #213 <https://github.com/hpyproject/hpy/issues/213>`_
+   for more discussion about the naming convention.
+
+.. note::
+   The goal of the document is only to describe the current CPython API and
+   its real-world usage. For a discussion about how to design the equivalent
+   HPy API, see `issue #214 <https://github.com/hpyproject/hpy/issues/214>`_
+
 
 Current CPython API
 --------------------
