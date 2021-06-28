@@ -1,11 +1,6 @@
 #include "hpy.h"
 
-HPyDef_METH(myabs, "myabs", myabs_impl, HPyFunc_O)
-static HPy myabs_impl(HPyContext *ctx, HPy self, HPy obj)
-{
-    return HPy_Absolute(ctx, obj);
-}
-
+/* a HPy style function */
 HPyDef_METH(add_ints, "add_ints", add_ints_impl, HPyFunc_VARARGS)
 static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
@@ -15,10 +10,27 @@ static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs
     return HPyLong_FromLong(ctx, a+b);
 }
 
-static HPyDef *module_defines[] = {
-    &myabs,
+
+/* Add an old-style function */
+static PyObject *
+add_ints2(PyObject *self, PyObject *args)
+{
+
+    long a, b, ret;
+    if (!PyArg_ParseTuple(args, "ll", &a, &b))
+        return NULL;
+    ret = a + b;
+    return PyLong_FromLong(ret);
+}
+
+static HPyDef *hpy_defines[] = {
     &add_ints,
     NULL
+};
+
+static PyMethodDef py_defines[] = {
+    {"add_ints_legacy", add_ints2, METH_VARARGS, "add two ints"},
+    {NULL, NULL, 0, NULL}    /* Sentinel */
 };
 
 static HPyModuleDef moduledef = {
@@ -26,7 +38,8 @@ static HPyModuleDef moduledef = {
     .m_name = "simple",
     .m_doc = "HPy Example",
     .m_size = -1,
-    .defines = module_defines
+    .defines = hpy_defines,
+    .legacy_methods = py_defines
 };
 
 
