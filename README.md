@@ -65,7 +65,7 @@ More concrete goals
 
   - PyPy will implement this natively: extensions using this API will be
     orders of magnitude faster than the ones using the existing old API (see
-    [this blog post](https://morepypy.blogspot.com/2018/09/inside-cpyext-why-emulating-cpython-c.html)
+    [this blog post](https://www.pypy.org/posts/2018/09/inside-cpyext-why-emulating-cpython-c-8083064623681286567.html)
     for details)
 
   - Cython will adopt this from day one: existing Cython programs will benefit

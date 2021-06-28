@@ -20,7 +20,7 @@ low-level data structure layouts. This has two important consequences:
 
 Over the years, it has become evident that emulating the Python/C
 API in an efficient way is `challenging, if not impossible
-<https://morepypy.blogspot.com/2018/09/inside-cpyext-why-emulating-cpython-c.html>`_.
+<https://www.pypy.org/posts/2018/09/inside-cpyext-why-emulating-cpython-c-8083064623681286567.html>`_.
 The main goal of HPy is provide a **C API which is possible to implement in an
 efficient way on a number of very diverse implementations**.  The following is
 a list of sub-goals.
@@ -310,7 +310,7 @@ because it is simple enough to require porting only a handful of API
 functions, but at the same time it is performance critical and performs many
 API calls during the parsing of a JSON file.
 
-This `blog post <https://morepypy.blogspot.com/2019/12/hpy-kick-off-sprint-report.html>`_
+This `blog post <https://www.pypy.org/posts/2019/12/hpy-kick-off-sprint-report-1840829336092490938.html>`_
 explains the results in more detail, but they can be summarized as follows:
 
   - ``ujson-hpy`` compiled with the CPython ABI is as fast as the original
