@@ -1,6 +1,6 @@
 import textwrap
 import sys
-import os
+import os.path
 from setuptools import setup, Extension
 
 # this package is supposed to be installed ONLY on CPython. Try to bail out
@@ -29,6 +29,11 @@ if sys.implementation.name != 'cpython':
         msg += '(built-in module _hpy_universal not found).\n'
         msg += 'Please contact your vendor for more informations.'
     sys.exit(msg)
+
+
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
 
 
 if 'HPY_DEBUG' in os.environ:
@@ -113,6 +118,9 @@ DEV_REQUIREMENTS = [
 
 setup(
     name="hpy",
+    description='A better C API for Python',
+    long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     packages = ['hpy.devel', 'hpy.debug'],
     include_package_data=True,
     extras_require={
