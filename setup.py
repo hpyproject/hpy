@@ -112,8 +112,8 @@ DEV_REQUIREMENTS = [
 ]
 
 setup(
-    name="hpy.devel",
-    packages = ['hpy.devel'],
+    name="hpy",
+    packages = ['hpy.devel', 'hpy.debug'],
     include_package_data=True,
     extras_require={
         "dev": DEV_REQUIREMENTS,
