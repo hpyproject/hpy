@@ -293,6 +293,6 @@ class build_hpy_ext_mixin:
             module "HPyInit_" function.
         """
         exports = self._base_build_ext.get_export_symbols(self, ext)
-        if ext.hpy_abi == 'universal':
+        if hasattr(ext, "hpy_abi") and ext.hpy_abi == 'universal':
             exports = [re.sub(r"^PyInit_", "HPyInit_", name) for name in exports]
         return exports
