@@ -14,6 +14,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sys
 import os
 import re
 
@@ -66,15 +67,54 @@ def pre_process(app, filename, contents, *args):
 def setup(app):
     app.connect("c-autodoc-pre-process", pre_process)
 
-
-if 'READTHEDOCS' in os.environ:
-    # TODO: Hopefully we can remove this setting of the libclang path once
-    #       readthedocs updates its docker image to Ubuntu 20.04 which
-    #       supports clang-10 and clang-11.
+def setup_clang():
+    """
+    The clang library needs to find libclang*.so, but it seems there isn't a
+    fully portable solution. Let's try our best.
+    """
     from clang import cindex
-    cindex.Config.set_library_file(
-        "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
-    )
+
+    def get_clang_error():
+        try:
+            cindex.Index.create()
+        except cindex.LibclangError as e:
+            return e
+        else:
+            # it worked!
+            return None
+
+    if 'READTHEDOCS' in os.environ:
+        # TODO: Hopefully we can remove this setting of the libclang path once
+        #       readthedocs updates its docker image to Ubuntu 20.04 which
+        #       supports clang-10 and clang-11.
+        cindex.Config.set_library_file(
+            "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
+        )
+        return
+
+    # try to see if it works out of the box
+    if get_clang_error() is None:
+        return
+
+    # the following works on Ubuntu 20.04
+    cindex.Config.set_library_file('/usr/lib/llvm-10/lib/libclang-10.so.1')
+    error = get_clang_error()
+    if error is None:
+        return
+
+    # libclang*.so not found :( Try to print a reasonable message
+    YELLOW = "\033[1;33m"
+    RESET = "\033[0m"
+    print(YELLOW)
+    print('====================')
+    print('Cannot load libclang')
+    print('   ', error)
+    print('Hint: try one of the following solutions:')
+    print('    1. apt install llvm-10')
+    print('    2. run llvm-config-10 --libs and modify conf.py:setup_clang() accordingly')
+    print(RESET)
+
+setup_clang()
 
 # -- Options for HTML output -------------------------------------------------
 
