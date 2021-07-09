@@ -73,16 +73,6 @@ def setup_clang():
     fully portable solution. Let's try our best.
     """
     from clang import cindex
-
-    def get_clang_error():
-        try:
-            cindex.Index.create()
-        except cindex.LibclangError as e:
-            return e
-        else:
-            # it worked!
-            return None
-
     if 'READTHEDOCS' in os.environ:
         # TODO: Hopefully we can remove this setting of the libclang path once
         #       readthedocs updates its docker image to Ubuntu 20.04 which
@@ -92,14 +82,12 @@ def setup_clang():
         )
         return
 
-    # try to see if it works out of the box
-    if get_clang_error() is None:
-        return
-
-    # the following works on Ubuntu 20.04
-    cindex.Config.set_library_file('/usr/lib/llvm-10/lib/libclang-10.so.1')
-    error = get_clang_error()
-    if error is None:
+    try:
+        cindex.Index.create()
+    except cindex.LibclangError as error:
+        pass
+    else:
+        # it works out of the box, nothing to do
         return
 
     # libclang*.so not found :( Try to print a reasonable message
@@ -109,9 +97,8 @@ def setup_clang():
     print('====================')
     print('Cannot load libclang')
     print('   ', error)
-    print('Hint: try one of the following solutions:')
-    print('    1. apt install llvm-10')
-    print('    2. run llvm-config-10 --libs and modify conf.py:setup_clang() accordingly')
+    print('HINT if you are on ubuntu, try the following:')
+    print('    apt install libclang-10-dev')
     print(RESET)
 
 setup_clang()
