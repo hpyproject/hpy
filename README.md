@@ -4,7 +4,7 @@ HPy: a better API for Python
 [![Build Status](https://dev.azure.com/pyhandle/hpy/_apis/build/status/pyhandle.hpy?branchName=master)](https://dev.azure.com/pyhandle/hpy/_build/latest?definitionId=1&branchName=master)
 [![Documentation](https://readthedocs.org/projects/hpy/badge/)](https://hpy.readthedocs.io/)
 
-**IRC channel** : #hpy on freenode.net
+**IRC channel** : #hpy on [libera.chat](https://libera.chat)
 
 **Mailing list**: [hpy-dev@python.org](https://mail.python.org/mailman3/lists/hpy-dev.python.org/)
 
