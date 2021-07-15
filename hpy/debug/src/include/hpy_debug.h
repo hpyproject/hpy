@@ -25,6 +25,16 @@
 */
 
 HPyContext * hpy_debug_get_ctx(HPyContext *uctx);
+int hpy_debug_ctx_init(HPyContext *dctx, HPyContext *uctx);
+void hpy_debug_set_ctx(HPyContext *dctx);
+
+// convert between debug and universal handles. These are basically
+// the same as DHPy_open and DHPy_unwrap but with a different name
+// because this is the public-facing API and DHPy/UHPy are only internal
+// implementation details.
+HPy hpy_debug_open_handle(HPyContext *dctx, HPy uh);
+HPy hpy_debug_unwrap_handle(HPyContext *dctx, HPy dh);
+void hpy_debug_close_handle(HPyContext *dctx, HPy dh);
 
 // this is the HPy init function created by HPy_MODINIT. In CPython's version
 // of hpy.universal the code is embedded inside the extension, so we can call

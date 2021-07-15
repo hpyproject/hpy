@@ -2,6 +2,25 @@ from test.support import HPyDebugTest
 
 class TestHandles(HPyDebugTest):
 
+    def test_debug_ctx_name(self):
+        # this is very similar to the one in test_00_basic, but:
+        #   1. by doing the same here, we ensure that we are actually using
+        #      the debug ctx in these tests
+        #   2. in pypy we run HPyTest with only hpy_abi==universal, so this
+        #      tests something which is NOT tested by test_00_basic
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyUnicode_FromString(ctx, ctx->name);
+            }
+
+            @EXPORT(f)
+            @INIT
+        """)
+        ctx_name = mod.f()
+        assert ctx_name.startswith('HPy Debug Mode ABI')
+
     def test_get_open_handles(self):
         from hpy.universal import _debug
         mod = self.make_leak_module()
@@ -16,6 +35,31 @@ class TestHandles(HPyDebugTest):
         leaks2 = [dh.obj for dh in leaks2]
         assert leaks1 == ['hello', 'world', 'a younger leak']
         assert leaks2 == ['a younger leak']
+
+    def test_leak_from_method(self):
+        from hpy.universal import _debug
+        mod = self.make_module("""
+            HPyDef_METH(Dummy_leak, "leak", Dummy_leak_impl, HPyFunc_O)
+            static HPy Dummy_leak_impl(HPyContext *ctx, HPy self, HPy arg) {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            static HPyDef *Dummy_defines[] = {
+                &Dummy_leak,
+                NULL
+            };
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .defines = Dummy_defines,
+            };
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @INIT
+       """)
+        gen = _debug.new_generation()
+        obj = mod.Dummy()
+        obj.leak("a")
+        leaks = [dh.obj for dh in _debug.get_open_handles(gen)]
+        assert leaks == ["a"]
 
     def test_DebugHandle_id(self):
         from hpy.universal import _debug

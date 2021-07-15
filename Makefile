@@ -5,6 +5,10 @@ all: hpy.universal
 hpy.universal:
 	python3 setup.py build_ext -if
 
+.PHONY: dist-info
+dist-info:
+	python3 setup.py dist_info
+
 debug:
 	HPY_DEBUG=1 make all
 
