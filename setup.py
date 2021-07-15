@@ -118,6 +118,10 @@ DEV_REQUIREMENTS = [
 
 setup(
     name="hpy",
+    author='The HPy team',
+    author_email='hpy-dev@python.org',
+    url='https://hpyproject.org',
+    license='MIT',
     description='A better C API for Python',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
