@@ -263,29 +263,29 @@ HPy_AsPyObject(HPyContext *ctx, HPy h)
  */
 #define _HPy_IMPL_NAME(name) HPy##name
 #define _HPy_IMPL_NAME_NOPREFIX(name) HPy_##name
-#include "../common/implementation.h"
+#include "hpy/implementation.h"
 #undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
-#include "../common/cpy_types.h"
+#include "hpy/cpy_types.h"
 
-#include "../common/macros.h"
+#include "hpy/macros.h"
 
-#include "../common/hpyfunc.h"
-#include "../common/hpydef.h"
-#include "../common/hpytype.h"
-#include "../common/hpymodule.h"
-#include "../common/runtime/ctx_call.h"
-#include "../common/runtime/ctx_module.h"
-#include "../common/runtime/ctx_object.h"
-#include "../common/runtime/ctx_type.h"
-#include "../common/runtime/ctx_listbuilder.h"
-#include "../common/runtime/ctx_tracker.h"
-#include "../common/runtime/ctx_tuple.h"
-#include "../common/runtime/ctx_tuplebuilder.h"
+#include "hpy/hpyfunc.h"
+#include "hpy/hpydef.h"
+#include "hpy/hpytype.h"
+#include "hpy/hpymodule.h"
+#include "hpy/runtime/ctx_call.h"
+#include "hpy/runtime/ctx_module.h"
+#include "hpy/runtime/ctx_object.h"
+#include "hpy/runtime/ctx_type.h"
+#include "hpy/runtime/ctx_listbuilder.h"
+#include "hpy/runtime/ctx_tracker.h"
+#include "hpy/runtime/ctx_tuple.h"
+#include "hpy/runtime/ctx_tuplebuilder.h"
 
-#include "../common/runtime/argparse.h"
-#include "../common/runtime/helpers.h"
+#include "hpy/runtime/argparse.h"
+#include "hpy/runtime/helpers.h"
 
 HPyAPI_FUNC(HPy)
 HPyModule_Create(HPyContext *ctx, HPyModuleDef *mdef)
