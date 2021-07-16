@@ -3,7 +3,7 @@
 
 #include <Python.h>
 #include "hpy.h"
-#include "common/hpytype.h"
+#include "hpy/hpytype.h"
 
 
 _HPy_HIDDEN HPyListBuilder ctx_ListBuilder_New(HPyContext *ctx,

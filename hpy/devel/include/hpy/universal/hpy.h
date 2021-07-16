@@ -40,7 +40,7 @@ typedef struct { HPy_ssize_t _i; } HPyTracker;
 typedef struct _HPyContext_s HPyContext;
 
 /* compatibility CPython types */
-#include "common/cpy_types.h"
+#include "hpy/cpy_types.h"
 
 
 /* misc stuff, which should probably go in its own header */
@@ -54,15 +54,15 @@ static inline HPy HPy_FromVoidP(void *p) { return (HPy){(HPy_ssize_t)p}; }
 static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 // include runtime functions
-#include "common/macros.h"
+#include "hpy/macros.h"
 
-#include "common/hpyfunc.h"
-#include "common/hpydef.h"
-#include "common/hpytype.h"
-#include "common/hpymodule.h"
+#include "hpy/hpyfunc.h"
+#include "hpy/hpydef.h"
+#include "hpy/hpytype.h"
+#include "hpy/hpymodule.h"
 
-#include "common/runtime/argparse.h"
-#include "common/runtime/helpers.h"
+#include "hpy/runtime/argparse.h"
+#include "hpy/runtime/helpers.h"
 
 #include "autogen_ctx.h"
 #include "autogen_trampolines.h"

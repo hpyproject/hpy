@@ -3,7 +3,7 @@
 
 #include <Python.h>
 #include "hpy.h"
-#include "common/hpytype.h"
+#include "hpy/hpytype.h"
 
 _HPy_HIDDEN void* ctx_AsStruct(HPyContext *ctx, HPy h);
 _HPy_HIDDEN void* ctx_AsStructLegacy(HPyContext *ctx, HPy h);

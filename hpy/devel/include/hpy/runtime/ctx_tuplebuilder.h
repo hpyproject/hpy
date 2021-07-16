@@ -3,7 +3,7 @@
 
 #include <Python.h>
 #include "hpy.h"
-#include "common/hpytype.h"
+#include "hpy/hpytype.h"
 
 
 _HPy_HIDDEN HPyTupleBuilder ctx_TupleBuilder_New(HPyContext *ctx,

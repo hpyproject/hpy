@@ -2,7 +2,7 @@
 #define HPY_COMMON_RUNTIME_HELPERS_H
 
 #include "hpy.h"
-#include "common/hpytype.h"
+#include "hpy/hpytype.h"
 
 HPyAPI_RUNTIME_FUNC(int)
 HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
