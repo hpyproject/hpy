@@ -1,6 +1,6 @@
 #include <Python.h>
 #include "ctx_meth.h"
-#include "common/runtime/ctx_type.h"
+#include "hpy/runtime/ctx_type.h"
 #include "handles.h"
 
 static void _buffer_h2py(HPyContext *ctx, const HPy_buffer *src, Py_buffer *dest)
