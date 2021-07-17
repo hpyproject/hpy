@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+/* ~~~~~~~~~~~~~~~~ useful macros ~~~~~~~~~~~~~~~~ */
+
 #ifdef __GNUC__
 #define _HPy_HIDDEN  __attribute__((visibility("hidden")))
 #else
@@ -21,6 +23,57 @@
 #else
 #  define _HPy_NO_RETURN
 #endif
+
+
+/* ~~~~~~~~~~~~~~~~ Definition of the type HPy ~~~~~~~~~~~~~~~~ */
+
+/* HPy handles are fully opaque: depending on the implementation, the _i can
+   be either an integer or a pointer. A few examples:
+
+   * in CPython ABI mode, ._i is a PyObject*
+
+   * in Universal ABI mode, the meaning of ._i depends on the implementation:
+
+       - CPython (i.e., the code in hpy/universal/src/): ._i is the bitwise
+         invert of a PyObject*
+
+       - PyPy: ._i is an index into a list
+
+       - GraalPython: ???
+
+       - Debug mode: _i is a pointer to a DebugHandle, which contains a
+         another HPy among other stuff
+ */
+typedef struct _HPy_s { intptr_t _i; } HPy;
+typedef struct { intptr_t _lst; } HPyListBuilder;
+typedef struct { intptr_t _tup; } HPyTupleBuilder;
+typedef struct { intptr_t _i; } HPyTracker;
+
+
+/* A null handle is officially defined as a handle whose _i is 0. This is true
+   in all ABI modes. */
+#define HPy_NULL ((HPy){0})
+#define HPy_IsNull(h) ((h)._i == 0)
+
+
+/* ~~~~~~~~~~~~~~~~ Definition of other types ~~~~~~~~~~~~~~~~ */
+
+#ifdef HPY_UNIVERSAL_ABI
+    typedef intptr_t HPy_ssize_t;
+    typedef intptr_t HPy_hash_t;
+#else
+/*  It would be nice if we could include hpy.h WITHOUT bringing in all the
+    stuff from Python.h, to make sure that people don't use the CPython API by
+    mistake. How to achieve it, though? */
+#   define PY_SSIZE_T_CLEAN
+#   include <Python.h>
+    typedef Py_ssize_t HPy_ssize_t;
+    typedef Py_hash_t HPy_hash_t;
+#endif
+
+
+
+
 
 
 #ifdef HPY_UNIVERSAL_ABI

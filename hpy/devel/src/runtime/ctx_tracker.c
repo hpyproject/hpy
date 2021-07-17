@@ -68,21 +68,12 @@ typedef struct {
 } _HPyTracker_s;
 
 
-#ifdef HPY_UNIVERSAL_ABI
 static inline _HPyTracker_s *_ht2hp(HPyTracker ht) {
     return (_HPyTracker_s *) (ht)._i;
 }
 static inline HPyTracker _hp2ht(_HPyTracker_s *hp) {
     return (HPyTracker) {(HPy_ssize_t) (hp)};
 }
-#else
-static inline _HPyTracker_s *_ht2hp(HPyTracker ht) {
-    return (_HPyTracker_s *) (ht)._o;
-}
-static inline HPyTracker _hp2ht(_HPyTracker_s *hp) {
-    return (HPyTracker) {(void *) (hp)};
-}
-#endif
 
 
 _HPy_HIDDEN HPyTracker

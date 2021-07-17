@@ -3,28 +3,12 @@
 
 #define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
-/* HPy types */
-typedef intptr_t HPy_ssize_t;
-typedef intptr_t HPy_hash_t;
-
-/* The following types, when compiled with the present universal-mode header,
-   are each just a pointer-sized integer.  What this integer (or pointer)
-   means is up to the implementation.  For example, on both CPython and PyPy,
-   the HPy structure contains an index in a global array. */
-typedef struct _HPy_s { HPy_ssize_t _i; } HPy;
-typedef struct { HPy_ssize_t _lst; } HPyListBuilder;
-typedef struct { HPy_ssize_t _tup; } HPyTupleBuilder;
-typedef struct { HPy_ssize_t _i; } HPyTracker;
 
 typedef struct _HPyContext_s HPyContext;
 
 /* compatibility CPython types */
 #include "hpy/cpy_types.h"
 
-
-/* misc stuff, which should probably go in its own header */
-#define HPy_NULL ((HPy){0})
-#define HPy_IsNull(x) ((x)._i == 0)
 
 // XXX: we need to decide whether these are part of the official API or not,
 // and maybe introduce a better naming convetion. For now, they are needed for
