@@ -8,7 +8,7 @@ NO_CALL = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
 class autogen_hpyfunc_declare_h(AutoGenFile):
-    PATH = 'hpy/devel/include/common/autogen_hpyfunc_declare.h'
+    PATH = 'hpy/devel/include/hpy/autogen_hpyfunc_declare.h'
 
     ## #define _HPyFunc_DECLARE_HPyFunc_NOARGS(SYM)  \
     ##     static HPy SYM(HPyContext *ctx, HPy self)
@@ -44,7 +44,7 @@ def hpy_to_cpy(declnode):
 
 
 class autogen_hpyfunc_trampoline_h(AutoGenFile):
-    PATH = 'hpy/devel/include/universal/autogen_hpyfunc_trampolines.h'
+    PATH = 'hpy/devel/include/hpy/universal/autogen_hpyfunc_trampolines.h'
 
     def generate(self):
         lines = []
@@ -132,7 +132,7 @@ class autogen_ctx_call_i(AutoGenFile):
 
 
 class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
-    PATH = 'hpy/devel/include/cpython/autogen_hpyfunc_trampolines.h'
+    PATH = 'hpy/devel/include/hpy/cpython/autogen_hpyfunc_trampolines.h'
 
     def generate(self):
         lines = []

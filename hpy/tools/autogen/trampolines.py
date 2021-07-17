@@ -5,7 +5,7 @@ from .parse import toC, find_typedecl
 
 
 class autogen_trampolines_h(AutoGenFile):
-    PATH = 'hpy/devel/include/universal/autogen_trampolines.h'
+    PATH = 'hpy/devel/include/hpy/universal/autogen_trampolines.h'
 
     NO_TRAMPOLINES = set([
         '_HPy_New',
@@ -51,7 +51,7 @@ class autogen_trampolines_h(AutoGenFile):
 
 
 class autogen_impl_h(AutoGenFile):
-    PATH = 'hpy/devel/include/common/autogen_impl.h'
+    PATH = 'hpy/devel/include/hpy/autogen_impl.h'
 
     def generate(self):
         lines = []

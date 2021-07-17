@@ -3,7 +3,7 @@ from .autogenfile import AutoGenFile
 from .parse import toC
 
 class autogen_hpyslot_h(AutoGenFile):
-    PATH = 'hpy/devel/include/common/autogen_hpyslot.h'
+    PATH = 'hpy/devel/include/hpy/autogen_hpyslot.h'
 
     def generate(self):
         lines = []
