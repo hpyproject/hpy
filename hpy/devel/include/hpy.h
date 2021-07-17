@@ -107,14 +107,8 @@ typedef struct _HPyContext_s HPyContext;
 #   include "hpy/universal/misc_trampolines.h"
 #else
 //  CPython-ABI
-#   include "hpy/runtime/ctx_call.h"
-#   include "hpy/runtime/ctx_module.h"
-#   include "hpy/runtime/ctx_object.h"
+#   include "hpy/runtime/ctx_funcs.h"
 #   include "hpy/runtime/ctx_type.h"
-#   include "hpy/runtime/ctx_listbuilder.h"
-#   include "hpy/runtime/ctx_tracker.h"
-#   include "hpy/runtime/ctx_tuple.h"
-#   include "hpy/runtime/ctx_tuplebuilder.h"
 #   include "hpy/cpython/misc.h"
 #endif
 

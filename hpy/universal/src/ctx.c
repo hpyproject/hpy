@@ -1,14 +1,8 @@
 #include "hpy.h"
 #include "handles.h"
 
-#include "hpy/runtime/ctx_call.h"
+#include "hpy/runtime/ctx_funcs.h"
 #include "hpy/runtime/ctx_type.h"
-#include "hpy/runtime/ctx_module.h"
-#include "hpy/runtime/ctx_object.h"
-#include "hpy/runtime/ctx_listbuilder.h"
-#include "hpy/runtime/ctx_tracker.h"
-#include "hpy/runtime/ctx_tuple.h"
-#include "hpy/runtime/ctx_tuplebuilder.h"
 #include "ctx_meth.h"
 #include "ctx_misc.h"
 
