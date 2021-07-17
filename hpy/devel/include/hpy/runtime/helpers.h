@@ -4,7 +4,7 @@
 #include "hpy.h"
 #include "hpy/hpytype.h"
 
-HPyAPI_RUNTIME_FUNC(int)
+_HPy_HIDDEN int
 HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
                   HPyType_Spec *hpyspec, HPyType_SpecParam *params);
 

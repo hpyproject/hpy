@@ -24,8 +24,6 @@
 #  define _HPy_NO_RETURN
 #endif
 
-#define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
-
 /* ~~~~~~~~~~~~~~~~ Definition of the type HPy ~~~~~~~~~~~~~~~~ */
 
 /* HPy handles are fully opaque: depending on the implementation, the _i can
