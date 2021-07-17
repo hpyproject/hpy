@@ -96,7 +96,7 @@ typedef struct _HPyContext_s HPyContext;
 #ifdef HPY_UNIVERSAL_ABI
 #   include "hpy/universal/autogen_ctx.h"
 #   include "hpy/universal/autogen_trampolines.h"
-#   include "hpy/universal/hpy.h"
+#   include "hpy/universal/misc_trampolines.h"
 #else
 //  CPython-ABI
 #   include "hpy/runtime/ctx_call.h"
