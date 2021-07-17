@@ -369,4 +369,25 @@ HPyTracker_Close(HPyContext *ctx, HPyTracker ht)
     ctx_Tracker_Close(ctx, ht);
 }
 
+HPyAPI_FUNC(HPy)
+HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
+    return ctx_GetItem_i(ctx, obj, idx);
+}
+
+HPyAPI_FUNC(HPy)
+HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *key) {
+    return ctx_GetItem_s(ctx, obj, key);
+}
+
+HPyAPI_FUNC(int)
+HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value) {
+    return ctx_SetItem_i(ctx, obj, idx, value);
+}
+
+HPyAPI_FUNC(int)
+HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value) {
+    return ctx_SetItem_s(ctx, obj, key, value);
+}
+
+
 #endif /* !HPY_CPYTHON_MISC_H */
