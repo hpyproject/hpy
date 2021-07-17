@@ -107,7 +107,7 @@ typedef struct _HPyContext_s HPyContext;
 #   include "hpy/runtime/ctx_tracker.h"
 #   include "hpy/runtime/ctx_tuple.h"
 #   include "hpy/runtime/ctx_tuplebuilder.h"
-#   include "hpy/cpython/hpy.h"
+#   include "hpy/cpython/misc.h"
 #endif
 
 #endif /* HPy_H */
