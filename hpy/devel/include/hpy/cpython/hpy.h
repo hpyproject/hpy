@@ -1,18 +1,6 @@
 #ifndef HPy_CPYTHON_H
 #define HPy_CPYTHON_H
 
-/* XXX: it would be nice if we could include hpy.h WITHOUT bringing in all the
-   stuff from Python.h, to make sure that people don't use the CPython API by
-   mistake. How to achieve it, though? Is defining Py_LIMITED_API enough? */
-
-/* XXX: should we:
- *    - enforce PY_SSIZE_T_CLEAN in hpy
- *    - make it optional
- *    - make it the default but give a way to disable it?
- */
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-
 #ifdef __GNUC__
 #define HPyAPI_STORAGE __attribute__((unused)) static inline
 #else
@@ -20,7 +8,6 @@
 #endif /* __GNUC__ */
 
 #define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
-#define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
 /* For internal usage only. These should be #undef at the end of this header.
    If you need to convert HPy to PyObject* and vice-versa, you should use
@@ -243,25 +230,6 @@ HPy_AsPyObject(HPyContext *ctx, HPy h)
 #undef _HPy_IMPL_NAME_NOPREFIX
 #undef _HPy_IMPL_NAME
 
-#include "hpy/cpy_types.h"
-
-#include "hpy/macros.h"
-
-#include "hpy/hpyfunc.h"
-#include "hpy/hpydef.h"
-#include "hpy/hpytype.h"
-#include "hpy/hpymodule.h"
-#include "hpy/runtime/ctx_call.h"
-#include "hpy/runtime/ctx_module.h"
-#include "hpy/runtime/ctx_object.h"
-#include "hpy/runtime/ctx_type.h"
-#include "hpy/runtime/ctx_listbuilder.h"
-#include "hpy/runtime/ctx_tracker.h"
-#include "hpy/runtime/ctx_tuple.h"
-#include "hpy/runtime/ctx_tuplebuilder.h"
-
-#include "hpy/runtime/argparse.h"
-#include "hpy/runtime/helpers.h"
 
 HPyAPI_FUNC(HPy)
 HPyModule_Create(HPyContext *ctx, HPyModuleDef *mdef)

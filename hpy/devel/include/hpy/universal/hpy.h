@@ -1,26 +1,6 @@
 #ifndef HPY_UNIVERSAL_H
 #define HPY_UNIVERSAL_H
 
-#define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
-
-/* compatibility CPython types */
-#include "hpy/cpy_types.h"
-
-
-// include runtime functions
-#include "hpy/macros.h"
-
-#include "hpy/hpyfunc.h"
-#include "hpy/hpydef.h"
-#include "hpy/hpytype.h"
-#include "hpy/hpymodule.h"
-
-#include "hpy/runtime/argparse.h"
-#include "hpy/runtime/helpers.h"
-
-#include "autogen_ctx.h"
-#include "autogen_trampolines.h"
-
 /* manual trampolines */
 
 static inline HPy _HPy_New(HPyContext *ctx, HPy h_type, void **data) {

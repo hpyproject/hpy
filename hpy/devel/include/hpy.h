@@ -24,6 +24,7 @@
 #  define _HPy_NO_RETURN
 #endif
 
+#define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
 /* ~~~~~~~~~~~~~~~~ Definition of the type HPy ~~~~~~~~~~~~~~~~ */
 
@@ -80,12 +81,33 @@ typedef struct _HPyContext_s HPyContext;
 #endif
 
 
+/* ~~~~~~~~~~~~~~~~ Additional #includes ~~~~~~~~~~~~~~~~ */
 
+/* compatibility CPython types */
+#include "hpy/cpy_types.h"
+#include "hpy/macros.h"
+#include "hpy/hpyfunc.h"
+#include "hpy/hpydef.h"
+#include "hpy/hpytype.h"
+#include "hpy/hpymodule.h"
+#include "hpy/runtime/argparse.h"
+#include "hpy/runtime/helpers.h"
 
 #ifdef HPY_UNIVERSAL_ABI
-#    include "hpy/universal/hpy.h"
+#   include "hpy/universal/autogen_ctx.h"
+#   include "hpy/universal/autogen_trampolines.h"
+#   include "hpy/universal/hpy.h"
 #else
-#    include "hpy/cpython/hpy.h"
+//  CPython-ABI
+#   include "hpy/runtime/ctx_call.h"
+#   include "hpy/runtime/ctx_module.h"
+#   include "hpy/runtime/ctx_object.h"
+#   include "hpy/runtime/ctx_type.h"
+#   include "hpy/runtime/ctx_listbuilder.h"
+#   include "hpy/runtime/ctx_tracker.h"
+#   include "hpy/runtime/ctx_tuple.h"
+#   include "hpy/runtime/ctx_tuplebuilder.h"
+#   include "hpy/cpython/hpy.h"
 #endif
 
 #endif /* HPy_H */
