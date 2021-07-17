@@ -64,6 +64,8 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 /* ~~~~~~~~~~~~~~~~ Definition of other types ~~~~~~~~~~~~~~~~ */
 
+typedef struct _HPyContext_s HPyContext;
+
 #ifdef HPY_UNIVERSAL_ABI
     typedef intptr_t HPy_ssize_t;
     typedef intptr_t HPy_hash_t;
@@ -76,8 +78,6 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;
 #endif
-
-
 
 
 

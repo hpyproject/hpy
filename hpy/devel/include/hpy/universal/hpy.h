@@ -3,9 +3,6 @@
 
 #define HPyAPI_RUNTIME_FUNC(restype) _HPy_HIDDEN restype
 
-
-typedef struct _HPyContext_s HPyContext;
-
 /* compatibility CPython types */
 #include "hpy/cpy_types.h"
 
