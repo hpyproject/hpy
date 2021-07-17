@@ -10,12 +10,6 @@ typedef struct _HPyContext_s HPyContext;
 #include "hpy/cpy_types.h"
 
 
-// XXX: we need to decide whether these are part of the official API or not,
-// and maybe introduce a better naming convetion. For now, they are needed for
-// ujson
-static inline HPy HPy_FromVoidP(void *p) { return (HPy){(HPy_ssize_t)p}; }
-static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
-
 // include runtime functions
 #include "hpy/macros.h"
 

@@ -55,6 +55,12 @@ typedef struct { intptr_t _i; } HPyTracker;
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(h) ((h)._i == 0)
 
+/* Convenience functions to cast between HPy and void*.  We need to decide
+   whether these are part of the official API or not, and maybe introduce a
+   better naming convetion. For now, they are needed for ujson. */
+static inline HPy HPy_FromVoidP(void *p) { return (HPy){(intptr_t)p}; }
+static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
+
 
 /* ~~~~~~~~~~~~~~~~ Definition of other types ~~~~~~~~~~~~~~~~ */
 

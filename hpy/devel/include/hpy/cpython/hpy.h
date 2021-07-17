@@ -116,13 +116,6 @@ typedef struct _HPyContext_s {
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx;
 
-// XXX: we need to decide whether these are part of the official API or not,
-// and maybe introduce a better naming convetion. For now, they are needed for
-// ujson
-static inline HPy HPy_FromVoidP(void *p) { return (HPy){(intptr_t)p}; }
-static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
-
-
 HPyAPI_FUNC(HPyContext *)
 _HPyGetContext(void) {
     HPyContext *ctx = &_global_ctx;
