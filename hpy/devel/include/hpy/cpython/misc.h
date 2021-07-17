@@ -389,5 +389,9 @@ HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value) {
     return ctx_SetItem_s(ctx, obj, key, value);
 }
 
+HPyAPI_FUNC(HPy)
+HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len) {
+    return ctx_Bytes_FromStringAndSize(ctx, v, len);
+}
 
 #endif /* !HPY_CPYTHON_MISC_H */
