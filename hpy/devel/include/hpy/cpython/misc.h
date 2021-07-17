@@ -1,14 +1,6 @@
 #ifndef HPY_CPYTHON_MISC_H
 #define HPY_CPYTHON_MISC_H
 
-#ifdef __GNUC__
-#define HPyAPI_STORAGE __attribute__((unused)) static inline
-#else
-#define HPyAPI_STORAGE static inline
-#endif /* __GNUC__ */
-
-#define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
-
 /* For internal usage only. These should be #undef at the end of this header.
    If you need to convert HPy to PyObject* and vice-versa, you should use
    HPy_AsPyObject and HPy_FromPyObject.

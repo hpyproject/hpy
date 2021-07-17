@@ -8,9 +8,11 @@
 /* ~~~~~~~~~~~~~~~~ useful macros ~~~~~~~~~~~~~~~~ */
 
 #ifdef __GNUC__
-#define _HPy_HIDDEN  __attribute__((visibility("hidden")))
+#   define _HPy_HIDDEN __attribute__((visibility("hidden")))
+#   define _HPy_UNUSED __attribute__((unused))
 #else
-#define _HPy_HIDDEN
+#   define _HPy_HIDDEN
+#   define _HPy_UNUSED
 #endif /* __GNUC__ */
 
 #if defined(__clang__) || \
@@ -23,6 +25,14 @@
 #else
 #  define _HPy_NO_RETURN
 #endif
+
+#ifdef HPY_UNIVERSAL_ABI
+#   define HPyAPI_STORAGE _HPy_HIDDEN
+#else
+#   define HPyAPI_STORAGE _HPy_UNUSED static inline
+#   define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
+#endif
+
 
 /* ~~~~~~~~~~~~~~~~ Definition of the type HPy ~~~~~~~~~~~~~~~~ */
 

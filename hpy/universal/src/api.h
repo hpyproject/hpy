@@ -3,7 +3,6 @@
 
 #include "hpy.h"
 
-#define HPyAPI_STORAGE _HPy_HIDDEN
 extern struct _HPyContext_s g_universal_ctx;
 
 /* declare alloca() */
