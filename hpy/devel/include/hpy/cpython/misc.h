@@ -1,5 +1,5 @@
-#ifndef HPy_CPYTHON_H
-#define HPy_CPYTHON_H
+#ifndef HPY_CPYTHON_MISC_H
+#define HPY_CPYTHON_MISC_H
 
 #ifdef __GNUC__
 #define HPyAPI_STORAGE __attribute__((unused)) static inline
@@ -377,4 +377,4 @@ HPyTracker_Close(HPyContext *ctx, HPyTracker ht)
     ctx_Tracker_Close(ctx, ht);
 }
 
-#endif /* !HPy_CPYTHON_H */
+#endif /* !HPY_CPYTHON_MISC_H */
