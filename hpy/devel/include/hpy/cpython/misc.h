@@ -394,4 +394,9 @@ HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len) {
     return ctx_Bytes_FromStringAndSize(ctx, v, len);
 }
 
+HPyAPI_FUNC(int)
+HPyErr_Occurred(HPyContext *ctx) {
+    return ctx_Err_Occurred(ctx);
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */
