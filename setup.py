@@ -112,7 +112,7 @@ EXT_MODULES = [
                   '-DHPY_UNIVERSAL_ABI',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
                   '-Wfatal-errors',    # stop after one error (unrelated to warnings)
-                  '-Werror',           # turn warnings into errors
+                  #'-Werror',           # turn warnings into errors
               ] + EXTRA_COMPILE_ARGS
               )
     ]
