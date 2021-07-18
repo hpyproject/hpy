@@ -7,8 +7,6 @@
 #include <Python.h>
 #include "hpy.h"
 
-#include "hpy/hpytype.h" // ?
-
 // ctx_bytes.c
 _HPy_HIDDEN HPy ctx_Bytes_FromStringAndSize(HPyContext *ctx, const char *v,
                                             HPy_ssize_t len);
