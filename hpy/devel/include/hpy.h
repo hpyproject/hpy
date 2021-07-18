@@ -26,12 +26,12 @@
 #  define _HPy_NO_RETURN
 #endif
 
-#ifdef HPY_UNIVERSAL_ABI
-#   define HPyAPI_STORAGE _HPy_HIDDEN
-#else
-#   define HPyAPI_STORAGE _HPy_UNUSED static inline
-#   define HPyAPI_FUNC(restype) HPyAPI_STORAGE restype
-#endif
+/* HPyAPI declarations:
+     * HPyAPI_FUNC is for things like HPy_Add & co.
+     * HPyAPI_IMPL is for things like ctx_Add & co.
+*/
+#define HPyAPI_IMPL _HPy_HIDDEN
+#define HPyAPI_FUNC _HPy_UNUSED static inline
 
 
 /* ~~~~~~~~~~~~~~~~ Definition of the type HPy ~~~~~~~~~~~~~~~~ */

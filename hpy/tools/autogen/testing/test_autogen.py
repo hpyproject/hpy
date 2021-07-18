@@ -145,19 +145,19 @@ class TestAutoGen(BaseTestAutogen):
         """)
         got = cpython_autogen_api_impl_h(api).generate()
         exp = """
-            HPyAPI_STORAGE
+            HPyAPI_FUNC
             HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2)
             {
                 return _py2h(PyNumber_Add(_h2py(h1), _h2py(h2)));
             }
 
-            HPyAPI_STORAGE
+            HPyAPI_FUNC
             HPy HPyLong_FromLong(HPyContext *ctx, long value)
             {
                 return _py2h(PyLong_FromLong(value));
             }
 
-            HPyAPI_STORAGE
+            HPyAPI_FUNC
             char *HPyBytes_AsString(HPyContext *ctx, HPy h)
             {
                 return PyBytes_AsString(_h2py(h));

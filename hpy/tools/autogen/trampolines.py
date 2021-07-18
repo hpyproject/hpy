@@ -58,12 +58,13 @@ class cpython_autogen_api_impl_h(AutoGenFile):
         Return the C signature of the impl function.
 
         In CPython mode, the name it's the same as in public_api:
-           HPy_Add          ==> HPy_Add
-           HPyLong_FromLong ==> HPyLong_FromLong
+           HPy_Add          ==> HPyAPI_FUNC HPy_Add
+           HPyLong_FromLong ==> HPyAPI_FUNC HPyLong_FromLong
 
         See also universal_autogen_ctx_impl_h.
         """
-        return toC(func.node)
+        sig = toC(func.node)
+        return 'HPyAPI_FUNC %s' % sig
 
     def generate(self):
         lines = []
@@ -98,7 +99,7 @@ class cpython_autogen_api_impl_h(AutoGenFile):
             raise ValueError(f"Cannot generate implementation for {self}")
         return_type = toC(func.node.type.type)
         return_stmt = '' if return_type == 'void' else 'return '
-        w('HPyAPI_STORAGE %s' % self.signature(func))
+        w(self.signature(func))
         w('{')
         w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
         w('}')
@@ -113,8 +114,8 @@ class universal_autogen_ctx_impl_h(cpython_autogen_api_impl_h):
         Return the C signature of the impl function.
 
         In Universal mode, the name is prefixed by ctx_:
-           HPy_Add          ==> ctx_Add
-           HPyLong_FromLong ==> ctx_Long_FromLong
+           HPy_Add          ==> HPyAPI_IMPL ctx_Add
+           HPyLong_FromLong ==> HPyAPI_IMPL ctx_Long_FromLong
 
         See also cpython_autogen_api_impl_h.
         """
@@ -122,4 +123,5 @@ class universal_autogen_ctx_impl_h(cpython_autogen_api_impl_h):
         typedecl = find_typedecl(newnode)
         # rename the function
         typedecl.declname = func.ctx_name()
-        return toC(newnode)
+        sig = toC(newnode)
+        return 'HPyAPI_IMPL %s' % sig
