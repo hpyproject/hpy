@@ -22,7 +22,7 @@ class autogen_trampolines_h(AutoGenFile):
         return '\n'.join(lines)
 
     def gen_trampoline(self, func):
-        # static inline HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
+        # HPyAPI_FUNC HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
         if func.name in self.NO_TRAMPOLINES:
@@ -30,7 +30,7 @@ class autogen_trampolines_h(AutoGenFile):
         rettype = toC(func.node.type.type)
         parts = []
         w = parts.append
-        w('static inline')
+        w('HPyAPI_FUNC')
         w(toC(func.node))
         w('{\n    ')
 
