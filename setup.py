@@ -39,8 +39,12 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 if 'HPY_DEBUG' in os.environ:
     # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
     # functions are available to call inside GDB
-    EXTRA_COMPILE_ARGS = ['-g', '-O0', '-UNDEBUG',
-                          '-fkeep-inline-functions']
+    EXTRA_COMPILE_ARGS = [
+        '-g', '-O0', '-UNDEBUG',
+        '-fkeep-inline-functions',
+        #'-Wfatal-errors',    # stop after one error (unrelated to warnings)
+        #'-Werror',           # turn warnings into errors
+    ]
 else:
     EXTRA_COMPILE_ARGS = []
 
@@ -111,8 +115,6 @@ EXT_MODULES = [
               extra_compile_args=[
                   '-DHPY_UNIVERSAL_ABI',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
-                  '-Wfatal-errors',    # stop after one error (unrelated to warnings)
-                  #'-Werror',           # turn warnings into errors
               ] + EXTRA_COMPILE_ARGS
               )
     ]
