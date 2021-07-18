@@ -91,7 +91,6 @@ typedef struct _HPyContext_s HPyContext;
 
 /* ~~~~~~~~~~~~~~~~ Additional #includes ~~~~~~~~~~~~~~~~ */
 
-/* compatibility CPython types */
 #include "hpy/cpy_types.h"
 #include "hpy/macros.h"
 #include "hpy/hpyfunc.h"
