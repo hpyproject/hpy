@@ -212,17 +212,6 @@ HPy_AsPyObject(HPyContext *ctx, HPy h)
     return result;
 }
 
-/* expand impl functions as:
- *     static inline HPyLong_FromLong(...);
- *
- */
-#define _HPy_IMPL_NAME(name) HPy##name
-#define _HPy_IMPL_NAME_NOPREFIX(name) HPy_##name
-#include "hpy/implementation.h"
-#undef _HPy_IMPL_NAME_NOPREFIX
-#undef _HPy_IMPL_NAME
-
-
 HPyAPI_FUNC(HPy)
 HPyModule_Create(HPyContext *ctx, HPyModuleDef *mdef)
 {

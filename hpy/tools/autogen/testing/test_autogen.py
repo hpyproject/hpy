@@ -4,7 +4,8 @@ import py
 import pytest
 from hpy.tools.autogen.parse import HPyAPI
 from hpy.tools.autogen.ctx import autogen_ctx_h, autogen_ctx_def_h
-from hpy.tools.autogen.trampolines import autogen_trampolines_h, autogen_impl_h
+from hpy.tools.autogen.trampolines import (autogen_trampolines_h,
+                                           cpython_autogen_api_impl_h)
 from hpy.tools.autogen.hpyslot import autogen_hpyslot_h
 
 def src_equal(exp, got):
@@ -131,29 +132,29 @@ class TestAutoGen(BaseTestAutogen):
         """
         assert src_equal(got, exp)
 
-    def test_autogen_impl_h(self):
+    def test_cpython_api_impl_h(self):
         api = self.parse("""
             HPy HPy_Dup(HPyContext *ctx, HPy h);
             HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
             HPy HPyLong_FromLong(HPyContext *ctx, long value);
             char* HPyBytes_AsString(HPyContext *ctx, HPy h);
         """)
-        got = autogen_impl_h(api).generate()
+        got = cpython_autogen_api_impl_h(api).generate()
         exp = """
             HPyAPI_STORAGE
-            HPy _HPy_IMPL_NAME_NOPREFIX(Add)(HPyContext *ctx, HPy h1, HPy h2)
+            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2)
             {
                 return _py2h(PyNumber_Add(_h2py(h1), _h2py(h2)));
             }
 
             HPyAPI_STORAGE
-            HPy _HPy_IMPL_NAME(Long_FromLong)(HPyContext *ctx, long value)
+            HPy HPyLong_FromLong(HPyContext *ctx, long value)
             {
                 return _py2h(PyLong_FromLong(value));
             }
 
             HPyAPI_STORAGE
-            char *_HPy_IMPL_NAME(Bytes_AsString)(HPyContext *ctx, HPy h)
+            char *HPyBytes_AsString(HPyContext *ctx, HPy h)
             {
                 return PyBytes_AsString(_h2py(h));
             }
