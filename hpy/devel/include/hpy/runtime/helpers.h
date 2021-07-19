@@ -4,7 +4,7 @@
 #include "hpy.h"
 #include "hpy/hpytype.h"
 
-_HPy_HIDDEN int
+HPyAPI_HELPER int
 HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
                   HPyType_Spec *hpyspec, HPyType_SpecParam *params);
 
