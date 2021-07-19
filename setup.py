@@ -42,6 +42,9 @@ if 'HPY_DEBUG' in os.environ:
     EXTRA_COMPILE_ARGS = [
         '-g', '-O0', '-UNDEBUG',
         '-fkeep-inline-functions',
+        #
+        ## these flags are useful but don't work on all
+        ## platforms/compilers. Uncomment temporarily if you need them.
         #'-Wfatal-errors',    # stop after one error (unrelated to warnings)
         #'-Werror',           # turn warnings into errors
     ]
