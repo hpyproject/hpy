@@ -32,29 +32,30 @@
 
 /**
  * Public API functions which are exposed to the user, e.g.
- * HPy_Add or HPyType_FromSpec. Generally speaking they are thin shims
- * dispatching to the actual implementation:
+ * ``HPy_Add`` or ``HPyType_FromSpec``. Generally speaking they are
+ * thin shims dispatching to the actual implementation:
  *
- * - In CPython-ABI mode they directly call the corresponding Py* or
- *   HPyAPI_IMPL equivalent, e.g. PyObject_Add or ctx_Type_FromSpec.
+ * * In CPython-ABI mode they directly call the corresponding Py* or
+ *   ``HPyAPI_IMPL`` equivalent, e.g. ``PyObject_Add`` or
+ *   ``ctx_Type_FromSpec``.
  *
- * - In Universal-ABI mode, they always resolve to an indirect call
- *   through HPyContext*, i.e. ctx->ctx_Add(...), which on CPython
- *   dispaches to ctx_Add
+ * * In Universal-ABI mode, they always resolve to an indirect call
+ *   through ``HPyContext *``, i.e. ``ctx->ctx_Add(...)``, which on CPython
+ *   dispaches to ``ctx_Add``.
  */
 #define HPyAPI_FUNC   _HPy_UNUSED static inline
 
 /**
- * CPython implementations for HPyAPI_FUNC
+ * CPython implementations for ``HPyAPI_FUNC``
  * functions. Generally speaking, they are put in ctx_*.c files and they are
  * prefixed by ctx\_.
  *
  * Some of these functions are needed by the CPython ABI mode, and by
  * CPython's implementation of hpy.universal: these can be found in
- * hpy/devel/src/runtime/ctx_*.c, e.g. ctx_Type_FromSpec and
- * ctx_Tuple_FromArray.
+ * hpy/devel/src/runtime/ctx_*.c, e.g. ``ctx_Type_FromSpec`` and
+ * ``ctx_Tuple_FromArray``.
  *
- * Some other are used ONLY by hpy.universal and can be found in
+ * Some other are used ONLY by ``hpy.universal`` and can be found in
  * hpy/universal/src/ctx_*.c.
  */
 #define HPyAPI_IMPL   _HPy_HIDDEN
@@ -62,7 +63,7 @@
 /**
  * These functions are part of the public API but **not** of
  * the ABI. They are helpers which are meant to be compiled togeher with every
- * extension. E.g. HPyArg_Parse and HPyHelpers_AddType.
+ * extension. E.g. ``HPyArg_Parse`` and ``HPyHelpers_AddType``.
  */
 #define HPyAPI_HELPER _HPy_HIDDEN
 
