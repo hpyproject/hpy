@@ -52,7 +52,7 @@
  *         return HPy_NULL;
  *     ...
  */
-HPyAPI_RUNTIME_FUNC(int)
+HPyAPI_HELPER int
 HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
                   HPyType_Spec *hpyspec, HPyType_SpecParam *params)
 {

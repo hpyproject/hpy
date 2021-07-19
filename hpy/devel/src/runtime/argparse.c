@@ -405,7 +405,7 @@ parse_item(HPyContext *ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp
  *    The option exists only to support releasing temporary storage used by
  *    future format string codes (e.g. for character strings).
  */
-HPyAPI_RUNTIME_FUNC(int)
+HPyAPI_HELPER int
 HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
 {
     const char *fmt1 = fmt;
@@ -534,7 +534,7 @@ HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, cons
  *     when the `O` format is used. In future other new format string codes
  *     (e.g. for character strings) may also require it.
  */
-HPyAPI_RUNTIME_FUNC(int)
+HPyAPI_HELPER int
 HPyArg_ParseKeywords(HPyContext *ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, HPy kw,
                      const char *fmt, const char *keywords[], ...)
 {

@@ -417,3 +417,17 @@ class TestBasic(HPyTest):
             assert ctx_name.startswith('HPy Debug Mode ABI')
         else:
             assert False, 'unexpected hpy_abi: %s' % hpy_abi
+
+    def test_FromVoidP_AsVoidP(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                void *p = HPy_AsVoidP(arg);
+                HPy h = HPy_FromVoidP(p);
+                return HPy_Dup(ctx, h);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(42) == 42

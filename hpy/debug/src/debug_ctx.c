@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "debug_internal.h"
 #include "autogen_debug_ctx_init.h"
-#include "common/runtime/ctx_tracker.h"
+#include "hpy/runtime/ctx_funcs.h"
 #if defined(_MSC_VER)
 # include <malloc.h>   /* for alloca() */
 #endif
