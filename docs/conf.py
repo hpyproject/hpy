@@ -50,7 +50,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- sphinx_c_autodoc --------------------------------------------------------
 
 c_autodoc_roots = [
-    "../hpy/devel/include/common",
+    "../hpy/devel/include",
     "../hpy/devel/src",
 ]
 
