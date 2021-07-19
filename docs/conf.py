@@ -37,6 +37,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx_c_autodoc",
     "sphinx_c_autodoc.viewcode",
+    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,7 +51,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- sphinx_c_autodoc --------------------------------------------------------
 
 c_autodoc_roots = [
-    "../hpy/devel/include/common",
+    "../hpy/devel/include",
     "../hpy/devel/src",
 ]
 
