@@ -51,6 +51,14 @@ ctx_Field_Load(HPyContext *ctx, HPyField f)
 }
 
 HPyAPI_IMPL void
+ctx_Field_Clear(HPyContext *ctx, HPyField *pf)
+{
+    HPy h = { ._i = pf->_i };
+    Py_XDECREF(_h2py(h));
+    *pf = (HPyField){ ._i = 0 };
+}
+
+HPyAPI_IMPL void
 ctx_FatalError(HPyContext *ctx, const char *message)
 {
     Py_FatalError(message);

@@ -220,5 +220,6 @@ struct _HPyContext_s {
     void (*ctx_Tracker_Close)(HPyContext *ctx, HPyTracker ht);
     HPyField (*ctx_Field_Store)(HPyContext *ctx, HPy h);
     HPy (*ctx_Field_Load)(HPyContext *ctx, HPyField f);
+    void (*ctx_Field_Clear)(HPyContext *ctx, HPyField *pf);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
 };

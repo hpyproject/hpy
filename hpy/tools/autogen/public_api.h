@@ -300,8 +300,6 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
 /* TODO / Open questions:
 
-  - HPyField_Clear()
-
   - what is the semantics w.r.t. overwriting HPyFields? I.e.:
 
         pair->a = HPyField_Store(ctx, h1);
@@ -329,7 +327,7 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 */
 HPyField HPyField_Store(HPyContext *ctx, HPy h);
 HPy HPyField_Load(HPyContext *ctx, HPyField f);
-
+void HPyField_Clear(HPyContext *ctx, HPyField *pf);
 
 /* Debugging helpers */
 void _HPy_Dump(HPyContext *ctx, HPy h);

@@ -209,6 +209,13 @@ HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPyField f)
     return h;
 }
 
+HPyAPI_FUNC void HPyField_Clear(HPyContext *ctx, HPyField *pf)
+{
+    HPy h = { ._i = pf->_i };
+    Py_XDECREF(_h2py(h));
+    *pf = (HPyField){ ._i = 0 };
+}
+
 HPyAPI_FUNC HPy HPy_FromPyObject(HPyContext *ctx, PyObject *obj)
 {
     Py_XINCREF(obj);
