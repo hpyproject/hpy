@@ -194,6 +194,21 @@ HPyAPI_FUNC void HPy_Close(HPyContext *ctx, HPy handle)
     Py_XDECREF(_h2py(handle));
 }
 
+HPyAPI_FUNC HPyField HPyField_Store(HPyContext *ctx, HPy h)
+{
+    PyObject *obj = _h2py(h);
+    Py_INCREF(obj);
+    return (HPyField){ ._i = h._i };
+}
+
+HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPyField f)
+{
+    HPy h = { ._i = f._i };
+    PyObject *obj = _h2py(h);
+    Py_INCREF(obj);
+    return h;
+}
+
 HPyAPI_FUNC HPy HPy_FromPyObject(HPyContext *ctx, PyObject *obj)
 {
     Py_XINCREF(obj);
