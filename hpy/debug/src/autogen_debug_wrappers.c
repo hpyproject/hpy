@@ -612,6 +612,16 @@ void debug_ctx_TupleBuilder_Cancel(HPyContext *dctx, HPyTupleBuilder builder)
     HPyTupleBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
+HPyField debug_ctx_Field_Store(HPyContext *dctx, DHPy h)
+{
+    return HPyField_Store(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+DHPy debug_ctx_Field_Load(HPyContext *dctx, HPyField f)
+{
+    return DHPy_open(dctx, HPyField_Load(get_info(dctx)->uctx, f));
+}
+
 void debug_ctx_Dump(HPyContext *dctx, DHPy h)
 {
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

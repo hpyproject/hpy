@@ -33,6 +33,23 @@ ctx_Dup(HPyContext *ctx, HPy h)
     return _py2h(obj);
 }
 
+HPyAPI_IMPL HPyField
+ctx_Field_Store(HPyContext *ctx, HPy h)
+{
+    PyObject *obj = _h2py(h);
+    Py_INCREF(obj);
+    return (HPyField){ ._i = h._i };
+}
+
+HPyAPI_IMPL HPy
+ctx_Field_Load(HPyContext *ctx, HPyField f)
+{
+    HPy h = { ._i = f._i };
+    PyObject *obj = _h2py(h);
+    Py_INCREF(obj);
+    return h;
+}
+
 HPyAPI_IMPL void
 ctx_FatalError(HPyContext *ctx, const char *message)
 {

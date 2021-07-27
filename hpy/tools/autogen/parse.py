@@ -138,6 +138,8 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
 SPECIAL_CASES = {
     'HPy_Dup': None,
     'HPy_Close': None,
+    'HPyField_Load': None,
+    'HPyField_Store': None,
     'HPyModule_Create': None,
     'HPy_GetAttr': 'PyObject_GetAttr',
     'HPy_GetAttr_s': 'PyObject_GetAttrString',

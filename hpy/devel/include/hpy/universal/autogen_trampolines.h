@@ -518,6 +518,14 @@ HPyAPI_FUNC void HPyTracker_Close(HPyContext *ctx, HPyTracker ht) {
      ctx->ctx_Tracker_Close ( ctx, ht ); 
 }
 
+HPyAPI_FUNC HPyField HPyField_Store(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Field_Store ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPyField f) {
+     return ctx->ctx_Field_Load ( ctx, f ); 
+}
+
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {
      ctx->ctx_Dump ( ctx, h ); 
 }

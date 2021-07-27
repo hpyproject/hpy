@@ -88,6 +88,7 @@
          another HPy among other stuff
  */
 typedef struct _HPy_s { intptr_t _i; } HPy;
+typedef struct { intptr_t _i; } HPyField;
 typedef struct { intptr_t _lst; } HPyListBuilder;
 typedef struct { intptr_t _tup; } HPyTupleBuilder;
 typedef struct { intptr_t _i; } HPyTracker;
