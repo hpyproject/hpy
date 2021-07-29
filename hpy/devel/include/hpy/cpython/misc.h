@@ -1,10 +1,6 @@
 #ifndef HPY_CPYTHON_MISC_H
 #define HPY_CPYTHON_MISC_H
 
-/* For internal usage only. These should be #undef at the end of this header.
-   If you need to convert HPy to PyObject* and vice-versa, you should use
-   HPy_AsPyObject and HPy_FromPyObject.
-*/
 #define _h2py(h) ((PyObject*)h._i)
 #define _py2h(o) ((HPy){(intptr_t)o})
 
