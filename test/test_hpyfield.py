@@ -132,3 +132,29 @@ class TestHPyField(HPyTest):
             assert p2.get_a() is a
             p2.clear_a()
             assert sys.getrefcount(a) == a_refcnt
+
+    def test_tp_traverse(self):
+        import gc
+        mod = self.make_module("""
+            #include <assert.h>
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_get_ab
+
+            HPyDef_SLOT(Pair_traverse, Pair_traverse_impl, HPy_tp_traverse)
+            static int Pair_traverse_impl(HPyContext *ctx, HPy self,
+                                          HPyFunc_visitproc visit, void *arg)
+            {
+                PairObject *p = PairObject_AsStruct(ctx, self);
+                visit(ctx, &p->a, arg); // XXX use HPy_VISIT
+                visit(ctx, &p->b, arg);
+                return 0;
+            }
+
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_get_a, &Pair_get_b, &Pair_traverse)
+            @INIT
+        """)
+        p = mod.Pair("hello", "world")
+        referents = gc.get_referents(p)
+        referents.sort()
+        assert referents == ['hello', 'world']

@@ -37,6 +37,7 @@ typedef enum {
     HPyFunc_GETTER,
     HPyFunc_SETTER,
     HPyFunc_OBJOBJPROC,
+    HPyFunc_TRAVERSEPROC,
 
 } HPyFunc_Signature;
 
@@ -85,6 +86,8 @@ typedef struct {
     HPy_ssize_t *suboffsets;
     void *internal;
 } HPy_buffer;
+
+typedef int (*HPyFunc_visitproc)(HPyContext *, HPyField *, void *);
 
 #include "autogen_hpyfunc_declare.h"
 

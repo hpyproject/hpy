@@ -477,6 +477,17 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
     return tup;
 }
 
+static bool has_tp_traverse(HPyType_Spec *hpyspec)
+{
+    if (hpyspec->defines != NULL)
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *def = hpyspec->defines[i];
+            if (def->kind == HPyDef_Kind_Slot || def->slot.slot == HPy_tp_traverse)
+                return true;
+        }
+    return false;
+}
+
 _HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                   HPyType_SpecParam *params)
@@ -495,6 +506,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     int basicsize;
     HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
+
+    // if we define a tp_traverse, the CPython type must be HAVE_GC
+    if (has_tp_traverse(hpyspec))
+        flags |= Py_TPFLAGS_HAVE_GC;
+
     if (hpyspec->legacy != 0) {
         basicsize = hpyspec->basicsize;
         base_member_offset = 0;
@@ -567,7 +583,15 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
         return HPy_NULL;
     }
 
-    PyObject *result = PyObject_New(PyObject, tp);
+    PyObject *result;
+    if (PyType_IS_GC(tp))
+        // XXX we should call PyObject_GC_Track, but only after the user has
+        // initialized all the HPyField*. Or maybe we could memset the memory
+        // to 0 and call PyObject_GC_Track here?
+        result = PyObject_GC_New(PyObject, tp);
+    else
+        result = PyObject_New(PyObject, tp);
+
     if (!result)
         return HPy_NULL;
 #if PY_VERSION_HEX < 0x03080000

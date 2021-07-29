@@ -148,4 +148,23 @@ typedef struct {
         return; \
     }
 
+
+typedef struct {
+    cpy_PyObject *self;
+    cpy_visitproc visit;
+    void *arg;
+    int result;
+} _HPyFunc_args_TRAVERSEPROC;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_TRAVERSEPROC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg) \
+    { \
+        _HPyFunc_args_TRAVERSEPROC a = { self, visit, arg }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_TRAVERSEPROC, IMPL, &a); \
+        return a.result; \
+    }
+
+
+
 #endif // HPY_UNIVERSAL_HPYFUNC_TRAMPOLINES_H

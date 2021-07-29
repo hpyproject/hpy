@@ -33,6 +33,76 @@ static void _buffer_py2h(HPyContext *ctx, const Py_buffer *src, HPy_buffer *dest
     dest->internal = src->internal;
 }
 
+/* Some explanation about what's going on with tp_traverse.
+
+   From the HPy user point of view, the visitor function passed to tp_traverse
+   takes a ctx and an HPyField*:
+
+       typedef int (*HPyFunc_visitproc)(HPyContext *, HPyField *, void *);
+       ...
+       static int my_traverse_impl(HPyContext *ctx, HPy self,
+                                   HPyFunc_visitproc hpy_visit, void *arg)
+       {
+           MyCustomObject *obj = ...;
+           hpy_visit(&obj->a, arg);  // obj->a is an HPyField
+           hpy_visit(&obj->b, arg);
+           ...
+       }
+
+   However, from the CPython point of view the visitor function passed to
+   tp_traverse takes a PyObject*:
+
+       typedef int (*visitproc)(cpy_PyObject *, void *);
+       static int my_traverse(MyCustomObject *self, visitproc cpy_visit, void *arg)
+       {
+           cpy_visit(self->a, arg);  // self->a is a PyObject*
+           cpy_visit(self->b, arg);
+           ...
+       }
+
+   This is what happens:
+
+   1. CPython calls the trampoline created by _HPyFunc_TRAMPOLINE_TRAVERSEPROC
+      passing a visitor function. Let's call it cpy_visit, and remember that
+      it takes a PyObject*.
+
+   2. The trampoline invokes _HPy_CallRealFunctionFromTrampoline, which
+      ultimately calls call_traverseproc_from_trampoline.
+
+   3. call_traverseproc_from_trampoline invokes the tp_traverse_impl written
+      by the HPy user, passing hpy2cpy_visit as the visitor function.
+
+   4. tp_traverse_impl calls hpy2cpy_visit multiple times, once for every HPyField
+
+   5. hpy2cpy_visit takes an HPyField*, converts it to a PyObject* and invokes
+      the cpy_visit of point (1)
+*/
+
+typedef struct {
+    cpy_visitproc cpy_visit;
+    void *cpy_arg;
+} hpy2cpy_visit_args_t;
+
+static int hpy2cpy_visit(HPyContext *ctx, HPyField *f, void *v_args)
+{
+    hpy2cpy_visit_args_t *args = (hpy2cpy_visit_args_t *)v_args;
+    cpy_visitproc cpy_visit = args->cpy_visit;
+    void *cpy_arg = args->cpy_arg;
+    HPy h = { ._i = f->_i }; // XXX we need _HPyField2HPy
+    PyObject *cpy_obj = _h2py(h);
+    return cpy_visit(cpy_obj, cpy_arg);
+}
+
+static int call_traverseproc_from_trampoline(HPyContext *ctx,
+                                             HPyFunc_traverseproc tp_traverse,
+                                             HPy h_self,
+                                             cpy_visitproc cpy_visit,
+                                             void *cpy_arg)
+{
+    hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
+    return tp_traverse(ctx, h_self, hpy2cpy_visit, &args);
+}
+
 
 HPyAPI_IMPL void
 ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
@@ -105,6 +175,13 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
         f(ctx, _py2h(a->self), &hbuf);
         // XXX: copy back from hbuf?
         HPy_Close(ctx, hbuf.obj);
+        return;
+    }
+    case HPyFunc_TRAVERSEPROC: {
+        HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
+        _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
+        a->result = call_traverseproc_from_trampoline(ctx, f, _py2h(a->self),
+                                                      a->visit, a->arg);
         return;
     }
 #include "autogen_ctx_call.i"

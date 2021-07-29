@@ -17,6 +17,7 @@ typedef int HPyTupleBuilder;
 typedef int HPyTracker;
 typedef int HPy_RichCmpOp;
 typedef int HPy_buffer;
+typedef int HPyFunc_visitproc;
 
 /* HPy public API */
 
@@ -375,6 +376,8 @@ typedef int (*HPyFunc_setter)(HPyContext *ctx, HPy, HPy, void *);
 typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
 typedef int (*HPyFunc_getbufferproc)(HPyContext *ctx, HPy, HPy_buffer *, int);
 typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
+typedef int (*HPyFunc_traverseproc)(HPyContext *ctx, HPy self, HPyFunc_visitproc visit,
+                                    void *arg);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
@@ -444,7 +447,7 @@ typedef enum {
     //HPy_tp_base = SLOT(48, HPyFunc_X),
     //HPy_tp_bases = SLOT(49, HPyFunc_X),
     //HPy_tp_call = SLOT(50, HPyFunc_X),
-    //HPy_tp_clear = SLOT(51, HPyFunc_X),
+    //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
     //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
@@ -464,7 +467,7 @@ typedef enum {
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),
     //HPy_tp_setattro = SLOT(69, HPyFunc_X),
     //HPy_tp_str = SLOT(70, HPyFunc_X),
-    //HPy_tp_traverse = SLOT(71, HPyFunc_X),
+    HPy_tp_traverse = SLOT(71, HPyFunc_TRAVERSEPROC),
     //HPy_tp_members = SLOT(72, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_getset = SLOT(73, HPyFunc_X),     NOT SUPPORTED
     //HPy_tp_free = SLOT(74, HPyFunc_X),       NOT SUPPORTED
