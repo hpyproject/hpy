@@ -38,24 +38,23 @@ ctx_Field_Store(HPyContext *ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
     Py_INCREF(obj);
-    return (HPyField){ ._i = h._i };
+    return _py2hf(obj);
 }
 
 HPyAPI_IMPL HPy
 ctx_Field_Load(HPyContext *ctx, HPyField f)
 {
-    HPy h = { ._i = f._i };
-    PyObject *obj = _h2py(h);
+    PyObject *obj = _hf2py(f);
     Py_INCREF(obj);
-    return h;
+    return _py2h(obj);
 }
 
 HPyAPI_IMPL void
 ctx_Field_Clear(HPyContext *ctx, HPyField *pf)
 {
-    HPy h = { ._i = pf->_i };
-    Py_XDECREF(_h2py(h));
-    *pf = (HPyField){ ._i = 0 };
+    PyObject *obj = _hf2py(*pf);
+    Py_XDECREF(obj);
+    *pf = HPyField_NULL;
 }
 
 HPyAPI_IMPL void

@@ -88,8 +88,7 @@ static int hpy2cpy_visit(HPyContext *ctx, HPyField *f, void *v_args)
     hpy2cpy_visit_args_t *args = (hpy2cpy_visit_args_t *)v_args;
     cpy_visitproc cpy_visit = args->cpy_visit;
     void *cpy_arg = args->cpy_arg;
-    HPy h = { ._i = f->_i }; // XXX we need _HPyField2HPy
-    PyObject *cpy_obj = _h2py(h);
+    PyObject *cpy_obj = _hf2py(*f);
     return cpy_visit(cpy_obj, cpy_arg);
 }
 
