@@ -89,6 +89,21 @@ typedef struct {
 
 typedef int (*HPyFunc_visitproc)(HPyContext *, HPyField *, void *);
 
+/* COPIED AND ADAPTED FROM CPython.
+ * Utility macro to help write tp_traverse functions
+ * To use this macro, the tp_traverse function must name its arguments
+ * "ctx", "visit" and "arg".  This is intended to keep tp_traverse functions
+ * looking as much alike as possible.
+ */
+#define HPy_VISIT(hpyfield)                                             \
+    do {                                                                \
+        int vret = visit(ctx, hpyfield, arg);                           \
+        if (vret)                                                       \
+            return vret;                                                \
+    } while (0)
+
+
+
 #include "autogen_hpyfunc_declare.h"
 
 #ifdef HPY_UNIVERSAL_ABI

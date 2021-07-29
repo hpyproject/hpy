@@ -146,8 +146,8 @@ class TestHPyField(HPyTest):
                                           HPyFunc_visitproc visit, void *arg)
             {
                 PairObject *p = PairObject_AsStruct(ctx, self);
-                visit(ctx, &p->a, arg); // XXX use HPy_VISIT
-                visit(ctx, &p->b, arg);
+                HPy_VISIT(&p->a);
+                HPy_VISIT(&p->b);
                 return 0;
             }
 
