@@ -407,6 +407,28 @@ static int check_legacy_consistent(HPyType_Spec *hpyspec)
     return 0;
 }
 
+static bool has_tp_traverse(HPyType_Spec *hpyspec)
+{
+    if (hpyspec->defines != NULL)
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *def = hpyspec->defines[i];
+            if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse)
+                return true;
+        }
+    return false;
+}
+
+static int check_have_gc_and_tp_traverse(HPyContext *ctx, HPyType_Spec *hpyspec)
+{
+    // if we specify HPy_TPFLAGS_HAVE_GC, we must provide a tp_traverse
+    if (hpyspec->flags & HPy_TPFLAGS_HAVE_GC && !has_tp_traverse(hpyspec)) {
+        HPyErr_SetString(ctx, ctx->h_ValueError,
+                         "You must provide an HPy_tp_traverse slot if you specify "
+                         "HPy_TPFLAGS_HAVE_GC");
+        return -1;
+    }
+    return 0;
+}
 
 static int check_inheritance_constraints(PyTypeObject *tp)
 {
@@ -477,17 +499,6 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
     return tup;
 }
 
-static bool has_tp_traverse(HPyType_Spec *hpyspec)
-{
-    if (hpyspec->defines != NULL)
-        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
-            HPyDef *def = hpyspec->defines[i];
-            if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse)
-                return true;
-        }
-    return false;
-}
-
 _HPy_HIDDEN HPy
 ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                   HPyType_SpecParam *params)
@@ -498,6 +509,10 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     if (check_legacy_consistent(hpyspec) < 0) {
         return HPy_NULL;
     }
+    if (check_have_gc_and_tp_traverse(ctx, hpyspec) < 0) {
+        return HPy_NULL;
+    }
+
     PyType_Spec *spec = PyMem_Calloc(1, sizeof(PyType_Spec));
     if (spec == NULL) {
         PyErr_NoMemory();
@@ -506,10 +521,6 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     int basicsize;
     HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
-
-    // if we define a tp_traverse, the CPython type must be HAVE_GC
-    if (has_tp_traverse(hpyspec))
-        flags |= Py_TPFLAGS_HAVE_GC;
 
     if (hpyspec->legacy != 0) {
         basicsize = hpyspec->basicsize;

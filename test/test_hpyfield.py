@@ -68,6 +68,10 @@ class PairTemplate(DefaultExtensionTemplate):
             }
         """
 
+    pair_type_flags = 'HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_GC'
+    def PAIR_TYPE_FLAGS(self, flags):
+        self.pair_type_flags = flags
+
     def EXPORT_PAIR_TYPE(self, *defines):
         defines += ('NULL',)
         defines = ', '.join(defines)
@@ -77,10 +81,10 @@ class PairTemplate(DefaultExtensionTemplate):
             static HPyType_Spec Pair_spec = {
                 .name = "mytest.Pair",
                 .basicsize = sizeof(PairObject),
+                .flags = %s,
                 .defines = Pair_defines
             };
-        """ % defines
-
+        """ % (defines, self.pair_type_flags)
 
 class TestHPyField(HPyTest):
 
@@ -93,6 +97,7 @@ class TestHPyField(HPyTest):
             @DEFINE_Pair_new
             @DEFINE_Pair_get_ab
 
+            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
             @EXPORT_PAIR_TYPE(&Pair_new, &Pair_get_a, &Pair_get_b)
             @INIT
         """)
@@ -127,6 +132,7 @@ class TestHPyField(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
+            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
             @EXPORT_PAIR_TYPE(&Pair_new, &Pair_get_a, &Pair_get_b, &Pair_clear_a)
             @INIT
         """)
@@ -146,21 +152,6 @@ class TestHPyField(HPyTest):
             p2.clear_a()
             assert sys.getrefcount(a) == a_refcnt
 
-    def test_tp_traverse(self):
-        import gc
-        mod = self.make_module("""
-            @DEFINE_PairObject
-            @DEFINE_Pair_new
-            @DEFINE_Pair_traverse
-
-            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse)
-            @INIT
-        """)
-        p = mod.Pair("hello", "world")
-        referents = gc.get_referents(p)
-        referents.sort()
-        assert referents == ['hello', 'world']
-
     def test_gc_track(self):
         # Test that we correctly call PyObject_GC_Track on CPython. The
         # easiest way is to check whether the object is in
@@ -178,3 +169,50 @@ class TestHPyField(HPyTest):
         """)
         p = mod.Pair("hello", "world")
         assert p in gc.get_objects()
+        assert gc.is_tracked(p)
+
+    def test_gc_track_no_gc_flag(self):
+        # Same code as test_gc_track, but without HPy_TPFLAGS_HAVE_GC. On
+        # CPython, the object is NOT tracked. Again, this is probably a
+        # CPython-specific test.
+        import gc
+        mod = self.make_module("""
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_traverse
+
+            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse)
+            @INIT
+        """)
+        p = mod.Pair("hello", "world")
+        assert p not in gc.get_objects()
+        assert not gc.is_tracked(p)
+
+    def test_tp_traverse(self):
+        import gc
+        mod = self.make_module("""
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_traverse
+
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse)
+            @INIT
+        """)
+        p = mod.Pair("hello", "world")
+        referents = gc.get_referents(p)
+        referents.sort()
+        assert referents == ['hello', 'world']
+
+    def test_tp_traverse_sanity_check(self):
+        import pytest
+        with pytest.raises(ValueError):
+            self.make_module("""
+                @DEFINE_PairObject
+                @DEFINE_Pair_new
+
+                // here we are defining a type with HPy_TPFLAGS_HAVE_GC but
+                // without providing a tp_traverse
+                @EXPORT_PAIR_TYPE(&Pair_new)
+                @INIT
+            """)
