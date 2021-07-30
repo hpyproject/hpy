@@ -592,6 +592,11 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
     else
         result = PyObject_New(PyObject, tp);
 
+    // HPy_New guarantees that the memory is zeroed, but PyObject_{GC}_New
+    // doesn't. But we need to make sure to NOT overwrite ob_refcnt and
+    // ob_type. See test_HPy_New_initialize_to_zero
+    memset(((char*)result + HPyPure_PyObject_HEAD_SIZE), 0, tp->tp_basicsize - HPyPure_PyObject_HEAD_SIZE);
+
     if (!result)
         return HPy_NULL;
 #if PY_VERSION_HEX < 0x03080000
