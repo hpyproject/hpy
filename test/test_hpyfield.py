@@ -38,6 +38,19 @@ class PairTemplate(DefaultExtensionTemplate):
             }
         """
 
+    def DEFINE_Pair_traverse(self):
+        return """
+            HPyDef_SLOT(Pair_traverse, Pair_traverse_impl, HPy_tp_traverse)
+            static int Pair_traverse_impl(HPyContext *ctx, HPy self,
+                                          HPyFunc_visitproc visit, void *arg)
+            {
+                PairObject *p = PairObject_AsStruct(ctx, self);
+                HPy_VISIT(&p->a);
+                HPy_VISIT(&p->b);
+                return 0;
+            }
+        """
+
     def DEFINE_Pair_get_ab(self):
         return """
             HPyDef_METH(Pair_get_a, "get_a", Pair_get_a_impl, HPyFunc_NOARGS)
@@ -136,25 +149,32 @@ class TestHPyField(HPyTest):
     def test_tp_traverse(self):
         import gc
         mod = self.make_module("""
-            #include <assert.h>
             @DEFINE_PairObject
             @DEFINE_Pair_new
-            @DEFINE_Pair_get_ab
+            @DEFINE_Pair_traverse
 
-            HPyDef_SLOT(Pair_traverse, Pair_traverse_impl, HPy_tp_traverse)
-            static int Pair_traverse_impl(HPyContext *ctx, HPy self,
-                                          HPyFunc_visitproc visit, void *arg)
-            {
-                PairObject *p = PairObject_AsStruct(ctx, self);
-                HPy_VISIT(&p->a);
-                HPy_VISIT(&p->b);
-                return 0;
-            }
-
-            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_get_a, &Pair_get_b, &Pair_traverse)
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse)
             @INIT
         """)
         p = mod.Pair("hello", "world")
         referents = gc.get_referents(p)
         referents.sort()
         assert referents == ['hello', 'world']
+
+    def test_gc_track(self):
+        # Test that we correctly call PyObject_GC_Track on CPython. The
+        # easiest way is to check whether the object is in
+        # gc.get_objects(). This test might need to be tweaked and/or disabled
+        # for alternative implementations: after all, it's mostly a test about
+        # the CPython-specific implementation.
+        import gc
+        mod = self.make_module("""
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_traverse
+
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse)
+            @INIT
+        """)
+        p = mod.Pair("hello", "world")
+        assert p in gc.get_objects()

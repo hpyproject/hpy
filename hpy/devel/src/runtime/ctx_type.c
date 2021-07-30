@@ -585,9 +585,6 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
 
     PyObject *result;
     if (PyType_IS_GC(tp))
-        // XXX we should call PyObject_GC_Track, but only after the user has
-        // initialized all the HPyField*. Or maybe we could memset the memory
-        // to 0 and call PyObject_GC_Track here?
         result = PyObject_GC_New(PyObject, tp);
     else
         result = PyObject_New(PyObject, tp);
@@ -597,6 +594,11 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
     // ob_type. See test_HPy_New_initialize_to_zero
     HPy_ssize_t payload_size = tp->tp_basicsize - _HPy_PyObject_HEAD_SIZE;
     memset(_HPy_PyObject_Payload(result), 0, payload_size);
+
+    // NOTE: The CPython docs explicitly ask to call GC_Track when all fields
+    // are initialized, so it's important to do so AFTER zeroing the memory.
+    if (PyType_IS_GC(tp))
+        PyObject_GC_Track(result);
 
     if (!result)
         return HPy_NULL;
