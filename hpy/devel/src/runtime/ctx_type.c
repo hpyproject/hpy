@@ -482,7 +482,7 @@ static bool has_tp_traverse(HPyType_Spec *hpyspec)
     if (hpyspec->defines != NULL)
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *def = hpyspec->defines[i];
-            if (def->kind == HPyDef_Kind_Slot || def->slot.slot == HPy_tp_traverse)
+            if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse)
                 return true;
         }
     return false;
