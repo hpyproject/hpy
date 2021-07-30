@@ -115,7 +115,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
     }
 #include "autogen_ctx_call.i"
     default:
-        abort();  // XXX
+        Py_FatalError("Unsupported HPyFunc_Signature in ctx_meth.c");
     }
 }
 
