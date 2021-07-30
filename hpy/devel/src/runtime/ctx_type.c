@@ -517,11 +517,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         flags &= ~HPy_TPFLAGS_INTERNAL_PURE;
     }
     else {
-        // HPyPure_PyObject_HEAD_SIZE ensures that the custom struct is
+        // _HPy_PyObject_HEAD_SIZE ensures that the custom struct is
         // correctly aligned.
         if (hpyspec->basicsize != 0) {
-            basicsize = hpyspec->basicsize + HPyPure_PyObject_HEAD_SIZE;
-            base_member_offset = HPyPure_PyObject_HEAD_SIZE;
+            basicsize = hpyspec->basicsize + _HPy_PyObject_HEAD_SIZE;
+            base_member_offset = _HPy_PyObject_HEAD_SIZE;
         }
         else {
             // If basicsize is 0, it is inherited from the parent type.
@@ -595,7 +595,8 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
     // HPy_New guarantees that the memory is zeroed, but PyObject_{GC}_New
     // doesn't. But we need to make sure to NOT overwrite ob_refcnt and
     // ob_type. See test_HPy_New_initialize_to_zero
-    memset(((char*)result + HPyPure_PyObject_HEAD_SIZE), 0, tp->tp_basicsize - HPyPure_PyObject_HEAD_SIZE);
+    HPy_ssize_t payload_size = tp->tp_basicsize - _HPy_PyObject_HEAD_SIZE;
+    memset(_HPy_PyObject_Payload(result), 0, payload_size);
 
     if (!result)
         return HPy_NULL;
@@ -608,7 +609,7 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
     if (tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
         // For pure HPy custom types, we return a pointer to only the custom
         // struct data, without the hidden PyObject header.
-        *data = (void*) ((char*) result + HPyPure_PyObject_HEAD_SIZE);
+        *data = _HPy_PyObject_Payload(result);
     }
     else {
         *data = (void*) result;
@@ -633,7 +634,7 @@ ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, H
 _HPy_HIDDEN void*
 ctx_AsStruct(HPyContext *ctx, HPy h)
 {
-    return (void *) ((char *) _h2py(h) + HPyPure_PyObject_HEAD_SIZE);
+    return _HPy_PyObject_Payload(_h2py(h));
 }
 
 _HPy_HIDDEN void*

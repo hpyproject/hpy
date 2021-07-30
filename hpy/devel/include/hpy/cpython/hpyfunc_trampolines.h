@@ -57,7 +57,7 @@
     {                                                                   \
         void *data = (void *) self;                                     \
         if (self->ob_type->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {      \
-            data = ((char *) data) + HPyPure_PyObject_HEAD_SIZE;        \
+            data = _HPy_PyObject_Payload(self);                         \
         }                                                               \
         IMPL(data);                                                     \
         Py_TYPE(self)->tp_free(self);                                   \
