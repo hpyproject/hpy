@@ -8,6 +8,12 @@
 _HPy_HIDDEN PyMethodDef *create_method_defs(HPyDef *hpydefs[],
                                             PyMethodDef *legacy_methods);
 
+_HPy_HIDDEN int call_traverseproc_from_trampoline(HPyContext *ctx,
+                                                  HPyFunc_traverseproc tp_traverse,
+                                                  HPy h_self,
+                                                  cpy_visitproc cpy_visit,
+                                                  void *cpy_arg);
+
 /* The C structs of pure HPy (i.e. non-legacy) custom types do NOT include
  * PyObject_HEAD. So, the CPython implementation of HPy_New must allocate a
  * memory region which is big enough to contain PyObject_HEAD + any eventual

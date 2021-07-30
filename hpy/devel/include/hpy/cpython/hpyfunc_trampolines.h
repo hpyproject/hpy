@@ -87,4 +87,13 @@
         return; \
     }
 
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_TRAVERSEPROC(SYM, IMPL)             \
+    static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg)  \
+    {                                                                   \
+        HPyContext *ctx = _HPyGetContext();                             \
+        return call_traverseproc_from_trampoline(ctx, IMPL, _py2h(self),\
+                                                 visit, arg);           \
+    }
+
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
