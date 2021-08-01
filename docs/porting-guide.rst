@@ -1,15 +1,21 @@
 Porting guide
 =============
 
-Porting ``PyObject *``: ``HPy`` vs ``HPyField``
------------------------------------------------
+Porting ``PyObject *`` to HPy
+-----------------------------
+
+``HPy`` vs ``HPyField``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 The rule of thumb is:
 
   * for local variables, function arguments and return types: use ``HPy``;
 
-  * for struct fields, use ``HPyField``.
+  * for struct fields: use ``HPyField``.
 
+**WARNING**: never use a local variable of type ``HPyField``, for any reason!
+If the GC kicks in, it might become invalid and become a dangling pointer.
 
 The ``HPy``/``HPyField`` dichotomy might seem arbirary at first, but it is
 needed to allow Python implementations to use a moving GC, such as PyPy. It is
@@ -37,20 +43,71 @@ Back to ``HPy`` vs ``HPyField``:
 
   * ``HPyField`` is for long-lived references, and the GC must be aware of
     their location in memory. In PyPy, an ``HPyField`` is implemented as a
-    direct pointer to the object, and since the GC is aware it automatically
-    updates its value upon moving.
+    direct pointer to the object, and thus we need a way to inform the GC
+    where it is in memory, so that it can update its value upon moving: this
+    job is done by ``tp_traverse``, as explained in the next section.
 
   * On CPython, both ``HPy`` and ``HPyField`` are implemented as ``PyObject *``.
 
-**IMPORTANT**: if you write a custom type having ``HPyField``s, you **MUST**
- also write a ``tp_traverse`` slot. Note that this is different than CPython,
- where you need ``tp_traverse`` only under certain conditions. See the next
- section for more details.
+**IMPORTANT**: if you write a custom type having ``HPyField`` s, you **MUST**
+also write a ``tp_traverse`` slot. Note that this is different than the old
+Python/C API, where you need ``tp_traverse`` only under certain
+conditions. See the next section for more details.
 
-``tp_traverse`` and ``Py_TPFLAGS_HAVE_GC``
-------------------------------------------
+``tp_traverse``, ``tp_clear``, ``Py_TPFLAGS_HAVE_GC``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-XXX
+Let's quote the Python/C documentation about `GC support
+<https://docs.python.org/3/c-api/gcsupport.html>`_
+
+  Python’s support for detecting and collecting garbage which involves
+  circular references requires support from object types which are
+  “containers” for other objects which may also be containers. Types which do
+  not store references to other objects, or which only store references to
+  atomic types (such as numbers or strings), do not need to provide any
+  explicit support for garbage collection.
+
+A good rule of thumb is that if your type contains ``PyObject *`` fields, you
+need to:
+
+  1. provide a ``tp_traverse`` slot;
+
+  2. provide a ``tp_clear`` slot;
+
+  3. add the ``Py_TPFLAGS_GC`` to the ``tp_flags``.
+
+
+However, if you know that your ``PyObject *`` fields will contain only
+"atomic" types, you can avoid these steps.
+
+In HPy the rules are slightly different:
+
+  1. if you have a field of type ``HPyField``, you always **MUST** provide a
+     ``tp_traverse``. This is needed so that a moving GC can track the
+     relevant areas of memory;
+
+  2. ``tp_clear`` does not exist. On CPython, ``HPy`` automatically generates
+     one for you, by using ``tp_traverse`` to know which are the fields to
+     clear. Other implementations are free to ignore it, if it's not needed;
+
+  3. ``HPy_TPFLAGS_GC`` is still needed, especially on CPython. If you don't
+     specify it, your type will not be tracked by CPython's GC and thus it
+     might cause memory leaks if it's part of a reference cycle.  However,
+     other implementations are free to ignore the flag and track the objects
+     anyway, if their GC implementation allows it.
+
+
+``tp_dealloc`` and ``Py_DECREF``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Generally speaking, if you have one or more ``PyObject *`` fields in the old
+Python/C, you must provide a ``tp_dealloc`` slot where you ``Py_DECREF`` all
+of them. In HPy this is not needed and will be handled automatically by the
+system.
+
+In particular, when running on top of CPython, HPy will automatically provide
+a ``tp_dealloc`` which decrefs all the fields listed by ``tp_traverse``.
+
 
 
 PyModule_AddObject
