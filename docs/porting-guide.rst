@@ -1,6 +1,58 @@
 Porting guide
 =============
 
+Porting ``PyObject *``: ``HPy`` vs ``HPyField``
+-----------------------------------------------
+
+The rule of thumb is:
+
+  * for local variables, function arguments and return types: use ``HPy``;
+
+  * for struct fields, use ``HPyField``.
+
+
+The ``HPy``/``HPyField`` dichotomy might seem arbirary at first, but it is
+needed to allow Python implementations to use a moving GC, such as PyPy. It is
+easier to explain and understand the rules by thinking at how a moving GC
+interacts with the C code inside an HPy extension.
+
+It is worth remembering that during the collection phase, a moving GC might
+move an existing object to another memory location, and in that case it needs
+to update all the places which store a pointer to it.  It is obvious that in
+order to do so, it needs to *know* where they are. If there is a local C
+variable which is unknown to the GC but contains a pointer to a GC-managed
+object, the variable will point to invalid memory as soon as the object is
+moved.
+
+Back to ``HPy`` vs ``HPyField``:
+
+  * ``HPy`` handles must be used for all C local variables, function arguments
+    and function return values. They are supposed to be short-lived and closed
+    as soon as they are no longer needed. The debug mode will report a
+    long-lived ``HPy`` as a potential memory leak.
+
+  * In PyPy, they are implemented using an indirection: they are indexes
+    inside a big list of GC-managed objects: this big list is tracked by the
+    GC, so when an object move its pointer is correctly updated.
+
+  * ``HPyField`` is for long-lived references, and the GC must be aware of
+    their location in memory. In PyPy, an ``HPyField`` is implemented as a
+    direct pointer to the object, and since the GC is aware it automatically
+    updates its value upon moving.
+
+  * On CPython, both ``HPy`` and ``HPyField`` are implemented as ``PyObject *``.
+
+**IMPORTANT**: if you write a custom type having ``HPyField``s, you **MUST**
+ also write a ``tp_traverse`` slot. Note that this is different than CPython,
+ where you need ``tp_traverse`` only under certain conditions. See the next
+ section for more details.
+
+``tp_traverse`` and ``Py_TPFLAGS_HAVE_GC``
+------------------------------------------
+
+XXX
+
+
 PyModule_AddObject
 ------------------
 
