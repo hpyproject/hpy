@@ -138,7 +138,15 @@ typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext *uctx;
     long current_generation;
-    UHPy uh_on_invalid_handle; // should be an HPyField, when we have it
+
+    // the following should be an HPyField, but it's complicate:
+    // HPyFields should be used only on memory which is known by the GC, which
+    // happens automatically if you use e.g. HPy_New, but currently
+    // HPy_DebugInfo is malloced(). We need either:
+    //   1. a generic HPy_GcMalloc() OR
+    //   2. HPy_{Un}TrackMemory(), so that we can add manually allocated
+    //      memory as a GC root
+    UHPy uh_on_invalid_handle;
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
     DHQueue open_handles;
     DHQueue closed_handles;

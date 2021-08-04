@@ -297,8 +297,35 @@ int HPyTracker_Add(HPyContext *ctx, HPyTracker ht, HPy h);
 void HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht);
 void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
-/* HPyField */
+/* HPyField
 
+   HPyFields should be used ONLY in parts of memory which is known to the GC,
+   e.g. memory allocated by HPy_New:
+
+     - NEVER declare a local variable of type HPyField
+     - NEVER use HPyField on a struct allocated by e.g. malloc()
+
+   **CPython's note**: contrarily than PyObject*, you don't need to manually
+   manage refcounting when using HPyField: if you use HPyField_Store to
+   overwrite an existing value, the old object will be automatically decrefed.
+   This means that you CANNOT use HPyField_Store to write memory which
+   contains uninitialized values, because it would try to decref a dangling
+   pointer.
+
+   Note that HPy_New automatically zeroes the memory it allocates, so
+   everything works well out of the box. In case you are using manually
+   allocated memory, you should initialize the HPyField to HPyField_NULL.
+
+   Note the difference:
+
+     - ``obj->f = HPyField_NULL``: this should be used only to inizialize
+       uninitialized memory. If you use it to overwrite a valid HPyFied, you
+       will cause a memory leak (at least on CPython)
+
+     - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
+       the old value. However, you CANNOT use it if the memory is not
+       initialized.
+*/
 void HPyField_Store(HPyContext *ctx, HPyField *target, HPy h);
 HPy HPyField_Load(HPyContext *ctx, HPyField f);
 
