@@ -622,11 +622,6 @@ DHPy debug_ctx_Field_Load(HPyContext *dctx, HPyField f)
     return DHPy_open(dctx, HPyField_Load(get_info(dctx)->uctx, f));
 }
 
-void debug_ctx_Field_Clear(HPyContext *dctx, HPyField *pf)
-{
-    HPyField_Clear(get_info(dctx)->uctx, pf);
-}
-
 void debug_ctx_Dump(HPyContext *dctx, DHPy h)
 {
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

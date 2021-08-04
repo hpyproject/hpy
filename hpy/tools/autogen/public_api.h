@@ -301,7 +301,6 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
 void HPyField_Store(HPyContext *ctx, HPyField *target, HPy h);
 HPy HPyField_Load(HPyContext *ctx, HPyField f);
-void HPyField_Clear(HPyContext *ctx, HPyField *pf);
 
 /* Debugging helpers */
 void _HPy_Dump(HPyContext *ctx, HPy h);

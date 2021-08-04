@@ -526,10 +526,6 @@ HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPyField f) {
      return ctx->ctx_Field_Load ( ctx, f ); 
 }
 
-HPyAPI_FUNC void HPyField_Clear(HPyContext *ctx, HPyField *pf) {
-     ctx->ctx_Field_Clear ( ctx, pf ); 
-}
-
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {
      ctx->ctx_Dump ( ctx, h ); 
 }

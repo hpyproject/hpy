@@ -140,7 +140,6 @@ SPECIAL_CASES = {
     'HPy_Close': None,
     'HPyField_Load': None,
     'HPyField_Store': None,
-    'HPyField_Clear': None,
     'HPyModule_Create': None,
     'HPy_GetAttr': 'PyObject_GetAttr',
     'HPy_GetAttr_s': 'PyObject_GetAttrString',

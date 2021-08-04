@@ -141,7 +141,6 @@ void debug_ctx_Tracker_ForgetAll(HPyContext *dctx, HPyTracker ht);
 void debug_ctx_Tracker_Close(HPyContext *dctx, HPyTracker ht);
 void debug_ctx_Field_Store(HPyContext *dctx, HPyField *target, DHPy h);
 DHPy debug_ctx_Field_Load(HPyContext *dctx, HPyField f);
-void debug_ctx_Field_Clear(HPyContext *dctx, HPyField *pf);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
@@ -352,6 +351,5 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Tracker_Close = &debug_ctx_Tracker_Close;
     dctx->ctx_Field_Store = &debug_ctx_Field_Store;
     dctx->ctx_Field_Load = &debug_ctx_Field_Load;
-    dctx->ctx_Field_Clear = &debug_ctx_Field_Clear;
     dctx->ctx_Dump = &debug_ctx_Dump;
 }

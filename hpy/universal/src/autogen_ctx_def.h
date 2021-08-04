@@ -146,6 +146,5 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Tracker_Close = &ctx_Tracker_Close,
     .ctx_Field_Store = &ctx_Field_Store,
     .ctx_Field_Load = &ctx_Field_Load,
-    .ctx_Field_Clear = &ctx_Field_Clear,
     .ctx_Dump = &ctx_Dump,
 };
