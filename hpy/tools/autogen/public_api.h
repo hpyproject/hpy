@@ -299,34 +299,7 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
 /* HPyField */
 
-/* TODO / Open questions:
-
-  - what is the semantics w.r.t. overwriting HPyFields? I.e.:
-
-        pair->a = HPyField_Store(ctx, h1);
-        pair->a = HPyField_Store(ctx, h2);
-
-    In this case, we have a leak because nobody is going to DECREF the old
-    pair->a. Option 1 is to declare that you always have to call
-    HPyField_Clear() before, i.e.:
-
-         HPyField_Clear(ctx, pair->a);
-         pair->a = HPyField_Store(ctx, h1);
-
-    This is very similar to the current pattern, i.e.:
-
-         Py_DECREF(pair->a);
-         pair->a = obj1;
-         Py_INCREF(obj1);
-
-    Option 2 is described in issue #9, and requires to do something like this:
-
-        HPyField_Store(ctx, &pair->a, h1);
-
-    So that HPyField_Store can do the DECREF by itself. This is uglier, and
-    also requires to worry about uninitialized memory.
-*/
-HPyField HPyField_Store(HPyContext *ctx, HPy h);
+void HPyField_Store(HPyContext *ctx, HPyField *target, HPy h);
 HPy HPyField_Load(HPyContext *ctx, HPyField f);
 void HPyField_Clear(HPyContext *ctx, HPyField *pf);
 

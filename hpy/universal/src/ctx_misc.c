@@ -33,12 +33,13 @@ ctx_Dup(HPyContext *ctx, HPy h)
     return _py2h(obj);
 }
 
-HPyAPI_IMPL HPyField
-ctx_Field_Store(HPyContext *ctx, HPy h)
+HPyAPI_IMPL void
+ctx_Field_Store(HPyContext *ctx, HPyField *target, HPy h)
 {
     PyObject *obj = _h2py(h);
+    Py_XDECREF(_hf2py(*target));
     Py_INCREF(obj);
-    return _py2hf(obj);
+    *target = _py2hf(obj);
 }
 
 HPyAPI_IMPL HPy
