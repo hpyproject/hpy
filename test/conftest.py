@@ -1,5 +1,5 @@
 import pytest
-from .support import ExtensionCompiler
+from .support import ExtensionCompiler, DefaultExtensionTemplate
 from hpy.debug.pytest import hpy_debug # make it available to all tests
 
 def pytest_addoption(parser):
@@ -17,7 +17,13 @@ def hpy_abi(request):
     return request.param
 
 @pytest.fixture
-def compiler(request, tmpdir, hpy_devel, hpy_abi):
+def ExtensionTemplate():
+    return DefaultExtensionTemplate
+
+
+@pytest.fixture
+def compiler(request, tmpdir, hpy_devel, hpy_abi, ExtensionTemplate):
     compiler_verbose = request.config.getoption('--compiler-v')
     return ExtensionCompiler(tmpdir, hpy_devel, hpy_abi,
-                             compiler_verbose=compiler_verbose)
+                             compiler_verbose=compiler_verbose,
+                             ExtensionTemplate=ExtensionTemplate)
