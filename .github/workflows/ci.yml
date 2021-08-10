@@ -1,0 +1,304 @@
+---
+name: Continuous Integration tests
+
+on: [pull_request]
+
+jobs:
+  main_tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9']   # ['2.7', '3.6', '3.7', '3.8', '3.9', '3.10.0-rc.1', 'pypy-2.7', 'pypy-3.6', 'pypy-3.7-nightly']
+        include:
+          - os: ubuntu-latest
+            python-version: '3.6'
+          - os: ubuntu-latest
+            python-version: '3.7'
+          - os: ubuntu-latest
+            python-version: '3.8'
+          # Failure is expected on 3.10.0 currently
+          # - os: ubuntu-latest
+          #   python-version: '3.10.0-rc.1'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # - template: azure-templates/ccache.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+      # - template: azure-templates/python.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Build
+        run: python -m pip install .
+
+      - name: Run tests
+        run: |
+          python -m pip install pytest pytest-xdist
+          python -m pytest -n auto test/
+
+
+  valgrind:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/ccache.yml
+    # - template: azure-templates/python.yml
+
+      - name: Install/Upgrade system dependencies
+        run: sudo apt update && sudo apt install -y valgrind
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Build
+        run: python -m pip install .
+
+      - name: Run tests
+        run: |
+          python -m pip install pytest pytest-valgrind
+          make valgrind
+
+
+  c_test:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run C tests
+        run: make -C c_test
+
+
+  poc_tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9']
+        include:
+          - os: ubuntu-latest
+            python-version: '3.6'
+          - os: ubuntu-latest
+            python-version: '3.7'
+          - os: ubuntu-latest
+            python-version: '3.8'
+          - os: ubuntu-latest
+            python-version: '3.10.0-rc.1'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # - template: azure-templates/ccache.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+      # - template: azure-templates/python.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=cpython bdist_wheel'
+        run: proof-of-concept/test_pof.sh wheel cpython
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=universal bdist_wheel'
+        run: proof-of-concept/test_pof.sh wheel universal
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=cpython install'
+        run: proof-of-concept/test_pof.sh setup_py_install cpython
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=universal install'
+        run: proof-of-concept/test_pof.sh setup_py_install universal
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=cpython build_ext --inplace'
+        run: proof-of-concept/test_pof.sh setup_py_build_ext_inplace cpython
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=universal build_ext --inplace'
+        run: proof-of-concept/test_pof.sh setup_py_build_ext_inplace universal
+        shell: bash
+
+
+  check_autogen:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/python.yml
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Install dependencies
+        run: |
+          pip install pycparser==2.20
+          pip install py==1.8.0
+          pip install packaging==19.2
+          pip install attrs==19.3.0
+      - name: make autogen
+        run: |
+          make autogen
+          if [ -z "$(git status --porcelain)" ]; then
+              # clean working copy
+              echo "Working copy is clean, everything ok"
+          else
+              # Uncommitted changes
+              echo "ERROR: uncommitted changes after running make autogen"
+              echo "git status"
+              git status
+              echo
+              echo "git diff"
+              git diff
+              exit 1
+          fi
+
+
+  check_py27_compat:
+    name: Check Python2.7 compatibility
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/python.yml
+    #   parameters:
+    #     pythonVersion: "2.7"
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '2.7'
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: check_py27_compat.py
+        run: |
+          python -m pip install pytest pathlib
+          python test/check_py27_compat.py
+
+
+  # cpp_check:
+  #   runs-on: 'ubuntu-latest'
+  #   steps:
+
+  #   # - template: azure-templates/cppcheck.yml
+  #   # - template: azure-templates/python.yml
+
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: '3.x'
+
+  #   - name: Run CppCheck
+  #     run: make cppcheck
+
+
+  infer:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/python.yml
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Install Infer
+        run: |
+          pip install compiledb wheel;
+          VERSION=1.1.0; \
+          curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+          | sudo tar -C /opt -xJ && \
+          echo "##vso[task.prependpath]/opt/infer-linux64-v$VERSION/bin"
+      # TODO: this doesn't work in GHA
+
+      - name: Run Infer
+        run: make infer
+
+
+
+# - uses: actions/cache@v2
+#   if: startsWith(runner.os, 'Linux')
+#   with:
+#     path: ~/.cache/pip
+#     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#     restore-keys: |
+#       ${{ runner.os }}-pip-
+
+# - uses: actions/cache@v2
+#   if: startsWith(runner.os, 'macOS')
+#   with:
+#     path: ~/Library/Caches/pip
+#     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#     restore-keys: |
+#       ${{ runner.os }}-pip-
+
+# - uses: actions/cache@v2
+#   if: startsWith(runner.os, 'Windows')
+#   with:
+#     path: ~\AppData\Local\pip\Cache
+#     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#     restore-keys: |
+#       ${{ runner.os }}-pip-
+
+
+# ============================== or maybe =====================
+
+# - name: Get pip cache dir
+#   id: pip-cache
+#   run: |
+#     echo "::set-output name=dir::$(pip cache dir)"
+
+# - name: pip cache
+#   uses: actions/cache@v2
+#   with:
+#     path: ${{ steps.pip-cache.outputs.dir }}
+#     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+#     restore-keys: |
+#       ${{ runner.os }}-pip-
+
+
+# ===============================================================
+
+      # - name: Cache pip
+      #   uses: actions/cache@v2
+      #   if: startsWith(runner.os, 'Linux')
+      #   with:
+      #     # This path is specific to Ubuntu
+      #     path: ~/.cache/pip
+      #     # Look to see if there is a cache hit for the corresponding requirements file
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-pip-
+      #       ${{ runner.os }}-
