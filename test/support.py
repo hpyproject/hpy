@@ -277,9 +277,7 @@ class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
 
     @pytest.fixture()
-    def initargs(self, compiler, hpy_debug):
-        # compiler and hpy_debug are fixtures defined/imported by conftest.py.
-        # By using hpy_debug we enable leak detection in debug mode
+    def initargs(self, compiler):
         self.compiler = compiler
 
     def make_module(self, main_src, name='mytest', extra_sources=()):

@@ -1,6 +1,6 @@
 import pytest
 from .support import ExtensionCompiler, DefaultExtensionTemplate
-from hpy.debug.pytest import hpy_debug # make it available to all tests
+from hpy.debug.leakdetector import LeakDetector
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -14,7 +14,12 @@ def hpy_devel(request):
 
 @pytest.fixture(params=['cpython', 'universal', 'debug'])
 def hpy_abi(request):
-    return request.param
+    abi = request.param
+    if abi == 'debug':
+        with LeakDetector():
+            yield abi
+    else:
+        yield abi
 
 @pytest.fixture
 def ExtensionTemplate():
