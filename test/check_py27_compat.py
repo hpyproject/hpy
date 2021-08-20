@@ -15,6 +15,10 @@ import traceback
 import py
 
 ROOT = py.path.local(__file__).join('..', '..')
+TEST_DIRS = [ROOT / 'test', ROOT / 'test' / 'debug']
+
+# PyPy does NOT import these files using py2
+PY3_ONLY = ['test_support.py', 'test_handles.py']
 
 def try_import(name):
     try:
@@ -56,13 +60,12 @@ def try_import_tests(dirs):
     failed = 0
     for d in dirs:
         for t in d.listdir('test_*.py'):
-            if t.purebasename == 'test_support':
+            if t.basename in PY3_ONLY:
                 continue
             if not try_import(t):
                 failed += 1
     return failed
 
-TEST_DIRS = [ROOT / 'test', ROOT / 'test' / 'debug']
 
 def main():
     if sys.version_info[:2] != (2, 7):
