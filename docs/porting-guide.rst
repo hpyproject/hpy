@@ -37,7 +37,7 @@ Back to ``HPy`` vs ``HPyField``:
     as soon as they are no longer needed. The debug mode will report a
     long-lived ``HPy`` as a potential memory leak.
 
-  * In PyPy, they are implemented using an indirection: they are indexes
+  * In PyPy and GraalPython, they are implemented using an indirection: they are indexes
     inside a big list of GC-managed objects: this big list is tracked by the
     GC, so when an object move its pointer is correctly updated.
 
