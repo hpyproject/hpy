@@ -78,6 +78,11 @@
  *     `Truth Value Testing <https://docs.python.org/3/library/stdtypes.html#truth>`_
  *     for more information about how Python tests values for truth.
  *
+ * ``s (unicode) [const char*]``
+ *      Convert a Python unicode object to a C string. The lifetime of the C string
+ *      is tied to the underlying Python object (TODO: should be tied to the handle
+ *      instead?).
+ *
  * Options
  * ~~~~~~~
  *
@@ -337,10 +342,36 @@ parse_item(HPyContext *ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp
         break;
     }
 
-    default:
+    case 's': {
+        const char **output = va_arg(*vl, const char **);
+        if (!HPyUnicode_Check(ctx, current_arg)) {
+            set_error(ctx, ctx->h_TypeError, err_fmt, "a str is required");
+            return 0;
+        }
+        HPy_ssize_t size;
+        const char *data = HPyUnicode_AsUTF8AndSize(ctx, current_arg, &size);
+        // loop bounded by size is more robust/paranoid than strlen
+        HPy_ssize_t i;
+        for (i = 0; i < size; ++i) {
+            if (data[i] == '\0') {
+                set_error(ctx, ctx->h_ValueError, err_fmt, "embedded null character");
+                return 0;
+            }
+        }
+        if (data[i] != '\0') {
+            set_error(ctx, ctx->h_ValueError, err_fmt, "missing terminating null character");
+            return 0;
+        }
+        *output = data;
+        break;
+    }
+
+    default: {
         set_error(ctx, ctx->h_SystemError, err_fmt, "unknown arg format code");
         return 0;
     }
+
+    } // switch
 
     return 1;
 }

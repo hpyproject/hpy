@@ -241,6 +241,7 @@ HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len);
 HPy HPyUnicode_FromString(HPyContext *ctx, const char *utf8);
 int HPyUnicode_Check(HPyContext *ctx, HPy h);
 HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h);
+const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
 
 /* listobject.h */
