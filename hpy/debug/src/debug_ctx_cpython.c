@@ -182,10 +182,8 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
     case HPyFunc_TRAVERSEPROC: {
         HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
-        DHPy dh_self = _py2dh(dctx, a->self);
-        a->result = call_traverseproc_from_trampoline(dctx, f, dh_self,
+        a->result = call_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
-        DHPy_close(dctx, dh_self);
         return;
     }
 #include "autogen_debug_ctx_call.i"

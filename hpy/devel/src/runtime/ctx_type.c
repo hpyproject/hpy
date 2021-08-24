@@ -37,6 +37,16 @@ static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name)
     return result;
 }
 
+static void *_pyobj_as_struct(PyObject *obj)
+{
+    if (Py_TYPE(obj)->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
+        return _HPy_PyObject_Payload(obj);
+    }
+    else {
+        return obj;
+    }
+}
+
 static void hpytype_dealloc(PyObject *self)
 {
     /* the tp_dealloc for all the user-defined HPy types */
@@ -44,16 +54,7 @@ static void hpytype_dealloc(PyObject *self)
     HPyType_Extra_t *extra = _HPyType_EXTRA(tp);
 
     if (extra->tp_destroy_impl != NULL) {
-        /* It would be more consistent to call HPy_AsStruct or HPy_AsStructLegacy on
-         * _py2h(self), but HPy_AsStruct calls _h2py(...) which checks whether
-         * the reference count of the object passed is non-zero, which it isn't
-         * at this point because the object is in the process of being destroyed.
-         */
-        void *data = (void *)self;
-        if (tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
-            data = _HPy_PyObject_Payload(self);
-        }
-        extra->tp_destroy_impl(data);
+        extra->tp_destroy_impl(_pyobj_as_struct(self));
     }
     tp->tp_free(self);
 }
@@ -779,7 +780,7 @@ typedef struct {
     void *cpy_arg;
 } hpy2cpy_visit_args_t;
 
-static int hpy2cpy_visit(HPyContext *ctx, HPyField *f, void *v_args)
+static int hpy2cpy_visit(HPyField *f, void *v_args)
 {
     hpy2cpy_visit_args_t *args = (hpy2cpy_visit_args_t *)v_args;
     cpy_visitproc cpy_visit = args->cpy_visit;
@@ -788,12 +789,11 @@ static int hpy2cpy_visit(HPyContext *ctx, HPyField *f, void *v_args)
     return cpy_visit(cpy_obj, cpy_arg);
 }
 
-_HPy_HIDDEN int call_traverseproc_from_trampoline(HPyContext *ctx,
-                                                  HPyFunc_traverseproc tp_traverse,
-                                                  HPy h_self,
+_HPy_HIDDEN int call_traverseproc_from_trampoline(HPyFunc_traverseproc tp_traverse,
+                                                  PyObject *self,
                                                   cpy_visitproc cpy_visit,
                                                   void *cpy_arg)
 {
     hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
-    return tp_traverse(ctx, h_self, hpy2cpy_visit, &args);
+    return tp_traverse(_pyobj_as_struct(self), hpy2cpy_visit, &args);
 }

@@ -8,9 +8,8 @@
 _HPy_HIDDEN PyMethodDef *create_method_defs(HPyDef *hpydefs[],
                                             PyMethodDef *legacy_methods);
 
-_HPy_HIDDEN int call_traverseproc_from_trampoline(HPyContext *ctx,
-                                                  HPyFunc_traverseproc tp_traverse,
-                                                  HPy h_self,
+_HPy_HIDDEN int call_traverseproc_from_trampoline(HPyFunc_traverseproc tp_traverse,
+                                                  PyObject *self,
                                                   cpy_visitproc cpy_visit,
                                                   void *cpy_arg);
 

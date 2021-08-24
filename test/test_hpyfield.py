@@ -41,10 +41,9 @@ class PairTemplate(DefaultExtensionTemplate):
     def DEFINE_Pair_traverse(self):
         return """
             HPyDef_SLOT(Pair_traverse, Pair_traverse_impl, HPy_tp_traverse)
-            static int Pair_traverse_impl(HPyContext *ctx, HPy self,
-                                          HPyFunc_visitproc visit, void *arg)
+            static int Pair_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
             {
-                PairObject *p = PairObject_AsStruct(ctx, self);
+                PairObject *p = (PairObject *)self;
                 HPy_VISIT(&p->a);
                 HPy_VISIT(&p->b);
                 return 0;

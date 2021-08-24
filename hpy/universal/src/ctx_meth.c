@@ -109,7 +109,7 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
     case HPyFunc_TRAVERSEPROC: {
         HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
-        a->result = call_traverseproc_from_trampoline(ctx, f, _py2h(a->self),
+        a->result = call_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
         return;
     }
