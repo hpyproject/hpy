@@ -203,17 +203,18 @@ HPyAPI_FUNC void HPy_Close(HPyContext *ctx, HPy handle)
     Py_XDECREF(_h2py(handle));
 }
 
-HPyAPI_FUNC void HPyField_Store(HPyContext *ctx, HPyField *target, HPy h)
+HPyAPI_FUNC void HPyField_Store(HPyContext *ctx, HPy target_obj,
+                                HPyField *target_field, HPy h)
 {
     PyObject *obj = _h2py(h);
-    Py_XDECREF(_hf2py(*target));
+    Py_XDECREF(_hf2py(*target_field));
     Py_XINCREF(obj);
-    *target = _py2hf(obj);
+    *target_field = _py2hf(obj);
 }
 
-HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPyField f)
+HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPy source_obj, HPyField source_field)
 {
-    PyObject *obj = _hf2py(f);
+    PyObject *obj = _hf2py(source_field);
     Py_INCREF(obj);
     return _py2h(obj);
 }

@@ -32,8 +32,8 @@ class PairTemplate(DefaultExtensionTemplate):
                     return HPy_NULL;
                 PairObject *pair;
                 HPy h_obj = HPy_New(ctx, cls, &pair);
-                HPyField_Store(ctx, &pair->a, a);
-                HPyField_Store(ctx, &pair->b, b);
+                HPyField_Store(ctx, h_obj, &pair->a, a);
+                HPyField_Store(ctx, h_obj, &pair->b, b);
                 return h_obj;
             }
         """
@@ -59,7 +59,7 @@ class PairTemplate(DefaultExtensionTemplate):
                 PairObject *pair = PairObject_AsStruct(ctx, self);
                 if (HPy_IsNull(pair->a))
                     return HPyUnicode_FromString(ctx, "<NULL>");
-                return HPyField_Load(ctx, pair->a);
+                return HPyField_Load(ctx, self, pair->a);
             }
 
             HPyDef_METH(Pair_get_b, "get_b", Pair_get_b_impl, HPyFunc_NOARGS)
@@ -68,7 +68,7 @@ class PairTemplate(DefaultExtensionTemplate):
                 PairObject *pair = PairObject_AsStruct(ctx, self);
                 if (HPy_IsNull(pair->b))
                     return HPyUnicode_FromString(ctx, "<NULL>");
-                return HPyField_Load(ctx, pair->b);
+                return HPyField_Load(ctx, self, pair->b);
             }
         """
 
@@ -130,14 +130,14 @@ class TestHPyField(HPyTest):
             static HPy Pair_set_a_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 PairObject *pair = PairObject_AsStruct(ctx, self);
-                HPyField_Store(ctx, &pair->a, arg);
+                HPyField_Store(ctx, self, &pair->a, arg);
                 return HPy_Dup(ctx, ctx->h_None);
             }
             HPyDef_METH(Pair_clear_a, "clear_a", Pair_clear_a_impl, HPyFunc_NOARGS)
             static HPy Pair_clear_a_impl(HPyContext *ctx, HPy self)
             {
                 PairObject *pair = PairObject_AsStruct(ctx, self);
-                HPyField_Store(ctx, &pair->a, HPy_NULL);
+                HPyField_Store(ctx, self, &pair->a, HPy_NULL);
                 return HPy_Dup(ctx, ctx->h_None);
             }
 

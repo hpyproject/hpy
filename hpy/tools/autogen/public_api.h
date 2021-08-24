@@ -325,9 +325,13 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
      - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
        the old value. However, you CANNOT use it if the memory is not
        initialized.
+
+Note: target_object and source_object are there in case an implementation
+needs to add write and/or read barriers on the objects. They are ignored by
+CPython but e.g. PyPy needs a write barrier.
 */
-void HPyField_Store(HPyContext *ctx, HPyField *target, HPy h);
-HPy HPyField_Load(HPyContext *ctx, HPyField f);
+void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
+HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
 
 /* Debugging helpers */
 void _HPy_Dump(HPyContext *ctx, HPy h);

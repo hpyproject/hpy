@@ -218,7 +218,7 @@ struct _HPyContext_s {
     int (*ctx_Tracker_Add)(HPyContext *ctx, HPyTracker ht, HPy h);
     void (*ctx_Tracker_ForgetAll)(HPyContext *ctx, HPyTracker ht);
     void (*ctx_Tracker_Close)(HPyContext *ctx, HPyTracker ht);
-    void (*ctx_Field_Store)(HPyContext *ctx, HPyField *target, HPy h);
-    HPy (*ctx_Field_Load)(HPyContext *ctx, HPyField f);
+    void (*ctx_Field_Store)(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
+    HPy (*ctx_Field_Load)(HPyContext *ctx, HPy source_object, HPyField source_field);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
 };

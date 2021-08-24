@@ -139,8 +139,8 @@ HPyTracker debug_ctx_Tracker_New(HPyContext *dctx, HPy_ssize_t size);
 int debug_ctx_Tracker_Add(HPyContext *dctx, HPyTracker ht, DHPy h);
 void debug_ctx_Tracker_ForgetAll(HPyContext *dctx, HPyTracker ht);
 void debug_ctx_Tracker_Close(HPyContext *dctx, HPyTracker ht);
-void debug_ctx_Field_Store(HPyContext *dctx, HPyField *target, DHPy h);
-DHPy debug_ctx_Field_Load(HPyContext *dctx, HPyField f);
+void debug_ctx_Field_Store(HPyContext *dctx, DHPy target_object, HPyField *target_field, DHPy h);
+DHPy debug_ctx_Field_Load(HPyContext *dctx, DHPy source_object, HPyField source_field);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
