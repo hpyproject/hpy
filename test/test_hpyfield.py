@@ -188,7 +188,6 @@ class TestHPyField(HPyTest):
             @INIT
         """)
         p = mod.Pair("hello", "world")
-        assert p in gc.get_objects()
         assert gc.is_tracked(p)
 
     def test_gc_track_no_gc_flag(self):
@@ -206,7 +205,6 @@ class TestHPyField(HPyTest):
             @INIT
         """)
         p = mod.Pair("hello", "world")
-        assert p not in gc.get_objects()
         assert not gc.is_tracked(p)
 
     def test_tp_traverse(self):
