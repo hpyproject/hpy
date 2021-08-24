@@ -233,3 +233,26 @@ class TestHPyField(HPyTest):
                 @EXPORT_PAIR_TYPE(&Pair_new)
                 @INIT
             """)
+
+    def test_automatic_tp_dealloc(self):
+        if not self.supports_refcounts():
+            import pytest
+            pytest.skip("CPython only")
+
+        import sys
+        mod = self.make_module("""
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_traverse
+
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse)
+            @INIT
+        """)
+        a = object()
+        b = object()
+        p = mod.Pair(a, b)
+        a_cnt = sys.getrefcount(a)
+        b_cnt = sys.getrefcount(b)
+        del p
+        assert sys.getrefcount(a) == a_cnt - 1
+        assert sys.getrefcount(b) == b_cnt - 1

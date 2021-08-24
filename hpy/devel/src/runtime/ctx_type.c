@@ -15,7 +15,7 @@
    of type HPyType_Extra_t, which we never free for now.  We can access
    it because tp->tp_name points to the "name" field at the end... */
 typedef struct {
-    //void *tp_traverse_impl;
+    HPyFunc_traverseproc tp_traverse_impl;
     HPyFunc_destroyfunc tp_destroy_impl;
     char name[];
 } HPyType_Extra_t;
@@ -47,11 +47,23 @@ static void *_pyobj_as_struct(PyObject *obj)
     }
 }
 
+static int _decref_visitor(HPyField *pf, void *arg)
+{
+    PyObject *old_object = _hf2py(*pf);
+    *pf = HPyField_NULL;
+    Py_XDECREF(old_object);
+    return 0;
+}
+
 static void hpytype_dealloc(PyObject *self)
 {
     /* the tp_dealloc for all the user-defined HPy types */
     PyTypeObject *tp = Py_TYPE(self);
     HPyType_Extra_t *extra = _HPyType_EXTRA(tp);
+
+    if (extra->tp_traverse_impl != NULL) {
+        extra->tp_traverse_impl(_pyobj_as_struct(self), _decref_visitor, NULL);
+    }
 
     if (extra->tp_destroy_impl != NULL) {
         extra->tp_destroy_impl(_pyobj_as_struct(self));
@@ -80,6 +92,12 @@ is_bf_slot(HPyDef *def)
 {
     return def->kind == HPyDef_Kind_Slot && (
         def->slot.slot == HPy_bf_getbuffer || def->slot.slot == HPy_bf_releasebuffer);
+}
+
+static inline bool
+is_traverse_slot(HPyDef *def)
+{
+    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse;
 }
 
 static inline bool
@@ -323,7 +341,11 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
                 continue;
             if (is_destroy_slot(src)) {
                 extra->tp_destroy_impl = (HPyFunc_destroyfunc)src->slot.impl;
-                continue;
+                continue;   /* we don't have a trampoline for tp_destroy */
+            }
+            if (is_traverse_slot(src)) {
+                extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
+                /* no 'continue' here: we have a trampoline too */
             }
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
