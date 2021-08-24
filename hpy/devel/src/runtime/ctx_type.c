@@ -57,6 +57,9 @@ static void hpytype_dealloc(PyObject *self)
         extra->tp_destroy_impl(_pyobj_as_struct(self));
     }
     tp->tp_free(self);
+
+    assert(tp->tp_flags & Py_TPFLAGS_HEAPTYPE);
+    Py_DECREF(tp);
 }
 
 
