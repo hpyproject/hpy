@@ -126,7 +126,6 @@ DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name);
 DHPy debug_ctx_FromPyObject(HPyContext *dctx, cpy_PyObject *obj);
 cpy_PyObject *debug_ctx_AsPyObject(HPyContext *dctx, DHPy h);
 void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx, HPyFunc_Signature sig, void *func, void *args);
-void debug_ctx_CallDestroyAndThenDealloc(HPyContext *dctx, void *func, cpy_PyObject *self);
 HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);
 void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder builder);
@@ -336,7 +335,6 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_FromPyObject = &debug_ctx_FromPyObject;
     dctx->ctx_AsPyObject = &debug_ctx_AsPyObject;
     dctx->ctx_CallRealFunctionFromTrampoline = &debug_ctx_CallRealFunctionFromTrampoline;
-    dctx->ctx_CallDestroyAndThenDealloc = &debug_ctx_CallDestroyAndThenDealloc;
     dctx->ctx_ListBuilder_New = &debug_ctx_ListBuilder_New;
     dctx->ctx_ListBuilder_Set = &debug_ctx_ListBuilder_Set;
     dctx->ctx_ListBuilder_Build = &debug_ctx_ListBuilder_Build;

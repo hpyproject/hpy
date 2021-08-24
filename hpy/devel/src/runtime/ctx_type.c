@@ -9,6 +9,56 @@
 #  include "handles.h"
 #endif
 
+
+/* This is a hack: we need some extra space to store random data on the
+   type objects created by HPyType_FromSpec().  We allocate a structure
+   of type HPyType_Extra_t, which we never free for now.  We can access
+   it because tp->tp_name points to the "name" field at the end... */
+typedef struct {
+    //void *tp_traverse_impl;
+    HPyFunc_destroyfunc tp_destroy_impl;
+    char name[];
+} HPyType_Extra_t;
+
+static inline HPyType_Extra_t *_HPyType_EXTRA(PyTypeObject *tp) {
+    return (HPyType_Extra_t *)(tp->tp_name - offsetof(HPyType_Extra_t, name));
+}
+
+static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name)
+{
+    size_t size = offsetof(HPyType_Extra_t, name) + strlen(name) + 1;
+    HPyType_Extra_t *result = PyMem_Calloc(1, size);
+    if (result == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    strcpy(result->name, name);
+    /* XXX the returned struct is never freed */
+    return result;
+}
+
+static void hpytype_dealloc(PyObject *self)
+{
+    /* the tp_dealloc for all the user-defined HPy types */
+    PyTypeObject *tp = Py_TYPE(self);
+    HPyType_Extra_t *extra = _HPyType_EXTRA(tp);
+
+    if (extra->tp_destroy_impl != NULL) {
+        /* It would be more consistent to call HPy_AsStruct or HPy_AsStructLegacy on
+         * _py2h(self), but HPy_AsStruct calls _h2py(...) which checks whether
+         * the reference count of the object passed is non-zero, which it isn't
+         * at this point because the object is in the process of being destroyed.
+         */
+        void *data = (void *)self;
+        if (tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
+            data = _HPy_PyObject_Payload(self);
+        }
+        extra->tp_destroy_impl(data);
+    }
+    tp->tp_free(self);
+}
+
+
 static int
 sig2flags(HPyFunc_Signature sig)
 {
@@ -21,11 +71,17 @@ sig2flags(HPyFunc_Signature sig)
     }
 }
 
-static inline int
-is_bf_slot(HPyDef* def)
+static inline bool
+is_bf_slot(HPyDef *def)
 {
     return def->kind == HPyDef_Kind_Slot && (
         def->slot.slot == HPy_bf_getbuffer || def->slot.slot == HPy_bf_releasebuffer);
+}
+
+static inline bool
+is_destroy_slot(HPyDef *def)
+{
+    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_destroy;
 }
 
 static HPy_ssize_t
@@ -35,7 +91,7 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     if (defs == NULL)
         return res;
     for(int i=0; defs[i] != NULL; i++)
-        if (defs[i]->kind == kind && !is_bf_slot(defs[i]))
+        if (defs[i]->kind == kind && !is_bf_slot(defs[i]) && !is_destroy_slot(defs[i]))
             res++;
     return res;
 }
@@ -226,7 +282,8 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
 }
 
 static PyType_Slot *
-create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
+create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
+                 HPyType_Extra_t *extra)
 {
     HPy_ssize_t hpyslot_count = HPyDef_count(hpyspec->defines, HPyDef_Kind_Slot);
     // add the legacy slots
@@ -238,9 +295,12 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
 
-    // add slots to hold Py_tp_doc, Py_tp_methods, Py_tp_members, Py_tp_getset
-    hpyslot_count += 3;
-    if (hpyspec->doc != NULL) hpyslot_count++;
+    if (hpyspec->doc != NULL)
+        hpyslot_count++;    // Py_tp_doc
+    hpyslot_count++;        // Py_tp_methods
+    hpyslot_count++;        // Py_tp_members
+    hpyslot_count++;        // Py_tp_getset
+    hpyslot_count++;        // Py_tp_dealloc
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -257,6 +317,10 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
             HPyDef *src = hpyspec->defines[i];
             if (src->kind != HPyDef_Kind_Slot || is_bf_slot(src))
                 continue;
+            if (is_destroy_slot(src)) {
+                extra->tp_destroy_impl = (HPyFunc_destroyfunc)src->slot.impl;
+                continue;
+            }
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
             dst->pfunc = src->slot.cpy_trampoline;
@@ -307,6 +371,9 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset)
         return NULL;
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
+
+    // add a dealloc function
+    result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
@@ -543,11 +610,16 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         }
         flags |= HPy_TPFLAGS_INTERNAL_PURE;
     }
-    spec->name = hpyspec->name;
+    HPyType_Extra_t *extra = _HPyType_Extra_Alloc(hpyspec->name);
+    if (extra == NULL) {
+        PyMem_Free(spec);
+        return HPy_NULL;
+    }
+    spec->name = extra->name;
     spec->basicsize = basicsize;
     spec->flags = flags;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec, base_member_offset);
+    spec->slots = create_slot_defs(hpyspec, base_member_offset, extra);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
@@ -725,4 +797,3 @@ _HPy_HIDDEN int call_traverseproc_from_trampoline(HPyContext *ctx,
     hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
     return tp_traverse(ctx, h_self, hpy2cpy_visit, &args);
 }
-

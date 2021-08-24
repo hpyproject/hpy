@@ -466,10 +466,6 @@ HPyAPI_FUNC void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Si
      ctx->ctx_CallRealFunctionFromTrampoline ( ctx, sig, func, args ); 
 }
 
-HPyAPI_FUNC void _HPy_CallDestroyAndThenDealloc(HPyContext *ctx, void *func, cpy_PyObject *self) {
-     ctx->ctx_CallDestroyAndThenDealloc ( ctx, func, self ); 
-}
-
 HPyAPI_FUNC HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size) {
      return ctx->ctx_ListBuilder_New ( ctx, initial_size ); 
 }

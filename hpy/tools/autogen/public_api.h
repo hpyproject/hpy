@@ -271,9 +271,6 @@ void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
                                          HPyFunc_Signature sig,
                                          void *func,
                                          void *args);
-void _HPy_CallDestroyAndThenDealloc(HPyContext *ctx,
-                                    void *func,
-                                    cpy_PyObject *self);
 
 
 /* Builders */

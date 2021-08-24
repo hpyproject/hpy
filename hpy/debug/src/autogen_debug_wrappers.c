@@ -567,11 +567,6 @@ cpy_PyObject *debug_ctx_AsPyObject(HPyContext *dctx, DHPy h)
     return HPy_AsPyObject(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-void debug_ctx_CallDestroyAndThenDealloc(HPyContext *dctx, void *func, cpy_PyObject *self)
-{
-    _HPy_CallDestroyAndThenDealloc(get_info(dctx)->uctx, func, self);
-}
-
 HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size)
 {
     return HPyListBuilder_New(get_info(dctx)->uctx, initial_size);
