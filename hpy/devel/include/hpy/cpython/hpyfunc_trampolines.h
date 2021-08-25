@@ -55,7 +55,7 @@
    Instead, it is called from our own tp_dealloc: see also
    hpytype_dealloc(). */
 #define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
-    static void *const SYM = NULL;
+    static void SYM(void) { abort(); }
 
 /* this needs to be written manually because HPy has a different type for
    "op": HPy_RichCmpOp instead of int */
