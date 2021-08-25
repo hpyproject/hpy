@@ -64,6 +64,9 @@ typedef struct {
 */
 #define HPy_TPFLAGS_INTERNAL_PURE (1UL << 8)
 
+#define HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE (1UL << 7)
+
+
 /* Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)
 

@@ -21,6 +21,7 @@ typedef struct {
 } HPyType_Extra_t;
 
 static inline HPyType_Extra_t *_HPyType_EXTRA(PyTypeObject *tp) {
+    assert(tp->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE);
     return (HPyType_Extra_t *)(tp->tp_name - offsetof(HPyType_Extra_t, name));
 }
 
@@ -55,18 +56,27 @@ static int _decref_visitor(HPyField *pf, void *arg)
     return 0;
 }
 
+/* this is a generic tp_dealloc which we use for all the user-defined HPy
+   types created by HPyType_FromSpec */
 static void hpytype_dealloc(PyObject *self)
 {
-    /* the tp_dealloc for all the user-defined HPy types */
     PyTypeObject *tp = Py_TYPE(self);
-    HPyType_Extra_t *extra = _HPyType_EXTRA(tp);
 
-    if (extra->tp_traverse_impl != NULL) {
-        extra->tp_traverse_impl(_pyobj_as_struct(self), _decref_visitor, NULL);
-    }
+    // call tp_destroy and tp_traverse on all the HPy types of the hierarchy
+    PyTypeObject *base = tp;
+    while(base) {
+        if (base->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE) {
+            HPyType_Extra_t *extra = _HPyType_EXTRA(base);
+            assert(extra != NULL);
+            if (extra->tp_traverse_impl != NULL) {
+                extra->tp_traverse_impl(_pyobj_as_struct(self), _decref_visitor, NULL);
+            }
 
-    if (extra->tp_destroy_impl != NULL) {
-        extra->tp_destroy_impl(_pyobj_as_struct(self));
+            if (extra->tp_destroy_impl != NULL) {
+                extra->tp_destroy_impl(_pyobj_as_struct(self));
+            }
+        }
+        base = base->tp_base;
     }
     tp->tp_free(self);
 
@@ -643,7 +653,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     }
     spec->name = extra->name;
     spec->basicsize = basicsize;
-    spec->flags = flags;
+    spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
     spec->itemsize = hpyspec->itemsize;
     spec->slots = create_slot_defs(hpyspec, base_member_offset, extra);
     if (spec->slots == NULL) {
