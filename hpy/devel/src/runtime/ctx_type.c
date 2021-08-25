@@ -9,6 +9,8 @@
 #  include "handles.h"
 #endif
 
+static bool has_tp_traverse(HPyType_Spec *hpyspec);
+
 
 /* This is a hack: we need some extra space to store random data on the
    type objects created by HPyType_FromSpec().  We allocate a structure
@@ -56,13 +58,10 @@ static int _decref_visitor(HPyField *pf, void *arg)
     return 0;
 }
 
-/* this is a generic tp_dealloc which we use for all the user-defined HPy
-   types created by HPyType_FromSpec */
-static void hpytype_dealloc(PyObject *self)
+static void hpytype_clear(PyObject *self)
 {
+    // call tp_traverse on all the HPy types of the hierarchy
     PyTypeObject *tp = Py_TYPE(self);
-
-    // call tp_destroy and tp_traverse on all the HPy types of the hierarchy
     PyTypeObject *base = tp;
     while(base) {
         if (base->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE) {
@@ -71,15 +70,36 @@ static void hpytype_dealloc(PyObject *self)
             if (extra->tp_traverse_impl != NULL) {
                 extra->tp_traverse_impl(_pyobj_as_struct(self), _decref_visitor, NULL);
             }
+        }
+        base = base->tp_base;
+    }
+}
 
+/* this is a generic tp_dealloc which we use for all the user-defined HPy
+   types created by HPyType_FromSpec */
+static void hpytype_dealloc(PyObject *self)
+{
+    // decref and clear all the HPyFields
+    hpytype_clear(self);
+
+    // call tp_destroy on all the HPy types of the hierarchy
+    PyTypeObject *tp = Py_TYPE(self);
+    PyTypeObject *base = tp;
+    while(base) {
+        if (base->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE) {
+            HPyType_Extra_t *extra = _HPyType_EXTRA(base);
+            assert(extra != NULL);
             if (extra->tp_destroy_impl != NULL) {
                 extra->tp_destroy_impl(_pyobj_as_struct(self));
             }
         }
         base = base->tp_base;
     }
+
+    // deallocate
     tp->tp_free(self);
 
+    // decref the type
     assert(tp->tp_flags & Py_TPFLAGS_HEAPTYPE);
     Py_DECREF(tp);
 }
@@ -333,6 +353,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     hpyslot_count++;        // Py_tp_members
     hpyslot_count++;        // Py_tp_getset
     hpyslot_count++;        // Py_tp_dealloc
+    if (has_tp_traverse(hpyspec))
+        hpyslot_count++;    // Py_tp_clear
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -410,6 +432,11 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
 
     // add a dealloc function
     result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
+
+    // add a tp_clear, if the user provided a tp_traverse
+    if (has_tp_traverse(hpyspec)) {
+        result[dst_idx++] = (PyType_Slot){Py_tp_clear, hpytype_clear};
+    }
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};

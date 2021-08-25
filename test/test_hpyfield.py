@@ -256,3 +256,46 @@ class TestHPyField(HPyTest):
         del p
         assert sys.getrefcount(a) == a_cnt - 1
         assert sys.getrefcount(b) == b_cnt - 1
+
+    def test_automatic_tp_clear(self):
+        if not self.supports_refcounts():
+            import pytest
+            pytest.skip("CPython only")
+
+        import sys
+        import gc
+        mod = self.make_module("""
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_traverse
+
+            HPyDef_METH(Pair_set_a, "set_a", Pair_set_a_impl, HPyFunc_O)
+            static HPy Pair_set_a_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                PairObject *pair = PairObject_AsStruct(ctx, self);
+                HPyField_Store(ctx, self, &pair->a, arg);
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse, &Pair_set_a)
+            @INIT
+        """)
+        def count_pairs():
+            return len([obj for obj in gc.get_objects() if type(obj) is mod.Pair])
+        assert count_pairs() == 0
+        p1 = mod.Pair(None, 'hello')
+        p2 = mod.Pair(None, 'world')
+        p1.set_a(p2)
+        p2.set_a(p1)
+        assert count_pairs() == 2
+        #
+        try:
+            gc.disable()
+            del p1
+            del p2
+            assert count_pairs() == 2
+        finally:
+            gc.enable()
+        #
+        gc.collect()
+        assert count_pairs() == 0
