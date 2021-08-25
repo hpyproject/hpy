@@ -315,8 +315,8 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
    Note the difference:
 
-     - ``obj->f = HPyField_NULL``: this should be used only to inizialize
-       uninitialized memory. If you use it to overwrite a valid HPyFied, you
+     - ``obj->f = HPyField_NULL``: this should be used only to initialize
+       uninitialized memory. If you use it to overwrite a valid HPyField, you
        will cause a memory leak (at least on CPython)
 
      - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
