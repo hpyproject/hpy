@@ -94,11 +94,12 @@ class TestHPyField(HPyTest):
     ExtensionTemplate = PairTemplate
 
     def test_gc_track(self):
+        if not self.supports_refcounts():
+            import pytest
+            pytest.skip("CPython only")
         # Test that we correctly call PyObject_GC_Track on CPython. The
         # easiest way is to check whether the object is in
-        # gc.get_objects(). This test might need to be tweaked and/or disabled
-        # for alternative implementations: after all, it's mostly a test about
-        # the CPython-specific implementation.
+        # gc.get_objects().
         import gc
         mod = self.make_module("""
             @DEFINE_PairObject
@@ -112,9 +113,11 @@ class TestHPyField(HPyTest):
         assert gc.is_tracked(p)
 
     def test_gc_track_no_gc_flag(self):
+        if not self.supports_refcounts():
+            import pytest
+            pytest.skip("CPython only")
         # Same code as test_gc_track, but without HPy_TPFLAGS_HAVE_GC. On
-        # CPython, the object is NOT tracked. Again, this is probably a
-        # CPython-specific test.
+        # CPython, the object is NOT tracked.
         import gc
         mod = self.make_module("""
             @DEFINE_PairObject
