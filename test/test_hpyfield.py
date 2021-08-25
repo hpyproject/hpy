@@ -93,84 +93,6 @@ class TestHPyField(HPyTest):
 
     ExtensionTemplate = PairTemplate
 
-    def test_store_load(self):
-        import sys
-        mod = self.make_module("""
-            @DEFINE_PairObject
-            @DEFINE_Pair_new
-            @DEFINE_Pair_get_ab
-
-            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
-            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_get_a, &Pair_get_b)
-            @INIT
-        """)
-        p = mod.Pair("hello", "world")
-        assert p.get_a() == 'hello'
-        assert p.get_b() == 'world'
-        #
-        # check the refcnt
-        if self.supports_refcounts():
-            a = object()
-            a_refcnt = sys.getrefcount(a)
-            p2 = mod.Pair(a, None)
-            assert sys.getrefcount(a) == a_refcnt + 1
-            assert p2.get_a() is a
-            assert sys.getrefcount(a) == a_refcnt + 1
-
-    def test_store_overwrite(self):
-        import sys
-        mod = self.make_module("""
-            #include <assert.h>
-            @DEFINE_PairObject
-            @DEFINE_Pair_new
-            @DEFINE_Pair_get_ab
-
-            HPyDef_METH(Pair_set_a, "set_a", Pair_set_a_impl, HPyFunc_O)
-            static HPy Pair_set_a_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                PairObject *pair = PairObject_AsStruct(ctx, self);
-                HPyField_Store(ctx, self, &pair->a, arg);
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            HPyDef_METH(Pair_clear_a, "clear_a", Pair_clear_a_impl, HPyFunc_NOARGS)
-            static HPy Pair_clear_a_impl(HPyContext *ctx, HPy self)
-            {
-                PairObject *pair = PairObject_AsStruct(ctx, self);
-                HPyField_Store(ctx, self, &pair->a, HPy_NULL);
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-
-            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
-            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_get_a, &Pair_get_b, &Pair_set_a, &Pair_clear_a)
-            @INIT
-        """)
-        p = mod.Pair("hello", "world")
-        assert p.get_a() == 'hello'
-        assert p.get_b() == 'world'
-        p.set_a('foo')
-        assert p.get_a() == 'foo'
-        p.clear_a()
-        assert p.get_a() == '<NULL>'
-        p.set_a('bar')
-        assert p.get_a() == 'bar'
-        #
-        # check the refcnt
-        if self.supports_refcounts():
-            a = object()
-            a_refcnt = sys.getrefcount(a)
-            p2 = mod.Pair(a, None)
-            assert sys.getrefcount(a) == a_refcnt + 1
-            assert p2.get_a() is a
-            p2.set_a('foo')
-            assert sys.getrefcount(a) == a_refcnt
-            p2.set_a(a)
-            assert sys.getrefcount(a) == a_refcnt + 1
-            p2.clear_a()
-            assert sys.getrefcount(a) == a_refcnt
-            p2.clear_a()
-            assert sys.getrefcount(a) == a_refcnt
-
-
     def test_gc_track(self):
         # Test that we correctly call PyObject_GC_Track on CPython. The
         # easiest way is to check whether the object is in
@@ -233,6 +155,85 @@ class TestHPyField(HPyTest):
                 @EXPORT_PAIR_TYPE(&Pair_new)
                 @INIT
             """)
+
+    def test_store_load(self):
+        import sys
+        mod = self.make_module("""
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_get_ab
+            @DEFINE_Pair_traverse
+
+            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse, &Pair_get_a, &Pair_get_b)
+            @INIT
+        """)
+        p = mod.Pair("hello", "world")
+        assert p.get_a() == 'hello'
+        assert p.get_b() == 'world'
+        #
+        # check the refcnt
+        if self.supports_refcounts():
+            a = object()
+            a_refcnt = sys.getrefcount(a)
+            p2 = mod.Pair(a, None)
+            assert sys.getrefcount(a) == a_refcnt + 1
+            assert p2.get_a() is a
+            assert sys.getrefcount(a) == a_refcnt + 1
+
+    def test_store_overwrite(self):
+        import sys
+        mod = self.make_module("""
+            #include <assert.h>
+            @DEFINE_PairObject
+            @DEFINE_Pair_new
+            @DEFINE_Pair_get_ab
+            @DEFINE_Pair_traverse
+
+            HPyDef_METH(Pair_set_a, "set_a", Pair_set_a_impl, HPyFunc_O)
+            static HPy Pair_set_a_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                PairObject *pair = PairObject_AsStruct(ctx, self);
+                HPyField_Store(ctx, self, &pair->a, arg);
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            HPyDef_METH(Pair_clear_a, "clear_a", Pair_clear_a_impl, HPyFunc_NOARGS)
+            static HPy Pair_clear_a_impl(HPyContext *ctx, HPy self)
+            {
+                PairObject *pair = PairObject_AsStruct(ctx, self);
+                HPyField_Store(ctx, self, &pair->a, HPy_NULL);
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @PAIR_TYPE_FLAGS(HPy_TPFLAGS_DEFAULT)
+            @EXPORT_PAIR_TYPE(&Pair_new, &Pair_traverse, &Pair_get_a, &Pair_get_b, &Pair_set_a, &Pair_clear_a)
+            @INIT
+        """)
+        p = mod.Pair("hello", "world")
+        assert p.get_a() == 'hello'
+        assert p.get_b() == 'world'
+        p.set_a('foo')
+        assert p.get_a() == 'foo'
+        p.clear_a()
+        assert p.get_a() == '<NULL>'
+        p.set_a('bar')
+        assert p.get_a() == 'bar'
+        #
+        # check the refcnt
+        if self.supports_refcounts():
+            a = object()
+            a_refcnt = sys.getrefcount(a)
+            p2 = mod.Pair(a, None)
+            assert sys.getrefcount(a) == a_refcnt + 1
+            assert p2.get_a() is a
+            p2.set_a('foo')
+            assert sys.getrefcount(a) == a_refcnt
+            p2.set_a(a)
+            assert sys.getrefcount(a) == a_refcnt + 1
+            p2.clear_a()
+            assert sys.getrefcount(a) == a_refcnt
+            p2.clear_a()
+            assert sys.getrefcount(a) == a_refcnt
 
     def test_automatic_tp_dealloc(self):
         if not self.supports_refcounts():
