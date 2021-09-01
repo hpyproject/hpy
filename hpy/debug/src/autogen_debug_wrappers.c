@@ -527,6 +527,11 @@ DHPy debug_ctx_Unicode_FromWideChar(HPyContext *dctx, const wchar_t *w, HPy_ssiz
     return DHPy_open(dctx, HPyUnicode_FromWideChar(get_info(dctx)->uctx, w, size));
 }
 
+DHPy debug_ctx_Unicode_DecodeFSDefault(HPyContext *dctx, const char *v)
+{
+    return DHPy_open(dctx, HPyUnicode_DecodeFSDefault(get_info(dctx)->uctx, v));
+}
+
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
 {
     return HPyList_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

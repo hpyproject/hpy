@@ -121,6 +121,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Unicode_AsUTF8String = &ctx_Unicode_AsUTF8String,
     .ctx_Unicode_AsUTF8AndSize = &ctx_Unicode_AsUTF8AndSize,
     .ctx_Unicode_FromWideChar = &ctx_Unicode_FromWideChar,
+    .ctx_Unicode_DecodeFSDefault = &ctx_Unicode_DecodeFSDefault,
     .ctx_List_Check = &ctx_List_Check,
     .ctx_List_New = &ctx_List_New,
     .ctx_List_Append = &ctx_List_Append,

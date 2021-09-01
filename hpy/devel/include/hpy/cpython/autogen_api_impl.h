@@ -450,6 +450,11 @@ HPyAPI_FUNC HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_s
     return _py2h(PyUnicode_FromWideChar(w, size));
 }
 
+HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char *v)
+{
+    return _py2h(PyUnicode_DecodeFSDefault(v));
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h)
 {
     return PyList_Check(_h2py(h));

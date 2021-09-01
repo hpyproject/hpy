@@ -426,6 +426,10 @@ HPyAPI_FUNC HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_s
      return ctx->ctx_Unicode_FromWideChar ( ctx, w, size ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char *v) {
+     return ctx->ctx_Unicode_DecodeFSDefault ( ctx, v ); 
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_List_Check ( ctx, h ); 
 }

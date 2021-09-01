@@ -243,6 +243,7 @@ int HPyUnicode_Check(HPyContext *ctx, HPy h);
 HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h);
 const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
+HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char* v);
 
 /* listobject.h */
 int HPyList_Check(HPyContext *ctx, HPy h);

@@ -86,3 +86,19 @@ class TestUnicode(HPyTest):
         """)
         assert mod.f('ABC') == 100*ord('A') + 10*ord('B') + ord('C')
         assert mod.f(b'A\0C'.decode('utf-8')) == 100*ord('A') + ord('C')
+
+
+    def test_DecodeFSDefault(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy_ssize_t n;
+                const char* buf = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
+                return HPyUnicode_DecodeFSDefault(ctx, buf);
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f('ABC') == "ABC"
