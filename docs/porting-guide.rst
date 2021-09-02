@@ -84,7 +84,8 @@ In HPy the rules are slightly different:
 
   1. if you have a field of type ``HPyField``, you always **MUST** provide a
      ``tp_traverse``. This is needed so that a moving GC can track the
-     relevant areas of memory;
+     relevant areas of memory. However, you **MUST NOT** rely on
+     ``tp_traverse`` to be called;
 
   2. ``tp_clear`` does not exist. On CPython, ``HPy`` automatically generates
      one for you, by using ``tp_traverse`` to know which are the fields to
