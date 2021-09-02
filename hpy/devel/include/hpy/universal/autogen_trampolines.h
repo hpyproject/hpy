@@ -250,6 +250,10 @@ HPyAPI_FUNC void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value) {
      ctx->ctx_Err_SetObject ( ctx, h_type, h_value ); 
 }
 
+HPyAPI_FUNC void HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type) {
+     ctx->ctx_Err_SetFromErrno ( ctx, h_type ); 
+}
+
 HPyAPI_FUNC int HPyErr_Occurred(HPyContext *ctx) {
      return ctx->ctx_Err_Occurred ( ctx ); 
 }

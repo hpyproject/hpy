@@ -135,6 +135,28 @@ class TestErr(HPyTest):
             mod.f(ValueError("error message"))
         assert str(err.value) == "error message"
 
+    def test_HPyErr_SetFromErrno(self):
+        import pytest
+        import errno
+        mod = self.make_module("""
+            #include <stdio.h>
+
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy type)
+            {
+                fseek(stdin, -200, -10);
+                HPyErr_SetFromErrno(ctx, type);
+                return HPy_NULL;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        for type in [OSError, IOError]:
+            with pytest.raises(type) as err:
+                mod.f(type)
+
+            assert err.value.errno in [errno.EINVAL, errno.ESPIPE]
+
     def test_h_exceptions(self):
         import pytest
         mod = self.make_module("""

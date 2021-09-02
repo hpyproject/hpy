@@ -290,6 +290,11 @@ HPyAPI_IMPL void ctx_Err_SetObject(HPyContext *ctx, HPy h_type, HPy h_value)
     PyErr_SetObject(_h2py(h_type), _h2py(h_value));
 }
 
+HPyAPI_IMPL void ctx_Err_SetFromErrno(HPyContext *ctx, HPy h_type)
+{
+    PyErr_SetFromErrno(_h2py(h_type));
+}
+
 HPyAPI_IMPL HPy ctx_Err_NoMemory(HPyContext *ctx)
 {
     return _py2h(PyErr_NoMemory());

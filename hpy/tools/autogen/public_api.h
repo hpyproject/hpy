@@ -179,6 +179,7 @@ HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
 void HPy_FatalError(HPyContext *ctx, const char *message);
 void HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message);
 void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
+void HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext *ctx);
 HPy HPyErr_NoMemory(HPyContext *ctx);
