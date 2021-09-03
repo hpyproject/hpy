@@ -440,9 +440,19 @@ HPyAPI_IMPL HPy ctx_Unicode_AsUTF8String(HPyContext *ctx, HPy h)
     return _py2h(PyUnicode_AsUTF8String(_h2py(h)));
 }
 
+HPyAPI_IMPL const char *ctx_Unicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size)
+{
+    return PyUnicode_AsUTF8AndSize(_h2py(h), size);
+}
+
 HPyAPI_IMPL HPy ctx_Unicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size)
 {
     return _py2h(PyUnicode_FromWideChar(w, size));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_DecodeFSDefault(HPyContext *ctx, const char *v)
+{
+    return _py2h(PyUnicode_DecodeFSDefault(v));
 }
 
 HPyAPI_IMPL int ctx_List_Check(HPyContext *ctx, HPy h)
