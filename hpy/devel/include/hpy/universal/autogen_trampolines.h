@@ -474,10 +474,6 @@ HPyAPI_FUNC void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Si
      ctx->ctx_CallRealFunctionFromTrampoline ( ctx, sig, func, args ); 
 }
 
-HPyAPI_FUNC void _HPy_CallDestroyAndThenDealloc(HPyContext *ctx, void *func, cpy_PyObject *self) {
-     ctx->ctx_CallDestroyAndThenDealloc ( ctx, func, self ); 
-}
-
 HPyAPI_FUNC HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size) {
      return ctx->ctx_ListBuilder_New ( ctx, initial_size ); 
 }
@@ -524,6 +520,14 @@ HPyAPI_FUNC void HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht) {
 
 HPyAPI_FUNC void HPyTracker_Close(HPyContext *ctx, HPyTracker ht) {
      ctx->ctx_Tracker_Close ( ctx, ht ); 
+}
+
+HPyAPI_FUNC void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h) {
+     ctx->ctx_Field_Store ( ctx, target_object, target_field, h ); 
+}
+
+HPyAPI_FUNC HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field) {
+     return ctx->ctx_Field_Load ( ctx, source_object, source_field ); 
 }
 
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {

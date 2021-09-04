@@ -133,7 +133,6 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_FromPyObject = &ctx_FromPyObject,
     .ctx_AsPyObject = &ctx_AsPyObject,
     .ctx_CallRealFunctionFromTrampoline = &ctx_CallRealFunctionFromTrampoline,
-    .ctx_CallDestroyAndThenDealloc = &ctx_CallDestroyAndThenDealloc,
     .ctx_ListBuilder_New = &ctx_ListBuilder_New,
     .ctx_ListBuilder_Set = &ctx_ListBuilder_Set,
     .ctx_ListBuilder_Build = &ctx_ListBuilder_Build,
@@ -146,5 +145,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Tracker_Add = &ctx_Tracker_Add,
     .ctx_Tracker_ForgetAll = &ctx_Tracker_ForgetAll,
     .ctx_Tracker_Close = &ctx_Tracker_Close,
+    .ctx_Field_Store = &ctx_Field_Store,
+    .ctx_Field_Load = &ctx_Field_Load,
     .ctx_Dump = &ctx_Dump,
 };

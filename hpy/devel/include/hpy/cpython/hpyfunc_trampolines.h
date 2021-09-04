@@ -51,17 +51,11 @@
                     items, nargs, _py2h(kw));                           \
     }
 
+/* special case: the HPy_tp_destroy slot doesn't map to any CPython slot.
+   Instead, it is called from our own tp_dealloc: see also
+   hpytype_dealloc(). */
 #define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
-    static void                                                         \
-    SYM(PyObject *self)                                                 \
-    {                                                                   \
-        void *data = (void *) self;                                     \
-        if (self->ob_type->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {      \
-            data = ((char *) data) + HPyPure_PyObject_HEAD_SIZE;        \
-        }                                                               \
-        IMPL(data);                                                     \
-        Py_TYPE(self)->tp_free(self);                                   \
-    }
+    static void SYM(void) { abort(); }
 
 /* this needs to be written manually because HPy has a different type for
    "op": HPy_RichCmpOp instead of int */
@@ -85,6 +79,14 @@
     { \
         IMPL(_HPyGetContext(), _py2h(arg0), (HPy_buffer*)arg1); \
         return; \
+    }
+
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_TRAVERSEPROC(SYM, IMPL)             \
+    static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg)  \
+    {                                                                   \
+        return call_traverseproc_from_trampoline(IMPL, self,            \
+                                                 visit, arg);           \
     }
 
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H

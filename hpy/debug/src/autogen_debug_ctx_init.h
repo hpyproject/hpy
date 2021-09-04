@@ -128,7 +128,6 @@ DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name);
 DHPy debug_ctx_FromPyObject(HPyContext *dctx, cpy_PyObject *obj);
 cpy_PyObject *debug_ctx_AsPyObject(HPyContext *dctx, DHPy h);
 void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx, HPyFunc_Signature sig, void *func, void *args);
-void debug_ctx_CallDestroyAndThenDealloc(HPyContext *dctx, void *func, cpy_PyObject *self);
 HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);
 void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder builder);
@@ -141,6 +140,8 @@ HPyTracker debug_ctx_Tracker_New(HPyContext *dctx, HPy_ssize_t size);
 int debug_ctx_Tracker_Add(HPyContext *dctx, HPyTracker ht, DHPy h);
 void debug_ctx_Tracker_ForgetAll(HPyContext *dctx, HPyTracker ht);
 void debug_ctx_Tracker_Close(HPyContext *dctx, HPyTracker ht);
+void debug_ctx_Field_Store(HPyContext *dctx, DHPy target_object, HPyField *target_field, DHPy h);
+DHPy debug_ctx_Field_Load(HPyContext *dctx, DHPy source_object, HPyField source_field);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
@@ -338,7 +339,6 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_FromPyObject = &debug_ctx_FromPyObject;
     dctx->ctx_AsPyObject = &debug_ctx_AsPyObject;
     dctx->ctx_CallRealFunctionFromTrampoline = &debug_ctx_CallRealFunctionFromTrampoline;
-    dctx->ctx_CallDestroyAndThenDealloc = &debug_ctx_CallDestroyAndThenDealloc;
     dctx->ctx_ListBuilder_New = &debug_ctx_ListBuilder_New;
     dctx->ctx_ListBuilder_Set = &debug_ctx_ListBuilder_Set;
     dctx->ctx_ListBuilder_Build = &debug_ctx_ListBuilder_Build;
@@ -351,5 +351,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Tracker_Add = &debug_ctx_Tracker_Add;
     dctx->ctx_Tracker_ForgetAll = &debug_ctx_Tracker_ForgetAll;
     dctx->ctx_Tracker_Close = &debug_ctx_Tracker_Close;
+    dctx->ctx_Field_Store = &debug_ctx_Field_Store;
+    dctx->ctx_Field_Load = &debug_ctx_Field_Load;
     dctx->ctx_Dump = &debug_ctx_Dump;
 }

@@ -94,16 +94,11 @@ typedef struct {
         return a.result;                                                \
     }
 
-/* special case: this function is used as 'tp_dealloc', but from the user
-   point of view the slot is HPy_tp_destroy. */
+/* special case: the HPy_tp_destroy slot doesn't map to any CPython slot.
+   Instead, it is called from our own tp_dealloc: see also
+   hpytype_dealloc(). */
 #define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
-    static void                                                         \
-    SYM(cpy_PyObject *self)                                             \
-    {                                                                   \
-        _HPy_CallDestroyAndThenDealloc(                                 \
-            _ctx_for_trampolines, IMPL, self);                          \
-    }
-
+    static void SYM(void) { abort(); }
 
 
 /* this needs to be written manually because HPy has a different type for
@@ -147,5 +142,24 @@ typedef struct {
            _ctx_for_trampolines, HPyFunc_RELEASEBUFFERPROC, IMPL, &a); \
         return; \
     }
+
+
+typedef struct {
+    cpy_PyObject *self;
+    cpy_visitproc visit;
+    void *arg;
+    int result;
+} _HPyFunc_args_TRAVERSEPROC;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_TRAVERSEPROC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg) \
+    { \
+        _HPyFunc_args_TRAVERSEPROC a = { self, visit, arg }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_TRAVERSEPROC, IMPL, &a); \
+        return a.result; \
+    }
+
+
 
 #endif // HPY_UNIVERSAL_HPYFUNC_TRAMPOLINES_H

@@ -23,6 +23,7 @@
 
 #include <Python.h>
 #include "debug_internal.h"
+#include "hpy/runtime/ctx_type.h" // for call_traverseproc_from_trampoline
 #include "handles.h" // for _py2h and _h2py
 #if defined(_MSC_VER)
 # include <malloc.h>   /* for alloca() */
@@ -178,8 +179,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         HPy_Close(dctx, hbuf.obj);
         return;
     }
+    case HPyFunc_TRAVERSEPROC: {
+        HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
+        _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
+        a->result = call_traverseproc_from_trampoline(f, a->self,
+                                                      a->visit, a->arg);
+        return;
+    }
 #include "autogen_debug_ctx_call.i"
     default:
-        abort();  // XXX
+        Py_FatalError("Unsupported HPyFunc_Signature in debug_ctx_cpython.c");
     }
 }

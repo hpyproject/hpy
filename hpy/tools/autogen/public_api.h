@@ -11,11 +11,13 @@ typedef int wchar_t;
 typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
+typedef int HPyField;
 typedef int HPyListBuilder;
 typedef int HPyTupleBuilder;
 typedef int HPyTracker;
 typedef int HPy_RichCmpOp;
 typedef int HPy_buffer;
+typedef int HPyFunc_visitproc;
 
 /* HPy public API */
 
@@ -271,9 +273,6 @@ void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
                                          HPyFunc_Signature sig,
                                          void *func,
                                          void *args);
-void _HPy_CallDestroyAndThenDealloc(HPyContext *ctx,
-                                    void *func,
-                                    cpy_PyObject *self);
 
 
 /* Builders */
@@ -296,6 +295,42 @@ HPyTracker HPyTracker_New(HPyContext *ctx, HPy_ssize_t size);
 int HPyTracker_Add(HPyContext *ctx, HPyTracker ht, HPy h);
 void HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht);
 void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
+
+/* HPyField
+
+   HPyFields should be used ONLY in parts of memory which is known to the GC,
+   e.g. memory allocated by HPy_New:
+
+     - NEVER declare a local variable of type HPyField
+     - NEVER use HPyField on a struct allocated by e.g. malloc()
+
+   **CPython's note**: contrarily than PyObject*, you don't need to manually
+   manage refcounting when using HPyField: if you use HPyField_Store to
+   overwrite an existing value, the old object will be automatically decrefed.
+   This means that you CANNOT use HPyField_Store to write memory which
+   contains uninitialized values, because it would try to decref a dangling
+   pointer.
+
+   Note that HPy_New automatically zeroes the memory it allocates, so
+   everything works well out of the box. In case you are using manually
+   allocated memory, you should initialize the HPyField to HPyField_NULL.
+
+   Note the difference:
+
+     - ``obj->f = HPyField_NULL``: this should be used only to initialize
+       uninitialized memory. If you use it to overwrite a valid HPyField, you
+       will cause a memory leak (at least on CPython)
+
+     - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
+       the old value. However, you CANNOT use it if the memory is not
+       initialized.
+
+Note: target_object and source_object are there in case an implementation
+needs to add write and/or read barriers on the objects. They are ignored by
+CPython but e.g. PyPy needs a write barrier.
+*/
+void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
+HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
 
 /* Debugging helpers */
 void _HPy_Dump(HPyContext *ctx, HPy h);
@@ -343,6 +378,7 @@ typedef int (*HPyFunc_setter)(HPyContext *ctx, HPy, HPy, void *);
 typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
 typedef int (*HPyFunc_getbufferproc)(HPyContext *ctx, HPy, HPy_buffer *, int);
 typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
+typedef int (*HPyFunc_traverseproc)(void *object, HPyFunc_visitproc visit, void *arg);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
@@ -412,7 +448,7 @@ typedef enum {
     //HPy_tp_base = SLOT(48, HPyFunc_X),
     //HPy_tp_bases = SLOT(49, HPyFunc_X),
     //HPy_tp_call = SLOT(50, HPyFunc_X),
-    //HPy_tp_clear = SLOT(51, HPyFunc_X),
+    //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
     //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
@@ -432,7 +468,7 @@ typedef enum {
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),
     //HPy_tp_setattro = SLOT(69, HPyFunc_X),
     //HPy_tp_str = SLOT(70, HPyFunc_X),
-    //HPy_tp_traverse = SLOT(71, HPyFunc_X),
+    HPy_tp_traverse = SLOT(71, HPyFunc_TRAVERSEPROC),
     //HPy_tp_members = SLOT(72, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_getset = SLOT(73, HPyFunc_X),     NOT SUPPORTED
     //HPy_tp_free = SLOT(74, HPyFunc_X),       NOT SUPPORTED

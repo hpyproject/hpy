@@ -207,7 +207,6 @@ struct _HPyContext_s {
     HPy (*ctx_FromPyObject)(HPyContext *ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext *ctx, HPy h);
     void (*ctx_CallRealFunctionFromTrampoline)(HPyContext *ctx, HPyFunc_Signature sig, void *func, void *args);
-    void (*ctx_CallDestroyAndThenDealloc)(HPyContext *ctx, void *func, cpy_PyObject *self);
     HPyListBuilder (*ctx_ListBuilder_New)(HPyContext *ctx, HPy_ssize_t initial_size);
     void (*ctx_ListBuilder_Set)(HPyContext *ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item);
     HPy (*ctx_ListBuilder_Build)(HPyContext *ctx, HPyListBuilder builder);
@@ -220,5 +219,7 @@ struct _HPyContext_s {
     int (*ctx_Tracker_Add)(HPyContext *ctx, HPyTracker ht, HPy h);
     void (*ctx_Tracker_ForgetAll)(HPyContext *ctx, HPyTracker ht);
     void (*ctx_Tracker_Close)(HPyContext *ctx, HPyTracker ht);
+    void (*ctx_Field_Store)(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
+    HPy (*ctx_Field_Load)(HPyContext *ctx, HPy source_object, HPyField source_field);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
 };

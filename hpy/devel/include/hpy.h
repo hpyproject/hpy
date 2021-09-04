@@ -88,6 +88,7 @@
          another HPy among other stuff
  */
 typedef struct _HPy_s { intptr_t _i; } HPy;
+typedef struct { intptr_t _i; } HPyField;
 typedef struct { intptr_t _lst; } HPyListBuilder;
 typedef struct { intptr_t _tup; } HPyTupleBuilder;
 typedef struct { intptr_t _i; } HPyTracker;
@@ -97,6 +98,8 @@ typedef struct { intptr_t _i; } HPyTracker;
    in all ABI modes. */
 #define HPy_NULL ((HPy){0})
 #define HPy_IsNull(h) ((h)._i == 0)
+
+#define HPyField_NULL ((HPyField){0})
 
 /* Convenience functions to cast between HPy and void*.  We need to decide
    whether these are part of the official API or not, and maybe introduce a
