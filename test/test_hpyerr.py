@@ -139,23 +139,23 @@ class TestErr(HPyTest):
         import pytest
         import errno
         mod = self.make_module("""
-            #include <stdio.h>
+            #include <errno.h>
 
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy type)
-            {
-                fseek(stdin, -200, -10);
+            {{
+                errno = {errno};
                 HPyErr_SetFromErrno(ctx, type);
                 return HPy_NULL;
-            }
+            }}
             @EXPORT(f)
             @INIT
-        """)
-        for type in [OSError, IOError]:
+        """.format(errno = errno.EINVAL))
+        for type in [OSError, TimeoutError]:
             with pytest.raises(type) as err:
                 mod.f(type)
 
-            assert err.value.errno in [errno.EINVAL, errno.ESPIPE]
+            assert err.value.errno == errno.EINVAL
 
     def test_h_exceptions(self):
         import pytest
