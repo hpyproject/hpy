@@ -57,10 +57,10 @@ c_autodoc_roots = [
 
 
 def pre_process(app, filename, contents, *args):
-    # remove HPyAPI_RUNTIME_FUNC so that the sphinx-c-autodoc and clang
+    # remove HPyAPI_HELPER so that the sphinx-c-autodoc and clang
     # find and render the API functions
     contents[:] = [
-        re.sub(r"HPyAPI_RUNTIME_FUNC\((.*)\)", r"\1", part)
+        re.sub(r"^HPyAPI_HELPER ", r"", part, flags=re.MULTILINE)
         for part in contents
     ]
 
