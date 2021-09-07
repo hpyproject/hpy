@@ -84,7 +84,7 @@ def setup_clang():
         return
 
     try:
-        cindex.Index.create()
+        pass  # cindex.Index.create()
     except cindex.LibclangError as error:
         pass
     else:
