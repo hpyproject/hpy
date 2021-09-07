@@ -45,7 +45,7 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end);
 static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end);
 static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values);
 
-// HPyAPI_HELPER
+HPyAPI_HELPER
 HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
 {
     va_list values;
@@ -102,6 +102,9 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values)
     switch (*(*fmt)++) {
         case '(': {
             HPy_ssize_t size = count_items(ctx, *fmt, ')');
+            if (size < 0) {
+                return HPy_NULL;
+            }
             return build_tuple(ctx, fmt, values, size, ')');
         }
 
