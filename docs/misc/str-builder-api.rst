@@ -227,12 +227,12 @@ widely used outside CPython. A simple ``grep`` found only 17 matches in the
 4000 packages, although some are in very important packages such as
 `cffi <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0021-cffi-1.14.5/c/wchar_helper_3.h#L36>`_,
 ``markupsafe``
-(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L106>`_,
-`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L132>`_,
-`3 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L158>`_)
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L106>`__,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L132>`__,
+`3 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0024-MarkupSafe-2.0.1/src/markupsafe/_speedups.c#L158>`__)
 and ``simplejson``
-(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L517>`_,
-`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L3330>`_).
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L517>`__,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L3330>`__).
 
 In all the examples linked above, ``maxchar`` is hard-coded and known at
 compile time.
@@ -241,13 +241,13 @@ There are only four usages of ``PyUnicode_New`` in which ``maxchar`` is
 actually unknown until runtime, and it is curious to note that the first three
 are in runtime libraries used by code generators:
 
-  1. `mypyc <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0277-mypy-0.812/mypyc/lib-rt/str_ops.c#L22>`_
+  1. `mypyc <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0277-mypy-0.812/mypyc/lib-rt/str_ops.c#L22>`__
 
-  2. `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L829>`_
+  2. `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L829>`__
 
-  3. `siplib <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1236-PyQt5_sip-12.9.0/siplib.c#L12808>`_
+  3. `siplib <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1236-PyQt5_sip-12.9.0/siplib.c#L12808>`__
 
-  4. `PyICU <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/2601-PyICU-2.7.3/common.cpp#L213>`_:
+  4. `PyICU <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/2601-PyICU-2.7.3/common.cpp#L213>`__:
      this is the only non-runtime library usage of it, and it's used to
      implement a routine to create a ``str`` object from an UTF-16 buffer.
 
@@ -263,8 +263,8 @@ A special case is ``PyUnicode_New(0, 0)``, which contructs an empty ``str``
 object.  CPython special-cases it to always return a prebuilt object.
 
 This pattern is used a lot inside CPython but only once in 3rd-party extensions, in the ``regex`` library (
-`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19486>`_,
-`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19516>`_).
+`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19486>`__,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19516>`__).
 
 Other ways to build empty strings are ``PyUnicode_FromString("")`` which is used 27 times and ``PyUnicode_FromStringAndSize("", 0)`` which is used only `once
 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0268-pyodbc-4.0.30/src/textenc.cpp#L144>`_.
@@ -331,6 +331,7 @@ macro takes a parameter called ``outp`` which is obtained by calling
 ``DO_ESCAPE`` contains code like this, which would be hard to port to a fully-opaque API:
 
 .. code-block:: c
+
     memcpy(outp, inp-ncopy, sizeof(*outp)*ncopy); \
     outp += ncopy; ncopy = 0; \
     *outp++ = '&'; \
@@ -341,10 +342,11 @@ macro takes a parameter called ``outp`` which is obtained by calling
     break; \
 
 Another interesting example is
-`pybase64 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1925-pybase64-1.1.4/pybase64/_pybase64.c#L320-349`_.
+`pybase64 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1925-pybase64-1.1.4/pybase64/_pybase64.c#L320-349>`_.
 After removing the unnecessary stuff, the logic boils down to this:
 
 .. code-block:: c
+
     out_len = (size_t)(((buffer.len + 2) / 3) * 4);
     out_object = PyUnicode_New((Py_ssize_t)out_len, 127);
     dst = (char*)PyUnicode_1BYTE_DATA(out_object);
@@ -382,12 +384,10 @@ The other way to get a pointer to the raw-buffer is to call
 ``PyUnicode_DATA()``, which returns a ``void *``: the only reasonable way to
 write something in this buffer is to ``memcpy()`` the data from another
 ``str`` buffer of the same kind. This technique is used for example by
-`CPython's textio.c
-<https://github.com/antocuni/cpython/blob/7b3ab5921fa25ed8b97b6296f97c5c78aacf5447/Modules/_io/textio.c#L344>`_.
+`CPython's textio.c <https://github.com/antocuni/cpython/blob/7b3ab5921fa25ed8b97b6296f97c5c78aacf5447/Modules/_io/textio.c#L344>`_.
 
 Outside CPython, the only usage of this technique is inside cython's helper
-function `__Pyx_PyUnicode_Join
-<https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L857>`_.
+function `__Pyx_PyUnicode_Join <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L857>`_.
 
 This probably means that we don't need to offer untyped raw-buffer writing for
 HPy. If we really need to support the ``memcpy`` use case, we can probably
@@ -398,8 +398,8 @@ PyUnicode_WRITE, PyUnicode_WriteChar
 
 Outside CPython, ``PyUnicode_WRITE()`` is used only inside Cython's helper
 functions
-(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L865>`_,
-`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L914-L926>`_).
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L865>`__,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L914-L926>`__).
 Considering that Cython will need special support for HPy anyway, this means
 that we don't need an equivalent of ``PyUnicode_WRITE`` for HPy.
 
@@ -415,30 +415,29 @@ size of the string: ``PyUnicode_Join()`` is the only native API call which
 allows to build a string whose size is not known in advance.
 
 Examples of usage are found in ``simplejson``
-(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L779>`_,
-`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L1033>`_),
-`pycairo <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0759-pycairo-1.20.0/cairo/path.c#L156>`_,
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L779>`__,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top100/0096-simplejson-3.17.2/simplejson/_speedups.c#L1033>`__),
+`pycairo <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0759-pycairo-1.20.0/cairo/path.c#L156>`__,
 ``regex``
-(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19492>`_,
-`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22674>`_,
-`3 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22768>`_,
-`4 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19440>`_,
-`5 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22495>`_,
-`6 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22589>`_)
+(`1 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19492>`__,
+`2 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22674>`__,
+`3 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22768>`__,
+`4 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19440>`__,
+`5 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22495>`__,
+`6 <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L22589>`__)
 and others, for a total of 25 grep matches.
 
 
 .. note::
+
    Contrarily to its unicode equivalent, ``PyBytes_Join()`` does not
    exist. There is ``_PyBytes_Join()`` which is private and undocumented, but
    some extensions rely on it anyway:
-   `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L795>`_,
-   `regex <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19501>`_,
-   `dulwich <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1424-dulwich-0.20.23/dulwich/_pack.c#L62>`_.
+   `Cython <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0158-Cython-0.29.23/Cython/Utility/StringTools.c#L795>`__,
+   `regex <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top1000/0119-regex-2021.4.4/regex_3/_regex.c#L19501>`__,
+   `dulwich <https://github.com/hpyproject/top4000-pypi-packages/blob/0cd919943a007f95f4bf8510e667cfff5bd059fc/top4000/1424-dulwich-0.20.23/dulwich/_pack.c#L62>`__.
 
 In theory, alternative implementaions should be able to provide a more
 efficient way to achieve the goal. E.g. for pure Python code PyPy offers
 ``__pypy__.builders.StringBuilder`` which is faster than both ``StringIO`` and
 ``''.join``, so maybe it might make sense to offer a way to use it from C.
-
-

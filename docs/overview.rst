@@ -189,7 +189,7 @@ API:
     to early :ref:`benchmarks`, an extension written in HPy can be ~3x faster
     than the equivalent extension written in Python/C.
 
-  - Improved debugging: when you load extensions in :ref:`debugging mode`,
+  - Improved debugging: when you load extensions in :ref:`debug mode`,
     many common mistakes are checked and reported automatically.
 
   - Universal binaries: you can choose to distribute only Universal ABI

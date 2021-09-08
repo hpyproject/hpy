@@ -14,7 +14,6 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import sys
 import os
 import re
 
@@ -57,10 +56,10 @@ c_autodoc_roots = [
 
 
 def pre_process(app, filename, contents, *args):
-    # remove HPyAPI_RUNTIME_FUNC so that the sphinx-c-autodoc and clang
+    # remove HPyAPI_HELPER so that the sphinx-c-autodoc and clang
     # find and render the API functions
     contents[:] = [
-        re.sub(r"HPyAPI_RUNTIME_FUNC\((.*)\)", r"\1", part)
+        re.sub(r"^HPyAPI_HELPER ", r"", part, flags=re.MULTILINE)
         for part in contents
     ]
 
@@ -68,10 +67,25 @@ def pre_process(app, filename, contents, *args):
 def setup(app):
     app.connect("c-autodoc-pre-process", pre_process)
 
+
 def setup_clang():
     """
-    The clang library needs to find libclang*.so, but it seems there isn't a
-    fully portable solution. Let's try our best.
+    Make sure clang is set up correctly for the sphinx_c_autodoc extension.
+
+    The Python clang package requires a matching libclang*.so. Our
+    ``doc/requirements.txt`` file specifies ``clang==10.0.1``, so we need
+    ``libclang-10``.
+
+    On Ubuntu 20.04 (and possibly later), this can be installed with
+    ``apt install libclang-10-dev`` and the Python clang package finds the
+    appropriate .so automatically.
+
+    However, ReadTheDocs has an older Ubuntu that only packages libclang-6.0.
+    The Python ``clang==10.0.1`` packages supports this older .so, but
+    needs to be explicitly told where to find it.
+
+    If you encounter issues with a local build, please start by checking that
+    the ``libclang-10-dev`` system package or equivalent is installed.
     """
     from clang import cindex
     if 'READTHEDOCS' in os.environ:
@@ -81,26 +95,7 @@ def setup_clang():
         cindex.Config.set_library_file(
             "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
         )
-        return
 
-    try:
-        cindex.Index.create()
-    except cindex.LibclangError as error:
-        pass
-    else:
-        # it works out of the box, nothing to do
-        return
-
-    # libclang*.so not found :( Try to print a reasonable message
-    YELLOW = "\033[1;33m"
-    RESET = "\033[0m"
-    print(YELLOW)
-    print('====================')
-    print('Cannot load libclang')
-    print('   ', error)
-    print('HINT if you are on ubuntu, try the following:')
-    print('    apt install libclang-10-dev')
-    print(RESET)
 
 setup_clang()
 
