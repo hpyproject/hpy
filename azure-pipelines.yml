@@ -184,6 +184,8 @@ jobs:
   displayName: 'Build documentation'
   steps:
   - template: azure-templates/python.yml
+  - script: sudo apt update && sudo apt install -y libclang-10-dev
+    displayName: 'Install libclang-10-dev'
   - script: python -m pip install --upgrade pip
     displayName: 'Upgrade pip'
   - script: python -m pip install -r docs/requirements.txt
