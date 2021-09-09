@@ -145,8 +145,7 @@ class TestErr(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self, HPy type)
             {{
                 errno = {errno};
-                HPyErr_SetFromErrno(ctx, type);
-                return HPy_NULL;
+                return HPyErr_SetFromErrno(ctx, type);
             }}
             @EXPORT(f)
             @INIT

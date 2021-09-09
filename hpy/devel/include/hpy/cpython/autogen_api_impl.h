@@ -290,9 +290,9 @@ HPyAPI_FUNC void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value)
     PyErr_SetObject(_h2py(h_type), _h2py(h_value));
 }
 
-HPyAPI_FUNC void HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type)
+HPyAPI_FUNC HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type)
 {
-    PyErr_SetFromErrno(_h2py(h_type));
+    return _py2h(PyErr_SetFromErrno(_h2py(h_type)));
 }
 
 HPyAPI_FUNC HPy HPyErr_NoMemory(HPyContext *ctx)
