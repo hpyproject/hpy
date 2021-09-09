@@ -312,6 +312,11 @@ void debug_ctx_Err_SetObject(HPyContext *dctx, DHPy h_type, DHPy h_value)
     HPyErr_SetObject(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type), DHPy_unwrap(dctx, h_value));
 }
 
+DHPy debug_ctx_Err_SetFromErrno(HPyContext *dctx, DHPy h_type)
+{
+    return DHPy_open(dctx, HPyErr_SetFromErrno(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type)));
+}
+
 int debug_ctx_Err_Occurred(HPyContext *dctx)
 {
     return HPyErr_Occurred(get_info(dctx)->uctx);
