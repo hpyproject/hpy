@@ -1,5 +1,5 @@
 ---
-name: Continuous Integration tests
+name: tests
 
 on: [pull_request]
 
