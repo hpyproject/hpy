@@ -150,7 +150,8 @@ struct _HPyContext_s {
     void (*ctx_FatalError)(HPyContext *ctx, const char *message);
     void (*ctx_Err_SetString)(HPyContext *ctx, HPy h_type, const char *message);
     void (*ctx_Err_SetObject)(HPyContext *ctx, HPy h_type, HPy h_value);
-    HPy (*ctx_Err_SetFromErrno)(HPyContext *ctx, HPy h_type);
+    HPy (*ctx_Err_SetFromErrnoWithFilename)(HPyContext *ctx, HPy h_type, const char *filename_fsencoded);
+    HPy (*ctx_Err_SetFromErrnoWithFilenameObjects)(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2);
     int (*ctx_Err_Occurred)(HPyContext *ctx);
     HPy (*ctx_Err_NoMemory)(HPyContext *ctx);
     void (*ctx_Err_Clear)(HPyContext *ctx);

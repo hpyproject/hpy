@@ -71,7 +71,8 @@ DHPy debug_ctx_CallTupleDict(HPyContext *dctx, DHPy callable, DHPy args, DHPy kw
 void debug_ctx_FatalError(HPyContext *dctx, const char *message);
 void debug_ctx_Err_SetString(HPyContext *dctx, DHPy h_type, const char *message);
 void debug_ctx_Err_SetObject(HPyContext *dctx, DHPy h_type, DHPy h_value);
-DHPy debug_ctx_Err_SetFromErrno(HPyContext *dctx, DHPy h_type);
+DHPy debug_ctx_Err_SetFromErrnoWithFilename(HPyContext *dctx, DHPy h_type, const char *filename_fsencoded);
+DHPy debug_ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *dctx, DHPy h_type, DHPy filename1, DHPy filename2);
 int debug_ctx_Err_Occurred(HPyContext *dctx);
 DHPy debug_ctx_Err_NoMemory(HPyContext *dctx);
 void debug_ctx_Err_Clear(HPyContext *dctx);
@@ -283,7 +284,8 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_FatalError = &debug_ctx_FatalError;
     dctx->ctx_Err_SetString = &debug_ctx_Err_SetString;
     dctx->ctx_Err_SetObject = &debug_ctx_Err_SetObject;
-    dctx->ctx_Err_SetFromErrno = &debug_ctx_Err_SetFromErrno;
+    dctx->ctx_Err_SetFromErrnoWithFilename = &debug_ctx_Err_SetFromErrnoWithFilename;
+    dctx->ctx_Err_SetFromErrnoWithFilenameObjects = &debug_ctx_Err_SetFromErrnoWithFilenameObjects;
     dctx->ctx_Err_Occurred = &debug_ctx_Err_Occurred;
     dctx->ctx_Err_NoMemory = &debug_ctx_Err_NoMemory;
     dctx->ctx_Err_Clear = &debug_ctx_Err_Clear;
