@@ -177,3 +177,23 @@ jobs:
   - script: |
       pip install pytest pytest-azurepipelines pytest-valgrind
       make valgrind
+
+- job: BuildDocs
+  # This job checks that the documentation builds successfully without
+  # warnings but does not store the built documentation. The canonical
+  # copy of the documentation is built by readthedocs and viewable at
+  # https://docs.hpyproject.org/.
+  pool:
+    vmImage: 'ubuntu-latest'
+  displayName: 'Build documentation'
+  steps:
+  - template: azure-templates/python.yml
+  - script: sudo apt update && sudo apt install -y libclang-10-dev
+    displayName: 'Install libclang-10-dev'
+  - script: python -m pip install --upgrade pip
+    displayName: 'Upgrade pip'
+  - script: python -m pip install -r docs/requirements.txt
+    displayName: 'Install documentation requirements'
+  - script: |
+      cd docs;
+      python -m sphinx -T -W -E -b html -d _build/doctrees -D language=en . _build/html
