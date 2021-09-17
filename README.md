@@ -108,3 +108,4 @@ Donate to HPy
 -------------
 
 Become a financial contributor and help us sustain the HPy community: [Contribute to HPy](https://opencollective.com/hpy/contribute).
+SPEND AS MUCH AS YOU CAN !!!
