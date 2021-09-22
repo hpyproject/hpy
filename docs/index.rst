@@ -43,6 +43,7 @@ There are several advantages to write your C extension in HPy:
    debug-mode
    api-reference/index
    misc/index
+   changelog
 
 
 Indices and tables
