@@ -156,6 +156,64 @@ class TestErr(HPyTest):
 
             assert err.value.errno == errno.EINVAL
 
+    def test_HPyErr_SetFromErrnoWithFilenameObjects(self):
+        import pytest
+        import errno
+        mod = self.make_module("""
+            #include <errno.h>
+
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {{
+                HPy type, file1, file2;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOO", &type, &file1, &file2))
+                    return HPy_NULL;
+
+                errno = {errno};
+                if (HPy_Is(ctx, file2, ctx->h_None)) {{
+                    return HPyErr_SetFromErrnoWithFilenameObject(ctx, type, file1);
+                }} else {{
+                    return HPyErr_SetFromErrnoWithFilenameObjects(ctx, type, file1, file2);
+                }}
+            }}
+            @EXPORT(f)
+            @INIT
+        """.format(errno = errno.EINVAL))
+        file1 = "some/file/name/to/be/asserted"
+        with pytest.raises(OSError) as err:
+            mod.f(OSError, file1, None)
+        assert err.value.errno == errno.EINVAL
+        assert err.value.filename == file1
+
+        file2 = "some/different/file/name/to/be/asserted"
+        with pytest.raises(OSError) as err:
+            mod.f(OSError, file1, file2)
+        assert err.value.errno == errno.EINVAL
+        assert err.value.filename == file1
+        assert err.value.filename2 == file2
+
+    def test_HPyErr_SetFromErrnoWithFilename(self):
+        import pytest
+        import errno
+        mod = self.make_module("""
+            #include <errno.h>
+
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy type)
+            {{
+                errno = {errno};
+                return HPyErr_SetFromErrnoWithFilename(ctx, type, "Some message that will be asserted");
+            }}
+            @EXPORT(f)
+            @INIT
+        """.format(errno = errno.EINVAL))
+        with pytest.raises(OSError) as err:
+            mod.f(OSError)
+
+        assert err.value.errno == errno.EINVAL
+        assert "Some message that will be asserted" in str(err.value)
+
     def test_h_exceptions(self):
         import pytest
         mod = self.make_module("""
