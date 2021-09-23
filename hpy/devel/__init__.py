@@ -217,6 +217,7 @@ class build_hpy_ext_mixin:
         ext.hpy_abi = self.distribution.hpy_abi
         ext.include_dirs += self.hpydevel.get_extra_include_dirs()
         ext.sources += self.hpydevel.get_extra_sources()
+        ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
             ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
