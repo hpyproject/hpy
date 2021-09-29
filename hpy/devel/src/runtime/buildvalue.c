@@ -2,7 +2,8 @@
  * Implementation of HPy_BuildValue.
  *
  * HPy_BuildValue creates a new value based on a format string from the values
- * passed in an array. Returns HPy_NULL in case of an error and raises an exception.
+ * passed in variadic arguments. Returns HPy_NULL in case of an error and raises
+ * an exception.
  *
  * HPy_BuildValue does not always build a tuple. It builds a tuple only if its format
  * string contains two or more format units. If the format string is empty, it returns
@@ -24,14 +25,53 @@
  * ``i (int) [int]``
  *     Convert a plain C int to a Python integer object.
  *
+ * ``l (int) [long int]``
+ *     Convert a C long int to a Python integer object.
+ *
+ * ``I (int) [unsigned int]``
+ *     Convert a C unsigned int to a Python integer object.
+ *
+ * ``k (int) [unsigned long]``
+ *     Convert a C unsigned long to a Python integer object.
+ *
+ * ``L (int) [long long]``
+ *     Convert a C long long to a Python integer object.
+ *
+ * ``K (int) [unsigned long long]``
+ *     Convert a C unsigned long long to a Python integer object.
+ *
  * ``f (float) [float]``
  *     Convert a C float to a Python floating point number.
+ *
+ * ``d (float) [double]``
+ *     Convert a C double to a Python floating point number.
  *
  * Collections
  * ~~~~~~~
  *
  * ``(items) (tuple) [matching-items]``
  *     Convert a sequence of C values to a Python tuple with the same number of items.
+ *
+ * ``[items] (list) [matching-items]``
+ *     Convert a sequence of C values to a Python list with the same number of items.
+ *
+ * Misc
+ * ~~~~~~~
+ *
+ * ``O (Python object) [HPy]``
+ *      Pass a untouched Python object represented by the handle. If the object passed
+ *      in is a HPy_NULL, it is assumed that this was caused because the call producing
+ *      the argument found an error and set an exception. Therefore, HPy_BuildValue will
+ *      also immediately stop and return HPy_NULL but will not raise a new exception. If
+ *      no exception has been raised yet, SystemError is set.
+ *
+ * ``N (Python object) [HPy]``
+ *      For the compatibility reasons and ease of porting from CPython API, HPy_BuildValue
+ *      also supports, but it is an alias to 'O'. Any HPy handle passed to HPy_BuildValue is
+ *      always owned by the caller.
+ *
+ * ``S (Python object) [HPy]``
+ *      Alias for 'O'.
  *
  * API
  * ---
@@ -40,10 +80,12 @@
 
 #include "hpy.h"
 #include <stdarg.h>
+#include <stdio.h>
 
 static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end);
 static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end);
-static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values);
+static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size);
+static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int *needs_close);
 
 HPyAPI_HELPER
 HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
@@ -54,7 +96,8 @@ HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
     if (size < 0) {
         return HPy_NULL;
     } else if (size == 1) {
-        return build_single(ctx, &fmt, &values);
+        int dummy_needs_close;
+        return build_single(ctx, &fmt, &values, &dummy_needs_close);
     } else {
         return build_tuple(ctx, &fmt, &values, size, '\0');
     }
@@ -63,17 +106,36 @@ HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
 static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
 {
     HPy_ssize_t level = 0, result = 0;
-    while (*fmt != end) {
-        switch (*fmt++) {
-            case '\0':
+    char top_level_par = 'X';
+    while (level != 0 || *fmt != end) {
+        char c = *fmt++;
+        switch (c) {
+            case '\0': {
                 // Premature end
-                HPyErr_SetString(ctx, ctx->h_SystemError, "unmatched paren in format");
+                // We try to provide slightly better diagnostics than CPython
+                char msg[128];
+                char par_type = 'X';
+                if (end == ')') {
+                    par_type = '(';
+                } else if (end == ']') {
+                    par_type = '[';
+                } else {
+                    if (level == 0 || top_level_par == 'X') {
+                        HPyErr_SetString(ctx, ctx->h_SystemError, "internal error in HPy_BuildValue");
+                        return -1;
+                    }
+                    par_type = top_level_par;
+                }
+                sprintf(msg, "unmatched '%c' in the format string passed HPy_BuildValue", par_type);
+                HPyErr_SetString(ctx, ctx->h_SystemError, msg);
                 return -1;
+            }
 
             case '[':
             case '(':
             case '{':
                 if (level == 0) {
+                    top_level_par = c;
                     result++;
                 }
                 level++;
@@ -97,9 +159,11 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
     return result;
 }
 
-static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values)
+static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int *needs_close)
 {
-    switch (*(*fmt)++) {
+    char format_char = *(*fmt)++;
+    *needs_close = 1;
+    switch (format_char) {
         case '(': {
             HPy_ssize_t size = count_items(ctx, *fmt, ')');
             if (size < 0) {
@@ -108,34 +172,105 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values)
             return build_tuple(ctx, fmt, values, size, ')');
         }
 
+        case '[': {
+            HPy_ssize_t size = count_items(ctx, *fmt, ']');
+            if (size < 0) {
+                return HPy_NULL;
+            }
+            return build_list(ctx, fmt, values, size);
+        }
+
         case 'i':
             return HPyLong_FromLong(ctx, (long)va_arg(*values, int));
 
-        case 'f':
-            return HPyFloat_FromDouble(ctx, (double)va_arg(*values, double));
+        case 'I':
+            return HPyLong_FromUnsignedLong(ctx, (unsigned long)va_arg(*values, unsigned int));
+
+        case 'k':
+            return HPyLong_FromUnsignedLong(ctx, va_arg(*values, unsigned long));
+
+        case 'l':
+            return HPyLong_FromLong(ctx, va_arg(*values, long));
+
+        case 'L':
+            return HPyLong_FromLongLong(ctx, (long long)va_arg(*values, long long));
+
+        case 'K':
+            return HPyLong_FromUnsignedLongLong(ctx, (long long)va_arg(*values, unsigned long long));
+
+        case 's':
+            return HPyUnicode_FromString(ctx, va_arg(*values, const char*));
+
+        case 'O':
+        case 'N':
+        case 'S':
+            *needs_close = 0;
+            return (HPy) va_arg(*values, HPy);
+
+        case 'f': // Note: floats are promoted to doubles when passed in "..."
+        case 'd':
+            return HPyFloat_FromDouble(ctx, va_arg(*values, double));
 
         default: {
-            HPyErr_SetString(ctx, ctx->h_SystemError, "NULL object passed to Py_BuildValue");
+            char message[128];
+            sprintf(message, "bad format char '%c' in the format string passed HPy_BuildValue", format_char);
+            HPyErr_SetString(ctx, ctx->h_SystemError, message);
             return HPy_NULL;
         }
     } // switch
+}
+
+static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size)
+{
+    HPyListBuilder builder = HPyListBuilder_New(ctx, size);
+    for (HPy_ssize_t i = 0; i < size; ++i) {
+        int needs_close;
+        HPy item = build_single(ctx, fmt, values, &needs_close);
+        if (HPy_IsNull(item)) {
+            HPyListBuilder_Cancel(ctx, builder);
+            return HPy_NULL;
+        }
+        HPyListBuilder_Set(ctx, builder, i, item);
+        if (needs_close) {
+            HPy_Close(ctx, item);
+        }
+    }
+    if (**fmt != ']') {
+        // count_items does not check the type of the matching paren, that's what we do here
+        HPyListBuilder_Cancel(ctx, builder);
+        HPyErr_SetString(ctx, ctx->h_SystemError,
+                         "unmatched '[' in the format string passed HPy_BuildValue");
+        return HPy_NULL;
+    }
+    ++*fmt;
+    return HPyListBuilder_Build(ctx, builder);
 }
 
 static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end)
 {
     HPyTupleBuilder builder = HPyTupleBuilder_New(ctx, size);
     for (HPy_ssize_t i = 0; i < size; ++i) {
-        HPy item = build_single(ctx, fmt, values);
+        int needs_close;
+        HPy item = build_single(ctx, fmt, values, &needs_close);
         if (HPy_IsNull(item)) {
             HPyTupleBuilder_Cancel(ctx, builder);
             return HPy_NULL;
         }
         HPyTupleBuilder_Set(ctx, builder, i, item);
-        HPy_Close(ctx, item);
+        if (needs_close) {
+            HPy_Close(ctx, item);
+        }
     }
     if (**fmt != expected_end) {
+        // count_items does not check the type of the matching paren, that's what we do here
+        // if expected_end == '\0', then there would have to be bug in count_items
         HPyTupleBuilder_Cancel(ctx, builder);
-        HPyErr_SetString(ctx, ctx->h_SystemError, "Unmatched paren in format");
+        if (expected_end == '\0') {
+            HPyErr_SetString(ctx, ctx->h_SystemError, "internal error in HPy_BuildValue");
+        } else {
+            HPyErr_SetString(ctx, ctx->h_SystemError,
+                             "unmatched '[' in the format string passed HPy_BuildValue");
+        }
         return HPy_NULL;
     }
     if (expected_end != '\0') {
