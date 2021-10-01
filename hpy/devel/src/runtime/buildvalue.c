@@ -59,16 +59,16 @@
  * ~~~~~~~
  *
  * ``O (Python object) [HPy]``
- *      Pass a untouched Python object represented by the handle. If the object passed
+ *      Pass an untouched Python object represented by the handle. If the object passed
  *      in is a HPy_NULL, it is assumed that this was caused because the call producing
  *      the argument found an error and set an exception. Therefore, HPy_BuildValue will
- *      also immediately stop and return HPy_NULL but will not raise a new exception. If
- *      no exception has been raised yet, SystemError is set.
+ *      also immediately stop and return HPy_NULL but will not raise any new exception.
+ *      If no exception has been raised yet, SystemError is set.
  *
  * ``N (Python object) [HPy]``
- *      For the compatibility reasons and ease of porting from CPython API, HPy_BuildValue
- *      also supports, but it is an alias to 'O'. Any HPy handle passed to HPy_BuildValue is
- *      always owned by the caller.
+ *      For compatibility reasons and ease of porting from CPython API, HPy_BuildValue
+ *      also supports 'N', but it is an alias to 'O'. Any HPy handle passed to HPy_BuildValue
+ *      is always owned by the caller.
  *
  * ``S (Python object) [HPy]``
  *      Alias for 'O'.
