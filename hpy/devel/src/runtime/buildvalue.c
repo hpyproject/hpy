@@ -16,6 +16,10 @@
  * HPy_BuildValue provides straightforward way to port existing code that uses
  * Py_BuildValue.
  *
+ * HPy_BuildValue always returns a new handle that will be owned by the caller. Even
+ * an artificial example 'HPy_BuildValue(ctx, "O", h)' does not simply forward
+ * the value stored in 'h' but duplicates the handle.
+ *
  * Supported Formatting Strings
  * ----------------------------
  *
@@ -59,16 +63,20 @@
  * ~~~~~~~
  *
  * ``O (Python object) [HPy]``
- *      Pass an untouched Python object represented by the handle. If the object passed
- *      in is a HPy_NULL, it is assumed that this was caused because the call producing
- *      the argument found an error and set an exception. Therefore, HPy_BuildValue will
- *      also immediately stop and return HPy_NULL but will not raise any new exception.
- *      If no exception has been raised yet, SystemError is set.
+ *      Pass an untouched Python object represented by the handle.
+ *
+ *      If the object passed in is a HPy_NULL, it is assumed that this was caused because
+ *      the call producing the argument found an error and set an exception. Therefore,
+ *      HPy_BuildValue will also immediately stop and return HPy_NULL but will not raise
+ *      any new exception. If no exception has been raised yet, SystemError is set.
+ *
+ *      Any HPy handle passed to HPy_BuildValue is always owned by the caller. HPy_BuildValue
+ *      never closes the handle nor transfers its ownership. If the handle is used, then
+ *      HPy_BuildValue creates a duplicate of the handle.
  *
  * ``N (Python object) [HPy]``
  *      For compatibility reasons and ease of porting from CPython API, HPy_BuildValue
- *      also supports 'N', but it is an alias to 'O'. Any HPy handle passed to HPy_BuildValue
- *      is always owned by the caller.
+ *      also supports 'N', but it is an alias to 'O'.
  *
  * ``S (Python object) [HPy]``
  *      Alias for 'O'.
@@ -96,8 +104,13 @@ HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
     if (size < 0) {
         return HPy_NULL;
     } else if (size == 1) {
-        int dummy_needs_close;
-        return build_single(ctx, &fmt, &values, &dummy_needs_close);
+        int needs_close;
+        HPy result = build_single(ctx, &fmt, &values, &needs_close);
+        if (!needs_close) {
+            return HPy_Dup(ctx, result);
+        } else {
+            return result;
+        }
     } else {
         return build_tuple(ctx, &fmt, &values, size, '\0');
     }
@@ -193,19 +206,27 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
             return HPyLong_FromLong(ctx, va_arg(*values, long));
 
         case 'L':
-            return HPyLong_FromLongLong(ctx, (long long)va_arg(*values, long long));
+            return HPyLong_FromLongLong(ctx, va_arg(*values, long long));
 
         case 'K':
-            return HPyLong_FromUnsignedLongLong(ctx, (long long)va_arg(*values, unsigned long long));
+            return HPyLong_FromUnsignedLongLong(ctx, va_arg(*values, unsigned long long));
 
         case 's':
             return HPyUnicode_FromString(ctx, va_arg(*values, const char*));
 
         case 'O':
         case 'N':
-        case 'S':
+        case 'S': {
+            HPy handle = (HPy) va_arg(*values, HPy);
+            if (HPy_IsNull(handle)) {
+                if (!HPyErr_Occurred(ctx)) {
+                    HPyErr_SetString(ctx, ctx->h_SystemError, "HPy_NULL object passed to HPy_BuildValue");
+                }
+                return handle;
+            }
             *needs_close = 0;
-            return (HPy) va_arg(*values, HPy);
+            return handle;
+        }
 
         case 'f': // Note: floats are promoted to doubles when passed in "..."
         case 'd':
@@ -263,7 +284,7 @@ static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_s
     }
     if (**fmt != expected_end) {
         // count_items does not check the type of the matching paren, that's what we do here
-        // if expected_end == '\0', then there would have to be bug in count_items
+        // if expected_end == '\0', then there would have to be a bug in count_items
         HPyTupleBuilder_Cancel(ctx, builder);
         if (expected_end == '\0') {
             HPyErr_SetString(ctx, ctx->h_SystemError, "internal error in HPy_BuildValue");

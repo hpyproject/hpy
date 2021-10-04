@@ -53,19 +53,69 @@ class TestBuildValue(HPyTest):
         mod = self.make_build_item(fmt, "arg")
         assert mod.f(obj) == obj
 
-    def test_OO_pars_with_new_objects(self):
+    def test_O_with_new_object(self):
+        # HPy_BuildValue does not steal the reference to the object passed as 'O',
+        # the caller still needs to close it, otherwise -> handle leak
+        mod = self.make_module("""
+            #include <stdio.h>
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy o = HPyLong_FromLong(ctx, 42);
+                HPy result;
+                if (HPyLong_AsLong(ctx, arg)) {
+                    result = HPy_BuildValue(ctx, "O", o);
+                } else {
+                    result = HPy_BuildValue(ctx, "(dO)", 0.25, o);
+                }
+                HPy_Close(ctx, o);
+                return result;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(0) == (0.25, 42)
+        assert mod.f(1) == 42
+
+    @pytest.mark.parametrize("fmt, values", [
+        ("O", "HPy_NULL"),
+        ("(iO)", "42, HPy_NULL"),
+    ])
+    def test_O_with_null(self, fmt, values):
+        import pytest
         mod = self.make_module("""
             #include <stdio.h>
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {{
+                if (HPyLong_AsLong(ctx, arg)) {{
+                    HPyErr_SetString(ctx, ctx->h_ValueError, "Some err msg that will be asserted");
+                }}
+                return HPy_BuildValue(ctx, "{fmt}", {values});
+            }}
+            @EXPORT(f)
+            @INIT
+        """.format(fmt=fmt, values=values))
+        with pytest.raises(SystemError) as e:
+            mod.f(0)
+        assert 'HPy_NULL object passed to HPy_BuildValue' in str(e)
+        with pytest.raises(ValueError) as e:
+            mod.f(1)
+        assert "Some err msg that will be asserted" in str(e)
+
+    def test_OO_pars_with_new_objects(self):
+        mod = self.make_module("""
+            #include <stdio.h>
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
                 HPy o1 = HPyLong_FromLong(ctx, 1);
                 HPy o2 = HPyLong_FromLong(ctx, 2);
                 HPy result = HPy_BuildValue(ctx, "(OO)", o1, o2);
                 HPy_Close(ctx, o1);
                 HPy_Close(ctx, o2);
                 return result;
-            }}
+            }
             @EXPORT(f)
             @INIT
         """)
@@ -94,7 +144,7 @@ class TestBuildValue(HPyTest):
         assert mod.f(None) > 0
 
     def test_ulonglong_limit(self):
-        mod = self.make_build_item("k", "ULLONG_MAX")
+        mod = self.make_build_item("K", "ULLONG_MAX")
         assert mod.f(None) > 0
 
     def test_uint_limit(self):
