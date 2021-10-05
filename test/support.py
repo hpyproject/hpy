@@ -312,10 +312,42 @@ class HPyTest:
         return bool(getattr(sys, "executable", None))
 
 
+class HPyDebugCapture:
+    def __init__(self):
+        self.invalid_handles_count = 0
+
+    def _capture_report(self):
+        self.invalid_handles_count += 1
+
+    def __enter__(self):
+        from hpy.universal import _debug
+        _debug.set_on_invalid_handle(self._capture_report)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        from hpy.universal import _debug
+        _debug.set_on_invalid_handle(None)
+
 
 class HPyDebugTest(HPyTest):
     """
     Like HPyTest, but force hpy_abi=='debug' and thus run only [debug] tests
+    """
+
+    @pytest.fixture()
+    def hpy_debug_capture(self, request):
+        with HPyDebugCapture() as reporter:
+            yield reporter
+
+    @pytest.fixture(params=['debug'])
+    def hpy_abi(self, request):
+        return request.param
+
+
+class HPyDebugLeakTest(HPyDebugTest):
+    """
+    Like HPyDebugTest, but also disables the leak detector, so that the tests
+    can intentionally create leaks.
     """
 
     # override initargs to avoid using hpy_debug (we don't want to detect
@@ -323,10 +355,6 @@ class HPyDebugTest(HPyTest):
     @pytest.fixture()
     def initargs(self, compiler):
         self.compiler = compiler
-
-    @pytest.fixture(params=['debug'])
-    def hpy_abi(self, request):
-        return request.param
 
     def make_leak_module(self):
         # for convenience
