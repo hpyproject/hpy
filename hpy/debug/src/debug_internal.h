@@ -88,6 +88,10 @@ typedef struct DebugHandle {
     UHPy uh;
     long generation;
     bool is_closed;
+    // pointer to and size of any raw data associated with
+    // the lifetime of the handle:
+    void *associated_data;
+    HPy_ssize_t associated_data_size;
     struct DebugHandle *prev;
     struct DebugHandle *next;
 } DebugHandle;
@@ -159,5 +163,19 @@ static inline HPyDebugInfo *get_info(HPyContext *dctx)
     return info;
 }
 
+/* Functions that abstract memory protection mechanism, which is OS dependent.
+ *
+ * raw_data_copy creates a copy of given data that can be protected from
+ * writing and reading. The memory is initially protected from writing if
+ * write_protect flag is set. The returned copy of the memory can be further
+ * protected from any access, reading or writing, by passing it to
+ * raw_data_protect.
+ *
+ * These functions have OS dependent implementations and should attempt to
+ * protect the memory as much as possible, but there are no concrete protection
+ * guarantees.
+ */
+void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect);
+void *raw_data_protect(void* data, HPy_ssize_t size);
 
 #endif /* HPY_DEBUG_INTERNAL_H */

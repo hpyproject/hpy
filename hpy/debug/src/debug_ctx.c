@@ -116,6 +116,17 @@ void debug_ctx_Close(HPyContext *dctx, DHPy dh)
     HPy_Close(get_info(dctx)->uctx, uh);
 }
 
+const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_t *size)
+{
+    const char *ptr = HPyUnicode_AsUTF8AndSize(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), size);
+    HPy_ssize_t data_size = *size + 1;
+    char* new_ptr = (char*) raw_data_copy(ptr, data_size, true);
+    DebugHandle *handle = as_DebugHandle(h);
+    handle->associated_data = new_ptr;
+    handle->associated_data_size = data_size;
+    return new_ptr;
+}
+
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
 {
     UHPy *uh_items = (UHPy *)alloca(n * sizeof(UHPy));
@@ -162,7 +173,7 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
    This is a bit special and it's worth explaining what is going on.
 
    The HPyTracker functions need their own debug mode implementation because
-   the debug moe needs to be aware of when a DHPy is closed, for the same
+   the debug mode needs to be aware of when a DHPy is closed, for the same
    reason for why we need debug_ctx_Close.
 
    So, in theory here we should have our own implementation of a

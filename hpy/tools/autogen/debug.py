@@ -57,9 +57,10 @@ class autogen_debug_ctx_init_h(AutoGenFile):
 class autogen_debug_wrappers(AutoGenFile):
     PATH = 'hpy/debug/src/autogen_debug_wrappers.c'
 
-    NO_WRAPPER = set([
+    NO_WRAPPER = {
         '_HPy_CallRealFunctionFromTrampoline',
         'HPy_Close',
+        'HPyUnicode_AsUTF8AndSize',
         'HPyTuple_FromArray',
         'HPyType_GenericNew',
         'HPyType_FromSpec',
@@ -67,7 +68,7 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyTracker_Add',
         'HPyTracker_ForgetAll',
         'HPyTracker_Close',
-        ])
+    }
 
     def generate(self):
         lines = []

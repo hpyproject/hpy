@@ -1,5 +1,6 @@
 import textwrap
 import sys
+import os
 import os.path
 from setuptools import setup, Extension
 
@@ -50,6 +51,9 @@ if 'HPY_DEBUG' in os.environ:
     ]
 else:
     EXTRA_COMPILE_ARGS = []
+
+if os.name == "posix":
+    EXTRA_COMPILE_ARGS += ['-D_HPY_POSIX']
 
 
 def get_scm_config():
@@ -108,6 +112,7 @@ EXT_MODULES = [
                'hpy/debug/src/debug_ctx_cpython.c',
                'hpy/debug/src/debug_handles.c',
                'hpy/debug/src/dhqueue.c',
+               'hpy/debug/src/memprotect.c',
                'hpy/debug/src/_debugmod.c',
                'hpy/debug/src/autogen_debug_wrappers.c',
               ],

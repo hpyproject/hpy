@@ -41,6 +41,7 @@ DHPy DHPy_open(HPyContext *dctx, UHPy uh)
     handle->uh = uh;
     handle->generation = info->current_generation;
     handle->is_closed = 0;
+    handle->associated_data = NULL;
     DHQueue_append(&info->open_handles, handle);
     debug_handles_sanity_check(info);
     return as_DHPy(handle);
@@ -109,6 +110,15 @@ void DHPy_close(HPyContext *dctx, DHPy dh)
     DHQueue_remove(&info->open_handles, handle);
     DHQueue_append(&info->closed_handles, handle);
     handle->is_closed = true;
+    if (handle->associated_data) {
+        // This leaks. So far all implementations of raw_data_protect keep the
+        // physical memory (or at least are not guaranteed to release it).
+        // Ideally the raw_data_protect implementation would at least release
+        // the physical memory, but in any case it would still leak the virtual
+        // memory, but we cannot do anything about that if we want to make sure
+        // that this specific memory address is never accessed again
+        raw_data_protect(handle->associated_data, handle->associated_data_size);
+    }
 
     if (info->closed_handles.size > info->closed_handles_queue_max_size) {
         // we have too many closed handles. Let's free the oldest one
