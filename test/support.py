@@ -226,6 +226,9 @@ class ExtensionCompiler:
         if you are writing a test which needs a proper import, you should not
         use make_module but explicitly use compile_module and import it
         manually as required by your test.
+
+        To load the module in subprocess, use compile_module and
+        HPyTest run_python_subprocess
         """
         so_filename = self.compile_module(
             ExtensionTemplate, main_src, name, extra_sources)
@@ -267,9 +270,13 @@ class ExtensionCompiler:
         return module
 
 
-@pytest.mark.usefixtures('initargs')
+@pytest.mark.usefixtures('initargs', 'initopts')
 class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
+
+    @pytest.fixture()
+    def initopts(self, request):
+        self.subprocess_verbose = request.config.getoption('--subprocess-v')
 
     @pytest.fixture()
     def initargs(self, compiler, hpy_debug):
@@ -281,6 +288,12 @@ class HPyTest:
         ExtensionTemplate = self.ExtensionTemplate
         return self.compiler.make_module(ExtensionTemplate, main_src, name,
                                          extra_sources)
+
+    def compile_module(self, main_src, name='mytest', extra_sources=()):
+        ExtensionTemplate = self.ExtensionTemplate
+        so_filename = self.compiler.compile_module(ExtensionTemplate, main_src,
+                                                   name, extra_sources)
+        return (name, so_filename)
 
     def supports_refcounts(self):
         """ Returns True if the underlying Python implementation supports
@@ -310,6 +323,39 @@ class HPyTest:
             By default returns `True` if sys.executable is set to a true value.
         """
         return bool(getattr(sys, "executable", None))
+
+    def run_python_subprocess(self, mod, code):
+        """ Starts new subprocess that loads given module as 'mod' using the
+            correct ABI mode and then executes given code snippet. Use
+            "--subprocess-v" to enable logging from this.
+        """
+        assert self.supports_sys_executable()
+        import subprocess
+        env = os.environ.copy()
+        pythonpath = [os.path.dirname(mod[1])]
+        if 'PYTHONPATH' in env:
+            pythonpath.append(env['PYTHONPATH'])
+        env["PYTHONPATH"] = os.pathsep.join(pythonpath)
+        if self.compiler.hpy_abi in ['universal', 'debug']:
+            # HPy module
+            load_module = "import sys;" + \
+                          "import hpy.universal;" + \
+                          "mod = hpy.universal.load('{name}', '{so_filename}', debug={debug});"
+            load_module = load_module.format(name=mod[0], so_filename=mod[1],
+                                             debug=self.compiler.hpy_abi == 'debug')
+        else:
+            # CPython module
+            assert self.compiler.hpy_abi == 'cpython'
+            load_module = "import {} as mod;".format(mod[0])
+        if self.subprocess_verbose:
+            print("\n---\nExecuting in subprocess: {}\n".format(load_module + code))
+        result = subprocess.run([sys.executable, "-c", load_module + code], env=env,
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if self.subprocess_verbose:
+            out = result.stdout.decode('ascii')
+            err = result.stderr.decode('ascii')
+            print("\n---\n{out}\n{err}\n---\n".format(out=out, err=err))
+        return result
 
 
 class HPyDebugCapture:
@@ -343,6 +389,19 @@ class HPyDebugTest(HPyTest):
     def hpy_abi(self, request):
         return request.param
 
+    def make_leak_module(self):
+        # for convenience
+        return self.make_module("""
+            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
+            static HPy leak_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy_Dup(ctx, arg); // leak!
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(leak)
+            @INIT
+        """)
+
 
 class HPyDebugLeakTest(HPyDebugTest):
     """
@@ -356,18 +415,6 @@ class HPyDebugLeakTest(HPyDebugTest):
     def initargs(self, compiler):
         self.compiler = compiler
 
-    def make_leak_module(self):
-        # for convenience
-        return self.make_module("""
-            HPyDef_METH(leak, "leak", leak_impl, HPyFunc_O)
-            static HPy leak_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                HPy_Dup(ctx, arg); // leak!
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            @EXPORT(leak)
-            @INIT
-        """)
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
 

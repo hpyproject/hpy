@@ -1,4 +1,5 @@
 from test.support import HPyDebugTest
+import pytest
 
 
 class TestHandlesInvalid(HPyDebugTest):
@@ -83,3 +84,23 @@ class TestHandlesInvalid(HPyDebugTest):
         assert hpy_debug_capture.invalid_handles_count == 1
         mod.g('bar')   # use-after-close
         assert hpy_debug_capture.invalid_handles_count == 2
+
+    def test_invalid_handle_crashes_python_if_no_hook(self, fatal_exit_code):
+        if not self.supports_sys_executable():
+            pytest.skip("no sys.executable")
+
+        mod = self.compile_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O, .doc="double close")
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy h = HPy_Dup(ctx, arg);
+                HPy_Close(ctx, h);
+                HPy_Close(ctx, h); // double close
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT(f)
+            @INIT
+        """)
+        result = self.run_python_subprocess(mod, "mod.f(42);")
+        assert result.returncode == fatal_exit_code
