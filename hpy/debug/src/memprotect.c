@@ -14,7 +14,9 @@
 void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
     void* new_ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     memcpy(new_ptr, data, size);
-    mprotect(new_ptr, size, PROT_READ);
+    if (write_protect) {
+        mprotect(new_ptr, size, PROT_READ);
+    }
     return new_ptr;
 }
 
