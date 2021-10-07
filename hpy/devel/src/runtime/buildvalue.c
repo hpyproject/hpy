@@ -90,6 +90,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define MESSAGE_BUF_SIZE 128
+
 static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end);
 static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end);
 static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size);
@@ -126,7 +128,7 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
             case '\0': {
                 // Premature end
                 // We try to provide slightly better diagnostics than CPython
-                char msg[128];
+                char msg[MESSAGE_BUF_SIZE];
                 char par_type = 'X';
                 if (end == ')') {
                     par_type = '(';
@@ -139,7 +141,7 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
                     }
                     par_type = top_level_par;
                 }
-                sprintf(msg, "unmatched '%c' in the format string passed HPy_BuildValue", par_type);
+                snprintf(msg, MESSAGE_BUF_SIZE, "unmatched '%c' in the format string passed HPy_BuildValue", par_type);
                 HPyErr_SetString(ctx, ctx->h_SystemError, msg);
                 return -1;
             }
@@ -217,7 +219,7 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
         case 'O':
         case 'N':
         case 'S': {
-            HPy handle = (HPy) va_arg(*values, HPy);
+            HPy handle = va_arg(*values, HPy);
             if (HPy_IsNull(handle)) {
                 if (!HPyErr_Occurred(ctx)) {
                     HPyErr_SetString(ctx, ctx->h_SystemError, "HPy_NULL object passed to HPy_BuildValue");
@@ -233,8 +235,8 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
             return HPyFloat_FromDouble(ctx, va_arg(*values, double));
 
         default: {
-            char message[128];
-            sprintf(message, "bad format char '%c' in the format string passed HPy_BuildValue", format_char);
+            char message[MESSAGE_BUF_SIZE];
+            snprintf(message, MESSAGE_BUF_SIZE, "bad format char '%c' in the format string passed to HPy_BuildValue", format_char);
             HPyErr_SetString(ctx, ctx->h_SystemError, message);
             return HPy_NULL;
         }
