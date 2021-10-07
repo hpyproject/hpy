@@ -143,7 +143,7 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
                     }
                     par_type = top_level_par;
                 }
-                snprintf(msg, MESSAGE_BUF_SIZE, "unmatched '%c' in the format string passed HPy_BuildValue", par_type);
+                snprintf(msg, MESSAGE_BUF_SIZE, "unmatched '%c' in the format string passed to HPy_BuildValue", par_type);
                 HPyErr_SetString(ctx, ctx->h_SystemError, msg);
                 return -1;
             }
@@ -264,7 +264,7 @@ static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ss
         // count_items does not check the type of the matching paren, that's what we do here
         HPyListBuilder_Cancel(ctx, builder);
         HPyErr_SetString(ctx, ctx->h_SystemError,
-                         "unmatched '[' in the format string passed HPy_BuildValue");
+                         "unmatched '[' in the format string passed to HPy_BuildValue");
         return HPy_NULL;
     }
     ++*fmt;
@@ -294,7 +294,7 @@ static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_s
             HPyErr_SetString(ctx, ctx->h_SystemError, "internal error in HPy_BuildValue");
         } else {
             HPyErr_SetString(ctx, ctx->h_SystemError,
-                             "unmatched '[' in the format string passed HPy_BuildValue");
+                             "unmatched '[' in the format string passed to HPy_BuildValue");
         }
         return HPy_NULL;
     }

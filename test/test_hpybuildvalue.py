@@ -153,12 +153,12 @@ class TestBuildValue(HPyTest):
         assert mod.f(None) > 0
 
     @pytest.mark.parametrize("fmt, msg", [
-        ("(q)", "bad format char 'q' in the format string passed HPy_BuildValue"),
-        ("(i", "unmatched '(' in the format string passed HPy_BuildValue"),
-        ("[i", "unmatched '[' in the format string passed HPy_BuildValue"),
-        ("([(i)k", "unmatched '(' in the format string passed HPy_BuildValue"),
-        ("(i]", "unmatched '(' in the format string passed HPy_BuildValue"),
-        ("[i)", "unmatched '[' in the format string passed HPy_BuildValue"),
+        ("(q)", "bad format char 'q' in the format string passed to HPy_BuildValue"),
+        ("(i", "unmatched '(' in the format string passed to HPy_BuildValue"),
+        ("[i", "unmatched '[' in the format string passed to HPy_BuildValue"),
+        ("([(i)k", "unmatched '(' in the format string passed to HPy_BuildValue"),
+        ("(i]", "unmatched '(' in the format string passed to HPy_BuildValue"),
+        ("[i)", "unmatched '[' in the format string passed to HPy_BuildValue"),
     ])
     def test_bad_format(self, fmt, msg):
         import pytest
