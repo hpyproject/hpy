@@ -1,5 +1,9 @@
 from test.support import HPyDebugTest
+import os
 import pytest
+
+SUPPORTS_MEM_PROTECTION = os.name == 'posix'
+
 
 class TestCharPtr(HPyDebugTest):
     """
@@ -33,7 +37,11 @@ class TestCharPtr(HPyDebugTest):
             @EXPORT(g)
             @INIT
         """)
-        result = self.run_python_subprocess(mod, "mod.f('leak me!'); mod.g()")
+        if SUPPORTS_MEM_PROTECTION:
+            code = "mod.f('leak me!'); mod.g()"
+        else:
+            code = "mod.f('leak me!'); assert mod.g() == 'leak me!'"
+        result = self.run_python_subprocess(mod, code)
         assert result.returncode != 0
 
     def test_charptr_use_after_handle_close(self):
@@ -54,9 +62,17 @@ class TestCharPtr(HPyDebugTest):
             @EXPORT(f)
             @INIT
         """)
-        result = self.run_python_subprocess(mod, "mod.f('use after close me!');")
+        if SUPPORTS_MEM_PROTECTION:
+            code = "mod.f('use after close me!')"
+        else:
+            code = "assert mod.f('use after close me!') == 'use after close me!'"
+        result = self.run_python_subprocess(mod, code)
         assert result.returncode != 0
 
+    @pytest.mark.skipif(not SUPPORTS_MEM_PROTECTION, reason=
+                        "Could be implemented by checking the contents on "
+                        "close, but long term it would be better to provide"
+                        "proper protection on Windows in the future")
     def test_charptr_write_ptr(self):
         if not self.supports_sys_executable():
             pytest.skip("no sys.executable")
@@ -102,5 +118,5 @@ class TestCharPtr(HPyDebugTest):
             @EXPORT(f)
             @INIT
         """)
-        result = self.run_python_subprocess(mod, "mod.f('I wont be leaked!');")
+        result = self.run_python_subprocess(mod, "assert mod.f('I wont be leaked!') == 'I wont be leaked!';")
         assert result.returncode == 0

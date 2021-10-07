@@ -29,7 +29,7 @@ void *raw_data_protect(void* data, HPy_ssize_t size) {
 
 #include <string.h>
 
-void *raw_data_copy(void* data, HPy_ssize_t size, bool write_protect) {
+void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
     void *new_data = malloc(size);
     memcpy(new_data, data, size);
     return new_data;
@@ -40,7 +40,7 @@ void *raw_data_protect(void* data, HPy_ssize_t size) {
     // eventually crash or give incorrect result if it reads the garbage
     char val = 0;
     for (HPy_ssize_t i = 0; i < size; ++i) {
-        ((*char)data)[i] = 143 + val;
+        ((char*)data)[i] = 143 + val;
         val = (val + 1) % 10;
     }
 }
