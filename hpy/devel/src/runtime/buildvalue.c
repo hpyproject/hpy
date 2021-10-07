@@ -105,6 +105,8 @@ HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
     HPy_ssize_t size = count_items(ctx, fmt, '\0');
     if (size < 0) {
         return HPy_NULL;
+    } else if (size == 0) {
+        return HPy_Dup(ctx, ctx->h_None);
     } else if (size == 1) {
         int needs_close;
         HPy result = build_single(ctx, &fmt, &values, &needs_close);

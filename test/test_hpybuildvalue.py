@@ -20,6 +20,7 @@ class TestBuildValue(HPyTest):
         return mod
 
     @pytest.mark.parametrize("fmt, c_values, expected", [
+        ("", None, None),
         ("i", "42", 42),
         ("i", "0", 0),
         ("i", "-1", -1),
