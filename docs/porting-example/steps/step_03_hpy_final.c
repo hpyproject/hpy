@@ -34,7 +34,7 @@ HPyType_HELPERS(PointObject)
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
-int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
+int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", NULL};
     PointObject *p = PointObject_AsStruct(ctx, self);
@@ -48,7 +48,7 @@ int Point_init_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy 
 
 // an HPy method of Point
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
-HPy Point_norm_impl(HPyContext ctx, HPy self)
+HPy Point_norm_impl(HPyContext *ctx, HPy self)
 {
     PointObject *p = PointObject_AsStruct(ctx, self);
     double norm;
@@ -60,7 +60,7 @@ HPy Point_norm_impl(HPyContext ctx, HPy self)
 
 // this is an HPy function that uses Point
 HPyDef_METH(dot, "dot", dot_impl, HPyFunc_VARARGS, .doc="Dot product.")
-HPy dot_impl(HPyContext ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     HPy point1, point2;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO",  &point1, &point2))
@@ -118,7 +118,7 @@ static HPyModuleDef moduledef = {
 };
 
 HPy_MODINIT(step_03_hpy_final)
-static HPy init_step_03_hpy_final_impl(HPyContext ctx)
+static HPy init_step_03_hpy_final_impl(HPyContext *ctx)
 {
     HPy m = HPyModule_Create(ctx, &moduledef);
     if (HPy_IsNull(m))
