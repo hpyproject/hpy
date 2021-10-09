@@ -11,5 +11,5 @@ setup(
         Extension(step.name, sources=[step.src])
         for step in PORTING_STEPS
     ],
-    setup_requires=['hpy.devel'],
+    setup_requires=['hpy'],
 )
