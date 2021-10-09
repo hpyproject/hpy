@@ -510,3 +510,22 @@ class TestObject(HPyTest):
         assert mod.f('hello', str)
         assert not mod.f('hello', int)
         assert mod.f(MyStr('hello'), str)
+
+    def test_is(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                HPy obj, other;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &obj, &other))
+                    return HPy_NULL;
+                int res = HPy_Is(ctx, obj, other);
+                return HPyBool_FromLong(ctx, res);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(None, None)
+        a = object()
+        assert mod.f(a, a)
+        assert not mod.f(a, None)

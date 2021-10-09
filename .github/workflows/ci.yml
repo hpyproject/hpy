@@ -1,0 +1,277 @@
+---
+name: tests
+
+on: [pull_request]
+
+jobs:
+  main_tests:
+    name: Main tests
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      # Duplicate changes to this matrix to 'poc_tests'
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9']
+        # Possible values: ['2.7', '3.6', '3.7', '3.8', '3.9', '3.10.0-rc.2']
+        include:
+          - os: ubuntu-latest
+            python-version: '3.6'
+          - os: ubuntu-latest
+            python-version: '3.7'
+          - os: ubuntu-latest
+            python-version: '3.8'
+          ## Expected failure
+          # - os: ubuntu-latest
+          #   python-version: '3.10.0-rc.2'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # - template: azure-templates/ccache.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+      # - template: azure-templates/python.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Build
+        run: python -m pip install .
+
+      - name: Run tests
+        run: |
+          python -m pip install pytest pytest-xdist
+          python -m pytest -n auto test/
+
+
+  poc_tests:
+    name: Proof of concept tests
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9']
+        include:
+          - os: ubuntu-latest
+            python-version: '3.6'
+          - os: ubuntu-latest
+            python-version: '3.7'
+          - os: ubuntu-latest
+            python-version: '3.8'
+          ## Expected failure
+          # - os: ubuntu-latest
+          #   python-version: '3.10.0-rc.2'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # - template: azure-templates/ccache.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+      # - template: azure-templates/python.yml
+      #   parameters:
+      #     pythonVersion: $(python.version)
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=cpython bdist_wheel'
+        run: proof-of-concept/test_pof.sh wheel cpython
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=universal bdist_wheel'
+        run: proof-of-concept/test_pof.sh wheel universal
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=cpython install'
+        run: proof-of-concept/test_pof.sh setup_py_install cpython
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=universal install'
+        run: proof-of-concept/test_pof.sh setup_py_install universal
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=cpython build_ext --inplace'
+        run: proof-of-concept/test_pof.sh setup_py_build_ext_inplace cpython
+        shell: bash
+
+      - name: 'Test setup.py --hpy-abi=universal build_ext --inplace'
+        run: proof-of-concept/test_pof.sh setup_py_build_ext_inplace universal
+        shell: bash
+
+
+  valgrind_tests:
+    name: Valgrind tests
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/ccache.yml
+    # - template: azure-templates/python.yml
+
+      - name: Install / Upgrade system dependencies
+        run: sudo apt update && sudo apt install -y valgrind
+
+      - name: Install / Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Build
+        run: python -m pip install .
+
+      - name: Run tests
+        run: |
+          python -m pip install pytest pytest-valgrind
+          make valgrind
+
+
+  build_docs:
+    name: Build documentation
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+      # - template: azure-templates/python.yml
+
+      - name: Install / Upgrade system requirements
+        run: sudo apt update && sudo apt install -y libclang-10-dev
+
+      - name: Install / Upgrade Python requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r docs/requirements.txt
+
+      - name: Build docs
+        run: |
+          cd docs;
+          python -m sphinx -T -W -E -b html -d _build/doctrees -D language=en . _build/html
+
+
+  c_tests:
+    name: C tests
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+      - run: make -C c_test
+
+
+  check_autogen:
+    name: Check autogen
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/python.yml
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Install dependencies
+        run: |
+          pip install pycparser==2.20
+          pip install py==1.8.0
+          pip install packaging==19.2
+          pip install attrs==19.3.0
+      - name: make autogen
+        run: |
+          make autogen
+          if [ -z "$(git status --porcelain)" ]; then
+              # clean working copy
+              echo "Working copy is clean, everything ok"
+          else
+              # Uncommitted changes
+              echo "ERROR: uncommitted changes after running make autogen"
+              echo "git status"
+              git status
+              echo
+              echo "git diff"
+              git diff
+              exit 1
+          fi
+
+
+  check_py27_compat:
+    name: Check Python 2.7 compatibility
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+    # - template: azure-templates/python.yml
+    #   parameters:
+    #     pythonVersion: "2.7"
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '2.7'
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: check_py27_compat.py
+        run: |
+          python -m pip install pytest pathlib
+          python test/check_py27_compat.py
+
+
+  # cpp_check:
+  #   runs-on: 'ubuntu-latest'
+  #   steps:
+
+  #   # - template: azure-templates/cppcheck.yml
+  #   # - template: azure-templates/python.yml
+
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v2
+  #     with:
+  #       python-version: '3.x'
+
+  #   - name: Run CppCheck
+  #     run: make cppcheck
+
+
+  infer:
+    name: Infer static analysis
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+      # - template: azure-templates/python.yml
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Install Infer
+        run: |
+          python -m pip install compiledb wheel;
+          VERSION=1.1.0; \
+          curl -sSL "https://github.com/facebook/infer/releases/download/v$VERSION/infer-linux64-v$VERSION.tar.xz" \
+          | sudo tar -C /opt -xJ && \
+          echo "/opt/infer-linux64-v$VERSION/bin" >> $GITHUB_PATH
+
+      - name: Run Infer
+        run: make infer

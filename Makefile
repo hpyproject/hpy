@@ -5,6 +5,10 @@ all: hpy.universal
 hpy.universal:
 	python3 setup.py build_ext -if
 
+.PHONY: dist-info
+dist-info:
+	python3 setup.py dist_info
+
 debug:
 	HPY_DEBUG=1 make all
 
@@ -16,6 +20,7 @@ cppcheck-build-dir:
 
 cppcheck: cppcheck-build-dir
 	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
+	cppcheck --version
 	cppcheck \
 		--error-exitcode=1 \
 		--cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) \

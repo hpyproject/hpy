@@ -4,15 +4,15 @@
  * These are not part of the HPy context or ABI, but are available for
  * HPy extensions to incorporate at compile time.
  *
- * API
- * ---
+ * Runtime Helpers API
+ * -------------------
  *
  */
 
 #include "hpy.h"
 
 /**
- * Create a type and add it as an attribute ot the given object. The type is
+ * Create a type and add it as an attribute on the given object. The type is
  * created using `HPyType_FromSpec`. The object is often a module that the type
  * is being added to.
  *
@@ -39,7 +39,7 @@
  *         return HPy_NULL;
  *     ...
  *
- * Using `HPyArg_Parse` with `HPyType_SpecParam` parameters:
+ * Using `HPyHelpers_AddType` with `HPyType_SpecParam` parameters:
  *
  * .. code-block:: c
  *
@@ -52,7 +52,7 @@
  *         return HPy_NULL;
  *     ...
  */
-HPyAPI_RUNTIME_FUNC(int)
+HPyAPI_HELPER int
 HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
                   HPyType_Spec *hpyspec, HPyType_SpecParam *params)
 {

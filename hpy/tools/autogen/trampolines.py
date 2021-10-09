@@ -5,7 +5,7 @@ from .parse import toC, find_typedecl
 
 
 class autogen_trampolines_h(AutoGenFile):
-    PATH = 'hpy/devel/include/universal/autogen_trampolines.h'
+    PATH = 'hpy/devel/include/hpy/universal/autogen_trampolines.h'
 
     NO_TRAMPOLINES = set([
         '_HPy_New',
@@ -22,7 +22,7 @@ class autogen_trampolines_h(AutoGenFile):
         return '\n'.join(lines)
 
     def gen_trampoline(self, func):
-        # static inline HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
+        # HPyAPI_FUNC HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
         if func.name in self.NO_TRAMPOLINES:
@@ -30,7 +30,7 @@ class autogen_trampolines_h(AutoGenFile):
         rettype = toC(func.node.type.type)
         parts = []
         w = parts.append
-        w('static inline')
+        w('HPyAPI_FUNC')
         w(toC(func.node))
         w('{\n    ')
 
@@ -50,8 +50,21 @@ class autogen_trampolines_h(AutoGenFile):
         return ' '.join(parts)
 
 
-class autogen_impl_h(AutoGenFile):
-    PATH = 'hpy/devel/include/common/autogen_impl.h'
+class cpython_autogen_api_impl_h(AutoGenFile):
+    PATH = 'hpy/devel/include/hpy/cpython/autogen_api_impl.h'
+
+    def signature(self, func):
+        """
+        Return the C signature of the impl function.
+
+        In CPython mode, the name it's the same as in public_api:
+           HPy_Add          ==> HPyAPI_FUNC HPy_Add
+           HPyLong_FromLong ==> HPyAPI_FUNC HPyLong_FromLong
+
+        See also universal_autogen_ctx_impl_h.
+        """
+        sig = toC(func.node)
+        return 'HPyAPI_FUNC %s' % sig
 
     def generate(self):
         lines = []
@@ -63,17 +76,6 @@ class autogen_impl_h(AutoGenFile):
         return '\n'.join(lines)
 
     def gen_implementation(self, func):
-        def signature(base_name):
-            # HPy _HPy_API_NAME(Number_Add)(HPyContext *ctx, HPy x, HPy y)
-            newnode = deepcopy(func.node)
-            typedecl = find_typedecl(newnode)
-            # rename the function
-            if func.name.startswith('HPy_'):
-                typedecl.declname = '_HPy_IMPL_NAME_NOPREFIX(%s)' % base_name
-            else:
-                typedecl.declname = '_HPy_IMPL_NAME(%s)' % base_name
-            return toC(newnode)
-        #
         def call(pyfunc, return_type):
             # return _py2h(PyNumber_Add(_h2py(x), _h2py(y)))
             args = []
@@ -97,8 +99,29 @@ class autogen_impl_h(AutoGenFile):
             raise ValueError(f"Cannot generate implementation for {self}")
         return_type = toC(func.node.type.type)
         return_stmt = '' if return_type == 'void' else 'return '
-        w('HPyAPI_STORAGE %s' % signature(func.base_name()))
+        w(self.signature(func))
         w('{')
         w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
         w('}')
         return '\n'.join(lines)
+
+
+class universal_autogen_ctx_impl_h(cpython_autogen_api_impl_h):
+    PATH = 'hpy/universal/src/autogen_ctx_impl.h'
+
+    def signature(self, func):
+        """
+        Return the C signature of the impl function.
+
+        In Universal mode, the name is prefixed by ctx_:
+           HPy_Add          ==> HPyAPI_IMPL ctx_Add
+           HPyLong_FromLong ==> HPyAPI_IMPL ctx_Long_FromLong
+
+        See also cpython_autogen_api_impl_h.
+        """
+        newnode = deepcopy(func.node)
+        typedecl = find_typedecl(newnode)
+        # rename the function
+        typedecl.declname = func.ctx_name()
+        sig = toC(newnode)
+        return 'HPyAPI_IMPL %s' % sig

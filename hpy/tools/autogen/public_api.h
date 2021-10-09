@@ -11,11 +11,13 @@ typedef int wchar_t;
 typedef int size_t;
 typedef int HPyFunc_Signature;
 typedef int cpy_PyObject;
+typedef int HPyField;
 typedef int HPyListBuilder;
 typedef int HPyTupleBuilder;
 typedef int HPyTracker;
 typedef int HPy_RichCmpOp;
 typedef int HPy_buffer;
+typedef int HPyFunc_visitproc;
 
 /* HPy public API */
 
@@ -177,10 +179,13 @@ HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
 void HPy_FatalError(HPyContext *ctx, const char *message);
 void HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message);
 void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
+HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext *ctx);
 HPy HPyErr_NoMemory(HPyContext *ctx);
 void HPyErr_Clear(HPyContext *ctx);
+HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
+HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
 
 /* object.h */
 int HPy_IsTrue(HPyContext *ctx, HPy h);
@@ -208,6 +213,8 @@ int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
 HPy HPy_Type(HPyContext *ctx, HPy obj);
 // WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
+
+int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 
 void* HPy_AsStruct(HPyContext *ctx, HPy h);
 void* HPy_AsStructLegacy(HPyContext *ctx, HPy h);
@@ -237,7 +244,9 @@ HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len);
 HPy HPyUnicode_FromString(HPyContext *ctx, const char *utf8);
 int HPyUnicode_Check(HPyContext *ctx, HPy h);
 HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h);
+const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
+HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char* v);
 
 /* listobject.h */
 int HPyList_Check(HPyContext *ctx, HPy h);
@@ -253,6 +262,8 @@ int HPyTuple_Check(HPyContext *ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
+/* import.h */
+HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);
@@ -263,9 +274,6 @@ void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
                                          HPyFunc_Signature sig,
                                          void *func,
                                          void *args);
-void _HPy_CallDestroyAndThenDealloc(HPyContext *ctx,
-                                    void *func,
-                                    cpy_PyObject *self);
 
 
 /* Builders */
@@ -288,6 +296,42 @@ HPyTracker HPyTracker_New(HPyContext *ctx, HPy_ssize_t size);
 int HPyTracker_Add(HPyContext *ctx, HPyTracker ht, HPy h);
 void HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht);
 void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
+
+/* HPyField
+
+   HPyFields should be used ONLY in parts of memory which is known to the GC,
+   e.g. memory allocated by HPy_New:
+
+     - NEVER declare a local variable of type HPyField
+     - NEVER use HPyField on a struct allocated by e.g. malloc()
+
+   **CPython's note**: contrarily than PyObject*, you don't need to manually
+   manage refcounting when using HPyField: if you use HPyField_Store to
+   overwrite an existing value, the old object will be automatically decrefed.
+   This means that you CANNOT use HPyField_Store to write memory which
+   contains uninitialized values, because it would try to decref a dangling
+   pointer.
+
+   Note that HPy_New automatically zeroes the memory it allocates, so
+   everything works well out of the box. In case you are using manually
+   allocated memory, you should initialize the HPyField to HPyField_NULL.
+
+   Note the difference:
+
+     - ``obj->f = HPyField_NULL``: this should be used only to initialize
+       uninitialized memory. If you use it to overwrite a valid HPyField, you
+       will cause a memory leak (at least on CPython)
+
+     - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
+       the old value. However, you CANNOT use it if the memory is not
+       initialized.
+
+Note: target_object and source_object are there in case an implementation
+needs to add write and/or read barriers on the objects. They are ignored by
+CPython but e.g. PyPy needs a write barrier.
+*/
+void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
+HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
 
 /* Debugging helpers */
 void _HPy_Dump(HPyContext *ctx, HPy h);
@@ -335,6 +379,7 @@ typedef int (*HPyFunc_setter)(HPyContext *ctx, HPy, HPy, void *);
 typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
 typedef int (*HPyFunc_getbufferproc)(HPyContext *ctx, HPy, HPy_buffer *, int);
 typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
+typedef int (*HPyFunc_traverseproc)(void *object, HPyFunc_visitproc visit, void *arg);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
@@ -404,7 +449,7 @@ typedef enum {
     //HPy_tp_base = SLOT(48, HPyFunc_X),
     //HPy_tp_bases = SLOT(49, HPyFunc_X),
     //HPy_tp_call = SLOT(50, HPyFunc_X),
-    //HPy_tp_clear = SLOT(51, HPyFunc_X),
+    //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
     //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
@@ -424,7 +469,7 @@ typedef enum {
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),
     //HPy_tp_setattro = SLOT(69, HPyFunc_X),
     //HPy_tp_str = SLOT(70, HPyFunc_X),
-    //HPy_tp_traverse = SLOT(71, HPyFunc_X),
+    HPy_tp_traverse = SLOT(71, HPyFunc_TRAVERSEPROC),
     //HPy_tp_members = SLOT(72, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_getset = SLOT(73, HPyFunc_X),     NOT SUPPORTED
     //HPy_tp_free = SLOT(74, HPyFunc_X),       NOT SUPPORTED

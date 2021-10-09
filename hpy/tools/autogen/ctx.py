@@ -5,7 +5,7 @@ from .parse import toC, find_typedecl
 
 
 class autogen_ctx_h(AutoGenFile):
-    PATH = 'hpy/devel/include/universal/autogen_ctx.h'
+    PATH = 'hpy/devel/include/hpy/universal/autogen_ctx.h'
 
     ## struct _HPyContext_s {
     ##     const char *name;

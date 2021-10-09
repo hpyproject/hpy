@@ -28,7 +28,7 @@ class TestBytes(HPyTest):
             {
                 HPy_ssize_t a = HPyBytes_Size(ctx, arg);
                 HPy_ssize_t b = HPyBytes_GET_SIZE(ctx, arg);
-                return HPyLong_FromLong(ctx, 10*a + b);
+                return HPyLong_FromLongLong(ctx, 10 * a + b);
             }
             @EXPORT(f)
             @INIT

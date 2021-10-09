@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include "debug_internal.h"
 #include "autogen_debug_ctx_init.h"
-#include "common/runtime/ctx_tracker.h"
+#include "hpy/runtime/ctx_funcs.h"
+#if defined(_MSC_VER)
+# include <malloc.h>   /* for alloca() */
+#endif
 
 static struct _HPyContext_s g_debug_ctx = {
     .name = "HPy Debug Mode ABI",
@@ -14,7 +17,7 @@ static struct _HPyContext_s g_debug_ctx = {
 // same. If/when we migrate to a system in which we can have multiple
 // independent contexts, this function should ensure to create a different
 // debug wrapper for each of them.
-static int debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
+int hpy_debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
 {
     if (dctx->_private != NULL) {
         // already initialized
@@ -31,10 +34,11 @@ static int debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
     info->magic_number = HPY_DEBUG_MAGIC;
     info->uctx = uctx;
     info->current_generation = 0;
-    info->open_handles = NULL;
-    //info->closed_handles = NULL;
+    info->uh_on_invalid_handle = HPy_NULL;
+    info->closed_handles_queue_max_size = DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE;
+    DHQueue_init(&info->open_handles);
+    DHQueue_init(&info->closed_handles);
     dctx->_private = info;
-
     debug_ctx_init_fields(dctx, uctx);
     return 0;
 }
@@ -46,15 +50,38 @@ HPyContext * hpy_debug_get_ctx(HPyContext *uctx)
         HPy_FatalError(uctx, "hpy_debug_get_ctx: expected an universal ctx, "
                              "got a debug ctx");
     }
-    if (debug_ctx_init(dctx, uctx) < 0)
+    if (hpy_debug_ctx_init(dctx, uctx) < 0)
         return NULL;
     return dctx;
+}
+
+void hpy_debug_set_ctx(HPyContext *dctx)
+{
+    g_debug_ctx = *dctx;
+}
+
+HPy hpy_debug_open_handle(HPyContext *dctx, HPy uh)
+{
+    return DHPy_open(dctx, uh);
+}
+
+HPy hpy_debug_unwrap_handle(HPyContext *dctx, HPy dh)
+{
+    return DHPy_unwrap(dctx, dh);
+}
+
+void hpy_debug_close_handle(HPyContext *dctx, HPy dh)
+{
+    DHPy_close(dctx, dh);
 }
 
 // this function is supposed to be called from gdb: it tries to determine
 // whether a handle is universal or debug by looking at the last bit
 extern struct _HPyContext_s g_universal_ctx;
-__attribute__((unused)) static void hpy_magic_dump(HPy h)
+#ifndef _MSC_VER
+__attribute__((unused))
+#endif
+static void hpy_magic_dump(HPy h)
 {
     int universal = h._i & 1;
     if (universal)
@@ -62,12 +89,20 @@ __attribute__((unused)) static void hpy_magic_dump(HPy h)
     else
         fprintf(stderr, "\nDebug handle\n");
 
+#ifdef _MSC_VER
+    fprintf(stderr, "raw value: %Ix (%Id)\n", h._i, h._i);
+#else
     fprintf(stderr, "raw value: %lx (%ld)\n", h._i, h._i);
+#endif
     if (universal)
         _HPy_Dump(&g_universal_ctx, h);
     else {
         DebugHandle *dh = as_DebugHandle(h);
+#ifdef _MSC_VER
+        fprintf(stderr, "dh->uh: %Ix\n", dh->uh._i);
+#else
         fprintf(stderr, "dh->uh: %lx\n", dh->uh._i);
+#endif
         _HPy_Dump(&g_universal_ctx, dh->uh);
     }
 }
@@ -76,7 +111,7 @@ __attribute__((unused)) static void hpy_magic_dump(HPy h)
 
 void debug_ctx_Close(HPyContext *dctx, DHPy dh)
 {
-    UHPy uh = DHPy_unwrap(dh);
+    UHPy uh = DHPy_unwrap(dctx, dh);
     DHPy_close(dctx, dh);
     HPy_Close(get_info(dctx)->uctx, uh);
 }
@@ -85,21 +120,21 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
 {
     UHPy *uh_items = (UHPy *)alloca(n * sizeof(UHPy));
     for(int i=0; i<n; i++) {
-        uh_items[i] = DHPy_unwrap(dh_items[i]);
+        uh_items[i] = DHPy_unwrap(dctx, dh_items[i]);
     }
-    return DHPy_wrap(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
+    return DHPy_open(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
 }
 
 DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, DHPy *dh_args,
                                HPy_ssize_t nargs, DHPy dh_kw)
 {
-    UHPy uh_type = DHPy_unwrap(dh_type);
-    UHPy uh_kw = DHPy_unwrap(dh_kw);
+    UHPy uh_type = DHPy_unwrap(dctx, dh_type);
+    UHPy uh_kw = DHPy_unwrap(dctx, dh_kw);
     UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(UHPy));
     for(int i=0; i<nargs; i++) {
-        uh_args[i] = DHPy_unwrap(dh_args[i]);
+        uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
     }
-    return DHPy_wrap(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
+    return DHPy_open(dctx, HPyType_GenericNew(get_info(dctx)->uctx, uh_type, uh_args,
                                               nargs, uh_kw));
 }
 
@@ -115,11 +150,11 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
         HPyType_SpecParam *uparams = (HPyType_SpecParam *)alloca(n * sizeof(HPyType_SpecParam));
         for (HPy_ssize_t i=0; i<n; i++) {
             uparams[i].kind = dparams[i].kind;
-            uparams[i].object = DHPy_unwrap(dparams[i].object);
+            uparams[i].object = DHPy_unwrap(dctx, dparams[i].object);
         }
-        return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, uparams));
+        return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, uparams));
     }
-    return DHPy_wrap(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
+    return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
 }
 
 /* ~~~ debug mode implementation of HPyTracker ~~~

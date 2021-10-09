@@ -45,7 +45,7 @@ class autogen_debug_ctx_init_h(AutoGenFile):
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    dctx->{name} = DHPy_wrap(dctx, uctx->{name});')
+            w(f'    dctx->{name} = DHPy_open(dctx, uctx->{name});')
         for func in self.api.functions:
             name = func.ctx_name()
             w(f'    dctx->{name} = &debug_{name};')
@@ -96,7 +96,7 @@ class autogen_debug_wrappers(AutoGenFile):
                 if p.name == 'ctx':
                     lst.append('get_info(dctx)->uctx')
                 elif toC(p.type) == 'DHPy':
-                    lst.append('DHPy_unwrap(%s)' % p.name)
+                    lst.append('DHPy_unwrap(dctx, %s)' % p.name)
                 elif toC(p.type) in ('DHPy *', 'DHPy []'):
                     assert False, ('C type %s not supported, please write the wrapper '
                                    'for %s by hand' % (toC(p.type), func.name))
@@ -112,7 +112,7 @@ class autogen_debug_wrappers(AutoGenFile):
         if rettype == 'void':
             w(f'    {func.name}({params});')
         elif rettype == 'DHPy':
-            w(f'    return DHPy_wrap(dctx, {func.name}({params}));')
+            w(f'    return DHPy_open(dctx, {func.name}({params}));')
         else:
             w(f'    return {func.name}({params});')
         w('}')
@@ -155,7 +155,7 @@ class autogen_debug_ctx_call_i(AutoGenFile):
                 w(f'        f({args});')
             elif c_ret_type == 'HPy':
                 w(f'        DHPy dh_result = f({args});')
-                w(f'        a->result = _dh2py(dh_result);')
+                w(f'        a->result = _dh2py(dctx, dh_result);')
                 dhpys.append('result')
             else:
                 w(f'        a->result = f({args});')

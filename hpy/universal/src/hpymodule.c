@@ -10,7 +10,7 @@
 
 #include "api.h"
 #include "handles.h"
-#include "common/version.h"
+#include "hpy/version.h"
 #include "hpy_debug.h"
 
 #ifdef PYPY_VERSION
