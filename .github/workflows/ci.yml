@@ -136,6 +136,13 @@ jobs:
         run: python -m pip install --upgrade pip wheel
         shell: bash
 
+      - name: Install HPy
+        run: python -m pip install .
+
+      - name: Install pytest
+        run: |
+          python -m pip install pytest
+
       - name: Run tests
         run: make porting-example-tests
         shell: bash
