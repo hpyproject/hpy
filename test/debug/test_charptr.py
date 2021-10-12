@@ -141,11 +141,12 @@ class TestCharPtr(HPyDebugTest):
                 }
 
                 HPy result;
+                char *string = NULL;
                 for (HPy_ssize_t i = 0; i < N; ++i) {
                     // create some random-ish string
                     HPy_ssize_t str_len = STR_SIZE + (i % 23);
                     log("\\nIteration %zd, creating string of size %zd\\n", i, str_len);
-                    char *string = (char*) malloc(str_len + 1);
+                    string = (char*) malloc(str_len + 1);
                     string[str_len] = '\\0';
                     for (HPy_ssize_t str_idx = 0; str_idx < str_len; ++str_idx) {
                         string[str_idx] = 'a' + (i + str_idx) % 5;
@@ -178,6 +179,7 @@ class TestCharPtr(HPyDebugTest):
                     // data returned by HPyUnicode_AsUTF8AndSize
                     string[0] = '\\0';
                     free(string);
+                    string = NULL;
                     if (strlen(py_str_data) != (size_t) py_str_size) {
                         HPyErr_SetString(ctx, ctx->h_SystemError,
                             "Freeing the user string corrupted the Python string data");
@@ -196,10 +198,14 @@ class TestCharPtr(HPyDebugTest):
 
                 result = HPy_Dup(ctx, ctx->h_None);
             cleanup:
+                if (string != NULL) {
+                    free(string);
+                }
                 for (size_t i = 0; i < N; ++i) {
                     log("Cleanup: closing handle at index %zu\\n", i);
                     HPy_Close(ctx, handles[i]);
                 }
+                free(handles);
                 return result;
             }
 
