@@ -52,8 +52,8 @@ if 'HPY_DEBUG' in os.environ:
 else:
     EXTRA_COMPILE_ARGS = []
 
-if os.name == "posix":
-    EXTRA_COMPILE_ARGS += ['-D_HPY_POSIX']
+if os.name == "posix" and not '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' in os.environ:
+    EXTRA_COMPILE_ARGS += ['-D_HPY_DEBUG_MEM_PROTECT_USEMMAP']
 
 
 def get_scm_config():

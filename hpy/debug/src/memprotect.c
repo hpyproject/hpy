@@ -2,14 +2,14 @@
 
 // Implements OS dependent abstraction of memory protection
 
-#ifdef _HPY_POSIX
+#ifdef _HPY_DEBUG_MEM_PROTECT_USEMMAP
 
 // On UNIX systems we use mmap and mprotect
 // On Windows this should be eventually extended to use
 // VirtualAlloc and VirtualProtect
 
-#include <string.h>
 #include <sys/mman.h>
+#include <string.h>
 
 void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
     void* new_ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

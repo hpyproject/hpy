@@ -1,5 +1,4 @@
 import sys
-import os
 import os.path
 import functools
 import re
@@ -221,8 +220,6 @@ class build_hpy_ext_mixin:
         ext.include_dirs += self.hpydevel.get_extra_include_dirs()
         ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
-        if os.name == 'posix':
-            ext.define_macros.append(('_HPY_POSIX', None))
         if ext.hpy_abi == 'cpython':
             ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False

@@ -2,7 +2,8 @@ from test.support import HPyDebugTest
 import os
 import pytest
 
-SUPPORTS_MEM_PROTECTION = os.name == 'posix'
+SUPPORTS_MEM_PROTECTION = os.name == 'posix' and \
+                          '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ
 
 
 class TestCharPtr(HPyDebugTest):
@@ -97,7 +98,7 @@ class TestCharPtr(HPyDebugTest):
         if not self.supports_sys_executable():
             pytest.skip("no sys.executable")
 
-        mod = self.compile_module("""
+        mod = self.make_module("""
             #include <string.h>
             #include <stdio.h>
             
