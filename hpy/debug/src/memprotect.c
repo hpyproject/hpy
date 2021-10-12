@@ -20,8 +20,12 @@ void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
     return new_ptr;
 }
 
-void *raw_data_protect(void* data, HPy_ssize_t size) {
+void raw_data_protect(void* data, HPy_ssize_t size) {
     mprotect(data, size, PROT_NONE);
+}
+
+int raw_data_free(void *data, HPy_ssize_t size) {
+    return munmap(data, size);
 }
 
 #else
@@ -29,6 +33,7 @@ void *raw_data_protect(void* data, HPy_ssize_t size) {
 // Generic fallback that should work for any OS with decent C compiler: copy
 // the memory and then override it with garbage to "protect" it from reading.
 
+#include <stdlib.h>
 #include <string.h>
 
 void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
@@ -37,7 +42,7 @@ void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
     return new_data;
 }
 
-void *raw_data_protect(void* data, HPy_ssize_t size) {
+void raw_data_protect(void* data, HPy_ssize_t size) {
     // Override the data with some garbage in hope that the program will
     // eventually crash or give incorrect result if it reads the garbage
     char val = 0;
@@ -45,6 +50,11 @@ void *raw_data_protect(void* data, HPy_ssize_t size) {
         ((char*)data)[i] = 143 + val;
         val = (val + 1) % 10;
     }
+}
+
+int raw_data_free(void *data, HPy_ssize_t size) {
+    free(data);
+    return 0;
 }
 
 #endif

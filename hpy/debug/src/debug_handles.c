@@ -19,6 +19,16 @@ static void debug_handles_sanity_check(HPyDebugInfo *info)
 #endif
 }
 
+static void DebugHandle_free_raw_data(HPyDebugInfo *info, DebugHandle *handle) {
+    if (handle->associated_data) {
+        info->protected_raw_data_size -= handle->associated_data_size;
+        if (raw_data_free(handle->associated_data, handle->associated_data_size)) {
+            HPy_FatalError(info->uctx, "HPy could not free internally allocated memory.");
+        }
+        handle->associated_data = NULL;
+    }
+}
+
 DHPy DHPy_open(HPyContext *dctx, UHPy uh)
 {
     UHPy_sanity_check(uh);
@@ -31,6 +41,7 @@ DHPy DHPy_open(HPyContext *dctx, UHPy uh)
     DebugHandle *handle = NULL;
     if (info->closed_handles.size >= info->closed_handles_queue_max_size) {
         handle = DHQueue_popfront(&info->closed_handles);
+        DebugHandle_free_raw_data(info, handle);
     }
     else {
         handle = malloc(sizeof(DebugHandle));
@@ -62,7 +73,6 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
 {
     HPyDebugInfo *info = get_info(dctx);
     HPyContext *uctx = info->uctx;
-    DebugHandle *handle = as_DebugHandle(dh);
     assert(handle->is_closed);
     if (HPy_IsNull(info->uh_on_invalid_handle)) {
         // default behavior: print an error and abort
@@ -111,27 +121,39 @@ void DHPy_close(HPyContext *dctx, DHPy dh)
     DHQueue_append(&info->closed_handles, handle);
     handle->is_closed = true;
     if (handle->associated_data) {
-        // This leaks. So far all implementations of raw_data_protect keep the
-        // physical memory (or at least are not guaranteed to release it).
+        // So far all implementations of raw_data_protect keep the physical
+        // memory (or at least are not guaranteed to release it), which leaks.
         // Ideally the raw_data_protect implementation would at least release
         // the physical memory, but in any case it would still leak the virtual
-        // memory, but we cannot do anything about that if we want to make sure
-        // that this specific memory address is never accessed again
-        raw_data_protect(handle->associated_data, handle->associated_data_size);
+        // memory. To mitigate this a bit, we free the memory once the closed
+        // handle is removed from the closed handles queue (because it reaches
+        // max size), or if the total size of the retained/leaked memory would
+        // overflow configured limit.
+        HPy_ssize_t new_size = info->protected_raw_data_size + handle->associated_data_size;
+        if (new_size > info->protected_raw_data_max_size) {
+            // free it now
+            DebugHandle_free_raw_data(info, handle);
+        } else {
+            // keep/leak it and make it protected from further reading
+            info->protected_raw_data_size = new_size;
+            raw_data_protect(handle->associated_data, handle->associated_data_size);
+        }
     }
 
     if (info->closed_handles.size > info->closed_handles_queue_max_size) {
         // we have too many closed handles. Let's free the oldest one
         DebugHandle *oldest = DHQueue_popfront(&info->closed_handles);
-        DHPy_free(as_DHPy(oldest));
+        DHPy_free(dctx, as_DHPy(oldest));
     }
     debug_handles_sanity_check(info);
 }
 
-void DHPy_free(DHPy dh)
+void DHPy_free(HPyContext *dctx, DHPy dh)
 {
     DHPy_sanity_check(dh);
     DebugHandle *handle = as_DebugHandle(dh);
+    HPyDebugInfo *info = get_info(dctx);
+    DebugHandle_free_raw_data(info, handle);
     // this is not strictly necessary, but it increases the chances that you
     // get a clear segfault if you use a freed handle
     handle->uh = HPy_NULL;

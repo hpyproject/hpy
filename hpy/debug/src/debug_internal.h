@@ -107,7 +107,7 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 
 DHPy DHPy_open(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
-void DHPy_free(DHPy dh);
+void DHPy_free(HPyContext *dctx, DHPy dh);
 void DHPy_invalid_handle(HPyContext *dctx, DHPy dh);
 
 static inline UHPy DHPy_unwrap(HPyContext *dctx, DHPy dh)
@@ -137,6 +137,7 @@ void DHQueue_sanity_check(DHQueue *q);
 /* === HPyDebugInfo === */
 
 static const HPy_ssize_t DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE = 1024;
+static const HPy_ssize_t DEFAULT_PROTECTED_RAW_DATA_MAX_SIZE = 1024 * 1024 * 10;
 
 typedef struct {
     long magic_number; // used just for sanity checks
@@ -152,6 +153,8 @@ typedef struct {
     //      memory as a GC root
     UHPy uh_on_invalid_handle;
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
+    HPy_ssize_t protected_raw_data_max_size;
+    HPy_ssize_t protected_raw_data_size;
     DHQueue open_handles;
     DHQueue closed_handles;
 } HPyDebugInfo;
@@ -169,13 +172,15 @@ static inline HPyDebugInfo *get_info(HPyContext *dctx)
  * writing and reading. The memory is initially protected from writing if
  * write_protect flag is set. The returned copy of the memory can be further
  * protected from any access, reading or writing, by passing it to
- * raw_data_protect.
+ * raw_data_protect, and freed by passing it to raw_data_free.
  *
  * These functions have OS dependent implementations and should attempt to
  * protect the memory as much as possible, but there are no concrete protection
  * guarantees.
  */
 void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect);
-void *raw_data_protect(void* data, HPy_ssize_t size);
+void raw_data_protect(void* data, HPy_ssize_t size);
+/* Return value: 0 indicates success, any different value indicates an error */
+int raw_data_free(void *data, HPy_ssize_t size);
 
 #endif /* HPY_DEBUG_INTERNAL_H */
