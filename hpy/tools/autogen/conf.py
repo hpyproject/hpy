@@ -41,6 +41,8 @@ SPECIAL_CASES = {
     'HPy_Contains': 'PySequence_Contains',
     'HPy_Length': 'PyObject_Length',
     'HPy_CallTupleDict': None,
+    'HPy_CallVectorDict': None,
+    'HPy_CallMethodVectorDict': None,
     'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
     '_HPy_AsStruct_Object': None,

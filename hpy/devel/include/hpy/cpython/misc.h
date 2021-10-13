@@ -278,6 +278,16 @@ HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy k
     return ctx_CallTupleDict(ctx, callable, args, kw);
 }
 
+HPyAPI_FUNC HPy HPy_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw)
+{
+    return ctx_CallVectorDict(ctx, callable, args, nargs, kw);
+}
+
+HPyAPI_FUNC HPy HPy_CallMethodVectorDict(HPyContext *ctx, HPy callable, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw)
+{
+    return ctx_CallMethodVectorDict(ctx, callable, name, args, nargs, kw);
+}
+
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h)
 {
     ctx_Dump(ctx, h);

@@ -250,6 +250,14 @@ HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy k
      return ctx->ctx_CallTupleDict ( ctx, callable, args, kw ); 
 }
 
+HPyAPI_FUNC HPy HPy_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw) {
+     return ctx->ctx_CallVectorDict ( ctx, callable, args, nargs, kw ); 
+}
+
+HPyAPI_FUNC HPy HPy_CallMethodVectorDict(HPyContext *ctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw) {
+     return ctx->ctx_CallMethodVectorDict ( ctx, receiver, name, args, nargs, kw ); 
+}
+
 HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message) {
      ctx->ctx_Err_SetString ( ctx, h_type, utf8_message ); return HPy_NULL; 
 }

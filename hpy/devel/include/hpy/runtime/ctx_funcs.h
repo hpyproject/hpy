@@ -12,6 +12,8 @@ _HPy_HIDDEN HPy ctx_Bytes_FromStringAndSize(HPyContext *ctx, const char *v,
 
 // ctx_call.c
 _HPy_HIDDEN HPy ctx_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
+_HPy_HIDDEN HPy ctx_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw);
+_HPy_HIDDEN HPy ctx_CallMethodVectorDict(HPyContext *ctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw);
 
 // ctx_dict.c
 _HPy_HIDDEN HPy ctx_Dict_GetItem(HPyContext *ctx, HPy op, HPy key);

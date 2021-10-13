@@ -70,6 +70,8 @@ DHPy debug_ctx_InPlaceXor(HPyContext *dctx, DHPy h1, DHPy h2);
 DHPy debug_ctx_InPlaceOr(HPyContext *dctx, DHPy h1, DHPy h2);
 int debug_ctx_Callable_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_CallTupleDict(HPyContext *dctx, DHPy callable, DHPy args, DHPy kw);
+DHPy debug_ctx_CallVectorDict(HPyContext *dctx, DHPy callable, DHPy args[], HPy_ssize_t nargs, DHPy kw);
+DHPy debug_ctx_CallMethodVectorDict(HPyContext *dctx, DHPy receiver, DHPy name, DHPy args[], HPy_ssize_t nargs, DHPy kw);
 void debug_ctx_FatalError(HPyContext *dctx, const char *message);
 void debug_ctx_Err_SetString(HPyContext *dctx, DHPy h_type, const char *utf8_message);
 void debug_ctx_Err_SetObject(HPyContext *dctx, DHPy h_type, DHPy h_value);
@@ -340,6 +342,8 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_InPlaceOr = &debug_ctx_InPlaceOr;
     dctx->ctx_Callable_Check = &debug_ctx_Callable_Check;
     dctx->ctx_CallTupleDict = &debug_ctx_CallTupleDict;
+    dctx->ctx_CallVectorDict = &debug_ctx_CallVectorDict;
+    dctx->ctx_CallMethodVectorDict = &debug_ctx_CallMethodVectorDict;
     dctx->ctx_FatalError = &debug_ctx_FatalError;
     dctx->ctx_Err_SetString = &debug_ctx_Err_SetString;
     dctx->ctx_Err_SetObject = &debug_ctx_Err_SetObject;

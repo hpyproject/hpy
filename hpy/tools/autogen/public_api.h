@@ -158,7 +158,7 @@ HPy HPyBool_FromBool(HPyContext *ctx, bool v);
 /* abstract.h */
 HPy_ID(98)
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
-HPy_ID(266)
+HPy_ID(268)
 int HPySequence_Check(HPyContext *ctx, HPy h);
 
 HPy_ID(99)
@@ -237,6 +237,10 @@ HPy_ID(134)
 int HPyCallable_Check(HPyContext *ctx, HPy h);
 HPy_ID(135)
 HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
+HPy_ID(261)
+HPy HPy_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw);
+HPy_ID(262)
+HPy HPy_CallMethodVectorDict(HPyContext *ctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw);
 
 /* pyerrors.h */
 HPy_ID(136)
@@ -333,7 +337,7 @@ HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy_ID(153)
 HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name);
 
-HPy_ID(264)
+HPy_ID(266)
 HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
 HPy_ID(154)
@@ -406,7 +410,7 @@ HPy HPy_Type(HPyContext *ctx, HPy obj);
  */
 HPy_ID(166)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(262)
+HPy_ID(264)
 int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
 
 /**
@@ -499,7 +503,7 @@ int HPy_RichCompareBool(HPyContext *ctx, HPy v, HPy w, int op);
 HPy_ID(177)
 HPy_hash_t HPy_Hash(HPyContext *ctx, HPy obj);
 
-HPy_ID(265)
+HPy_ID(267)
 HPy HPySeqIter_New(HPyContext *ctx, HPy seq);
 
 /* bytesobject.h */
@@ -622,7 +626,7 @@ HPy HPyDict_New(HPyContext *ctx);
    if 'HPyErr_Occurred(ctx) != 0', it will still work.
    This function, of course, returns a new reference.
  */
-HPy_ID(261)
+HPy_ID(263)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 
 /**
@@ -1247,5 +1251,5 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
-HPy_ID(263)
+HPy_ID(265)
 int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);
