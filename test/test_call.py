@@ -88,6 +88,72 @@ class TestCall(HPyTest):
         with pytest.raises(TypeError):
             mod.call(f, kw=None)
 
+    def test_hpy_callmethodtupledict(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(call, "call", call_impl, HPyFunc_KEYWORDS)
+            static HPy call_impl(HPyContext *ctx, HPy self,
+                                 HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPy result, result_0, result_1;
+                HPy receiver = HPy_NULL;
+                HPy h_name = HPy_NULL;
+                HPy m_args = HPy_NULL;
+                const char *s_name = "";
+                HPyTracker ht;
+                static const char *kwlist[] = { "receiver", "name", "args", NULL };
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "OO|O",
+                                          kwlist, &receiver, &h_name, &m_args)) {
+                    return HPy_NULL;
+                }
+                s_name = HPyUnicode_AsUTF8AndSize(ctx, h_name, NULL);
+                if (s_name == NULL) {
+                    HPyTracker_Close(ctx, ht);
+                    return HPy_NULL;
+                }
+
+                result_0 = HPy_CallMethodTupleDict(ctx, receiver, h_name, m_args, HPy_NULL);
+                if (HPy_IsNull(result_0)) {
+                    HPyTracker_Close(ctx, ht);
+                    return HPy_NULL;
+                }
+
+                result_1 = HPy_CallMethodTupleDict_s(ctx, receiver, s_name, m_args, HPy_NULL);
+                if (HPy_IsNull(result_1)) {
+                    HPyTracker_Close(ctx, ht);
+                    HPy_Close(ctx, result_0);
+                    return HPy_NULL;
+                }
+
+                HPyTracker_Close(ctx, ht);
+                result = HPyTuple_Pack(ctx, 2, result_0, result_1);
+                HPy_Close(ctx, result_0);
+                HPy_Close(ctx, result_1);
+                return result;
+            }
+            @EXPORT(call)
+            @INIT
+        """)
+
+        test_args = (
+            # (receiver, method, args_tuple)
+            dict(receiver={"hello": 1, "world": 2}, name="keys", args=tuple()),
+            dict(receiver="Hello, World", name="find", args=("Wo", )),
+        )
+
+        for kw in test_args:
+            res = getattr(kw["receiver"], kw["name"])(*kw["args"])
+            assert mod.call(**kw) == (res, res)
+
+        with pytest.raises(AttributeError):
+            mod.call(receiver=dict(), name="asdf", args=tuple())
+
+        with pytest.raises(TypeError):
+            mod.call(receiver="Hello, World", name="find")
+
+        with pytest.raises(TypeError):
+            mod.call(receiver="Hello, World", name="find", args=("1", ) * 100)
+
     def test_hpycallable_check(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_O)
