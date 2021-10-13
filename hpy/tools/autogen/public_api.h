@@ -235,6 +235,10 @@ HPy_ID(134)
 int HPyCallable_Check(HPyContext *ctx, HPy h);
 HPy_ID(135)
 HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
+HPy_ID(261)
+HPy HPy_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw);
+HPy_ID(262)
+HPy HPy_CallMethodVectorDict(HPyContext *ctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw);
 
 /* pyerrors.h */
 HPy_ID(136)

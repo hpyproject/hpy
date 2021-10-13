@@ -610,3 +610,21 @@ DHPy debug_ctx_Unicode_Substring(HPyContext *dctx, DHPy str, HPy_ssize_t start, 
     ctx_info->is_valid = true;
     return DHPy_open(dctx, universal_result);
 }
+
+DHPy debug_ctx_CallVectorDict(HPyContext *dctx, DHPy dh_callable, DHPy dh_args[], HPy_ssize_t nargs, DHPy dh_kw)
+{
+    UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(UHPy));
+    for(int i=0; i<nargs; i++) {
+        uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
+    }
+    return DHPy_open(dctx, HPy_CallVectorDict(get_info(dctx)->uctx, DHPy_unwrap(dctx, dh_callable), uh_args, nargs, DHPy_unwrap(dctx, dh_kw)));
+}
+
+DHPy debug_ctx_CallMethodVectorDict(HPyContext *dctx, DHPy dh_receiver, DHPy dh_name, DHPy dh_args[], HPy_ssize_t nargs, DHPy dh_kw)
+{
+    UHPy *uh_args = (UHPy *)alloca(nargs * sizeof(UHPy));
+    for(int i=0; i<nargs; i++) {
+        uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
+    }
+    return DHPy_open(dctx, HPy_CallMethodVectorDict(get_info(dctx)->uctx, DHPy_unwrap(dctx, dh_receiver), DHPy_unwrap(dctx, dh_name), uh_args, nargs, DHPy_unwrap(dctx, dh_kw)));
+}

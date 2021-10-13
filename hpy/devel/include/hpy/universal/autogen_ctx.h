@@ -275,4 +275,6 @@ struct _HPyContext_s {
     HPy (*ctx_Dict_Copy)(HPyContext *ctx, HPy h);
     int (*ctx_Slice_Unpack)(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
     int (*ctx_SetCallFunction)(HPyContext *ctx, HPy h, HPyCallFunction *func);
+    HPy (*ctx_CallVectorDict)(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw);
+    HPy (*ctx_CallMethodVectorDict)(HPyContext *ctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw);
 };

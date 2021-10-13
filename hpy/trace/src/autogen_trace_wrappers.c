@@ -778,6 +778,32 @@ HPy trace_ctx_CallTupleDict(HPyContext *tctx, HPy callable, HPy args, HPy kw)
     return res;
 }
 
+HPy trace_ctx_CallVectorDict(HPyContext *tctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 261);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPy_CallVectorDict(uctx, callable, args, nargs, kw);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 261, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_CallMethodVectorDict(HPyContext *tctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 262);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPy_CallMethodVectorDict(uctx, receiver, name, args, nargs, kw);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 262, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 void trace_ctx_Err_SetString(HPyContext *tctx, HPy h_type, const char *utf8_message)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 137);
