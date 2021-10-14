@@ -131,7 +131,7 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
                 // Premature end
                 // We try to provide slightly better diagnostics than CPython
                 char msg[MESSAGE_BUF_SIZE];
-                char par_type = 'X';
+                char par_type;
                 if (end == ')') {
                     par_type = '(';
                 } else if (end == ']') {
