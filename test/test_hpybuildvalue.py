@@ -1,58 +1,110 @@
 from .support import HPyTest
-import pytest
 
 
 class TestBuildValue(HPyTest):
 
-    def make_build_item(self, fmt, values=None):
-        comma_and_values = "" if values is None else ", " + values
-        mod = self.make_module("""
+    def make_tests_module(self, test_cases):
+        # Creates a module with function "f", that takes index of a test case
+        # to execute. Argument test_cases should be a tuple with first item
+        # being C code of the test case.
+        # Generates, e.g.: case 0: return HPy_BuildValue(...);
+        test_cases_c_code = [f"case {i}: {case[0]}; break;" for i, case in enumerate(test_cases)]
+        return self.make_module("""
             #include <limits.h>
-        
+
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {{
-                return HPy_BuildValue(ctx, "{fmt}" {values});
+                switch (HPyLong_AsLong(ctx, arg)) {{
+                    {test_cases}
+                    default:
+                        HPyErr_SetString(ctx, ctx->h_ValueError, "Wrong test case number");
+                        return HPy_NULL;
+                }}
             }}
+
             @EXPORT(f)
             @INIT
-        """.format(fmt=fmt, values=comma_and_values))
-        return mod
+        """.format(test_cases='\n'.join(test_cases_c_code)))
 
-    @pytest.mark.parametrize("fmt, c_values, expected", [
-        ("", None, None),
-        ("i", "42", 42),
-        ("i", "0", 0),
-        ("i", "-1", -1),
-        ("I", "33", 33),
-        ("k", "1", 1),
-        ("K", "6543", 6543),
-        ("l", "345L", 345),
-        ("l", "-876L", -876),
-        ("L", "545LL", 545),
-        ("L", "-344LL", -344),
-        ("f", "0.25f", 0.25),
-        ("d", "0.25", 0.25),
-        ("ii", "-1, 1", (-1, 1)),
-        ("(i)", "-1", (-1,)),
-        ("(ii)", "-1, 1", (-1, 1)),
-        ("s", '"test string"', "test string"),
-        ("[ii]", "4, 2", [4, 2]),
-        ("[is]", '4, "2"', [4, "2"]),
-        ("[]", None, []),
-        ("[(is)((f)[kk])i]", '4, "str", 0.25, 4, 2, 14267', [(4, "str"), ((0.25,), [4, 2]), 14267]),
-    ])
-    def test_formats(self, fmt, c_values, expected):
-        mod = self.make_build_item(fmt, c_values)
-        assert mod.f(None) == expected
+    def test_formats(self):
+        test_cases = [
+            ('return HPy_BuildValue(ctx, "");', None),
+            ('return HPy_BuildValue(ctx, "i", 42);', 42),
+            ('return HPy_BuildValue(ctx, "i", 0);', 0),
+            ('return HPy_BuildValue(ctx, "i", -1);', -1),
+            ('return HPy_BuildValue(ctx, "I", 33);', 33),
+            ('return HPy_BuildValue(ctx, "k", 1);', 1),
+            ('return HPy_BuildValue(ctx, "K", 6543);', 6543),
+            ('return HPy_BuildValue(ctx, "l", 345L);', 345),
+            ('return HPy_BuildValue(ctx, "l", -876L);', -876),
+            ('return HPy_BuildValue(ctx, "L", 545LL);', 545),
+            ('return HPy_BuildValue(ctx, "L", -344LL);', -344),
+            ('return HPy_BuildValue(ctx, "f", 0.25f);', 0.25),
+            ('return HPy_BuildValue(ctx, "d", 0.25);', 0.25),
+            ('return HPy_BuildValue(ctx, "ii", -1, 1);', (-1, 1)),
+            ('return HPy_BuildValue(ctx, "(i)", -1);', (-1,)),
+            ('return HPy_BuildValue(ctx, "(ii)", -1, 1);', (-1, 1)),
+            ('return HPy_BuildValue(ctx, "s", "test string");', 'test string'),
+            ('return HPy_BuildValue(ctx, "[ii]", 4, 2);', [4, 2]),
+            ('return HPy_BuildValue(ctx, "[is]", 4, "2");', [4, '2']),
+            ('return HPy_BuildValue(ctx, "[]");', []),
+            ('return HPy_BuildValue(ctx, "[(is)((f)[kk])i]", 4, "str", 0.25, 4, 2, 14267);',
+                [(4, 'str'), ((0.25,), [4, 2]), 14267])
+        ]
+        mod = self.make_tests_module(test_cases)
+        for i, (code, expected) in enumerate(test_cases):
+            actual = mod.f(i)
+            assert actual == expected, code
 
-    @pytest.mark.parametrize("fmt", ["O", "N", "S"])
-    def test_O_and_aliases(self, fmt):
+    def test_bad_formats(self):
+        test_cases = [
+            ('return HPy_BuildValue(ctx, "(q)", 42);',
+             "bad format char 'q' in the format string passed to HPy_BuildValue"),
+            ('return HPy_BuildValue(ctx, "(i", 42);',
+             "unmatched '(' in the format string passed to HPy_BuildValue"),
+            ('return HPy_BuildValue(ctx, "[i", 42);',
+             "unmatched '[' in the format string passed to HPy_BuildValue"),
+            ('return HPy_BuildValue(ctx, "([(i)k", 42);',
+             "unmatched '(' in the format string passed to HPy_BuildValue"),
+            ('return HPy_BuildValue(ctx, "(i]", 42);',
+             "unmatched '(' in the format string passed to HPy_BuildValue"),
+            ('return HPy_BuildValue(ctx, "[i)", 42);',
+             "unmatched '[' in the format string passed to HPy_BuildValue"),
+            ('return HPy_BuildValue(ctx, "N", 42);',
+             "HPy_BuildValue does not support the 'N' formatting unit."),
+        ]
+        import pytest
+        mod = self.make_tests_module(test_cases)
+        for i, (code, expected_error) in enumerate(test_cases):
+            with pytest.raises(SystemError) as e:
+                mod.f(i)
+            assert expected_error in str(e), code
+
+    def test_O_and_aliases(self):
+        mod = self.make_module("""
+            HPyDef_METH(fo, "fo", fo_impl, HPyFunc_O)
+            static HPy fo_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPy_BuildValue(ctx, "O", arg);
+            }
+
+            HPyDef_METH(fs, "fs", fs_impl, HPyFunc_O)
+            static HPy fs_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPy_BuildValue(ctx, "S", arg);
+            }
+
+            @EXPORT(fo)
+            @EXPORT(fs)
+            @INIT
+        """)
+
         class Dummy:
             pass
         obj = Dummy()
-        mod = self.make_build_item(fmt, "arg")
-        assert mod.f(obj) == obj
+        assert mod.fo(obj) == obj
+        assert mod.fs(obj) == obj
 
     def test_O_with_new_object(self):
         # HPy_BuildValue does not steal the reference to the object passed as 'O',
@@ -78,31 +130,39 @@ class TestBuildValue(HPyTest):
         assert mod.f(0) == (0.25, 42)
         assert mod.f(1) == 42
 
-    @pytest.mark.parametrize("fmt, values", [
-        ("O", "HPy_NULL"),
-        ("(iO)", "42, HPy_NULL"),
-    ])
-    def test_O_with_null(self, fmt, values):
+    def test_O_with_null(self):
         import pytest
         mod = self.make_module("""
-            #include <stdio.h>
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
-            {{
-                if (HPyLong_AsLong(ctx, arg)) {{
-                    HPyErr_SetString(ctx, ctx->h_ValueError, "Some err msg that will be asserted");
-                }}
-                return HPy_BuildValue(ctx, "{fmt}", {values});
-            }}
-            @EXPORT(f)
+            HPyDef_METH(no_msg, "no_msg", no_msg_impl, HPyFunc_O)
+            static HPy no_msg_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                if (HPyLong_AsLong(ctx, arg)) {
+                    return HPy_BuildValue(ctx, "O", HPy_NULL);
+                } else {
+                    return HPy_BuildValue(ctx, "(iO)", 42, HPy_NULL);
+                }
+            }
+
+            HPyDef_METH(with_msg, "with_msg", with_msg_impl, HPyFunc_O)
+            static HPy with_msg_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPyErr_SetString(ctx, ctx->h_ValueError, "Some err msg that will be asserted");
+                return no_msg_impl(ctx, self, arg);
+            }
+
+            @EXPORT(with_msg)
+            @EXPORT(no_msg)
             @INIT
-        """.format(fmt=fmt, values=values))
-        with pytest.raises(SystemError) as e:
-            mod.f(0)
-        assert 'HPy_NULL object passed to HPy_BuildValue' in str(e)
-        with pytest.raises(ValueError) as e:
-            mod.f(1)
-        assert "Some err msg that will be asserted" in str(e)
+        """)
+        for i in [0, 1]:
+            with pytest.raises(ValueError) as e:
+                mod.with_msg(i)
+            assert "Some err msg that will be asserted" in str(e)
+        for i in [0, 1]:
+            with pytest.raises(SystemError) as e:
+                mod.no_msg(i)
+            assert 'HPy_NULL object passed to HPy_BuildValue' in str(e)
+
 
     def test_OO_pars_with_new_objects(self):
         mod = self.make_module("""
@@ -122,47 +182,17 @@ class TestBuildValue(HPyTest):
         """)
         assert mod.f(None) == (1, 2)
 
-    def test_int_limits(self):
-        mod = self.make_build_item("(ii)", "INT_MIN, INT_MAX")
-        result = mod.f(None)
-        assert result[0] < 0
-        assert result[1] > 0
-
-    def test_long_limit(self):
-        mod = self.make_build_item("(ll)", "LONG_MIN, LONG_MAX")
-        result = mod.f(None)
-        assert result[0] < 0
-        assert result[1] > 0
-
-    def test_longlong_limit(self):
-        mod = self.make_build_item("(LL)", "LLONG_MIN, LLONG_MAX")
-        result = mod.f(None)
-        assert result[0] < 0
-        assert result[1] > 0
-
-    def test_ulong_limit(self):
-        mod = self.make_build_item("k", "ULONG_MAX")
-        assert mod.f(None) > 0
-
-    def test_ulonglong_limit(self):
-        mod = self.make_build_item("K", "ULLONG_MAX")
-        assert mod.f(None) > 0
-
-    def test_uint_limit(self):
-        mod = self.make_build_item("k", "UINT_MAX")
-        assert mod.f(None) > 0
-
-    @pytest.mark.parametrize("fmt, msg", [
-        ("(q)", "bad format char 'q' in the format string passed to HPy_BuildValue"),
-        ("(i", "unmatched '(' in the format string passed to HPy_BuildValue"),
-        ("[i", "unmatched '[' in the format string passed to HPy_BuildValue"),
-        ("([(i)k", "unmatched '(' in the format string passed to HPy_BuildValue"),
-        ("(i]", "unmatched '(' in the format string passed to HPy_BuildValue"),
-        ("[i)", "unmatched '[' in the format string passed to HPy_BuildValue"),
-    ])
-    def test_bad_format(self, fmt, msg):
-        import pytest
-        mod = self.make_build_item(fmt, "42")
-        with pytest.raises(SystemError) as e:
-            mod.f(None)
-        assert msg in str(e)
+    def test_num_limits(self):
+        test_cases = [
+            ('return HPy_BuildValue(ctx, "(ii)", INT_MIN, INT_MAX);',),
+            ('return HPy_BuildValue(ctx, "(ll)", LONG_MIN, LONG_MAX);',),
+            ('return HPy_BuildValue(ctx, "(LL)", LLONG_MIN, LLONG_MAX);',),
+            ('return HPy_BuildValue(ctx, "(iI)", -1, UINT_MAX);',),
+            ('return HPy_BuildValue(ctx, "(ik)", -1, ULONG_MAX);',),
+            ('return HPy_BuildValue(ctx, "(iK)", -1, ULLONG_MAX);',),
+        ]
+        mod = self.make_tests_module(test_cases)
+        for i, (test,) in enumerate(test_cases):
+            result = mod.f(i)
+            assert result[0] < 0, test
+            assert result[1] > 0, test

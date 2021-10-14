@@ -219,7 +219,6 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
             return HPyUnicode_FromString(ctx, va_arg(*values, const char*));
 
         case 'O':
-        case 'N':
         case 'S': {
             HPy handle = va_arg(*values, HPy);
             if (HPy_IsNull(handle)) {
@@ -230,6 +229,17 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
             }
             *needs_close = 0;
             return handle;
+        }
+
+        case 'N': {
+            HPyErr_SetString(ctx, ctx->h_SystemError,
+                             "HPy_BuildValue does not support the 'N' formatting unit. "
+                             "Instead, use the 'O' formatting unit and manually close "
+                             "the handle in the caller if necessary. HPy API functions "
+                             "never 'steal' handles and always make a duplicate handle if "
+                             "needed, the 'ownership' of the original handle is never "
+                             "'transferred'. ");
+            return HPy_NULL;
         }
 
         case 'f': // Note: floats are promoted to doubles when passed in "..."
