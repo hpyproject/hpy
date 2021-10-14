@@ -78,6 +78,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Err_SetObject = &ctx_Err_SetObject,
     .ctx_Err_SetFromErrno = &ctx_Err_SetFromErrno,
     .ctx_Err_Occurred = &ctx_Err_Occurred,
+    .ctx_Err_ExceptionMatches = &ctx_Err_ExceptionMatches,
     .ctx_Err_NoMemory = &ctx_Err_NoMemory,
     .ctx_Err_Clear = &ctx_Err_Clear,
     .ctx_Err_NewException = &ctx_Err_NewException,

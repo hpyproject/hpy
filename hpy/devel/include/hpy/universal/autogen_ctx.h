@@ -152,6 +152,7 @@ struct _HPyContext_s {
     void (*ctx_Err_SetObject)(HPyContext *ctx, HPy h_type, HPy h_value);
     HPy (*ctx_Err_SetFromErrno)(HPyContext *ctx, HPy h_type);
     int (*ctx_Err_Occurred)(HPyContext *ctx);
+    int (*ctx_Err_ExceptionMatches)(HPyContext *ctx, HPy exc);
     HPy (*ctx_Err_NoMemory)(HPyContext *ctx);
     void (*ctx_Err_Clear)(HPyContext *ctx);
     HPy (*ctx_Err_NewException)(HPyContext *ctx, const char *name, HPy base, HPy dict);

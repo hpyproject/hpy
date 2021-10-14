@@ -295,6 +295,11 @@ HPyAPI_IMPL HPy ctx_Err_SetFromErrno(HPyContext *ctx, HPy h_type)
     return _py2h(PyErr_SetFromErrno(_h2py(h_type)));
 }
 
+HPyAPI_IMPL int ctx_Err_ExceptionMatches(HPyContext *ctx, HPy exc)
+{
+    return PyErr_ExceptionMatches(_h2py(exc));
+}
+
 HPyAPI_IMPL HPy ctx_Err_NoMemory(HPyContext *ctx)
 {
     return _py2h(PyErr_NoMemory());
