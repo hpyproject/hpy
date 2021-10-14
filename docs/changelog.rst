@@ -2,7 +2,7 @@ Changelog
 =========
 
 Version 0.0.3 (September 22nd, 2021)
-----------------------------------
+------------------------------------
 
 This release adds various new API functions (see below) and extends the debug 
 mode with the ability to track closed handles.
