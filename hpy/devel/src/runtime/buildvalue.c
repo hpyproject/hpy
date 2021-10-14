@@ -74,10 +74,6 @@
  *      never closes the handle nor transfers its ownership. If the handle is used, then
  *      HPy_BuildValue creates a duplicate of the handle.
  *
- * ``N (Python object) [HPy]``
- *      For compatibility reasons and ease of porting from CPython API, HPy_BuildValue
- *      also supports 'N', but it is an alias to 'O'.
- *
  * ``S (Python object) [HPy]``
  *      Alias for 'O'.
  *
