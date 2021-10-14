@@ -8,7 +8,7 @@ class TestBuildValue(HPyTest):
         # to execute. Argument test_cases should be a tuple with first item
         # being C code of the test case.
         # Generates, e.g.: case 0: return HPy_BuildValue(...);
-        test_cases_c_code = [f"case {i}: {case[0]}; break;" for i, case in enumerate(test_cases)]
+        test_cases_c_code = ["case {}: {}; break;".format(i, case[0]) for i, case in enumerate(test_cases)]
         return self.make_module("""
             #include <limits.h>
 
