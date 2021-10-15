@@ -218,7 +218,9 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->h_ResourceWarning = DHPy_open(dctx, uctx->h_ResourceWarning);
     dctx->h_BaseObjectType = DHPy_open(dctx, uctx->h_BaseObjectType);
     dctx->h_TypeType = DHPy_open(dctx, uctx->h_TypeType);
+    dctx->h_BoolType = DHPy_open(dctx, uctx->h_BoolType);
     dctx->h_LongType = DHPy_open(dctx, uctx->h_LongType);
+    dctx->h_FloatType = DHPy_open(dctx, uctx->h_FloatType);
     dctx->h_UnicodeType = DHPy_open(dctx, uctx->h_UnicodeType);
     dctx->h_TupleType = DHPy_open(dctx, uctx->h_TupleType);
     dctx->h_ListType = DHPy_open(dctx, uctx->h_ListType);

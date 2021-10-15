@@ -85,7 +85,9 @@ struct _HPyContext_s {
     HPy h_ResourceWarning;
     HPy h_BaseObjectType;
     HPy h_TypeType;
+    HPy h_BoolType;
     HPy h_LongType;
+    HPy h_FloatType;
     HPy h_UnicodeType;
     HPy h_TupleType;
     HPy h_ListType;
