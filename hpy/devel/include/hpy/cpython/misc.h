@@ -95,7 +95,9 @@ struct _HPyContext_s {
     /* Types */
     HPy h_BaseObjectType;
     HPy h_TypeType;
+    HPy h_BoolType;
     HPy h_LongType;
+    HPy h_FloatType;
     HPy h_UnicodeType;
     HPy h_TupleType;
     HPy h_ListType;
@@ -183,7 +185,9 @@ HPyAPI_FUNC HPyContext * _HPyGetContext(void) {
         /* Types */
         ctx->h_BaseObjectType = _py2h((PyObject *)&PyBaseObject_Type);
         ctx->h_TypeType = _py2h((PyObject *)&PyType_Type);
+        ctx->h_BoolType = _py2h((PyObject *)&PyBool_Type);
         ctx->h_LongType = _py2h((PyObject *)&PyLong_Type);
+        ctx->h_FloatType = _py2h((PyObject *)&PyFloat_Type);
         ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
         ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
         ctx->h_ListType = _py2h((PyObject *)&PyList_Type);

@@ -101,7 +101,9 @@ HPy h_ResourceWarning;
 /* Types */
 HPy h_BaseObjectType;   /* built-in 'object' */
 HPy h_TypeType;         /* built-in 'type' */
+HPy h_BoolType;         /* built-in 'bool' */
 HPy h_LongType;         /* built-in 'int' */
+HPy h_FloatType;        /* built-in 'float' */
 HPy h_UnicodeType;      /* built-in 'str' */
 HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */

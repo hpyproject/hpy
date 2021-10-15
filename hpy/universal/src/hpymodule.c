@@ -272,7 +272,9 @@ static void init_universal_ctx(HPyContext *ctx)
     /* Types */
     ctx->h_BaseObjectType = _py2h((PyObject *)&PyBaseObject_Type);
     ctx->h_TypeType = _py2h((PyObject *)&PyType_Type);
+    ctx->h_BoolType = _py2h((PyObject *)&PyBool_Type);
     ctx->h_LongType = _py2h((PyObject *)&PyLong_Type);
+    ctx->h_FloatType  = _py2h((PyObject *)&PyFloat_Type);
     ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
     ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
     ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
