@@ -512,3 +512,77 @@ class TestErr(HPyTest):
         check(base=RuntimeError, dict_=None, doc=b'mytest')
         check(base=RuntimeError, dict_={"test": "pass"}, doc=None)
         check(base=RuntimeError, dict_={"test": "pass"}, doc=b'mytest')
+
+    def test_exception_matches(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                HPyTracker ht;
+                HPy fun, fun_args;
+                HPy expected_exc_type;
+                HPy tmp;
+                HPy result;
+
+                if (!HPyArg_Parse(ctx, &ht, args, nargs, "OOO", &fun, &fun_args, &expected_exc_type)) {
+                    return HPy_NULL;
+                }
+
+                tmp = HPy_CallTupleDict(ctx, fun, fun_args, HPy_NULL);
+                if (HPy_IsNull(tmp)) {
+                    if (HPyErr_ExceptionMatches(ctx, expected_exc_type)) {
+                        HPyErr_Clear(ctx);
+                        result = HPy_Dup(ctx, ctx->h_True);
+                    } else {
+                        // propagate the unexpected exception to the caller
+                        result = HPy_NULL;
+                    }
+                } else {
+                    HPy_Close(ctx, tmp);
+                    result = HPy_Dup(ctx, ctx->h_False);
+                }
+
+                HPyTracker_Close(ctx, ht);
+                return result;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+
+        class DummyException(Exception):
+            pass
+
+        def raise_exception(e):
+            raise e
+
+        def do_not_raise_exception(*args):
+            return None
+
+        exc_types = (StopAsyncIteration, StopIteration, GeneratorExit, ArithmeticError, LookupError, AssertionError,
+                AttributeError, BufferError, EOFError, FloatingPointError, OSError, ImportError, ModuleNotFoundError, IndexError,
+                KeyError, KeyboardInterrupt, MemoryError, NameError, OverflowError, RuntimeError, RecursionError, NotImplementedError,
+                SyntaxError, IndentationError, TabError, ReferenceError, SystemError, SystemExit, TypeError, UnboundLocalError,
+                ValueError, ZeroDivisionError, BlockingIOError, BrokenPipeError, ChildProcessError, ConnectionError, ConnectionAbortedError,
+                ConnectionRefusedError, ConnectionResetError, FileExistsError, FileNotFoundError, InterruptedError, IsADirectoryError,
+                NotADirectoryError, PermissionError, ProcessLookupError, TimeoutError)
+
+        # just a sanity check of the extension function
+        assert not mod.f(do_not_raise_exception, tuple(), DummyException)
+
+        # test with "leaf" exception
+        assert mod.f(raise_exception, (DummyException, ), DummyException)
+        with pytest.raises(DummyException):
+            mod.f(raise_exception, (DummyException, ), StopIteration)
+
+        # test exception subclass
+        for exc_type in exc_types:
+            assert mod.f(raise_exception, (exc_type, ), BaseException)
+        assert mod.f(raise_exception, (DummyException, ), BaseException)
+
+        # match whole tuple
+        for exc_type in exc_types:
+            res = mod.f(raise_exception, (exc_type, ), exc_types)
+        with pytest.raises(DummyException):
+            mod.f(raise_exception, (DummyException, ), exc_types)
+
