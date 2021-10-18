@@ -51,17 +51,11 @@ Thus, the following perfectly valid piece of Python/C code::
       Py_DECREF(x);                       // two DECREF on x
   }
 
-Becomes using HPy API::
+Becomes using HPy API:
 
-  void foo(HPyContext *ctx)
-  {
-      HPy x = HPyLong_FromLong(ctx, 42);
-      HPy y = HPy_Dup(ctx, x);
-      /* ... */
-      // we need to close x and y independently
-      HPy_Close(ctx, x);
-      HPy_Close(ctx, y);
-  }
+.. literalinclude:: simple-example/simple.c
+  :start-at: void foo
+  :end-at: }
 
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
@@ -97,13 +91,11 @@ two different handles which point to the same underlying object, so comparing
 two handles directly is ill-defined.  To prevent this kind of common error
 (especially when porting existing code to HPy), the ``HPy`` C type is opaque
 and the C compiler actively forbids comparisons between them.  To check for
-identity, you can use ``HPy_Is()``::
+identity, you can use ``HPy_Is()``:
 
-    void is_same_object(HPyContext *ctx, HPy x, HPy y)
-    {
-        // return x == y; // compilation error!
-        return HPy_Is(ctx, x, y);
-    }
+.. literalinclude:: simple-example/simple.c
+  :start-at: is_same_object
+  :end-at: }
 
 .. note::
    The main benefit of the semantics of handles is that it allows
@@ -150,55 +142,48 @@ is assumed that you are already familiar with the existing Python/C API, so we
 will underline the similarities and the differences with it.
 
 We want to create a function named ``myabs`` which takes a single argument and
-computes its absolute value::
+computes its absolute value:
 
-    #include "hpy.h"
-
-    HPy_DEF_METH_O(myabs)
-    static HPy myabs_impl(HPyContext *ctx, HPy self, HPy obj)
-    {
-        return HPy_Absolute(ctx, obj);
-    }
+.. literalinclude:: simple-example/simple.c
+  :start-after: // BEGIN: myabs
+  :end-before: // END: myabs
 
 There are a couple of points which are worth noting:
 
-  * We use the macro ``HPy_DEF_METH_O`` to declare we are going to define a
-    HPy function called ``myabs``, which uses the ``METH_O`` calling
-    convention. As in Python/C, ``METH_O`` means that the function receives a
-    single argument.
+  * We use the macro ``HPyDef_METH`` to declare we are going to define a
+    HPy function called ``myabs``.
+
+  * The function will be available under the name ``"myabs"`` in our Python
+    module.
 
   * The actual C function which implements ``myabs`` is called ``myabs_impl``.
 
-  * It receives two arguments of type ``HPy``, which are handles which are
-    guaranteed to be valid: they are automatically closed by the caller, so
-    there is no need to call ``HPy_Close`` on them.
+  * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in CPython,
+    ``HPyFunc_O`` means that the function receives a single argument on top of
+    ``self``.
 
-  * It returns a handle, which has to be closed by the caller.
+  * ``myabs_impl`` takes two arguments of type ``HPy``, which are handles for ``self``
+    and the argument and which are guaranteed to be valid: they are automatically
+    closed by the caller, so there is no need to call ``HPy_Close`` on them.
+
+  * ``myabs_impl`` returns a handle, which has to be closed by the caller.
 
   * ``HPy_Absolute`` is the equivalent of ``PyNumber_Absolute`` and
     computes the absolute value of the given argument.
 
-The ``HPy_DEF_METH_O`` macro is needed to maintain compatibility with CPython.
+Among other things,
+the ``HPy_DEF_METH_O`` macro is needed to maintain compatibility with CPython.
 In CPython, C functions and methods have a C signature that is different to
 the one used by HPy: they don't receive an ``HPyContext`` and their arguments
 have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
 generates a trampoline function whose signature is appropriate for CPython and
 which calls the ``myabs_impl``.
 
-Now, we can define our module::
+Now, we can define our module:
 
-    static HPyMethodDef SimpleMethods[] = {
-        {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
-        {NULL, NULL, 0, NULL}
-    };
-
-    static HPyModuleDef moduledef = {
-        HPyModuleDef_HEAD_INIT,
-        .m_name = "simple",
-        .m_doc = "HPy Example",
-        .m_size = -1,
-        .m_methods = SimpleMethods
-    };
+.. literalinclude:: simple-example/simple.c
+  :start-after: // BEGIN: methodsdef
+  :end-before: // END: methodsdef
 
 This part is very similar to the one you would write in Python/C.  Note that
 we specify ``myabs`` (and **not** ``myabs_impl``) in the method table, and
@@ -207,24 +192,19 @@ choice, to minimize the changes needed to port existing extensions, and to
 make it easier to support hybrid extensions in which some of the methods are
 still written using the Python/C API.
 
-Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``.
+Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``:
+
+.. literalinclude:: simple-example/simple.c
+  :start-after: // BEGIN: moduledef
+  :end-before: // END: moduledef
 
 Building the module
 ~~~~~~~~~~~~~~~~~~~~
 
 Let's write a ``setup.py`` to build our extension:
 
-.. code-block:: python
-
-    from setuptools import setup, Extension
-
-    setup(
-        name="hpy-example",
-        hpy_ext_modules=[
-            Extension('simple', sources=['simple.c']),
-        ],
-        setup_requires=['hpy.devel'],
-    )
+.. literalinclude:: simple-example/setup.py
+    :language: python
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
 CPython, it will target the :term:`CPython ABI` by default, so you will end up with
