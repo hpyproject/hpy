@@ -184,6 +184,7 @@ void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
 int HPyErr_Occurred(HPyContext *ctx);
+int HPyErr_ExceptionMatches(HPyContext *ctx, HPy exc);
 HPy HPyErr_NoMemory(HPyContext *ctx);
 void HPyErr_Clear(HPyContext *ctx);
 HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);

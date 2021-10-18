@@ -73,6 +73,7 @@ void debug_ctx_Err_SetString(HPyContext *dctx, DHPy h_type, const char *message)
 void debug_ctx_Err_SetObject(HPyContext *dctx, DHPy h_type, DHPy h_value);
 DHPy debug_ctx_Err_SetFromErrno(HPyContext *dctx, DHPy h_type);
 int debug_ctx_Err_Occurred(HPyContext *dctx);
+int debug_ctx_Err_ExceptionMatches(HPyContext *dctx, DHPy exc);
 DHPy debug_ctx_Err_NoMemory(HPyContext *dctx);
 void debug_ctx_Err_Clear(HPyContext *dctx);
 DHPy debug_ctx_Err_NewException(HPyContext *dctx, const char *name, DHPy base, DHPy dict);
@@ -287,6 +288,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Err_SetObject = &debug_ctx_Err_SetObject;
     dctx->ctx_Err_SetFromErrno = &debug_ctx_Err_SetFromErrno;
     dctx->ctx_Err_Occurred = &debug_ctx_Err_Occurred;
+    dctx->ctx_Err_ExceptionMatches = &debug_ctx_Err_ExceptionMatches;
     dctx->ctx_Err_NoMemory = &debug_ctx_Err_NoMemory;
     dctx->ctx_Err_Clear = &debug_ctx_Err_Clear;
     dctx->ctx_Err_NewException = &debug_ctx_Err_NewException;

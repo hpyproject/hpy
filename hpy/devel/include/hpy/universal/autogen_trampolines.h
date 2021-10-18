@@ -258,6 +258,10 @@ HPyAPI_FUNC int HPyErr_Occurred(HPyContext *ctx) {
      return ctx->ctx_Err_Occurred ( ctx ); 
 }
 
+HPyAPI_FUNC int HPyErr_ExceptionMatches(HPyContext *ctx, HPy exc) {
+     return ctx->ctx_Err_ExceptionMatches ( ctx, exc ); 
+}
+
 HPyAPI_FUNC HPy HPyErr_NoMemory(HPyContext *ctx) {
      return ctx->ctx_Err_NoMemory ( ctx ); 
 }

@@ -322,6 +322,11 @@ int debug_ctx_Err_Occurred(HPyContext *dctx)
     return HPyErr_Occurred(get_info(dctx)->uctx);
 }
 
+int debug_ctx_Err_ExceptionMatches(HPyContext *dctx, DHPy exc)
+{
+    return HPyErr_ExceptionMatches(get_info(dctx)->uctx, DHPy_unwrap(dctx, exc));
+}
+
 DHPy debug_ctx_Err_NoMemory(HPyContext *dctx)
 {
     return DHPy_open(dctx, HPyErr_NoMemory(get_info(dctx)->uctx));
