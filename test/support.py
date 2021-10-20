@@ -5,6 +5,11 @@ import textwrap
 
 PY2 = sys.version_info[0] == 2
 
+# True if `sys.executable` is set to a value that allows a Python equivalent to
+# the current Python to be launched via, e.g., `python_subprocess.run(...)`.
+# By default is `True` if sys.executable is set to a true value.
+SUPPORTS_SYS_EXECUTABLE = bool(getattr(sys, "executable", None))
+
 def reindent(s, indent):
     s = textwrap.dedent(s)
     return ''.join(' '*indent + line if line.strip() else line
@@ -131,6 +136,12 @@ class Spec(object):
         self.origin = origin
 
 
+class HPyModule(object):
+    def __init__(self, name, so_file):
+        self.name = name
+        self.so_filename = so_file
+
+
 class ExtensionCompiler:
     def __init__(self, tmpdir, hpy_devel, hpy_abi, compiler_verbose=False,
                  ExtensionTemplate=DefaultExtensionTemplate,
@@ -217,7 +228,7 @@ class ExtensionCompiler:
                                 hpy_devel=self.hpy_devel,
                                 hpy_abi=hpy_abi,
                                 compiler_verbose=self.compiler_verbose)
-        return so_filename
+        return HPyModule(name, so_filename)
 
     def make_module(self, main_src, ExtensionTemplate=None, name='mytest',
                     extra_sources=()):
@@ -232,8 +243,9 @@ class ExtensionCompiler:
         """
         if ExtensionTemplate is None:
             ExtensionTemplate = self.ExtensionTemplate
-        so_filename = self.compile_module(
+        module = self.compile_module(
             ExtensionTemplate, main_src, name, extra_sources)
+        so_filename = module.so_filename
         if self.hpy_abi == 'universal':
             return self.load_universal_module(name, so_filename, debug=False)
         elif self.hpy_abi == 'debug':
@@ -272,6 +284,44 @@ class ExtensionCompiler:
         return module
 
 
+class PythonSubprocessRunner:
+    def __init__(self, verbose, hpy_abi):
+        self.verbose = verbose
+        self.hpy_abi = hpy_abi
+
+    def run(self, mod, code):
+        """ Starts new subprocess that loads given module as 'mod' using the
+            correct ABI mode and then executes given code snippet. Use
+            "--subprocess-v" to enable logging from this.
+        """
+        import subprocess
+        env = os.environ.copy()
+        pythonpath = [os.path.dirname(mod.so_filename)]
+        if 'PYTHONPATH' in env:
+            pythonpath.append(env['PYTHONPATH'])
+        env["PYTHONPATH"] = os.pathsep.join(pythonpath)
+        if self.hpy_abi in ['universal', 'debug']:
+            # HPy module
+            load_module = "import sys;" + \
+                          "import hpy.universal;" + \
+                          "mod = hpy.universal.load('{name}', '{so_filename}', debug={debug});"
+            load_module = load_module.format(name=mod.name, so_filename=mod.so_filename,
+                                             debug=self.hpy_abi == 'debug')
+        else:
+            # CPython module
+            assert self.hpy_abi == 'cpython'
+            load_module = "import {} as mod;".format(mod.name)
+        if self.verbose:
+            print("\n---\nExecuting in subprocess: {}\n".format(load_module + code))
+        result = subprocess.run([sys.executable, "-c", load_module + code], env=env,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if self.verbose:
+            out = result.stdout.decode('ascii')
+            err = result.stderr.decode('ascii')
+            print("\n---\n{out}\n{err}\n---\n".format(out=out, err=err))
+        return result
+
+
 @pytest.mark.usefixtures('initargs')
 class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
@@ -284,6 +334,11 @@ class HPyTest:
         ExtensionTemplate = self.ExtensionTemplate
         return self.compiler.make_module(main_src, ExtensionTemplate, name,
                                          extra_sources)
+
+    def compile_module(self, main_src, name='mytest', extra_sources=()):
+        ExtensionTemplate = self.ExtensionTemplate
+        return self.compiler.compile_module(ExtensionTemplate, main_src, name,
+                                     extra_sources)
 
     def supports_refcounts(self):
         """ Returns True if the underlying Python implementation supports
@@ -304,15 +359,6 @@ class HPyTest:
             method.
         """
         return True
-
-    def supports_sys_executable(self):
-        """ Returns True is `sys.executable` is set to a value that allows
-            a Python equivalent to the current Python to be launched via, e.g.,
-            `subprocess.run(...)`.
-
-            By default returns `True` if sys.executable is set to a true value.
-        """
-        return bool(getattr(sys, "executable", None))
 
 
 

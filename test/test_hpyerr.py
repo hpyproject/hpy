@@ -1,6 +1,4 @@
-import pytest as pytest_collecting
-
-from .support import HPyTest
+from .support import HPyTest, SUPPORTS_SYS_EXECUTABLE
 
 
 class TestErr(HPyTest):
@@ -19,17 +17,8 @@ class TestErr(HPyTest):
         with pytest.raises(MemoryError):
             mod.f()
 
-    def test_FatalError(self):
-        import os
-        import sys
-        fatal_exit_code = {
-            "linux": -6,  # SIGABRT
-            # See https://bugs.python.org/issue36116#msg336782 -- the
-            # return code from abort on Windows 8+ is a stack buffer overrun.
-            # :|
-            "win32": 0xC0000409,  # STATUS_STACK_BUFFER_OVERRUN
-        }.get(sys.platform, -6)
-        mod = self.make_module("""
+    def test_FatalError(self, python_subprocess, fatal_exit_code):
+        mod = self.compile_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
@@ -42,21 +31,12 @@ class TestErr(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        if not self.supports_sys_executable():
+        if not SUPPORTS_SYS_EXECUTABLE:
             # if sys.executable is not available (e.g. inside pypy app-level)
             # tests, then skip the rest of this test
             return
         # subprocess is not importable in pypy app-level tests
-        import subprocess
-        env = os.environ.copy()
-        pythonpath = [os.path.dirname(mod.__file__)]
-        if 'PYTHONPATH' in env:
-            pythonpath.append(env['PYTHONPATH'])
-        env["PYTHONPATH"] = os.pathsep.join(pythonpath)
-        result = subprocess.run([
-            sys.executable,
-            "-c", "import {} as mod; mod.f()".format(mod.__name__)
-        ], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = python_subprocess.run(mod, "mod.f()")
         assert result.returncode == fatal_exit_code
         assert result.stdout == b""
         # In Python 3.9, the Py_FatalError() function was replaced with a macro
