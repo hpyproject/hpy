@@ -365,21 +365,27 @@ class HPyTest:
         return True
 
 
-
-class HPyDebugTest(HPyTest):
+class HPyDebugCapture:
     """
-    Like HPyTest, but force hpy_abi=='debug' and thus run only [debug] tests
+    Context manager that sets HPy debug invalid handle hook and remembers the
+    number of invalid handles reported. Once closed, sets the invalid handle
+    hook back to None.
     """
+    def __init__(self):
+        self.invalid_handles_count = 0
 
-    # override initargs to avoid using hpy_debug (we don't want to detect
-    # leaks here, we make them on purpose!
-    @pytest.fixture()
-    def initargs(self, compiler):
-        self.compiler = compiler
+    def _capture_report(self):
+        self.invalid_handles_count += 1
 
-    @pytest.fixture(params=['debug'])
-    def hpy_abi(self, request):
-        return request.param
+    def __enter__(self):
+        from hpy.universal import _debug
+        _debug.set_on_invalid_handle(self._capture_report)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        from hpy.universal import _debug
+        _debug.set_on_invalid_handle(None)
+
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
 

@@ -1,5 +1,6 @@
 import pytest
-from .support import ExtensionCompiler, DefaultExtensionTemplate, PythonSubprocessRunner
+from .support import ExtensionCompiler, DefaultExtensionTemplate,\
+    PythonSubprocessRunner, HPyDebugCapture
 from hpy.debug.leakdetector import LeakDetector
 
 def pytest_addoption(parser):
@@ -54,3 +55,10 @@ def fatal_exit_code(request):
 def python_subprocess(request, hpy_abi):
     verbose = request.config.getoption('--subprocess-v')
     yield PythonSubprocessRunner(verbose, hpy_abi)
+
+
+@pytest.fixture()
+def hpy_debug_capture(request, hpy_abi):
+    assert hpy_abi == 'debug'
+    with HPyDebugCapture() as reporter:
+        yield reporter

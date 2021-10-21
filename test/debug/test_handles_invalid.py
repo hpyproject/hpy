@@ -8,8 +8,7 @@ def hpy_abi():
         yield "debug"
 
 
-def test_cant_use_closed_handle(compiler):
-    from hpy.universal import _debug
+def test_cant_use_closed_handle(compiler, hpy_debug_capture):
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", f_impl, HPyFunc_O, .doc="double close")
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
@@ -32,15 +31,10 @@ def test_cant_use_closed_handle(compiler):
         @EXPORT(g)
         @INIT
     """)
-    n = 0
-    def callback():
-        nonlocal n
-        n += 1
-    _debug.set_on_invalid_handle(callback)
     mod.f('foo')   # double close
-    assert n == 1
+    assert hpy_debug_capture.invalid_handles_count == 1
     mod.g('bar')   # use-after-close
-    assert n == 2
+    assert hpy_debug_capture.invalid_handles_count == 2
 
 
 def test_invalid_handle_crashes_python_if_no_hook(compiler, python_subprocess, fatal_exit_code):
