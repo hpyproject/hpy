@@ -305,7 +305,8 @@ class PythonSubprocessRunner:
             load_module = "import sys;" + \
                           "import hpy.universal;" + \
                           "mod = hpy.universal.load('{name}', '{so_filename}', debug={debug});"
-            load_module = load_module.format(name=mod.name, so_filename=mod.so_filename,
+            escaped_filename = mod.so_filename.replace("\\", "\\\\")  # Needed for Windows paths
+            load_module = load_module.format(name=mod.name, so_filename=escaped_filename,
                                              debug=self.hpy_abi == 'debug')
         else:
             # CPython module
