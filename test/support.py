@@ -177,10 +177,14 @@ class ExtensionCompiler:
             filename.write(source)
         return name + '.c'
 
-    def compile_module(self, ExtensionTemplate, main_src, name, extra_sources):
+    def _fixup_template(self, ExtensionTemplate):
+        return self.ExtensionTemplate if ExtensionTemplate is None else ExtensionTemplate
+
+    def compile_module(self, main_src, ExtensionTemplate=None, name='mytest', extra_sources=()):
         """
         Create and compile a HPy module from the template
         """
+        ExtensionTemplate = self._fixup_template(ExtensionTemplate)
         from distutils.core import Extension
         filename = self._expand(ExtensionTemplate, name, main_src)
         sources = [str(filename)]
@@ -241,10 +245,9 @@ class ExtensionCompiler:
         use make_module but explicitly use compile_module and import it
         manually as required by your test.
         """
-        if ExtensionTemplate is None:
-            ExtensionTemplate = self.ExtensionTemplate
+        ExtensionTemplate = self._fixup_template(ExtensionTemplate)
         module = self.compile_module(
-            ExtensionTemplate, main_src, name, extra_sources)
+            main_src, ExtensionTemplate, name, extra_sources)
         so_filename = module.so_filename
         if self.hpy_abi == 'universal':
             return self.load_universal_module(name, so_filename, debug=False)
@@ -338,7 +341,7 @@ class HPyTest:
 
     def compile_module(self, main_src, name='mytest', extra_sources=()):
         ExtensionTemplate = self.ExtensionTemplate
-        return self.compiler.compile_module(ExtensionTemplate, main_src, name,
+        return self.compiler.compile_module(main_src, ExtensionTemplate, name,
                                      extra_sources)
 
     def supports_refcounts(self):
