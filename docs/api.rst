@@ -53,9 +53,9 @@ Thus, the following perfectly valid piece of Python/C code::
 
 Becomes using HPy API:
 
-.. literalinclude:: simple-example/simple.c
-  :start-at: void foo
-  :end-at: }
+.. literalinclude:: examples/simple-example/simple.c
+  :start-after: // BEGIN: foo
+  :end-before: // END: foo
 
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
@@ -93,9 +93,9 @@ two handles directly is ill-defined.  To prevent this kind of common error
 and the C compiler actively forbids comparisons between them.  To check for
 identity, you can use ``HPy_Is()``:
 
-.. literalinclude:: simple-example/simple.c
-  :start-at: is_same_object
-  :end-at: }
+.. literalinclude:: examples/simple-example/simple.c
+  :start-after: // BEGIN: is_same_object
+  :end-before: // END: is_same_object
 
 .. note::
    The main benefit of the semantics of handles is that it allows
@@ -144,7 +144,7 @@ will underline the similarities and the differences with it.
 We want to create a function named ``myabs`` which takes a single argument and
 computes its absolute value:
 
-.. literalinclude:: simple-example/simple.c
+.. literalinclude:: examples/simple-example/simple.c
   :start-after: // BEGIN: myabs
   :end-before: // END: myabs
 
@@ -181,7 +181,7 @@ which calls the ``myabs_impl``.
 
 Now, we can define our module:
 
-.. literalinclude:: simple-example/simple.c
+.. literalinclude:: examples/simple-example/simple.c
   :start-after: // BEGIN: methodsdef
   :end-before: // END: methodsdef
 
@@ -194,7 +194,7 @@ still written using the Python/C API.
 
 Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``:
 
-.. literalinclude:: simple-example/simple.c
+.. literalinclude:: examples/simple-example/simple.c
   :start-after: // BEGIN: moduledef
   :end-before: // END: moduledef
 
@@ -203,7 +203,7 @@ Building the module
 
 Let's write a ``setup.py`` to build our extension:
 
-.. literalinclude:: simple-example/setup.py
+.. literalinclude:: examples/simple-example/setup.py
     :language: python
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
@@ -218,21 +218,20 @@ produce a file called ``simple.hpy.so`` (note that you need to specify
 
   python setup.py --hpy-abi=universal build_ext -i
 
+Note: this command will also produce a Python file of the same name, which
+loads the HPy module using the `hpy.universal.load` function from the HPy
+Python package.
+
 VARARGS calling convention
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If we want to receive more than a single arguments, we need the
 ``HPy_METH_VARARGS`` calling convention. Let's add a function ``add_ints``
-which adds two integers::
+which adds two integers:
 
-    HPy_DEF_METH_VARARGS(add_ints)
-    static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
-    {
-        long a, b;
-        if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
-            return HPy_NULL;
-        return HPyLong_FromLong(ctx, a+b);
-    }
+.. literalinclude:: examples/snippets/hpyvarargs.c
+  :start-after: // BEGIN: add_ints
+  :end-before: // END: add_ints
 
 There are a few things to note:
 
@@ -254,10 +253,8 @@ There are a few things to note:
     because ``HPy`` is not a pointer type.
 
 Once we have written our function, we can add it to the ``SimpleMethods[]``
-table, which now becomes::
+table, which now becomes:
 
-    static HPyMethodDef SimpleMethods[] = {
-        {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
-        {"add_ints", add_ints, HPy_METH_VARARGS, "Add two integers"},
-        {NULL, NULL, 0, NULL}
-    };
+.. literalinclude:: examples/snippets/hpyvarargs.c
+  :start-after: // BEGIN: methodsdef
+  :end-before: // END: methodsdef

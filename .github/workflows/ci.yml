@@ -139,7 +139,7 @@ jobs:
           make valgrind
 
   docs_examples_tests:
-    name: Porting example tests
+    name: Documentation examples tests
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     strategy:

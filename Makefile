@@ -46,5 +46,7 @@ valgrind:
 	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/
 
 docs-examples-tests:
-	python docs/simple-example/setup.py install
-	pytest docs/simple-example/tests.py
+	python docs/examples/simple-example/setup.py install
+	python docs/examples/mixed-example/setup.py install
+	python docs/examples/snippets/setup.py install
+	pytest docs/examples/tests.py

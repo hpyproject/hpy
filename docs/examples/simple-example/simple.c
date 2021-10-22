@@ -4,6 +4,7 @@
 // For the following two illustrative snippets we just check that they compile:
 #include "hpy.h"
 
+// BEGIN: foo
 void foo(HPyContext *ctx)
 {
     HPy x = HPyLong_FromLong(ctx, 42);
@@ -13,12 +14,15 @@ void foo(HPyContext *ctx)
     HPy_Close(ctx, x);
     HPy_Close(ctx, y);
 }
+// END: foo
 
-void is_same_object(HPyContext *ctx, HPy x, HPy y)
+// BEGIN: is_same_object
+int is_same_object(HPyContext *ctx, HPy x, HPy y)
 {
     // return x == y; // compilation error!
     return HPy_Is(ctx, x, y);
 }
+// END: is_same_object
 
 // -------------
 
