@@ -19,9 +19,11 @@ static void debug_handles_sanity_check(HPyDebugInfo *info)
 #endif
 }
 
-static void DebugHandle_free_raw_data(HPyDebugInfo *info, DebugHandle *handle) {
+static void DebugHandle_free_raw_data(HPyDebugInfo *info, DebugHandle *handle, bool was_counted_in_limit) {
     if (handle->associated_data) {
-        info->protected_raw_data_size -= handle->associated_data_size;
+        if (was_counted_in_limit) {
+            info->protected_raw_data_size -= handle->associated_data_size;
+        }
         if (raw_data_free(handle->associated_data, handle->associated_data_size)) {
             HPy_FatalError(info->uctx, "HPy could not free internally allocated memory.");
         }
@@ -41,7 +43,7 @@ DHPy DHPy_open(HPyContext *dctx, UHPy uh)
     DebugHandle *handle = NULL;
     if (info->closed_handles.size >= info->closed_handles_queue_max_size) {
         handle = DHQueue_popfront(&info->closed_handles);
-        DebugHandle_free_raw_data(info, handle);
+        DebugHandle_free_raw_data(info, handle, true);
     }
     else {
         handle = malloc(sizeof(DebugHandle));
@@ -73,6 +75,7 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
 {
     HPyDebugInfo *info = get_info(dctx);
     HPyContext *uctx = info->uctx;
+    DebugHandle *handle = as_DebugHandle(dh);
     assert(handle->is_closed);
     if (HPy_IsNull(info->uh_on_invalid_handle)) {
         // default behavior: print an error and abort
@@ -132,7 +135,7 @@ void DHPy_close(HPyContext *dctx, DHPy dh)
         HPy_ssize_t new_size = info->protected_raw_data_size + handle->associated_data_size;
         if (new_size > info->protected_raw_data_max_size) {
             // free it now
-            DebugHandle_free_raw_data(info, handle);
+            DebugHandle_free_raw_data(info, handle, false);
         } else {
             // keep/leak it and make it protected from further reading
             info->protected_raw_data_size = new_size;
@@ -153,7 +156,7 @@ void DHPy_free(HPyContext *dctx, DHPy dh)
     DHPy_sanity_check(dh);
     DebugHandle *handle = as_DebugHandle(dh);
     HPyDebugInfo *info = get_info(dctx);
-    DebugHandle_free_raw_data(info, handle);
+    DebugHandle_free_raw_data(info, handle, true);
     // this is not strictly necessary, but it increases the chances that you
     // get a clear segfault if you use a freed handle
     handle->uh = HPy_NULL;

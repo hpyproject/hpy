@@ -75,13 +75,19 @@ static UHPy get_open_handles_impl(HPyContext *uctx, UHPy u_self, UHPy u_gen)
 }
 
 HPyDef_METH(get_closed_handles, "get_closed_handles", get_closed_handles_impl,
-            HPyFunc_NOARGS, .doc=
+            HPyFunc_VARARGS, .doc=
             "Return a list of all the closed handle in the cache")
-static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self)
+static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self, HPy *args, HPy_ssize_t nargs)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
-    return build_list_of_handles(uctx, u_self, &info->closed_handles, 0);
+    long gen = 0;
+    if (nargs > 0) {
+        gen = HPyLong_AsLong(uctx, args[0]);
+        if (HPyErr_Occurred(uctx))
+            return HPy_NULL;
+    }
+    return build_list_of_handles(uctx, u_self, &info->closed_handles, gen);
 }
 
 HPyDef_METH(get_closed_handles_queue_max_size, "get_closed_handles_queue_max_size",
@@ -105,6 +111,30 @@ static UHPy set_closed_handles_queue_max_size_impl(HPyContext *uctx, UHPy u_self
     if (HPyErr_Occurred(uctx))
         return HPy_NULL;
     info->closed_handles_queue_max_size = size;
+    return HPy_Dup(uctx, uctx->h_None);
+}
+
+HPyDef_METH(get_protected_raw_data_max_size, "get_protected_raw_data_max_size",
+get_protected_raw_data_max_size_impl, HPyFunc_NOARGS, .doc=
+"Return the maximum size of the retained raw memory associated with closed handles")
+static UHPy get_protected_raw_data_max_size_impl(HPyContext *uctx, UHPy u_self)
+{
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    return HPyLong_FromSsize_t(uctx, info->protected_raw_data_max_size);
+}
+
+HPyDef_METH(set_protected_raw_data_max_size, "set_protected_raw_data_max_size",
+set_protected_raw_data_max_size_impl, HPyFunc_O, .doc=
+"Set the maximum size of the retained raw memory associated with closed handles")
+static UHPy set_protected_raw_data_max_size_impl(HPyContext *uctx, UHPy u_self, UHPy u_size)
+{
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    HPy_ssize_t size = HPyLong_AsSize_t(uctx, u_size);
+    if (HPyErr_Occurred(uctx))
+        return HPy_NULL;
+    info->protected_raw_data_max_size = size;
     return HPy_Dup(uctx, uctx->h_None);
 }
 
@@ -177,6 +207,18 @@ static UHPy DebugHandle_is_closed_get(HPyContext *uctx, UHPy self, void *closure
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     return HPyBool_FromLong(uctx, dh->handle->is_closed);
+}
+
+HPyDef_GET(DebugHandle_raw_data_size, "raw_data_size", DebugHandle_raw_data_size_get,
+.doc="Size of retained raw memory. FOR TESTS ONLY.")
+static UHPy DebugHandle_raw_data_size_get(HPyContext *uctx, UHPy self, void *closure)
+{
+    DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
+    if (dh->handle->associated_data) {
+        return HPyLong_FromSsize_t(uctx, dh->handle->associated_data_size);
+    } else {
+        return HPyLong_FromLong(uctx, -1);
+    }
 }
 
 HPyDef_SLOT(DebugHandle_cmp, DebugHandle_cmp_impl, HPy_tp_richcompare)
@@ -253,6 +295,7 @@ static HPyDef *DebugHandleType_defs[] = {
     &DebugHandle_obj,
     &DebugHandle_id,
     &DebugHandle_is_closed,
+    &DebugHandle_raw_data_size,
     &DebugHandle_cmp,
     &DebugHandle_repr,
     &DebugHandle__force_close,
@@ -285,6 +328,8 @@ static HPyDef *module_defines[] = {
     &get_closed_handles,
     &get_closed_handles_queue_max_size,
     &set_closed_handles_queue_max_size,
+    &get_protected_raw_data_max_size,
+    &set_protected_raw_data_max_size,
     &set_on_invalid_handle,
     NULL
 };
