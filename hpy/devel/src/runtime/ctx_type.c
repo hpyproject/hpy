@@ -10,6 +10,7 @@
 #endif
 
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
+static bool has_tp_destroy(HPyType_Spec *hpyspec);
 
 
 /* This is a hack: we need some extra space to store random data on the
@@ -352,7 +353,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     hpyslot_count++;        // Py_tp_methods
     hpyslot_count++;        // Py_tp_members
     hpyslot_count++;        // Py_tp_getset
-    hpyslot_count++;        // Py_tp_dealloc
+    if (has_tp_traverse(hpyspec) || has_tp_destroy(hpyspec))
+        hpyslot_count++;        // Py_tp_dealloc
     if (has_tp_traverse(hpyspec))
         hpyslot_count++;    // Py_tp_clear
 
@@ -430,8 +432,10 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
 
-    // add a dealloc function
-    result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
+    // add a dealloc function, if needed
+    if (has_tp_traverse(hpyspec) || has_tp_destroy(hpyspec)) {
+        result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
+    }
 
     // add a tp_clear, if the user provided a tp_traverse
     if (has_tp_traverse(hpyspec)) {
@@ -543,6 +547,17 @@ static bool has_tp_traverse(HPyType_Spec *hpyspec)
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *def = hpyspec->defines[i];
             if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse)
+                return true;
+        }
+    return false;
+}
+
+static bool has_tp_destroy(HPyType_Spec *hpyspec)
+{
+    if (hpyspec->defines != NULL)
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *def = hpyspec->defines[i];
+            if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_destroy)
                 return true;
         }
     return false;

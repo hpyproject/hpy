@@ -28,6 +28,45 @@ class TestLegacyType(_TestType):
 
     ExtensionTemplate = LegacyPointTemplate
 
+    def test_legacy_dealloc(self):
+        mod = self.make_module("""
+            static long dealloc_counter = 0;
+
+            HPyDef_METH(get_counter, "get_counter", get_counter_impl, HPyFunc_NOARGS)
+            static HPy get_counter_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, dealloc_counter);
+            }
+
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            static void Point_dealloc(PyObject *self)
+            {
+                dealloc_counter++;
+            }
+
+            static HPyDef *Point_defines[] = {&Point_new, NULL};
+            static PyType_Slot Point_slots[] = {
+                {Py_tp_dealloc, Point_dealloc},
+                {0, NULL},
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines,
+                .legacy = true,
+                .legacy_slots = Point_slots,
+            };
+
+            @EXPORT(get_counter)
+            @EXPORT_TYPE("Point", Point_spec)
+            @INIT
+        """)
+        assert mod.get_counter() == 0
+        p = mod.Point(0, 0)
+        del p
+        import gc; gc.collect()
+        assert mod.get_counter() == 1
 
 class TestCustomLegacyFeatures(HPyTest):
 
