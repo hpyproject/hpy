@@ -1,3 +1,8 @@
+/* Simple C module that shows how to mix CPython API and HPY.
+ * At the moment, this code is not referenced from the documentation, but it is
+ * tested nonetheless.
+ */
+
 #include "hpy.h"
 
 /* a HPy style function */

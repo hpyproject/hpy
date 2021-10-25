@@ -1,30 +1,9 @@
-/* Simple module that defines single simple function "myabs" */
-/* NOTE: snippets from the following code are referenced from the docs! */
-
-// For the following two illustrative snippets we just check that they compile:
-#include "hpy.h"
-
-// BEGIN: foo
-void foo(HPyContext *ctx)
-{
-    HPy x = HPyLong_FromLong(ctx, 42);
-    HPy y = HPy_Dup(ctx, x);
-    /* ... */
-    // we need to close x and y independently
-    HPy_Close(ctx, x);
-    HPy_Close(ctx, y);
-}
-// END: foo
-
-// BEGIN: is_same_object
-int is_same_object(HPyContext *ctx, HPy x, HPy y)
-{
-    // return x == y; // compilation error!
-    return HPy_Is(ctx, x, y);
-}
-// END: is_same_object
-
-// -------------
+/* Simple C module that defines single simple function "myabs".
+ * We need to have a separate standalone package for those snippets, because we
+ * want to show the source code in its entirety, including the HPyDef array
+ * initialization, the module definition, and the setup.py script, so there is
+ * no room left for mixing these code snippets with other code snippets.
+ */
 
 // BEGIN: myabs
 #include "hpy.h"
@@ -47,7 +26,8 @@ static HPyModuleDef simple = {
         .m_name = "simple",
         .m_doc = "HPy Example",
         .m_size = -1,
-        .defines = SimpleMethods
+        .defines = SimpleMethods,
+        .legacy_methods = NULL
 };
 // END: methodsdef
 

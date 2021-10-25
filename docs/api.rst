@@ -53,7 +53,7 @@ Thus, the following perfectly valid piece of Python/C code::
 
 Becomes using HPy API:
 
-.. literalinclude:: examples/simple-example/simple.c
+.. literalinclude:: examples/snippets/snippets.c
   :start-after: // BEGIN: foo
   :end-before: // END: foo
 
@@ -81,7 +81,7 @@ references to the same object results in the very same ``PyObject *`` pointer.
 Thus, it is possible to compare C pointers by equality to check whether they
 point to the same object::
 
-    void is_same_object(PyObject *x, PyObject *y)
+    int is_same_object(PyObject *x, PyObject *y)
     {
         return x == y;
     }
@@ -93,7 +93,7 @@ two handles directly is ill-defined.  To prevent this kind of common error
 and the C compiler actively forbids comparisons between them.  To check for
 identity, you can use ``HPy_Is()``:
 
-.. literalinclude:: examples/simple-example/simple.c
+.. literalinclude:: examples/snippets/snippets.c
   :start-after: // BEGIN: is_same_object
   :end-before: // END: is_same_object
 
@@ -126,7 +126,7 @@ Python/C function call, where there is no notion of context.
 One of the reasons to include ``HPyContext`` from the day one is to be
 future-proof: it is conceivable to use it to hold the interpreter or the
 thread state in the future, in particular when there will be support for
-sub-interpreter.  Another possible usage could be to embed different versions
+sub-interpreters.  Another possible usage could be to embed different versions
 or implementations of Python inside the same process.
 
 Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
@@ -158,12 +158,12 @@ There are a couple of points which are worth noting:
 
   * The actual C function which implements ``myabs`` is called ``myabs_impl``.
 
-  * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in CPython,
+  * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in Python/C API,
     ``HPyFunc_O`` means that the function receives a single argument on top of
     ``self``.
 
-  * ``myabs_impl`` takes two arguments of type ``HPy``, which are handles for ``self``
-    and the argument and which are guaranteed to be valid: they are automatically
+  * ``myabs_impl`` takes two arguments of type ``HPy``: handles for ``self``
+    and the argument, which are guaranteed to be valid. They are automatically
     closed by the caller, so there is no need to call ``HPy_Close`` on them.
 
   * ``myabs_impl`` returns a handle, which has to be closed by the caller.
@@ -171,13 +171,20 @@ There are a couple of points which are worth noting:
   * ``HPy_Absolute`` is the equivalent of ``PyNumber_Absolute`` and
     computes the absolute value of the given argument.
 
-Among other things,
-the ``HPy_DEF_METH_O`` macro is needed to maintain compatibility with CPython.
-In CPython, C functions and methods have a C signature that is different to
-the one used by HPy: they don't receive an ``HPyContext`` and their arguments
-have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
-generates a trampoline function whose signature is appropriate for CPython and
-which calls the ``myabs_impl``.
+  * We also do not call ``HPy_Close`` on the result returned to the caller.
+    We must return a valid handle.
+
+.. note::
+   Among other things,
+   the ``HPyDef_METH`` macro is needed to maintain compatibility with CPython.
+   In CPython, C functions and methods have a C signature that is different to
+   the one used by HPy: they don't receive an ``HPyContext`` and their arguments
+   have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
+   generates a trampoline function whose signature is appropriate for CPython and
+   which calls the ``myabs_impl``. This trampoline is then used from both the
+   CPython ABI and the CPython implementation of the universal ABI, but other
+   implementations of the universal ABI will usually call directly the HPy
+   function itself.
 
 Now, we can define our module:
 
@@ -186,11 +193,14 @@ Now, we can define our module:
   :end-before: // END: methodsdef
 
 This part is very similar to the one you would write in Python/C.  Note that
-we specify ``myabs`` (and **not** ``myabs_impl``) in the method table, and
-that we have to indicate the calling convention again.  This is a deliberate
-choice, to minimize the changes needed to port existing extensions, and to
-make it easier to support hybrid extensions in which some of the methods are
-still written using the Python/C API.
+we specify ``myabs`` (and **not** ``myabs_impl``) in the method table. There
+is also the ``.legacy_methods`` field, which allows to add methods that use the
+Python/C API, i.e., the value should be an array of ``PyMethodDef``. This
+feature enables support for hybrid extensions in which some of the methods
+are still written using the Python/C API.
+
+.. This would be perhaps good place to add a link to the porting tutorial
+   once it's merged
 
 Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``:
 
@@ -218,9 +228,10 @@ produce a file called ``simple.hpy.so`` (note that you need to specify
 
   python setup.py --hpy-abi=universal build_ext -i
 
-Note: this command will also produce a Python file of the same name, which
-loads the HPy module using the `hpy.universal.load` function from the HPy
-Python package.
+.. note::
+   This command will also produce a Python file named ``simple.py``, which
+   loads the HPy module using the ``universal.load`` function from
+   the ``hpy`` Python package.
 
 VARARGS calling convention
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

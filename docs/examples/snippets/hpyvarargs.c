@@ -1,6 +1,12 @@
-/* Simple module that defines simple functions "myabs" and "add_ints" with
- * varargs calling convention */
-/* NOTE: snippets from the following code are referenced from the docs! */
+/* Simple C module that defines simple functions "myabs" and "add_ints".
+ *
+ * This module represents an incremental change over the "simple" package
+ * and shows how to add a method with VARARGS calling convention.
+ *
+ * We need to have a separate standalone C module for those snippets, because we
+ * want to show the source code including the HPyDef array initialization, so
+ * there is no room left for adding other entry points for other code snippets.
+ */
 
 #include "hpy.h"
 
