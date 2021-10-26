@@ -67,13 +67,3 @@ HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
     HPy_Close(ctx, h_type);
     return 1;
 }
-
-HPyAPI_HELPER HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type)
-{
-    return HPyErr_SetFromErrnoWithFilenameObjects(ctx, h_type, HPy_NULL, HPy_NULL);
-}
-
-HPyAPI_HELPER HPy HPyErr_SetFromErrnoWithFilenameObject(HPyContext *ctx, HPy h_type, HPy filename)
-{
-    return HPyErr_SetFromErrnoWithFilenameObjects(ctx, h_type, filename, HPy_NULL);
-}
