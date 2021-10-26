@@ -51,6 +51,37 @@ jobs:
           python -m pip install pytest pytest-xdist
           python -m pytest -n auto test/
 
+  main_tests_debug:
+    name: Main tests on the latest CPython debug build
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Python
+        run: sudo apt install python3-dbg python3-dev python3-setuptools
+
+      - name: Check Python debug build
+        run: python3-dbg -c "import sys; print(hasattr(sys, 'gettotalrefcount'))"
+
+      - name: Check Python version
+        run: python3-dbg --version
+
+      - name: Install/Upgrade Python dependencies
+        run: python3 -m pip install --upgrade pip wheel
+
+      - name: Build
+        run: python3-dbg -m pip install .
+
+      - name: Run tests
+        run: |
+          python3 -m pip install pytest pytest-xdist
+          python3-dbg -m pytest -n auto test/
+
 
   poc_tests:
     name: Proof of concept tests
