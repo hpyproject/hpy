@@ -290,9 +290,14 @@ HPyAPI_FUNC void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value)
     PyErr_SetObject(_h2py(h_type), _h2py(h_value));
 }
 
-HPyAPI_FUNC HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type)
+HPyAPI_FUNC HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded)
 {
-    return _py2h(PyErr_SetFromErrno(_h2py(h_type)));
+    return _py2h(PyErr_SetFromErrnoWithFilename(_h2py(h_type), filename_fsencoded));
+}
+
+HPyAPI_FUNC HPy HPyErr_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2)
+{
+    return _py2h(PyErr_SetFromErrnoWithFilenameObjects(_h2py(h_type), _h2py(filename1), _h2py(filename2)));
 }
 
 HPyAPI_FUNC int HPyErr_ExceptionMatches(HPyContext *ctx, HPy exc)

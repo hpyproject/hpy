@@ -149,4 +149,6 @@ typedef struct _HPyContext_s HPyContext;
 #   include "hpy/cpython/autogen_api_impl.h"
 #endif
 
+#include "hpy/inline_helpers.h"
+
 #endif /* HPy_H */
