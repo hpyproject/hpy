@@ -539,6 +539,17 @@ static int check_legacy_consistent(HPyType_Spec *hpyspec)
             " set .legacy=true instead");
         return -1;
     }
+    if (hpyspec->legacy_slots && needs_hpytype_dealloc(hpyspec)) {
+        PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
+        for (int i = 0; legacy_slots[i].slot != 0; i++) {
+            if (legacy_slots[i].slot == Py_tp_dealloc) {
+                PyErr_SetString(PyExc_TypeError,
+                    "legacy tp_dealloc is incompatible with HPy_tp_traverse"
+                    " or HPy_tp_destroy.");
+                return -1;
+            }
+        }
+    }
     return 0;
 }
 

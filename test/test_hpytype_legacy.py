@@ -68,6 +68,75 @@ class TestLegacyType(_TestType):
         import gc; gc.collect()
         assert mod.get_counter() == 1
 
+    def test_legacy_dealloc_and_HPy_tp_traverse(self):
+        import pytest
+        mod_src = """
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+            static int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
+            {
+                return 0;
+            }
+            static void Point_dealloc(PyObject *self)
+            {
+                return;
+            }
+
+            static HPyDef *Point_defines[] = {&Point_new, &Point_traverse, NULL};
+            static PyType_Slot Point_slots[] = {
+                {Py_tp_dealloc, Point_dealloc},
+                {0, NULL},
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines,
+                .legacy = true,
+                .legacy_slots = Point_slots,
+            };
+            @EXPORT_TYPE("Point", Point_spec)
+            @INIT
+        """
+        with pytest.raises(TypeError) as err:
+            mod = self.make_module(mod_src)
+        assert "legacy tp_dealloc" in str(err.value)
+
+    def test_legacy_dealloc_and_HPy_tp_destroy(self):
+        import pytest
+        mod_src = """
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            HPyDef_SLOT(Point_destroy, Point_destroy_impl, HPy_tp_destroy)
+            static void Point_destroy_impl(void *obj)
+            {
+                return;
+            }
+            static void Point_dealloc(PyObject *self)
+            {
+                return;
+            }
+
+            static HPyDef *Point_defines[] = {&Point_new, &Point_destroy, NULL};
+            static PyType_Slot Point_slots[] = {
+                {Py_tp_dealloc, Point_dealloc},
+                {0, NULL},
+            };
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .defines = Point_defines,
+                .legacy = true,
+                .legacy_slots = Point_slots,
+            };
+            @EXPORT_TYPE("Point", Point_spec)
+            @INIT
+        """
+        with pytest.raises(TypeError) as err:
+            mod = self.make_module(mod_src)
+        assert "legacy tp_dealloc" in str(err.value)
+
+
 class TestCustomLegacyFeatures(HPyTest):
 
     def test_legacy_methods(self):
