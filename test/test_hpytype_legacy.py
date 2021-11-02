@@ -51,7 +51,7 @@ class TestLegacyType(_TestType):
                 {0, NULL},
             };
             static HPyType_Spec Point_spec = {
-                .name = "Point",
+                .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
                 .defines = Point_defines,
                 .legacy = true,
