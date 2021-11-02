@@ -43,6 +43,7 @@ class TestLegacyType(_TestType):
             static void Point_dealloc(PyObject *self)
             {
                 dealloc_counter++;
+                Py_TYPE(self)->tp_free(self);
             }
 
             static HPyDef *Point_defines[] = {&Point_new, NULL};
