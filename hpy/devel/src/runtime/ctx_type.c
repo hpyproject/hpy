@@ -10,6 +10,7 @@
 #endif
 
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
+static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec);
 
 
 /* This is a hack: we need some extra space to store random data on the
@@ -346,13 +347,15 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
+    bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
 
     if (hpyspec->doc != NULL)
         hpyslot_count++;    // Py_tp_doc
     hpyslot_count++;        // Py_tp_methods
     hpyslot_count++;        // Py_tp_members
     hpyslot_count++;        // Py_tp_getset
-    hpyslot_count++;        // Py_tp_dealloc
+    if (needs_dealloc)
+        hpyslot_count++;        // Py_tp_dealloc
     if (has_tp_traverse(hpyspec))
         hpyslot_count++;    // Py_tp_clear
 
@@ -430,8 +433,10 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
 
-    // add a dealloc function
-    result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
+    // add a dealloc function, if needed
+    if (needs_dealloc) {
+        result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
+    }
 
     // add a tp_clear, if the user provided a tp_traverse
     if (has_tp_traverse(hpyspec)) {
@@ -534,6 +539,17 @@ static int check_legacy_consistent(HPyType_Spec *hpyspec)
             " set .legacy=true instead");
         return -1;
     }
+    if (hpyspec->legacy_slots && needs_hpytype_dealloc(hpyspec)) {
+        PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
+        for (int i = 0; legacy_slots[i].slot != 0; i++) {
+            if (legacy_slots[i].slot == Py_tp_dealloc) {
+                PyErr_SetString(PyExc_TypeError,
+                    "legacy tp_dealloc is incompatible with HPy_tp_traverse"
+                    " or HPy_tp_destroy.");
+                return -1;
+            }
+        }
+    }
     return 0;
 }
 
@@ -543,6 +559,18 @@ static bool has_tp_traverse(HPyType_Spec *hpyspec)
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *def = hpyspec->defines[i];
             if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse)
+                return true;
+        }
+    return false;
+}
+
+static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec)
+{
+    if (hpyspec->defines != NULL)
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *def = hpyspec->defines[i];
+            if (def->kind == HPyDef_Kind_Slot &&
+                    (def->slot.slot == HPy_tp_destroy || def->slot.slot == HPy_tp_traverse))
                 return true;
         }
     return false;
