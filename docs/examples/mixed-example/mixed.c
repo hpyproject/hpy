@@ -1,3 +1,8 @@
+/* Simple C module that shows how to mix CPython API and HPY.
+ * At the moment, this code is not referenced from the documentation, but it is
+ * tested nonetheless.
+ */
+
 #include "hpy.h"
 
 /* a HPy style function */
@@ -35,16 +40,16 @@ static PyMethodDef py_defines[] = {
 
 static HPyModuleDef moduledef = {
     HPyModuleDef_HEAD_INIT,
-    .m_name = "simple",
-    .m_doc = "HPy Example",
+    .m_name = "mixed",
+    .m_doc = "HPy Example of mixing CPython API and HPy API",
     .m_size = -1,
     .defines = hpy_defines,
     .legacy_methods = py_defines
 };
 
 
-HPy_MODINIT(simple)
-static HPy init_simple_impl(HPyContext *ctx)
+HPy_MODINIT(mixed)
+static HPy init_mixed_impl(HPyContext *ctx)
 {
     HPy m;
     m = HPyModule_Create(ctx, &moduledef);
