@@ -52,7 +52,7 @@ jobs:
           python -m pytest -n auto test/
 
   main_tests_debug:
-    name: Main tests on the latest CPython debug build
+    name: Main tests on CPython debug builds
     runs-on: ${{ matrix.os }}
     continue-on-error: true
     strategy:
