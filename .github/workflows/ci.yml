@@ -51,6 +51,37 @@ jobs:
           python -m pip install pytest pytest-xdist
           python -m pytest -n auto test/
 
+  main_tests_debug:
+    name: Main tests on CPython debug builds
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.9', '3.8', '3.7']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python from deadsnakes
+        uses: deadsnakes/action@v2.1.1
+        with:
+          python-version: ${{ matrix.python-version }}
+          debug: true
+
+      - name: Check Python debug build
+        run: python -c "import sys; print(hasattr(sys, 'gettotalrefcount'))"
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+
+      - name: Build
+        run: python -m pip install .
+
+      - name: Run tests
+        run: |
+          python -m pip install pytest pytest-xdist
+          python -m pytest -n auto test/
 
   poc_tests:
     name: Proof of concept tests
