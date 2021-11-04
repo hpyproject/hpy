@@ -459,4 +459,30 @@ HPySlice_AdjustIndices(HPyContext *_HPy_UNUSED_ARG(ctx), HPy_ssize_t length,
     return 0;
 }
 
+HPyAPI_INLINE_HELPER HPy
+HPy_CallMethodTupleDict_s(HPyContext *ctx, HPy receiver, const char *name, HPy args, HPy kw)
+{
+    HPy method = HPy_GetAttr_s(ctx, receiver, name);
+    if (HPy_IsNull(method)) {
+        return HPy_NULL;
+    }
+
+    HPy result = HPy_CallTupleDict(ctx, method, args, kw);
+    HPy_Close(ctx, method);
+    return result;
+}
+
+HPyAPI_INLINE_HELPER HPy
+HPy_CallMethodTupleDict(HPyContext *ctx, HPy receiver, HPy name, HPy args, HPy kw)
+{
+    HPy method = HPy_GetAttr(ctx, receiver, name);
+    if (HPy_IsNull(method)) {
+        return HPy_NULL;
+    }
+
+    HPy result = HPy_CallTupleDict(ctx, method, args, kw);
+    HPy_Close(ctx, method);
+    return result;
+}
+
 #endif //HPY_INLINE_HELPERS_H
