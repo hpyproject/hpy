@@ -372,3 +372,16 @@ typedef struct {
         return a.result; \
     }
 
+typedef struct {
+    cpy_PyObject *arg0;
+} _HPyFunc_args_DESTRUCTOR;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_DESTRUCTOR(SYM, IMPL) \
+    static void SYM(cpy_PyObject *arg0) \
+    { \
+        _HPyFunc_args_DESTRUCTOR a = { arg0 }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_DESTRUCTOR, IMPL, &a); \
+        return; \
+    }
+

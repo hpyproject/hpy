@@ -38,6 +38,7 @@ typedef enum {
     HPyFunc_SETTER,
     HPyFunc_OBJOBJPROC,
     HPyFunc_TRAVERSEPROC,
+    HPyFunc_DESTRUCTOR,
 
 } HPyFunc_Signature;
 

@@ -270,3 +270,11 @@
         DHPy_close(dctx, dh_arg1);
         return;
     }
+    case HPyFunc_DESTRUCTOR: {
+        HPyFunc_destructor f = (HPyFunc_destructor)func;
+        _HPyFunc_args_DESTRUCTOR *a = (_HPyFunc_args_DESTRUCTOR*)args;
+        DHPy dh_arg0 = _py2dh(dctx, a->arg0);
+        f(dctx, dh_arg0);
+        DHPy_close(dctx, dh_arg0);
+        return;
+    }

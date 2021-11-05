@@ -80,11 +80,21 @@ static void hpytype_clear(PyObject *self)
    types created by HPyType_FromSpec */
 static void hpytype_dealloc(PyObject *self)
 {
+    PyTypeObject *tp = Py_TYPE(self);
+    // Call finalizer if it exists
+    if (tp->tp_finalize) {
+        // Exit early if resurrected
+        if (PyObject_CallFinalizerFromDealloc(self) < 0) {
+            return;
+        }
+    }
+    if (PyType_IS_GC(tp))
+        PyObject_GC_UnTrack(self);
+
     // decref and clear all the HPyFields
     hpytype_clear(self);
 
     // call tp_destroy on all the HPy types of the hierarchy
-    PyTypeObject *tp = Py_TYPE(self);
     PyTypeObject *base = tp;
     while(base) {
         if (base->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE) {

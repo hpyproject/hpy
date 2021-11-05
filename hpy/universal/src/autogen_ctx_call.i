@@ -160,3 +160,9 @@
         a->result = f(ctx, _py2h(a->arg0), _py2h(a->arg1));
         return;
     }
+    case HPyFunc_DESTRUCTOR: {
+        HPyFunc_destructor f = (HPyFunc_destructor)func;
+        _HPyFunc_args_DESTRUCTOR *a = (_HPyFunc_args_DESTRUCTOR*)args;
+        f(ctx, _py2h(a->arg0));
+        return;
+    }

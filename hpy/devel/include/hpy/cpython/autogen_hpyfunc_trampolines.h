@@ -130,3 +130,8 @@
     { \
         return (IMPL(_HPyGetContext(), _py2h(arg0), _py2h(arg1))); \
     }
+#define _HPyFunc_TRAMPOLINE_HPyFunc_DESTRUCTOR(SYM, IMPL) \
+    static void SYM(cpy_PyObject *arg0) \
+    { \
+        return (IMPL(_HPyGetContext(), _py2h(arg0))); \
+    }
