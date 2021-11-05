@@ -15,8 +15,8 @@
         _HPyFunc_args_UNARYFUNC *a = (_HPyFunc_args_UNARYFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -26,9 +26,9 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_result = f(dctx, dh_arg0, dh_arg1);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
         DHPy_close(dctx, dh_arg1);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -39,10 +39,10 @@
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
         DHPy dh_result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
         DHPy_close(dctx, dh_arg1);
         DHPy_close(dctx, dh_arg2);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -67,8 +67,8 @@
         _HPyFunc_args_SSIZEARGFUNC *a = (_HPyFunc_args_SSIZEARGFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0, a->arg1);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -77,8 +77,8 @@
         _HPyFunc_args_SSIZESSIZEARGFUNC *a = (_HPyFunc_args_SSIZESSIZEARGFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0, a->arg1, a->arg2);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -125,8 +125,8 @@
         _HPyFunc_args_GETATTRFUNC *a = (_HPyFunc_args_GETATTRFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0, a->arg1);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -136,9 +136,9 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_result = f(dctx, dh_arg0, dh_arg1);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
         DHPy_close(dctx, dh_arg1);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -169,8 +169,8 @@
         _HPyFunc_args_REPRFUNC *a = (_HPyFunc_args_REPRFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -188,9 +188,9 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_result = f(dctx, dh_arg0, dh_arg1, a->arg2);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
         DHPy_close(dctx, dh_arg1);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -199,8 +199,8 @@
         _HPyFunc_args_GETITERFUNC *a = (_HPyFunc_args_GETITERFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -209,8 +209,8 @@
         _HPyFunc_args_ITERNEXTFUNC *a = (_HPyFunc_args_ITERNEXTFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -221,10 +221,10 @@
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
         DHPy dh_result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
         DHPy_close(dctx, dh_arg1);
         DHPy_close(dctx, dh_arg2);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }
@@ -245,8 +245,8 @@
         _HPyFunc_args_GETTER *a = (_HPyFunc_args_GETTER*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_result = f(dctx, dh_arg0, a->arg1);
-        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;
     }

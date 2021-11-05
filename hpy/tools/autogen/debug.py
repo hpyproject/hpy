@@ -156,13 +156,15 @@ class autogen_debug_ctx_call_i(AutoGenFile):
                 w(f'        f({args});')
             elif c_ret_type == 'HPy':
                 w(f'        DHPy dh_result = f({args});')
-                w(f'        a->result = _dh2py(dctx, dh_result);')
-                dhpys.append('result')
             else:
                 w(f'        a->result = f({args});')
             #
             for pname in dhpys:
                 w(f'        DHPy_close(dctx, dh_{pname});')
+            #
+            if c_ret_type == 'HPy':
+                w(f'        a->result = _dh2py(dctx, dh_result);')
+                w(f'        DHPy_close(dctx, dh_result);')
             #
             w(f'        return;')
             w(f'    }}')
