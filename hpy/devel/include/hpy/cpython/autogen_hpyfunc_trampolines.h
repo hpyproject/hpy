@@ -63,7 +63,8 @@
 #define _HPyFunc_TRAMPOLINE_HPyFunc_FREEFUNC(SYM, IMPL) \
     static void SYM(void *arg0) \
     { \
-        return (IMPL(_HPyGetContext(), arg0)); \
+        IMPL(_HPyGetContext(), arg0); \
+        return; \
     }
 #define _HPyFunc_TRAMPOLINE_HPyFunc_GETATTRFUNC(SYM, IMPL) \
     static cpy_PyObject *SYM(cpy_PyObject *arg0, char *arg1) \
@@ -133,5 +134,6 @@
 #define _HPyFunc_TRAMPOLINE_HPyFunc_DESTRUCTOR(SYM, IMPL) \
     static void SYM(cpy_PyObject *arg0) \
     { \
-        return (IMPL(_HPyGetContext(), _py2h(arg0))); \
+        IMPL(_HPyGetContext(), _py2h(arg0)); \
+        return; \
     }
