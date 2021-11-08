@@ -735,6 +735,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     /* note that we do NOT free the memory which was allocated by
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
+#if PY_VERSION_HEX < 0x03080000
+    if (((PyTypeObject*)result)->tp_finalize != NULL) {
+        ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
+    }
+#endif
     Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
