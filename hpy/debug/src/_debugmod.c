@@ -115,11 +115,14 @@ static UHPy set_on_invalid_handle_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
     HPyDebugInfo *info = get_info(dctx);
-    if (!HPyCallable_Check(uctx, u_arg)) {
+    if (HPy_Is(uctx, u_arg, uctx->h_None)) {
+        info->uh_on_invalid_handle = HPy_NULL;
+    } else if (!HPyCallable_Check(uctx, u_arg)) {
         HPyErr_SetString(uctx, uctx->h_TypeError, "Expected a callable object");
         return HPy_NULL;
+    } else {
+        info->uh_on_invalid_handle = HPy_Dup(uctx, u_arg);
     }
-    info->uh_on_invalid_handle = HPy_Dup(uctx, u_arg);
     return HPy_Dup(uctx, uctx->h_None);
 }
 
