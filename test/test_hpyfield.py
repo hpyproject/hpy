@@ -98,9 +98,6 @@ class TestHPyField(HPyTest):
             import pytest
             pytest.skip("CPython only")
         import sys
-        if hasattr(sys, 'gettotalrefcount'):
-            import pytest
-            pytest.skip("Test fails on debug build: https://github.com/hpyproject/hpy/issues/255")
         # Test that we correctly call PyObject_GC_Track on CPython. The
         # easiest way is to check whether the object is in
         # gc.get_objects().
@@ -137,9 +134,6 @@ class TestHPyField(HPyTest):
 
     def test_tp_traverse(self):
         import sys
-        if hasattr(sys, 'gettotalrefcount'):
-            import pytest
-            pytest.skip("Test fails on debug build: https://github.com/hpyproject/hpy/issues/255")
         import gc
         mod = self.make_module("""
             @DEFINE_PairObject
@@ -248,9 +242,6 @@ class TestHPyField(HPyTest):
 
     def test_automatic_tp_dealloc(self):
         import sys
-        if hasattr(sys, 'gettotalrefcount'):
-            import pytest
-            pytest.skip("Test fails on debug build: https://github.com/hpyproject/hpy/issues/255")
         if not self.supports_refcounts():
             import pytest
             pytest.skip("CPython only")
@@ -278,9 +269,6 @@ class TestHPyField(HPyTest):
             import pytest
             pytest.skip("CPython only")
         import sys
-        if hasattr(sys, 'gettotalrefcount'):
-            import pytest
-            pytest.skip("Test fails on debug build: https://github.com/hpyproject/hpy/issues/255")
 
         import gc
         mod = self.make_module("""
