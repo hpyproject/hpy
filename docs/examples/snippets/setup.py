@@ -12,5 +12,5 @@ setup(
     ext_modules=[
         Extension('legacyinit', sources=[path.join(path.dirname(__file__), 'legacyinit.c')]),
     ],
-    setup_requires=['hpy'],
+    setup_requires=['hpyproject-hpy'],
 )

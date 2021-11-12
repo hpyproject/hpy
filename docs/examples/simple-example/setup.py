@@ -6,5 +6,5 @@ setup(
     hpy_ext_modules=[
         Extension('simple', sources=[path.join(path.dirname(__file__), 'simple.c')]),
     ],
-    setup_requires=['hpy'],
+    setup_requires=['hpyproject-hpy'],
 )

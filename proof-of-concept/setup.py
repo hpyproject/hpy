@@ -32,5 +32,5 @@ setup(
                   language='C++',
                   extra_compile_args=compile_extra_args + cpp_compile_extra_args),
     ],
-    setup_requires=['hpy'],
+    setup_requires=['hpyproject-hpy'],
 )

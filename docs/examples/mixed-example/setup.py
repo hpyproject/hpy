@@ -6,5 +6,5 @@ setup(
     hpy_ext_modules=[
         Extension('mixed', sources=[path.join(path.dirname(__file__), 'mixed.c')]),
     ],
-    setup_requires=['hpy'],
+    setup_requires=['hpyproject-hpy'],
 )

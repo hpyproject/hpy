@@ -243,7 +243,7 @@ DEV_REQUIREMENTS = [
 ]
 
 setup(
-    name="hpy",
+    name="hpyproject-hpy",
     author='The HPy team',
     author_email='hpy-dev@python.org',
     url='https://hpyproject.org',
