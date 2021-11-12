@@ -37,10 +37,9 @@ static HPyDef *SimpleMethods[] = {
 // END: methodsdef
 
 static HPyModuleDef simple = {
-        HPyModuleDef_HEAD_INIT,
-        .m_name = "hpyvarargs",
-        .m_doc = "HPy Example of varargs calling convention",
-        .m_size = -1,
+        .name = "hpyvarargs",
+        .doc = "HPy Example of varargs calling convention",
+        .size = -1,
         .defines = SimpleMethods
 };
 

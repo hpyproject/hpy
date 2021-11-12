@@ -290,10 +290,9 @@ static HPyDef *module_defines[] = {
 };
 
 static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "hpy.debug._debug",
-    .m_doc = "HPy debug mode",
-    .m_size = -1,
+    .name = "hpy.debug._debug",
+    .doc = "HPy debug mode",
+    .size = -1,
     .defines = module_defines
 };
 
