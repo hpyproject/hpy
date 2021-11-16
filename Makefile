@@ -18,6 +18,7 @@ autogen:
 cppcheck-build-dir:
 	mkdir -p $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)
 
+.PHONY: cppcheck
 cppcheck: cppcheck-build-dir
 	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
 	$(eval PYTHON_INC = $(shell python3 -q -c "from sysconfig import get_paths as gp; print(gp()['include'])"))
@@ -29,6 +30,7 @@ cppcheck: cppcheck-build-dir
 		--output-file=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt \
 		--enable=warning,performance,portability,information,missingInclude \
 		--inline-suppr \
+		--suppress=allocaCalled \
 		-I /usr/local/include \
 		-I ${PYTHON_INC} \
 		-I hpy/devel/include/ \
