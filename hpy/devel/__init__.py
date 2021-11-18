@@ -40,6 +40,7 @@ class HPyDevel:
         """
         return list(map(str, [
             self.src_dir.joinpath('argparse.c'),
+            self.src_dir.joinpath('buildvalue.c'),
             self.src_dir.joinpath('helpers.c'),
         ]))
 

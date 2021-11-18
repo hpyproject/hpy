@@ -135,6 +135,7 @@ typedef struct _HPyContext_s HPyContext;
 #include "hpy/hpytype.h"
 #include "hpy/hpymodule.h"
 #include "hpy/runtime/argparse.h"
+#include "hpy/runtime/buildvalue.h"
 #include "hpy/runtime/helpers.h"
 
 #ifdef HPY_UNIVERSAL_ABI
