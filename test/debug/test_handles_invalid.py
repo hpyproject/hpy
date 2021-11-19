@@ -1,6 +1,7 @@
 import pytest
 from hpy.debug.leakdetector import LeakDetector
-from test.support import SUPPORTS_SYS_EXECUTABLE
+from test.support import SUPPORTS_SYS_EXECUTABLE, IS_PYTHON_DEBUG_BUILD,\
+    IS_VALGRIND_RUN
 
 @pytest.fixture
 def hpy_abi():
@@ -83,12 +84,15 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
     assert hpy_debug_capture.invalid_handles_count == 1
     mod.g('bar')   # use-after-close
     assert hpy_debug_capture.invalid_handles_count == 2
-    mod.f0('foo')
-    assert hpy_debug_capture.invalid_handles_count == 3
-    mod.f_noargs()
-    assert hpy_debug_capture.invalid_handles_count == 4
-    mod.f_varargs('foo', 'bar')
-    assert hpy_debug_capture.invalid_handles_count == 5
+    if not IS_PYTHON_DEBUG_BUILD and not IS_VALGRIND_RUN:
+        # CPython debug build can also catch these errors, so we cannot trigger
+        # them when running on debug builds
+        mod.f0('foo')
+        assert hpy_debug_capture.invalid_handles_count == 3
+        mod.f_noargs()
+        assert hpy_debug_capture.invalid_handles_count == 4
+        mod.f_varargs('foo', 'bar')
+        assert hpy_debug_capture.invalid_handles_count == 5
 
 
 def test_keeping_and_reusing_argument_handle(compiler, hpy_debug_capture):
