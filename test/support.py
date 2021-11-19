@@ -9,9 +9,11 @@ PY2 = sys.version_info[0] == 2
 # the current Python to be launched via, e.g., `python_subprocess.run(...)`.
 # By default is `True` if sys.executable is set to a true value.
 SUPPORTS_SYS_EXECUTABLE = bool(getattr(sys, "executable", None))
-IS_VALGRIND_RUN = 'valgrind' in os.environ.get('PYTHONMALLOC', '')
 # True if we are running on the CPython debug build
 IS_PYTHON_DEBUG_BUILD = hasattr(sys, 'gettotalrefcount')
+
+def is_valgrind_run(config):
+    return config.pluginmanager.getplugin("valgrind_checker")
 
 def reindent(s, indent):
     s = textwrap.dedent(s)

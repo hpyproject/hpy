@@ -3,6 +3,8 @@ from .support import ExtensionCompiler, DefaultExtensionTemplate,\
     PythonSubprocessRunner, HPyDebugCapture
 from hpy.debug.leakdetector import LeakDetector
 
+IS_VALGRIND_RUN = False
+
 def pytest_addoption(parser):
     parser.addoption(
         "--compiler-v", action="store_true",
@@ -11,6 +13,13 @@ def pytest_addoption(parser):
         "--subprocess-v", action="store_true",
         help="Print to stdout the stdout and stderr of Python subprocesses"
              "executed via run_python_subprocess")
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_configure(config):
+    global IS_VALGRIND_RUN
+    IS_VALGRIND_RUN = config.pluginmanager.hasplugin('valgrind_checker')
+
 
 @pytest.fixture(scope='session')
 def hpy_devel(request):
