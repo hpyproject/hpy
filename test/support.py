@@ -23,10 +23,9 @@ class DefaultExtensionTemplate(object):
         NULL
     };
     static HPyModuleDef moduledef = {
-        HPyModuleDef_HEAD_INIT,
-        .m_name = "%(name)s",
-        .m_doc = "some test for hpy",
-        .m_size = -1,
+        .name = "%(name)s",
+        .doc = "some test for hpy",
+        .size = -1,
         .legacy_methods = %(legacy_methods)s,
         .defines = moduledefs
     };

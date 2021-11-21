@@ -47,10 +47,9 @@ static HPyDef *Methods[] = {
 };
 
 static HPyModuleDef snippets = {
-        HPyModuleDef_HEAD_INIT,
-        .m_name = "snippets",
-        .m_doc = "Various HPy code snippets for the docs",
-        .m_size = -1,
+        .name = "snippets",
+        .doc = "Various HPy code snippets for the docs",
+        .size = -1,
         .defines = Methods
 };
 

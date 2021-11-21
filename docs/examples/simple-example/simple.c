@@ -22,10 +22,9 @@ static HPyDef *SimpleMethods[] = {
 };
 
 static HPyModuleDef simple = {
-        HPyModuleDef_HEAD_INIT,
-        .m_name = "simple",
-        .m_doc = "HPy Example",
-        .m_size = -1,
+        .name = "simple",
+        .doc = "HPy Example",
+        .size = -1,
         .defines = SimpleMethods,
         .legacy_methods = NULL
 };

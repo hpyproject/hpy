@@ -39,10 +39,9 @@ static PyMethodDef py_defines[] = {
 };
 
 static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "mixed",
-    .m_doc = "HPy Example of mixing CPython API and HPy API",
-    .m_size = -1,
+    .name = "mixed",
+    .doc = "HPy Example of mixing CPython API and HPy API",
+    .size = -1,
     .defines = hpy_defines,
     .legacy_methods = py_defines
 };

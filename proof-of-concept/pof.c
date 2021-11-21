@@ -84,10 +84,9 @@ static HPyDef *module_defines[] = {
     NULL
 };
 static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "pof",
-    .m_doc = "HPy Proof of Concept",
-    .m_size = -1,
+    .name = "pof",
+    .doc = "HPy Proof of Concept",
+    .size = -1,
     .defines = module_defines
 };
 

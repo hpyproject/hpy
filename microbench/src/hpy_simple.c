@@ -117,10 +117,9 @@ static HPyDef *module_defines[] = {
 
 
 static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "hpy_simple",
-    .m_doc = "HPy microbenchmarks",
-    .m_size = -1,
+    .name = "hpy_simple",
+    .doc = "HPy microbenchmarks",
+    .size = -1,
     .defines = module_defines,
 };
 
