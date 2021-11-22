@@ -300,9 +300,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-    # - template: azure-templates/cppcheck.yml
-    # - template: azure-templates/python.yml
-    #
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
