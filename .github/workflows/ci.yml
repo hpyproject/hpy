@@ -294,20 +294,22 @@ jobs:
           python test/check_py27_compat.py
 
 
-  # cpp_check:
-  #   runs-on: 'ubuntu-latest'
-  #   steps:
+  cpp_check:
+    name: Cppcheck static analysis
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
 
-  #   # - template: azure-templates/cppcheck.yml
-  #   # - template: azure-templates/python.yml
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
-  #   - name: Set up Python
-  #     uses: actions/setup-python@v2
-  #     with:
-  #       python-version: '3.x'
+      - name: Install Cppcheck
+        run: sudo apt-get -qq -y install cppcheck
 
-  #   - name: Run CppCheck
-  #     run: make cppcheck
+      - name: Run Cppcheck
+        run: make cppcheck
 
 
   infer:

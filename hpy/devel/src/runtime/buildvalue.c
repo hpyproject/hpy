@@ -97,23 +97,24 @@ HPyAPI_HELPER
 HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
 {
     va_list values;
+    HPy result;
     va_start(values, fmt);
     HPy_ssize_t size = count_items(ctx, fmt, '\0');
     if (size < 0) {
-        return HPy_NULL;
+        result = HPy_NULL;
     } else if (size == 0) {
-        return HPy_Dup(ctx, ctx->h_None);
+        result = HPy_Dup(ctx, ctx->h_None);
     } else if (size == 1) {
         int needs_close;
-        HPy result = build_single(ctx, &fmt, &values, &needs_close);
+        result = build_single(ctx, &fmt, &values, &needs_close);
         if (!needs_close) {
-            return HPy_Dup(ctx, result);
-        } else {
-            return result;
+            result = HPy_Dup(ctx, result);
         }
     } else {
-        return build_tuple(ctx, &fmt, &values, size, '\0');
+        result = build_tuple(ctx, &fmt, &values, size, '\0');
     }
+    va_end(values);
+    return result;
 }
 
 static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
