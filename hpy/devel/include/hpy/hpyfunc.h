@@ -97,9 +97,11 @@ typedef int (*HPyFunc_visitproc)(HPyField *, void *);
  */
 #define HPy_VISIT(hpyfield)                                             \
     do {                                                                \
-        int vret = visit(hpyfield, arg);                                \
-        if (vret)                                                       \
-            return vret;                                                \
+        if (!HPyField_IsNull(*hpyfield)) {                              \
+            int vret = visit(hpyfield, arg);                            \
+            if (vret)                                                   \
+                return vret;                                            \
+            }                                                           \
     } while (0)
 
 

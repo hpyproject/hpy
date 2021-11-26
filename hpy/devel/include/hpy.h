@@ -100,6 +100,7 @@ typedef struct { intptr_t _i; } HPyTracker;
 #define HPy_IsNull(h) ((h)._i == 0)
 
 #define HPyField_NULL ((HPyField){0})
+#define HPyField_IsNull(f) ((f)._i == 0)
 
 /* Convenience functions to cast between HPy and void*.  We need to decide
    whether these are part of the official API or not, and maybe introduce a
