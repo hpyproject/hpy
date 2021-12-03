@@ -83,6 +83,11 @@ static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self, HPy *args, HP
     HPyDebugInfo *info = get_info(dctx);
     long gen = 0;
     if (nargs > 0) {
+        if (nargs != 1) {
+            HPyErr_SetString(uctx, uctx->h_TypeError,
+                             "get_closed_handles expects no arguments or exactly one argument");
+            return HPy_NULL;
+        }
         gen = HPyLong_AsLong(uctx, args[0]);
         if (HPyErr_Occurred(uctx))
             return HPy_NULL;
