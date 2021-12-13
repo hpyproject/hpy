@@ -75,8 +75,7 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
 {
     HPyDebugInfo *info = get_info(dctx);
     HPyContext *uctx = info->uctx;
-    DebugHandle *handle = as_DebugHandle(dh);
-    assert(handle->is_closed);
+    assert(as_DebugHandle(dh)->is_closed);
     if (HPy_IsNull(info->uh_on_invalid_handle)) {
         // default behavior: print an error and abort
         HPy_FatalError(uctx, "Invalid usage of already closed handle");
