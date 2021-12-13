@@ -45,10 +45,10 @@ void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect) {
 void raw_data_protect(void* data, HPy_ssize_t size) {
     // Override the data with some garbage in hope that the program will
     // eventually crash or give incorrect result if it reads the garbage
-    char val = 0;
-    for (HPy_ssize_t i = 0; i < size; ++i) {
-        ((char*)data)[i] = 143 + val;
-        val = (val + 1) % 10;
+    char poison[] = {0xBA, 0xD0, 0xDA, 0x7A};
+    for (HPy_ssize_t dataIdx = 0, poisonIdx = 0; dataIdx < size; ++dataIdx) {
+        ((char*)data)[dataIdx] = poison[poisonIdx];
+        poisonIdx = (poisonIdx + 1) % sizeof(poison);
     }
 }
 
