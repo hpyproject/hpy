@@ -6,7 +6,7 @@
 HPyAPI_IMPL HPy
 ctx_FromPyObject(HPyContext *ctx, cpy_PyObject *obj)
 {
-    Py_INCREF(obj);
+    Py_XINCREF(obj);
     return _py2h(obj);
 }
 
@@ -14,7 +14,7 @@ HPyAPI_IMPL cpy_PyObject *
 ctx_AsPyObject(HPyContext *ctx, HPy h)
 {
     PyObject *obj = _h2py(h);
-    Py_INCREF(obj);
+    Py_XINCREF(obj);
     return obj;
 }
 
