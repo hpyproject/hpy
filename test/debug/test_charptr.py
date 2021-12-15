@@ -1,4 +1,3 @@
-from hpy.debug.leakdetector import LeakDetector
 from test.support import SUPPORTS_SYS_EXECUTABLE
 import os
 import pytest
@@ -12,6 +11,7 @@ SUPPORTS_MEM_PROTECTION = os.name == 'posix' and \
 
 @pytest.fixture
 def hpy_abi():
+    from hpy.debug import LeakDetector
     with LeakDetector():
         yield "debug"
 
