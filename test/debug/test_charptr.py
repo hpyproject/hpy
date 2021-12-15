@@ -45,6 +45,12 @@ def test_charptr_use_after_implicit_arg_handle_close(compiler, python_subprocess
         code = "mod.f('leak me!'); assert mod.g() == 'leak me!'"
     result = python_subprocess.run(mod, code)
     assert result.returncode != 0
+    assert result.stdout == b""
+    if SUPPORTS_MEM_PROTECTION:
+        assert result.stderr == b""
+    else:
+        # The garbage we override the data with will cause this error
+        assert b"UnicodeDecodeError" in result.stderr
 
 
 @pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
@@ -69,6 +75,12 @@ def test_charptr_use_after_handle_close(compiler, python_subprocess):
         code = "assert mod.f('use after close me!') == 'use after close me!'"
     result = python_subprocess.run(mod, code)
     assert result.returncode != 0
+    assert result.stdout == b""
+    if SUPPORTS_MEM_PROTECTION:
+        assert result.stderr == b""
+    else:
+        # The garbage we override the data with will cause this error
+        assert b"UnicodeDecodeError" in result.stderr
 
 
 @pytest.mark.skipif(not SUPPORTS_MEM_PROTECTION, reason=
@@ -92,6 +104,8 @@ def test_charptr_write_ptr(compiler, python_subprocess):
     """)
     result = python_subprocess.run(mod, "mod.f('try writing me!');")
     assert result.returncode != 0
+    assert result.stdout == b""
+    assert result.stderr == b""
 
 
 def test_charptr_correct_usage(compiler):
