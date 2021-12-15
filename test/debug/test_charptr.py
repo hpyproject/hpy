@@ -168,12 +168,31 @@ def test_charptr_limit_stress_test(compiler):
     def get_raw_data_sizes(handles):
         return list(map(lambda h: h.raw_data_size, handles))
 
+    def clear_raw_data_in_closed_handles():
+        closed_size = len(_debug.get_closed_handles())
+        old_limit = _debug.get_closed_handles_queue_max_size()
+        try:
+            # make sure that the closed_handles queue is considered full: this
+            # will force the reuse of existing closed handles.
+            _debug.set_closed_handles_queue_max_size(closed_size)
+            # Dummy call to force the reuse of the existing closed handles
+            # -2 because 'self' and the 'arg' should already reuse 2 handles
+            mod.g(closed_size - 2)
+        finally:
+            _debug.set_closed_handles_queue_max_size(old_limit)
+        return closed_size
+
     old_raw_data_max_size = _debug.get_protected_raw_data_max_size()
     old_closed_handles_max_size = _debug.get_closed_handles_queue_max_size()
     _debug.set_protected_raw_data_max_size(100)
     try:
+        # Reset the state as much as possible:
+        closed_size = clear_raw_data_in_closed_handles()
         # Make enough room for the handles created by this test
-        _debug.set_closed_handles_queue_max_size(old_closed_handles_max_size + 100)
+        _debug.set_closed_handles_queue_max_size(closed_size + 100)
+        # Sanity check: no raw data is now held by closed handles
+        initial = get_raw_data_sizes(_debug.get_closed_handles())
+        assert all(map(lambda x: x == -1, initial))
 
         # Large string that shouldn't be retained at all
         gen = _debug.new_generation()
@@ -207,13 +226,7 @@ def test_charptr_limit_stress_test(compiler):
 
         # Check that raw data of closed handles is freed when the handle
         # is reused
-        closed_size = len(_debug.get_closed_handles())
-        # make sure that the closed_handles queue is considered full: this
-        # will force the reuse of existing closed handles.
-        _debug.set_closed_handles_queue_max_size(closed_size)
-        # Dummy call to force the reuse of the existing closed handles
-        # -2 because 'self' and the 'arg' should already reuse 2 handles
-        mod.g(closed_size - 2)
+        closed_size = clear_raw_data_in_closed_handles()
 
         # None of the closed handles should now have any raw data attached
         all_closed = _debug.get_closed_handles()
