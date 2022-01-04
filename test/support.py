@@ -315,13 +315,17 @@ class PythonSubprocessRunner:
             assert self.hpy_abi == 'cpython'
             load_module = "import {} as mod;".format(mod.name)
         if self.verbose:
-            print("\n---\nExecuting in subprocess: {}\n".format(load_module + code))
+            print("\n---\nExecuting in subprocess: {}".format(load_module + code))
         result = subprocess.run([sys.executable, "-c", load_module + code], env=env,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if self.verbose:
-            out = result.stdout.decode('ascii')
-            err = result.stderr.decode('ascii')
-            print("\n---\n{out}\n{err}\n---\n".format(out=out, err=err))
+            print("stdout/stderr:")
+            try:
+                out = result.stdout.decode('latin-1')
+                err = result.stderr.decode('latin-1')
+                print("----\n{out}--\n{err}-----".format(out=out, err=err))
+            except UnicodeDecodeError:
+                print("Warning: stdout or stderr could not be decoded with 'latin-1' encoding")
         return result
 
 
