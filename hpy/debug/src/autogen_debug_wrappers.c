@@ -352,6 +352,11 @@ DHPy debug_ctx_Err_NewExceptionWithDoc(HPyContext *dctx, const char *name, const
     return DHPy_open(dctx, HPyErr_NewExceptionWithDoc(get_info(dctx)->uctx, name, doc, DHPy_unwrap(dctx, base), DHPy_unwrap(dctx, dict)));
 }
 
+int debug_ctx_Err_WarnEx(HPyContext *dctx, DHPy category, const char *message, HPy_ssize_t stack_level)
+{
+    return HPyErr_WarnEx(get_info(dctx)->uctx, DHPy_unwrap(dctx, category), message, stack_level);
+}
+
 int debug_ctx_IsTrue(HPyContext *dctx, DHPy h)
 {
     return HPy_IsTrue(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
@@ -545,6 +550,11 @@ DHPy debug_ctx_Unicode_FromWideChar(HPyContext *dctx, const wchar_t *w, HPy_ssiz
 DHPy debug_ctx_Unicode_DecodeFSDefault(HPyContext *dctx, const char *v)
 {
     return DHPy_open(dctx, HPyUnicode_DecodeFSDefault(get_info(dctx)->uctx, v));
+}
+
+DHPy debug_ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *dctx, const char *v, HPy_ssize_t size)
+{
+    return DHPy_open(dctx, HPyUnicode_DecodeFSDefaultAndSize(get_info(dctx)->uctx, v, size));
 }
 
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)

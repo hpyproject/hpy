@@ -191,6 +191,7 @@ HPy HPyErr_NoMemory(HPyContext *ctx);
 void HPyErr_Clear(HPyContext *ctx);
 HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
 HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
+int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level);
 
 /* object.h */
 int HPy_IsTrue(HPyContext *ctx, HPy h);
@@ -252,6 +253,7 @@ HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h);
 const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
 HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char* v);
+HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char* v, HPy_ssize_t size);
 
 /* listobject.h */
 int HPyList_Check(HPyContext *ctx, HPy h);

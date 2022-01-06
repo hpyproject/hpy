@@ -325,6 +325,11 @@ HPyAPI_FUNC HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, co
     return _py2h(PyErr_NewExceptionWithDoc(name, doc, _h2py(base), _h2py(dict)));
 }
 
+HPyAPI_FUNC int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level)
+{
+    return PyErr_WarnEx(_h2py(category), message, stack_level);
+}
+
 HPyAPI_FUNC int HPy_IsTrue(HPyContext *ctx, HPy h)
 {
     return PyObject_IsTrue(_h2py(h));
@@ -468,6 +473,11 @@ HPyAPI_FUNC HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_s
 HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char *v)
 {
     return _py2h(PyUnicode_DecodeFSDefault(v));
+}
+
+HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char *v, HPy_ssize_t size)
+{
+    return _py2h(PyUnicode_DecodeFSDefaultAndSize(v, size));
 }
 
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h)

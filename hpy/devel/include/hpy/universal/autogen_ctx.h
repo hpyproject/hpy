@@ -160,6 +160,7 @@ struct _HPyContext_s {
     void (*ctx_Err_Clear)(HPyContext *ctx);
     HPy (*ctx_Err_NewException)(HPyContext *ctx, const char *name, HPy base, HPy dict);
     HPy (*ctx_Err_NewExceptionWithDoc)(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
+    int (*ctx_Err_WarnEx)(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level);
     int (*ctx_IsTrue)(HPyContext *ctx, HPy h);
     HPy (*ctx_Type_FromSpec)(HPyContext *ctx, HPyType_Spec *spec, HPyType_SpecParam *params);
     HPy (*ctx_Type_GenericNew)(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
@@ -201,6 +202,7 @@ struct _HPyContext_s {
     const char *(*ctx_Unicode_AsUTF8AndSize)(HPyContext *ctx, HPy h, HPy_ssize_t *size);
     HPy (*ctx_Unicode_FromWideChar)(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
     HPy (*ctx_Unicode_DecodeFSDefault)(HPyContext *ctx, const char *v);
+    HPy (*ctx_Unicode_DecodeFSDefaultAndSize)(HPyContext *ctx, const char *v, HPy_ssize_t size);
     int (*ctx_List_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_List_New)(HPyContext *ctx, HPy_ssize_t len);
     int (*ctx_List_Append)(HPyContext *ctx, HPy h_list, HPy h_item);
