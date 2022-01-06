@@ -402,6 +402,11 @@ DHPy debug_ctx_GetItem_s(HPyContext *dctx, DHPy obj, const char *key)
     return DHPy_open(dctx, HPy_GetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key));
 }
 
+int debug_ctx_Contains(HPyContext *dctx, DHPy container, DHPy key)
+{
+    return HPy_Contains(get_info(dctx)->uctx, DHPy_unwrap(dctx, container), DHPy_unwrap(dctx, key));
+}
+
 int debug_ctx_SetItem(HPyContext *dctx, DHPy obj, DHPy key, DHPy value)
 {
     return HPy_SetItem(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, key), DHPy_unwrap(dctx, value));

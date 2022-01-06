@@ -211,6 +211,8 @@ HPy HPy_GetItem(HPyContext *ctx, HPy obj, HPy key);
 HPy HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *key);
 
+int HPy_Contains(HPyContext *ctx, HPy container, HPy key);
+
 int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value);
 int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);

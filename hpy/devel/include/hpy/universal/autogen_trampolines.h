@@ -330,6 +330,10 @@ HPyAPI_FUNC HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *key) {
      return ctx->ctx_GetItem_s ( ctx, obj, key ); 
 }
 
+HPyAPI_FUNC int HPy_Contains(HPyContext *ctx, HPy container, HPy key) {
+     return ctx->ctx_Contains ( ctx, container, key ); 
+}
+
 HPyAPI_FUNC int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value) {
      return ctx->ctx_SetItem ( ctx, obj, key, value ); 
 }

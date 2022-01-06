@@ -153,6 +153,7 @@ SPECIAL_CASES = {
     'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
+    'HPy_Contains': 'PySequence_Contains',
     'HPy_Length': 'PyObject_Length',
     'HPy_CallTupleDict': None,
     'HPy_FromPyObject': None,
