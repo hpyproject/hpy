@@ -385,6 +385,7 @@ typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
 typedef int (*HPyFunc_getbufferproc)(HPyContext *ctx, HPy, HPy_buffer *, int);
 typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
 typedef int (*HPyFunc_traverseproc)(void *object, HPyFunc_visitproc visit, void *arg);
+typedef void (*HPyFunc_destructor)(HPyContext *ctx, HPy);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
 
@@ -483,7 +484,7 @@ typedef enum {
     //HPy_am_await = SLOT(77, HPyFunc_X),
     //HPy_am_aiter = SLOT(78, HPyFunc_X),
     //HPy_am_anext = SLOT(79, HPyFunc_X),
-    //HPy_tp_finalize = SLOT(80, HPyFunc_X),
+    HPy_tp_finalize = SLOT(80, HPyFunc_DESTRUCTOR),
 
     /* extra HPy slots */
     HPy_tp_destroy = SLOT(1000, HPyFunc_DESTROYFUNC),

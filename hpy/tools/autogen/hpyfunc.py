@@ -172,6 +172,10 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
             w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{NAME}(SYM, IMPL) \\')
             w(f'    static {toC(tramp_node)} \\')
             w(f'    {{ \\')
-            w(f'        return {result}(IMPL({args})); \\')
+            if toC(tramp_node.type) == 'void':
+                w(f'        IMPL({args}); \\')
+                w(f'        return; \\')
+            else:
+                w(f'        return {result}(IMPL({args})); \\')
             w(f'    }}')
         return '\n'.join(lines)
