@@ -1,6 +1,14 @@
 #ifndef HPy_H
 #define HPy_H
 
+#ifndef HPY_UNIVERSAL_ABI
+/*  It would be nice if we could include hpy.h WITHOUT bringing in all the
+    stuff from Python.h, to make sure that people don't use the CPython API by
+    mistake. How to achieve it, though? */
+#   define PY_SSIZE_T_CLEAN
+#   include <Python.h>
+#endif
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdarg.h>
@@ -117,11 +125,6 @@ typedef struct _HPyContext_s HPyContext;
     typedef intptr_t HPy_ssize_t;
     typedef intptr_t HPy_hash_t;
 #else
-/*  It would be nice if we could include hpy.h WITHOUT bringing in all the
-    stuff from Python.h, to make sure that people don't use the CPython API by
-    mistake. How to achieve it, though? */
-#   define PY_SSIZE_T_CLEAN
-#   include <Python.h>
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;
 #endif
