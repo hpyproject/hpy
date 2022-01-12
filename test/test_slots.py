@@ -1,3 +1,4 @@
+import pytest
 from .support import HPyTest
 from .test_hpytype import PointTemplate
 
@@ -33,6 +34,7 @@ class TestSlots(HPyTest):
         assert p.x == 1
         assert p.y == 2
 
+    @pytest.mark.syncgc
     def test_tp_destroy(self):
         import gc
         mod = self.make_module("""
@@ -66,6 +68,7 @@ class TestSlots(HPyTest):
         gc.collect()
         assert mod.get_destroyed_x() == 7
 
+    @pytest.mark.syncgc
     def test_tp_finalize_nongc(self):
         import gc
         mod = self.make_module("""
@@ -99,6 +102,7 @@ class TestSlots(HPyTest):
         gc.collect()
         assert mod.get_finalized_x() == 7
 
+    @pytest.mark.syncgc
     def test_tp_finalize_gc(self):
         import gc
         mod = self.make_module("""

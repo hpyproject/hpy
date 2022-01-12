@@ -1,5 +1,6 @@
 """ HPyType tests on legacy types. """
 
+import pytest
 from .support import HPyTest
 from .test_hpytype import PointTemplate, TestType as _TestType
 
@@ -28,6 +29,7 @@ class TestLegacyType(_TestType):
 
     ExtensionTemplate = LegacyPointTemplate
 
+    @pytest.mark.syncgc
     def test_legacy_dealloc(self):
         mod = self.make_module("""
             static long dealloc_counter = 0;
