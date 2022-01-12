@@ -19,6 +19,7 @@ typedef int HPy_RichCmpOp;
 typedef int HPy_buffer;
 typedef int HPyFunc_visitproc;
 typedef int HPy_UCS4;
+typedef int HPyThreadState;
 
 /* HPy public API */
 
@@ -347,6 +348,30 @@ CPython but e.g. PyPy needs a write barrier.
 */
 void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
 HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
+
+/* Leaving Python execution: for releasing GIL and other use-cases.
+
+    In most situations, users should prefer using convenience macros:
+    HPy_BEGIN_LEAVE_PYTHON(context)/HPy_END_LEAVE_PYTHON(context)
+
+    HPy extensions may leave Python execution when running Python independent
+    code: long-running computations or blocking operations. When an extension
+    has left the Python execution it must not call any HPy API other than
+    HPy_ReenterPythonExecution. It can access pointers returned by HPy API,
+    e.g., HPyUnicode_AsUTF8String, provided that they are valid at the point
+    of calling HPy_LeavePythonExecution.
+
+    Python execution must be reentered on the same thread as where it was left.
+    The leave/enter calls must not be nested. Debug mode will, in the future,
+    enforce these constraints.
+
+    Python implementations may use this knowledge however they wish. The most
+    obvious use case is to release the GIL, in which case the
+    HPy_BEGIN_LEAVE_PYTHON/HPy_END_LEAVE_PYTHON becomes equivalent to
+    Py_BEGIN_ALLOW_THREADS/Py_END_ALLOW_THREADS.
+*/
+HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
+void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state);
 
 /* Debugging helpers */
 void _HPy_Dump(HPyContext *ctx, HPy h);

@@ -1,9 +1,21 @@
 #ifndef HPY_CPYTHON_MISC_H
 #define HPY_CPYTHON_MISC_H
 
+#include <Python.h>
+#include "hpy.h"
+#include "hpy/runtime/ctx_funcs.h"
+
 // XXX: turn these into static inline functions
 #define _h2py(h) ((PyObject*)h._i)
 #define _py2h(o) _hconv((intptr_t)o)
+
+static inline HPyThreadState _threads2h(PyThreadState *s) {
+    return (HPyThreadState) { (intptr_t) s };
+}
+
+static inline PyThreadState* _h2threads(HPyThreadState h) {
+    return (PyThreadState*) h._i;
+}
 
 static inline HPyField _py2hf(PyObject *obj)
 {
@@ -194,7 +206,6 @@ HPyAPI_FUNC HPyContext * _HPyGetContext(void) {
     }
     return ctx;
 }
-
 
 HPyAPI_FUNC HPy HPy_Dup(HPyContext *ctx, HPy handle)
 {

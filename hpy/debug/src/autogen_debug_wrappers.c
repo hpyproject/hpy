@@ -682,6 +682,16 @@ DHPy debug_ctx_Field_Load(HPyContext *dctx, DHPy source_object, HPyField source_
     return DHPy_open(dctx, HPyField_Load(get_info(dctx)->uctx, DHPy_unwrap(dctx, source_object), source_field));
 }
 
+HPyThreadState debug_ctx_LeavePythonExecution(HPyContext *dctx)
+{
+    return HPy_LeavePythonExecution(get_info(dctx)->uctx);
+}
+
+void debug_ctx_ReenterPythonExecution(HPyContext *dctx, HPyThreadState state)
+{
+    HPy_ReenterPythonExecution(get_info(dctx)->uctx, state);
+}
+
 void debug_ctx_Dump(HPyContext *dctx, DHPy h)
 {
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

@@ -85,12 +85,16 @@ class cpython_autogen_api_impl_h(AutoGenFile):
                     continue
                 elif toC(p.type) == 'HPy':
                     arg = '_h2py(%s)' % p.name
+                elif toC(p.type) == 'HPyThreadState':
+                    arg = '_h2threads(%s)' % p.name
                 else:
                     arg = p.name
                 args.append(arg)
             result = '%s(%s)' % (pyfunc, ', '.join(args))
             if return_type == 'HPy':
                 result = '_py2h(%s)' % result
+            elif return_type == 'HPyThreadState':
+                result = '_threads2h(%s)' % result
             return result
         #
         lines = []

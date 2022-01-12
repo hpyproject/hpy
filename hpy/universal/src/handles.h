@@ -33,4 +33,12 @@ static inline PyObject * _hf2py(HPyField hf)
     return _h2py(h);
 }
 
+static inline HPyThreadState _threads2h(PyThreadState* s) {
+    return (HPyThreadState) { (intptr_t) s };
+}
+
+static inline PyThreadState* _h2threads(HPyThreadState h) {
+    return (PyThreadState*) h._i;
+}
+
 #endif /* HPY_HANDLES_H */
