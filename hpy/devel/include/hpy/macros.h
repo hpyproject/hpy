@@ -69,3 +69,23 @@ typedef enum {
 #else
 #error "sizeof(pid_t) is neither sizeof(int), sizeof(long) or sizeof(long long)"
 #endif /* SIZEOF_PID_T */
+
+/* Convenience macro that closes handle `op` and sets `op` to HPy_NULL.
+ *
+ * Note: the issues solved by Py_CLEAR on CPython do not apply to HPy. Since
+ * handles should be always short-lived and never shared between threads or
+ * different calls to HPy module entry points, arbitrary code triggered
+ * from __del__ (which can be triggered from HPy_Close) cannot access the same
+ * stale handle value.
+ *
+ * What can be shared are HPy_Fields, but there the
+ * ``HPyField_Store(ctx, obj_h, &obj->f, HPy_NULL)`` should internally do the
+ * right thing.
+ */
+#define HPy_CLEAR(ctx, op)          \
+    do {                            \
+        if (!HPy_IsNull(op)) {      \
+            HPy_Close(ctx, op);     \
+            (op) = HPy_NULL;        \
+        }                           \
+    } while (0)

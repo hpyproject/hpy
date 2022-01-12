@@ -122,10 +122,29 @@ class TestBasic(HPyTest):
                 HPy_Close(ctx, one);
                 return res;
             }
+            HPyDef_METH(g, "g", g_impl, HPyFunc_O)
+            static HPy g_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy h = HPy_NULL;
+                for (size_t i = 0; i < 3; ++i) {
+                    // imagine some more code here that can also jump to cleanup
+                    h = HPyLong_FromLong(ctx, i);
+                    if (HPy_IsNull(h))
+                        break; // goto cleanup code
+                    if (HPyList_Append(ctx, arg, h))
+                        break; // goto cleanup code
+                    HPy_CLEAR(ctx, h);
+                }
+                HPy_Close(ctx, h); // cleanup code
+                return arg;
+            }
+
             @EXPORT(f)
+            @EXPORT(g)
             @INIT
         """)
         assert mod.f(41.5) == 42.5
+        assert mod.g(list()) == [0, 1, 2]
 
     def test_bool(self):
         mod = self.make_module("""

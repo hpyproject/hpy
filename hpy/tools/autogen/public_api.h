@@ -327,9 +327,9 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
        uninitialized memory. If you use it to overwrite a valid HPyField, you
        will cause a memory leak (at least on CPython)
 
-     - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
-       the old value. However, you CANNOT use it if the memory is not
-       initialized.
+     - ``HPyField_Store(ctx, obj_h, &obj->f, HPy_NULL)``: this does the right
+       and decref the old value. However, you CANNOT use it if the memory is
+       not initialized.
 
 Note: target_object and source_object are there in case an implementation
 needs to add write and/or read barriers on the objects. They are ignored by
