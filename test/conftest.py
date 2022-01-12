@@ -20,6 +20,10 @@ def pytest_configure(config):
     global IS_VALGRIND_RUN
     IS_VALGRIND_RUN = config.pluginmanager.hasplugin('valgrind_checker')
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "syncgc: Mark tests that rely on a synchronous GC."
+    )
 
 @pytest.fixture(scope='session')
 def hpy_devel(request):
