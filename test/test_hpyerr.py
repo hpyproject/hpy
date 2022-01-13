@@ -54,8 +54,7 @@ class TestErr(HPyTest):
             {
                 HPyLong_AsLong(ctx, arg);
                 if (HPyErr_Occurred(ctx)) {
-                    HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
-                    return HPy_NULL;
+                    return HPyErr_SetString(ctx, ctx->h_ValueError, "hello world");
                 }
                 return HPyLong_FromLong(ctx, -1002);
             }
@@ -89,14 +88,26 @@ class TestErr(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
+                return HPyErr_SetString(ctx, ctx->h_ValueError, "error message");
+            }
+
+            HPyDef_METH(g, "g", g_impl, HPyFunc_NOARGS)
+            static HPy g_impl(HPyContext *ctx, HPy self)
+            {
                 HPyErr_SetString(ctx, ctx->h_ValueError, "error message");
                 return HPy_NULL;
             }
+
+            @EXPORT(g)
             @EXPORT(f)
             @INIT
         """)
         with pytest.raises(ValueError) as err:
             mod.f()
+        assert str(err.value) == "error message"
+
+        with pytest.raises(ValueError) as err:
+            mod.g()
         assert str(err.value) == "error message"
 
     def test_HPyErr_SetObject(self):
@@ -105,8 +116,7 @@ class TestErr(HPyTest):
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                HPyErr_SetObject(ctx, ctx->h_ValueError, arg);
-                return HPy_NULL;
+                return HPyErr_SetObject(ctx, ctx->h_ValueError, arg);
             }
             @EXPORT(f)
             @INIT

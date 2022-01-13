@@ -179,8 +179,8 @@ HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
 
 /* pyerrors.h */
 void HPy_FatalError(HPyContext *ctx, const char *message);
-void HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message);
-void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
+HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message);
+HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 /* note: the filename will be FS decoded */
 HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded);
 HPy HPyErr_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2);

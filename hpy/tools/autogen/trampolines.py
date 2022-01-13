@@ -1,16 +1,12 @@
 from copy import deepcopy
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
-from .parse import toC, find_typedecl
+from .parse import toC,find_typedecl,get_context_return_type,make_void
+from . import conf
 
 
 class autogen_trampolines_h(AutoGenFile):
     PATH = 'hpy/devel/include/hpy/universal/autogen_trampolines.h'
-
-    NO_TRAMPOLINES = set([
-        '_HPy_New',
-        'HPy_FatalError',
-        ])
 
     def generate(self):
         lines = []
@@ -25,9 +21,10 @@ class autogen_trampolines_h(AutoGenFile):
         # HPyAPI_FUNC HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
         #      return ctx->ctx_Module_Create ( ctx, def );
         # }
-        if func.name in self.NO_TRAMPOLINES:
+        if func.name in conf.NO_TRAMPOLINES:
             return None
-        rettype = toC(func.node.type.type)
+        const_return = conf.RETURN_CONSTANT.get(func.node.name)
+        rettype = get_context_return_type(func, const_return)
         parts = []
         w = parts.append
         w('HPyAPI_FUNC')
@@ -46,14 +43,18 @@ class autogen_trampolines_h(AutoGenFile):
         w(', '.join(params))
         w(');')
 
+        if const_return:
+            w('return %s;' % const_return)
+
         w('\n}')
         return ' '.join(parts)
 
 
 class cpython_autogen_api_impl_h(AutoGenFile):
     PATH = 'hpy/devel/include/hpy/cpython/autogen_api_impl.h'
+    GENERATE_CONST_RETURN = True
 
-    def signature(self, func):
+    def signature(self, func, const_return):
         """
         Return the C signature of the impl function.
 
@@ -97,19 +98,25 @@ class cpython_autogen_api_impl_h(AutoGenFile):
         pyfunc = func.cpython_name
         if not pyfunc:
             raise ValueError(f"Cannot generate implementation for {self}")
-        return_type = toC(func.node.type.type)
+        const_return = conf.RETURN_CONSTANT.get(func.node.name)
+        return_type = get_context_return_type(func, const_return)
         return_stmt = '' if return_type == 'void' else 'return '
-        w(self.signature(func))
+        w(self.signature(func, const_return))
         w('{')
         w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
+
+        if self.GENERATE_CONST_RETURN and const_return:
+            w('    return %s;' % const_return)
+
         w('}')
         return '\n'.join(lines)
 
 
 class universal_autogen_ctx_impl_h(cpython_autogen_api_impl_h):
     PATH = 'hpy/universal/src/autogen_ctx_impl.h'
+    GENERATE_CONST_RETURN = False
 
-    def signature(self, func):
+    def signature(self, func, const_return):
         """
         Return the C signature of the impl function.
 
@@ -120,6 +127,8 @@ class universal_autogen_ctx_impl_h(cpython_autogen_api_impl_h):
         See also cpython_autogen_api_impl_h.
         """
         newnode = deepcopy(func.node)
+        if const_return:
+            make_void(newnode)
         typedecl = find_typedecl(newnode)
         # rename the function
         typedecl.declname = func.ctx_name()
