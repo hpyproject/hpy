@@ -295,9 +295,9 @@ HPyAPI_IMPL HPy ctx_Err_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, co
     return _py2h(PyErr_SetFromErrnoWithFilename(_h2py(h_type), filename_fsencoded));
 }
 
-HPyAPI_IMPL HPy ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2)
+HPyAPI_IMPL void ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2)
 {
-    return _py2h(PyErr_SetFromErrnoWithFilenameObjects(_h2py(h_type), _h2py(filename1), _h2py(filename2)));
+    PyErr_SetFromErrnoWithFilenameObjects(_h2py(h_type), _h2py(filename1), _h2py(filename2));
 }
 
 HPyAPI_IMPL int ctx_Err_ExceptionMatches(HPyContext *ctx, HPy exc)
@@ -305,9 +305,9 @@ HPyAPI_IMPL int ctx_Err_ExceptionMatches(HPyContext *ctx, HPy exc)
     return PyErr_ExceptionMatches(_h2py(exc));
 }
 
-HPyAPI_IMPL HPy ctx_Err_NoMemory(HPyContext *ctx)
+HPyAPI_IMPL void ctx_Err_NoMemory(HPyContext *ctx)
 {
-    return _py2h(PyErr_NoMemory());
+    PyErr_NoMemory();
 }
 
 HPyAPI_IMPL void ctx_Err_Clear(HPyContext *ctx)

@@ -242,12 +242,12 @@ HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy k
      return ctx->ctx_CallTupleDict ( ctx, callable, args, kw ); 
 }
 
-HPyAPI_FUNC void HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message) {
-     ctx->ctx_Err_SetString ( ctx, h_type, message ); 
+HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message) {
+     ctx->ctx_Err_SetString ( ctx, h_type, message ); return HPy_NULL; 
 }
 
-HPyAPI_FUNC void HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value) {
-     ctx->ctx_Err_SetObject ( ctx, h_type, h_value ); 
+HPyAPI_FUNC HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value) {
+     ctx->ctx_Err_SetObject ( ctx, h_type, h_value ); return HPy_NULL; 
 }
 
 HPyAPI_FUNC HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded) {
@@ -255,7 +255,7 @@ HPyAPI_FUNC HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, con
 }
 
 HPyAPI_FUNC HPy HPyErr_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2) {
-     return ctx->ctx_Err_SetFromErrnoWithFilenameObjects ( ctx, h_type, filename1, filename2 ); 
+     ctx->ctx_Err_SetFromErrnoWithFilenameObjects ( ctx, h_type, filename1, filename2 ); return HPy_NULL; 
 }
 
 HPyAPI_FUNC int HPyErr_Occurred(HPyContext *ctx) {
@@ -267,7 +267,7 @@ HPyAPI_FUNC int HPyErr_ExceptionMatches(HPyContext *ctx, HPy exc) {
 }
 
 HPyAPI_FUNC HPy HPyErr_NoMemory(HPyContext *ctx) {
-     return ctx->ctx_Err_NoMemory ( ctx ); 
+     ctx->ctx_Err_NoMemory ( ctx ); return HPy_NULL; 
 }
 
 HPyAPI_FUNC void HPyErr_Clear(HPyContext *ctx) {
