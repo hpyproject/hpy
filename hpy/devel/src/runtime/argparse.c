@@ -110,6 +110,11 @@
  *     to their default value — when an optional argument is not specified, the
  *     contents of the corresponding C variable is not modified.
  *
+ * ``()``
+ *     HPyArg_Parse() only: Indicates that arguments between `(` and `)` are 
+ *     nested within a tuple. Thus, the tuple length must match the number of 
+ *     nested arguments. Recursive nested arguments is allowed up to 30 levels.
+ *
  * ``$``
  *     HPyArg_ParseKeywords() only: Indicates that the remaining arguments in
  *     the argument list are keyword-only. Currently, all keyword-only arguments
@@ -399,6 +404,65 @@ parse_item(HPyContext *ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp
 }
 
 
+static int
+parse_tuple_items(HPyContext *ctx, 
+                    HPyTracker *ht, 
+                    HPy tuple, 
+                    int tuple_nested_level,
+                    const char **fmt, 
+                    const char **fmt_end, 
+                    va_list *vl, 
+                    const char *err_fmt)
+{
+    if (!HPyTuple_Check(ctx, tuple)) {
+        set_error(ctx, ctx->h_TypeError, err_fmt, "argument is not a tuple object");
+        return 0;
+    }
+    HPy current_arg;
+    HPy_ssize_t tuple_length = HPy_Length(ctx, tuple);
+    for (HPy_ssize_t i = 0; i < tuple_length && fmt != fmt_end; i++) {
+        current_arg = HPy_GetItem_i(ctx, tuple, i);
+        switch (*(*fmt)) {
+            case ')': {
+                set_error(ctx, ctx->h_TypeError, err_fmt, "tuple length is too large for the format");
+                HPy_Close(ctx, current_arg);
+                return 0;
+            }
+
+            case '(': {
+                if (tuple_nested_level >= 30) { // same limit as CPython
+                    HPy_FatalError(ctx, "too many tuple nesting levels in argument format string");
+                    HPy_Close(ctx, current_arg);
+                    return 0;
+                }
+                (*fmt)++;
+                if (!parse_tuple_items(ctx, ht, current_arg, tuple_nested_level + 1, fmt, fmt_end, vl, err_fmt)) {
+                    HPy_Close(ctx, current_arg);
+                    return 0;
+                }                
+                break;
+            }
+            
+            default: {
+                if (!parse_item(ctx, ht, current_arg, 0, fmt, vl, err_fmt)) {
+                    HPy_Close(ctx, current_arg);
+                    return 0;
+                }
+            }
+        }
+        HPy_Close(ctx, current_arg);
+    }
+
+    if (*(*fmt) == ')') {
+        (*fmt)++;
+        return 1;
+    } else {
+        HPy_FatalError(ctx, "missing ')' in getargs format");
+        return 0;
+    }
+
+}
+
 /**
  * Parse positional arguments.
  *
@@ -492,8 +556,15 @@ HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, cons
             current_arg = args[i];
         }
         if (!HPy_IsNull(current_arg) || optional) {
-            if (!parse_item(ctx, ht, current_arg, 0, &fmt1, &vl, err_fmt)) {
-                goto error;
+            if (*fmt1 == '(') {
+                fmt1++;
+                if (!parse_tuple_items(ctx, ht, current_arg, 0, &fmt1, &fmt_end, &vl, err_fmt)) {
+                    goto error;
+                }
+            } else {
+                if (!parse_item(ctx, ht, current_arg, 0, &fmt1, &vl, err_fmt)) {
+                    goto error;
+                }
             }
         }
         else {

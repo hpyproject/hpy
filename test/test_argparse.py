@@ -6,7 +6,7 @@ functions. In particular, you have to "import pytest" inside the test in order
 to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
-from .support import HPyTest
+from .support import HPyTest, SUPPORTS_SYS_EXECUTABLE
 
 
 class TestParseItem(HPyTest):
@@ -338,6 +338,95 @@ class TestArgParse(HPyTest):
             @INIT
         """)
         assert mod.f(4, 5, 6, 7, 8) == 45678
+
+    def test_parse_tuple_arguments(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                long a, b, c, d, e;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "l(l)l(ll)",
+                                  &a, &b, &c, &d, &e))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx,
+                    10000*a + 1000*b + 100*c + 10*d + e);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(4, (5,), 6, (7, 8)) == 45678
+
+    def test_parse_nested_tuple_arguments(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                long a, b, c, d, e;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "l(l(l)l)l",
+                                  &a, &b, &c, &d, &e))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx,
+                    10000*a + 1000*b + 100*c + 10*d + e);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(4, (5, (6,), 7), 8) == 45678
+        import pytest
+        with pytest.raises(TypeError) as exc:
+            assert mod.f(4, (5, (6,), 7, 42), 8) == 45678
+
+    def test_parse_nested_tuple_format_error(self, python_subprocess, fatal_exit_code):
+        mod = self.compile_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                long a;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "(l", &a))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx, -1);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        if not SUPPORTS_SYS_EXECUTABLE:
+            return
+        result = python_subprocess.run(mod, "mod.f((42,))")
+        assert result.returncode == fatal_exit_code
+        assert result.stdout == b""
+        stderr_msg = result.stderr.splitlines()[0]
+        assert stderr_msg.startswith(b"Fatal Python error: ")
+        assert stderr_msg.endswith(b": missing ')' in getargs format")
+
+    def test_parse_max_nested_tuple_arguments(self, python_subprocess, fatal_exit_code):
+        vars = ', '.join(['v%d' % i for i in range(32)])
+        arguments = ', '.join(['&v%d' % i for i in range(32)])
+        format = '(l' * 32 + ')' * 32
+        mod = self.compile_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {{
+                long {vars};
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "{f}",
+                                  {arguments}))
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx, -1);
+            }}
+            @EXPORT(f)
+            @INIT
+        """.format(vars=vars, f=format, arguments=arguments))
+        if not SUPPORTS_SYS_EXECUTABLE:
+            return
+        result = python_subprocess.run(mod, "args = (0, );\nfor i in range(32):\n  args = (i, args);\nmod.f(args)")
+        assert result.returncode == fatal_exit_code
+        assert result.stdout == b""
+        stderr_msg = result.stderr.splitlines()[0]
+        assert stderr_msg.startswith(b"Fatal Python error: ")
+        assert stderr_msg.endswith(b": too many tuple nesting levels in argument format string")
 
     def test_many_handle_arguments(self):
         mod = self.make_module("""
