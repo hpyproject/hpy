@@ -24,6 +24,7 @@
 #include <Python.h>
 #include "debug_internal.h"
 #include "hpy/runtime/ctx_type.h" // for call_traverseproc_from_trampoline
+#include "hpy/runtime/ctx_module.h" // for call_mod_traverseproc_from_trampoline
 #include "handles.h" // for _py2h and _h2py
 #if defined(_MSC_VER)
 # include <malloc.h>   /* for alloca() */
@@ -184,6 +185,13 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
         a->result = call_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
+        return;
+    }
+    case HPyFunc_MODTRAVERSEPROC: {
+        HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
+        _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
+        a->result = call_mod_traverseproc_from_trampoline(f, a->self,
+                                                          a->visit, a->arg);
         return;
     }
 #include "autogen_debug_ctx_call.i"

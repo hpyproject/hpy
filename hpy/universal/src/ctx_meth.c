@@ -1,6 +1,7 @@
 #include <Python.h>
 #include "ctx_meth.h"
 #include "hpy/runtime/ctx_type.h"
+#include "hpy/runtime/ctx_module.h"
 #include "handles.h"
 
 static void _buffer_h2py(HPyContext *ctx, const HPy_buffer *src, Py_buffer *dest)
@@ -110,6 +111,13 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
         HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
         a->result = call_traverseproc_from_trampoline(f, a->self,
+                                                      a->visit, a->arg);
+        return;
+    }
+    case HPyFunc_MODTRAVERSEPROC: {
+        HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
+        _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
+        a->result = call_mod_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
         return;
     }

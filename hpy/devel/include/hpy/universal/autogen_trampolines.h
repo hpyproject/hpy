@@ -14,6 +14,10 @@ HPyAPI_FUNC HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def) {
      return ctx->ctx_Module_Create ( ctx, def ); 
 }
 
+HPyAPI_FUNC void *HPyModule_GetState(HPyContext *ctx, HPy module) {
+     return ctx->ctx_Module_GetState ( ctx, module ); 
+}
+
 HPyAPI_FUNC HPy HPy_Dup(HPyContext *ctx, HPy h) {
      return ctx->ctx_Dup ( ctx, h ); 
 }

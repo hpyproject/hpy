@@ -378,6 +378,15 @@ class HPyTest:
         """
         return sys.implementation.name == "cpython"
 
+    def supports_gc_module(self):
+        """ Returns True if the underlying Python implementation supports
+            the gc module and its functions such as gc.get_referents.
+
+            By default returns True on CPython and False on other
+            implementations.
+        """
+        return sys.implementation.name == "cpython"
+
     def supports_ordinary_make_module_imports(self):
         """ Returns True if `.make_module(...)` loads modules using a
             standard Python import mechanism (e.g. `importlib.import_module`).

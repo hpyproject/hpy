@@ -26,6 +26,8 @@ _HPy_HIDDEN void ctx_ListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder)
 
 // ctx_module.c
 _HPy_HIDDEN HPy ctx_Module_Create(HPyContext *ctx, HPyModuleDef *hpydef);
+// ctx_bytes.c
+_HPy_HIDDEN void* ctx_Module_GetState(HPyContext *ctx, HPy mod);
 
 // ctx_object.c
 _HPy_HIDDEN void ctx_Dump(HPyContext *ctx, HPy h);

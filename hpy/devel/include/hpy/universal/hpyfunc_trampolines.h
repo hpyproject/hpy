@@ -100,6 +100,9 @@ typedef struct {
 #define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
     static void SYM(void) { abort(); }
 
+/* special case: the same for HPy_m_destroy for module state */
+#define _HPyFunc_TRAMPOLINE_HPyFunc_MODDESTROYFUNC(SYM, IMPL)              \
+    static void SYM(void) { abort(); }
 
 /* this needs to be written manually because HPy has a different type for
    "op": HPy_RichCmpOp instead of int */
@@ -157,6 +160,15 @@ typedef struct {
         _HPyFunc_args_TRAVERSEPROC a = { self, visit, arg }; \
         _HPy_CallRealFunctionFromTrampoline( \
            _ctx_for_trampolines, HPyFunc_TRAVERSEPROC, (HPyCFunction)IMPL, &a); \
+        return a.result; \
+    }
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_MODTRAVERSEPROC(SYM, IMPL) \
+    static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg) \
+    { \
+        _HPyFunc_args_TRAVERSEPROC a = { self, visit, arg }; \
+        _HPy_CallRealFunctionFromTrampoline( \
+           _ctx_for_trampolines, HPyFunc_MODTRAVERSEPROC, (HPyCFunction)IMPL, &a); \
         return a.result; \
     }
 
