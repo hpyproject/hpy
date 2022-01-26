@@ -1,7 +1,7 @@
 from copy import deepcopy
-from pycparser import c_ast
 from .autogenfile import AutoGenFile
-from .parse import toC,find_typedecl,get_context_return_type,make_void
+from .parse import toC,find_typedecl, get_context_return_type, \
+    make_void, get_return_constant
 from . import conf
 
 
@@ -23,8 +23,8 @@ class autogen_trampolines_h(AutoGenFile):
         # }
         if func.name in conf.NO_TRAMPOLINES:
             return None
-        const_return = conf.RETURN_CONSTANT.get(func.node.name)
-        rettype = get_context_return_type(func, const_return)
+        const_return = get_return_constant(func)
+        rettype = get_context_return_type(func.node, const_return)
         parts = []
         w = parts.append
         w('HPyAPI_FUNC')
@@ -98,8 +98,8 @@ class cpython_autogen_api_impl_h(AutoGenFile):
         pyfunc = func.cpython_name
         if not pyfunc:
             raise ValueError(f"Cannot generate implementation for {self}")
-        const_return = conf.RETURN_CONSTANT.get(func.node.name)
-        return_type = get_context_return_type(func, const_return)
+        const_return = get_return_constant(func)
+        return_type = get_context_return_type(func.node, const_return)
         return_stmt = '' if return_type == 'void' else 'return '
         w(self.signature(func, const_return))
         w('{')

@@ -5,7 +5,7 @@ import py
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
-from .conf import SPECIAL_CASES
+from .conf import SPECIAL_CASES, RETURN_CONSTANT
 
 PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
 
@@ -19,12 +19,15 @@ def find_typedecl(node):
         node = node.type
     return node
 
-def get_context_return_type(func, const_return):
-    return 'void' if const_return else toC(func.node.type.type)
+def get_context_return_type(func_node, const_return):
+    return 'void' if const_return else toC(func_node.type.type)
 
 def make_void(func_node):
     voidid = c_ast.IdentifierType(names=['void'])
     func_node.type.type.type = c_ast.TypeDecl(declname='void', quals=[], type=voidid)
+
+def get_return_constant(func):
+    return RETURN_CONSTANT.get(func.node.name)
 
 @attr.s
 class Function:
