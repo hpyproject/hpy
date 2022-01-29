@@ -112,8 +112,8 @@
  *
  * ``()``
  *     HPyArg_Parse() only: Indicates that arguments between `(` and `)` are 
- *     nested within a tuple. Thus, the tuple length must match the number of 
- *     nested arguments. Recursive nested arguments is allowed up to 30 levels.
+ *     nested within a tuple/list. Thus, the tuple/list length must match the number 
+ *     of nested arguments. Recursive nested arguments is allowed up to 30 levels.
  *
  * ``$``
  *     HPyArg_ParseKeywords() only: Indicates that the remaining arguments in
@@ -414,7 +414,7 @@ parse_tuple_items(HPyContext *ctx,
                     va_list *vl, 
                     const char *err_fmt)
 {
-    if (!HPyTuple_Check(ctx, tuple)) {
+    if (!HPyTuple_Check(ctx, tuple) && !HPyList_Check(ctx, tuple)) {
         set_error(ctx, ctx->h_TypeError, err_fmt, "argument is not a tuple object");
         return 0;
     }
