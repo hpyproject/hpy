@@ -12,9 +12,6 @@ SUPPORTS_SYS_EXECUTABLE = bool(getattr(sys, "executable", None))
 # True if we are running on the CPython debug build
 IS_PYTHON_DEBUG_BUILD = hasattr(sys, 'gettotalrefcount')
 
-def is_valgrind_run(config):
-    return config.pluginmanager.getplugin("valgrind_checker")
-
 def reindent(s, indent):
     s = textwrap.dedent(s)
     return ''.join(' '*indent + line if line.strip() else line
