@@ -96,9 +96,18 @@ class TestUnicode(HPyTest):
                 HPy_ssize_t n;
                 const char* buf = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
                 return HPyUnicode_DecodeFSDefault(ctx, buf);
-                return HPy_Dup(ctx, ctx->h_None);
             }
+
+            HPyDef_METH(g, "g", g_impl, HPyFunc_NOARGS)
+            static HPy g_impl(HPyContext *ctx, HPy self)
+            {
+                const char buf[5] = { 'a', 'b', '\\0', 'c' };
+                return HPyUnicode_DecodeFSDefaultAndSize(ctx, buf, 4);
+            }
+
             @EXPORT(f)
+            @EXPORT(g)
             @INIT
         """)
         assert mod.f('ABC') == "ABC"
+        assert mod.g().encode('ascii') == b'ab\0c'

@@ -1,4 +1,4 @@
-from .support import HPyTest, SUPPORTS_SYS_EXECUTABLE
+from .support import HPyTest, SUPPORTS_SYS_EXECUTABLE, trampoline
 
 
 class TestErr(HPyTest):
@@ -426,6 +426,44 @@ class TestErr(HPyTest):
         check_warning(UnicodeWarning)
         check_warning(BytesWarning)
         check_warning(ResourceWarning)
+
+    def test_HPyErr_WarnEx(self):
+        import warnings
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                switch (HPyLong_AsLong(ctx, arg)) {
+                    case 0:
+                      HPyErr_WarnEx(ctx, ctx->h_RuntimeWarning, "warn qzp", 1);
+                      break;
+                    case 1:
+                      HPyErr_WarnEx(ctx, ctx->h_FutureWarning, "warn rtq", 2);
+                      break;
+                    case 2:
+                      HPyErr_WarnEx(ctx, HPy_NULL, "warn null", 1);
+                      break;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+
+        # NOTE: trampoline is defined in support.py
+        def check_warning(arg, category, message, file):
+            with warnings.catch_warnings(record=True) as warnings_list:
+                trampoline(mod.f, arg)
+                assert len(warnings_list) == 1, str(category)
+                w = warnings_list[-1]
+                assert issubclass(w.category, category), str(category)
+                assert str(w.message) == message, str(category)
+                assert w.filename.endswith(file), str(category)
+
+        check_warning(0, RuntimeWarning, "warn qzp", "support.py")
+        check_warning(1, FutureWarning, "warn rtq", "test_hpyerr.py")
+        check_warning(2, Warning, "warn null", "support.py")
+
 
     def test_errorval_returned_by_api_functions_hpy(self):
         mod = self.make_module("""

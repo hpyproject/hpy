@@ -282,6 +282,10 @@ HPyAPI_FUNC HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, co
      return ctx->ctx_Err_NewExceptionWithDoc ( ctx, name, doc, base, dict ); 
 }
 
+HPyAPI_FUNC int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level) {
+     return ctx->ctx_Err_WarnEx ( ctx, category, message, stack_level ); 
+}
+
 HPyAPI_FUNC int HPy_IsTrue(HPyContext *ctx, HPy h) {
      return ctx->ctx_IsTrue ( ctx, h ); 
 }
@@ -440,6 +444,10 @@ HPyAPI_FUNC HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_s
 
 HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char *v) {
      return ctx->ctx_Unicode_DecodeFSDefault ( ctx, v ); 
+}
+
+HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char *v, HPy_ssize_t size) {
+     return ctx->ctx_Unicode_DecodeFSDefaultAndSize ( ctx, v, size ); 
 }
 
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
