@@ -59,6 +59,9 @@
  * ``[items] (list) [matching-items]``
  *     Convert a sequence of C values to a Python list with the same number of items.
  *
+ * ``{key:value} (dict) [matching-items]``
+ *     Convert a sequence of C values to a Python dict with the same number of items.
+ *
  * Misc
  * ~~~~~~~
  *
@@ -312,12 +315,16 @@ static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values)
             HPy_Close(ctx, dict);
             return HPy_NULL;
         }
-        HPy_SetItem(ctx, dict, key, value);
+        int res = HPy_SetItem(ctx, dict, key, value);
         if (needs_key_close) {
             HPy_Close(ctx, key);
         }
         if (needs_value_close) {
             HPy_Close(ctx, value);
+        }
+        if (res < 0) {
+            HPy_Close(ctx, dict);
+            return HPy_NULL;
         }
 
         expect_comma = 1;

@@ -57,6 +57,10 @@ class TestBuildValue(HPyTest):
                 {'A':4, "B":0.25}),
             ('return HPy_BuildValue(ctx, "{s:(i,i), s:f}", "A", 4, 4, "B", 0.25);',
                 {'A':(4, 4), "B":0.25}),
+            ('return HPy_BuildValue(ctx, "[{s:(i,i), s:f},i]", "A", 4, 4, "B", 0.25, 42);',
+                [{'A':(4, 4), "B":0.25}, 42]),
+            ('return HPy_BuildValue(ctx, "({s:(i,i), s:f},[i])", "A", 4, 4, "B", 0.25, 42);',
+                ({'A':(4, 4), "B":0.25}, [42])),
         ]
         mod = self.make_tests_module(test_cases)
         for i, (code, expected) in enumerate(test_cases):
