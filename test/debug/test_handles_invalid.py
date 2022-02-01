@@ -1,6 +1,7 @@
 import pytest
 from hpy.debug.leakdetector import LeakDetector
-from test.support import SUPPORTS_SYS_EXECUTABLE
+from test.support import SUPPORTS_SYS_EXECUTABLE, IS_PYTHON_DEBUG_BUILD
+from test.conftest import IS_VALGRIND_RUN
 
 @pytest.fixture
 def hpy_abi():
@@ -51,14 +52,47 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
             return HPy_Repr(ctx, h);
         }
 
+        HPyDef_METH(f_noargs, "f_noargs", f_noargs_impl, HPyFunc_NOARGS, .doc="returns arg w/o dupping it")
+        static HPy f_noargs_impl(HPyContext *ctx, HPy self)
+        {
+            // should be: return HPy_Dup(ctx, self);
+            return self;
+        }
+
+        HPyDef_METH(f0, "f0", f0_impl, HPyFunc_O, .doc="returns arg w/o dupping it")
+        static HPy f0_impl(HPyContext *ctx, HPy self, HPy arg)
+        {
+            // should be: return HPy_Dup(ctx, arg);
+            return arg;
+        }
+
+        HPyDef_METH(f_varargs, "f_varargs", f_varargs_impl, HPyFunc_VARARGS, .doc="returns arg w/o dupping it")
+        static HPy f_varargs_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        {
+            // should be: return HPy_Dup(ctx, args[0]);
+            return args[0];
+        }
+
         @EXPORT(f)
         @EXPORT(g)
+        @EXPORT(f0)
+        @EXPORT(f_noargs)
+        @EXPORT(f_varargs)
         @INIT
     """)
     mod.f('foo')   # double close
     assert hpy_debug_capture.invalid_handles_count == 1
     mod.g('bar')   # use-after-close
     assert hpy_debug_capture.invalid_handles_count == 2
+    if not IS_PYTHON_DEBUG_BUILD and not IS_VALGRIND_RUN:
+        # CPython debug build can also catch these errors, so we cannot trigger
+        # them when running on debug builds
+        mod.f0('foo')
+        assert hpy_debug_capture.invalid_handles_count == 3
+        mod.f_noargs()
+        assert hpy_debug_capture.invalid_handles_count == 4
+        mod.f_varargs('foo', 'bar')
+        assert hpy_debug_capture.invalid_handles_count == 5
 
 
 def test_keeping_and_reusing_argument_handle(compiler, hpy_debug_capture):
