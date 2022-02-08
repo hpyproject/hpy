@@ -114,6 +114,90 @@ class TestCPythonCompatibility(HPyTest):
         obj = MyClass()
         assert mod.f(obj) == 1234
 
+    def test_aspyobject_hpy_type(self):
+        mod = self.make_module("""
+            typedef struct {
+                int magic;
+                HPyField f;
+            } MyHPyType;
+
+            #include <Python.h>
+            typedef struct {
+                PyObject_HEAD
+                int magic;
+                PyObject *f;
+            } MyLegacyType;
+
+            HPyDef_SLOT(MyType_new, MyType_new_impl, HPy_tp_new)
+            static HPy MyType_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                MyHPyType *t;
+                HPy h_obj = HPy_New(ctx, cls, &t);
+                HPyField_Store(ctx, h_obj, &t->f, args[0]);
+                t->magic = 42;
+                return h_obj;
+            }
+
+            HPyDef_SLOT(MyType_traverse, MyType_traverse_impl, HPy_tp_traverse)
+            static int MyType_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
+            {
+                MyHPyType *p = (MyHPyType *)self;
+                HPy_VISIT(&p->f);
+                return 0;
+            }
+
+            static HPyDef *MyType_defines[] = { &MyType_new, &MyType_traverse, NULL };
+            static HPyType_Spec MyType_spec = {
+                .name = "mytest.MyType",
+                .basicsize = sizeof(MyHPyType),
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_GC,
+                .defines = MyType_defines
+            };
+
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                // Note: omits error checking to keep the code brief
+                PyObject *o = HPy_AsPyObject(ctx, arg);
+                MyLegacyType* legacy_struct = (MyLegacyType*) o;
+
+                PyObject *foo_res = PyObject_CallMethod(legacy_struct->f, "foo", "");
+                HPy h_foo_res = HPy_FromPyObject(ctx, foo_res);
+                HPy h_magic = HPyLong_FromLong(ctx, legacy_struct->magic);
+
+                HPy h_res = HPyTuple_FromArray(ctx, (HPy[]) {h_foo_res, h_magic}, 2);
+                Py_DecRef(o);
+                Py_DecRef(foo_res);
+                HPy_Close(ctx, h_foo_res);
+                HPy_Close(ctx, h_magic);
+                return h_res;
+            }
+
+            HPyDef_METH(add_type, "add_type", add_type_impl, HPyFunc_NOARGS)
+            static HPy add_type_impl(HPyContext *ctx, HPy self)
+            {
+                if (!HPyHelpers_AddType(ctx, self, "MyType", &MyType_spec, NULL)) {
+                    return HPy_NULL;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT(f)
+            @EXPORT(add_type)
+            @INIT
+        """)
+
+        class MyClass:
+            def foo(self):
+                return 1234
+        field_obj = MyClass()
+
+        mod.add_type()
+        obj = mod.MyType(field_obj)
+
+        assert mod.f(obj) == (1234, 42)
+
     def test_hpy_close(self):
         mod = self.make_module("""
             #include <Python.h>

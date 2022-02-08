@@ -23,14 +23,12 @@ static inline PyObject *_h2py(HPy h) {
 
 static inline HPyField _py2hf(PyObject *obj)
 {
-    HPy h = _py2h(obj);
-    return (HPyField){ ._i = h._i };
+    return (HPyField){(intptr_t) obj};
 }
 
 static inline PyObject * _hf2py(HPyField hf)
 {
-    HPy h = { ._i = hf._i };
-    return _h2py(h);
+    return (PyObject*)hf._i;
 }
 
 #endif /* HPY_HANDLES_H */
