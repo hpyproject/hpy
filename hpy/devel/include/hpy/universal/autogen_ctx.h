@@ -173,6 +173,7 @@ struct _HPyContext_s {
     HPy (*ctx_GetItem)(HPyContext *ctx, HPy obj, HPy key);
     HPy (*ctx_GetItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
     HPy (*ctx_GetItem_s)(HPyContext *ctx, HPy obj, const char *key);
+    int (*ctx_Contains)(HPyContext *ctx, HPy container, HPy key);
     int (*ctx_SetItem)(HPyContext *ctx, HPy obj, HPy key, HPy value);
     int (*ctx_SetItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
     int (*ctx_SetItem_s)(HPyContext *ctx, HPy obj, const char *key, HPy value);

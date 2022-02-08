@@ -97,6 +97,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_GetItem = &ctx_GetItem,
     .ctx_GetItem_i = &ctx_GetItem_i,
     .ctx_GetItem_s = &ctx_GetItem_s,
+    .ctx_Contains = &ctx_Contains,
     .ctx_SetItem = &ctx_SetItem,
     .ctx_SetItem_i = &ctx_SetItem_i,
     .ctx_SetItem_s = &ctx_SetItem_s,
