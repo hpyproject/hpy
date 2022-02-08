@@ -94,6 +94,17 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
     HPy_Close(uctx, uh_res);
 }
 
+// DHPy_close, unlike debug_ctx_Close does not check the validity of the handle.
+// Use this in case you want to close only the debug handle like DHPy_close,
+// you but still want to check its validity
+void DHPy_close_and_check(HPyContext *dctx, DHPy dh) {
+    DHPy_unwrap(dctx, dh);
+    DHPy_close(dctx, dh);
+}
+
+// Note: the difference from just HPy_Close(dctx, dh), which calls debug_ctx_Close,
+// is that this only closes the debug handle. This is useful in situations
+// where we know that the wrapped handle will be closed by the wrapped context.
 void DHPy_close(HPyContext *dctx, DHPy dh)
 {
     DHPy_sanity_check(dh);

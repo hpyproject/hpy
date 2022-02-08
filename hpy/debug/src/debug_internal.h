@@ -157,6 +157,7 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 
 DHPy DHPy_open(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
+void DHPy_close_and_check(HPyContext *dctx, DHPy dh);
 void DHPy_free(HPyContext *dctx, DHPy dh);
 void DHPy_invalid_handle(HPyContext *dctx, DHPy dh);
 

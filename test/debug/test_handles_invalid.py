@@ -52,6 +52,14 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
             return HPy_Repr(ctx, h);
         }
 
+        HPyDef_METH(h, "h", h_impl, HPyFunc_O, .doc="closing argument")
+        static HPy h_impl(HPyContext *ctx, HPy self, HPy arg)
+        {
+            // Argument is implicitly closed by the caller
+            HPy_Close(ctx, arg);
+            return HPy_Dup(ctx, ctx->h_None);
+        }
+
         HPyDef_METH(f_noargs, "f_noargs", f_noargs_impl, HPyFunc_NOARGS, .doc="returns arg w/o dupping it")
         static HPy f_noargs_impl(HPyContext *ctx, HPy self)
         {
@@ -78,6 +86,7 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
         @EXPORT(f0)
         @EXPORT(f_noargs)
         @EXPORT(f_varargs)
+        @EXPORT(h)
         @INIT
     """)
     mod.f('foo')   # double close
@@ -93,6 +102,8 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
         assert hpy_debug_capture.invalid_handles_count == 4
         mod.f_varargs('foo', 'bar')
         assert hpy_debug_capture.invalid_handles_count == 5
+        mod.h('baz')
+        assert hpy_debug_capture.invalid_handles_count == 6
 
 
 def test_keeping_and_reusing_argument_handle(compiler, hpy_debug_capture):
