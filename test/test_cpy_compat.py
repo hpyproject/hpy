@@ -116,12 +116,14 @@ class TestCPythonCompatibility(HPyTest):
 
     def test_aspyobject_hpy_type(self):
         mod = self.make_module("""
+            #include <Python.h>
+
             typedef struct {
+                PyObject_HEAD
                 int magic;
                 HPyField f;
             } MyHPyType;
 
-            #include <Python.h>
             typedef struct {
                 PyObject_HEAD
                 int magic;
@@ -152,7 +154,8 @@ class TestCPythonCompatibility(HPyTest):
                 .name = "mytest.MyType",
                 .basicsize = sizeof(MyHPyType),
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_GC,
-                .defines = MyType_defines
+                .defines = MyType_defines,
+                .legacy = true,
             };
 
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
