@@ -282,11 +282,6 @@ been implemented yet:
     is to work on the "hard" features to prove that the HPy approach works, and
     we will port new functions as needed
 
-  - handles are intended to be short-lived, but sometimes one needs a
-    long-lived reference to a Python object. In HPy, we call this
-    long-lived reference an `HPyField`, but we still need to implement it.
-    We also need `HPy_Store` and `HPy_Load` to save and load these fields. This will allow alternative implementations to use a moving GC.
-
   - add C-level module state. Often an extension needs module state that is
     accessible from C (e.g. if a module implements a new type `ArrayType`,
     many of the module methods written in C may need access to `ArrayType`)

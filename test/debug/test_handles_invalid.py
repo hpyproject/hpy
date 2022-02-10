@@ -109,16 +109,18 @@ def test_keeping_and_reusing_argument_handle(compiler, hpy_debug_capture):
         HPyDef_METH(g, "g", g_impl, HPyFunc_NOARGS)
         static HPy g_impl(HPyContext *ctx, HPy self)
         {
-            return keep;
+            HPy_ssize_t len = HPy_Length(ctx, keep);
+            return HPyLong_FromSsize_t(ctx, len);
         }
 
         @EXPORT(f)
         @EXPORT(g)
         @INIT
     """)
-    mod.f("hello leaks!")
+    s = "hello leaks!"
+    mod.f(s)
     assert hpy_debug_capture.invalid_handles_count == 0
-    mod.g()
+    assert mod.g() == len(s)
     assert hpy_debug_capture.invalid_handles_count == 1
 
 

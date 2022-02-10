@@ -6,6 +6,7 @@ functions. In particular, you have to "import pytest" inside the test in order
 to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
+import pytest
 from .support import HPyTest, DefaultExtensionTemplate
 
 class PairTemplate(DefaultExtensionTemplate):
@@ -264,6 +265,7 @@ class TestHPyField(HPyTest):
         assert sys.getrefcount(a) == a_cnt - 1
         assert sys.getrefcount(b) == b_cnt - 1
 
+    @pytest.mark.syncgc
     def test_automatic_tp_clear(self):
         if not self.supports_refcounts():
             import pytest
