@@ -160,7 +160,7 @@ class autogen_debug_ctx_call_i(AutoGenFile):
                 w(f'        a->result = f({args});')
             #
             for pname in dhpys:
-                w(f'        DHPy_close(dctx, dh_{pname});')
+                w(f'        DHPy_close_and_check(dctx, dh_{pname});')
             #
             if c_ret_type == 'HPy':
                 w(f'        a->result = _dh2py(dctx, dh_result);')
