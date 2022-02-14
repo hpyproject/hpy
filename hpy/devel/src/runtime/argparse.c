@@ -421,6 +421,12 @@ parse_tuple_items(HPyContext *ctx,
     HPy current_arg;
     HPy_ssize_t tuple_length = HPy_Length(ctx, tuple);
     for (HPy_ssize_t i = 0; i < tuple_length && fmt != fmt_end; i++) {
+        if (*(*fmt) == 'O' && ht == NULL) {
+            set_error(ctx, ctx->h_SystemError, err_fmt,
+                "parsing tuples cannot be used unless"
+                " an HPyTracker is provided. Please supply an HPyTracker.");
+            return 0;
+        }
         current_arg = HPy_GetItem_i(ctx, tuple, i);
         switch (*(*fmt)) {
             case ')': {
@@ -444,13 +450,15 @@ parse_tuple_items(HPyContext *ctx,
             }
             
             default: {
-                if (!parse_item(ctx, ht, current_arg, 0, fmt, vl, err_fmt)) {
+                if (!parse_item(ctx, ht, current_arg, 1, fmt, vl, err_fmt)) {
                     HPy_Close(ctx, current_arg);
                     return 0;
                 }
             }
         }
-        HPy_Close(ctx, current_arg);
+        if (*(*fmt) != 'O') {
+            HPy_Close(ctx, current_arg);
+        }
     }
 
     if (*(*fmt) == ')') {
@@ -460,7 +468,6 @@ parse_tuple_items(HPyContext *ctx,
         HPy_FatalError(ctx, "missing ')' in getargs format");
         return 0;
     }
-
 }
 
 /**
@@ -558,7 +565,7 @@ HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, HPy *args, HPy_ssize_t nargs, cons
         if (!HPy_IsNull(current_arg) || optional) {
             if (*fmt1 == '(') {
                 fmt1++;
-                if (!parse_tuple_items(ctx, ht, current_arg, 0, &fmt1, &fmt_end, &vl, err_fmt)) {
+                if (!parse_tuple_items(ctx, ht, current_arg, 1, &fmt1, &fmt_end, &vl, err_fmt)) {
                     goto error;
                 }
             } else {
