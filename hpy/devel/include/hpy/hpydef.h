@@ -121,8 +121,7 @@ typedef struct {
 // this is the actual implementation, after we determined the SIG
 #define _HPyDef_SLOT(SYM, IMPL, SLOT, SIG)                              \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
-    static const HPyCFunction IMPL##_func = (HPyCFunction)IMPL;         \
-    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL##_func, SIG);             \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);             \
     HPyDef SYM = {                                                      \
         .kind = HPyDef_Kind_Slot,                                       \
         .slot = {                                                       \
@@ -135,8 +134,7 @@ typedef struct {
 
 #define HPyDef_METH(SYM, NAME, IMPL, SIG, ...)                          \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
-    static const HPyCFunction IMPL##_func = (HPyCFunction)IMPL;         \
-    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL##_func, SIG);             \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);             \
     HPyDef SYM = {                                                      \
         .kind = HPyDef_Kind_Meth,                                       \
         .meth = {                                                       \
@@ -161,8 +159,7 @@ typedef struct {
 
 #define HPyDef_GET(SYM, NAME, GETIMPL, ...)                                     \
     HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                                   \
-    static const HPyCFunction GETIMPL##_getter = (HPyCFunction)GETIMPL;         \
-    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL##_getter, HPyFunc_GETTER); \
+    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER); \
     HPyDef SYM = {                                                              \
         .kind = HPyDef_Kind_GetSet,                                             \
         .getset = {                                                             \
@@ -175,8 +172,7 @@ typedef struct {
 
 #define HPyDef_SET(SYM, NAME, SETIMPL, ...)                                     \
     HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                                   \
-    static const HPyCFunction SETIMPL##_setter = (HPyCFunction)SETIMPL;         \
-    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL##_setter, HPyFunc_SETTER); \
+    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER); \
     HPyDef SYM = {                                                              \
         .kind = HPyDef_Kind_GetSet,                                             \
         .getset = {                                                             \
@@ -189,11 +185,9 @@ typedef struct {
 
 #define HPyDef_GETSET(SYM, NAME, GETIMPL, SETIMPL, ...)                         \
     HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                                   \
-    static const HPyCFunction GETIMPL##_getter = (HPyCFunction)GETIMPL;         \
-    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL##_getter, HPyFunc_GETTER); \
+    HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER); \
     HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                                   \
-    static const HPyCFunction SETIMPL##_setter = (HPyCFunction)SETIMPL;         \
-    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL##_setter, HPyFunc_SETTER); \
+    HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER); \
     HPyDef SYM = {                                                              \
         .kind = HPyDef_Kind_GetSet,                                             \
         .getset = {                                                             \

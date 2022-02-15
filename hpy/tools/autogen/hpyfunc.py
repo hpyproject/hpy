@@ -83,7 +83,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             w(f'    {{ \\')
             w(f'        _HPyFunc_args_{NAME} a = {{ {arg_names} }}; \\')
             w(f'        _HPy_CallRealFunctionFromTrampoline( \\')
-            w(f'           _ctx_for_trampolines, HPyFunc_{NAME}, IMPL, &a); \\')
+            w(f'           _ctx_for_trampolines, HPyFunc_{NAME}, (HPyCFunction)IMPL, &a); \\')
             if toC(tramp_node.type) == 'void':
                 w(f'        return; \\')
             else:
