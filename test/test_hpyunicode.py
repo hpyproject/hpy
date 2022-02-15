@@ -68,6 +68,20 @@ class TestUnicode(HPyTest):
         assert type(b) is bytes
         assert b == s.encode('utf-8')
 
+    def test_AsASCIIString(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPyUnicode_AsASCIIString(ctx, arg);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        s = 'world'
+        b = mod.f(s)
+        assert type(b) is bytes
+        assert b == s.encode('ascii')
 
     def test_AsUTF8AndSize(self):
         mod = self.make_module("""
@@ -87,6 +101,44 @@ class TestUnicode(HPyTest):
         assert mod.f('ABC') == 100*ord('A') + 10*ord('B') + ord('C')
         assert mod.f(b'A\0C'.decode('utf-8')) == 100*ord('A') + ord('C')
 
+    def test_DecodeLatin1(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                const char* buf = HPyBytes_AS_STRING(ctx, arg);
+                HPy_ssize_t n = HPyBytes_Size(ctx, arg);
+                return HPyUnicode_DecodeLatin1(ctx, buf, n, "");
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(b'M\xfcller') == "Müller"
+
+    def test_ReadChar(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                long c = HPyUnicode_ReadChar(ctx, arg, 1);
+                return HPyLong_FromLong(ctx, c);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f('ABC') == 66
+
+    def test_EncodeFSDefault(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPyUnicode_EncodeFSDefault(ctx, arg);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f('ABC') == b'ABC'
 
     def test_DecodeFSDefault(self):
         mod = self.make_module("""
