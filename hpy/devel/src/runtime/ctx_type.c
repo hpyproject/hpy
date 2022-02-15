@@ -462,6 +462,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
 
 // XXX: This is a hack to work-around the missing Py_bf_getbuffer and
 // Py_bf_releasebuffer before 3.9. We shouldn't use it on 3.9+.
+typedef int (*HPyGetBufferProc)(struct _object *, struct bufferinfo *, int);
+typedef void (*HPyReleaseBufferProc)(struct _object *, struct bufferinfo *);
 static PyBufferProcs*
 create_buffer_procs(HPyType_Spec *hpyspec)
 {
@@ -480,7 +482,7 @@ create_buffer_procs(HPyType_Spec *hpyspec)
                             return NULL;
                         }
                     }
-                    buffer_procs->bf_getbuffer = src->slot.cpy_trampoline;
+                    buffer_procs->bf_getbuffer = (HPyGetBufferProc)src->slot.cpy_trampoline;
                     break;
                 case HPy_bf_releasebuffer:
                     if (buffer_procs == NULL) {
@@ -490,7 +492,7 @@ create_buffer_procs(HPyType_Spec *hpyspec)
                             return NULL;
                         }
                     }
-                    buffer_procs->bf_releasebuffer = src->slot.cpy_trampoline;
+                    buffer_procs->bf_releasebuffer = (HPyReleaseBufferProc)src->slot.cpy_trampoline;
                     break;
                 default:
                     break;

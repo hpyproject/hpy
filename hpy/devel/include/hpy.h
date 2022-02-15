@@ -1,5 +1,8 @@
 #ifndef HPy_H
 #define HPy_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef HPY_UNIVERSAL_ABI
 /*  It would be nice if we could include hpy.h WITHOUT bringing in all the
@@ -156,4 +159,7 @@ typedef struct _HPyContext_s HPyContext;
 
 #include "hpy/inline_helpers.h"
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* HPy_H */

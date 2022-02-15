@@ -4,12 +4,12 @@ typedef int HPyContext;
 typedef int HPyModuleDef;
 typedef int HPyType_Spec;
 typedef int HPyType_SpecParam;
-typedef int HPyCFunction;
 typedef int HPy_ssize_t;
 typedef int HPy_hash_t;
 typedef int wchar_t;
 typedef int size_t;
 typedef int HPyFunc_Signature;
+typedef int HPyCFunction;
 typedef int cpy_PyObject;
 typedef int HPyField;
 typedef int HPyListBuilder;
@@ -281,9 +281,8 @@ cpy_PyObject *HPy_AsPyObject(HPyContext *ctx, HPy h);
 /* internal helpers which need to be exposed to modules for practical reasons :( */
 void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
                                          HPyFunc_Signature sig,
-                                         void *func,
+                                         HPyCFunction func,
                                          void *args);
-
 
 /* Builders */
 

@@ -107,7 +107,7 @@ typedef struct {
     static cpy_PyObject *                                               \
     SYM(cpy_PyObject *self, cpy_PyObject *obj, int op)                  \
     {                                                                   \
-        _HPyFunc_args_RICHCMPFUNC a = { self, obj, op };                \
+        _HPyFunc_args_RICHCMPFUNC a = { self, obj, (HPy_RichCmpOp)op };                \
         _HPy_CallRealFunctionFromTrampoline(                            \
            _ctx_for_trampolines, HPyFunc_RICHCMPFUNC, IMPL, &a);        \
         return a.result;                                                \
