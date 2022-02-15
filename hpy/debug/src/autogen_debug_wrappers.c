@@ -537,6 +537,11 @@ int debug_ctx_Unicode_Check(HPyContext *dctx, DHPy h)
     return HPyUnicode_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
+DHPy debug_ctx_Unicode_AsASCIIString(HPyContext *dctx, DHPy h)
+{
+    return DHPy_open(dctx, HPyUnicode_AsASCIIString(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
+}
+
 DHPy debug_ctx_Unicode_AsUTF8String(HPyContext *dctx, DHPy h)
 {
     return DHPy_open(dctx, HPyUnicode_AsUTF8String(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
@@ -555,6 +560,21 @@ DHPy debug_ctx_Unicode_DecodeFSDefault(HPyContext *dctx, const char *v)
 DHPy debug_ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *dctx, const char *v, HPy_ssize_t size)
 {
     return DHPy_open(dctx, HPyUnicode_DecodeFSDefaultAndSize(get_info(dctx)->uctx, v, size));
+}
+
+DHPy debug_ctx_Unicode_EncodeFSDefault(HPyContext *dctx, DHPy h)
+{
+    return DHPy_open(dctx, HPyUnicode_EncodeFSDefault(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
+}
+
+uint32_t debug_ctx_Unicode_ReadChar(HPyContext *dctx, DHPy h, HPy_ssize_t index)
+{
+    return HPyUnicode_ReadChar(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), index);
+}
+
+DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors)
+{
+    return DHPy_open(dctx, HPyUnicode_DecodeLatin1(get_info(dctx)->uctx, s, size, errors));
 }
 
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
