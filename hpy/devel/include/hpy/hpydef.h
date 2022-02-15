@@ -127,7 +127,7 @@ typedef struct {
         .kind = HPyDef_Kind_Slot,                                       \
         .slot = {                                                       \
             .slot = SLOT,                                               \
-            .impl = IMPL##_func,                                        \
+            .impl = (HPyCFunction)IMPL,                                 \
             .cpy_trampoline = (cpy_PyCFunction)SYM##_trampoline         \
         }                                                               \
     };
@@ -141,7 +141,7 @@ typedef struct {
         .kind = HPyDef_Kind_Meth,                                       \
         .meth = {                                                       \
             .name = NAME,                                               \
-            .impl = IMPL##_func,                                        \
+            .impl = (HPyCFunction)IMPL,                                 \
             .cpy_trampoline = (cpy_PyCFunction)SYM##_trampoline,        \
             .signature = SIG,                                           \
             __VA_ARGS__                                                 \
@@ -167,7 +167,7 @@ typedef struct {
         .kind = HPyDef_Kind_GetSet,                                             \
         .getset = {                                                             \
             .name = NAME,                                                       \
-            .getter_impl = GETIMPL##_getter,                                    \
+            .getter_impl = (HPyCFunction)GETIMPL,                               \
             .getter_cpy_trampoline = (cpy_getter)SYM##_get_trampoline,          \
             __VA_ARGS__                                                         \
         }                                                                       \
@@ -181,7 +181,7 @@ typedef struct {
         .kind = HPyDef_Kind_GetSet,                                             \
         .getset = {                                                             \
             .name = NAME,                                                       \
-            .setter_impl = SETIMPL##_setter,                                    \
+            .setter_impl = (HPyCFunction)SETIMPL,                               \
             .setter_cpy_trampoline = (cpy_setter)SYM##_set_trampoline,          \
             __VA_ARGS__                                                         \
         }                                                                       \
@@ -198,8 +198,8 @@ typedef struct {
         .kind = HPyDef_Kind_GetSet,                                             \
         .getset = {                                                             \
             .name = NAME,                                                       \
-            .getter_impl = GETIMPL##_getter,                                    \
-            .setter_impl = SETIMPL##_setter,                                    \
+            .getter_impl = (HPyCFunction)GETIMPL,                               \
+            .setter_impl = (HPyCFunction)SETIMPL,                               \
             .getter_cpy_trampoline = (cpy_getter)SYM##_get_trampoline,          \
             .setter_cpy_trampoline = (cpy_setter)SYM##_set_trampoline,          \
             __VA_ARGS__                                                         \
