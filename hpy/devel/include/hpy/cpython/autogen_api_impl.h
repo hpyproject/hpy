@@ -534,6 +534,11 @@ HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssiz
     return _py2h(PyUnicode_DecodeLatin1(s, size, errors));
 }
 
+HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors)
+{
+    return _py2h(PyUnicode_FromEncodedObject(_h2py(obj), encoding, errors));
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h)
 {
     return PyList_Check(_h2py(h));

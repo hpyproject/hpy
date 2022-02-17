@@ -490,6 +490,10 @@ HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssiz
      return ctx->ctx_Unicode_DecodeLatin1 ( ctx, s, size, errors ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors) {
+     return ctx->ctx_Unicode_FromEncodedObject ( ctx, obj, encoding, errors ); 
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_List_Check ( ctx, h ); 
 }

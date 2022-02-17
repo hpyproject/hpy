@@ -132,6 +132,7 @@ DHPy debug_ctx_Unicode_EncodeFSDefault(HPyContext *dctx, DHPy h);
 HPy_UCS4 debug_ctx_Unicode_ReadChar(HPyContext *dctx, DHPy h, HPy_ssize_t index);
 DHPy debug_ctx_Unicode_DecodeASCII(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors);
 DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors);
+DHPy debug_ctx_Unicode_FromEncodedObject(HPyContext *dctx, DHPy obj, const char *encoding, const char *errors);
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_List_New(HPyContext *dctx, HPy_ssize_t len);
 int debug_ctx_List_Append(HPyContext *dctx, DHPy h_list, DHPy h_item);
@@ -362,6 +363,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Unicode_ReadChar = &debug_ctx_Unicode_ReadChar;
     dctx->ctx_Unicode_DecodeASCII = &debug_ctx_Unicode_DecodeASCII;
     dctx->ctx_Unicode_DecodeLatin1 = &debug_ctx_Unicode_DecodeLatin1;
+    dctx->ctx_Unicode_FromEncodedObject = &debug_ctx_Unicode_FromEncodedObject;
     dctx->ctx_List_Check = &debug_ctx_List_Check;
     dctx->ctx_List_New = &debug_ctx_List_New;
     dctx->ctx_List_Append = &debug_ctx_List_Append;

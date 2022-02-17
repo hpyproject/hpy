@@ -602,6 +602,11 @@ DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *s, HPy_ssize_t
     return DHPy_open(dctx, HPyUnicode_DecodeLatin1(get_info(dctx)->uctx, s, size, errors));
 }
 
+DHPy debug_ctx_Unicode_FromEncodedObject(HPyContext *dctx, DHPy obj, const char *encoding, const char *errors)
+{
+    return DHPy_open(dctx, HPyUnicode_FromEncodedObject(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), encoding, errors));
+}
+
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
 {
     return HPyList_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
