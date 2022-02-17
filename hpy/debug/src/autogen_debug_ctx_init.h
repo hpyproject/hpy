@@ -156,6 +156,8 @@ void debug_ctx_Field_Store(HPyContext *dctx, DHPy target_object, HPyField *targe
 DHPy debug_ctx_Field_Load(HPyContext *dctx, DHPy source_object, HPyField source_field);
 HPyThreadState debug_ctx_LeavePythonExecution(HPyContext *dctx);
 void debug_ctx_ReenterPythonExecution(HPyContext *dctx, HPyThreadState state);
+void debug_ctx_Global_Store(HPyContext *dctx, HPyGlobal *global, DHPy h);
+DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
@@ -383,5 +385,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Field_Load = &debug_ctx_Field_Load;
     dctx->ctx_LeavePythonExecution = &debug_ctx_LeavePythonExecution;
     dctx->ctx_ReenterPythonExecution = &debug_ctx_ReenterPythonExecution;
+    dctx->ctx_Global_Store = &debug_ctx_Global_Store;
+    dctx->ctx_Global_Load = &debug_ctx_Global_Load;
     dctx->ctx_Dump = &debug_ctx_Dump;
 }

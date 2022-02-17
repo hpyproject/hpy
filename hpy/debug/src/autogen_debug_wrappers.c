@@ -692,6 +692,16 @@ void debug_ctx_ReenterPythonExecution(HPyContext *dctx, HPyThreadState state)
     HPy_ReenterPythonExecution(get_info(dctx)->uctx, state);
 }
 
+void debug_ctx_Global_Store(HPyContext *dctx, HPyGlobal *global, DHPy h)
+{
+    HPyGlobal_Store(get_info(dctx)->uctx, global, DHPy_unwrap(dctx, h));
+}
+
+DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global)
+{
+    return DHPy_open(dctx, HPyGlobal_Load(get_info(dctx)->uctx, global));
+}
+
 void debug_ctx_Dump(HPyContext *dctx, DHPy h)
 {
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

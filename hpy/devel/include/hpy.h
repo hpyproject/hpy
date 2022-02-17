@@ -109,6 +109,7 @@ extern "C" {
  */
 typedef struct _HPy_s { intptr_t _i; } HPy;
 typedef struct { intptr_t _i; } HPyField;
+typedef struct { intptr_t _i; } HPyGlobal;
 typedef struct { intptr_t _lst; } HPyListBuilder;
 typedef struct { intptr_t _tup; } HPyTupleBuilder;
 typedef struct { intptr_t _i; } HPyTracker;
@@ -121,6 +122,7 @@ typedef struct { intptr_t _i; } HPyThreadState;
 #define HPy_IsNull(h) ((h)._i == 0)
 
 #define HPyField_NULL _hfconv(0)
+#define HPyGlobal_INIT ((HPyGlobal){0})
 #define HPyField_IsNull(f) ((f)._i == 0)
 
 /* Convenience functions to cast between HPy and void*.  We need to decide

@@ -50,6 +50,24 @@ ctx_Field_Load(HPyContext *ctx, HPy source_object, HPyField source_field)
     return _py2h(obj);
 }
 
+
+HPyAPI_IMPL void
+ctx_Global_Store(HPyContext *ctx, HPyGlobal *global, HPy h)
+{
+    PyObject *obj = _h2py(h);
+    Py_XDECREF(_hg2py(*global));
+    Py_XINCREF(obj);
+    *global = _py2hg(obj);
+}
+
+HPyAPI_IMPL HPy
+ctx_Global_Load(HPyContext *ctx, HPyGlobal global)
+{
+    PyObject *obj = _hg2py(global);
+    Py_INCREF(obj);
+    return _py2h(obj);
+}
+
 HPyAPI_IMPL void
 ctx_FatalError(HPyContext *ctx, const char *message)
 {

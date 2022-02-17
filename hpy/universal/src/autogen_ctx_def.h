@@ -161,5 +161,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Field_Load = &ctx_Field_Load,
     .ctx_LeavePythonExecution = &ctx_LeavePythonExecution,
     .ctx_ReenterPythonExecution = &ctx_ReenterPythonExecution,
+    .ctx_Global_Store = &ctx_Global_Store,
+    .ctx_Global_Load = &ctx_Global_Load,
     .ctx_Dump = &ctx_Dump,
 };
