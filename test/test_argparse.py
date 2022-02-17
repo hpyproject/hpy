@@ -378,8 +378,48 @@ class TestArgParse(HPyTest):
         with pytest.raises(TypeError) as exc:
             assert mod.f(4, (5, (6,), 7, 42), 8) == 45678
 
+    def test_supplying_hpy_tracker_nested_tuple_O(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy a, b, result;
+                HPyTracker ht;
+                if (!HPyArg_Parse(ctx, &ht, args, nargs, "(OO)", &a, &b))
+                    return HPy_NULL;
+                result = HPy_Add(ctx, a, b);
+                HPyTracker_Close(ctx, ht);
+                return result;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f((21, 21)) == 42
+
+    def test_error_hpy_without_tracker_nested_tuple_O(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              HPy *args, HPy_ssize_t nargs)
+            {
+                HPy a, b, result;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "(OO)", &a, &b))
+                    return HPy_NULL;
+                result = HPy_Add(ctx, a, b);
+                return result;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        with pytest.raises(SystemError) as exc:
+            mod.f(("a", "b"))
+        assert str(exc.value).endswith("Please supply an HPyTracker.")
+
     def test_parse_nested_tuple_format_error(self, python_subprocess, fatal_exit_code):
-        mod = self.compile_module("""
+        import pytest
+        mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
@@ -392,20 +432,16 @@ class TestArgParse(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        if not SUPPORTS_SYS_EXECUTABLE:
-            return
-        result = python_subprocess.run(mod, "mod.f((42,))")
-        assert result.returncode == fatal_exit_code
-        assert result.stdout == b""
-        stderr_msg = result.stderr.splitlines()[0]
-        assert stderr_msg.startswith(b"Fatal Python error: ")
-        assert stderr_msg.endswith(b": missing ')' in getargs format")
+        with pytest.raises(SystemError) as exc:
+            mod.f((42,))
+        assert str(exc.value).endswith("missing ')' in getargs format")
 
     def test_parse_max_nested_tuple_arguments(self, python_subprocess, fatal_exit_code):
+        import pytest
         vars = ', '.join(['v%d' % i for i in range(32)])
         arguments = ', '.join(['&v%d' % i for i in range(32)])
         format = '(l' * 32 + ')' * 32
-        mod = self.compile_module("""
+        mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
@@ -419,14 +455,12 @@ class TestArgParse(HPyTest):
             @EXPORT(f)
             @INIT
         """.format(vars=vars, f=format, arguments=arguments))
-        if not SUPPORTS_SYS_EXECUTABLE:
-            return
-        result = python_subprocess.run(mod, "args = (0, );\nfor i in range(32):\n  args = (i, args);\nmod.f(args)")
-        assert result.returncode == fatal_exit_code
-        assert result.stdout == b""
-        stderr_msg = result.stderr.splitlines()[0]
-        assert stderr_msg.startswith(b"Fatal Python error: ")
-        assert stderr_msg.endswith(b": too many tuple nesting levels in argument format string")
+        with pytest.raises(SystemError) as exc:
+            args = (0, )
+            for i in range(32):
+                args = (i, args)
+            mod.f(args)
+        assert str(exc.value).endswith("too many tuple nesting levels in argument format string")
 
     def test_many_handle_arguments(self):
         mod = self.make_module("""

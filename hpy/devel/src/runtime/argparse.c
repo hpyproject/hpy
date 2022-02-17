@@ -423,8 +423,8 @@ parse_tuple_items(HPyContext *ctx,
     for (HPy_ssize_t i = 0; i < tuple_length && fmt != fmt_end; i++) {
         if (*(*fmt) == 'O' && ht == NULL) {
             set_error(ctx, ctx->h_SystemError, err_fmt,
-                "parsing tuples cannot be used unless"
-                " an HPyTracker is provided. Please supply an HPyTracker.");
+                "parsing tuples cannot be used unless an HPyTracker is provided. "
+                "Please supply an HPyTracker.");
             return 0;
         }
         current_arg = HPy_GetItem_i(ctx, tuple, i);
@@ -437,7 +437,8 @@ parse_tuple_items(HPyContext *ctx,
 
             case '(': {
                 if (tuple_nested_level >= 30) { // same limit as CPython
-                    HPy_FatalError(ctx, "too many tuple nesting levels in argument format string");
+                    set_error(ctx, ctx->h_SystemError, err_fmt, 
+                        "too many tuple nesting levels in argument format string");
                     HPy_Close(ctx, current_arg);
                     return 0;
                 }
@@ -456,16 +457,14 @@ parse_tuple_items(HPyContext *ctx,
                 }
             }
         }
-        if (*(*fmt) != 'O') {
-            HPy_Close(ctx, current_arg);
-        }
+        HPy_Close(ctx, current_arg);
     }
 
     if (*(*fmt) == ')') {
         (*fmt)++;
         return 1;
     } else {
-        HPy_FatalError(ctx, "missing ')' in getargs format");
+        set_error(ctx, ctx->h_SystemError, err_fmt, "missing ')' in getargs format");
         return 0;
     }
 }
