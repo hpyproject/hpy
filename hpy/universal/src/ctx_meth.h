@@ -3,4 +3,4 @@
 
 HPyAPI_IMPL void
 ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
-                                   void *func, void *args);
+                                   void* (*func)(), void *args);

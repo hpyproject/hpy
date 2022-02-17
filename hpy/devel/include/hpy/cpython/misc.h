@@ -3,12 +3,12 @@
 
 // XXX: turn these into static inline functions
 #define _h2py(h) ((PyObject*)h._i)
-#define _py2h(o) ((HPy){(intptr_t)o})
+#define _py2h(o) _hconv((intptr_t)o)
 
 static inline HPyField _py2hf(PyObject *obj)
 {
     HPy h = _py2h(obj);
-    return (HPyField){ ._i = h._i };
+    return _hfconv( ._i = h._i );
 }
 
 static inline PyObject * _hf2py(HPyField hf)

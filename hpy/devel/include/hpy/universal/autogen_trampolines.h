@@ -494,7 +494,7 @@ HPyAPI_FUNC cpy_PyObject *HPy_AsPyObject(HPyContext *ctx, HPy h) {
      return ctx->ctx_AsPyObject ( ctx, h ); 
 }
 
-HPyAPI_FUNC void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig, void *func, void *args) {
+HPyAPI_FUNC void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig, HPyCFunction func, void *args) {
      ctx->ctx_CallRealFunctionFromTrampoline ( ctx, sig, func, args ); 
 }
 

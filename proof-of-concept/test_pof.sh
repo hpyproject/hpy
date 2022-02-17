@@ -71,6 +71,8 @@ clean() {
     # remove files written by build_ext --inplace
     _myrm ${ROOT}/proof-of-concept/pof*{.so,.py}
     _myrm ${ROOT}/proof-of-concept/pofpackage/foo*{.so,.py}
+    _myrm ${ROOT}/proof-of-concept/pofcpp*{.so,.py}
+    _myrm ${ROOT}/proof-of-concept/pofpackage/bar*{.so,.py}
     echo
 }
 

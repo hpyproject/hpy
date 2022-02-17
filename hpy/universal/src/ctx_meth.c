@@ -35,7 +35,7 @@ static void _buffer_py2h(HPyContext *ctx, const Py_buffer *src, HPy_buffer *dest
 
 HPyAPI_IMPL void
 ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
-                                   void *func, void *args)
+                                   void* (*func)(), void *args)
 {
     switch (sig) {
     case HPyFunc_NOARGS: {
