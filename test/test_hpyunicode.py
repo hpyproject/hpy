@@ -83,6 +83,21 @@ class TestUnicode(HPyTest):
         assert type(b) is bytes
         assert b == s.encode('ascii')
 
+    def test_AsLatin1String(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPyUnicode_AsLatin1String(ctx, arg);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        s = "Müller"
+        b = mod.f(s)
+        assert type(b) is bytes
+        assert b == s.encode('latin1')
+
     def test_AsUTF8AndSize(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_O)
@@ -114,6 +129,20 @@ class TestUnicode(HPyTest):
             @INIT
         """)
         assert mod.f(b'M\xfcller') == "Müller"
+
+    def test_DecodeASCII(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                const char* buf = HPyBytes_AS_STRING(ctx, arg);
+                HPy_ssize_t n = HPyBytes_Size(ctx, arg);
+                return HPyUnicode_DecodeASCII(ctx, buf, n, "");
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(b'hello') == "hello"
 
     def test_ReadChar(self):
         mod = self.make_module("""

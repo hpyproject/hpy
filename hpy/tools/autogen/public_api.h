@@ -18,7 +18,7 @@ typedef int HPyTracker;
 typedef int HPy_RichCmpOp;
 typedef int HPy_buffer;
 typedef int HPyFunc_visitproc;
-typedef int uint32_t;
+typedef int HPy_UCS4;
 
 /* HPy public API */
 
@@ -253,13 +253,15 @@ HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len);
 HPy HPyUnicode_FromString(HPyContext *ctx, const char *utf8);
 int HPyUnicode_Check(HPyContext *ctx, HPy h);
 HPy HPyUnicode_AsASCIIString(HPyContext *ctx, HPy h);
+HPy HPyUnicode_AsLatin1String(HPyContext *ctx, HPy h);
 HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h);
 const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
 HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char* v);
 HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char* v, HPy_ssize_t size);
 HPy HPyUnicode_EncodeFSDefault(HPyContext *ctx, HPy h);
-uint32_t HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index);
+HPy_UCS4 HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index);
+HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
 
 /* listobject.h */

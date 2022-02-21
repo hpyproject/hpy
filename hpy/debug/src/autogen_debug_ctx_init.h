@@ -119,13 +119,15 @@ DHPy debug_ctx_Bytes_FromStringAndSize(HPyContext *dctx, const char *v, HPy_ssiz
 DHPy debug_ctx_Unicode_FromString(HPyContext *dctx, const char *utf8);
 int debug_ctx_Unicode_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Unicode_AsASCIIString(HPyContext *dctx, DHPy h);
+DHPy debug_ctx_Unicode_AsLatin1String(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Unicode_AsUTF8String(HPyContext *dctx, DHPy h);
 const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_t *size);
 DHPy debug_ctx_Unicode_FromWideChar(HPyContext *dctx, const wchar_t *w, HPy_ssize_t size);
 DHPy debug_ctx_Unicode_DecodeFSDefault(HPyContext *dctx, const char *v);
 DHPy debug_ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *dctx, const char *v, HPy_ssize_t size);
 DHPy debug_ctx_Unicode_EncodeFSDefault(HPyContext *dctx, DHPy h);
-uint32_t debug_ctx_Unicode_ReadChar(HPyContext *dctx, DHPy h, HPy_ssize_t index);
+HPy_UCS4 debug_ctx_Unicode_ReadChar(HPyContext *dctx, DHPy h, HPy_ssize_t index);
+DHPy debug_ctx_Unicode_DecodeASCII(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors);
 DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors);
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_List_New(HPyContext *dctx, HPy_ssize_t len);
@@ -342,6 +344,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Unicode_FromString = &debug_ctx_Unicode_FromString;
     dctx->ctx_Unicode_Check = &debug_ctx_Unicode_Check;
     dctx->ctx_Unicode_AsASCIIString = &debug_ctx_Unicode_AsASCIIString;
+    dctx->ctx_Unicode_AsLatin1String = &debug_ctx_Unicode_AsLatin1String;
     dctx->ctx_Unicode_AsUTF8String = &debug_ctx_Unicode_AsUTF8String;
     dctx->ctx_Unicode_AsUTF8AndSize = &debug_ctx_Unicode_AsUTF8AndSize;
     dctx->ctx_Unicode_FromWideChar = &debug_ctx_Unicode_FromWideChar;
@@ -349,6 +352,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Unicode_DecodeFSDefaultAndSize = &debug_ctx_Unicode_DecodeFSDefaultAndSize;
     dctx->ctx_Unicode_EncodeFSDefault = &debug_ctx_Unicode_EncodeFSDefault;
     dctx->ctx_Unicode_ReadChar = &debug_ctx_Unicode_ReadChar;
+    dctx->ctx_Unicode_DecodeASCII = &debug_ctx_Unicode_DecodeASCII;
     dctx->ctx_Unicode_DecodeLatin1 = &debug_ctx_Unicode_DecodeLatin1;
     dctx->ctx_List_Check = &debug_ctx_List_Check;
     dctx->ctx_List_New = &debug_ctx_List_New;
