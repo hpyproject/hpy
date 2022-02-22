@@ -92,6 +92,16 @@ HPy_ssize_t debug_ctx_Long_AsSsize_t(HPyContext *dctx, DHPy h)
     return HPyLong_AsSsize_t(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
+void *debug_ctx_Long_AsVoidPtr(HPyContext *dctx, DHPy h)
+{
+    return HPyLong_AsVoidPtr(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+double debug_ctx_Long_AsDouble(HPyContext *dctx, DHPy h)
+{
+    return HPyLong_AsDouble(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
 DHPy debug_ctx_Float_FromDouble(HPyContext *dctx, double v)
 {
     return DHPy_open(dctx, HPyFloat_FromDouble(get_info(dctx)->uctx, v));
@@ -355,6 +365,11 @@ DHPy debug_ctx_Err_NewExceptionWithDoc(HPyContext *dctx, const char *name, const
 int debug_ctx_Err_WarnEx(HPyContext *dctx, DHPy category, const char *message, HPy_ssize_t stack_level)
 {
     return HPyErr_WarnEx(get_info(dctx)->uctx, DHPy_unwrap(dctx, category), message, stack_level);
+}
+
+void debug_ctx_Err_WriteUnraisable(HPyContext *dctx, DHPy obj)
+{
+    HPyErr_WriteUnraisable(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj));
 }
 
 int debug_ctx_IsTrue(HPyContext *dctx, DHPy h)
