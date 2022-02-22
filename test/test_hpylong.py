@@ -296,3 +296,39 @@ class TestLong(HPyTest):
             mod.f(self.magic_int(2))
         with pytest.raises(TypeError):
             mod.f(self.magic_index(2))
+
+    def test_Long_AsVoidPtr(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "is_null", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy val)
+            {
+                void* ptr = HPyLong_AsVoidPtr(ctx, val);
+                if (!ptr) {
+                    return HPy_Dup(ctx, ctx->h_True);
+                } else {
+                    return HPy_Dup(ctx, ctx->h_False);
+                }
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.is_null(0) == True
+        assert mod.is_null(10) == False
+
+    def test_Long_AsDouble(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                double a = HPyLong_AsDouble(ctx, arg);
+                if (a == -1.0 && HPyErr_Occurred(ctx))
+                    return HPy_NULL;
+                return HPyFloat_FromDouble(ctx, a);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(45) == 45.0
+        with pytest.raises(TypeError):
+            mod.f("this is not a number")
