@@ -29,6 +29,10 @@ def make_void(func_node):
 def get_return_constant(func):
     return RETURN_CONSTANT.get(func.node.name)
 
+def maybe_make_void(func, node):
+    if RETURN_CONSTANT.get(func.node.name):
+        make_void(node)
+
 @attr.s
 class Function:
     _BASE_NAME = re.compile(r'^_?HPy_?')

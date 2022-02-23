@@ -1,9 +1,8 @@
 from copy import deepcopy
-import textwrap
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl, get_context_return_type, \
-    make_void, get_return_constant
+    maybe_make_void, make_void, get_return_constant
 from .hpyfunc import NO_CALL
 
 
@@ -27,8 +26,7 @@ def funcnode_with_new_name(node, name):
 
 def get_debug_wrapper_node(func):
     newnode = funcnode_with_new_name(func.node, 'debug_%s' % func.ctx_name())
-    if get_return_constant(func):
-        make_void(newnode)
+    maybe_make_void(func, newnode)
     # fix all the types
     visitor = HPy_2_DHPy_Visitor()
     visitor.visit(newnode)
