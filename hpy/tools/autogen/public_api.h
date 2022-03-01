@@ -227,8 +227,10 @@ int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
 
 HPy HPy_Type(HPyContext *ctx, HPy obj);
-// WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
+// WARNING: HPy_TypeCheck/HPyType_IsSubtype could be tweaked/removed in the future,
+// see issue #160
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
+int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
 
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 

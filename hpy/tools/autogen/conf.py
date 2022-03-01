@@ -107,6 +107,7 @@ SPECIAL_CASES = {
     '_HPy_Dump': None,
     'HPy_Type': 'PyObject_Type',
     'HPy_TypeCheck': None,
+    'HPyType_IsSubtype': None,
     'HPy_Is': None,
     'HPyBytes_FromStringAndSize': None,
     'HPy_LeavePythonExecution': 'PyEval_SaveThread',

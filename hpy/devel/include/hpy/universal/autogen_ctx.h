@@ -185,6 +185,7 @@ struct _HPyContext_s {
     int (*ctx_SetItem_s)(HPyContext *ctx, HPy obj, const char *key, HPy value);
     HPy (*ctx_Type)(HPyContext *ctx, HPy obj);
     int (*ctx_TypeCheck)(HPyContext *ctx, HPy obj, HPy type);
+    int (*ctx_Type_IsSubtype)(HPyContext *ctx, HPy sub, HPy type);
     int (*ctx_Is)(HPyContext *ctx, HPy obj, HPy other);
     void *(*ctx_AsStruct)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStructLegacy)(HPyContext *ctx, HPy h);

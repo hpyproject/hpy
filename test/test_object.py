@@ -540,15 +540,22 @@ class TestObject(HPyTest):
         assert mod.f('hello') is str
         assert mod.f(42) is int
 
-    def test_typecheck(self):
+    def test_typecheck_and_subtype(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy a, b;
-                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
+                int c, res;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOi", &a, &b, &c))
                     return HPy_NULL;
-                int res = HPy_TypeCheck(ctx, a, b);
+                if (c) {
+                    res = HPy_TypeCheck(ctx, a, b);
+                } else {
+                    HPy t = HPy_Type(ctx, a);
+                    res = HPyType_IsSubtype(ctx, t, b);
+                    HPy_Close(ctx, t);
+                }
                 return HPyBool_FromLong(ctx, res);
             }
             @EXPORT(f)
@@ -556,9 +563,10 @@ class TestObject(HPyTest):
         """)
         class MyStr(str):
             pass
-        assert mod.f('hello', str)
-        assert not mod.f('hello', int)
-        assert mod.f(MyStr('hello'), str)
+        for use_typecheck in [True, False]:
+            assert mod.f('hello', str, use_typecheck)
+            assert not mod.f('hello', int, use_typecheck)
+            assert mod.f(MyStr('hello'), str, use_typecheck)
 
     def test_is(self):
         mod = self.make_module("""
