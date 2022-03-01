@@ -199,11 +199,17 @@ struct _HPyContext_s {
     HPy (*ctx_Bytes_FromStringAndSize)(HPyContext *ctx, const char *v, HPy_ssize_t len);
     HPy (*ctx_Unicode_FromString)(HPyContext *ctx, const char *utf8);
     int (*ctx_Unicode_Check)(HPyContext *ctx, HPy h);
+    HPy (*ctx_Unicode_AsASCIIString)(HPyContext *ctx, HPy h);
+    HPy (*ctx_Unicode_AsLatin1String)(HPyContext *ctx, HPy h);
     HPy (*ctx_Unicode_AsUTF8String)(HPyContext *ctx, HPy h);
     const char *(*ctx_Unicode_AsUTF8AndSize)(HPyContext *ctx, HPy h, HPy_ssize_t *size);
     HPy (*ctx_Unicode_FromWideChar)(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
     HPy (*ctx_Unicode_DecodeFSDefault)(HPyContext *ctx, const char *v);
     HPy (*ctx_Unicode_DecodeFSDefaultAndSize)(HPyContext *ctx, const char *v, HPy_ssize_t size);
+    HPy (*ctx_Unicode_EncodeFSDefault)(HPyContext *ctx, HPy h);
+    HPy_UCS4 (*ctx_Unicode_ReadChar)(HPyContext *ctx, HPy h, HPy_ssize_t index);
+    HPy (*ctx_Unicode_DecodeASCII)(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
+    HPy (*ctx_Unicode_DecodeLatin1)(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
     int (*ctx_List_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_List_New)(HPyContext *ctx, HPy_ssize_t len);
     int (*ctx_List_Append)(HPyContext *ctx, HPy h_list, HPy h_item);

@@ -434,6 +434,14 @@ HPyAPI_FUNC int HPyUnicode_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_Unicode_Check ( ctx, h ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_AsASCIIString(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Unicode_AsASCIIString ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPy HPyUnicode_AsLatin1String(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Unicode_AsLatin1String ( ctx, h ); 
+}
+
 HPyAPI_FUNC HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h) {
      return ctx->ctx_Unicode_AsUTF8String ( ctx, h ); 
 }
@@ -452,6 +460,22 @@ HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char *v) {
 
 HPyAPI_FUNC HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char *v, HPy_ssize_t size) {
      return ctx->ctx_Unicode_DecodeFSDefaultAndSize ( ctx, v, size ); 
+}
+
+HPyAPI_FUNC HPy HPyUnicode_EncodeFSDefault(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Unicode_EncodeFSDefault ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPy_UCS4 HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index) {
+     return ctx->ctx_Unicode_ReadChar ( ctx, h, index ); 
+}
+
+HPyAPI_FUNC HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors) {
+     return ctx->ctx_Unicode_DecodeASCII ( ctx, s, size, errors ); 
+}
+
+HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors) {
+     return ctx->ctx_Unicode_DecodeLatin1 ( ctx, s, size, errors ); 
 }
 
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {

@@ -460,6 +460,16 @@ HPyAPI_IMPL int ctx_Unicode_Check(HPyContext *ctx, HPy h)
     return PyUnicode_Check(_h2py(h));
 }
 
+HPyAPI_IMPL HPy ctx_Unicode_AsASCIIString(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyUnicode_AsASCIIString(_h2py(h)));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_AsLatin1String(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyUnicode_AsLatin1String(_h2py(h)));
+}
+
 HPyAPI_IMPL HPy ctx_Unicode_AsUTF8String(HPyContext *ctx, HPy h)
 {
     return _py2h(PyUnicode_AsUTF8String(_h2py(h)));
@@ -483,6 +493,26 @@ HPyAPI_IMPL HPy ctx_Unicode_DecodeFSDefault(HPyContext *ctx, const char *v)
 HPyAPI_IMPL HPy ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char *v, HPy_ssize_t size)
 {
     return _py2h(PyUnicode_DecodeFSDefaultAndSize(v, size));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_EncodeFSDefault(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyUnicode_EncodeFSDefault(_h2py(h)));
+}
+
+HPyAPI_IMPL HPy_UCS4 ctx_Unicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index)
+{
+    return PyUnicode_ReadChar(_h2py(h), index);
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors)
+{
+    return _py2h(PyUnicode_DecodeASCII(s, size, errors));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors)
+{
+    return _py2h(PyUnicode_DecodeLatin1(s, size, errors));
 }
 
 HPyAPI_IMPL int ctx_List_Check(HPyContext *ctx, HPy h)

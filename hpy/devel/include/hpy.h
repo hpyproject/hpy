@@ -134,9 +134,11 @@ typedef struct _HPyContext_s HPyContext;
 #ifdef HPY_UNIVERSAL_ABI
     typedef intptr_t HPy_ssize_t;
     typedef intptr_t HPy_hash_t;
+    typedef uint32_t HPy_UCS4;
 #else
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;
+    typedef Py_UCS4 HPy_UCS4;
 #endif
 
 
