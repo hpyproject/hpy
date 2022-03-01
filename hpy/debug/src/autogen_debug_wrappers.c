@@ -317,9 +317,9 @@ DHPy debug_ctx_Err_SetFromErrnoWithFilename(HPyContext *dctx, DHPy h_type, const
     return DHPy_open(dctx, HPyErr_SetFromErrnoWithFilename(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type), filename_fsencoded));
 }
 
-DHPy debug_ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *dctx, DHPy h_type, DHPy filename1, DHPy filename2)
+void debug_ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *dctx, DHPy h_type, DHPy filename1, DHPy filename2)
 {
-    return DHPy_open(dctx, HPyErr_SetFromErrnoWithFilenameObjects(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type), DHPy_unwrap(dctx, filename1), DHPy_unwrap(dctx, filename2)));
+    HPyErr_SetFromErrnoWithFilenameObjects(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type), DHPy_unwrap(dctx, filename1), DHPy_unwrap(dctx, filename2));
 }
 
 int debug_ctx_Err_Occurred(HPyContext *dctx)
@@ -332,9 +332,9 @@ int debug_ctx_Err_ExceptionMatches(HPyContext *dctx, DHPy exc)
     return HPyErr_ExceptionMatches(get_info(dctx)->uctx, DHPy_unwrap(dctx, exc));
 }
 
-DHPy debug_ctx_Err_NoMemory(HPyContext *dctx)
+void debug_ctx_Err_NoMemory(HPyContext *dctx)
 {
-    return DHPy_open(dctx, HPyErr_NoMemory(get_info(dctx)->uctx));
+    HPyErr_NoMemory(get_info(dctx)->uctx);
 }
 
 void debug_ctx_Err_Clear(HPyContext *dctx)

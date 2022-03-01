@@ -1,9 +1,10 @@
 from copy import deepcopy
-import textwrap
 from pycparser import c_ast
 from .autogenfile import AutoGenFile
-from .parse import toC, find_typedecl
+from .parse import toC, find_typedecl, get_context_return_type, \
+    maybe_make_void, make_void, get_return_constant
 from .hpyfunc import NO_CALL
+
 
 class HPy_2_DHPy_Visitor(c_ast.NodeVisitor):
     "Visitor which renames all HPy types to DHPy"
@@ -25,6 +26,7 @@ def funcnode_with_new_name(node, name):
 
 def get_debug_wrapper_node(func):
     newnode = funcnode_with_new_name(func.node, 'debug_%s' % func.ctx_name())
+    maybe_make_void(func, newnode)
     # fix all the types
     visitor = HPy_2_DHPy_Visitor()
     visitor.visit(newnode)
@@ -88,8 +90,11 @@ class autogen_debug_wrappers(AutoGenFile):
         #
         assert not func.is_varargs()
         node = get_debug_wrapper_node(func)
+        const_return = get_return_constant(func)
+        if const_return:
+            make_void(node)
         signature = toC(node)
-        rettype = toC(node.type.type)
+        rettype = get_context_return_type(node, const_return)
         #
         def get_params():
             lst = []
