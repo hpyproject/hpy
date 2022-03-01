@@ -114,9 +114,12 @@ struct _HPyContext_s {
     HPy h_BoolType;
     HPy h_LongType;
     HPy h_FloatType;
+    HPy h_ComplexType;
     HPy h_UnicodeType;
+    HPy h_BytesType;
     HPy h_TupleType;
     HPy h_ListType;
+    HPy h_MemoryViewType;
 };
 
 /* XXX! should be defined only once, not once for every .c! */
@@ -204,9 +207,12 @@ HPyAPI_FUNC HPyContext * _HPyGetContext(void) {
         ctx->h_BoolType = _py2h((PyObject *)&PyBool_Type);
         ctx->h_LongType = _py2h((PyObject *)&PyLong_Type);
         ctx->h_FloatType = _py2h((PyObject *)&PyFloat_Type);
+        ctx->h_ComplexType = _py2h((PyObject *)&PyComplex_Type);
         ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
+        ctx->h_BytesType = _py2h((PyObject *)&PyBytes_Type);
         ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
         ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
+        ctx->h_MemoryViewType = _py2h((PyObject *)&PyMemoryView_Type);
     }
     return ctx;
 }

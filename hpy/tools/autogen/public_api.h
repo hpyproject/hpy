@@ -106,9 +106,12 @@ HPy h_TypeType;         /* built-in 'type' */
 HPy h_BoolType;         /* built-in 'bool' */
 HPy h_LongType;         /* built-in 'int' */
 HPy h_FloatType;        /* built-in 'float' */
+HPy h_ComplexType;      /* built-in 'complex' */
 HPy h_UnicodeType;      /* built-in 'str' */
+HPy h_BytesType;        /* built-in 'bytes' */
 HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */
+HPy h_MemoryViewType;   /* built-in 'memoryview' */
 
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext *ctx, HPy h);

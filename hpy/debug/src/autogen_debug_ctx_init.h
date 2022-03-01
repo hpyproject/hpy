@@ -238,9 +238,12 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->h_BoolType = DHPy_open(dctx, uctx->h_BoolType);
     dctx->h_LongType = DHPy_open(dctx, uctx->h_LongType);
     dctx->h_FloatType = DHPy_open(dctx, uctx->h_FloatType);
+    dctx->h_ComplexType = DHPy_open(dctx, uctx->h_ComplexType);
     dctx->h_UnicodeType = DHPy_open(dctx, uctx->h_UnicodeType);
+    dctx->h_BytesType = DHPy_open(dctx, uctx->h_BytesType);
     dctx->h_TupleType = DHPy_open(dctx, uctx->h_TupleType);
     dctx->h_ListType = DHPy_open(dctx, uctx->h_ListType);
+    dctx->h_MemoryViewType = DHPy_open(dctx, uctx->h_MemoryViewType);
     dctx->ctx_Module_Create = &debug_ctx_Module_Create;
     dctx->ctx_Dup = &debug_ctx_Dup;
     dctx->ctx_Close = &debug_ctx_Close;

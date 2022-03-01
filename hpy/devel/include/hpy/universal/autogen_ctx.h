@@ -88,9 +88,12 @@ struct _HPyContext_s {
     HPy h_BoolType;
     HPy h_LongType;
     HPy h_FloatType;
+    HPy h_ComplexType;
     HPy h_UnicodeType;
+    HPy h_BytesType;
     HPy h_TupleType;
     HPy h_ListType;
+    HPy h_MemoryViewType;
     HPy (*ctx_Module_Create)(HPyContext *ctx, HPyModuleDef *def);
     HPy (*ctx_Dup)(HPyContext *ctx, HPy h);
     void (*ctx_Close)(HPyContext *ctx, HPy h);
