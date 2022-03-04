@@ -417,9 +417,9 @@ typedef void (*HPyFunc_destroyfunc)(void *);
 typedef enum {
     HPy_bf_getbuffer = SLOT(1, HPyFunc_GETBUFFERPROC),
     HPy_bf_releasebuffer = SLOT(2, HPyFunc_RELEASEBUFFERPROC),
-    //HPy_mp_ass_subscript = SLOT(3, HPyFunc_X),
-    //HPy_mp_length = SLOT(4, HPyFunc_X),
-    //HPy_mp_subscript = SLOT(5, HPyFunc_X),
+    HPy_mp_ass_subscript = SLOT(3, HPyFunc_OBJOBJARGPROC),
+    HPy_mp_length = SLOT(4, HPyFunc_LENFUNC),
+    HPy_mp_subscript = SLOT(5, HPyFunc_BINARYFUNC),
     HPy_nb_absolute = SLOT(6, HPyFunc_UNARYFUNC),
     HPy_nb_add = SLOT(7, HPyFunc_BINARYFUNC),
     HPy_nb_and = SLOT(8, HPyFunc_BINARYFUNC),
