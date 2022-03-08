@@ -110,6 +110,7 @@ typedef struct { intptr_t _i; } HPyField;
 typedef struct { intptr_t _lst; } HPyListBuilder;
 typedef struct { intptr_t _tup; } HPyTupleBuilder;
 typedef struct { intptr_t _i; } HPyTracker;
+typedef struct { intptr_t _i; } HPyThreadState;
 
 
 /* A null handle is officially defined as a handle whose _i is 0. This is true

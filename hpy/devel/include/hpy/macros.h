@@ -69,3 +69,11 @@ typedef enum {
 #else
 #error "sizeof(pid_t) is neither sizeof(int), sizeof(long) or sizeof(long long)"
 #endif /* SIZEOF_PID_T */
+
+#define HPy_BEGIN_LEAVE_PYTHON(context) { \
+    HPyThreadState _token;                                    \
+    _token = HPy_LeavePythonExecution(context);
+
+#define HPy_END_LEAVE_PYTHON(context)   \
+    HPy_ReenterPythonExecution(context, _token); \
+    }
