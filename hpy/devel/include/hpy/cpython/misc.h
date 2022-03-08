@@ -10,7 +10,8 @@
 #define _py2h(o) _hconv((intptr_t)o)
 
 static inline HPyThreadState _threads2h(PyThreadState *s) {
-    return (HPyThreadState) { (intptr_t) s };
+    HPyThreadState res = { ._i = (intptr_t) s };
+    return res;
 }
 
 static inline PyThreadState* _h2threads(HPyThreadState h) {
