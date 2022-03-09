@@ -77,3 +77,10 @@ typedef enum {
 #define HPy_END_LEAVE_PYTHON(context)   \
     HPy_ReenterPythonExecution(context, _token); \
     }
+
+/* HPyCapsule field keys */
+typedef enum {
+    HPyCapsule_key_Pointer = 0,
+    HPyCapsule_key_Name = 1,
+    HPyCapsule_key_Context = 2,
+} HPyCapsule_key;

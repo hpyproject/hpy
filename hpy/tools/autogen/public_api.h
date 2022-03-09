@@ -20,6 +20,7 @@ typedef int HPy_buffer;
 typedef int HPyFunc_visitproc;
 typedef int HPy_UCS4;
 typedef int HPyThreadState;
+typedef int HPyCapsule_key;
 
 /* HPy public API */
 
@@ -112,6 +113,7 @@ HPy h_BytesType;        /* built-in 'bytes' */
 HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */
 HPy h_MemoryViewType;   /* built-in 'memoryview' */
+HPy h_CapsuleType;      /* built-in 'capsule' */
 
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext *ctx, HPy h);
@@ -295,6 +297,12 @@ HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
 /* import.h */
 HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
+
+/* pycapsule.h */
+HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name);
+void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *name);
+int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name);
+int HPyCapsule_Set(HPyContext *ctx, HPy capsule, HPyCapsule_key key, void *value);
 
 /* integration with the old CPython API */
 HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);

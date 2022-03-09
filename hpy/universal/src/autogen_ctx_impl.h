@@ -580,6 +580,11 @@ HPyAPI_IMPL HPy ctx_Import_ImportModule(HPyContext *ctx, const char *name)
     return _py2h(PyImport_ImportModule(name));
 }
 
+HPyAPI_IMPL int ctx_Capsule_IsValid(HPyContext *ctx, HPy capsule, const char *name)
+{
+    return PyCapsule_IsValid(_h2py(capsule), name);
+}
+
 HPyAPI_IMPL HPyThreadState ctx_LeavePythonExecution(HPyContext *ctx)
 {
     return _threads2h(PyEval_SaveThread());
