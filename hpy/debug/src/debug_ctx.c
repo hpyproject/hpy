@@ -126,7 +126,7 @@ const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_
     char* new_ptr;
     if (ptr != NULL)
     {
-        data_size = size != NULL ? *size + 1 : strlen(ptr) + 1;
+        data_size = size != NULL ? *size + 1 : (HPy_ssize_t) strlen(ptr) + 1;
         new_ptr = (char*) raw_data_copy(ptr, data_size, true);
     }
     else
