@@ -27,5 +27,7 @@ typedef int HPyFunc_visitproc;
 typedef int HPy_UCS4;
 typedef int HPyThreadState;
 typedef int HPyType_BuiltinShape;
+typedef int HPyCapsule_key;
+typedef int HPyCapsule_Destructor;
 
 #include "public_api.h"

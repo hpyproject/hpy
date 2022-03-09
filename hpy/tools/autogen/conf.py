@@ -123,4 +123,7 @@ SPECIAL_CASES = {
     'HPy_ReenterPythonExecution': 'PyEval_RestoreThread',
     'HPyGlobal_Load': None,
     'HPyGlobal_Store': None,
+    'HPyCapsule_New': None,
+    'HPyCapsule_Get': None,
+    'HPyCapsule_Set': None,
 }
