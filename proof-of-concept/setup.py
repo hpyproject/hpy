@@ -13,7 +13,8 @@ setup(
     name="hpy-pof",
     hpy_ext_modules=[
         Extension('pof', 
-                    sources=['pof.c']),
+                    sources=['pof.c'],
+                    extra_compile_args=compile_extra_args),
         Extension('pofpackage.foo',
                     sources=['pofpackage/foo.c'],
                     extra_compile_args=compile_extra_args),
