@@ -1,4 +1,5 @@
 #include "hpy.h"
+#include <stdio.h>
 
 HPyDef_METH(do_nothing, "do_nothing", do_nothing_impl, HPyFunc_NOARGS)
 static HPy do_nothing_impl(HPyContext *ctx, HPy self)
