@@ -120,6 +120,9 @@ typedef struct { intptr_t _i; } HPyThreadState;
 #define HPy_NULL _hconv(0)
 #define HPy_IsNull(h) ((h)._i == 0)
 
+#define HPyListBuilder_IsNull(h) ((h)._lst == 0)
+#define HPyTupleBuilder_IsNull(h) ((h)._tup == 0)
+
 #define HPyField_NULL _hfconv(0)
 #define HPyField_IsNull(f) ((f)._i == 0)
 
