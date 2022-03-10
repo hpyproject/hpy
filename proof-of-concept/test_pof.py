@@ -17,7 +17,7 @@ def test_add_ints_kw():
 
 def test_point():
     p = pof.Point(1, 2)
-    assert repr(p) == 'Point(?, ?)' # fixme when we have HPyFloat_FromDouble
+    assert repr(p) == 'Point(1, 2)' # fixme when we have HPyFloat_FromDouble
 
 def test_pofpackage():
     assert pofpackage.foo.__name__ == "pofpackage.foo"
@@ -37,7 +37,7 @@ def test_cpp_add_ints_kw():
 
 def test_cpp_point():
     p = pofcpp.Point(1, 2)
-    assert repr(p) == 'Point(?, ?)' # fixme when we have HPyFloat_FromDouble
+    assert repr(p) == 'Point(1, 2)' # fixme when we have HPyFloat_FromDouble
 
 def test_cpp_pofpackage():
     assert pofpackage.bar.__name__ == "pofpackage.bar"

@@ -3,6 +3,7 @@ import sys
 import os
 import os.path
 from setuptools import setup, Extension
+import platform
 
 # this package is supposed to be installed ONLY on CPython. Try to bail out
 # with a meaningful error message in other cases.
@@ -55,6 +56,10 @@ else:
 if os.name == "posix" and not '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' in os.environ:
     EXTRA_COMPILE_ARGS += ['-D_HPY_DEBUG_MEM_PROTECT_USEMMAP']
 
+if platform.system() == "Windows":
+    EXTRA_COMPILE_ARGS += ['/WX']
+else:
+    EXTRA_COMPILE_ARGS += ['-Werror']
 
 def get_scm_config():
     """
@@ -122,7 +127,6 @@ EXT_MODULES = [
                   'hpy/debug/src/include',
               ],
               extra_compile_args=[
-                  '-Werror',
                   '-DHPY_UNIVERSAL_ABI',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
               ] + EXTRA_COMPILE_ARGS

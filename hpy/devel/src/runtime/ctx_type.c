@@ -30,13 +30,14 @@ static inline HPyType_Extra_t *_HPyType_EXTRA(PyTypeObject *tp) {
 
 static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name)
 {
-    size_t size = offsetof(HPyType_Extra_t, name) + strlen(name) + 1;
+    size_t name_size = strlen(name) + 1;
+    size_t size = offsetof(HPyType_Extra_t, name) + name_size;
     HPyType_Extra_t *result = PyMem_Calloc(1, size);
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    strcpy(result->name, name);
+    memcpy(result->name, name, name_size);
     /* XXX the returned struct is never freed */
     return result;
 }
