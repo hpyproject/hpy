@@ -5,13 +5,16 @@
 #include "hpy.h"
 #include "hpy/runtime/ctx_funcs.h"
 
-// XXX: turn these into static inline functions
-#define _h2py(h) ((PyObject*)h._i)
-#define _py2h(o) _hconv((intptr_t)o)
+static inline PyObject* _h2py(HPy h) {
+    return (PyObject*) h._i;
+}
+
+static inline HPy _py2h(PyObject *o) {
+    return _hconv((intptr_t)o);
+}
 
 static inline HPyThreadState _threads2h(PyThreadState *s) {
-    HPyThreadState res = { ._i = (intptr_t) s };
-    return res;
+    return _htsconv((intptr_t)s);
 }
 
 static inline PyThreadState* _h2threads(HPyThreadState h) {

@@ -40,9 +40,11 @@ extern "C" {
 #if defined(_MSC_VER) && defined(__cplusplus) // MSVC C4576
 #  define _hconv(h) {h}
 #  define _hfconv(h) {h}
+#  define _htsconv(h) {h}
 #else
 #  define _hconv(h) ((HPy){h})
 #  define _hfconv(h) ((HPyField){h})
+#  define _htsconv(h) ((HPyThreadState){h})
 #endif
 /* ~~~~~~~~~~~~~~~~ HPyAPI declaration ~~~~~~~~~~~~~~~~ */
 

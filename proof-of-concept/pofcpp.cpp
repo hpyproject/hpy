@@ -1,4 +1,5 @@
 #include "hpy.h"
+#include <stdio.h>
 
 HPyDef_METH(do_nothing, "do_nothing", do_nothing_impl, HPyFunc_NOARGS)
 static HPy do_nothing_impl(HPyContext *ctx, HPy self)
@@ -59,8 +60,10 @@ HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext *ctx, HPy self)
 {
     PointObject *point = PointObject_AsStruct(ctx, self);
-    return HPyUnicode_FromString(ctx, "Point(?, ?)");
-    //return HPyUnicode_FromFormat("Point(%d, %d)", point->x, point->y);
+    char msg[256];
+    snprintf(msg, 256, "Point(%g, %g)", point->x, point->y);
+    return HPyUnicode_FromString(ctx, msg);
+    //return HPyUnicode_FromFormat("Point(%g, %g)", point->x, point->y);
 }
 
 
