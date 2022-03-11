@@ -103,6 +103,7 @@ EXT_MODULES = [
                'hpy/devel/src/runtime/argparse.c',
                'hpy/devel/src/runtime/buildvalue.c',
                'hpy/devel/src/runtime/helpers.c',
+               'hpy/devel/src/runtime/structseq.c',
                'hpy/devel/src/runtime/ctx_bytes.c',
                'hpy/devel/src/runtime/ctx_call.c',
                'hpy/devel/src/runtime/ctx_contextvar.c',
