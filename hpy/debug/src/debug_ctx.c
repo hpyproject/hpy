@@ -53,8 +53,10 @@ HPyContext * hpy_debug_get_ctx(HPyContext *uctx)
         HPy_FatalError(uctx, "hpy_debug_get_ctx: expected an universal ctx, "
                              "got a debug ctx");
     }
-    if (hpy_debug_ctx_init(dctx, uctx) < 0)
+    if (hpy_debug_ctx_init(dctx, uctx) < 0) {
+        HPyErr_SetString(uctx, uctx->h_SystemError, "Could not create debug context");
         return NULL;
+    }
     return dctx;
 }
 
