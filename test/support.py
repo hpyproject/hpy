@@ -24,15 +24,14 @@ class DefaultExtensionTemplate(object):
         %(defines)s
         NULL
     };
+    %(globals_defs)s
     static HPyModuleDef moduledef = {
         .name = "%(name)s",
         .doc = "some test for hpy",
         .size = -1,
         .legacy_methods = %(legacy_methods)s,
         .defines = moduledefs,
-        .globals = {
-            %(globals)s
-        },
+        %(globals_field)s
     };
 
     HPy_MODINIT(%(name)s)
@@ -65,7 +64,7 @@ class DefaultExtensionTemplate(object):
 
     def expand(self):
         self.defines_table = []
-        self.globals_table = ['0']
+        self.globals_table = []
         self.type_table = []
         self.output = ['#include <hpy.h>']
         for line in self.src.split('\n'):
@@ -100,12 +99,24 @@ class DefaultExtensionTemplate(object):
         else:
             init_types = ''
 
+        globals_defs = ''
+        globals_field = ''
+        if self.globals_table:
+            globals_defs = 'static HPyGlobal *module_globals[] = {\n%s\n};' % ('\n' + 2*INDENT).join(self.globals_table)
+            globals_field = '.globals = module_globals'
+
         exp = self.INIT_TEMPLATE % {
             'legacy_methods': self.legacy_methods,
             'defines': ('\n' + INDENT).join(self.defines_table),
             'init_types': init_types,
             'name': self.name,
-            'globals': ('\n' + 2*INDENT).join(self.globals_table)}
+            'globals_defs': globals_defs,
+            'globals_field': globals_field}
+
+        print('====================')
+        print(exp)
+        print('====================')
+
         self.output.append(exp)
         # make sure that we don't fill the tables any more
         self.defines_table = None
@@ -115,7 +126,7 @@ class DefaultExtensionTemplate(object):
         self.defines_table.append('&%s,' % meth)
 
     def EXPORT_GLOBAL(self, var):
-        self.globals_table = ['&%s,' % var] + self.globals_table
+        self.globals_table.append('&%s,' % var)
 
     def EXPORT_LEGACY(self, pymethoddef):
         self.legacy_methods = pymethoddef

@@ -18,6 +18,7 @@ def test_expand_template():
         'legacy_methods': 'NULL',
         'name': 'mytest',
         'init_types': '',
+        'globals': '',
     }
     assert expanded.rstrip() == f"""#include <hpy.h>
 
