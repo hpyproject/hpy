@@ -13,12 +13,12 @@
    with HPyType_FromSpec. This is used internally within HPy to distinguish
    HPy types.
 
-   Note on the choice of bit 5: CPython uses bit 0 and all bits from 5 up.
-   Using a random currently unused bit in type flags is a temporary solution.
-   Going forward, HPy may ask CPython to reserve one bit for HPy or find
-   another more reliable solution.
+   Note on the choice of bit: CPython uses bit 0 and all bits from 4 up in
+   ver. 3.11a. Using a random currently unused bit in type flags is a temporary
+   solution. Going forward, HPy may ask CPython to reserve one bit for HPy or
+   find another more reliable solution.
 */
-#define HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE (1UL << 4)
+#define HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE (1UL << 2)
 
 #define HPy_TYPE_MAGIC 0xba5f
 
