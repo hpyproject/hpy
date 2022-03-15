@@ -93,7 +93,7 @@ class DefaultExtensionTemplate(object):
         return name, args
 
     def INIT(self):
-        INDENT = '        '
+        NL_INDENT = '\n    '
         if self.type_table:
             init_types = '\n'.join(self.type_table)
         else:
@@ -102,21 +102,20 @@ class DefaultExtensionTemplate(object):
         globals_defs = ''
         globals_field = ''
         if self.globals_table:
-            globals_defs = 'static HPyGlobal *module_globals[] = {\n%s\n};' % ('\n' + 2*INDENT).join(self.globals_table)
+            globals_defs = \
+                textwrap.dedent('''
+                static HPyGlobal *module_globals[] = {
+                    %s
+                };''') % NL_INDENT.join(self.globals_table)
             globals_field = '.globals = module_globals'
 
         exp = self.INIT_TEMPLATE % {
             'legacy_methods': self.legacy_methods,
-            'defines': ('\n' + INDENT).join(self.defines_table),
+            'defines': NL_INDENT.join(self.defines_table),
             'init_types': init_types,
             'name': self.name,
             'globals_defs': globals_defs,
             'globals_field': globals_field}
-
-        print('====================')
-        print(exp)
-        print('====================')
-
         self.output.append(exp)
         # make sure that we don't fill the tables any more
         self.defines_table = None
