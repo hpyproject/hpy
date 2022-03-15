@@ -129,6 +129,8 @@ unsigned long long HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h);
 unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h);
 size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h);
 HPy_ssize_t HPyLong_AsSsize_t(HPyContext *ctx, HPy h);
+void* HPyLong_AsVoidPtr(HPyContext *ctx, HPy h);
+double HPyLong_AsDouble(HPyContext *ctx, HPy h);
 
 HPy HPyFloat_FromDouble(HPyContext *ctx, double v);
 double HPyFloat_AsDouble(HPyContext *ctx, HPy h);
@@ -194,6 +196,7 @@ void HPyErr_Clear(HPyContext *ctx);
 HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
 HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
 int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level);
+void HPyErr_WriteUnraisable(HPyContext *ctx, HPy obj);
 
 /* object.h */
 int HPy_IsTrue(HPyContext *ctx, HPy h);
