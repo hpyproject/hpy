@@ -13,7 +13,7 @@ class TestHPyGlobal(HPyTest):
 
     def test_basics(self):
         mod = self.make_module("""
-            HPyGlobal myglobal = HPyGlobal_INIT;
+            HPyGlobal myglobal;
 
             HPyDef_METH(setg, "setg", setg_impl, HPyFunc_O)
             static HPy setg_impl(HPyContext *ctx, HPy self, HPy arg)
@@ -30,6 +30,7 @@ class TestHPyGlobal(HPyTest):
 
             @EXPORT(setg)
             @EXPORT(getg)
+            @EXPORT_GLOBAL(myglobal)
             @INIT
         """)
         obj = {'hello': 'world'}

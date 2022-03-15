@@ -122,7 +122,6 @@ typedef struct { intptr_t _i; } HPyThreadState;
 #define HPy_IsNull(h) ((h)._i == 0)
 
 #define HPyField_NULL _hfconv(0)
-#define HPyGlobal_INIT ((HPyGlobal){0})
 #define HPyField_IsNull(f) ((f)._i == 0)
 
 /* Convenience functions to cast between HPy and void*.  We need to decide

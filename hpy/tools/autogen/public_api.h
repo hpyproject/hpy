@@ -376,36 +376,41 @@ void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state);
 
 /* HPyGlobal
 
-   HPyGlobal is an alternative to module state. HPyGlobal must be a C global
-   variable initialized to value HPyGlobal_INIT. HPyGlobal serves as an
-   identifier of a Python object that should be globally available per one
-   Python interpreter. Python objects referenced by HPyGlobal should be
-   destroyed automatically on the interpreter exit, but the HPyGlobal itself
-   stays valid for the whole lifetime of the process. There must be a finite
-   number of HPyGlobal instances. Therefore:
+   HPyGlobal is an alternative to module state. HPyGlobal must be a statically
+   allocated C global variable registered in HPyModuleDef.globals array. Given
+   HPyGlobal can be used only after the HPy module where it is registered was
+   created using HPyModule_Create.
 
-     - NEVER declare a local variable of type HPyGlobal
-     - NEVER store HPyGlobal to dynamically allocated memory
+   HPyGlobal serves as an identifier of a Python object that should be globally
+   available per one Python interpreter. Python objects referenced by HPyGlobal
+   are destroyed automatically on the interpreter exit (not necessarily the
+   process exit).
 
    HPyGlobal instance does not allow anything else but loading and storing
    a HPy handle using a HPyContext. Given that a handle to object X1 is stored
    to HPyGlobal using HPyContext of Python interpreter I1, then loading
    a handle from the same HPyGlobal using HPyContext of Python interpreter I1
-   should give a handle to the same object X1.
+   should give a handle to the same object X1. Another Python interpreter I2
+   running within the same process and using the same HPyGlobal variable will
+   not be able to load X1 from it, it will have its own view on what is stored
+   in the given HPyGlobal.
 
    All Python interpreters running in one process must be compatible, because
-   they will share all HPyGlobal instances.
+   they will share all HPyGlobal C level variables.
 
    Python interpreters may use indirection to isolate different interpreter
    instances, but alternative techniques such as copy-on-write or immortal
-   objects can be used to avoid the indirection (even selectively on per object
-   basis using tagged pointers).
+   objects can be used to avoid that indirection (even selectively on per
+   object basis using tagged pointers).
 
    CPython HPy implementation may even provide configuration option that
    switches between a faster version that stores directly PyObject* to
    HPyGlobal but does not support subinterpreters, or a version that supports
    subinterpreters. For now, CPython HPy always stores PyObject* directly
    to HPyField.
+
+   While the standard implementation does not fully enforce the documented
+   contract, the HPy debug mode will enforce it (not implemented yet).
 */
 void HPyGlobal_Store(HPyContext *ctx, HPyGlobal *global, HPy h);
 HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global);
