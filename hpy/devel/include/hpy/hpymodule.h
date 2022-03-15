@@ -21,7 +21,7 @@ typedef struct {
     HPyDef **defines;   /* points to an array of 'HPyDef *' */
     /* array with pointers to statically allocated HPyGlobal,
      * with NULL at the end as a sentinel. */
-    HPyGlobal *globals[];
+    HPyGlobal **globals;
 } HPyModuleDef;
 
 

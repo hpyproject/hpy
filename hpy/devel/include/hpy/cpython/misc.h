@@ -36,7 +36,7 @@ static inline PyObject * _hf2py(HPyField hf)
 static inline HPyGlobal _py2hg(PyObject *obj)
 {
     HPy h = _py2h(obj);
-    return (HPyGlobal){ ._i = h._i };
+    return _hgconv(._i = h._i);
 }
 
 static inline PyObject * _hg2py(HPyGlobal hf)

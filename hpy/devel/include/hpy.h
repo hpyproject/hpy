@@ -41,10 +41,12 @@ extern "C" {
 #  define _hconv(h) {h}
 #  define _hfconv(h) {h}
 #  define _htsconv(h) {h}
+#  define _hgconv(h) {h}
 #else
 #  define _hconv(h) ((HPy){h})
 #  define _hfconv(h) ((HPyField){h})
 #  define _htsconv(h) ((HPyThreadState){h})
+#  define _hgconv(h) ((HPyGlobal){h})
 #endif
 /* ~~~~~~~~~~~~~~~~ HPyAPI declaration ~~~~~~~~~~~~~~~~ */
 
