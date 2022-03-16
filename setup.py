@@ -160,4 +160,5 @@ setup(
         ],
     },
     use_scm_version=get_scm_config,
+    setup_requires=['setuptools_scm'],
 )
