@@ -642,6 +642,16 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
+DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy value)
+{
+    return DHPy_open(dctx, HPyContextVar_New(get_info(dctx)->uctx, name, DHPy_unwrap(dctx, value)));
+}
+
+DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value)
+{
+    return DHPy_open(dctx, HPyContextVar_Set(get_info(dctx)->uctx, DHPy_unwrap(dctx, context_var), DHPy_unwrap(dctx, value)));
+}
+
 DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name)
 {
     return DHPy_open(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, name));

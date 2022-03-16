@@ -526,6 +526,18 @@ HPyAPI_FUNC HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n) 
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }
 
+HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy value) {
+     return ctx->ctx_ContextVar_New ( ctx, name, value ); 
+}
+
+HPyAPI_FUNC int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result) {
+     return ctx->ctx_ContextVar_Get ( ctx, context_var, default_value, result ); 
+}
+
+HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value) {
+     return ctx->ctx_ContextVar_Set ( ctx, context_var, value ); 
+}
+
 HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name) {
      return ctx->ctx_Import_ImportModule ( ctx, name ); 
 }

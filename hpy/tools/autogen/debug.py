@@ -70,6 +70,7 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyTracker_Add',
         'HPyTracker_ForgetAll',
         'HPyTracker_Close',
+        'HPyContextVar_Get'
     }
 
     def generate(self):

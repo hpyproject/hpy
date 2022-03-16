@@ -112,4 +112,5 @@ SPECIAL_CASES = {
     'HPyBytes_FromStringAndSize': None,
     'HPy_LeavePythonExecution': 'PyEval_SaveThread',
     'HPy_ReenterPythonExecution': 'PyEval_RestoreThread',
+    'HPyContextVar_Get': None,
 }

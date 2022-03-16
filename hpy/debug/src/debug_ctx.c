@@ -238,3 +238,17 @@ void debug_ctx_Tracker_Close(HPyContext *dctx, HPyTracker ht)
     // the handles were closed.
     ctx_Tracker_Close(dctx, ht);
 }
+
+int debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy defaul_value, DHPy *result) {
+    HPy uresult;
+    int ret = HPyContextVar_Get(get_info(dctx)->uctx,
+                      DHPy_unwrap(dctx, context_var),
+                      DHPy_unwrap(dctx, defaul_value),
+                      &uresult);
+    if (HPy_IsNull(uresult)) {
+        *result = HPy_NULL;
+    } else {
+        *result = DHPy_open(dctx, uresult);
+    }
+    return ret;
+}

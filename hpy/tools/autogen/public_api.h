@@ -288,6 +288,11 @@ int HPyTuple_Check(HPyContext *ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
+/* contextvar */
+HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
+int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
+HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
+
 /* import.h */
 HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
