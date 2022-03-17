@@ -230,7 +230,7 @@ struct _HPyContext_s {
     int (*ctx_ContextVar_Get)(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     HPy (*ctx_Import_ImportModule)(HPyContext *ctx, const char *name);
-    HPy (*ctx_Capsule_New)(HPyContext *ctx, void *pointer, const char *name);
+    HPy (*ctx_Capsule_New)(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
     void *(*ctx_Capsule_Get)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
     int (*ctx_Capsule_IsValid)(HPyContext *ctx, HPy capsule, const char *name);
     int (*ctx_Capsule_Set)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);

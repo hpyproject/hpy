@@ -19,7 +19,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             } SomeObject;
         """
 
-    def DEFINE_Capsule_New(self):
+    def DEFINE_Capsule_New(self, destructor="NULL"):
         return """
             #include <string.h>
 
@@ -39,9 +39,9 @@ class CapsuleTemplate(DefaultExtensionTemplate):
                 SomeObject *pointer = (SomeObject *) malloc(sizeof(SomeObject) + n_message * sizeof(char));
                 pointer->value = value;
                 strncpy(pointer->message, message, n_message);
-                return HPyCapsule_New(ctx, pointer, CAPSULE_NAME);
+                return HPyCapsule_New(ctx, pointer, CAPSULE_NAME, (HPyCapsule_Destructor) %s);
             }
-        """
+        """ % destructor
 
     def DEFINE_Payload_Free(self):
         return """
@@ -173,3 +173,38 @@ class TestHPyCapsule(HPyTest):
         name = "legacy_capsule"
         p = mod.create_pycapsule(name)
         assert mod.get(p) == (name, 123)
+
+    def test_capsule_new_with_destructor(self):
+        mod = self.make_module("""
+            static void my_destructor(const char *name, void *pointer, void *context);
+
+            @DEFINE_SomeObject
+            @DEFINE_Capsule_New(my_destructor)
+            @DEFINE_Capsule_GetName
+            @DEFINE_Payload_Free
+
+            static int pointer_freed = 0;
+
+            static void my_destructor(const char *name, void *pointer, void *context)
+            {
+                free(pointer);
+                pointer_freed = 1;
+            }
+
+            HPyDef_METH(Pointer_freed, "pointer_freed", pointer_freed_impl, HPyFunc_NOARGS)
+            static HPy pointer_freed_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyBool_FromLong(ctx, pointer_freed);
+            }
+
+
+            @EXPORT(Capsule_New)
+            @EXPORT(Capsule_GetName)
+            @EXPORT(Pointer_freed)
+
+            @INIT
+        """)
+        p = mod.capsule_new(789, "Hello, World!")
+        assert mod.capsule_getname(p) == "some_capsule"
+        del p
+        assert mod.pointer_freed()

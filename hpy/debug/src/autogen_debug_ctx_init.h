@@ -145,7 +145,7 @@ DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy default_v
 int debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy default_value, DHPy *result);
 DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value);
 DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name);
-DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name);
+DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
 void *debug_ctx_Capsule_Get(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, const char *name);
 int debug_ctx_Capsule_IsValid(HPyContext *dctx, DHPy capsule, const char *name);
 int debug_ctx_Capsule_Set(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, void *value);
