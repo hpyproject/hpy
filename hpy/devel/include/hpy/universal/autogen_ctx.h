@@ -231,9 +231,9 @@ struct _HPyContext_s {
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     HPy (*ctx_Import_ImportModule)(HPyContext *ctx, const char *name);
     HPy (*ctx_Capsule_New)(HPyContext *ctx, void *pointer, const char *name);
-    void *(*ctx_Capsule_Get)(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *name);
+    void *(*ctx_Capsule_Get)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
     int (*ctx_Capsule_IsValid)(HPyContext *ctx, HPy capsule, const char *name);
-    int (*ctx_Capsule_Set)(HPyContext *ctx, HPy capsule, HPyCapsule_key key, void *value);
+    int (*ctx_Capsule_Set)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
     HPy (*ctx_FromPyObject)(HPyContext *ctx, cpy_PyObject *obj);
     cpy_PyObject *(*ctx_AsPyObject)(HPyContext *ctx, HPy h);
     void (*ctx_CallRealFunctionFromTrampoline)(HPyContext *ctx, HPyFunc_Signature sig, HPyCFunction func, void *args);
