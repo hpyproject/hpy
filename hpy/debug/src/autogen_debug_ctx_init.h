@@ -150,7 +150,7 @@ DHPy debug_ctx_Dict_New(HPyContext *dctx);
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy items[], HPy_ssize_t n);
 DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name);
-DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name);
+DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
 void *debug_ctx_Capsule_Get(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, const char *name);
 int debug_ctx_Capsule_IsValid(HPyContext *dctx, DHPy capsule, const char *name);
 int debug_ctx_Capsule_Set(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, void *value);

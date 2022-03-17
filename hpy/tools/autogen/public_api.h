@@ -435,7 +435,7 @@ HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
 /* pycapsule.h */
 HPy_ID(245)
-HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name);
+HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
 HPy_ID(246)
 void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
 HPy_ID(247)

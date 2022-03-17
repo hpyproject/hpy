@@ -259,7 +259,7 @@ struct _HPyContext_s {
     HPy h_CapsuleType;
     HPy h_SliceType;
     HPy h_Builtins;
-    HPy (*ctx_Capsule_New)(HPyContext *ctx, void *pointer, const char *name);
+    HPy (*ctx_Capsule_New)(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
     void *(*ctx_Capsule_Get)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
     int (*ctx_Capsule_IsValid)(HPyContext *ctx, HPy capsule, const char *name);
     int (*ctx_Capsule_Set)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
