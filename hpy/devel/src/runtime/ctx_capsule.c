@@ -13,7 +13,7 @@ ctx_Capsule_New(HPyContext *ctx, void *pointer, const char *name)
 }
 
 _HPy_HIDDEN void *
-ctx_Capsule_Get(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *name)
+ctx_Capsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name)
 {
     switch (key)
     {
@@ -30,7 +30,7 @@ ctx_Capsule_Get(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *na
 }
 
 _HPy_HIDDEN int
-ctx_Capsule_Set(HPyContext *ctx, HPy capsule, HPyCapsule_key key, void *value)
+ctx_Capsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value)
 {
     switch (key)
     {

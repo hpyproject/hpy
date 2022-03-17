@@ -437,11 +437,11 @@ HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 HPy_ID(245)
 HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name);
 HPy_ID(246)
-void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *name);
+void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
 HPy_ID(247)
 int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name);
 HPy_ID(248)
-int HPyCapsule_Set(HPyContext *ctx, HPy capsule, HPyCapsule_key key, void *value);
+int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
 
 /* integration with the old CPython API */
 HPy_ID(207)

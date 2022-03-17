@@ -566,7 +566,7 @@ HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name)
      return ctx->ctx_Capsule_New ( ctx, pointer, name ); 
 }
 
-HPyAPI_FUNC void *HPyCapsule_Get(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *name) {
+HPyAPI_FUNC void *HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name) {
      return ctx->ctx_Capsule_Get ( ctx, capsule, key, name ); 
 }
 
@@ -574,7 +574,7 @@ HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *nam
      return ctx->ctx_Capsule_IsValid ( ctx, capsule, name ); 
 }
 
-HPyAPI_FUNC int HPyCapsule_Set(HPyContext *ctx, HPy capsule, HPyCapsule_key key, void *value) {
+HPyAPI_FUNC int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value) {
      return ctx->ctx_Capsule_Set ( ctx, capsule, key, value ); 
 }
 

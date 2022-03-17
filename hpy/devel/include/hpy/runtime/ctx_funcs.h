@@ -58,8 +58,8 @@ _HPy_HIDDEN HPy ctx_Tuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n)
 
 // ctx_capsule.c
 _HPy_HIDDEN HPy ctx_Capsule_New(HPyContext *ctx, void *pointer, const char *name);
-_HPy_HIDDEN void* ctx_Capsule_Get(HPyContext *ctx, HPy capsule, HPyCapsule_key key, const char *name);
-_HPy_HIDDEN int ctx_Capsule_Set(HPyContext *ctx, HPy capsule, HPyCapsule_key key, void *value);
+_HPy_HIDDEN void* ctx_Capsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
+_HPy_HIDDEN int ctx_Capsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
 
 // ctx_type.c
 _HPy_HIDDEN void* ctx_AsStruct_Object(HPyContext *ctx, HPy h);
