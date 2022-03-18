@@ -10,19 +10,32 @@
 #define DESTRUCTOR_REGISTRY_KEY "_hpycapsule_destructors"
 
 static PyObject *
-hpy_get_destructor_registry()
+hpy_get_destructor_registry(void)
 {
-    PyObject *interp_dict;
-    PyObject *key;
     PyObject *res;
 
+#if PY_VERSION_HEX < 0x03080000
+    res = PySys_GetObject(DESTRUCTOR_REGISTRY_KEY); /* borrowed ref */
+    if (res == NULL) {
+        /* create the HPy capsule destructor registry on demand */
+        res = PyDict_New();
+        if (PySys_SetObject(DESTRUCTOR_REGISTRY_KEY, res) < 0) {
+	    return NULL;
+	}
+
+        /* this function returns a borrowed ref */
+        Py_DECREF(res);
+    }
+#else
     /* borrowed ref */
-    interp_dict = PyInterpreterState_GetDict(PyThreadState_Get()->interp);
+    PyObject *interp_dict = 
+	    PyInterpreterState_GetDict(PyThreadState_Get()->interp);
     if (interp_dict == NULL) {
-        PyErr_SetString(PyExc_SystemError, "HPyCapsule destructor registry is not available");
+        PyErr_SetString(PyExc_SystemError, 
+			"HPyCapsule destructor registry is not available");
         return NULL;
     }
-    key = PyUnicode_InternFromString(DESTRUCTOR_REGISTRY_KEY);
+    PyObject *key = PyUnicode_InternFromString(DESTRUCTOR_REGISTRY_KEY);
     if (key == NULL) {
         return NULL;
     }
@@ -30,11 +43,15 @@ hpy_get_destructor_registry()
     if (res == NULL) {
         /* create the HPy capsule destructor registry on demand */
         res = PyDict_New();
-        PyDict_SetItem(interp_dict, key, res);
+        if (PyDict_SetItem(interp_dict, key, res) < 0) {
+	    return NULL;
+	}
+
         /* this function returns a borrowed ref */
         Py_DECREF(res);
     }
     Py_DECREF(key);
+#endif
     return res;
 }
 
@@ -78,7 +95,7 @@ _HPy_HIDDEN HPy
 ctx_Capsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
 {
     PyObject *registry;
-    PyObject *destructor_capsule;
+    PyObject *destructor_capsule = NULL;
     PyObject *res;
     PyObject *key;
 
