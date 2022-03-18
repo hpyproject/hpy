@@ -598,6 +598,14 @@ HPyAPI_FUNC void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState stat
      ctx->ctx_ReenterPythonExecution ( ctx, state ); 
 }
 
+HPyAPI_FUNC void HPyGlobal_Store(HPyContext *ctx, HPyGlobal *global, HPy h) {
+     ctx->ctx_Global_Store ( ctx, global, h ); 
+}
+
+HPyAPI_FUNC HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global) {
+     return ctx->ctx_Global_Load ( ctx, global ); 
+}
+
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {
      ctx->ctx_Dump ( ctx, h ); 
 }
