@@ -55,6 +55,27 @@ _HPy_HIDDEN void ctx_TupleBuilder_Cancel(HPyContext *ctx,
 // ctx_tuple.c
 _HPy_HIDDEN HPy ctx_Tuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 
+// ctx_capsule.c
+_HPy_HIDDEN HPy ctx_Capsule_New(HPyContext *ctx,
+                                void *pointer,
+                                const char *name,
+                                HPyCapsule_Destructor destructor);
+_HPy_HIDDEN HPyCapsule_Destructor ctx_Capsule_GetDestructor(HPyContext *ctx,
+                                                            HPy h_capsule);
+_HPy_HIDDEN int ctx_Capsule_SetDestructor(HPyContext *ctx,
+                                          HPy h_capsule,
+                                          HPyCapsule_Destructor destructor);
+#ifdef HPY_UNIVERSAL_ABI
+_HPy_HIDDEN void* ctx_Capsule_Get(HPyContext *ctx,
+                                  HPy capsule,
+                                  _HPyCapsule_key key,
+                                  const char *name);
+_HPy_HIDDEN int ctx_Capsule_Set(HPyContext *ctx,
+                                HPy capsule,
+                                _HPyCapsule_key key,
+                                void *value);
+#endif
+
 // ctx_type.c
 _HPy_HIDDEN void* ctx_AsStruct(HPyContext *ctx, HPy h);
 _HPy_HIDDEN void* ctx_AsStructLegacy(HPyContext *ctx, HPy h);

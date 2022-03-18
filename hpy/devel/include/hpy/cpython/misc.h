@@ -120,6 +120,7 @@ struct _HPyContext_s {
     HPy h_TupleType;
     HPy h_ListType;
     HPy h_MemoryViewType;
+    HPy h_CapsuleType;
 };
 
 /* XXX! should be defined only once, not once for every .c! */
@@ -213,6 +214,7 @@ HPyAPI_FUNC HPyContext * _HPyGetContext(void) {
         ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
         ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
         ctx->h_MemoryViewType = _py2h((PyObject *)&PyMemoryView_Type);
+        ctx->h_CapsuleType = _py2h((PyObject *)&PyCapsule_Type);
     }
     return ctx;
 }
@@ -413,6 +415,51 @@ HPyAPI_FUNC int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_
     int ret = PyContextVar_Get(_h2py(context_var), _h2py(default_value), &py_result);
     *result = _py2h(py_result);
     return ret;
+}
+
+HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
+{
+    return ctx_Capsule_New(ctx, pointer, name, destructor);
+}
+
+HPyAPI_FUNC void * HPyCapsule_GetPointer(HPyContext *ctx, HPy capsule, const char *name)
+{
+    return PyCapsule_GetPointer(_h2py(capsule), name);
+}
+
+HPyAPI_FUNC const char * HPyCapsule_GetName(HPyContext *ctx, HPy capsule)
+{
+    return PyCapsule_GetName(_h2py(capsule));
+}
+
+HPyAPI_FUNC void * HPyCapsule_GetContext(HPyContext *ctx, HPy capsule)
+{
+    return PyCapsule_GetContext(_h2py(capsule));
+}
+
+HPyAPI_FUNC HPyCapsule_Destructor HPyCapsule_GetDestructor(HPyContext *ctx, HPy capsule)
+{
+    return ctx_Capsule_GetDestructor(ctx, capsule);
+}
+
+HPyAPI_FUNC int HPyCapsule_SetPointer(HPyContext *ctx, HPy capsule, void *pointer)
+{
+    return PyCapsule_SetPointer(_h2py(capsule), pointer);
+}
+
+HPyAPI_FUNC int HPyCapsule_SetName(HPyContext *ctx, HPy capsule, const char *name)
+{
+    return PyCapsule_SetName(_h2py(capsule), name);
+}
+
+HPyAPI_FUNC int HPyCapsule_SetContext(HPyContext *ctx, HPy capsule, void *context)
+{
+    return PyCapsule_SetContext(_h2py(capsule), context);
+}
+
+HPyAPI_FUNC int HPyCapsule_SetDestructor(HPyContext *ctx, HPy capsule, HPyCapsule_Destructor destructor)
+{
+    return ctx_Capsule_SetDestructor(ctx, capsule, destructor);
 }
 
 #endif /* !HPY_CPYTHON_MISC_H */
