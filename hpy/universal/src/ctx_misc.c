@@ -37,9 +37,10 @@ HPyAPI_IMPL void
 ctx_Field_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h)
 {
     PyObject *obj = _h2py(h);
-    Py_XDECREF(_hf2py(*target_field));
+    PyObject *target_py_obj = _hf2py(*target_field);
     Py_XINCREF(obj);
     *target_field = _py2hf(obj);
+    Py_XDECREF(target_py_obj);
 }
 
 HPyAPI_IMPL HPy
