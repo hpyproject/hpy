@@ -43,10 +43,12 @@ hpy_get_destructor_registry(void)
     if (res == NULL) {
         /* create the HPy capsule destructor registry on demand */
         res = PyDict_New();
+        if (res == NULL) {
+            return NULL;
+        }
         if (PyDict_SetItem(interp_dict, key, res) < 0) {
-	    return NULL;
-	}
-
+            return NULL;
+        }
         /* this function returns a borrowed ref */
         Py_DECREF(res);
     }
@@ -55,31 +57,59 @@ hpy_get_destructor_registry(void)
     return res;
 }
 
+/*
+ * Fetch the HPyCapsule destructor function for a given capsule from the global
+ * destructor function registry.
+ * IMPORTANT: Only use this function if you are sure that the given capsule
+ * is expected to have a destructor. This is determined by:
+ * 'PyCapsule_GetDestructor(capsule) == hpy_capsule_destructor_trampoline'.
+ */
 static HPyCapsule_Destructor
-get_hpy_destructor_function(PyObject *capsule)
+get_hpy_destructor_function(PyObject *capsule, int remove)
 {
     /* we only register this destructor if the user provided a destructor
        function at creation time */
     PyObject *hpy_destructor_registry = hpy_get_destructor_registry();
+    if (hpy_destructor_registry == NULL) {
+        return NULL;
+    }
 
     PyObject *key = PyLong_FromVoidPtr(capsule);
     if (key == NULL) {
         return NULL;
     }
 
-    PyObject *hpy_destructor_capsule = PyDict_GetItem(hpy_destructor_registry, key);
-    Py_DECREF(key);
-    void *ptr = PyCapsule_GetPointer(hpy_destructor_capsule, NULL);
-    if (ptr == NULL) {
-        return NULL;
+    /* borrowed ref */
+    PyObject *hpy_destructor_capsule =
+            PyDict_GetItem(hpy_destructor_registry, key);
+    if (hpy_destructor_capsule == NULL) {
+        PyErr_Format(PyExc_SystemError,
+                "could not get destructor for %R", capsule);
+        goto error;
     }
 
+    void *ptr = PyCapsule_GetPointer(hpy_destructor_capsule, NULL);
+    if (ptr == NULL) {
+        goto error;
+    }
+
+    if (remove && PyDict_DelItem(hpy_destructor_registry, key) < 0) {
+        PyErr_Format(PyExc_SystemError,
+                "could not remove destructor for %R", capsule);
+        goto error;
+    }
+
+    Py_DECREF(key);
     return (HPyCapsule_Destructor) ptr;
+
+error:
+    Py_DECREF(key);
+    return NULL;
 }
 
 static void hpy_capsule_destructor_trampoline(PyObject *capsule)
 {
-    HPyCapsule_Destructor hpy_destr = get_hpy_destructor_function(capsule);
+    HPyCapsule_Destructor hpy_destr = get_hpy_destructor_function(capsule, 1);
     if (hpy_destr == NULL) {
         PyErr_Clear();
         return;
@@ -92,7 +122,8 @@ static void hpy_capsule_destructor_trampoline(PyObject *capsule)
 }
 
 _HPy_HIDDEN HPy
-ctx_Capsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
+ctx_Capsule_New(HPyContext *ctx, void *pointer, const char *name,
+        HPyCapsule_Destructor destructor)
 {
     PyObject *registry;
     PyObject *destructor_capsule = NULL;
@@ -157,7 +188,7 @@ ctx_Capsule_GetDestructor(HPyContext *ctx, HPy h_capsule)
 
     if (py_destructor == hpy_capsule_destructor_trampoline)
     {
-        return get_hpy_destructor_function(capsule);
+        return get_hpy_destructor_function(capsule, 0);
     }
 
     /* We do not expose foreign PyCapsule destructor functions since they have
