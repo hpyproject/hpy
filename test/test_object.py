@@ -546,9 +546,10 @@ class TestObject(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy a, b;
-                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
+                int exact;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOi", &a, &b, &exact))
                     return HPy_NULL;
-                int res = HPy_TypeCheck(ctx, a, b);
+                int res = HPy_TypeCheck(ctx, a, b, exact);
                 return HPyBool_FromLong(ctx, res);
             }
             @EXPORT(f)
@@ -556,9 +557,13 @@ class TestObject(HPyTest):
         """)
         class MyStr(str):
             pass
-        assert mod.f('hello', str)
-        assert not mod.f('hello', int)
-        assert mod.f(MyStr('hello'), str)
+        assert mod.f('hello', str, False)
+        assert not mod.f('hello', int, False)
+        assert mod.f(MyStr('hello'), str, False)
+
+        assert mod.f('hello', str, True)
+        assert not mod.f('hello', int, True)
+        assert not mod.f(MyStr('hello'), str, True)
 
     def test_is(self):
         mod = self.make_module("""

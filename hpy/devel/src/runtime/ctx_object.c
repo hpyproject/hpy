@@ -29,12 +29,15 @@ ctx_Dump(HPyContext *ctx, HPy h)
    do the check only in debug mode.
 */
 _HPy_HIDDEN int
-ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
+ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type, int exact)
 {
     PyObject *type= _h2py(h_type);
     assert(type != NULL);
     if (!PyType_Check(type)) {
         Py_FatalError("HPy_TypeCheck arg 2 must be a type");
+    }
+    if (exact) {
+        return Py_TYPE(_h2py(h_obj)) == (PyTypeObject*)type;
     }
     return PyObject_TypeCheck(_h2py(h_obj), (PyTypeObject*)type);
 }

@@ -226,7 +226,7 @@ int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
 
 HPy HPy_Type(HPyContext *ctx, HPy obj);
 // WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
-int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
+int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type, int exact);
 
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 

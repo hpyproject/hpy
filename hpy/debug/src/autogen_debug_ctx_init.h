@@ -100,7 +100,7 @@ int debug_ctx_SetItem(HPyContext *dctx, DHPy obj, DHPy key, DHPy value);
 int debug_ctx_SetItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx, DHPy value);
 int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *key, DHPy value);
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj);
-int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type);
+int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type, int exact);
 int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other);
 void *debug_ctx_AsStruct(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStructLegacy(HPyContext *dctx, DHPy h);

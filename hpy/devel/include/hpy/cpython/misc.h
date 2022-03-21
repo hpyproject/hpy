@@ -324,9 +324,9 @@ HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h)
     ctx_Dump(ctx, h);
 }
 
-HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
+HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type, int exact)
 {
-    return ctx_TypeCheck(ctx, h_obj, h_type);
+    return ctx_TypeCheck(ctx, h_obj, h_type, exact);
 }
 
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
