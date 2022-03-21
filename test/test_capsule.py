@@ -50,8 +50,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
 
                 if (nargs > 0)
                 {
-                    if (!HPyArg_Parse(ctx, NULL, args, nargs, "is", &value, &message))
-                    {
+                    if (!HPyArg_Parse(ctx, NULL, args, nargs, "is", &value, &message)) {
                         return HPy_NULL;
                     }
                     ptr = (void *) create_payload(value, message);
@@ -74,9 +73,12 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             static HPy payload_free_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 void *pointer = HPyCapsule_GetPointer(ctx, arg, HPyCapsule_GetName(ctx, arg));
-                if (pointer != NULL)
-                {
+                if (pointer != NULL) {
                     free(pointer);
+                }
+                void *context = HPyCapsule_GetContext(ctx, arg);
+                if (context != NULL) {
+                    free(context);
                 }
                 return HPy_Dup(ctx, ctx->h_None);
             }
@@ -250,6 +252,17 @@ class TestHPyCapsule(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
+            HPyDef_METH(Capsule_free_name, "capsule_freename", capsule_free_name_impl, HPyFunc_O)
+            static HPy capsule_free_name_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                /* avoid memleak; get and free previous context */
+                const char *old_name = HPyCapsule_GetName(ctx, arg);
+                if (old_name != NULL && old_name != CAPSULE_NAME) {
+                    free((void *) old_name);
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
             @EXPORT(Capsule_New)
             @EXPORT(Capsule_GetPointer)
             @EXPORT(Capsule_SetPointer)
@@ -257,6 +270,7 @@ class TestHPyCapsule(HPyTest):
             @EXPORT(Capsule_SetContext)
             @EXPORT(Capsule_GetName)
             @EXPORT(Capsule_SetName)
+            @EXPORT(Capsule_free_name)
             @EXPORT(Payload_Free)
 
             @INIT
@@ -278,6 +292,7 @@ class TestHPyCapsule(HPyTest):
             # since HPy's capsule API does not allow a destructor, we need to
             # manually free the payload to avoid a memleak
             mod.payload_free(p)
+            mod.capsule_freename(p)
 
         not_a_capsule = "hello"
         with pytest.raises(ValueError):
