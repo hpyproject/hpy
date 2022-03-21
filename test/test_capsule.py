@@ -23,7 +23,8 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             static SomeObject *create_payload(int value, char *message)
             {
                 size_t n_message = strlen(message) + 1;
-                SomeObject *pointer = (SomeObject *) malloc(sizeof(SomeObject) + n_message * sizeof(char));
+                SomeObject *pointer = (SomeObject *) 
+                        malloc(sizeof(SomeObject) + n_message * sizeof(char));
                 if (pointer == NULL) {
                     return NULL;
                 }
@@ -72,14 +73,23 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             HPyDef_METH(Payload_Free, "payload_free", payload_free_impl, HPyFunc_O)
             static HPy payload_free_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                void *pointer = HPyCapsule_GetPointer(ctx, arg, HPyCapsule_GetName(ctx, arg));
-                if (pointer != NULL) {
-                    free(pointer);
+                const char *name = HPyCapsule_GetName(ctx, arg);
+                if (name == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
                 }
+
+                void *pointer = HPyCapsule_GetPointer(ctx, arg, name);
+                if (pointer == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
+                }
+                free(pointer);
+
                 void *context = HPyCapsule_GetContext(ctx, arg);
-                if (context != NULL) {
-                    free(context);
+                if (context == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
                 }
+                free(context);
+
                 return HPy_Dup(ctx, ctx->h_None);
             }
         """
@@ -149,6 +159,8 @@ class TestHPyCapsule(HPyTest):
 
     def test_capsule_getter_and_setter(self):
         mod = self.make_module("""
+            #include <string.h>
+
             @DEFINE_SomeObject
             @DEFINE_Capsule_New
             @DEFINE_Capsule_GetPointer
@@ -167,10 +179,10 @@ class TestHPyCapsule(HPyTest):
                     return HPy_NULL;
                 }
 
-                /* avoid memleak; get and free previous pointer */
+                /* avoid memleak; get and later free previous pointer */
                 void *old_ptr= HPyCapsule_GetPointer(ctx, capsule, CAPSULE_NAME);
-                if (old_ptr) {
-                    free(old_ptr);
+                if (old_ptr == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
                 }
 
                 SomeObject *pointer = NULL;
@@ -181,9 +193,14 @@ class TestHPyCapsule(HPyTest):
                         return HPy_NULL;
                     }
                 }
+
                 if (HPyCapsule_SetPointer(ctx, capsule, (void *) pointer) < 0) {
+                    if (non_null_pointer) {
+                        free(pointer);
+                    }
                     return HPy_NULL;
                 }
+                free(old_ptr);
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
@@ -208,7 +225,10 @@ class TestHPyCapsule(HPyTest):
                 }
 
                 /* avoid memleak; get and free previous context */
-                void *old_context= HPyCapsule_GetContext(ctx, capsule);
+                void *old_context = HPyCapsule_GetContext(ctx, capsule);
+                if (old_context == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
+                }
                 free(old_context);
 
                 SomeObject *context = create_payload(value, message);
@@ -227,23 +247,23 @@ class TestHPyCapsule(HPyTest):
             {
                 HPy capsule;
                 const char *name;
-                size_t n_name;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "Os", &capsule, &name)) {
                     return HPy_NULL;
                 }
 
-                n_name = strlen(name);
-                char *name_copy = (char *) calloc(n_name, sizeof(char));
-                if (name == NULL) {
-                    HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
-                    return HPy_NULL;
-                }
-                strncpy(name_copy, name, n_name);
-
                 /* avoid memleak; get and free previous context */
                 const char *old_name = HPyCapsule_GetName(ctx, capsule);
-                if (old_name != NULL && old_name != CAPSULE_NAME) {
+                if (old_name == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
+                }
+                if (old_name != CAPSULE_NAME) {
                     free((void *) old_name);
+                }
+
+                char *name_copy = strdup(name);
+                if (name_copy == NULL) {
+                    HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
+                    return HPy_NULL;
                 }
 
                 if (HPyCapsule_SetName(ctx, capsule, (const char *) name_copy) < 0) {
@@ -257,7 +277,10 @@ class TestHPyCapsule(HPyTest):
             {
                 /* avoid memleak; get and free previous context */
                 const char *old_name = HPyCapsule_GetName(ctx, arg);
-                if (old_name != NULL && old_name != CAPSULE_NAME) {
+                if (old_name == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
+                }
+                if (old_name != CAPSULE_NAME) {
                     free((void *) old_name);
                 }
                 return HPy_Dup(ctx, ctx->h_None);
@@ -288,27 +311,27 @@ class TestHPyCapsule(HPyTest):
             assert mod.capsule_getname(p) == "some_capsule"
             assert mod.capsule_setname(p, "foo") is None
             assert mod.capsule_getname(p) == "foo"
+
+            not_a_capsule = "hello"
+            with pytest.raises(ValueError):
+                mod.capsule_getpointer(not_a_capsule)
+            with pytest.raises(ValueError):
+                mod.capsule_setpointer(not_a_capsule, 0, "", True)
+            with pytest.raises(ValueError):
+                mod.capsule_setpointer(p, 456, "lorem ipsum", False)
+            #with pytest.raises(ValueError):
+            #    mod.capsule_getcontext(not_a_capsule)
+            #with pytest.raises(ValueError):
+            #    mod.capsule_setcontext(not_a_capsule, 0, "")
+            #with pytest.raises(ValueError):
+            #    mod.capsule_getname(not_a_capsule)
+            #with pytest.raises(ValueError):
+            #    mod.capsule_setname(not_a_capsule, "")
         finally:
             # since HPy's capsule API does not allow a destructor, we need to
             # manually free the payload to avoid a memleak
             mod.payload_free(p)
             mod.capsule_freename(p)
-
-        not_a_capsule = "hello"
-        with pytest.raises(ValueError):
-            mod.capsule_getpointer(not_a_capsule)
-        with pytest.raises(ValueError):
-            mod.capsule_setpointer(not_a_capsule, 0, "", True)
-        with pytest.raises(ValueError):
-            mod.capsule_setpointer(p, 456, "lorem ipsum", False)
-        with pytest.raises(ValueError):
-            mod.capsule_getcontext(not_a_capsule)
-        with pytest.raises(ValueError):
-            mod.capsule_setcontext(not_a_capsule, 0, "")
-        with pytest.raises(ValueError):
-            mod.capsule_getname(not_a_capsule)
-        with pytest.raises(ValueError):
-            mod.capsule_setname(not_a_capsule, "")
 
     def test_capsule_isvalid(self):
         mod = self.make_module("""
@@ -387,6 +410,7 @@ class TestHPyCapsuleLegacy(HPyTest):
         import pytest
         mod = self.make_module("""
             #include <Python.h>
+            #include <string.h>
 
             static int dummy = 123;
 
@@ -400,12 +424,11 @@ class TestHPyCapsuleLegacy(HPyTest):
             {
                 HPy_ssize_t n;
                 const char *name = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
-                char *name_copy = (char *) PyMem_RawCalloc(n + 1, sizeof(char));
+                char *name_copy = strdup(name);
                 if (name_copy == NULL) {
                     HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
                     return HPy_NULL;
                 }
-                strncpy(name_copy, name, n);
                 PyObject *legacy_caps = PyCapsule_New(&dummy, (const char *) name_copy, 
                                                       legacy_destructor);
                 HPy res = HPy_FromPyObject(ctx, legacy_caps);
@@ -416,16 +439,39 @@ class TestHPyCapsuleLegacy(HPyTest):
             HPyDef_METH(Capsule_get, "get", get_impl, HPyFunc_O)
             static HPy get_impl(HPyContext *ctx, HPy self, HPy arg)
             {
+                HPy res = HPy_NULL;
                 const char *name = HPyCapsule_GetName(ctx, arg);
+                if (name == NULL && HPyErr_Occurred(ctx)) {
+                    return HPy_NULL;
+                }
                 HPy h_name = HPyUnicode_FromString(ctx, name);
+                if (HPy_IsNull(h_name)) {
+                    goto finish;
+                }
 
                 int *ptr = (int *) HPyCapsule_GetPointer(ctx, arg, name);
+                if (ptr == NULL && HPyErr_Occurred(ctx)) {
+                    goto finish;
+                }
+
                 HPy h_value = HPyLong_FromLong(ctx, *ptr);
+                if (HPy_IsNull(h_value)) {
+                    goto finish;
+                }
 
                 HPyCapsule_Destructor destr = HPyCapsule_GetDestructor(ctx, arg);
-                HPy has_destructor = HPyBool_FromLong(ctx, destr != NULL);
+                if (destr == NULL && HPyErr_Occurred(ctx)) {
+                    goto finish;
+                }
 
-                HPy res = HPyTuple_Pack(ctx, 3, h_name, h_value, has_destructor);
+                HPy has_destructor = HPyBool_FromLong(ctx, destr != NULL);
+                if (HPy_IsNull(has_destructor)) {
+                    goto finish;
+                }
+
+                res = HPyTuple_Pack(ctx, 3, h_name, h_value, has_destructor);
+
+            finish:
                 HPy_Close(ctx, h_name);
                 HPy_Close(ctx, h_value);
                 HPy_Close(ctx, has_destructor);
