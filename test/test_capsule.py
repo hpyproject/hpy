@@ -11,6 +11,22 @@ from .support import HPyTest, DefaultExtensionTemplate
 
 class CapsuleTemplate(DefaultExtensionTemplate):
 
+    def DEFINE_strdup(self):
+        return """
+            #include <string.h>
+
+            static char *strdup0(const char *s)
+            {
+                size_t n = strlen(s) + 1;
+                char *copy = (char *) malloc(n * sizeof(char));
+                if (copy == NULL) {
+                    return NULL;
+                }
+                strncpy(copy, s, n);
+                return copy;
+            }
+        """
+
     def DEFINE_SomeObject(self):
         return """
             #include <string.h>
@@ -161,6 +177,7 @@ class TestHPyCapsule(HPyTest):
         mod = self.make_module("""
             #include <string.h>
 
+            @DEFINE_strdup
             @DEFINE_SomeObject
             @DEFINE_Capsule_New
             @DEFINE_Capsule_GetPointer
@@ -260,7 +277,7 @@ class TestHPyCapsule(HPyTest):
                     free((void *) old_name);
                 }
 
-                char *name_copy = strdup(name);
+                char *name_copy = strdup0(name);
                 if (name_copy == NULL) {
                     HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
                     return HPy_NULL;
@@ -406,9 +423,13 @@ class TestHPyCapsule(HPyTest):
 
 class TestHPyCapsuleLegacy(HPyTest):
 
+    ExtensionTemplate = CapsuleTemplate
+
     def test_legacy_capsule_compat(self):
         import pytest
         mod = self.make_module("""
+            @DEFINE_strdup
+
             #include <Python.h>
             #include <string.h>
 
@@ -417,7 +438,7 @@ class TestHPyCapsuleLegacy(HPyTest):
             static void legacy_destructor(PyObject *capsule)
             {
                 /* We need to use C lib 'free' because the string was
-                   created with 'strdup'. */
+                   created with 'strdup0'. */
                 free((void *) PyCapsule_GetName(capsule));
             }
 
@@ -426,7 +447,7 @@ class TestHPyCapsuleLegacy(HPyTest):
             {
                 HPy_ssize_t n;
                 const char *name = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
-                char *name_copy = strdup(name);
+                char *name_copy = strdup0(name);
                 if (name_copy == NULL) {
                     HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
                     return HPy_NULL;
