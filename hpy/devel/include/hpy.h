@@ -170,6 +170,7 @@ typedef void (*HPyCapsule_Destructor)(const char *name, void *pointer, void *con
 #include "hpy/runtime/argparse.h"
 #include "hpy/runtime/buildvalue.h"
 #include "hpy/runtime/helpers.h"
+#include "hpy/runtime/structseq.h"
 
 #ifdef HPY_UNIVERSAL_ABI
 #   include "hpy/universal/autogen_ctx.h"
