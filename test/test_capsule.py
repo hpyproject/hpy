@@ -442,6 +442,10 @@ class TestHPyCapsuleLegacy(HPyTest):
             static HPy get_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy res = HPy_NULL;
+                HPy h_value = HPy_NULL;
+                HPy has_destructor = HPy_NULL;
+                HPyCapsule_Destructor destr = NULL;
+
                 const char *name = HPyCapsule_GetName(ctx, arg);
                 if (name == NULL && HPyErr_Occurred(ctx)) {
                     return HPy_NULL;
@@ -456,17 +460,17 @@ class TestHPyCapsuleLegacy(HPyTest):
                     goto finish;
                 }
 
-                HPy h_value = HPyLong_FromLong(ctx, *ptr);
+                h_value = HPyLong_FromLong(ctx, *ptr);
                 if (HPy_IsNull(h_value)) {
                     goto finish;
                 }
 
-                HPyCapsule_Destructor destr = HPyCapsule_GetDestructor(ctx, arg);
+                destr = HPyCapsule_GetDestructor(ctx, arg);
                 if (destr == NULL && HPyErr_Occurred(ctx)) {
                     goto finish;
                 }
 
-                HPy has_destructor = HPyBool_FromLong(ctx, destr != NULL);
+                has_destructor = HPyBool_FromLong(ctx, destr != NULL);
                 if (HPy_IsNull(has_destructor)) {
                     goto finish;
                 }
