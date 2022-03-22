@@ -416,7 +416,9 @@ class TestHPyCapsuleLegacy(HPyTest):
 
             static void legacy_destructor(PyObject *capsule)
             {
-                PyMem_RawFree((void *) PyCapsule_GetName(capsule));
+                /* We need to use C lib 'free' because the string was
+                   created with 'strdup'. */
+                free((void *) PyCapsule_GetName(capsule));
             }
 
             HPyDef_METH(Create_pycapsule, "create_pycapsule", create_pycapsule_impl, HPyFunc_O)
