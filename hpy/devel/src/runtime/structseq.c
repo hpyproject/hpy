@@ -158,7 +158,21 @@ HPyStructSequenceBuilder_Set(HPyContext *ctx, HPyStructSequenceBuilder self, HPy
 #ifdef HPY_UNIVERSAL_ABI
     HPyTupleBuilder_Set(ctx, self, i, value);
 #else
-    PyStructSequence_SetItem((PyObject *)self._tup, i, _h2py(value));
+    PyObject *v = _h2py(value);
+    Py_INCREF(v);
+    PyStructSequence_SetItem((PyObject *)self._tup, i, v);
+#endif
+}
+
+HPyAPI_HELPER void
+HPyStructSequenceBuilder_Set_i(HPyContext *ctx, HPyStructSequenceBuilder self, HPy_ssize_t i, long value)
+{
+#ifdef HPY_UNIVERSAL_ABI
+    HPy v = HPyLong_FromLong(ctx, value);
+    HPyTupleBuilder_Set(ctx, self, i, v);
+    HPy_Close(ctx, v);
+#else
+    PyStructSequence_SetItem((PyObject *)self._tup, i, PyLong_FromLong(value));
 #endif
 }
 
@@ -201,6 +215,8 @@ HPyStructSequence_GetItem(HPyContext *ctx, HPy self, HPy_ssize_t i)
 #ifdef HPY_UNIVERSAL_ABI
     return HPy_GetItem_i(ctx, self, i);
 #else
-    return _py2h(PyStructSequence_GetItem(_h2py(self), i));
+    PyObject *v = PyStructSequence_GetItem(_h2py(self), i);
+    Py_INCREF(v);
+    return _py2h(v);
 #endif
 }
