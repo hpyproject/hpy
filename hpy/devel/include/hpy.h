@@ -104,7 +104,8 @@ extern "C" {
 
        - PyPy: ._i is an index into a list
 
-       - GraalPython: ???
+       - GraalPython: _i is an index into a list (may be optimized to a direct
+         reference depending on the runtime options and control flow)
 
        - Debug mode: _i is a pointer to a DebugHandle, which contains a
          another HPy among other stuff
