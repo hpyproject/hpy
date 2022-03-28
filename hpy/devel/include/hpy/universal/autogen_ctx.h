@@ -253,5 +253,7 @@ struct _HPyContext_s {
     HPy (*ctx_Field_Load)(HPyContext *ctx, HPy source_object, HPyField source_field);
     HPyThreadState (*ctx_LeavePythonExecution)(HPyContext *ctx);
     void (*ctx_ReenterPythonExecution)(HPyContext *ctx, HPyThreadState state);
+    void (*ctx_Global_Store)(HPyContext *ctx, HPyGlobal *global, HPy h);
+    HPy (*ctx_Global_Load)(HPyContext *ctx, HPyGlobal global);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
 };
