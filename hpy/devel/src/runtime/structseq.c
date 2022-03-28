@@ -8,7 +8,7 @@
 
 #include "hpy.h"
 
-const char * const PyStructSequence_UnnamedField = "_";
+const char * const HPyStructSequence_UnnamedField = "_";
 
 HPyAPI_HELPER HPy
 HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
