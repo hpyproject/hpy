@@ -23,6 +23,7 @@ typedef int HPy_UCS4;
 typedef int HPyThreadState;
 typedef int _HPyCapsule_key;
 typedef int HPyCapsule_Destructor;
+typedef int HPyDef;
 
 /* HPy public API */
 
@@ -606,3 +607,6 @@ typedef enum {
     HPy_tp_destroy = SLOT(1000, HPyFunc_DESTROYFUNC),
 
 } HPySlot_Slot;
+
+// TODO: custom enum to allow only some slots?
+int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *expected);

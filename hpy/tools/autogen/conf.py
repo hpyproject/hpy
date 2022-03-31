@@ -118,4 +118,5 @@ SPECIAL_CASES = {
     'HPyCapsule_New': None,
     'HPyCapsule_Get': None,
     'HPyCapsule_Set': None,
+    'HPyType_CheckSlot': None,
 }

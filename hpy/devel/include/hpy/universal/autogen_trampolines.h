@@ -526,8 +526,8 @@ HPyAPI_FUNC HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n) 
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }
 
-HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy value) {
-     return ctx->ctx_ContextVar_New ( ctx, name, value ); 
+HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value) {
+     return ctx->ctx_ContextVar_New ( ctx, name, default_value ); 
 }
 
 HPyAPI_FUNC int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result) {
@@ -644,5 +644,9 @@ HPyAPI_FUNC HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global) {
 
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {
      ctx->ctx_Dump ( ctx, h ); 
+}
+
+HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *expected) {
+     return ctx->ctx_Type_CheckSlot ( ctx, type, expected ); 
 }
 

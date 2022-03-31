@@ -176,4 +176,5 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Global_Store = &ctx_Global_Store,
     .ctx_Global_Load = &ctx_Global_Load,
     .ctx_Dump = &ctx_Dump,
+    .ctx_Type_CheckSlot = &ctx_Type_CheckSlot,
 };

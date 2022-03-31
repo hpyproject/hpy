@@ -128,7 +128,7 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
         .fields = (PyStructSequence_Field *)desc->fields,
         .n_in_sequence = i
     };
-    return _py2h(PyStructSequence_NewType(&d));
+    return _py2h((PyObject*) PyStructSequence_NewType(&d));
 #endif
 }
 

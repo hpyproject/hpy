@@ -171,6 +171,7 @@ void debug_ctx_ReenterPythonExecution(HPyContext *dctx, HPyThreadState state);
 void debug_ctx_Global_Store(HPyContext *dctx, HPyGlobal *global, DHPy h);
 DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
+int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *expected);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
 {
@@ -416,4 +417,5 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Global_Store = &debug_ctx_Global_Store;
     dctx->ctx_Global_Load = &debug_ctx_Global_Load;
     dctx->ctx_Dump = &debug_ctx_Dump;
+    dctx->ctx_Type_CheckSlot = &debug_ctx_Type_CheckSlot;
 }

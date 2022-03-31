@@ -569,9 +569,9 @@ HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h)
     return PyTuple_Check(_h2py(h));
 }
 
-HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy value)
+HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value)
 {
-    return _py2h(PyContextVar_New(name, _h2py(value)));
+    return _py2h(PyContextVar_New(name, _h2py(default_value)));
 }
 
 HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value)
