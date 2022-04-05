@@ -100,3 +100,17 @@ ctx_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value) {
     Py_DECREF(key_o);
     return result;
 }
+
+_HPy_HIDDEN HPy
+ctx_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
+    PyObject *pyobj = _h2py(obj);
+    struct _typeobject* t = Py_TYPE(pyobj);
+    if (t->tp_getattr == NULL && t->tp_getattro == NULL) {
+        return HPy_NULL;
+    }
+    PyObject *res = PyObject_GetAttrString(pyobj, name);
+    if (res == NULL && PyErr_Occurred()) {
+        PyErr_Clear();
+    }
+    return _py2h(res);
+}

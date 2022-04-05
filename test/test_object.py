@@ -64,7 +64,19 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return result;
             }
+
+            HPyDef_METH(g, "g", g_impl, HPyFunc_O)
+            static HPy g_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy result;
+                result = HPy_MaybeGetAttr_s(ctx, arg, "foo");
+                if (HPy_IsNull(result) && !HPyErr_Occurred(ctx))
+                    return HPy_Dup(ctx, ctx->h_None);
+                return result;
+            }
+
             @EXPORT(f)
+            @EXPORT(g)
             @INIT
         """)
 
@@ -89,6 +101,14 @@ class TestObject(HPyTest):
         assert mod.f(ClassAttr) == 10
         assert mod.f(ClassAttr()) == 10
         assert mod.f(PropAttr()) == 11
+
+        assert mod.g(Attrs(foo=5)) == 5
+        assert mod.g(Attrs()) is None
+        assert mod.g(42) is None
+        assert mod.g(ClassAttr) == 10
+        assert mod.g(ClassAttr()) == 10
+        assert mod.g(PropAttr()) == 11
+        assert mod.g(type) is None
 
     def test_hasattr(self):
         mod = self.make_module("""

@@ -215,6 +215,8 @@ HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, 
 HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
+HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
+
 int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name);
 int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *name);
 

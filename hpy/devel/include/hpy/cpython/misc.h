@@ -515,4 +515,17 @@ HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value) {
     }
 }
 
+HPyAPI_FUNC HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
+    PyObject *pyobj = _h2py(obj);
+    struct _typeobject* t = Py_TYPE(pyobj);
+    if (t->tp_getattr == NULL && t->tp_getattro == NULL) {
+        return HPy_NULL;
+    }
+    PyObject *res = PyObject_GetAttrString(pyobj, name);
+    if (res == NULL && PyErr_Occurred()) {
+        PyErr_Clear();
+    }
+    return _py2h(res);
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */

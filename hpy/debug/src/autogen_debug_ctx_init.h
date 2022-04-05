@@ -88,6 +88,7 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
 DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw);
 DHPy debug_ctx_GetAttr(HPyContext *dctx, DHPy obj, DHPy name);
 DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *name);
+DHPy debug_ctx_MaybeGetAttr_s(HPyContext *dctx, DHPy obj, const char *name);
 int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name);
 int debug_ctx_HasAttr_s(HPyContext *dctx, DHPy obj, const char *name);
 int debug_ctx_SetAttr(HPyContext *dctx, DHPy obj, DHPy name, DHPy value);
@@ -334,6 +335,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Type_GenericNew = &debug_ctx_Type_GenericNew;
     dctx->ctx_GetAttr = &debug_ctx_GetAttr;
     dctx->ctx_GetAttr_s = &debug_ctx_GetAttr_s;
+    dctx->ctx_MaybeGetAttr_s = &debug_ctx_MaybeGetAttr_s;
     dctx->ctx_HasAttr = &debug_ctx_HasAttr;
     dctx->ctx_HasAttr_s = &debug_ctx_HasAttr_s;
     dctx->ctx_SetAttr = &debug_ctx_SetAttr;

@@ -387,6 +387,11 @@ DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *name)
     return DHPy_open(dctx, HPy_GetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name));
 }
 
+DHPy debug_ctx_MaybeGetAttr_s(HPyContext *dctx, DHPy obj, const char *name)
+{
+    return DHPy_open(dctx, HPy_MaybeGetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name));
+}
+
 int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name)
 {
     return HPy_HasAttr(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, name));

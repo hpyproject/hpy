@@ -318,6 +318,10 @@ HPyAPI_FUNC HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
      return ctx->ctx_GetAttr_s ( ctx, obj, name ); 
 }
 
+HPyAPI_FUNC HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
+     return ctx->ctx_MaybeGetAttr_s ( ctx, obj, name ); 
+}
+
 HPyAPI_FUNC int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name) {
      return ctx->ctx_HasAttr ( ctx, obj, name ); 
 }

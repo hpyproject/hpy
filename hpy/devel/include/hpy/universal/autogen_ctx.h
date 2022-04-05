@@ -173,6 +173,7 @@ struct _HPyContext_s {
     HPy (*ctx_Type_GenericNew)(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
     HPy (*ctx_GetAttr)(HPyContext *ctx, HPy obj, HPy name);
     HPy (*ctx_GetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
+    HPy (*ctx_MaybeGetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
     int (*ctx_HasAttr)(HPyContext *ctx, HPy obj, HPy name);
     int (*ctx_HasAttr_s)(HPyContext *ctx, HPy obj, const char *name);
     int (*ctx_SetAttr)(HPyContext *ctx, HPy obj, HPy name, HPy value);
