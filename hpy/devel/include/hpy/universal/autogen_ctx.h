@@ -173,6 +173,7 @@ struct _HPyContext_s {
     HPy (*ctx_Type_GenericNew)(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
     HPy (*ctx_GetAttr)(HPyContext *ctx, HPy obj, HPy name);
     HPy (*ctx_GetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
+    HPy (*ctx_MaybeGetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
     int (*ctx_HasAttr)(HPyContext *ctx, HPy obj, HPy name);
     int (*ctx_HasAttr_s)(HPyContext *ctx, HPy obj, const char *name);
     int (*ctx_SetAttr)(HPyContext *ctx, HPy obj, HPy name, HPy value);
@@ -226,7 +227,7 @@ struct _HPyContext_s {
     HPy (*ctx_Dict_New)(HPyContext *ctx);
     int (*ctx_Tuple_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Tuple_FromArray)(HPyContext *ctx, HPy items[], HPy_ssize_t n);
-    HPy (*ctx_ContextVar_New)(HPyContext *ctx, const char *name, HPy value);
+    HPy (*ctx_ContextVar_New)(HPyContext *ctx, const char *name, HPy default_value);
     int (*ctx_ContextVar_Get)(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     HPy (*ctx_Import_ImportModule)(HPyContext *ctx, const char *name);
@@ -256,4 +257,5 @@ struct _HPyContext_s {
     void (*ctx_Global_Store)(HPyContext *ctx, HPyGlobal *global, HPy h);
     HPy (*ctx_Global_Load)(HPyContext *ctx, HPyGlobal global);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
+    int (*ctx_Type_CheckSlot)(HPyContext *ctx, HPy type, HPyDef *expected);
 };

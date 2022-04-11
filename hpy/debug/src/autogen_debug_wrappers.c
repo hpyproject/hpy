@@ -387,6 +387,11 @@ DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *name)
     return DHPy_open(dctx, HPy_GetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name));
 }
 
+DHPy debug_ctx_MaybeGetAttr_s(HPyContext *dctx, DHPy obj, const char *name)
+{
+    return DHPy_open(dctx, HPy_MaybeGetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name));
+}
+
 int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name)
 {
     return HPy_HasAttr(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, name));
@@ -642,9 +647,9 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy value)
+DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy default_value)
 {
-    return DHPy_open(dctx, HPyContextVar_New(get_info(dctx)->uctx, name, DHPy_unwrap(dctx, value)));
+    return DHPy_open(dctx, HPyContextVar_New(get_info(dctx)->uctx, name, DHPy_unwrap(dctx, default_value)));
 }
 
 DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value)
@@ -760,5 +765,10 @@ DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global)
 void debug_ctx_Dump(HPyContext *dctx, DHPy h)
 {
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *expected)
+{
+    return HPyType_CheckSlot(get_info(dctx)->uctx, DHPy_unwrap(dctx, type), expected);
 }
 

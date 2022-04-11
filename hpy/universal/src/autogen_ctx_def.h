@@ -93,6 +93,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Type_GenericNew = &ctx_Type_GenericNew,
     .ctx_GetAttr = &ctx_GetAttr,
     .ctx_GetAttr_s = &ctx_GetAttr_s,
+    .ctx_MaybeGetAttr_s = &ctx_MaybeGetAttr_s,
     .ctx_HasAttr = &ctx_HasAttr,
     .ctx_HasAttr_s = &ctx_HasAttr_s,
     .ctx_SetAttr = &ctx_SetAttr,
@@ -176,4 +177,5 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Global_Store = &ctx_Global_Store,
     .ctx_Global_Load = &ctx_Global_Load,
     .ctx_Dump = &ctx_Dump,
+    .ctx_Type_CheckSlot = &ctx_Type_CheckSlot,
 };

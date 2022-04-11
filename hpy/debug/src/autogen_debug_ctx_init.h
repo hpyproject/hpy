@@ -88,6 +88,7 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
 DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw);
 DHPy debug_ctx_GetAttr(HPyContext *dctx, DHPy obj, DHPy name);
 DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *name);
+DHPy debug_ctx_MaybeGetAttr_s(HPyContext *dctx, DHPy obj, const char *name);
 int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name);
 int debug_ctx_HasAttr_s(HPyContext *dctx, DHPy obj, const char *name);
 int debug_ctx_SetAttr(HPyContext *dctx, DHPy obj, DHPy name, DHPy value);
@@ -171,6 +172,7 @@ void debug_ctx_ReenterPythonExecution(HPyContext *dctx, HPyThreadState state);
 void debug_ctx_Global_Store(HPyContext *dctx, HPyGlobal *global, DHPy h);
 DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
+int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *expected);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
 {
@@ -333,6 +335,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Type_GenericNew = &debug_ctx_Type_GenericNew;
     dctx->ctx_GetAttr = &debug_ctx_GetAttr;
     dctx->ctx_GetAttr_s = &debug_ctx_GetAttr_s;
+    dctx->ctx_MaybeGetAttr_s = &debug_ctx_MaybeGetAttr_s;
     dctx->ctx_HasAttr = &debug_ctx_HasAttr;
     dctx->ctx_HasAttr_s = &debug_ctx_HasAttr_s;
     dctx->ctx_SetAttr = &debug_ctx_SetAttr;
@@ -416,4 +419,5 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Global_Store = &debug_ctx_Global_Store;
     dctx->ctx_Global_Load = &debug_ctx_Global_Load;
     dctx->ctx_Dump = &debug_ctx_Dump;
+    dctx->ctx_Type_CheckSlot = &debug_ctx_Type_CheckSlot;
 }

@@ -36,6 +36,7 @@ _HPy_HIDDEN HPy ctx_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 _HPy_HIDDEN HPy ctx_GetItem_s(HPyContext *ctx, HPy obj, const char *key);
 _HPy_HIDDEN int ctx_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 _HPy_HIDDEN int ctx_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
+_HPy_HIDDEN HPy ctx_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
 // ctx_tracker.c
 _HPy_HIDDEN HPyTracker ctx_Tracker_New(HPyContext *ctx, HPy_ssize_t size);
@@ -84,6 +85,8 @@ _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
 _HPy_HIDDEN HPy ctx_New(HPyContext *ctx, HPy h_type, void **data);
 _HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
                                     HPy_ssize_t nargs, HPy kw);
+
+_HPy_HIDDEN int ctx_Type_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);
 
 // ctx_contextvar.c
 _HPy_HIDDEN int ctx_ContextVar_Get(HPyContext *ctx, HPy context_var, HPy defaul_value,
