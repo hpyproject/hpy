@@ -79,3 +79,19 @@ class TestTuple(HPyTest):
             @INIT
         """)
         assert mod.f("xy") == ("xy", True, -42)
+
+    def test_TupleBuilder_cancel_finished(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy h_self, HPy h_arg)
+            {
+                HPyTupleBuilder builder = HPyTupleBuilder_New(ctx, 1);
+                HPyTupleBuilder_Set(ctx, builder, 0, h_arg);
+                HPy h_tuple = HPyTupleBuilder_Build(ctx, builder);
+                HPyTupleBuilder_Cancel(ctx);
+                return h_tuple;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f("xy") == ("xy", True, -42)
