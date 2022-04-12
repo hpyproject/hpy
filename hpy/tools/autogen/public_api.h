@@ -289,6 +289,7 @@ int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 /* dictobject.h */
 int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy HPyDict_New(HPyContext *ctx);
+HPy HPyDict_Keys(HPyContext *ctx, HPy h);
 
 /* tupleobject.h */
 int HPyTuple_Check(HPyContext *ctx, HPy h);
