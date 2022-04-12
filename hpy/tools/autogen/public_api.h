@@ -573,7 +573,7 @@ typedef enum {
     //HPy_tp_alloc = SLOT(47, HPyFunc_X),      NOT SUPPORTED
     //HPy_tp_base = SLOT(48, HPyFunc_X),
     //HPy_tp_bases = SLOT(49, HPyFunc_X),
-    //HPy_tp_call = SLOT(50, HPyFunc_X),
+    HPy_tp_call = SLOT(50, HPyFunc_KEYWORDS),
     //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
