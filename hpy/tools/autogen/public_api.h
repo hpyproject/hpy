@@ -289,6 +289,7 @@ int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 /* dictobject.h */
 int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy HPyDict_New(HPyContext *ctx);
+HPy HPyDict_Keys(HPyContext *ctx, HPy h);
 
 /* tupleobject.h */
 int HPyTuple_Check(HPyContext *ctx, HPy h);
@@ -573,7 +574,7 @@ typedef enum {
     //HPy_tp_alloc = SLOT(47, HPyFunc_X),      NOT SUPPORTED
     //HPy_tp_base = SLOT(48, HPyFunc_X),
     //HPy_tp_bases = SLOT(49, HPyFunc_X),
-    //HPy_tp_call = SLOT(50, HPyFunc_X),
+    HPy_tp_call = SLOT(50, HPyFunc_KEYWORDS),
     //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
