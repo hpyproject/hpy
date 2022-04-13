@@ -161,6 +161,27 @@ static UHPy set_on_invalid_handle_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg
     return HPy_Dup(uctx, uctx->h_None);
 }
 
+HPyDef_METH(set_handle_stack_trace_limit, "set_handle_stack_trace_limit",
+            set_handle_stack_trace_limit_impl, HPyFunc_O, .doc=
+                    "Set the limit to captured HPy handles allocations stack traces. "
+                    "None means do not capture the stack traces.")
+static UHPy set_handle_stack_trace_limit_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg)
+{
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    HPyDebugInfo *info = get_info(dctx);
+    if (HPy_Is(uctx, u_arg, uctx->h_None)) {
+        info->handle_alloc_stacktrace_limit = 0;
+    } else {
+        assert(!HPyErr_Occurred(uctx));
+        info->handle_alloc_stacktrace_limit = HPyLong_AsSsize_t(uctx, u_arg);
+        if (HPyErr_Occurred(uctx)) {
+            info->handle_alloc_stacktrace_limit = 0;
+            return HPy_NULL;
+        }
+    }
+    return HPy_Dup(uctx, uctx->h_None);
+}
+
 
 /* ~~~~~~ DebugHandleType and DebugHandleObject ~~~~~~~~
 
@@ -256,9 +277,9 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
 
     const char *fmt = NULL;
     if (dh->handle->is_closed)
-        fmt = "<DebugHandle 0x%x CLOSED>";
+        fmt = "<DebugHandle 0x%x CLOSED>\n%s\n%s";
     else
-        fmt = "<DebugHandle 0x%x for %r>";
+        fmt = "<DebugHandle 0x%x for %r>\n%s\n%s";
 
     // XXX: switch to HPyUnicode_FromFormat when we have it
     uh_fmt = HPyUnicode_FromString(uctx, fmt);
@@ -269,10 +290,24 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
     if (HPy_IsNull(uh_id))
         goto exit;
 
+    const char *trace_header = "";
+    const char *trace = "";
+    if (dh->handle->allocation_stacktrace) {
+        trace_header = "Allocation stacktrace:";
+        trace = dh->handle->allocation_stacktrace;
+    } else {
+        trace_header = "To get a stack trace of where it was allocated use:";
+        trace = "hpy.debug.set_stack_trace_limit(size)";
+    }
+    HPy h_trace_header = HPyUnicode_FromString(uctx, trace_header);
+    HPy h_trace = HPyUnicode_FromString(uctx, trace);
+
     if (dh->handle->is_closed)
-        uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id}, 1);
+        uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id,
+                                                    h_trace_header, h_trace}, 3);
     else
-        uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id, dh->handle->uh}, 2);
+        uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id, dh->handle->uh,
+                                                    h_trace_header, h_trace}, 4);
     if (HPy_IsNull(uh_args))
         goto exit;
 
@@ -336,6 +371,7 @@ static HPyDef *module_defines[] = {
     &get_protected_raw_data_max_size,
     &set_protected_raw_data_max_size,
     &set_on_invalid_handle,
+    &set_handle_stack_trace_limit,
     NULL
 };
 

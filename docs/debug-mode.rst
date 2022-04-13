@@ -59,3 +59,19 @@ useful debugging facilities.
 **ATTENTION**: the usage of `LeakDetector` or `hpy_debug` by itself does not
 enable the HPy debug mode! If the debug mode is not enabled for any extension,
 then those features do nothing useful (but also nothing harmful).
+
+When dealing with handle leaks, it is useful to get a stack trace of the
+allocation of the leaked handle. This feature has large memory requirements
+and is therefore opt-in. It can be activated by:
+
+.. literalinclude:: examples/tests.py
+  :language: python
+  :start-at: hpy.debug.set_handle_stack_trace_limit
+  :end-at: hpy.debug.set_handle_stack_trace_limit
+
+and disabled by:
+
+.. literalinclude:: examples/tests.py
+  :language: python
+  :start-at: hpy.debug.disable_handle_stack_traces
+  :end-at: hpy.debug.disable_handle_stack_traces

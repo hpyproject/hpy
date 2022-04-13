@@ -118,6 +118,7 @@ EXT_MODULES = [
                'hpy/debug/src/debug_handles.c',
                'hpy/debug/src/dhqueue.c',
                'hpy/debug/src/memprotect.c',
+               'hpy/debug/src/stacktrace.c',
                'hpy/debug/src/_debugmod.c',
                'hpy/debug/src/autogen_debug_wrappers.c',
               ],

@@ -35,3 +35,10 @@ from hpy.debug.pytest import hpy_debug
 def test_that_uses_leak_detector_fixture(hpy_debug):
     # Run some HPy extension code
     assert mixed.add_ints(40, 2) == 42
+
+
+def test_leak_detector_with_traces():
+    import hpy.debug
+    hpy.debug.set_handle_stack_trace_limit(16)
+    assert mixed.add_ints(40, 2) == 42
+    hpy.debug.disable_handle_stack_traces()
