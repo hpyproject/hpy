@@ -31,3 +31,25 @@ The debugging context can already check for:
 An HPy module may be explicitly loaded in debug mode using::
 
   mod = hpy.universal.load(module_name, so_filename, debug=True)
+
+The HPy debug module also exposes `LeakDetector` class for detection of
+leaked handles. `LeakDetector` can be used to check that some code does
+not leave behind unclosed `HPy` handles. For example:
+
+.. literalinclude:: examples/tests.py
+  :language: python
+  :start-at: def test_leak_detector
+  :end-at: # Run some HPy extension code
+
+Additionally, the debug module also exposes pytest fixture `hpy_debug` that
+for the time being enables the `LeakDetector`, but may also enable other
+useful debugging facilities.
+
+.. literalinclude:: examples/tests.py
+  :language: python
+  :start-at: from hpy.debug.pytest import hpy_debug
+  :end-at: # Run some HPy extension code
+
+**ATTENTION**: the usage of `LeakDetector` or `hpy_debug` by itself does not
+enable the HPy debug mode! If the debug mode is not enabled for any extension,
+then those features do nothing useful (but also nothing harmful).
