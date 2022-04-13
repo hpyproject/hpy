@@ -1,4 +1,3 @@
-/* these are not real typedefs: they are there only to make pycparser happy */
 typedef int HPy;
 typedef int HPyContext;
 typedef int HPyModuleDef;
@@ -21,6 +20,9 @@ typedef int HPy_buffer;
 typedef int HPyFunc_visitproc;
 typedef int HPy_UCS4;
 typedef int HPyThreadState;
+// ^ these are not real typedefs: they are there only to make pycparser happy
+// and this comment is not on the top of the file, so that it is not picked up
+// by autodoc
 
 /* HPy public API */
 
@@ -317,119 +319,118 @@ int HPyTracker_Add(HPyContext *ctx, HPyTracker ht, HPy h);
 void HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht);
 void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
-/* HPyField
-
-   HPyFields should be used ONLY in parts of memory which is known to the GC,
-   e.g. memory allocated by HPy_New:
-
-     - NEVER declare a local variable of type HPyField
-     - NEVER use HPyField on a struct allocated by e.g. malloc()
-
-   **CPython's note**: contrarily than PyObject*, you don't need to manually
-   manage refcounting when using HPyField: if you use HPyField_Store to
-   overwrite an existing value, the old object will be automatically decrefed.
-   This means that you CANNOT use HPyField_Store to write memory which
-   contains uninitialized values, because it would try to decref a dangling
-   pointer.
-
-   Note that HPy_New automatically zeroes the memory it allocates, so
-   everything works well out of the box. In case you are using manually
-   allocated memory, you should initialize the HPyField to HPyField_NULL.
-
-   Note the difference:
-
-     - ``obj->f = HPyField_NULL``: this should be used only to initialize
-       uninitialized memory. If you use it to overwrite a valid HPyField, you
-       will cause a memory leak (at least on CPython)
-
-     - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
-       the old value. However, you CANNOT use it if the memory is not
-       initialized.
-
-Note: target_object and source_object are there in case an implementation
-needs to add write and/or read barriers on the objects. They are ignored by
-CPython but e.g. PyPy needs a write barrier.
+/**
+ * HPyFields should be used ONLY in parts of memory which is known to the GC,
+ * e.g. memory allocated by HPy_New:
+ *
+ *   - NEVER declare a local variable of type HPyField
+ *   - NEVER use HPyField on a struct allocated by e.g. malloc()
+ *
+ * **CPython's note**: contrarily than PyObject*, you don't need to manually
+ * manage refcounting when using HPyField: if you use HPyField_Store to
+ * overwrite an existing value, the old object will be automatically decrefed.
+ * This means that you CANNOT use HPyField_Store to write memory which
+ * contains uninitialized values, because it would try to decref a dangling
+ * pointer.
+ *
+ * Note that HPy_New automatically zeroes the memory it allocates, so
+ * everything works well out of the box. In case you are using manually
+ * allocated memory, you should initialize the HPyField to HPyField_NULL.
+ *
+ * Note the difference:
+ *
+ *   - ``obj->f = HPyField_NULL``: this should be used only to initialize
+ *     uninitialized memory. If you use it to overwrite a valid HPyField, you
+ *     will cause a memory leak (at least on CPython)
+ *
+ *   - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
+ *     the old value. However, you CANNOT use it if the memory is not
+ *     initialized.
+ *
+ * Note: target_object and source_object are there in case an implementation
+ * needs to add write and/or read barriers on the objects. They are ignored by
+ * CPython but e.g. PyPy needs a write barrier.
 */
 void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
 HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
 
-/* Leaving Python execution: for releasing GIL and other use-cases.
-
-    In most situations, users should prefer using convenience macros:
-    HPy_BEGIN_LEAVE_PYTHON(context)/HPy_END_LEAVE_PYTHON(context)
-
-    HPy extensions may leave Python execution when running Python independent
-    code: long-running computations or blocking operations. When an extension
-    has left the Python execution it must not call any HPy API other than
-    HPy_ReenterPythonExecution. It can access pointers returned by HPy API,
-    e.g., HPyUnicode_AsUTF8String, provided that they are valid at the point
-    of calling HPy_LeavePythonExecution.
-
-    Python execution must be reentered on the same thread as where it was left.
-    The leave/enter calls must not be nested. Debug mode will, in the future,
-    enforce these constraints.
-
-    Python implementations may use this knowledge however they wish. The most
-    obvious use case is to release the GIL, in which case the
-    HPy_BEGIN_LEAVE_PYTHON/HPy_END_LEAVE_PYTHON becomes equivalent to
-    Py_BEGIN_ALLOW_THREADS/Py_END_ALLOW_THREADS.
+/**
+ * Leaving Python execution: for releasing GIL and other use-cases.
+ *
+ * In most situations, users should prefer using convenience macros:
+ * HPy_BEGIN_LEAVE_PYTHON(context)/HPy_END_LEAVE_PYTHON(context)
+ *
+ * HPy extensions may leave Python execution when running Python independent
+ * code: long-running computations or blocking operations. When an extension
+ * has left the Python execution it must not call any HPy API other than
+ * HPy_ReenterPythonExecution. It can access pointers returned by HPy API,
+ * e.g., HPyUnicode_AsUTF8String, provided that they are valid at the point
+ * of calling HPy_LeavePythonExecution.
+ *
+ * Python execution must be reentered on the same thread as where it was left.
+ * The leave/enter calls must not be nested. Debug mode will, in the future,
+ * enforce these constraints.
+ *
+ * Python implementations may use this knowledge however they wish. The most
+ * obvious use case is to release the GIL, in which case the
+ * HPy_BEGIN_LEAVE_PYTHON/HPy_END_LEAVE_PYTHON becomes equivalent to
+ * Py_BEGIN_ALLOW_THREADS/Py_END_ALLOW_THREADS.
 */
-HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
 void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state);
+HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
 
-/* HPyGlobal
-
-   HPyGlobal is an alternative to module state. HPyGlobal must be a statically
-   allocated C global variable registered in HPyModuleDef.globals array.
-   A HPyGlobal can be used only after the HPy module where it is registered was
-   created using HPyModule_Create.
-
-   HPyGlobal serves as an identifier of a Python object that should be globally
-   available per one Python interpreter. Python objects referenced by HPyGlobals
-   are destroyed automatically on the interpreter exit (not necessarily the
-   process exit).
-
-   HPyGlobal instance does not allow anything else but loading and storing
-   a HPy handle using a HPyContext. Even if the HPyGlobal C variable may
-   be shared between threads or different interpreter instances within one
-   process, the API to load and store a handle from HPyGlobal is thread-safe (but
-   like any other HPy API must not be called in HPy_LeavePythonExecution blocks).
-
-   Given that a handle to object X1 is stored to HPyGlobal using HPyContext of
-   Python interpreter I1, then loading a handle from the same HPyGlobal using
-   HPyContext of Python interpreter I1 should give a handle to the same object
-   X1. Another Python interpreter I2 running within the same process and using
-   the same HPyGlobal variable will not be able to load X1 from it, it will have
-   its own view on what is stored in the given HPyGlobal.
-
-   All Python interpreters running in one process must be compatible, because
-   they will share all HPyGlobal C level variables. The internal data stored
-   in HPyGlobal are specific for each HPy implementation, each implementation
-   is also responsible for handling thread-safety when initializing the
-   internal data in HPyModule_Create. Note that HPyModule_Create may be called
-   concurrently depending on the semantics of the Python implementation (GIL vs
-   no GIL) and also depending on the whether there may be multiple instances of
-   given Python interpreter running within the same process. In the future, HPy
-   ABI may include a contract that internal data of each HPyGlobal must be
-   initialized to its address using atomic write and HPy implementations will
-   not be free to choose what to store in HPyGlobal, however, this will allow
-   multiple different HPy implementations within one process. This contract may
-   also be activated only by some runtime option, letting the HPy implementation
-   use more optimized HPyGlobal implementation otherwise.
-
-   Python interpreters may use indirection to isolate different interpreter
-   instances, but alternative techniques such as copy-on-write or immortal
-   objects can be used to avoid that indirection (even selectively on per
-   object basis using tagged pointers).
-
-   CPython HPy implementation may even provide configuration option that
-   switches between a faster version that stores directly PyObject* to
-   HPyGlobal but does not support subinterpreters, or a version that supports
-   subinterpreters. For now, CPython HPy always stores PyObject* directly
-   to HPyField.
-
-   While the standard implementation does not fully enforce the documented
-   contract, the HPy debug mode will enforce it (not implemented yet).
+/**
+ * HPyGlobal is an alternative to module state. HPyGlobal must be a statically
+ * allocated C global variable registered in HPyModuleDef.globals array.
+ * A HPyGlobal can be used only after the HPy module where it is registered was
+ * created using HPyModule_Create.
+ *
+ * HPyGlobal serves as an identifier of a Python object that should be globally
+ * available per one Python interpreter. Python objects referenced by HPyGlobals
+ * are destroyed automatically on the interpreter exit (not necessarily the
+ * process exit).
+ *
+ * HPyGlobal instance does not allow anything else but loading and storing
+ * a HPy handle using a HPyContext. Even if the HPyGlobal C variable may
+ * be shared between threads or different interpreter instances within one
+ * process, the API to load and store a handle from HPyGlobal is thread-safe (but
+ * like any other HPy API must not be called in HPy_LeavePythonExecution blocks).
+ *
+ * Given that a handle to object X1 is stored to HPyGlobal using HPyContext of
+ * Python interpreter I1, then loading a handle from the same HPyGlobal using
+ * HPyContext of Python interpreter I1 should give a handle to the same object
+ * X1. Another Python interpreter I2 running within the same process and using
+ * the same HPyGlobal variable will not be able to load X1 from it, it will have
+ * its own view on what is stored in the given HPyGlobal.
+ *
+ * All Python interpreters running in one process must be compatible, because
+ * they will share all HPyGlobal C level variables. The internal data stored
+ * in HPyGlobal are specific for each HPy implementation, each implementation
+ * is also responsible for handling thread-safety when initializing the
+ * internal data in HPyModule_Create. Note that HPyModule_Create may be called
+ * concurrently depending on the semantics of the Python implementation (GIL vs
+ * no GIL) and also depending on the whether there may be multiple instances of
+ * given Python interpreter running within the same process. In the future, HPy
+ * ABI may include a contract that internal data of each HPyGlobal must be
+ * initialized to its address using atomic write and HPy implementations will
+ * not be free to choose what to store in HPyGlobal, however, this will allow
+ * multiple different HPy implementations within one process. This contract may
+ * also be activated only by some runtime option, letting the HPy implementation
+ * use more optimized HPyGlobal implementation otherwise.
+ *
+ * Python interpreters may use indirection to isolate different interpreter
+ * instances, but alternative techniques such as copy-on-write or immortal
+ * objects can be used to avoid that indirection (even selectively on per
+ * object basis using tagged pointers).
+ *
+ * CPython HPy implementation may even provide configuration option that
+ * switches between a faster version that stores directly PyObject* to
+ * HPyGlobal but does not support subinterpreters, or a version that supports
+ * subinterpreters. For now, CPython HPy always stores PyObject* directly
+ * to HPyGlobal.
+ *
+ * While the standard implementation does not fully enforce the documented
+ * contract, the HPy debug mode will enforce it (not implemented yet).
 */
 void HPyGlobal_Store(HPyContext *ctx, HPyGlobal *global, HPy h);
 HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global);

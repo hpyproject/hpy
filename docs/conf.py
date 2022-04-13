@@ -52,6 +52,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 c_autodoc_roots = [
     "../hpy/devel/include",
     "../hpy/devel/src",
+    "../hpy/tools",
 ]
 
 

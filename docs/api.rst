@@ -1,5 +1,5 @@
-HPy API
-=======
+HPy API introduction
+====================
 
 .. warning::
    HPy is still in the early stages of development and the API may change.
@@ -18,6 +18,28 @@ When they are no longer needed, handles must be closed by calling
 Similarly, if you need a new handle for an existing object, you can duplicate
 it by calling ``HPy_Dup``, which plays more or less the same role as
 ``Py_INCREF``.
+
+The HPy API strictly follows these rules:
+
+- `HPy` handles are never borrowed, i.e., `HPy` handle returned by a API
+  function, such as `HPyLong_FromLong`, is always owned by the caller and
+  must be closed by the caller.
+- `HPy` handles are never stolen, i.e., `HPy` handle passed as an argument
+  to some API function is still owned by the caller and must be closed by
+  the caller.
+
+These rules makes the code simpler to reason about. Moreover, no reference
+borrowing enables the Python implementations to use whatever internal
+representation they wish. For example, the object returned by `HPy_GetItem_i`
+may be created on demand from some compact internal representation, which does
+not need to convert itself to full blown representation in order to hold onto
+the borrowed object.
+
+We strongly encourage the users of HPy to also internally follow these rules
+for their own internal APIs and helper functions. For the sake of simplicity
+and easier local reasoning and also because in the future, code adhering
+to those rules may be suitable target for some scalable and precise static
+analysis tool.
 
 The concept of handles is certainly not unique to HPy. Other examples include
 Unix file descriptors, where you have ``dup()`` and ``close()``, and Windows'
