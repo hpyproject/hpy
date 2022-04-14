@@ -46,7 +46,7 @@ Better debugging
   In debug mode, you get early and precise errors and warnings when you make
   some specific kind of mistakes and/or violate the API rules and
   assumptions. For example, you get an error if you try to use a handle
-  (see :ref:`handles`) which has already been closed. It is possible to
+  (see :ref:`api:handles`) which has already been closed. It is possible to
   turn on the debug mode at startup time, *without needing to recompile*.
 
 
@@ -192,7 +192,7 @@ API:
     to early :ref:`benchmarks`, an extension written in HPy can be ~3x faster
     than the equivalent extension written in Python/C.
 
-  - Improved debugging: when you load extensions in :ref:`debug mode`,
+  - Improved debugging: when you load extensions in :ref:`debug-mode:debug mode`,
     many common mistakes are checked and reported automatically.
 
   - Universal binaries: you can choose to distribute only Universal ABI

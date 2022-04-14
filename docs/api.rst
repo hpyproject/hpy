@@ -21,10 +21,10 @@ it by calling ``HPy_Dup``, which plays more or less the same role as
 
 The HPy API strictly follows these rules:
 
-- `HPy` handles are never borrowed, i.e., `HPy` handle returned by a API
-  function, such as `HPyLong_FromLong`, is always owned by the caller and
+- ``HPy`` handles are never borrowed, i.e., ``HPy`` handle returned by a API
+  function, such as ``HPyLong_FromLong``, is always owned by the caller and
   must be closed by the caller.
-- `HPy` handles are never stolen, i.e., `HPy` handle passed as an argument
+- ``HPy`` handles are never stolen, i.e., ``HPy`` handle passed as an argument
   to some API function is still owned by the caller and must be closed by
   the caller.
 
@@ -82,7 +82,7 @@ Becomes using HPy API:
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
 ``HPy_Close()`` on a handle results in a memory leak. When running in
-:ref:`debug mode`, HPy actively checks that you that you don't close a handle
+:ref:`debug-mode:debug mode`, HPy actively checks that you that you don't close a handle
 twice and that you don't forget to close any.
 
 
