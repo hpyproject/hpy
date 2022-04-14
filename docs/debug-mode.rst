@@ -38,17 +38,17 @@ modules are loaded with debug context. Alternatively ``HPY_DEBUG_CONTEXT``
 can be set to a comma separated list of names of the modules that should
 be loaded in the debug mode.
 
-The HPy debug module also exposes `LeakDetector` class for detection of
-leaked handles. `LeakDetector` can be used to check that some code does
-not leave behind unclosed `HPy` handles. For example:
+The HPy debug module also exposes ``LeakDetector`` class for detection of
+leaked handles. ``LeakDetector`` can be used to check that some code does
+not leave behind unclosed ``HPy`` handles. For example:
 
 .. literalinclude:: examples/tests.py
   :language: python
   :start-at: def test_leak_detector
   :end-at: # Run some HPy extension code
 
-Additionally, the debug module also exposes pytest fixture `hpy_debug` that
-for the time being enables the `LeakDetector`, but may also enable other
+Additionally, the debug module also exposes pytest fixture ``hpy_debug`` that
+for the time being enables the ``LeakDetector``, but may also enable other
 useful debugging facilities.
 
 .. literalinclude:: examples/tests.py
@@ -56,7 +56,7 @@ useful debugging facilities.
   :start-at: from hpy.debug.pytest import hpy_debug
   :end-at: # Run some HPy extension code
 
-**ATTENTION**: the usage of `LeakDetector` or `hpy_debug` by itself does not
+**ATTENTION**: the usage of ``LeakDetector`` or ``hpy_debug`` by itself does not
 enable the HPy debug mode! If the debug mode is not enabled for any extension,
 then those features do nothing useful (but also nothing harmful).
 

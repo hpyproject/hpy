@@ -277,9 +277,9 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
 
     const char *fmt = NULL;
     if (dh->handle->is_closed)
-        fmt = "<DebugHandle 0x%x CLOSED>\n%s\n%s";
+        fmt = "<DebugHandle 0x%x CLOSED>\n%s%s";
     else
-        fmt = "<DebugHandle 0x%x for %r>\n%s\n%s";
+        fmt = "<DebugHandle 0x%x for %r>\n%s%s";
 
     // XXX: switch to HPyUnicode_FromFormat when we have it
     uh_fmt = HPyUnicode_FromString(uctx, fmt);
@@ -293,11 +293,11 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
     const char *trace_header = "";
     const char *trace = "";
     if (dh->handle->allocation_stacktrace) {
-        trace_header = "Allocation stacktrace:";
+        trace_header = "Allocation stacktrace:\n";
         trace = dh->handle->allocation_stacktrace;
     } else {
-        trace_header = "To get a stack trace of where it was allocated use:";
-        trace = "hpy.debug.set_stack_trace_limit(size)";
+        trace_header = "To get the stack trace of where it was allocated use:\nhpy.debug.";
+        trace = set_handle_stack_trace_limit.meth.name;
     }
     HPy h_trace_header = HPyUnicode_FromString(uctx, trace_header);
     HPy h_trace = HPyUnicode_FromString(uctx, trace);
