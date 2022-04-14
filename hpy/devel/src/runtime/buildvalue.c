@@ -55,7 +55,7 @@
  *     Convert a C double to a Python floating point number.
  *
  * Collections
- * ~~~~~~~
+ * ~~~~~~~~~~~
  *
  * ``(items) (tuple) [matching-items]``
  *     Convert a sequence of C values to a Python tuple with the same number of items.
