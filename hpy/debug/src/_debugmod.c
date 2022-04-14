@@ -290,8 +290,8 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
     if (HPy_IsNull(uh_id))
         goto exit;
 
-    const char *trace_header = "";
-    const char *trace = "";
+    const char *trace_header;
+    const char *trace;
     if (dh->handle->allocation_stacktrace) {
         trace_header = "Allocation stacktrace:\n";
         trace = dh->handle->allocation_stacktrace;
