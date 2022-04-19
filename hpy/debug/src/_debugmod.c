@@ -317,6 +317,8 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
     HPy_Close(uctx, uh_fmt);
     HPy_Close(uctx, uh_id);
     HPy_Close(uctx, uh_args);
+    HPy_Close(uctx, h_trace);
+    HPy_Close(uctx, h_trace_header);
     return uh_result;
 }
 
