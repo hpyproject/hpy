@@ -274,6 +274,8 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
     UHPy uh_id = HPy_NULL;
     UHPy uh_args = HPy_NULL;
     UHPy uh_result = HPy_NULL;
+    UHPy h_trace_header = HPy_NULL;
+    UHPy h_trace = HPy_NULL;
 
     const char *fmt = NULL;
     if (dh->handle->is_closed)
@@ -299,8 +301,8 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
         trace_header = "To get the stack trace of where it was allocated use:\nhpy.debug.";
         trace = set_handle_stack_trace_limit.meth.name;
     }
-    HPy h_trace_header = HPyUnicode_FromString(uctx, trace_header);
-    HPy h_trace = HPyUnicode_FromString(uctx, trace);
+    h_trace_header = HPyUnicode_FromString(uctx, trace_header);
+    h_trace = HPyUnicode_FromString(uctx, trace);
 
     if (dh->handle->is_closed)
         uh_args = HPyTuple_FromArray(uctx, (UHPy[]){uh_id,
