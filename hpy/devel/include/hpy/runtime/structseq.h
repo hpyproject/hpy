@@ -34,6 +34,8 @@ HPyAPI_HELPER HPyStructSequenceBuilder HPyStructSequenceBuilder_New(HPyContext*,
 
 HPyAPI_HELPER void HPyStructSequenceBuilder_Set(HPyContext*, HPyStructSequenceBuilder, HPy_ssize_t, HPy);
 
+HPyAPI_HELPER void HPyStructSequenceBuilder_Set_i(HPyContext*, HPyStructSequenceBuilder, HPy_ssize_t, long);
+
 HPyAPI_HELPER HPy HPyStructSequenceBuilder_Build(HPyContext*, HPyStructSequenceBuilder, HPy);
 
 HPyAPI_HELPER void HPyStructSequenceBuilder_Cancel(HPyContext*, HPyStructSequenceBuilder);
