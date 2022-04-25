@@ -528,4 +528,8 @@ HPyAPI_FUNC HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
     return _py2h(res);
 }
 
+HPyAPI_FUNC HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key) {
+    return ctx_Dict_GetItem(ctx, op, key);
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */

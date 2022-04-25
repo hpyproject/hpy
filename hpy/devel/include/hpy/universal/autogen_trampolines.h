@@ -530,6 +530,10 @@ HPyAPI_FUNC HPy HPyDict_Keys(HPyContext *ctx, HPy h) {
      return ctx->ctx_Dict_Keys ( ctx, h ); 
 }
 
+HPyAPI_FUNC HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key) {
+     return ctx->ctx_Dict_GetItem ( ctx, op, key ); 
+}
+
 HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_Tuple_Check ( ctx, h ); 
 }

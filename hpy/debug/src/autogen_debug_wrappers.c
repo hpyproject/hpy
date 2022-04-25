@@ -652,6 +652,11 @@ DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h)
     return DHPy_open(dctx, HPyDict_Keys(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
 }
 
+DHPy debug_ctx_Dict_GetItem(HPyContext *dctx, DHPy op, DHPy key)
+{
+    return DHPy_open(dctx, HPyDict_GetItem(get_info(dctx)->uctx, DHPy_unwrap(dctx, op), DHPy_unwrap(dctx, key)));
+}
+
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
 {
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

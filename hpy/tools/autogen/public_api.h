@@ -291,6 +291,13 @@ int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy HPyDict_New(HPyContext *ctx);
 HPy HPyDict_Keys(HPyContext *ctx, HPy h);
+/* HPyDict_GetItem
+
+   In contrast to HPy_GetItem, this function ignores the error context. I.e.
+   if 'HPyErr_Occurred(ctx) != 0', it will still work.
+   This function, of course, returns a new reference.
+ */
+HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 
 /* tupleobject.h */
 int HPyTuple_Check(HPyContext *ctx, HPy h);

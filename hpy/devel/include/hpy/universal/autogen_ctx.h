@@ -227,6 +227,7 @@ struct _HPyContext_s {
     int (*ctx_Dict_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Dict_New)(HPyContext *ctx);
     HPy (*ctx_Dict_Keys)(HPyContext *ctx, HPy h);
+    HPy (*ctx_Dict_GetItem)(HPyContext *ctx, HPy op, HPy key);
     int (*ctx_Tuple_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Tuple_FromArray)(HPyContext *ctx, HPy items[], HPy_ssize_t n);
     HPy (*ctx_ContextVar_New)(HPyContext *ctx, const char *name, HPy default_value);
