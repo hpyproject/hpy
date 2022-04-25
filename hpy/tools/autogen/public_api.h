@@ -281,6 +281,7 @@ HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, con
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
 HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
 HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str);
+HPy HPyUnicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
 
 /* listobject.h */
 int HPyList_Check(HPyContext *ctx, HPy h);
