@@ -238,6 +238,7 @@ HPy HPy_Type(HPyContext *ctx, HPy obj);
 // see issue #160
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
 int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
+const char *HPyType_GetName(HPyContext *ctx, HPy type);
 
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 
