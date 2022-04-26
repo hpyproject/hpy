@@ -540,6 +540,11 @@ HPyAPI_IMPL HPy ctx_Unicode_InternFromString(HPyContext *ctx, const char *str)
     return _py2h(PyUnicode_InternFromString(str));
 }
 
+HPyAPI_IMPL HPy ctx_Unicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end)
+{
+    return _py2h(PyUnicode_Substring(_h2py(obj), start, end));
+}
+
 HPyAPI_IMPL int ctx_List_Check(HPyContext *ctx, HPy h)
 {
     return PyList_Check(_h2py(h));

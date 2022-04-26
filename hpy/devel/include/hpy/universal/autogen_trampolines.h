@@ -506,6 +506,10 @@ HPyAPI_FUNC HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str) {
      return ctx->ctx_Unicode_InternFromString ( ctx, str ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end) {
+     return ctx->ctx_Unicode_Substring ( ctx, obj, start, end ); 
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_List_Check ( ctx, h ); 
 }
@@ -528,6 +532,10 @@ HPyAPI_FUNC HPy HPyDict_New(HPyContext *ctx) {
 
 HPyAPI_FUNC HPy HPyDict_Keys(HPyContext *ctx, HPy h) {
      return ctx->ctx_Dict_Keys ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key) {
+     return ctx->ctx_Dict_GetItem ( ctx, op, key ); 
 }
 
 HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h) {

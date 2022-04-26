@@ -221,12 +221,14 @@ struct _HPyContext_s {
     HPy (*ctx_Unicode_DecodeLatin1)(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
     HPy (*ctx_Unicode_FromEncodedObject)(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
     HPy (*ctx_Unicode_InternFromString)(HPyContext *ctx, const char *str);
+    HPy (*ctx_Unicode_Substring)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
     int (*ctx_List_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_List_New)(HPyContext *ctx, HPy_ssize_t len);
     int (*ctx_List_Append)(HPyContext *ctx, HPy h_list, HPy h_item);
     int (*ctx_Dict_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Dict_New)(HPyContext *ctx);
     HPy (*ctx_Dict_Keys)(HPyContext *ctx, HPy h);
+    HPy (*ctx_Dict_GetItem)(HPyContext *ctx, HPy op, HPy key);
     int (*ctx_Tuple_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Tuple_FromArray)(HPyContext *ctx, HPy items[], HPy_ssize_t n);
     HPy (*ctx_ContextVar_New)(HPyContext *ctx, const char *name, HPy default_value);

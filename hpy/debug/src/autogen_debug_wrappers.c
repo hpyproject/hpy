@@ -622,6 +622,11 @@ DHPy debug_ctx_Unicode_InternFromString(HPyContext *dctx, const char *str)
     return DHPy_open(dctx, HPyUnicode_InternFromString(get_info(dctx)->uctx, str));
 }
 
+DHPy debug_ctx_Unicode_Substring(HPyContext *dctx, DHPy obj, HPy_ssize_t start, HPy_ssize_t end)
+{
+    return DHPy_open(dctx, HPyUnicode_Substring(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), start, end));
+}
+
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
 {
     return HPyList_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
@@ -650,6 +655,11 @@ DHPy debug_ctx_Dict_New(HPyContext *dctx)
 DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h)
 {
     return DHPy_open(dctx, HPyDict_Keys(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
+}
+
+DHPy debug_ctx_Dict_GetItem(HPyContext *dctx, DHPy op, DHPy key)
+{
+    return DHPy_open(dctx, HPyDict_GetItem(get_info(dctx)->uctx, DHPy_unwrap(dctx, op), DHPy_unwrap(dctx, key)));
 }
 
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
