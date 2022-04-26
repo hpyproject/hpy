@@ -457,9 +457,19 @@ int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type)
     return HPy_TypeCheck(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, type));
 }
 
+int debug_ctx_SetType(HPyContext *dctx, DHPy obj, DHPy type)
+{
+    return HPy_SetType(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, type));
+}
+
 int debug_ctx_Type_IsSubtype(HPyContext *dctx, DHPy sub, DHPy type)
 {
     return HPyType_IsSubtype(get_info(dctx)->uctx, DHPy_unwrap(dctx, sub), DHPy_unwrap(dctx, type));
+}
+
+const char *debug_ctx_Type_GetName(HPyContext *dctx, DHPy type)
+{
+    return HPyType_GetName(get_info(dctx)->uctx, DHPy_unwrap(dctx, type));
 }
 
 int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other)
