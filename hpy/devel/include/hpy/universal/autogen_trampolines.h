@@ -502,6 +502,10 @@ HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const cha
      return ctx->ctx_Unicode_FromEncodedObject ( ctx, obj, encoding, errors ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str) {
+     return ctx->ctx_Unicode_InternFromString ( ctx, str ); 
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_List_Check ( ctx, h ); 
 }

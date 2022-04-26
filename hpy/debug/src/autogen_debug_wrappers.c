@@ -617,6 +617,11 @@ DHPy debug_ctx_Unicode_FromEncodedObject(HPyContext *dctx, DHPy obj, const char 
     return DHPy_open(dctx, HPyUnicode_FromEncodedObject(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), encoding, errors));
 }
 
+DHPy debug_ctx_Unicode_InternFromString(HPyContext *dctx, const char *str)
+{
+    return DHPy_open(dctx, HPyUnicode_InternFromString(get_info(dctx)->uctx, str));
+}
+
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
 {
     return HPyList_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
