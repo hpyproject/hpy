@@ -122,3 +122,9 @@ SPECIAL_CASES = {
     'HPy_MaybeGetAttr_s': None,
     'HPyDict_GetItem': None,
 }
+
+# Allows to provide a simple inline implementation for the context function
+# and the CPython inline function. In this case the CPython trampoline will
+# not delegate to the ctx_* function, but will contain this code inline.
+INLINE_IMPLEMENTATION = {
+}
