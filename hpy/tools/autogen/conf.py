@@ -127,6 +127,12 @@ SPECIAL_CASES = {
 # and the CPython inline function. In this case the CPython trampoline will
 # not delegate to the ctx_* function, but will contain this code inline.
 INLINE_IMPLEMENTATION = {
+    'HPy_SetType':
+        # args: (obj, type)
+        '''
+        _h2py(obj)->ob_type = (PyTypeObject*) _h2py(type);
+        return 0;
+        ''',
     'HPyType_GetName':
         # args: (type)
         '''
