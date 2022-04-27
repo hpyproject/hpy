@@ -406,13 +406,15 @@ HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj)
 
 HPyAPI_FUNC int HPy_SetType(HPyContext *ctx, HPy obj, HPy type)
 {
-_h2py(obj)->ob_type = (PyTypeObject*) _h2py(type);
+assert(PyType_Check(_h2py(type)));
+        _h2py(obj)->ob_type = (PyTypeObject*) _h2py(type);
         return 0;
 }
 
 HPyAPI_FUNC const char *HPyType_GetName(HPyContext *ctx, HPy type)
 {
-return ((PyTypeObject*) _h2py(type))->tp_name;
+assert(PyType_Check(_h2py(type)));
+        return ((PyTypeObject*) _h2py(type))->tp_name;
 }
 
 HPyAPI_FUNC HPy HPy_Repr(HPyContext *ctx, HPy obj)

@@ -130,12 +130,14 @@ INLINE_IMPLEMENTATION = {
     'HPy_SetType':
         # args: (obj, type)
         '''
+        assert(PyType_Check(_h2py(type)));
         _h2py(obj)->ob_type = (PyTypeObject*) _h2py(type);
         return 0;
         ''',
     'HPyType_GetName':
         # args: (type)
         '''
+        assert(PyType_Check(_h2py(type)));
         return ((PyTypeObject*) _h2py(type))->tp_name;
         '''
 }
