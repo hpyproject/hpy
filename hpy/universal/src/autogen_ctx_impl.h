@@ -402,14 +402,14 @@ HPyAPI_IMPL HPy ctx_Type(HPyContext *ctx, HPy obj)
 
 HPyAPI_IMPL int ctx_SetType(HPyContext *ctx, HPy obj, HPy type)
 {
-assert(PyType_Check(_h2py(type)));
+        assert(PyType_Check(_h2py(type)));
         _h2py(obj)->ob_type = (PyTypeObject*) _h2py(type);
         return 0;
 }
 
 HPyAPI_IMPL const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
 {
-assert(PyType_Check(_h2py(type)));
+        assert(PyType_Check(_h2py(type)));
         return ((PyTypeObject*) _h2py(type))->tp_name;
 }
 
