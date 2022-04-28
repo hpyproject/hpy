@@ -108,7 +108,7 @@ class cpython_autogen_api_impl_h(AutoGenFile):
         w(self.signature(func, const_return))
         w('{')
         if func.node.name in INLINE_IMPLEMENTATION:
-            lines += INLINE_IMPLEMENTATION[func.node.name].strip('\n').split('\n')
+            lines += INLINE_IMPLEMENTATION[func.node.name].lstrip('\n').rstrip().split('\n')
         else:
             return_stmt = '' if return_type == 'void' else 'return '
             w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
