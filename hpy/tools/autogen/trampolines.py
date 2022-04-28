@@ -77,6 +77,7 @@ class cpython_autogen_api_impl_h(AutoGenFile):
         return '\n'.join(lines)
 
     def gen_implementation(self, func):
+        from .conf import INLINE_IMPLEMENTATION
         def call(pyfunc, return_type):
             # return _py2h(PyNumber_Add(_h2py(x), _h2py(y)))
             args = []
@@ -104,14 +105,15 @@ class cpython_autogen_api_impl_h(AutoGenFile):
             raise ValueError(f"Cannot generate implementation for {self}")
         const_return = get_return_constant(func)
         return_type = get_context_return_type(func.node, const_return)
-        return_stmt = '' if return_type == 'void' else 'return '
         w(self.signature(func, const_return))
         w('{')
-        w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
-
-        if self.GENERATE_CONST_RETURN and const_return:
-            w('    return %s;' % const_return)
-
+        if func.node.name in INLINE_IMPLEMENTATION:
+            lines += INLINE_IMPLEMENTATION[func.node.name].lstrip('\n').rstrip().split('\n')
+        else:
+            return_stmt = '' if return_type == 'void' else 'return '
+            w('    %s%s;' % (return_stmt, call(pyfunc, return_type)))
+            if self.GENERATE_CONST_RETURN and const_return:
+                w('    return %s;' % const_return)
         w('}')
         return '\n'.join(lines)
 

@@ -374,8 +374,16 @@ HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type) {
      return ctx->ctx_TypeCheck ( ctx, obj, type ); 
 }
 
+HPyAPI_FUNC int HPy_SetType(HPyContext *ctx, HPy obj, HPy type) {
+     return ctx->ctx_SetType ( ctx, obj, type ); 
+}
+
 HPyAPI_FUNC int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type) {
      return ctx->ctx_Type_IsSubtype ( ctx, sub, type ); 
+}
+
+HPyAPI_FUNC const char *HPyType_GetName(HPyContext *ctx, HPy type) {
+     return ctx->ctx_Type_GetName ( ctx, type ); 
 }
 
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy obj, HPy other) {

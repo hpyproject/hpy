@@ -102,7 +102,9 @@ int debug_ctx_SetItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx, DHPy value)
 int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *key, DHPy value);
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj);
 int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type);
+int debug_ctx_SetType(HPyContext *dctx, DHPy obj, DHPy type);
 int debug_ctx_Type_IsSubtype(HPyContext *dctx, DHPy sub, DHPy type);
+const char *debug_ctx_Type_GetName(HPyContext *dctx, DHPy type);
 int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other);
 void *debug_ctx_AsStruct(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStructLegacy(HPyContext *dctx, DHPy h);
@@ -353,7 +355,9 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_SetItem_s = &debug_ctx_SetItem_s;
     dctx->ctx_Type = &debug_ctx_Type;
     dctx->ctx_TypeCheck = &debug_ctx_TypeCheck;
+    dctx->ctx_SetType = &debug_ctx_SetType;
     dctx->ctx_Type_IsSubtype = &debug_ctx_Type_IsSubtype;
+    dctx->ctx_Type_GetName = &debug_ctx_Type_GetName;
     dctx->ctx_Is = &debug_ctx_Is;
     dctx->ctx_AsStruct = &debug_ctx_AsStruct;
     dctx->ctx_AsStructLegacy = &debug_ctx_AsStructLegacy;
