@@ -43,7 +43,7 @@ HPyCapsule_GetPointer(HPyContext *ctx, HPy capsule, const char *name)
 static inline const char *
 HPyCapsule_GetName(HPyContext *ctx, HPy capsule)
 {
-    return ctx->ctx_Capsule_Get(
+    return (const char *) ctx->ctx_Capsule_Get(
             ctx, capsule, HPyCapsule_key_Name, NULL);
 }
 
@@ -57,7 +57,7 @@ HPyCapsule_GetContext(HPyContext *ctx, HPy capsule)
 static inline HPyCapsule_Destructor
 HPyCapsule_GetDestructor(HPyContext *ctx, HPy capsule)
 {
-    return ctx->ctx_Capsule_Get(
+    return (HPyCapsule_Destructor) ctx->ctx_Capsule_Get(
             ctx, capsule, HPyCapsule_key_Destructor, NULL);
 }
 
@@ -87,7 +87,7 @@ HPyCapsule_SetDestructor(HPyContext *ctx, HPy capsule,
         HPyCapsule_Destructor destructor)
 {
     return ctx->ctx_Capsule_Set(
-            ctx, capsule, HPyCapsule_key_Destructor, destructor);
+            ctx, capsule, HPyCapsule_key_Destructor, (void *) destructor);
 }
 
 #endif /* HPY_MISC_TRAMPOLINES_H */
