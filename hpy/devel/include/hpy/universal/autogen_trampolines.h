@@ -102,6 +102,10 @@ HPyAPI_FUNC HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h) {
      return ctx->ctx_Length ( ctx, h ); 
 }
 
+HPyAPI_FUNC int HPySequence_Check(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Sequence_Check ( ctx, h ); 
+}
+
 HPyAPI_FUNC int HPyNumber_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_Number_Check ( ctx, h ); 
 }

@@ -110,6 +110,11 @@ HPyAPI_IMPL HPy_ssize_t ctx_Length(HPyContext *ctx, HPy h)
     return PyObject_Length(_h2py(h));
 }
 
+HPyAPI_IMPL int ctx_Sequence_Check(HPyContext *ctx, HPy h)
+{
+    return PySequence_Check(_h2py(h));
+}
+
 HPyAPI_IMPL int ctx_Number_Check(HPyContext *ctx, HPy h)
 {
     return PyNumber_Check(_h2py(h));

@@ -110,6 +110,11 @@ HPyAPI_FUNC HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h)
     return PyObject_Length(_h2py(h));
 }
 
+HPyAPI_FUNC int HPySequence_Check(HPyContext *ctx, HPy h)
+{
+    return PySequence_Check(_h2py(h));
+}
+
 HPyAPI_FUNC int HPyNumber_Check(HPyContext *ctx, HPy h)
 {
     return PyNumber_Check(_h2py(h));

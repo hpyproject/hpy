@@ -33,6 +33,7 @@ DHPy debug_ctx_Float_FromDouble(HPyContext *dctx, double v);
 double debug_ctx_Float_AsDouble(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Bool_FromLong(HPyContext *dctx, long v);
 HPy_ssize_t debug_ctx_Length(HPyContext *dctx, DHPy h);
+int debug_ctx_Sequence_Check(HPyContext *dctx, DHPy h);
 int debug_ctx_Number_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Add(HPyContext *dctx, DHPy h1, DHPy h2);
 DHPy debug_ctx_Subtract(HPyContext *dctx, DHPy h1, DHPy h2);
@@ -286,6 +287,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Float_AsDouble = &debug_ctx_Float_AsDouble;
     dctx->ctx_Bool_FromLong = &debug_ctx_Bool_FromLong;
     dctx->ctx_Length = &debug_ctx_Length;
+    dctx->ctx_Sequence_Check = &debug_ctx_Sequence_Check;
     dctx->ctx_Number_Check = &debug_ctx_Number_Check;
     dctx->ctx_Add = &debug_ctx_Add;
     dctx->ctx_Subtract = &debug_ctx_Subtract;
