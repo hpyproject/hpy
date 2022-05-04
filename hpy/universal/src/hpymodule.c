@@ -282,6 +282,7 @@ static void init_universal_ctx(HPyContext *ctx)
     ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
     ctx->h_MemoryViewType  = _py2h((PyObject *)&PyMemoryView_Type);
     ctx->h_CapsuleType = _py2h((PyObject *)&PyCapsule_Type);
+    ctx->h_SliceType = _py2h((PyObject *)&PySlice_Type);
 }
 
 

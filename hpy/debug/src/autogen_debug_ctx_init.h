@@ -149,6 +149,7 @@ DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Dict_GetItem(HPyContext *dctx, DHPy op, DHPy key);
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy items[], HPy_ssize_t n);
+int debug_ctx_Slice_Unpack(HPyContext *dctx, DHPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy default_value);
 int debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy default_value, DHPy *result);
 DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value);
@@ -264,6 +265,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->h_ListType = DHPy_open(dctx, uctx->h_ListType);
     dctx->h_MemoryViewType = DHPy_open(dctx, uctx->h_MemoryViewType);
     dctx->h_CapsuleType = DHPy_open(dctx, uctx->h_CapsuleType);
+    dctx->h_SliceType = DHPy_open(dctx, uctx->h_SliceType);
     dctx->ctx_Module_Create = &debug_ctx_Module_Create;
     dctx->ctx_Dup = &debug_ctx_Dup;
     dctx->ctx_Close = &debug_ctx_Close;
@@ -403,6 +405,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Dict_GetItem = &debug_ctx_Dict_GetItem;
     dctx->ctx_Tuple_Check = &debug_ctx_Tuple_Check;
     dctx->ctx_Tuple_FromArray = &debug_ctx_Tuple_FromArray;
+    dctx->ctx_Slice_Unpack = &debug_ctx_Slice_Unpack;
     dctx->ctx_ContextVar_New = &debug_ctx_ContextVar_New;
     dctx->ctx_ContextVar_Get = &debug_ctx_ContextVar_Get;
     dctx->ctx_ContextVar_Set = &debug_ctx_ContextVar_Set;

@@ -682,6 +682,11 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
+int debug_ctx_Slice_Unpack(HPyContext *dctx, DHPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step)
+{
+    return HPySlice_Unpack(get_info(dctx)->uctx, DHPy_unwrap(dctx, slice), start, stop, step);
+}
+
 DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy default_value)
 {
     return DHPy_open(dctx, HPyContextVar_New(get_info(dctx)->uctx, name, DHPy_unwrap(dctx, default_value)));

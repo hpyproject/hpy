@@ -598,6 +598,11 @@ HPyAPI_IMPL int ctx_Tuple_Check(HPyContext *ctx, HPy h)
     return PyTuple_Check(_h2py(h));
 }
 
+HPyAPI_IMPL int ctx_Slice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step)
+{
+    return PySlice_Unpack(_h2py(slice), start, stop, step);
+}
+
 HPyAPI_IMPL HPy ctx_ContextVar_New(HPyContext *ctx, const char *name, HPy default_value)
 {
     return _py2h(PyContextVar_New(name, _h2py(default_value)));
