@@ -154,6 +154,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Dict_GetItem = &ctx_Dict_GetItem,
     .ctx_Tuple_Check = &ctx_Tuple_Check,
     .ctx_Tuple_FromArray = &ctx_Tuple_FromArray,
+    .ctx_Slice_Unpack = &ctx_Slice_Unpack,
     .ctx_ContextVar_New = &ctx_ContextVar_New,
     .ctx_ContextVar_Get = &ctx_ContextVar_Get,
     .ctx_ContextVar_Set = &ctx_ContextVar_Set,

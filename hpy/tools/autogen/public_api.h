@@ -117,6 +117,7 @@ HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */
 HPy h_MemoryViewType;   /* built-in 'memoryview' */
 HPy h_CapsuleType;      /* built-in 'capsule' */
+HPy h_SliceType;        /* built-in 'slice' */
 
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
 HPy HPy_Dup(HPyContext *ctx, HPy h);
@@ -307,6 +308,9 @@ HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 int HPyTuple_Check(HPyContext *ctx, HPy h);
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
+
+/* slice */
+int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 
 /* contextvar */
 HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
