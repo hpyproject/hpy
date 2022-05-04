@@ -118,6 +118,7 @@ struct _HPyContext_s {
     double (*ctx_Float_AsDouble)(HPyContext *ctx, HPy h);
     HPy (*ctx_Bool_FromLong)(HPyContext *ctx, long v);
     HPy_ssize_t (*ctx_Length)(HPyContext *ctx, HPy h);
+    int (*ctx_Sequence_Check)(HPyContext *ctx, HPy h);
     int (*ctx_Number_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Add)(HPyContext *ctx, HPy h1, HPy h2);
     HPy (*ctx_Subtract)(HPyContext *ctx, HPy h1, HPy h2);

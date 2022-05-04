@@ -38,6 +38,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Float_AsDouble = &ctx_Float_AsDouble,
     .ctx_Bool_FromLong = &ctx_Bool_FromLong,
     .ctx_Length = &ctx_Length,
+    .ctx_Sequence_Check = &ctx_Sequence_Check,
     .ctx_Number_Check = &ctx_Number_Check,
     .ctx_Add = &ctx_Add,
     .ctx_Subtract = &ctx_Subtract,

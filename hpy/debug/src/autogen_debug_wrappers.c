@@ -122,6 +122,11 @@ HPy_ssize_t debug_ctx_Length(HPyContext *dctx, DHPy h)
     return HPy_Length(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
+int debug_ctx_Sequence_Check(HPyContext *dctx, DHPy h)
+{
+    return HPySequence_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
 int debug_ctx_Number_Check(HPyContext *dctx, DHPy h)
 {
     return HPyNumber_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

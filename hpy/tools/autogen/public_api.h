@@ -148,6 +148,7 @@ HPy HPyBool_FromLong(HPyContext *ctx, long v);
 
 /* abstract.h */
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
+int HPySequence_Check(HPyContext *ctx, HPy h);
 
 int HPyNumber_Check(HPyContext *ctx, HPy h);
 HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
