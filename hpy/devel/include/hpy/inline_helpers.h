@@ -1,6 +1,10 @@
 #ifndef HPY_INLINE_HELPERS_H
 #define HPY_INLINE_HELPERS_H
 
+#if defined(_MSC_VER)
+# include <malloc.h>  /* for alloca() */
+#endif
+
 HPyAPI_FUNC HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type)
 {
     return HPyErr_SetFromErrnoWithFilenameObjects(ctx, h_type, HPy_NULL, HPy_NULL);
