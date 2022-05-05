@@ -532,6 +532,11 @@ HPy_hash_t debug_ctx_Hash(HPyContext *dctx, DHPy obj)
     return HPy_Hash(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj));
 }
 
+DHPy debug_ctx_SeqIter_New(HPyContext *dctx, DHPy seq)
+{
+    return DHPy_open(dctx, HPySeqIter_New(get_info(dctx)->uctx, DHPy_unwrap(dctx, seq)));
+}
+
 int debug_ctx_Bytes_Check(HPyContext *dctx, DHPy h)
 {
     return HPyBytes_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));

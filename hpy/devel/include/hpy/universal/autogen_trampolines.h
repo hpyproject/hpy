@@ -430,6 +430,10 @@ HPyAPI_FUNC HPy_hash_t HPy_Hash(HPyContext *ctx, HPy obj) {
      return ctx->ctx_Hash ( ctx, obj ); 
 }
 
+HPyAPI_FUNC HPy HPySeqIter_New(HPyContext *ctx, HPy seq) {
+     return ctx->ctx_SeqIter_New ( ctx, seq ); 
+}
+
 HPyAPI_FUNC int HPyBytes_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_Check ( ctx, h ); 
 }

@@ -117,6 +117,7 @@ DHPy debug_ctx_Bytes(HPyContext *dctx, DHPy obj);
 DHPy debug_ctx_RichCompare(HPyContext *dctx, DHPy v, DHPy w, int op);
 int debug_ctx_RichCompareBool(HPyContext *dctx, DHPy v, DHPy w, int op);
 HPy_hash_t debug_ctx_Hash(HPyContext *dctx, DHPy obj);
+DHPy debug_ctx_SeqIter_New(HPyContext *dctx, DHPy seq);
 int debug_ctx_Bytes_Check(HPyContext *dctx, DHPy h);
 HPy_ssize_t debug_ctx_Bytes_Size(HPyContext *dctx, DHPy h);
 HPy_ssize_t debug_ctx_Bytes_GET_SIZE(HPyContext *dctx, DHPy h);
@@ -373,6 +374,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_RichCompare = &debug_ctx_RichCompare;
     dctx->ctx_RichCompareBool = &debug_ctx_RichCompareBool;
     dctx->ctx_Hash = &debug_ctx_Hash;
+    dctx->ctx_SeqIter_New = &debug_ctx_SeqIter_New;
     dctx->ctx_Bytes_Check = &debug_ctx_Bytes_Check;
     dctx->ctx_Bytes_Size = &debug_ctx_Bytes_Size;
     dctx->ctx_Bytes_GET_SIZE = &debug_ctx_Bytes_GET_SIZE;

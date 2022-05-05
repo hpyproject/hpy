@@ -453,6 +453,11 @@ HPyAPI_IMPL HPy_hash_t ctx_Hash(HPyContext *ctx, HPy obj)
     return PyObject_Hash(_h2py(obj));
 }
 
+HPyAPI_IMPL HPy ctx_SeqIter_New(HPyContext *ctx, HPy seq)
+{
+    return _py2h(PySeqIter_New(_h2py(seq)));
+}
+
 HPyAPI_IMPL int ctx_Bytes_Check(HPyContext *ctx, HPy h)
 {
     return PyBytes_Check(_h2py(h));

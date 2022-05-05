@@ -122,6 +122,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_RichCompare = &ctx_RichCompare,
     .ctx_RichCompareBool = &ctx_RichCompareBool,
     .ctx_Hash = &ctx_Hash,
+    .ctx_SeqIter_New = &ctx_SeqIter_New,
     .ctx_Bytes_Check = &ctx_Bytes_Check,
     .ctx_Bytes_Size = &ctx_Bytes_Size,
     .ctx_Bytes_GET_SIZE = &ctx_Bytes_GET_SIZE,

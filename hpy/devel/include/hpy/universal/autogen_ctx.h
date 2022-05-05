@@ -203,6 +203,7 @@ struct _HPyContext_s {
     HPy (*ctx_RichCompare)(HPyContext *ctx, HPy v, HPy w, int op);
     int (*ctx_RichCompareBool)(HPyContext *ctx, HPy v, HPy w, int op);
     HPy_hash_t (*ctx_Hash)(HPyContext *ctx, HPy obj);
+    HPy (*ctx_SeqIter_New)(HPyContext *ctx, HPy seq);
     int (*ctx_Bytes_Check)(HPyContext *ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_Size)(HPyContext *ctx, HPy h);
     HPy_ssize_t (*ctx_Bytes_GET_SIZE)(HPyContext *ctx, HPy h);
