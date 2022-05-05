@@ -1,4 +1,4 @@
-CC = gcc
+CC ?= gcc
 INCLUDE=-I.. -I../hpy/devel/include -I../hpy/debug/src/include
 CFLAGS = -O0 -UNDEBUG -g -Wall -Werror -Wfatal-errors $(INCLUDE) -DHPY_UNIVERSAL_ABI
 
