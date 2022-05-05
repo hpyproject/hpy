@@ -682,7 +682,7 @@ HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {
      ctx->ctx_Dump ( ctx, h ); 
 }
 
-HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *expected) {
-     return ctx->ctx_Type_CheckSlot ( ctx, type, expected ); 
+HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value) {
+     return ctx->ctx_Type_CheckSlot ( ctx, type, value ); 
 }
 

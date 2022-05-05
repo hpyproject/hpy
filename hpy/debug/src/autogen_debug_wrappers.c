@@ -807,8 +807,8 @@ void debug_ctx_Dump(HPyContext *dctx, DHPy h)
     _HPy_Dump(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *expected)
+int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *value)
 {
-    return HPyType_CheckSlot(get_info(dctx)->uctx, DHPy_unwrap(dctx, type), expected);
+    return HPyType_CheckSlot(get_info(dctx)->uctx, DHPy_unwrap(dctx, type), value);
 }
 

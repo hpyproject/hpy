@@ -180,7 +180,7 @@ void debug_ctx_ReenterPythonExecution(HPyContext *dctx, HPyThreadState state);
 void debug_ctx_Global_Store(HPyContext *dctx, HPyGlobal *global, DHPy h);
 DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
-int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *expected);
+int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *value);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
 {

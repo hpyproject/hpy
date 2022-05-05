@@ -628,4 +628,4 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
-int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *expected);
+int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);

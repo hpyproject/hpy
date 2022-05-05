@@ -266,5 +266,5 @@ struct _HPyContext_s {
     void (*ctx_Global_Store)(HPyContext *ctx, HPyGlobal *global, HPy h);
     HPy (*ctx_Global_Load)(HPyContext *ctx, HPyGlobal global);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
-    int (*ctx_Type_CheckSlot)(HPyContext *ctx, HPy type, HPyDef *expected);
+    int (*ctx_Type_CheckSlot)(HPyContext *ctx, HPy type, HPyDef *value);
 };
