@@ -16,10 +16,9 @@ HPyAPI_FUNC HPy HPyTuple_Pack(HPyContext *ctx, HPy_ssize_t n, ...) {
     HPy_ssize_t i;
 
     if (n == 0) {
-        HPy array[] = {};
-        return HPyTuple_FromArray(ctx, array, n);
+        return HPyTuple_FromArray(ctx, (HPy*)NULL, n);
     }
-    HPy *array = (HPy*)malloc(n * sizeof(HPy));
+    HPy *array = (HPy *)alloca(n * sizeof(HPy));
     va_start(vargs, n);
     if (array == NULL) {
         va_end(vargs);
@@ -29,9 +28,7 @@ HPyAPI_FUNC HPy HPyTuple_Pack(HPyContext *ctx, HPy_ssize_t n, ...) {
         array[i] = va_arg(vargs, HPy);
     }
     va_end(vargs);
-    HPy result = HPyTuple_FromArray(ctx, array, n);
-    free(array);
-    return result;
+    return HPyTuple_FromArray(ctx, array, n);
 }
 
 #endif //HPY_INLINE_HELPERS_H
