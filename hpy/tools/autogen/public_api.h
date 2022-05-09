@@ -260,6 +260,8 @@ int HPy_RichCompareBool(HPyContext *ctx, HPy v, HPy w, int op);
 
 HPy_hash_t HPy_Hash(HPyContext *ctx, HPy obj);
 
+HPy HPySeqIter_New(HPyContext *ctx, HPy seq);
+
 /* bytesobject.h */
 int HPyBytes_Check(HPyContext *ctx, HPy h);
 HPy_ssize_t HPyBytes_Size(HPyContext *ctx, HPy h);
@@ -602,7 +604,7 @@ typedef enum {
     //HPy_tp_hash = SLOT(59, HPyFunc_X),
     HPy_tp_init = SLOT(60, HPyFunc_INITPROC),
     //HPy_tp_is_gc = SLOT(61, HPyFunc_X),
-    //HPy_tp_iter = SLOT(62, HPyFunc_X),
+    HPy_tp_iter = SLOT(62, HPyFunc_GETITERFUNC),
     //HPy_tp_iternext = SLOT(63, HPyFunc_X),
     //HPy_tp_methods = SLOT(64, HPyFunc_X),    NOT SUPPORTED
     HPy_tp_new = SLOT(65, HPyFunc_KEYWORDS),
@@ -628,4 +630,4 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
-int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *expected);
+int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);
