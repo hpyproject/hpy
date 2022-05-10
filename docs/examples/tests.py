@@ -27,7 +27,7 @@ def test_snippets():
 def test_leak_detector():
     from hpy.debug.pytest import LeakDetector
     with LeakDetector() as ld:
-        # Run some HPy extension code
+        # add_ints is an HPy C function. If it forgets to close a handle, LeakDetector will complain
         assert mixed.add_ints(40, 2) == 42
 
 
