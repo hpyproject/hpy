@@ -127,7 +127,7 @@ def __bootstrap__():
     from os import environ
     from pkg_resources import resource_filename
     from hpy.universal import load
-    env_debug = environ.get('HPY_DEBUG_CONTEXT')
+    env_debug = environ.get('HPY_DEBUG')
     is_debug = env_debug is not None and (env_debug == "1" or __name__ in env_debug.split(","))
     ext_filepath = resource_filename(__name__, {ext_file!r})
     if 'HPY_LOG' in environ:
