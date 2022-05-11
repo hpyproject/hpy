@@ -38,11 +38,26 @@ static HPy test_foo_and_is_same_object_impl(HPyContext *ctx, HPy self,
     return HPyLong_FromLong(ctx, is_same_object(ctx, args[0], args[1]));
 }
 
+// BEGIN: test_leak_stacktrace
+HPyDef_METH(test_leak_stacktrace, "test_leak_stacktrace",
+            test_leak_stacktrace_impl, HPyFunc_NOARGS)
+static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
+{
+    HPy num = HPyLong_FromLong(ctx, 42);
+    if (HPy_IsNull(num)) {
+        return HPy_NULL;
+    }
+    // No HPy_Close(ctx, num);
+    return HPy_Dup(ctx, ctx->h_None);
+}
+// END: test_leak_stacktrace
+
 // ------------------------------------
 // Dummy module definition, so that we can test the snippets
 
 static HPyDef *Methods[] = {
         &test_foo_and_is_same_object,
+        &test_leak_stacktrace,
         NULL,
 };
 
