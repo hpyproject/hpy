@@ -203,7 +203,8 @@ API:
 Cython extensions
 -----------------
 
-If you use Cython, you can't use HPy directly. There is a work in progress to
+If you use Cython, you can't use HPy directly. There is a
+`work in progress <https://github.com/cython/cython/pull/4490>`_ to
 add Cython backend which emits HPy code instead of Python/C code: once this is
 done, you will get the benefits of HPy automatically.
 
@@ -243,7 +244,7 @@ Current status and roadmap
 HPy is still in the early stages of development, but many big pieces are
 already in place. As on April 2022, the following milestones have been reached:
 
-  - few real-world Python packages have been ported to HPy API.
+  - some real-world Python packages have been ported to HPy API.
     The ports will be published soon.
 
   - one can write extensions which expose module-level functions, with all

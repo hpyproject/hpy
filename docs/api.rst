@@ -21,12 +21,10 @@ it by calling ``HPy_Dup``, which plays more or less the same role as
 
 The HPy API strictly follows these rules:
 
-- ``HPy`` handles are never borrowed, i.e., ``HPy`` handle returned by a API
-  function, such as ``HPyLong_FromLong``, is always owned by the caller and
-  must be closed by the caller.
-- ``HPy`` handles are never stolen, i.e., ``HPy`` handle passed as an argument
-  to some API function is still owned by the caller and must be closed by
-  the caller.
+- ``HPy`` handles returned by a function are **never borrowed**, i.e.,
+  the caller must either close or return it.
+- ``HPy`` handles passed as function arguments are **never stolen**;
+  if you receive a ``HPy`` handle argument from your caller, you should never close it.
 
 These rules makes the code simpler to reason about. Moreover, no reference
 borrowing enables the Python implementations to use whatever internal

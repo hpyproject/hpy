@@ -403,6 +403,21 @@ HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
  * the same HPyGlobal variable will not be able to load X1 from it, it will have
  * its own view on what is stored in the given HPyGlobal.
  *
+ * Python interpreters may use indirection to isolate different interpreter
+ * instances, but alternative techniques such as copy-on-write or immortal
+ * objects can be used to avoid that indirection (even selectively on per
+ * object basis using tagged pointers).
+ *
+ * CPython HPy implementation may even provide configuration option that
+ * switches between a faster version that stores directly PyObject* to
+ * HPyGlobal but does not support subinterpreters, or a version that supports
+ * subinterpreters. For now, CPython HPy always stores PyObject* directly
+ * to HPyGlobal.
+ *
+ * While the standard implementation does not fully enforce the documented
+ * contract, the HPy debug mode will enforce it (not implemented yet).
+ *
+ * **Implementation notes:**
  * All Python interpreters running in one process must be compatible, because
  * they will share all HPyGlobal C level variables. The internal data stored
  * in HPyGlobal are specific for each HPy implementation, each implementation
@@ -417,20 +432,6 @@ HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
  * multiple different HPy implementations within one process. This contract may
  * also be activated only by some runtime option, letting the HPy implementation
  * use more optimized HPyGlobal implementation otherwise.
- *
- * Python interpreters may use indirection to isolate different interpreter
- * instances, but alternative techniques such as copy-on-write or immortal
- * objects can be used to avoid that indirection (even selectively on per
- * object basis using tagged pointers).
- *
- * CPython HPy implementation may even provide configuration option that
- * switches between a faster version that stores directly PyObject* to
- * HPyGlobal but does not support subinterpreters, or a version that supports
- * subinterpreters. For now, CPython HPy always stores PyObject* directly
- * to HPyGlobal.
- *
- * While the standard implementation does not fully enforce the documented
- * contract, the HPy debug mode will enforce it (not implemented yet).
 */
 void HPyGlobal_Store(HPyContext *ctx, HPyGlobal *global, HPy h);
 HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global);

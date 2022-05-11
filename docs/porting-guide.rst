@@ -77,7 +77,7 @@ conditions. See the next section for more details.
 **IMPORTANT**: the contract of ``tp_traverse`` is that it must visit all the
 ``HPyFields`` contained within given struct, or more precisely "owned" by given
 Python object (in the sense of the "owner" argument to ``HPyField_Store``), and
-nothing more or less. Some Python implementations may choose to not call the
+nothing more, nothing less. Some Python implementations may choose to not call the
 provided ``tp_traverse`` if they know how to visit all the ``HPyFields`` by other
 means (for example, when they track them internally already). The debug mode will
 check this contract.
