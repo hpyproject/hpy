@@ -175,7 +175,6 @@ static UHPy set_handle_stack_trace_limit_impl(HPyContext *uctx, UHPy u_self, UHP
         assert(!HPyErr_Occurred(uctx));
         info->handle_alloc_stacktrace_limit = HPyLong_AsSsize_t(uctx, u_arg);
         if (HPyErr_Occurred(uctx)) {
-            info->handle_alloc_stacktrace_limit = 0;
             return HPy_NULL;
         }
     }
