@@ -19,12 +19,6 @@
 
 typedef HPy (*InitFuncPtr)(HPyContext *ctx);
 
-static PyObject *set_debug(PyObject *self, PyObject *args)
-{
-    // TODO
-    Py_RETURN_NONE;
-}
-
 static const char *prefix = "HPyInit";
 
 static HPyContext * get_context(int debug)
@@ -158,7 +152,6 @@ static PyObject *get_version(PyObject *self, PyObject *ignored)
 }
 
 static PyMethodDef HPyMethods[] = {
-    {"set_debug", (PyCFunction)set_debug, METH_O, "TODO"},
     {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS, "Load a .hpy.so"},
     {"get_version", (PyCFunction)get_version, METH_NOARGS, "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}
