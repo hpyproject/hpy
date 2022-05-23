@@ -22,7 +22,12 @@ The debugging context can already check for:
 
 * Leaked handles.
 * Handles used after they are closed.
+* Reading from a memory which is no longer guaranteed to be still valid,
+  for example, the buffer returned by ``HPyUnicode_AsUTF8AndSize`` after the
+  corresponding ``HPy`` handle was closed.
+* Writing to a memory which should be read-only, for example,
+  the buffer returned by ``HPyUnicode_AsUTF8AndSize``.
 
-An HPy module may be loaded in debug mode using::
+An HPy module may be explicitly loaded in debug mode using::
 
   mod = hpy.universal.load(module_name, so_filename, debug=True)

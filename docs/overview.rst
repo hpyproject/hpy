@@ -46,7 +46,7 @@ Better debugging
   In debug mode, you get early and precise errors and warnings when you make
   some specific kind of mistakes and/or violate the API rules and
   assumptions. For example, you get an error if you try to use a handle
-  (see :ref:`handles`) which has already been closed. It is possible to
+  (see :ref:`api:handles`) which has already been closed. It is possible to
   turn on the debug mode at startup time, *without needing to recompile*.
 
 
@@ -146,20 +146,23 @@ different ABIs:
       As the name suggests, the HPy Universal ABI is designed to be loaded and
       executed by a variety of different Python implementations. Compiled
       extensions can be loaded unmodified on all the interpreters which supports
-      it.  PyPy supports it natively.  CPython supports it by using the
+      it.  PyPy and GraalPython support it natively.  CPython supports it by using the
       ``hpy.universal`` package, and there is a small speed penalty compared to
-      the CPython ABI.  The ABI tag has not been formally defined yet, but it will
-      be something like ``hpy-1``, where ``1`` is the version of the API.
+      the CPython ABI.  The ABI tag has not been formally defined yet.
 
     HPy Hybrid ABI
       To allow an incremental transition to HPy, it is possible to use both HPy
       and Python/C API calls in the same extension. In this case, it is not
       possible to target the Universal ABI because the resulting compiled library
       also needs to be compatible with a specific CPython version. The ABI tag
-      will be something like ``hpy-1_cpython-37m``.
+      will be something like ``hpy-1_cpython-37m``. Note: the tag is not implemented
+      yet. Currently, the approach to use HPy in hybrid mode is to build the extension
+      in HPy universal mode, which, for now, still allows mixing the HPy and CPython APIs.
+      Extensions mixing the HPy and CPython APIs will not work on Pythons that do not
+      support the hybrid ABI.
 
 Moreover, each alternative Python implementation could decide to implement its
-own non-universal ABI if it makes sense for them. For example, a hypotetical
+own non-universal ABI if it makes sense for them. For example, a hypothetical
 project *DummyPython* could decide to ship its own ``hpy.h`` which implements
 the HPy API but generates a DLL which targets the DummyPython ABI.
 
@@ -175,7 +178,7 @@ CPython versions.
 From the user point of view, extensions compiled for the CPython ABI can be
 distributed and installed as usual, while those compiled for the HPy Universal
 or HPy Hybrid ABIs require installing the ``hpy.universal`` package on
-CPython.
+CPython and have no further requirements on Pythons that support HPy natively.
 
 
 C extensions
@@ -189,7 +192,7 @@ API:
     to early :ref:`benchmarks`, an extension written in HPy can be ~3x faster
     than the equivalent extension written in Python/C.
 
-  - Improved debugging: when you load extensions in :ref:`debug mode`,
+  - Improved debugging: when you load extensions in :ref:`debug-mode:debug mode`,
     many common mistakes are checked and reported automatically.
 
   - Universal binaries: you can choose to distribute only Universal ABI
@@ -200,9 +203,10 @@ API:
 Cython extensions
 -----------------
 
-If you use Cython, you can't use HPy directly. The plan is to write a Cython
-backend which emits HPy code instead of Python/C code: once this is done, you
-will get the benefits of HPy automatically.
+If you use Cython, you can't use HPy directly. There is a
+`work in progress <https://github.com/cython/cython/pull/4490>`_ to
+add Cython backend which emits HPy code instead of Python/C code: once this is
+done, you will get the benefits of HPy automatically.
 
 
 Extensions in other languages
@@ -238,15 +242,23 @@ Current status and roadmap
 --------------------------
 
 HPy is still in the early stages of development, but many big pieces are
-already in place. As on April 2021, the following milestones have been reached:
+already in place. As on April 2022, the following milestones have been reached:
+
+  - some real-world Python packages have been ported to HPy API.
+    The ports will be published soon.
 
   - one can write extensions which expose module-level functions, with all
     the various kinds of calling conventions.
 
-  - there is support for argument parsing (i.e. the equivalents of
-    `PyArg_ParseTuple` and `PyArg_ParseTupleAndKeywords`).
+  - there is support for argument parsing (i.e., the equivalents of
+    `PyArg_ParseTuple` and `PyArg_ParseTupleAndKeywords`), and a
+    convenient complex value building (i.e., the equivalent `Py_BuildValue`).
 
-  - one can implement custom types.
+  - one can implement custom types, whose struct may contain references to other
+    Python objects using `HPyField`.
+
+  - there is a support for globally accessible Python object handles: `HPyGlobal`,
+    which can still provide isolation for subinterpreters if needed.
 
   - there is support for raising and catching exceptions.
 
@@ -278,20 +290,27 @@ public. In particular, the following features are on our roadmap but have not
 been implemented yet:
 
   - many of the original Python/C functions have not been ported to
-    HPy yet. Porting most of them is straighforward, so for now the priority
-    is to work on the "hard" features to prove that the HPy approach works, and
-    we will port new functions as needed
+    HPy yet. Porting most of them is straightforward, so for now the priority
+    is to test HPy with real-world Python packages and primarily resolve the
+    "hard" features to prove that the HPy approach works.
 
-  - add C-level module state. Often an extension needs module state that is
-    accessible from C (e.g. if a module implements a new type `ArrayType`,
-    many of the module methods written in C may need access to `ArrayType`)
-    but HPy does not have convenient support for this yet.
+  - add C-level module state to complement the `HPyGlobal` approach. While `HPyGlobal`
+    is easier to use, it will make the migration simpler for existing extensions that
+    use CPython module state.
 
-  - improve the debug mode so that it returns a C traceback showing where
-    a handle was leaked or a closed handle was used.
+  - the integration with Cython is work in progress
 
-  - there is no integration with Cython. The medium-term plan is to extend
-    Cython to automatically generate HPy-compatible C code.
+  - it is not clear yet how to approach pybind11 and similar C++ bindings. They serve two use-cases:
+
+    - As C++ wrappers for CPython API. HPy is fundamentally different in some ways, so fully compatible
+      pybind11 port of this API to HPy does not make sense. There can be a similar or even partially pybind11
+      compatible C++ wrapper for HPy adhering to the HPy semantics and conventions (e.g., passing the
+      HPyContext pointer argument around, no reference stealing, etc.).
+
+    - Way to expose (or "bind") mostly pure C++ functions as Python functions where the C++ templating
+      machinery takes care of the conversion between the Python world, i.e., ``PyObject*``, and the C++
+      types. Porting this abstraction to HPy is possible and desired in the future. To determine the priority
+      or such effort, we need to get more knowledge about existing pybind11 use-cases.
 
 
 .. _benchmarks:

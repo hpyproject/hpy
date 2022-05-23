@@ -234,6 +234,13 @@ jobs:
           cd docs;
           python -m sphinx -T -W -E -b html -d _build/doctrees -D language=en . _build/html
 
+      - name: Upload built HTML files
+        uses: actions/upload-artifact@v2
+        with:
+          name: hpy_html_docs
+          path: docs/_build/html/*
+          if-no-files-found: error
+          retention-days: 5
 
   c_tests:
     name: C tests

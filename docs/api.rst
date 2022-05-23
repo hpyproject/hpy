@@ -1,5 +1,5 @@
-HPy API
-=======
+HPy API introduction
+====================
 
 .. warning::
    HPy is still in the early stages of development and the API may change.
@@ -18,6 +18,26 @@ When they are no longer needed, handles must be closed by calling
 Similarly, if you need a new handle for an existing object, you can duplicate
 it by calling ``HPy_Dup``, which plays more or less the same role as
 ``Py_INCREF``.
+
+The HPy API strictly follows these rules:
+
+- ``HPy`` handles returned by a function are **never borrowed**, i.e.,
+  the caller must either close or return it.
+- ``HPy`` handles passed as function arguments are **never stolen**;
+  if you receive a ``HPy`` handle argument from your caller, you should never close it.
+
+These rules makes the code simpler to reason about. Moreover, no reference
+borrowing enables the Python implementations to use whatever internal
+representation they wish. For example, the object returned by `HPy_GetItem_i`
+may be created on demand from some compact internal representation, which does
+not need to convert itself to full blown representation in order to hold onto
+the borrowed object.
+
+We strongly encourage the users of HPy to also internally follow these rules
+for their own internal APIs and helper functions. For the sake of simplicity
+and easier local reasoning and also because in the future, code adhering
+to those rules may be suitable target for some scalable and precise static
+analysis tool.
 
 The concept of handles is certainly not unique to HPy. Other examples include
 Unix file descriptors, where you have ``dup()`` and ``close()``, and Windows'
@@ -60,7 +80,7 @@ Becomes using HPy API:
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
 ``HPy_Close()`` on a handle results in a memory leak. When running in
-:ref:`debug mode`, HPy actively checks that you that you don't close a handle
+:ref:`debug-mode:debug mode`, HPy actively checks that you that you don't close a handle
 twice and that you don't forget to close any.
 
 
