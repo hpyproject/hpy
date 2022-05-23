@@ -101,8 +101,10 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
     if (mylib == NULL) {
         const char *error = dlerror();
         if (error == NULL)
-            error = "unknown dlopen() error";
-        PyErr_Format(PyExc_RuntimeError, "dlopen: %s", error);
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at path "
+                     "'%s'. Error message from dlopen/WinAPI: %s", soname, error);
         goto error;
     }
 
@@ -110,8 +112,12 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
     if (initfn == NULL) {
         const char *error = dlerror();
         if (error == NULL)
-            error = "unknown dlsym() error";
-        PyErr_Format(PyExc_RuntimeError, "dlsym: %s", error);
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at "
+                     "path '%s' while trying to find symbol '%s'. Did you use"
+                     "the HPy_MODINIT macro to register your module? Error "
+                     "message from dlsym/WinAPI: %s", soname, init_name, error);
         goto error;
     }
 
