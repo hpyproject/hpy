@@ -14,7 +14,10 @@
 #include "hpy_debug.h"
 
 #ifdef PYPY_VERSION
-#  error "Cannot build hpy.univeral on top of PyPy. PyPy comes with its own version of it"
+#  error "Cannot build hpy.universal on top of PyPy. PyPy comes with its own version of it"
+#endif
+#ifdef GRAALVM_PYTHON
+#  error "Cannot build hpy.universal on top of GraalPython. GraalPython comes with its own version of it"
 #endif
 
 typedef HPy (*InitFuncPtr)(HPyContext *ctx);
