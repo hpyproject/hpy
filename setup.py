@@ -37,11 +37,6 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-if 'HPY_DEBUG' in os.environ:
-    print("WARNING: environment variable HPY_DEBUG used in setup.py was "
-          "renamed to HPY_DEBUG_BUILD. HPY_DEBUG is now used to activate "
-          "the HPy debug context when running HPy extensions in universal mode.")
-
 if 'HPY_DEBUG_BUILD' in os.environ:
     # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
     # functions are available to call inside GDB
