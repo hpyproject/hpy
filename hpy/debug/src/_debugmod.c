@@ -173,10 +173,11 @@ static UHPy set_handle_stack_trace_limit_impl(HPyContext *uctx, UHPy u_self, UHP
         info->handle_alloc_stacktrace_limit = 0;
     } else {
         assert(!HPyErr_Occurred(uctx));
-        info->handle_alloc_stacktrace_limit = HPyLong_AsSsize_t(uctx, u_arg);
-        if (HPyErr_Occurred(uctx)) {
+        HPy_ssize_t newlimit = HPyLong_AsSsize_t(uctx, u_arg);
+        if (newlimit == -1 && HPyErr_Occurred(uctx)) {
             return HPy_NULL;
         }
+        info->handle_alloc_stacktrace_limit = newlimit;
     }
     return HPy_Dup(uctx, uctx->h_None);
 }
