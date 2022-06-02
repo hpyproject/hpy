@@ -628,14 +628,14 @@ HPyAPI_IMPL int ctx_Capsule_IsValid(HPyContext *ctx, HPy capsule, const char *na
     return PyCapsule_IsValid(_h2py(capsule), name);
 }
 
-HPyAPI_IMPL HPyThreadState ctx_LeavePythonExecution(HPyContext *ctx)
-{
-    return _threads2h(PyEval_SaveThread());
-}
-
 HPyAPI_IMPL void ctx_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state)
 {
     PyEval_RestoreThread(_h2threads(state));
+}
+
+HPyAPI_IMPL HPyThreadState ctx_LeavePythonExecution(HPyContext *ctx)
+{
+    return _threads2h(PyEval_SaveThread());
 }
 
 HPyAPI_IMPL int ctx_Type_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value)

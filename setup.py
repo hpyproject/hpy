@@ -37,8 +37,7 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-
-if 'HPY_DEBUG' in os.environ:
+if 'HPY_DEBUG_BUILD' in os.environ:
     # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
     # functions are available to call inside GDB
     EXTRA_COMPILE_ARGS = [
@@ -122,6 +121,7 @@ EXT_MODULES = [
                'hpy/debug/src/debug_handles.c',
                'hpy/debug/src/dhqueue.c',
                'hpy/debug/src/memprotect.c',
+               'hpy/debug/src/stacktrace.c',
                'hpy/debug/src/_debugmod.c',
                'hpy/debug/src/autogen_debug_wrappers.c',
               ],
