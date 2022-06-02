@@ -24,7 +24,7 @@ def get_context_return_type(func_node, const_return):
 
 def make_void(func_node):
     voidid = c_ast.IdentifierType(names=['void'])
-    func_node.type.type.type = c_ast.TypeDecl(declname='void', quals=[], type=voidid)
+    func_node.type.type.type = c_ast.TypeDecl(declname='void', quals=[], align=[], type=voidid)
 
 def get_return_constant(func):
     return RETURN_CONSTANT.get(func.node.name)

@@ -5,8 +5,8 @@ import sys
 import py
 import pycparser
 from packaging import version
-if version.parse(pycparser.__version__) < version.parse('2.20'):
-    raise ImportError('You need pycparser>=2.20 to run autogen')
+if version.parse(pycparser.__version__) < version.parse('2.21'):
+    raise ImportError('You need pycparser>=2.21 to run autogen')
 
 from .parse import HPyAPI, PUBLIC_API_H
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
