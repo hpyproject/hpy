@@ -86,6 +86,7 @@ class HPySlot:
     name = attr.ib()      # "HPy_nb_add"
     value = attr.ib()     # "7"
     hpyfunc = attr.ib()   # "HPyFunc_BINARYFUNC"
+    node = attr.ib(repr=False)
 
 
 class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
@@ -146,7 +147,7 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
             assert isinstance(id_hpyfunc, c_ast.ID)
             value = const_value.value
             hpyfunc = id_hpyfunc.name
-            self.api.hpyslots.append(HPySlot(e.name, value, hpyfunc))
+            self.api.hpyslots.append(HPySlot(e.name, value, hpyfunc, e))
 
 
 def convert_name(hpy_name):
@@ -200,3 +201,15 @@ class HPyAPI:
         self.hpyslots = []
         v = HPyAPIVisitor(self, convert_name)
         v.visit(self.ast)
+
+        # Sort lists such that the generated files are deterministic.
+        # List elements are either 'Function', 'GlobalVar', or 'HPyFunc'. All
+        # of them have a 'node' attribute and the nodes have a 'coord' attr
+        # that provides the line and column number. We use that to sort.
+        def node_key(e):
+            coord = e.node.coord
+            return coord.line, coord.column
+        self.functions.sort(key=node_key)
+        self.variables.sort(key=node_key)
+        self.hpyfunc_typedefs.sort(key=node_key)
+        self.hpyslots.sort(key=node_key)
