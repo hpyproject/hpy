@@ -1,5 +1,4 @@
-HPy: a better API for Python
-==================================
+# HPy: a better API for Python
 
 [![Build](https://github.com/hpyproject/hpy/actions/workflows/ci.yml/badge.svg)](https://github.com/hpyproject/hpy/actions/workflows/ci.yml)
 [![Documentation](https://readthedocs.org/projects/hpy/badge/)](https://hpy.readthedocs.io/)
@@ -57,8 +56,7 @@ More specifically, the goals include (but are not necessarily limited to):
     time, be ready to handle the generic fallback case.
 
 
-More concrete goals
---------------------
+## More concrete goals
 
   - we will write a small C library which implements the new API on top of the
     existing one: no changes to CPython needed
@@ -72,8 +70,7 @@ More concrete goals
     from this automatically
 
 
-Why should I care about this stuff?
-------------------------------------
+## Why should I care about this stuff?
 
   - the existing C API is becoming a problem for CPython and for the
     evolution of the language itself: this project makes it possible to make
@@ -97,14 +94,12 @@ Future](https://github.com/vstinner/talks/raw/main/2019-EuroPython/python_perfor
 by Victor Stinner.
 
 
-What does `HPy` mean?
------------------------
+## What does `HPy` mean?
 
 The "H" in `HPy` stands for "handle": one of the key idea of the new API is to
 use fully opaque handles to represent and pass around Python objects.
 
 
-Donate to HPy
--------------
+## Donate to HPy
 
 Become a financial contributor and help us sustain the HPy community: [Contribute to HPy](https://opencollective.com/hpy/contribute).
