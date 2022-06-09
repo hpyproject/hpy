@@ -1,5 +1,14 @@
 /* HPy public API */
 
+/*
+ * IMPORTANT: In order to ensure backwards compatibility of HPyContext, it is
+ * necessary to define the order of the context members. To do so, use macros
+ * 'HPyAPI_HANDLE(idx)' for context handles and 'HPyAPI_FUNC(idx)' for
+ * context functions. When adding members, it doesn't matter where they are
+ * located in this file. It's just important that the maximum context index is
+ * incremented by exactly one.
+ */
+
 #if AUTOGEN
 
 /* Constants */
