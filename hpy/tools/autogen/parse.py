@@ -41,6 +41,7 @@ class Function:
 
     name = attr.ib()
     cpython_name = attr.ib()
+    ctx_index = attr.ib()
     node = attr.ib(repr=False)
 
     def base_name(self):
@@ -58,6 +59,7 @@ class Function:
 @attr.s
 class GlobalVar:
     name = attr.ib()
+    ctx_index = attr.ib()
     node = attr.ib(repr=False)
 
     def ctx_name(self):
@@ -95,6 +97,29 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self, api, convert_name):
         self.api = api
         self.convert_name = convert_name
+        self.cur_index = -1
+        self.all_indices = []
+
+    def _consume_ctx_index(self):
+        idx = self.cur_index
+        self.all_indices.append(idx)
+        self.cur_index = -1
+        return idx
+
+    def verify_context_indices(self):
+        """
+        Verifies if context indices are monotone and without gaps. This
+        function raises an assertion error if not.
+        For example:
+        [0, 1, 2, 3] is valid
+        [0, 1, 3] is invalid
+        """
+        self.all_indices.sort()
+        for i in range(1, len(self.all_indices)):
+            prev = self.all_indices[i-1]
+            cur = self.all_indices[i]
+            assert prev + 1 == cur, \
+                "context indices have gaps: %s -> %s" % (prev, cur)
 
     def _is_function_ptr(self, node):
         return (isinstance(node, c_ast.PtrDecl) and
@@ -113,6 +138,12 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
         elif node.name == 'HPySlot_Slot':
             self._visit_hpyslot_slot(node)
 
+    def visit_Pragma(self, node):
+        parts = node.string.split('=')
+        if len(parts) != 2:
+            raise ValueError('invalid pragma: %s' % node)
+        self.cur_index = int(parts[1])
+
     def _visit_function(self, node):
         name = node.name
         if not name.startswith('HPy') and not name.startswith('_HPy'):
@@ -123,7 +154,10 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
                 raise ValueError("non-named argument in declaration of %s" %
                                  name)
         cpy_name = self.convert_name(name)
-        func = Function(name, cpy_name, node)
+        idx = self._consume_ctx_index()
+        if idx == -1:
+            raise ValueError('missing context index for %s' % name)
+        func = Function(name, cpy_name, idx, node)
         self.api.functions.append(func)
 
     def _visit_global_var(self, node):
@@ -132,7 +166,10 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
             print('WARNING: Ignoring non-hpy variable declaration: %s' % name)
             return
         assert toC(node.type.type) == "HPy"
-        var = GlobalVar(name, node)
+        idx = self._consume_ctx_index()
+        if idx == -1:
+            raise ValueError('missing context index for %s' % name)
+        var = GlobalVar(name, idx, node)
         self.api.variables.append(var)
 
     def _visit_hpyfunc_typedef(self, node):
@@ -201,6 +238,8 @@ class HPyAPI:
         self.hpyslots = []
         v = HPyAPIVisitor(self, convert_name)
         v.visit(self.ast)
+
+        v.verify_context_indices()
 
         # Sort lists such that the generated files are deterministic.
         # List elements are either 'Function', 'GlobalVar', or 'HPyFunc'. All
