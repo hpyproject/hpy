@@ -8,6 +8,8 @@ from pycparser.c_generator import CGenerator
 from .conf import SPECIAL_CASES, RETURN_CONSTANT
 
 PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
+CURRENT_DIR = py.path.local(__file__).dirpath()
+AUTOGEN_H = py.path.local(__file__).dirpath('autogen.h')
 
 
 def toC(node):
@@ -106,8 +108,8 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
 
     def verify_context_indices(self):
         """
-        Verifies if context indices are monotone and without gaps. This
-        function raises an assertion error if not.
+        Verifies if context indices are without gaps. This function raises an
+        assertion error if not.
         For example:
         [0, 1, 2, 3] is valid
         [0, 1, 3] is invalid

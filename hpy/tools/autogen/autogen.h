@@ -6,8 +6,6 @@
 #define AUTOGEN 1
 
 // These are not real typedefs: they are there only to make pycparser happy
-// and this comment is not on the top of the file, so that it is not picked up
-// by autodoc
 typedef int HPy;
 typedef int HPyContext;
 typedef int HPyModuleDef;
