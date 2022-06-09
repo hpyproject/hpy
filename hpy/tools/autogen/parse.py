@@ -7,7 +7,9 @@ from pycparser import c_ast
 from pycparser.c_generator import CGenerator
 from .conf import SPECIAL_CASES, RETURN_CONSTANT
 
-PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
+CURRENT_DIR = py.path.local(__file__).dirpath()
+#PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
+AUTOGEN_H = py.path.local(__file__).dirpath('autogen.h')
 
 
 def toC(node):
@@ -160,9 +162,7 @@ class HPyAPI:
     _r_comment = re.compile(r"/\*.*?\*/|//([^\n\\]|\\.)*?$",
                             re.DOTALL | re.MULTILINE)
 
-    def __init__(self, filename):
-        with open(filename, 'r') as f:
-            csource = f.read()
+    def __init__(self, csource):
         # Remove comments.  NOTE: this assumes that comments are never inside
         # string literals, but there shouldn't be any here.
         def replace_keeping_newlines(m):
