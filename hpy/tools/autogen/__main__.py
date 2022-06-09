@@ -1,14 +1,15 @@
 """
 Parse public_api.h and generate various stubs around
 """
+import subprocess
 import sys
 import py
 import pycparser
 from packaging import version
-if version.parse(pycparser.__version__) < version.parse('2.20'):
-    raise ImportError('You need pycparser>=2.20 to run autogen')
+if version.parse(pycparser.__version__) < version.parse('2.21'):
+    raise ImportError('You need pycparser>=2.21 to run autogen')
 
-from .parse import HPyAPI, PUBLIC_API_H
+from .parse import HPyAPI, CURRENT_DIR, AUTOGEN_H
 from .ctx import autogen_ctx_h, autogen_ctx_def_h
 from .trampolines import (autogen_trampolines_h,
                           cpython_autogen_api_impl_h,
@@ -29,7 +30,14 @@ def main():
         sys.exit(1)
     outdir = py.path.local(sys.argv[1])
 
-    api = HPyAPI.parse(PUBLIC_API_H)
+    try:
+        content = subprocess.check_output(['gcc', '-E', '-I' + str(CURRENT_DIR), str(AUTOGEN_H)], stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        print("Preprocessing '%s' failed: " % AUTOGEN_H, file=sys.stderr)
+        print(e.output, file=sys.stderr)
+        raise e
+
+    api = HPyAPI.parse(content.decode('utf-8'))
     ## for func in api.functions:
     ##     print(func)
 

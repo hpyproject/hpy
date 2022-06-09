@@ -266,12 +266,9 @@ jobs:
       - name: Install/Upgrade Python dependencies
         run: python -m pip install --upgrade pip wheel
 
-      - name: Install dependencies
-        run: |
-          pip install pycparser==2.20
-          pip install py==1.8.0
-          pip install packaging==19.2
-          pip install attrs==19.3.0
+      - name: Install autogen dependencies
+        run: pip install -r requirements-autogen.txt
+
       - name: make autogen
         run: |
           make autogen

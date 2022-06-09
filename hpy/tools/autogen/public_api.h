@@ -1,304 +1,425 @@
-typedef int HPy;
-typedef int HPyContext;
-typedef int HPyModuleDef;
-typedef int HPyType_Spec;
-typedef int HPyType_SpecParam;
-typedef int HPyCFunction;
-typedef int HPy_ssize_t;
-typedef int HPy_hash_t;
-typedef int wchar_t;
-typedef int size_t;
-typedef int HPyFunc_Signature;
-typedef int cpy_PyObject;
-typedef int HPyField;
-typedef int HPyGlobal;
-typedef int HPyListBuilder;
-typedef int HPyTupleBuilder;
-typedef int HPyTracker;
-typedef int HPy_RichCmpOp;
-typedef int HPy_buffer;
-typedef int HPyFunc_visitproc;
-typedef int HPy_UCS4;
-typedef int HPyThreadState;
-typedef int _HPyCapsule_key;
-typedef int HPyCapsule_Destructor;
-typedef int HPyDef;
-// ^ these are not real typedefs: they are there only to make pycparser happy
-// and this comment is not on the top of the file, so that it is not picked up
-// by autodoc
-
 /* HPy public API */
 
+/*
+ * IMPORTANT: In order to ensure backwards compatibility of HPyContext, it is
+ * necessary to define the order of the context members. To do so, use macros
+ * 'HPyAPI_HANDLE(idx)' for context handles and 'HPyAPI_FUNC(idx)' for
+ * context functions. When adding members, it doesn't matter where they are
+ * located in this file. It's just important that the maximum context index is
+ * incremented by exactly one.
+ */
+
+#if AUTOGEN
+
 /* Constants */
-HPy h_None;
-HPy h_True;
-HPy h_False;
-HPy h_NotImplemented;
-HPy h_Ellipsis;
+HPyAPI_HANDLE(0) HPy h_None;
+HPyAPI_HANDLE(1) HPy h_True;
+HPyAPI_HANDLE(2) HPy h_False;
+HPyAPI_HANDLE(3) HPy h_NotImplemented;
+HPyAPI_HANDLE(4) HPy h_Ellipsis;
 
 /* Exceptions */
-HPy h_BaseException;
-HPy h_Exception;
-HPy h_StopAsyncIteration;
-HPy h_StopIteration;
-HPy h_GeneratorExit;
-HPy h_ArithmeticError;
-HPy h_LookupError;
-HPy h_AssertionError;
-HPy h_AttributeError;
-HPy h_BufferError;
-HPy h_EOFError;
-HPy h_FloatingPointError;
-HPy h_OSError;
-HPy h_ImportError;
-HPy h_ModuleNotFoundError;
-HPy h_IndexError;
-HPy h_KeyError;
-HPy h_KeyboardInterrupt;
-HPy h_MemoryError;
-HPy h_NameError;
-HPy h_OverflowError;
-HPy h_RuntimeError;
-HPy h_RecursionError;
-HPy h_NotImplementedError;
-HPy h_SyntaxError;
-HPy h_IndentationError;
-HPy h_TabError;
-HPy h_ReferenceError;
-HPy h_SystemError;
-HPy h_SystemExit;
-HPy h_TypeError;
-HPy h_UnboundLocalError;
-HPy h_UnicodeError;
-HPy h_UnicodeEncodeError;
-HPy h_UnicodeDecodeError;
-HPy h_UnicodeTranslateError;
-HPy h_ValueError;
-HPy h_ZeroDivisionError;
-HPy h_BlockingIOError;
-HPy h_BrokenPipeError;
-HPy h_ChildProcessError;
-HPy h_ConnectionError;
-HPy h_ConnectionAbortedError;
-HPy h_ConnectionRefusedError;
-HPy h_ConnectionResetError;
-HPy h_FileExistsError;
-HPy h_FileNotFoundError;
-HPy h_InterruptedError;
-HPy h_IsADirectoryError;
-HPy h_NotADirectoryError;
-HPy h_PermissionError;
-HPy h_ProcessLookupError;
-HPy h_TimeoutError;
+HPyAPI_HANDLE(5) HPy h_BaseException;
+HPyAPI_HANDLE(6) HPy h_Exception;
+HPyAPI_HANDLE(7) HPy h_StopAsyncIteration;
+HPyAPI_HANDLE(8) HPy h_StopIteration;
+HPyAPI_HANDLE(9) HPy h_GeneratorExit;
+HPyAPI_HANDLE(10) HPy h_ArithmeticError;
+HPyAPI_HANDLE(11) HPy h_LookupError;
+HPyAPI_HANDLE(12) HPy h_AssertionError;
+HPyAPI_HANDLE(13) HPy h_AttributeError;
+HPyAPI_HANDLE(14) HPy h_BufferError;
+HPyAPI_HANDLE(15) HPy h_EOFError;
+HPyAPI_HANDLE(16) HPy h_FloatingPointError;
+HPyAPI_HANDLE(17) HPy h_OSError;
+HPyAPI_HANDLE(18) HPy h_ImportError;
+HPyAPI_HANDLE(19) HPy h_ModuleNotFoundError;
+HPyAPI_HANDLE(20) HPy h_IndexError;
+HPyAPI_HANDLE(21) HPy h_KeyError;
+HPyAPI_HANDLE(22) HPy h_KeyboardInterrupt;
+HPyAPI_HANDLE(23) HPy h_MemoryError;
+HPyAPI_HANDLE(24) HPy h_NameError;
+HPyAPI_HANDLE(25) HPy h_OverflowError;
+HPyAPI_HANDLE(26) HPy h_RuntimeError;
+HPyAPI_HANDLE(27) HPy h_RecursionError;
+HPyAPI_HANDLE(28) HPy h_NotImplementedError;
+HPyAPI_HANDLE(29) HPy h_SyntaxError;
+HPyAPI_HANDLE(30) HPy h_IndentationError;
+HPyAPI_HANDLE(31) HPy h_TabError;
+HPyAPI_HANDLE(32) HPy h_ReferenceError;
+HPyAPI_HANDLE(33) HPy h_SystemError;
+HPyAPI_HANDLE(34) HPy h_SystemExit;
+HPyAPI_HANDLE(35) HPy h_TypeError;
+HPyAPI_HANDLE(36) HPy h_UnboundLocalError;
+HPyAPI_HANDLE(37) HPy h_UnicodeError;
+HPyAPI_HANDLE(38) HPy h_UnicodeEncodeError;
+HPyAPI_HANDLE(39) HPy h_UnicodeDecodeError;
+HPyAPI_HANDLE(40) HPy h_UnicodeTranslateError;
+HPyAPI_HANDLE(41) HPy h_ValueError;
+HPyAPI_HANDLE(42) HPy h_ZeroDivisionError;
+HPyAPI_HANDLE(43) HPy h_BlockingIOError;
+HPyAPI_HANDLE(44) HPy h_BrokenPipeError;
+HPyAPI_HANDLE(45) HPy h_ChildProcessError;
+HPyAPI_HANDLE(46) HPy h_ConnectionError;
+HPyAPI_HANDLE(47) HPy h_ConnectionAbortedError;
+HPyAPI_HANDLE(48) HPy h_ConnectionRefusedError;
+HPyAPI_HANDLE(49) HPy h_ConnectionResetError;
+HPyAPI_HANDLE(50) HPy h_FileExistsError;
+HPyAPI_HANDLE(51) HPy h_FileNotFoundError;
+HPyAPI_HANDLE(52) HPy h_InterruptedError;
+HPyAPI_HANDLE(53) HPy h_IsADirectoryError;
+HPyAPI_HANDLE(54) HPy h_NotADirectoryError;
+HPyAPI_HANDLE(55) HPy h_PermissionError;
+HPyAPI_HANDLE(56) HPy h_ProcessLookupError;
+HPyAPI_HANDLE(57) HPy h_TimeoutError;
 // EnvironmentError, IOError and WindowsError are intentionally omitted (they
 // are all aliases of OSError since Python 3.3).
 
 /* Warnings */
-HPy h_Warning;
-HPy h_UserWarning;
-HPy h_DeprecationWarning;
-HPy h_PendingDeprecationWarning;
-HPy h_SyntaxWarning;
-HPy h_RuntimeWarning;
-HPy h_FutureWarning;
-HPy h_ImportWarning;
-HPy h_UnicodeWarning;
-HPy h_BytesWarning;
-HPy h_ResourceWarning;
+HPyAPI_HANDLE(58) HPy h_Warning;
+HPyAPI_HANDLE(59) HPy h_UserWarning;
+HPyAPI_HANDLE(60) HPy h_DeprecationWarning;
+HPyAPI_HANDLE(61) HPy h_PendingDeprecationWarning;
+HPyAPI_HANDLE(62) HPy h_SyntaxWarning;
+HPyAPI_HANDLE(63) HPy h_RuntimeWarning;
+HPyAPI_HANDLE(64) HPy h_FutureWarning;
+HPyAPI_HANDLE(65) HPy h_ImportWarning;
+HPyAPI_HANDLE(66) HPy h_UnicodeWarning;
+HPyAPI_HANDLE(67) HPy h_BytesWarning;
+HPyAPI_HANDLE(68) HPy h_ResourceWarning;
 
 /* Types */
-HPy h_BaseObjectType;   /* built-in 'object' */
-HPy h_TypeType;         /* built-in 'type' */
-HPy h_BoolType;         /* built-in 'bool' */
-HPy h_LongType;         /* built-in 'int' */
-HPy h_FloatType;        /* built-in 'float' */
-HPy h_ComplexType;      /* built-in 'complex' */
-HPy h_UnicodeType;      /* built-in 'str' */
-HPy h_BytesType;        /* built-in 'bytes' */
-HPy h_TupleType;        /* built-in 'tuple' */
-HPy h_ListType;         /* built-in 'list' */
-HPy h_MemoryViewType;   /* built-in 'memoryview' */
-HPy h_CapsuleType;      /* built-in 'capsule' */
-HPy h_SliceType;        /* built-in 'slice' */
+HPyAPI_HANDLE(69) HPy h_BaseObjectType;   /* built-in 'object' */
+HPyAPI_HANDLE(70) HPy h_TypeType;         /* built-in 'type' */
+HPyAPI_HANDLE(71) HPy h_BoolType;         /* built-in 'bool' */
+HPyAPI_HANDLE(72) HPy h_LongType;         /* built-in 'int' */
+HPyAPI_HANDLE(73) HPy h_FloatType;        /* built-in 'float' */
+HPyAPI_HANDLE(74) HPy h_UnicodeType;      /* built-in 'str' */
+HPyAPI_HANDLE(75) HPy h_TupleType;        /* built-in 'tuple' */
+HPyAPI_HANDLE(76) HPy h_ListType;         /* built-in 'list' */
+HPyAPI_HANDLE(229) HPy h_ComplexType;     /* built-in 'complex' */
+HPyAPI_HANDLE(230) HPy h_BytesType;       /* built-in 'bytes' */
+HPyAPI_HANDLE(231) HPy h_MemoryViewType;  /* built-in 'memoryview' */
+HPyAPI_HANDLE(232) HPy h_CapsuleType;     /* built-in 'capsule' */
+HPyAPI_HANDLE(233) HPy h_SliceType;       /* built-in 'slice' */
 
+#endif
+
+HPyAPI_FUNC(77)
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
+HPyAPI_FUNC(78)
 HPy HPy_Dup(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(79)
 void HPy_Close(HPyContext *ctx, HPy h);
 
+HPyAPI_FUNC(80)
 HPy HPyLong_FromLong(HPyContext *ctx, long value);
+HPyAPI_FUNC(81)
 HPy HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long value);
+HPyAPI_FUNC(82)
 HPy HPyLong_FromLongLong(HPyContext *ctx, long long v);
+HPyAPI_FUNC(83)
 HPy HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long v);
+HPyAPI_FUNC(84)
 HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value);
+HPyAPI_FUNC(85)
 HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value);
 
+HPyAPI_FUNC(86)
 long HPyLong_AsLong(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(87)
 unsigned long HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(88)
 unsigned long HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(89)
 long long HPyLong_AsLongLong(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(90)
 unsigned long long HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(91)
 unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(92)
 size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(93)
 HPy_ssize_t HPyLong_AsSsize_t(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(94)
 void* HPyLong_AsVoidPtr(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(95)
 double HPyLong_AsDouble(HPyContext *ctx, HPy h);
 
+HPyAPI_FUNC(96)
 HPy HPyFloat_FromDouble(HPyContext *ctx, double v);
+HPyAPI_FUNC(97)
 double HPyFloat_AsDouble(HPyContext *ctx, HPy h);
 
+HPyAPI_FUNC(98)
 HPy HPyBool_FromLong(HPyContext *ctx, long v);
 
 
 /* abstract.h */
+HPyAPI_FUNC(99)
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(248)
 int HPySequence_Check(HPyContext *ctx, HPy h);
 
+HPyAPI_FUNC(100)
 int HPyNumber_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(101)
 HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(102)
 HPy HPy_Subtract(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(103)
 HPy HPy_Multiply(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(104)
 HPy HPy_MatrixMultiply(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(105)
 HPy HPy_FloorDivide(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(106)
 HPy HPy_TrueDivide(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(107)
 HPy HPy_Remainder(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(108)
 HPy HPy_Divmod(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(109)
 HPy HPy_Power(HPyContext *ctx, HPy h1, HPy h2, HPy h3);
+HPyAPI_FUNC(110)
 HPy HPy_Negative(HPyContext *ctx, HPy h1);
+HPyAPI_FUNC(111)
 HPy HPy_Positive(HPyContext *ctx, HPy h1);
+HPyAPI_FUNC(112)
 HPy HPy_Absolute(HPyContext *ctx, HPy h1);
+HPyAPI_FUNC(113)
 HPy HPy_Invert(HPyContext *ctx, HPy h1);
+HPyAPI_FUNC(114)
 HPy HPy_Lshift(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(115)
 HPy HPy_Rshift(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(116)
 HPy HPy_And(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(117)
 HPy HPy_Xor(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(118)
 HPy HPy_Or(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(119)
 HPy HPy_Index(HPyContext *ctx, HPy h1);
+HPyAPI_FUNC(120)
 HPy HPy_Long(HPyContext *ctx, HPy h1);
+HPyAPI_FUNC(121)
 HPy HPy_Float(HPyContext *ctx, HPy h1);
 
+HPyAPI_FUNC(122)
 HPy HPy_InPlaceAdd(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(123)
 HPy HPy_InPlaceSubtract(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(124)
 HPy HPy_InPlaceMultiply(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(125)
 HPy HPy_InPlaceMatrixMultiply(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(126)
 HPy HPy_InPlaceFloorDivide(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(127)
 HPy HPy_InPlaceTrueDivide(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(128)
 HPy HPy_InPlaceRemainder(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(129)
 HPy HPy_InPlacePower(HPyContext *ctx, HPy h1, HPy h2, HPy h3);
+HPyAPI_FUNC(130)
 HPy HPy_InPlaceLshift(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(131)
 HPy HPy_InPlaceRshift(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(132)
 HPy HPy_InPlaceAnd(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(133)
 HPy HPy_InPlaceXor(HPyContext *ctx, HPy h1, HPy h2);
+HPyAPI_FUNC(134)
 HPy HPy_InPlaceOr(HPyContext *ctx, HPy h1, HPy h2);
 
+HPyAPI_FUNC(135)
 int HPyCallable_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(136)
 HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
 
 /* pyerrors.h */
+HPyAPI_FUNC(137)
 void HPy_FatalError(HPyContext *ctx, const char *message);
+HPyAPI_FUNC(138)
 HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message);
+HPyAPI_FUNC(139)
 HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 /* note: the filename will be FS decoded */
+HPyAPI_FUNC(140)
 HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded);
+HPyAPI_FUNC(141)
 HPy HPyErr_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
+HPyAPI_FUNC(142)
 int HPyErr_Occurred(HPyContext *ctx);
+HPyAPI_FUNC(143)
 int HPyErr_ExceptionMatches(HPyContext *ctx, HPy exc);
+HPyAPI_FUNC(144)
 HPy HPyErr_NoMemory(HPyContext *ctx);
+HPyAPI_FUNC(145)
 void HPyErr_Clear(HPyContext *ctx);
+HPyAPI_FUNC(146)
 HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
+HPyAPI_FUNC(147)
 HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
+HPyAPI_FUNC(148)
 int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level);
+HPyAPI_FUNC(149)
 void HPyErr_WriteUnraisable(HPyContext *ctx, HPy obj);
 
 /* object.h */
+HPyAPI_FUNC(150)
 int HPy_IsTrue(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(151)
 HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec,
                      HPyType_SpecParam *params);
+HPyAPI_FUNC(152)
 HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
 
+HPyAPI_FUNC(153)
 HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
+HPyAPI_FUNC(154)
 HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
+HPyAPI_FUNC(234)
 HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
+HPyAPI_FUNC(155)
 int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name);
+HPyAPI_FUNC(156)
 int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
+HPyAPI_FUNC(157)
 int HPy_SetAttr(HPyContext *ctx, HPy obj, HPy name, HPy value);
+HPyAPI_FUNC(158)
 int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *name, HPy value);
 
+HPyAPI_FUNC(159)
 HPy HPy_GetItem(HPyContext *ctx, HPy obj, HPy key);
+HPyAPI_FUNC(160)
 HPy HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
+HPyAPI_FUNC(161)
 HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *key);
 
+HPyAPI_FUNC(162)
 int HPy_Contains(HPyContext *ctx, HPy container, HPy key);
 
+HPyAPI_FUNC(163)
 int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value);
+HPyAPI_FUNC(164)
 int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
+HPyAPI_FUNC(165)
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
 
+HPyAPI_FUNC(166)
 HPy HPy_Type(HPyContext *ctx, HPy obj);
 // WARNING: HPy_TypeCheck/HPyType_IsSubtype could be tweaked/removed in the future,
 // see issue #160
+HPyAPI_FUNC(167)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
+HPyAPI_FUNC(249)
 int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
+HPyAPI_FUNC(250)
 int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
+HPyAPI_FUNC(251)
 const char *HPyType_GetName(HPyContext *ctx, HPy type);
 
+HPyAPI_FUNC(168)
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 
+HPyAPI_FUNC(169)
 void* HPy_AsStruct(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(170)
 void* HPy_AsStructLegacy(HPyContext *ctx, HPy h);
 
+HPyAPI_FUNC(171)
 HPy _HPy_New(HPyContext *ctx, HPy h_type, void **data);
 
+HPyAPI_FUNC(172)
 HPy HPy_Repr(HPyContext *ctx, HPy obj);
+HPyAPI_FUNC(173)
 HPy HPy_Str(HPyContext *ctx, HPy obj);
+HPyAPI_FUNC(174)
 HPy HPy_ASCII(HPyContext *ctx, HPy obj);
+HPyAPI_FUNC(175)
 HPy HPy_Bytes(HPyContext *ctx, HPy obj);
 
+HPyAPI_FUNC(176)
 HPy HPy_RichCompare(HPyContext *ctx, HPy v, HPy w, int op);
+HPyAPI_FUNC(177)
 int HPy_RichCompareBool(HPyContext *ctx, HPy v, HPy w, int op);
 
+HPyAPI_FUNC(178)
 HPy_hash_t HPy_Hash(HPyContext *ctx, HPy obj);
 
+HPyAPI_FUNC(252)
 HPy HPySeqIter_New(HPyContext *ctx, HPy seq);
 
 /* bytesobject.h */
+HPyAPI_FUNC(179)
 int HPyBytes_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(180)
 HPy_ssize_t HPyBytes_Size(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(181)
 HPy_ssize_t HPyBytes_GET_SIZE(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(182)
 char* HPyBytes_AsString(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(183)
 char* HPyBytes_AS_STRING(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(184)
 HPy HPyBytes_FromString(HPyContext *ctx, const char *v);
+HPyAPI_FUNC(185)
 HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len);
 
 /* unicodeobject.h */
+HPyAPI_FUNC(186)
 HPy HPyUnicode_FromString(HPyContext *ctx, const char *utf8);
+HPyAPI_FUNC(187)
 int HPyUnicode_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(188)
 HPy HPyUnicode_AsASCIIString(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(189)
 HPy HPyUnicode_AsLatin1String(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(190)
 HPy HPyUnicode_AsUTF8String(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(191)
 const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
+HPyAPI_FUNC(192)
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
+HPyAPI_FUNC(193)
 HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char* v);
+HPyAPI_FUNC(194)
 HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char* v, HPy_ssize_t size);
+HPyAPI_FUNC(195)
 HPy HPyUnicode_EncodeFSDefault(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(196)
 HPy_UCS4 HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index);
+HPyAPI_FUNC(197)
 HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
+HPyAPI_FUNC(198)
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
+HPyAPI_FUNC(243)
 HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
+HPyAPI_FUNC(244)
 HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str);
+HPyAPI_FUNC(245)
 HPy HPyUnicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
 
 /* listobject.h */
+HPyAPI_FUNC(199)
 int HPyList_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(200)
 HPy HPyList_New(HPyContext *ctx, HPy_ssize_t len);
+HPyAPI_FUNC(201)
 int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
+HPyAPI_FUNC(202)
 int HPyDict_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(203)
 HPy HPyDict_New(HPyContext *ctx);
+HPyAPI_FUNC(246)
 HPy HPyDict_Keys(HPyContext *ctx, HPy h);
 /* HPyDict_GetItem
 
@@ -306,35 +427,50 @@ HPy HPyDict_Keys(HPyContext *ctx, HPy h);
    if 'HPyErr_Occurred(ctx) != 0', it will still work.
    This function, of course, returns a new reference.
  */
+HPyAPI_FUNC(247)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 
 /* tupleobject.h */
+HPyAPI_FUNC(204)
 int HPyTuple_Check(HPyContext *ctx, HPy h);
+HPyAPI_FUNC(205)
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
 /* slice */
+HPyAPI_FUNC(235)
 int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 
 /* contextvar */
+HPyAPI_FUNC(236)
 HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
+HPyAPI_FUNC(237)
 int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
+HPyAPI_FUNC(238)
 HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
 /* import.h */
+HPyAPI_FUNC(206)
 HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
 /* pycapsule.h */
+HPyAPI_FUNC(239)
 HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
+HPyAPI_FUNC(240)
 void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
+HPyAPI_FUNC(241)
 int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name);
+HPyAPI_FUNC(242)
 int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
 
 /* integration with the old CPython API */
+HPyAPI_FUNC(207)
 HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);
+HPyAPI_FUNC(208)
 cpy_PyObject *HPy_AsPyObject(HPyContext *ctx, HPy h);
 
 /* internal helpers which need to be exposed to modules for practical reasons :( */
+HPyAPI_FUNC(209)
 void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
                                          HPyFunc_Signature sig,
                                          HPyCFunction func,
@@ -342,23 +478,35 @@ void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
 
 /* Builders */
 
+HPyAPI_FUNC(210)
 HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size);
+HPyAPI_FUNC(211)
 void HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                         HPy_ssize_t index, HPy h_item);
+HPyAPI_FUNC(212)
 HPy HPyListBuilder_Build(HPyContext *ctx, HPyListBuilder builder);
+HPyAPI_FUNC(213)
 void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder);
 
+HPyAPI_FUNC(214)
 HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size);
+HPyAPI_FUNC(215)
 void HPyTupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,
                          HPy_ssize_t index, HPy h_item);
+HPyAPI_FUNC(216)
 HPy HPyTupleBuilder_Build(HPyContext *ctx, HPyTupleBuilder builder);
+HPyAPI_FUNC(217)
 void HPyTupleBuilder_Cancel(HPyContext *ctx, HPyTupleBuilder builder);
 
 /* Helper for correctly closing handles */
 
+HPyAPI_FUNC(218)
 HPyTracker HPyTracker_New(HPyContext *ctx, HPy_ssize_t size);
+HPyAPI_FUNC(219)
 int HPyTracker_Add(HPyContext *ctx, HPyTracker ht, HPy h);
+HPyAPI_FUNC(220)
 void HPyTracker_ForgetAll(HPyContext *ctx, HPyTracker ht);
+HPyAPI_FUNC(221)
 void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
 
 /**
@@ -393,7 +541,9 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
  * needs to add write and/or read barriers on the objects. They are ignored by
  * CPython but e.g. PyPy needs a write barrier.
 */
+HPyAPI_FUNC(222)
 void HPyField_Store(HPyContext *ctx, HPy target_object, HPyField *target_field, HPy h);
+HPyAPI_FUNC(223)
 HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
 
 /**
@@ -418,7 +568,9 @@ HPy HPyField_Load(HPyContext *ctx, HPy source_object, HPyField source_field);
  * HPy_BEGIN_LEAVE_PYTHON/HPy_END_LEAVE_PYTHON becomes equivalent to
  * Py_BEGIN_ALLOW_THREADS/Py_END_ALLOW_THREADS.
 */
+HPyAPI_FUNC(224)
 void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state);
+HPyAPI_FUNC(225)
 HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
 
 /**
@@ -475,10 +627,13 @@ HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
  * also be activated only by some runtime option, letting the HPy implementation
  * use more optimized HPyGlobal implementation otherwise.
 */
+HPyAPI_FUNC(226)
 void HPyGlobal_Store(HPyContext *ctx, HPyGlobal *global, HPy h);
+HPyAPI_FUNC(227)
 HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global);
 
 /* Debugging helpers */
+HPyAPI_FUNC(228)
 void _HPy_Dump(HPyContext *ctx, HPy h);
 
 
@@ -632,4 +787,5 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
+HPyAPI_FUNC(253)
 int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);
