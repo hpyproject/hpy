@@ -9,7 +9,7 @@
  * incremented by exactly one.
  */
 
-#if AUTOGEN
+#ifdef AUTOGEN
 
 /* Constants */
 HPyAPI_HANDLE(0) HPy h_None;
