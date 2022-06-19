@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 ROOT=`pwd` # we expect this script to be run from the repo root
+if [ -z ${PYTHON+x} ]; then
+  # Allow the caller to override the Python runtime used
+  PYTHON=python
+fi
 
 _install_hpy() {
     echo "Installing hpy"
@@ -17,9 +21,9 @@ _test_pof() {
     echo "==== testing pof ===="
     # this assumes that pof is already installed, e.g. after calling
     # wheel or setup_py_install
-    python -m pip install pytest pytest-azurepipelines
+    ${PYTHON} -m pip install pytest pytest-azurepipelines
     cd proof-of-concept
-    python -m pytest
+    ${PYTHON} -m pytest
 }
 
 _build_wheel() {
@@ -28,7 +32,7 @@ _build_wheel() {
     # we use this venv just to build the wheel, and then we install the wheel
     # in the currently active virtualenv
     echo "Create venv: $VENV"
-    python -m venv "$VENV"
+    ${PYTHON} -m venv "$VENV"
     local PY_BUILDER="`pwd`/$VENV/bin/python3"
     if [ -x "`pwd`/$VENV/Scripts/python.exe" ]
     then
@@ -87,15 +91,15 @@ wheel() {
     echo "Wheel created: ${WHEEL}"
     echo
     echo "Create venv: $VENV"
-    python -m venv "$VENV"
+    ${PYTHON} -m venv "$VENV"
     if [ -e "$VENV/bin/activate" ] ; then
         source "$VENV/bin/activate"
     else
         source "$VENV/Scripts/activate"
     fi
-    _install_hpy python
+    _install_hpy ${PYTHON}
     echo "Installing wheel"
-    python -m pip install $WHEEL
+    ${PYTHON} -m pip install $WHEEL
     echo
     _test_pof
 }
@@ -107,17 +111,17 @@ setup_py_install() {
     clean
     echo "=== testing setup.py --hpy-abi=$HPY_ABI install ==="
     echo "Create venv: $VENV"
-    python -m venv "$VENV"
+    ${PYTHON} -m venv "$VENV"
     if [ -e "$VENV/bin/activate" ] ; then
         source "$VENV/bin/activate"
     else
         source "$VENV/Scripts/activate"
     fi
-    _install_hpy python
+    _install_hpy ${PYTHON}
     echo
     echo "Running setup.py"
     pushd proof-of-concept
-    python setup.py --hpy-abi="$HPY_ABI" install
+    ${PYTHON} setup.py --hpy-abi="$HPY_ABI" install
     popd
     echo
     _test_pof
@@ -130,18 +134,18 @@ setup_py_build_ext_inplace() {
     clean
     echo "=== testing setup.py --hpy-abi=$HPY_ABI build_ext --inplace ==="
     echo "Create venv: $VENV"
-    python -m venv "$VENV"
+    ${PYTHON} -m venv "$VENV"
     if [ -e "$VENV/bin/activate" ] ; then
         source "$VENV/bin/activate"
     else
         source "$VENV/Scripts/activate"
     fi
-    _install_hpy python
+    _install_hpy ${PYTHON}
     echo
     echo "Running setup.py"
     pushd proof-of-concept
-    echo python is $(which python)
-    python setup.py --hpy-abi="$HPY_ABI" build_ext --inplace
+    echo python is $(which ${PYTHON})
+    ${PYTHON} setup.py --hpy-abi="$HPY_ABI" build_ext --inplace
     popd
     echo
     _test_pof
