@@ -1,6 +1,60 @@
 Changelog
 =========
 
+Version 0.0.4 (May 25th, 2022)
+------------------------------
+
+New Features/API:
+
+  - HPy headers are C++ compliant
+  - Python 3.10 support
+  - `HPyField <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L323>`_: 
+    References to Python objects that can be stored in raw native memory owned by Python objects.
+
+    - New API functions: ``HPyField_Load``, ``HPyField_Store``
+  - `HPyGlobal <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L383>`_: 
+    References to Python objects that can be stored into a C global variable.
+
+    - New API functions: ``HPyGlobal_Load``, ``HPyGlobal_Store``
+    - Note: ``HPyGlobal`` does not allow to share Python objects between (sub)interpreters
+
+  - `GIL support <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L358>`_
+    - New API functions: ``HPy_ReenterPythonExecution``, ``HPy_LeavePythonExecution``
+
+  - `Value building support <https://github.com/hpyproject/hpy/blob/master/hpy/devel/src/runtime/buildvalue.c#L4>`_ (``HPy_BuildValue``)
+
+  - New type slots
+
+    - ``HPy_mp_ass_subscript``, ``HPy_mp_length``, ``HPy_mp_subscript``
+    - ``HPy_tp_finalize``
+
+  - Other new API functions
+
+    - ``HPyErr_SetFromErrnoWithFilename``, ``HPyErr_SetFromErrnoWithFilenameObjects``
+    - ``HPyErr_ExceptionMatches``
+    - ``HPyErr_WarnEx``
+    - ``HPyErr_WriteUnraisable``
+    - ``HPy_Contains``
+    - ``HPyLong_AsVoidPtr``
+    - ``HPyLong_AsDouble``
+    - ``HPyUnicode_AsASCIIString``, ``HPyUnicode_DecodeASCII``
+    - ``HPyUnicode_AsLatin1String``, ``HPyUnicode_DecodeLatin1``
+    - ``HPyUnicode_DecodeFSDefault``, ``HPyUnicode_DecodeFSDefaultAndSize``
+    - ``HPyUnicode_ReadChar``
+
+Debug mode:
+
+  - Support activation of debug mode via environment variable ``HPY_DEBUG``
+  - Support capturing stack traces of handle allocations
+  - Check for invalid use of raw data pointers (e.g ``HPyUnicode_AsUTF8AndSize``) after handle was closed.
+  - Detect invalid handles returned from extension functions
+  - Detect incorrect closing of handles passed as arguments
+
+Misc Changes:
+
+  - Removed unnecessary prefix ``"m_"`` from fields of ``HPyModuleDef`` (incompatible change)
+  - For HPy implementors: new pytest mark for HPy tests assuming synchronous GC
+
 Version 0.0.3 (September 22nd, 2021)
 ------------------------------------
 
