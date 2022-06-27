@@ -114,6 +114,8 @@ HPy h_TupleType;        /* built-in 'tuple' */
 HPy h_ListType;         /* built-in 'list' */
 
 HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *def);
+void* HPyModule_GetState(HPyContext *ctx, HPy module);
+
 HPy HPy_Dup(HPyContext *ctx, HPy h);
 void HPy_Close(HPyContext *ctx, HPy h);
 
@@ -586,5 +588,7 @@ typedef enum {
 
     /* extra HPy slots */
     HPy_tp_destroy = SLOT(1000, HPyFunc_DESTROYFUNC),
+    HPy_m_traverse = SLOT(1001, HPyFunc_MODTRAVERSEPROC),
+    HPy_m_destroy = SLOT(1002, HPyFunc_MODDESTROYFUNC),
 
 } HPySlot_Slot;

@@ -284,6 +284,11 @@ HPyAPI_FUNC HPy HPyModule_Create(HPyContext *ctx, HPyModuleDef *mdef)
     return ctx_Module_Create(ctx, mdef);
 }
 
+HPyAPI_FUNC void* HPyModule_GetState(HPyContext *ctx, HPy mod)
+{
+    return ctx_Module_GetState(ctx, mod);
+}
+
 HPyAPI_FUNC HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec, HPyType_SpecParam *params)
 {
     return ctx_Type_FromSpec(ctx, spec, params);

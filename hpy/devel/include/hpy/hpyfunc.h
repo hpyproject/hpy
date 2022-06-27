@@ -39,6 +39,8 @@ typedef enum {
     HPyFunc_OBJOBJPROC,
     HPyFunc_TRAVERSEPROC,
     HPyFunc_DESTRUCTOR,
+    HPyFunc_MODTRAVERSEPROC,
+    HPyFunc_MODDESTROYFUNC,
 
 } HPyFunc_Signature;
 
@@ -108,6 +110,10 @@ typedef int (*HPyFunc_visitproc)(HPyField *, void *);
 
 
 #include "autogen_hpyfunc_declare.h"
+
+// Few special cases not handled by the autogen:
+#define _HPyFunc_DECLARE_HPyFunc_MODTRAVERSEPROC(SYM) static int SYM(void *object, HPyFunc_visitproc visit, void *arg)
+#define _HPyFunc_DECLARE_HPyFunc_MODDESTROYFUNC(SYM) static void SYM(void *object)
 
 #ifdef HPY_UNIVERSAL_ABI
 #  include "universal/hpyfunc_trampolines.h"

@@ -68,6 +68,10 @@ typedef int (*_HPyCFunction_INITPROC)(HPyContext*, HPy, HPy *, HPy_ssize_t, HPy)
 #define _HPyFunc_TRAMPOLINE_HPyFunc_DESTROYFUNC(SYM, IMPL)              \
     static void SYM(void) { abort(); }
 
+/* special case: the same for HPy_m_destroy for module state */
+#define _HPyFunc_TRAMPOLINE_HPyFunc_MODDESTROYFUNC(SYM, IMPL)              \
+    static void SYM(void) { abort(); }
+
 /* this needs to be written manually because HPy has a different type for
    "op": HPy_RichCmpOp instead of int */
 typedef HPy (*_HPyCFunction_RICHCMPFUNC)(HPyContext *, HPy, HPy, int);
@@ -104,6 +108,13 @@ typedef int (*_HPyCFunction_RELEASEBUFFERPROC)(HPyContext *, HPy, HPy_buffer *);
     static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg)  \
     {                                                                   \
         return call_traverseproc_from_trampoline((HPyFunc_traverseproc)IMPL, self,            \
+                                                 visit, arg);           \
+    }
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_MODTRAVERSEPROC(SYM, IMPL)          \
+    static int SYM(cpy_PyObject *self, cpy_visitproc visit, void *arg)  \
+    {                                                                   \
+        return call_mod_traverseproc_from_trampoline((HPyFunc_traverseproc)IMPL, self,        \
                                                  visit, arg);           \
     }
 

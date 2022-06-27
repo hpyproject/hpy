@@ -921,11 +921,22 @@ static int hpy2cpy_visit(HPyField *f, void *v_args)
     return cpy_visit(cpy_obj, cpy_arg);
 }
 
+_HPy_HIDDEN int call_struct_traverseproc_from_trampoline(HPyFunc_traverseproc tp_traverse,
+                                                  void *struct_data,
+                                                  cpy_visitproc cpy_visit,
+                                                  void *cpy_arg)
+{
+    hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
+    return tp_traverse(struct_data, hpy2cpy_visit, &args);
+}
+
 _HPy_HIDDEN int call_traverseproc_from_trampoline(HPyFunc_traverseproc tp_traverse,
                                                   PyObject *self,
                                                   cpy_visitproc cpy_visit,
                                                   void *cpy_arg)
 {
-    hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
-    return tp_traverse(_pyobj_as_struct(self), hpy2cpy_visit, &args);
+    return call_struct_traverseproc_from_trampoline(tp_traverse,
+                                                    _pyobj_as_struct(self),
+                                                    cpy_visit,
+                                                    cpy_arg);
 }

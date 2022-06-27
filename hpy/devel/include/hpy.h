@@ -168,6 +168,7 @@ typedef struct _HPyContext_s HPyContext;
 //  CPython-ABI
 #   include "hpy/runtime/ctx_funcs.h"
 #   include "hpy/runtime/ctx_type.h"
+#   include "hpy/runtime/ctx_module.h"
 #   include "hpy/cpython/misc.h"
 #   include "hpy/cpython/autogen_api_impl.h"
 #endif

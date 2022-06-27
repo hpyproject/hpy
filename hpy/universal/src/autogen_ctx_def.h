@@ -16,6 +16,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_version = 1,
     /* h_None & co. are initialized by init_universal_ctx() */
     .ctx_Module_Create = &ctx_Module_Create,
+    .ctx_Module_GetState = &ctx_Module_GetState,
     .ctx_Dup = &ctx_Dup,
     .ctx_Close = &ctx_Close,
     .ctx_Long_FromLong = &ctx_Long_FromLong,
