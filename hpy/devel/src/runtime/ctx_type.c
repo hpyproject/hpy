@@ -710,7 +710,7 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
             }
         }
     }
-    return &PyType_Type;
+    return NULL;
 }
 
 static PyObject *
