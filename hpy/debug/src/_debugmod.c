@@ -251,7 +251,7 @@ HPyDef_SLOT(DebugHandle_cmp, DebugHandle_cmp_impl, HPy_tp_richcompare)
 static UHPy DebugHandle_cmp_impl(HPyContext *uctx, UHPy self, UHPy o, HPy_RichCmpOp op)
 {
     UHPy T = HPy_Type(uctx, self);
-    if (!HPy_TypeCheck(uctx, o, T))
+    if (!HPy_TypeCheck(uctx, o, T, 0))
         return HPy_Dup(uctx, uctx->h_NotImplemented);
     DebugHandleObject *dh_self = DebugHandleObject_AsStruct(uctx, self);
     DebugHandleObject *dh_o = DebugHandleObject_AsStruct(uctx, o);

@@ -366,8 +366,8 @@ HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {
      return ctx->ctx_Type ( ctx, obj ); 
 }
 
-HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type) {
-     return ctx->ctx_TypeCheck ( ctx, obj, type ); 
+HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type, int exact) {
+     return ctx->ctx_TypeCheck ( ctx, obj, type, exact ); 
 }
 
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy obj, HPy other) {

@@ -181,7 +181,7 @@ struct _HPyContext_s {
     int (*ctx_SetItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
     int (*ctx_SetItem_s)(HPyContext *ctx, HPy obj, const char *key, HPy value);
     HPy (*ctx_Type)(HPyContext *ctx, HPy obj);
-    int (*ctx_TypeCheck)(HPyContext *ctx, HPy obj, HPy type);
+    int (*ctx_TypeCheck)(HPyContext *ctx, HPy obj, HPy type, int exact);
     int (*ctx_Is)(HPyContext *ctx, HPy obj, HPy other);
     void *(*ctx_AsStruct)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStructLegacy)(HPyContext *ctx, HPy h);
