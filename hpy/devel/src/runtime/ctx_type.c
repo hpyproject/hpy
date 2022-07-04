@@ -871,6 +871,10 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
             }
         }
     }
+    /* Returning NULL here does not indicate an error but that the metaclass
+       has not explicitly been specified. We could default here to &PyType_Type
+       but we actually want to use the bare 'PyType_FromSpecWithBases' if
+       nothing was specified. */
     return NULL;
 }
 
@@ -878,7 +882,7 @@ static PyObject *
 _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases, struct _typeobject *meta)
 {
 #if PY_VERSION_HEX >= 0x030C0000
-    /* On Python 3.11 an newer, we can just use 'PyType_FromMetaclass'. */
+    /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
     return PyType_FromMetaclass(meta, NULL, spec, bases);
 #else
     /* On older Python versions, we need to workaround the missing support for
@@ -1068,9 +1072,6 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     }
     struct _typeobject *metatype = get_metatype(params);
 
-    // PyType_FromSpecWithBases does not support passing a metaclass,
-    // so we have to use a patched CPython with PyType_FromSpecWithBasesAndMeta
-    // See also: https://bugs.python.org/issue15870
     PyObject *result = _PyType_FromMetaclass(spec, bases, metatype);
 
     /* note that we do NOT free the memory which was allocated by
