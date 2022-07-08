@@ -98,6 +98,8 @@ _HPy_GetHeaderSize(HPyType_BuiltinShape shape)
     return -1;
 }
 
+#define _HPy_OFFSET(OBJ, OFFSET) ((void*) ((char*) (OBJ) + (OFFSET)))
+
 // Return a pointer to the area of memory AFTER the header
 static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape)
 {
@@ -106,7 +108,7 @@ static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape
        trusted source. The shape is validated when creating the type from the
        specification. */
     assert(header_size >= 0);
-    return (void*) ((char*) obj + header_size);
+    return _HPy_OFFSET(obj, header_size);
 }
 
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
@@ -945,7 +947,15 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
         else
             s++;
 
-        memcpy(ht, temp_ht, sizeof(PyHeapTypeObject));
+        /* IMPORTANT: CPython debug builds may store additional information in
+           the object header (i.e. before 'ob_refcnt') for tracing references
+           or whatever. In this case, we MUST NOT copy the object header. So we
+           don't copy the whole embedded 'PyVarObject' chunk at the beginning
+           of the 'PyHeapTypeObject'. The appropriate 'PyVarObject' fields are
+           set explicitly right below. */
+        void *dst = _HPy_OFFSET(tp, sizeof(PyVarObject));
+        void *src = _HPy_OFFSET(temp_tp, sizeof(PyVarObject));
+        memcpy(dst, src, sizeof(PyHeapTypeObject) - sizeof(PyVarObject));
 
         tp->ob_base.ob_base.ob_type = meta;
         tp->ob_base.ob_base.ob_refcnt = 1;
