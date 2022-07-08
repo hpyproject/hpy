@@ -940,13 +940,6 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
         PyHeapTypeObject *ht = (PyHeapTypeObject *) result;
         PyTypeObject *tp = &ht->ht_type;
 
-        /* Set the type name and qualname */
-        const char *s = strrchr(spec->name, '.');
-        if (s == NULL)
-            s = (char*)spec->name;
-        else
-            s++;
-
         /* IMPORTANT: CPython debug builds may store additional information in
            the object header (i.e. before 'ob_refcnt') for tracing references
            or whatever. In this case, we MUST NOT copy the object header. So we
@@ -1004,7 +997,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
         /* The following is the tail of 'PyType_FromSpecWithBases'. */
 
         /* Set type.__module__ */
-        s = strrchr(spec->name, '.');
+        const char *s = strrchr(spec->name, '.');
         if (s != NULL) {
             int err;
             PyObject *modname = PyUnicode_FromStringAndSize(
