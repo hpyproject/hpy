@@ -985,11 +985,13 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
         if (PyType_Ready(tp) < 0)
             goto fail;
 
-        /* The following is the tail of 'PyType_FromSpecWithBases'. */
-
-        if (tp->tp_dictoffset) {
-            ht->ht_cached_keys = _PyDict_NewKeysForClass();
+        /* Restore 'ht_cached_keys' after call to 'PyType_Ready' */
+        if (temp_ht->ht_cached_keys) {
+            Py_INCREF(temp_ht->ht_cached_keys);
+            ht->ht_cached_keys = temp_ht->ht_cached_keys;
         }
+
+        /* The following is the tail of 'PyType_FromSpecWithBases'. */
 
         /* Set type.__module__ */
         s = strrchr(spec->name, '.');
