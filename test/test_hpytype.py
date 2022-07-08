@@ -1166,7 +1166,7 @@ class TestType(HPyTest):
 
                 HPyType_SpecParam specparam[] = {
                     { HPyType_SpecParam_Metaclass, metaclass },
-                    { 0 }
+                    { (HPyType_SpecParam_Kind)0 }
                 };
 
                 const char *bare_name = strrchr(Dummy_spec.name, '.');

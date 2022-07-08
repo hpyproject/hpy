@@ -157,10 +157,10 @@ class TestLegacyType(_TestType):
 
             static PyTypeObject DummyMetaType = {
                 PyVarObject_HEAD_INIT(&PyType_Type, 0)
-                .tp_base = &PyType_Type,
                 .tp_name = "mytest.DummyMeta",
                 .tp_basicsize = sizeof(DummyMeta),
                 .tp_flags = Py_TPFLAGS_DEFAULT,
+                .tp_base = &PyType_Type,
             };
             
             @DEFINE_Dummy_struct
@@ -191,7 +191,7 @@ class TestLegacyType(_TestType):
 
                 HPyType_SpecParam param[] = {
                     { HPyType_SpecParam_Metaclass, h_DummyMeta },
-                    { 0 }
+                    { (HPyType_SpecParam_Kind)0 }
                 };
                 HPy h_Dummy = HPyType_FromSpec(ctx, &Dummy_legacy_spec, param);
                 if (!HPy_IsNull(h_Dummy)) {

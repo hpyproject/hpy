@@ -880,6 +880,21 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
     return NULL;
 }
 
+static inline Py_ssize_t count_members(PyType_Spec *spec) {
+    Py_ssize_t nmembers = 0;
+    PyType_Slot *slot;
+    PyMemberDef *memb;
+    for (slot = spec->slots; slot->slot; slot++) {
+        if (slot->slot == Py_tp_members) {
+            nmembers = 0;
+            for (memb = (PyMemberDef *) slot->pfunc; memb->name != NULL; memb++) {
+                nmembers++;
+            }
+        }
+    }
+    return nmembers;
+}
+
 /* On older Python versions, we need to workaround the missing support for
    metaclasses. We create a temporary heap type using
    'PyType_FromSpecWithBases' and if a metaclass was provided, we use it to
@@ -891,15 +906,20 @@ static PyObject*
 _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
         struct _typeobject *meta)
 {
+    PyObject *temp, *result;
+    PyHeapTypeObject *temp_ht, *ht;
+    PyTypeObject *temp_tp, *tp;
+    Py_ssize_t nmembers;
+    const char *s;
 
-    PyObject *result = NULL;
-    PyObject *temp = PyType_FromSpecWithBases(spec, bases);
+    temp = PyType_FromSpecWithBases(spec, bases);
     if (!temp)
         return NULL;
 
     /* If no metaclass was provided, we avoid this path since it is rather
        expensive and slow. */
     if (meta) {
+        result = NULL;
         if (!PyType_Check(meta)) {
             PyErr_Format(PyExc_TypeError,
                     "Metaclass '%R' is not a subclass of 'type'.",
@@ -911,8 +931,8 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
                     "Metaclasses with custom tp_new are not supported.");
             goto fail;
         }
-        PyHeapTypeObject *temp_ht = (PyHeapTypeObject *) temp;
-        PyTypeObject *temp_tp = &temp_ht->ht_type;
+        temp_ht = (PyHeapTypeObject *) temp;
+        temp_tp = &temp_ht->ht_type;
 
         Py_INCREF(temp_ht->ht_name);
         Py_INCREF(temp_ht->ht_qualname);
@@ -921,24 +941,14 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
 
         /* Count the members as 'PyType_FromSpecWithBases' does such that we
            can properly allocate the size later when allocating the type. */
-        Py_ssize_t nmembers = 0;
-        PyType_Slot *slot;
-        PyMemberDef *memb;
-        for (slot = spec->slots; slot->slot; slot++) {
-            if (slot->slot == Py_tp_members) {
-                nmembers = 0;
-                for (memb = slot->pfunc; memb->name != NULL; memb++) {
-                    nmembers++;
-                }
-            }
-        }
+        nmembers = count_members(spec);
 
         result = meta->tp_alloc(meta, nmembers);
         if (!result)
             goto fail;
 
-        PyHeapTypeObject *ht = (PyHeapTypeObject *) result;
-        PyTypeObject *tp = &ht->ht_type;
+        ht = (PyHeapTypeObject *) result;
+        tp = &ht->ht_type;
 
         /* IMPORTANT: CPython debug builds may store additional information in
            the object header (i.e. before 'ob_refcnt') for tracing references
@@ -946,9 +956,9 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
            don't copy the whole embedded 'PyVarObject' chunk at the beginning
            of the 'PyHeapTypeObject'. The appropriate 'PyVarObject' fields are
            set explicitly right below. */
-        void *dst = _HPy_OFFSET(tp, sizeof(PyVarObject));
-        void *src = _HPy_OFFSET(temp_tp, sizeof(PyVarObject));
-        memcpy(dst, src, sizeof(PyHeapTypeObject) - sizeof(PyVarObject));
+        memcpy(_HPy_OFFSET(tp, sizeof(PyVarObject)),
+                _HPy_OFFSET(temp_tp, sizeof(PyVarObject)),
+                sizeof(PyHeapTypeObject) - sizeof(PyVarObject));
 
         tp->ob_base.ob_base.ob_type = meta;
         tp->ob_base.ob_base.ob_refcnt = 1;
@@ -974,7 +984,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
            free'd. */
         if (temp_tp->tp_doc) {
             size_t len = strlen(temp_tp->tp_doc)+1;
-            char *tp_doc = PyObject_MALLOC(len);
+            char *tp_doc = (char *)PyObject_MALLOC(len);
             if (!tp_doc)
                 goto fail;
             memcpy(tp_doc, temp_tp->tp_doc, len);
@@ -997,7 +1007,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
         /* The following is the tail of 'PyType_FromSpecWithBases'. */
 
         /* Set type.__module__ */
-        const char *s = strrchr(spec->name, '.');
+        s = strrchr(spec->name, '.');
         if (s != NULL) {
             int err;
             PyObject *modname = PyUnicode_FromStringAndSize(
@@ -1011,7 +1021,6 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
                 goto fail;
         }
         return result;
-
 fail:
         Py_DECREF(temp);
         Py_XDECREF(result);
