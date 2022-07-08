@@ -1103,6 +1103,13 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     /* note that we do NOT free the memory which was allocated by
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
+    Py_XDECREF(bases);
+    PyMem_Free(spec->slots);
+    PyMem_Free(spec);
+    if (result == NULL) {
+        return HPy_NULL;
+    }
+
 #if PY_VERSION_HEX < 0x03080000
     /*
     py3.7 compatibility
@@ -1113,12 +1120,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
     }
 #endif
-    Py_XDECREF(bases);
-    PyMem_Free(spec->slots);
-    PyMem_Free(spec);
-    if (result == NULL) {
-        return HPy_NULL;
-    }
+
     PyBufferProcs* buffer_procs = create_buffer_procs(hpyspec);
     if (buffer_procs) {
         ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
