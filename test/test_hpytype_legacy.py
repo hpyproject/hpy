@@ -155,12 +155,19 @@ class TestLegacyType(_TestType):
 
             @DEFINE_DummyMeta_struct
 
+            /* This module is compiled as a shared library and some compilers
+               don't allow addresses of Python objects defined in other
+               libraries to be used in static initializers here. The
+               DEFERRED_ADDRESS macro is just used for documentation and we
+               need to set the actual value before we call PyType_Ready. */
+            #define DEFERRED_ADDRESS(x) NULL
+
             static PyTypeObject DummyMetaType = {
-                PyVarObject_HEAD_INIT(&PyType_Type, 0)
+                PyVarObject_HEAD_INIT(DEFERRED_ADDRESS(&PyType_Type), 0)
                 .tp_name = "mytest.DummyMeta",
                 .tp_basicsize = sizeof(DummyMeta),
                 .tp_flags = Py_TPFLAGS_DEFAULT,
-                .tp_base = &PyType_Type,
+                .tp_base = DEFERRED_ADDRESS(&PyType_Type),
             };
             
             @DEFINE_Dummy_struct
@@ -185,6 +192,8 @@ class TestLegacyType(_TestType):
 
             void setup_types(HPyContext *ctx, HPy module) {
                 HPy h_DummyMeta;
+                DummyMetaType.ob_base.ob_base.ob_type = &PyType_Type;
+                DummyMetaType.tp_base = &PyType_Type;
                 if (PyType_Ready(&DummyMetaType))
                     return;
                 h_DummyMeta = HPy_FromPyObject(ctx, (PyObject*) &DummyMetaType);
