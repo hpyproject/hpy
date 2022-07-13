@@ -23,9 +23,8 @@ class autogen_ctx_h(AutoGenFile):
         # We need to remember the output function per item (either
         # 'declare_var' or 'declare_func'). So, we create tuples with structure
         # '(decl, declare_*)'.
-        all_decls = []
-        all_decls.extend(map(lambda x: (x, self.declare_var), self.api.variables))
-        all_decls.extend(map(lambda x: (x, self.declare_func), self.api.functions))
+        all_decls = [(x, self.declare_var) for x in self.api.variables]
+        all_decls += [(x, self.declare_func) for x in self.api.functions]
 
         # sort the list of all declaration by 'decl.ctx_index'
         all_decls.sort(key=lambda x: x[0].ctx_index)
