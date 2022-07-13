@@ -47,9 +47,9 @@ class TestHPyAPI(BaseTestAutogen):
 
     def test_ctx_name(self):
         api = self.parse("""
-            HPy h_None;
-            HPy HPy_Dup(HPyContext *ctx, HPy h);
-            void* _HPy_AsStruct(HPyContext *ctx, HPy h);
+            HPy_ID(0) HPy h_None;
+            HPy_ID(1) HPy HPy_Dup(HPyContext *ctx, HPy h);
+            HPy_ID(2) void* _HPy_AsStruct(HPyContext *ctx, HPy h);
         """)
         assert api.get_var('h_None').ctx_name() == 'h_None'
         assert api.get_func('HPy_Dup').ctx_name() == 'ctx_Dup'
@@ -57,9 +57,9 @@ class TestHPyAPI(BaseTestAutogen):
 
     def test_cpython_name(self):
         api = self.parse("""
-            HPy HPy_Dup(HPyContext *ctx, HPy h);
-            long HPyLong_AsLong(HPyContext *ctx, HPy h);
-            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            HPy_ID(0) HPy HPy_Dup(HPyContext *ctx, HPy h);
+            HPy_ID(1) long HPyLong_AsLong(HPyContext *ctx, HPy h);
+            HPy_ID(2) HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
         """)
         assert api.get_func('HPy_Dup').cpython_name is None
         assert api.get_func('HPyLong_AsLong').cpython_name == 'PyLong_AsLong'
@@ -121,8 +121,8 @@ class TestAutoGen(BaseTestAutogen):
 
     def test_autogen_ctx_h(self):
         api = self.parse("""
-            HPy h_None;
-            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            HPy_ID(0) HPy h_None;
+            HPy_ID(1) HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
         """)
         got = autogen_ctx_h(api).generate()
         exp = """
@@ -138,8 +138,8 @@ class TestAutoGen(BaseTestAutogen):
 
     def test_autogen_ctx_def_h(self):
         api = self.parse("""
-            HPy h_None;
-            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            HPy_ID(0) HPy h_None;
+            HPy_ID(1) HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
         """)
         got = autogen_ctx_def_h(api).generate()
         exp = """
@@ -155,9 +155,9 @@ class TestAutoGen(BaseTestAutogen):
 
     def test_autogen_trampolines_h(self):
         api = self.parse("""
-            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
-            void HPy_Close(HPyContext *ctx, HPy h);
-            void* _HPy_AsStruct(HPyContext *ctx, HPy h);
+            HPy_ID(0) HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            HPy_ID(1) void HPy_Close(HPyContext *ctx, HPy h);
+            HPy_ID(2) void* _HPy_AsStruct(HPyContext *ctx, HPy h);
         """)
         got = autogen_trampolines_h(api).generate()
         exp = """
@@ -177,10 +177,10 @@ class TestAutoGen(BaseTestAutogen):
 
     def test_cpython_api_impl_h(self):
         api = self.parse("""
-            HPy HPy_Dup(HPyContext *ctx, HPy h);
-            HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
-            HPy HPyLong_FromLong(HPyContext *ctx, long value);
-            char* HPyBytes_AsString(HPyContext *ctx, HPy h);
+            HPy_ID(0) HPy HPy_Dup(HPyContext *ctx, HPy h);
+            HPy_ID(1) HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2);
+            HPy_ID(2) HPy HPyLong_FromLong(HPyContext *ctx, long value);
+            HPy_ID(3) char* HPyBytes_AsString(HPyContext *ctx, HPy h);
         """)
         got = cpython_autogen_api_impl_h(api).generate()
         exp = """
