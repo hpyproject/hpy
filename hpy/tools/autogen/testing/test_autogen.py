@@ -31,8 +31,11 @@ class BaseTestAutogen:
 
     def parse(self, src):
         fname = self.tmpdir.join('test_api.h')
-        # automatically add usefuly typedefs
+        # automatically add useful typedefs
         src = """
+            #define STRINGIFY(X) #X
+            #define HPy_ID(X) _Pragma(STRINGIFY(id=X)) \\
+
             typedef int HPy;
             typedef int HPyContext;
         """ + src
@@ -77,6 +80,42 @@ class TestHPyAPI(BaseTestAutogen):
         assert tp_repr.value == '66'
         assert tp_repr.hpyfunc == 'HPyFunc_REPRFUNC'
 
+    def test_parse_id(self):
+        api = self.parse("""
+            HPy_ID(0) HPy h_Foo;
+            HPy_ID(1)
+            long HPyFoo_Bar(HPyContext *ctx, HPy h);
+        """)
+        assert len(api.variables) == 1
+        assert len(api.functions) == 1
+        assert api.variables[0].ctx_index == 0
+        assert api.functions[0].ctx_index == 1
+
+        # don't allow gaps in the sequence of IDs
+        with pytest.raises(AssertionError):
+            self.parse("""
+            HPy_ID(0) HPy h_Foo;
+            HPy_ID(3) long HPyFoo_Bar(HPyContext *ctx, HPy h);
+            """)
+
+        # don't allow re-using of IDs
+        with pytest.raises(AssertionError):
+            self.parse("""
+            HPy_ID(0) HPy h_Foo;
+            HPy_ID(0) HPy h_Foo;
+            """)
+
+        # all context members must have an ID
+        with pytest.raises(ValueError):
+            self.parse("HPy h_Foo;")
+
+        # pragmas must be of form '#pramga key=value'
+        with pytest.raises(ValueError):
+            self.parse("#pragma hello\nHPy h_Foo;")
+
+        # pragmas value must be an integer
+        with pytest.raises(ValueError):
+            self.parse("#pragma hello=world\nHPy h_Foo;")
 
 class TestAutoGen(BaseTestAutogen):
 
