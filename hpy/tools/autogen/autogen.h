@@ -1,7 +1,5 @@
 #define STRINGIFY(X) #X
-#define HPyAPI_HANDLE(X) _Pragma(STRINGIFY(ctx_index=X)) \
-
-#define HPyAPI_FUNC(X) _Pragma(STRINGIFY(ctx_index=X))
+#define HPy_ID(X) _Pragma(STRINGIFY(id=X)) \
 
 #define AUTOGEN 1
 
