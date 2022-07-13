@@ -50,7 +50,7 @@ class TestHPyFunc(BaseTestAutogen):
                 { \
                     _HPyFunc_args_FOO a = { arg, xy }; \
                     _HPy_CallRealFunctionFromTrampoline( \
-                       _ctx_for_trampolines, HPyFunc_FOO, IMPL, &a); \
+                       _ctx_for_trampolines, HPyFunc_FOO, (HPyCFunction)IMPL, &a); \
                     return a.result; \
                 }
 
@@ -65,7 +65,7 @@ class TestHPyFunc(BaseTestAutogen):
                 { \
                     _HPyFunc_args_BAR a = { arg0, arg1 }; \
                     _HPy_CallRealFunctionFromTrampoline( \
-                       _ctx_for_trampolines, HPyFunc_BAR, IMPL, &a); \
+                       _ctx_for_trampolines, HPyFunc_BAR, (HPyCFunction)IMPL, &a); \
                     return a.result; \
                 }
 
@@ -78,7 +78,7 @@ class TestHPyFunc(BaseTestAutogen):
                 { \
                     _HPyFunc_args_PROC a = { x }; \
                     _HPy_CallRealFunctionFromTrampoline( \
-                       _ctx_for_trampolines, HPyFunc_PROC, IMPL, &a); \
+                       _ctx_for_trampolines, HPyFunc_PROC, (HPyCFunction)IMPL, &a); \
                     return; \
                 }
         """
@@ -127,15 +127,19 @@ class TestHPyFunc(BaseTestAutogen):
         """)
         got = autogen_cpython_hpyfunc_trampoline_h(api).generate()
         exp = r"""
+            typedef HPy (*_HPyCFunction_FOO)(HPyContext *, HPy, int);
             #define _HPyFunc_TRAMPOLINE_HPyFunc_FOO(SYM, IMPL) \
                 static cpy_PyObject *SYM(cpy_PyObject *arg, int xy) \
                 { \
-                    return _h2py(IMPL(_HPyGetContext(), _py2h(arg), xy)); \
+                    _HPyCFunction_FOO func = (_HPyCFunction_FOO)IMPL; \
+                    return _h2py(func(_HPyGetContext(), _py2h(arg), xy)); \
                 }
+            typedef HPy (*_HPyCFunction_BAR)(HPyContext *, HPy, int);
             #define _HPyFunc_TRAMPOLINE_HPyFunc_BAR(SYM, IMPL) \
                 static cpy_PyObject *SYM(cpy_PyObject *arg0, int arg1) \
                 { \
-                    return _h2py(IMPL(_HPyGetContext(), _py2h(arg0), arg1)); \
+                    _HPyCFunction_BAR func = (_HPyCFunction_BAR)IMPL; \
+                    return _h2py(func(_HPyGetContext(), _py2h(arg0), arg1)); \
                 }
         """
         assert src_equal(got, exp)

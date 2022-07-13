@@ -122,15 +122,15 @@ class TestAutoGen(BaseTestAutogen):
         """)
         got = autogen_trampolines_h(api).generate()
         exp = """
-            static inline HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2) {
+            HPyAPI_FUNC HPy HPy_Add(HPyContext *ctx, HPy h1, HPy h2) {
                 return ctx->ctx_Add ( ctx, h1, h2 );
             }
 
-            static inline void HPy_Close(HPyContext *ctx, HPy h) {
+            HPyAPI_FUNC void HPy_Close(HPyContext *ctx, HPy h) {
                 ctx->ctx_Close ( ctx, h );
             }
 
-            static inline void *_HPy_AsStruct(HPyContext *ctx, HPy h) {
+            HPyAPI_FUNC void *_HPy_AsStruct(HPyContext *ctx, HPy h) {
                 return ctx->ctx_AsStruct ( ctx, h );
             }
         """
