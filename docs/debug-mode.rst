@@ -1,22 +1,21 @@
 Debug Mode
 ==========
 
-HPy includes a debug mode which includes a lot of useful run-time checks to
-ensure that C extensions use the API correctly. The major points of the debug mode are:
+HPy includes a debug mode which includes useful run-time checks to ensure
+that C extensions use the API correctly. Its features include:
 
-    1. no special compilation flags are required: it is enough to compile the extension 
-       with the Universal ABI.
+    1. No special compilation flags are required: it is enough to compile the
+       extension with the Universal ABI.
     
-    2. The debug mode can be activated at *import time*, and it can be activated
+    2. Debug mode can be activated at *import time*, and it can be activated
        per-extension.
     
-    3. You pay the overhead of the debug mode only if you use it. Extensions loaded 
+    3. You pay the overhead of debug mode only if you use it. Extensions loaded 
        without the debug mode run at full speed.
 
-This is possible because the whole of the HPy API is provided
-as part of the HPy context, so debug mode can pass in a special debugging
-context (that wraps the normal context) without affecting the performance of
-the regular context at all.
+This is possible because the whole of the HPy API is provided as part of the HPy
+context, so debug mode can pass in a special debugging context without affecting
+the performance of the regular context at all.
 
 The debugging context can already check for:
 
@@ -25,23 +24,23 @@ The debugging context can already check for:
 * Reading from a memory which is no longer guaranteed to be still valid,
   for example, the buffer returned by ``HPyUnicode_AsUTF8AndSize`` after the
   corresponding ``HPy`` handle was closed.
-* Writing to a memory which should be read-only, for example,
-  the buffer returned by ``HPyUnicode_AsUTF8AndSize``.
+* Writing to memory which should be read-only, for example the buffer
+  returned by ``HPyUnicode_AsUTF8AndSize``.
 
 
 Activating Debug Mode
 ---------------------
 
-The debug mode works only for extensions built with HPy universal ABI.
+Debug mode works *only* for extensions built with HPy universal ABI.
 
-To enable the debug mode, use environment variable ``HPY_DEBUG``.
-If ``HPY_DEBUG=1``, then all HPy modules are loaded with debug context.
+To enable debug mode, use environment variable ``HPY_DEBUG``. If
+``HPY_DEBUG=1``, then all HPy modules are loaded with the debug context.
 Alternatively ``HPY_DEBUG`` can be set to a comma separated list of names
-of the modules that should be loaded in the debug mode.
+of the modules that should be loaded in debug mode.
 
-In order to verify that your extension is being loaded in the HPy debug mode,
-use environment variable ``HPY_LOG``. If this variable is set, then all HPy
-extensions built in universal ABI mode print a message, such as:
+In order to verify that your extension is being loaded in debug mode, use
+environment variable ``HPY_LOG``. If this variable is set, then all HPy
+extensions built in universal ABI mode print a message when loaded, such as:
 
 .. code-block:: console
 
@@ -50,8 +49,8 @@ extensions built in universal ABI mode print a message, such as:
 
 .. Note: the output above is tested in test_leak_detector_with_traces_output
 
-If the extension is built in CPython ABI mode, then the ``HPY_LOG``
-environment variable has no effect.
+If the extension is built in CPython ABI mode, then the ``HPY_LOG`` environment
+variable has no effect.
 
 An HPy extension module may be also explicitly loaded in debug mode using::
 
@@ -64,27 +63,26 @@ and ``HPY_DEBUG`` have no effect for that extension.
 Using Debug Mode
 ----------------
 
-The HPy debug module exposes ``LeakDetector`` class for detection of
-leaked handles. ``LeakDetector`` can be used to check that some code does
-not leave behind unclosed ``HPy`` handles. For example:
+HPy debug module uses the ``LeakDetector`` class to detect leaked ``HPy``
+handles. Example usage of ``LeakDetector``:
 
 .. literalinclude:: examples/tests.py
   :language: python
   :start-at: def test_leak_detector
   :end-before: # END: test_leak_detector
 
-Additionally, the debug module also exposes pytest fixture ``hpy_debug`` that
-, for the time being, enables the ``LeakDetector``, but may also enable other
-useful debugging facilities.
+Additionally, the debug module also provides a pytest fixture, ``hpy_debug``,
+that for the time being, enables the ``LeakDetector``. In the future, it
+may also enable other useful debugging facilities.
 
 .. literalinclude:: examples/tests.py
   :language: python
   :start-at: from hpy.debug.pytest import hpy_debug
   :end-at: # Run some HPy extension code
 
-**ATTENTION**: the usage of ``LeakDetector`` or ``hpy_debug`` by itself does not
-enable the HPy debug mode! If the debug mode is not enabled for any extension,
-then those features do nothing useful (but also nothing harmful).
+**ATTENTION**: The usage of ``LeakDetector`` or ``hpy_debug`` by itself does not
+enable HPy debug mode! If debug mode is not enabled for any extension, then
+those features have no effect.
 
 When dealing with handle leaks, it is useful to get a stack trace of the
 allocation of the leaked handle. This feature has large memory requirements

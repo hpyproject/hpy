@@ -326,7 +326,7 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
  *   - NEVER declare a local variable of type HPyField
  *   - NEVER use HPyField on a struct allocated by e.g. malloc()
  *
- * **CPython's note**: contrarily than PyObject*, you don't need to manually
+ * **CPython's note**: contrary to PyObject*, you don't need to manually
  * manage refcounting when using HPyField: if you use HPyField_Store to
  * overwrite an existing value, the old object will be automatically decrefed.
  * This means that you CANNOT use HPyField_Store to write memory which
@@ -343,8 +343,8 @@ void HPyTracker_Close(HPyContext *ctx, HPyTracker ht);
  *     uninitialized memory. If you use it to overwrite a valid HPyField, you
  *     will cause a memory leak (at least on CPython)
  *
- *   - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right and decref
- *     the old value. However, you CANNOT use it if the memory is not
+ *   - HPyField_Store(ctx, &obj->f, HPy_NULL): this does the right thing and
+ *     decref the old value. However, you CANNOT use it if the memory is not
  *     initialized.
  *
  * Note: target_object and source_object are there in case an implementation
@@ -409,7 +409,7 @@ HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx);
  * object basis using tagged pointers).
  *
  * CPython HPy implementation may even provide configuration option that
- * switches between a faster version that stores directly PyObject* to
+ * switches between a faster version that directly stores PyObject* to
  * HPyGlobal but does not support subinterpreters, or a version that supports
  * subinterpreters. For now, CPython HPy always stores PyObject* directly
  * to HPyGlobal.
