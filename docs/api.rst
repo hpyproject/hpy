@@ -129,7 +129,7 @@ identity, you can use ``HPy_Is()``:
    Unlike CPython, PyPy does not use reference counting to manage memory:
    instead, it uses a *moving GC*, which means that the address of an object
    might change during its lifetime, and this makes it hard to implement
-   semantics like ``PyObject *``'s where the address *idenfies* the object,
+   semantics like ``PyObject *``'s where the address *identifies* the object,
    and this is directly exposed to the user.  HPy solves this problem: on
    PyPy, handles are integers which represent indices into a list, which
    is itself managed by the GC. When an address changes, the GC edits the
@@ -150,8 +150,8 @@ future-proof: it is conceivable to use it to hold the interpreter or the
 thread state in the future, in particular when there will be support for
 sub-interpreters.  Another possible usage could be to embed different versions
 or implementations of Python inside the same process. Its likely that
-future extensions to rune and extend the behavior of HPy would happen here,
-which would not break anything built against HPy.
+future additions to HPy would happen here, which would not break anything
+built against the current ``HPyContext``.
 
 Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back

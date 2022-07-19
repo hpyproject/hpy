@@ -190,7 +190,7 @@ users and to library developers.
     many common mistakes are checked and reported automatically.
   - Universal binaries: libraries can choose to distribute only Universal ABI
     binaries. By doing so, they can support all versions of CPython for which
-    an hpy loader exists, including versions of CPython that have not yet been
+    an HPy loader exists, including versions of CPython that have not yet been
     developed. This currently comes with a small speed penalty on CPython, but
     for non-performance critical libraries it might still be a good tradeoff.
   - Implementation-switching Python environments: Users can currently create
