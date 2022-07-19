@@ -81,8 +81,9 @@ Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on a handle results in a memory leak. When running in
 :ref:`debug-mode:debug mode`, HPy actively checks that you don't
 close a handle twice and that you don't forget to close any. This is
-possible because handles are unique - the handle used to reference an
-object is valid only in the context of the operation that produced it.
+possible because handles are associated with operations on objects,
+meaning that if a handle leaks, it is possible to identify exactly
+the operation which produced it.
 
 
 .. note::
