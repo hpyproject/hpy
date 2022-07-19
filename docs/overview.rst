@@ -189,10 +189,11 @@ users and to library developers.
   - Improved debugging: when you load extensions in :ref:`debug-mode:debug mode`,
     many common mistakes are checked and reported automatically.
   - Universal binaries: libraries can choose to distribute only Universal ABI
-    binaries. By doing so, they can support all versions of CPython for which
-    an HPy loader exists, including versions of CPython that have not yet been
-    developed. This currently comes with a small speed penalty on CPython, but
-    for non-performance critical libraries it might still be a good tradeoff.
+    binaries. By doing so, they can support all Python implementations and
+    version of CPython (like PyPy, GraalPython, CPython 3.10, CPython 3.11, etc)
+    for which an HPy loader exists, including those that do not yet exist! This
+    currently comes with a small speed penalty on CPython, but for
+    non-performance critical libraries it might still be a good tradeoff.
   - Implementation-switching Python environments: Users can currently create
     Python environments for a given implementation with a set of library
     requirements. With universal binaries, users can create Python environments
