@@ -79,7 +79,7 @@ Becomes using HPy API:
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
 ``HPy_Close()`` on a handle results in a memory leak. When running in
-:ref:`debug-mode:debug mode`, HPy actively checks that you that you don't
+:ref:`debug-mode:debug mode`, HPy actively checks that you don't
 close a handle twice and that you don't forget to close any. This is
 possible because handles are unique - the handle used to reference an
 object is valid only in the context of the operation that produced it.
@@ -91,7 +91,7 @@ object is valid only in the context of the operation that produced it.
   If you find a memory leak on CPython, you know that you are missing a
   ``Py_DECREF`` somewhere but the only way to find the corresponding
   ``Py_INCREF`` is to manually and carefully study the source code.
-  On the other hand, if you forget to call ``HPy_Close()``, Debug mode
+  On the other hand, if you forget to call ``HPy_Close()``, debug mode
   is able to identify the precise code location which created the unclosed
   handle. Similarly, if you try to operate on a closed handle, it will
   identify the precise code locations which created and closed it.
