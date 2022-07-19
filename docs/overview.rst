@@ -194,12 +194,11 @@ users and to library developers.
     for which an HPy loader exists, including those that do not yet exist! This
     currently comes with a small speed penalty on CPython, but for
     non-performance critical libraries it might still be a good tradeoff.
-  - Implementation-switching Python environments: Users can currently create
-    Python environments for a given implementation with a set of library
-    requirements. With universal binaries, users can create Python environments
-    with any permutation of both library requirements and choice of
-    implementation. This allows users to choose the best implementation for
-    their workload.
+  - Python environments: With general availability of universal ABI binaries for
+    popular packages, users can create equivalent python environments that
+    target different Python implementations. Thus, Python users can try their
+    workload against different implementations and pick the one best suited for
+    their usage.
   - In a situation where most or all popular Python extensions target the
     universal ABI, it will be more feasible for CPython to make breaking changes
     to its C/API for performance or maintainability reasons.
