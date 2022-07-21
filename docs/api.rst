@@ -149,9 +149,8 @@ One of the reasons to include ``HPyContext`` from the day one is to be
 future-proof: it is conceivable to use it to hold the interpreter or the
 thread state in the future, in particular when there will be support for
 sub-interpreters.  Another possible usage could be to embed different versions
-or implementations of Python inside the same process. Its likely that
-future additions to HPy would happen here, which would not break anything
-built against the current ``HPyContext``.
+or implementations of Python inside the same process. In addition, the ``HPyContext`` may
+also be extended by adding new functions to the end without breaking any extensions built against the current ``HPyContext``.
 
 Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back
