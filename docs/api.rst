@@ -48,7 +48,7 @@ Handles vs ``PyObject *``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to fully understand the way HPy handles work, it is useful to discuss
-the Python/C API ``Pyobject *`` pointer. In the latter, these pointers always
+the Python/C API ``Pyobject *`` pointer. These pointers always
 point to the same object, and a python object's identity is completely given
 by its address in memory, and two pointers with the same address can
 be passed to Python/C API functions interchangeably. As a result, ``Py_INCREF``
