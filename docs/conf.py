@@ -62,7 +62,7 @@ def pre_process(app, filename, contents, *args):
     # remove HPyAPI_HELPER so that the sphinx-c-autodoc and clang
     # find and render the API functions
     contents[:] = [
-        re.sub(r"^HPyAPI_HELPER ", r"", part, flags=re.MULTILINE)
+        re.sub(r"^(HPyAPI_HELPER|HPy_ID\(\d+\))", r"", part, flags=re.MULTILINE)
         for part in contents
     ]
 

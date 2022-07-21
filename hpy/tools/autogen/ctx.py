@@ -18,16 +18,25 @@ class autogen_ctx_h(AutoGenFile):
     ## }
 
     def generate(self):
+        # Put all declarations (variables and functions) into one list in order
+        # to be able to sort them by their given context index.
+        # We need to remember the output function per item (either
+        # 'declare_var' or 'declare_func'). So, we create tuples with structure
+        # '(decl, declare_*)'.
+        all_decls = [(x, self.declare_var) for x in self.api.variables]
+        all_decls += [(x, self.declare_func) for x in self.api.functions]
+
+        # sort the list of all declaration by 'decl.ctx_index'
+        all_decls.sort(key=lambda x: x[0].ctx_index)
+
         lines = []
         w = lines.append
         w('struct _HPyContext_s {')
         w('    const char *name; // used just to make debugging and testing easier')
         w('    void *_private;   // used by implementations to store custom data')
         w('    int ctx_version;')
-        for var in self.api.variables:
-            w('    %s;' % self.declare_var(var))
-        for func in self.api.functions:
-            w('    %s;' % self.declare_func(func))
+        for var, cons in all_decls:
+            w('    %s;' % cons(var))
         w('};')
         return '\n'.join(lines)
 
