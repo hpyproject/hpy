@@ -80,10 +80,7 @@ Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
 ``HPy_Close()`` on a handle results in a memory leak. When running in
 :ref:`debug-mode:debug mode`, HPy actively checks that you don't
-close a handle twice and that you don't forget to close any. This is
-possible because handles are associated with operations on objects,
-meaning that if a handle leaks, it is possible to identify exactly
-the operation which produced it.
+close a handle twice and that you don't forget to close any.
 
 
 .. note::
@@ -95,7 +92,10 @@ the operation which produced it.
   On the other hand, if you forget to call ``HPy_Close()``, debug mode
   is able to identify the precise code location which created the unclosed
   handle. Similarly, if you try to operate on a closed handle, it will
-  identify the precise code locations which created and closed it.
+  identify the precise code locations which created and closed it. This is
+  possible because handles are associated with a single call to a C/API
+  function. As a result, given a handle that is leaked or used after freeing,
+  it is possible to identify exactly the C/API function that producted it.
 
 
 Remember that Python/C guarantees that multiple references to the same
@@ -149,8 +149,9 @@ One of the reasons to include ``HPyContext`` from the day one is to be
 future-proof: it is conceivable to use it to hold the interpreter or the
 thread state in the future, in particular when there will be support for
 sub-interpreters.  Another possible usage could be to embed different versions
-or implementations of Python inside the same process. In addition, the ``HPyContext`` may
-also be extended by adding new functions to the end without breaking any extensions built against the current ``HPyContext``.
+or implementations of Python inside the same process. In addition, the
+``HPyContext`` may also be extended by adding new functions to the end without
+breaking any extensions built against the current ``HPyContext``.
 
 Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back
