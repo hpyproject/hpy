@@ -142,7 +142,7 @@ different ABIs:
       executed by a variety of different Python implementations. Compiled
       extensions can be loaded unmodified on all the interpreters which support
       it. PyPy and GraalPython support it natively. CPython supports it by using the
-      ``hpy.universal`` package, and there is a small speed penalty [1]_ compared to
+      ``hpy.universal`` package, and there is a small speed penalty [#f1]_ compared to
       the CPython ABI. The ABI tag has not been formally defined yet.
 
     HPy Hybrid ABI
@@ -386,9 +386,11 @@ compatibility layer include:
 
   - `GraalPython <https://github.com/graalvm/graalpython>`_
 
-.. [1] The reason for this minor performance penalty is a layer of pointer
-indirection. For instance, ``ctx->HPyLong_FromLong`` is called from the
-CPython extension, which in universal mode simply forwards the call to
-``PyLong_FromLong``. It is technically possible to implement a CPython
-universal module loader which edits the program's executable code at runtime
-to replace that call. Note that this is not at all trivial.
+.. rubric:: Footnotes
+
+.. [#f1] The reason for this minor performance penalty is a layer of pointer
+  indirection. For instance, ``ctx->HPyLong_FromLong`` is called from the
+  CPython extension, which in universal mode simply forwards the call to
+  ``PyLong_FromLong``. It is technically possible to implement a CPython
+  universal module loader which edits the program's executable code at runtime
+  to replace that call. Note that this is not at all trivial.
