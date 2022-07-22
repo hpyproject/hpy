@@ -47,15 +47,14 @@ Unix file descriptors, where you have ``dup()`` and ``close()``, and Windows'
 Handles vs ``PyObject *``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. XXX I don't like this sentence, but I can't come up with anything better
-   right now. Please rephrase/rewrite :)
-
-In the old Python/C API, multiple ``PyObject *`` references to the same object
-are completely equivalent to each other. Therefore they can be passed to Python/C
-API functions interchangeably. As a result, ``Py_INCREF`` an ``Py_DECREF`` can
-be called with any reference to an object as long as the total number of calls
-of `incref` is equal to the number of calls of `decref` at the end of the object
-lifetime.
+In order to fully understand the way HPy handles work, it is useful to discuss
+the Python/C API ``Pyobject *`` pointer. These pointers always
+point to the same object, and a python object's identity is completely given
+by its address in memory, and two pointers with the same address can
+be passed to Python/C API functions interchangeably. As a result, ``Py_INCREF``
+and ``Py_DECREF`` can be called with any reference to an object as long as the
+total number of calls of `incref` is equal to the number of calls of `decref`
+at the end of the object lifetime.
 
 Whereas using HPy API, each handle must be closed independently.
 
@@ -80,26 +79,29 @@ Becomes using HPy API:
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
 ``HPy_Close()`` on a handle results in a memory leak. When running in
-:ref:`debug-mode:debug mode`, HPy actively checks that you that you don't close a handle
-twice and that you don't forget to close any.
+:ref:`debug-mode:debug mode`, HPy actively checks that you don't
+close a handle twice and that you don't forget to close any.
 
 
 .. note::
-  The debug mode is a good example of how powerful it is to decouple the
-  lifetime of handles and the lifetime of an objects.  If you find a memory
-  leak on CPython, you know that you are missing a ``Py_DECREF`` somewhere but
-  the only way to find the corresponding ``Py_INCREF`` is to manually and
-  carefully study the source code.  On the other hand, if you forget to call
-  ``HPy_Close()``, the HPy debug mode is able to tell the precise code
-  location which created the unclosed handle.  Similarly, if you try to
-  operate on a closed handle, it will tell you the precise code locations
-  which created and closed it.
+  Debug mode is a good example of how powerful it is to decouple the
+  identity and therefore the lifetime of handles and those of objects.
+  If you find a memory leak on CPython, you know that you are missing a
+  ``Py_DECREF`` somewhere but the only way to find the corresponding
+  ``Py_INCREF`` is to manually and carefully study the source code.
+  On the other hand, if you forget to call ``HPy_Close()``, debug mode
+  is able to identify the precise code location which created the unclosed
+  handle. Similarly, if you try to operate on a closed handle, it will
+  identify the precise code locations which created and closed it. This is
+  possible because handles are associated with a single call to a C/API
+  function. As a result, given a handle that is leaked or used after freeing,
+  it is possible to identify exactly the C/API function that producted it.
 
 
-The other important difference is that Python/C guarantees that multiple
-references to the same object results in the very same ``PyObject *`` pointer.
-Thus, it is possible to compare C pointers by equality to check whether they
-point to the same object::
+Remember that Python/C guarantees that multiple references to the same
+object results in the very same ``PyObject *`` pointer. Thus, it is
+possible to compare the pointer addresses to check whether they refer
+to the same object::
 
     int is_same_object(PyObject *x, PyObject *y)
     {
@@ -118,20 +120,20 @@ identity, you can use ``HPy_Is()``:
   :end-before: // END: is_same_object
 
 .. note::
-   The main benefit of the semantics of handles is that it allows
-   implementations to use very different models of memory management.  On
-   CPython, implementing handles is trivial because ``HPy`` is basically
-   ``PyObject *`` in disguise, and ``HPy_Dup()`` and ``HPy_Close()`` are just
-   aliases for ``Py_INCREF`` and ``Py_DECREF``.
+   The main benefit of opaque handle semantics is that implementations are
+   allowed to use very different models of memory management.  On CPython,
+   implementing handles is trivial because ``HPy`` is basically ``PyObject *``
+   in disguise, and ``HPy_Dup()`` and ``HPy_Close()`` are just aliases for
+   ``Py_INCREF`` and ``Py_DECREF``.
 
-   Unlike CPython, PyPy does not use reference counting for memory
-   management: instead, it uses a *moving GC*, which means that the address of
-   an object might change during its lifetime, and this makes it hard to implement
-   semantics like ``PyObject *``'s where the address is directly exposed to
-   the user.  HPy solves this problem: on PyPy, handles are integers which
-   represent indices into a list, which is itself managed by the GC. When an
-   object moves, the GC fixes the address in the list, without having to touch
-   all the handles which have been passed to C.
+   Unlike CPython, PyPy does not use reference counting to manage memory:
+   instead, it uses a *moving GC*, which means that the address of an object
+   might change during its lifetime, and this makes it hard to implement
+   semantics like ``PyObject *``'s where the address *identifies* the object,
+   and this is directly exposed to the user.  HPy solves this problem: on
+   PyPy, handles are integers which represent indices into a list, which
+   is itself managed by the GC. When an address changes, the GC edits the
+   list, without having to touch all the handles which have been passed to C.
 
 
 HPyContext
@@ -147,7 +149,9 @@ One of the reasons to include ``HPyContext`` from the day one is to be
 future-proof: it is conceivable to use it to hold the interpreter or the
 thread state in the future, in particular when there will be support for
 sub-interpreters.  Another possible usage could be to embed different versions
-or implementations of Python inside the same process.
+or implementations of Python inside the same process. In addition, the
+``HPyContext`` may also be extended by adding new functions to the end without
+breaking any extensions built against the current ``HPyContext``.
 
 Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back

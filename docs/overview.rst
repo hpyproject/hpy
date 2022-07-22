@@ -4,26 +4,36 @@ HPy overview
 Motivation and goals
 ---------------------
 
-The biggest quality of the Python ecosystem is to have a huge number of high
-quality libraries for all kind of jobs. Many of them, especially in the
-scientific community, are written in C and exposed to Python using the
-`Python/C API <https://docs.python.org/3/c-api/index.html>`_.  However, the
-Python/C API exposes a number of CPython's implementation details and
-low-level data structure layouts. This has two important consequences:
+The superpower of the Python ecosystem is its libraries, which are
+developed by users. Over time, these libraries have grown in number,
+quality, and applicability. While it is possible to write python libraries
+entirely in python, many of them, especially in the scientific community,
+are written in C and exposed to Python using the `Python/C API <https://docs.python.org/3/c-api/index.html>`_.
+The existence of these C extensions using the Python/C API leads to some issues:
 
-  1. any alternative implementation which wants to support C extensions needs
-     to either follow the same low-level layout or to provide a compatibility
-     layer.
+  1. Usually, alternative implementation of the Python programming language
+     want to support C extensions. To do so, they must implement the same
+     Python/C API or provide a compatibility layer.
 
   2. CPython developers cannot experiment with new designs or refactoring
      without breaking compatibility with existing extensions.
 
-Over the years, it has become evident that emulating the Python/C
-API in an efficient way is `challenging, if not impossible
+Over the years, it has become evident that emulating the Python/C API in an
+efficient way is `challenging, if not impossible
 <https://www.pypy.org/posts/2018/09/inside-cpyext-why-emulating-cpython-c-8083064623681286567.html>`_.
-The main goal of HPy is provide a **C API which is possible to implement in an
-efficient way on a number of very diverse implementations**.  The following is
-a list of sub-goals.
+To summarize, it is mainly due to leaking of implementation details of CPython
+into the C/API - which makes it difficult to make different design choices than
+those made by CPython. As such - the main goal of HPy is to provide a **C API
+which makes as few assumptions as possible about the design decisions of any
+implementation of Python, allowing diverse implementations to support it
+efficiently and without compromise**. In particular, **reference counting is
+not part of the API**: we want a more generic way of managing resources that
+is possible to impelement with different strategies, including the existing
+reference counting and/or with a moving *Garbage Collector* (like the ones
+used by PyPy, GraalPython or Java, for example). Moreover, each implementation
+can experiment with new memory layout of objects, add optimizations, etc.
+The following is a list of sub-goals.
+
 
 Performance on CPython
   HPy is usable on CPython from day 1 with no performance impact compared to
@@ -48,21 +58,6 @@ Better debugging
   assumptions. For example, you get an error if you try to use a handle
   (see :ref:`api:handles`) which has already been closed. It is possible to
   turn on the debug mode at startup time, *without needing to recompile*.
-
-
-Hide internal details
-  The API is designed to allow a lot of flexibility for Python
-  implementations, allowing the possibility to explore different choices to
-  the ones used by CPython.  In particular, **reference counting is not part
-  of the API**: we want a more generic way of managing resources which is
-  possible to implement with different strategies, including the existing
-  reference counting and/or with a moving *Garbage Collector* (like the ones
-  used by PyPy, GraalPython or Java, for example).
-
-  Moreover, we want to avoid exposing internal details of a specific
-  implementation, so that each implementation can experiment with new memory
-  layout of objects, add optimizations, etc.
-
 
 Simplicity
   The HPy API aims to be smaller and easier to study/use/manage than the
@@ -129,7 +124,7 @@ explained in its own section of the documentation.
 Target ABIs
 -----------
 
-Depending on the compilation options, and HPy extension can target three
+Depending on the compilation options, an HPy extension can target three
 different ABIs:
 
 .. glossary::
@@ -140,15 +135,15 @@ different ABIs:
       time. The result is a compiled extension which is indistinguishable from a
       "normal" one and can be distributed using all the standard tools and will
       run at the very same speed. The ABI tag is defined by the version of CPython
-      which is used to compile it (e.g., ``cpython-37m``),
+      which is used to compile it (e.g., ``cpython-37m``).
 
     HPy Universal ABI
       As the name suggests, the HPy Universal ABI is designed to be loaded and
       executed by a variety of different Python implementations. Compiled
-      extensions can be loaded unmodified on all the interpreters which supports
-      it.  PyPy and GraalPython support it natively.  CPython supports it by using the
-      ``hpy.universal`` package, and there is a small speed penalty compared to
-      the CPython ABI.  The ABI tag has not been formally defined yet.
+      extensions can be loaded unmodified on all the interpreters which support
+      it. PyPy and GraalPython support it natively. CPython supports it by using the
+      ``hpy.universal`` package, and there is a small speed penalty [#f1]_ compared to
+      the CPython ABI. The ABI tag has not been formally defined yet.
 
     HPy Hybrid ABI
       To allow an incremental transition to HPy, it is possible to use both HPy
@@ -181,23 +176,32 @@ or HPy Hybrid ABIs require installing the ``hpy.universal`` package on
 CPython and have no further requirements on Pythons that support HPy natively.
 
 
-C extensions
-------------
+Benefits for the Python ecosystem
+---------------------------------
 
-If you are writing a Python extension in C, you are a consumer of the HPy
-API. There are three big advantages in using HPy instead of the old Python/C
-API:
+The HPy project offers some benefits to the python ecosystem, both to Python
+users and to library developers.
 
-  - Speed on PyPy, GraalPython and other alternative implementations: according
-    to early :ref:`benchmarks`, an extension written in HPy can be ~3x faster
-    than the equivalent extension written in Python/C.
-
+  - C extensions can achieve much better speed on alternative implementions,
+    including PyPy and GraalPython: according to early :ref:`benchmarks`, an
+    extension written in HPy can be ~3x faster than the equivalent extension
+    written in Python/C.
   - Improved debugging: when you load extensions in :ref:`debug-mode:debug mode`,
     many common mistakes are checked and reported automatically.
-
-  - Universal binaries: you can choose to distribute only Universal ABI
-    binaries. This comes with a small speed penalty on CPython, but for
+  - Universal binaries: libraries can choose to distribute only Universal ABI
+    binaries. By doing so, they can support all Python implementations and
+    version of CPython (like PyPy, GraalPython, CPython 3.10, CPython 3.11, etc)
+    for which an HPy loader exists, including those that do not yet exist! This
+    currently comes with a small speed penalty on CPython, but for
     non-performance critical libraries it might still be a good tradeoff.
+  - Python environments: With general availability of universal ABI binaries for
+    popular packages, users can create equivalent python environments that
+    target different Python implementations. Thus, Python users can try their
+    workload against different implementations and pick the one best suited for
+    their usage.
+  - In a situation where most or all popular Python extensions target the
+    universal ABI, it will be more feasible for CPython to make breaking changes
+    to its C/API for performance or maintainability reasons.
 
 
 Cython extensions
@@ -226,8 +230,8 @@ Benefits for alternative Python implementations
 -----------------------------------------------
 
 If you are writing an alternative Python implementation, there is a good
-chance that you already know how painful it is to support the Python/C
-API. HPy is designed to be both faster and easier to implement!
+chance that you already know how painful it is to support the Python/C API.
+HPy is designed to be both faster and easier to implement!
 
 You have two choices:
 
@@ -368,8 +372,6 @@ code/design/discussions of HPy:
   - rust-hpy (fork of the `cpython crate <https://crates.io/crates/cpython>`_)
 
 
-
-
 Related work
 -------------
 
@@ -383,3 +385,12 @@ compatibility layer include:
   - `IronPython <https://github.com/IronLanguages/ironclad>`_
 
   - `GraalPython <https://github.com/graalvm/graalpython>`_
+
+.. rubric:: Footnotes
+
+.. [#f1] The reason for this minor performance penalty is a layer of pointer
+  indirection. For instance, ``ctx->HPyLong_FromLong`` is called from the
+  CPython extension, which in universal mode simply forwards the call to
+  ``PyLong_FromLong``. It is technically possible to implement a CPython
+  universal module loader which edits the program's executable code at runtime
+  to replace that call. Note that this is not at all trivial.
