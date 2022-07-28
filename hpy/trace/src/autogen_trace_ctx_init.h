@@ -181,7 +181,7 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
     info->call_counts = (uint64_t *)calloc(249, sizeof(uint64_t));
-    info->durations = (long *)calloc(249, sizeof(long));
+    info->durations = (int64_t *)calloc(249, sizeof(int64_t));
 }
 
 static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)

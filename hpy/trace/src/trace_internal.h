@@ -19,7 +19,7 @@ typedef struct {
     /* call count of the corresponding HPy API function */
     uint64_t *call_counts;
     /* durations (ns) spent in the corresponding HPy API function */
-    long *durations;
+    int64_t *durations;
 } HPyTraceInfo;
 
 static inline HPyTraceInfo *get_info(HPyContext *tctx)
@@ -27,6 +27,13 @@ static inline HPyTraceInfo *get_info(HPyContext *tctx)
     HPyTraceInfo *info = (HPyTraceInfo*)tctx->_private;
     assert(info->magic_number == HPY_TRACE_MAGIC); // sanity check
     return info;
+}
+
+static inline int64_t
+diff_ns(const struct timespec start, const struct timespec end)
+{
+    return ((int64_t)end.tv_sec - (int64_t)start.tv_sec) * (int64_t)1000000000
+            + ((int64_t)end.tv_nsec - (int64_t)start.tv_nsec);
 }
 
 #endif /* HPY_TRACE_INTERNAL_H */
