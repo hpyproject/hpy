@@ -12,6 +12,7 @@
 #include "handles.h"
 #include "hpy/version.h"
 #include "hpy_debug.h"
+#include "hpy_trace.h"
 
 #ifdef PYPY_VERSION
 #  error "Cannot build hpy.universal on top of PyPy. PyPy comes with its own version of it"
@@ -20,16 +21,42 @@
 #  error "Cannot build hpy.universal on top of GraalPython. GraalPython comes with its own version of it"
 #endif
 
+static const char *hpy_mode_names[] = {
+        "MODE_UNIVERSAL",
+        "MODE_DEBUG",
+        "MODE_TRACE",
+        "MODE_DEBUG_TRACE",
+        "MODE_TRACE_DEBUG",
+        NULL
+};
+
+typedef enum {
+    MODE_UNIVERSAL = 0,
+    MODE_DEBUG = 1,
+    MODE_TRACE = 2,
+    MODE_DEBUG_TRACE = 3,
+    MODE_TRACE_DEBUG = 4
+} HPyMode;
+
 typedef HPy (*InitFuncPtr)(HPyContext *ctx);
 
 static const char *prefix = "HPyInit";
 
-static HPyContext * get_context(int debug)
+static HPyContext * get_context(HPyMode mode)
 {
-    if (debug)
+    switch (mode)
+    {
+    case MODE_DEBUG:
         return hpy_debug_get_ctx(&g_universal_ctx);
-    else
+    case MODE_TRACE:
+        return hpy_trace_get_ctx(&g_universal_ctx);
+    case MODE_DEBUG_TRACE:
+        return hpy_debug_get_ctx(hpy_trace_get_ctx(&g_universal_ctx));
+    case MODE_TRACE_DEBUG:
+        return hpy_trace_get_ctx(hpy_debug_get_ctx(&g_universal_ctx));
+    default:
         return &g_universal_ctx;
+    }
 }
 
 static PyObject *
@@ -75,7 +102,7 @@ error:
     return NULL;
 }
 
-static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
+static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
 {
     PyObject *name = NULL;
     PyObject *pathbytes = NULL;
@@ -118,7 +145,7 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
         goto error;
     }
 
-    HPyContext *ctx = get_context(debug);
+    HPyContext *ctx = get_context(mode);
     if (ctx == NULL)
         goto error;
     HPy h_mod = ((InitFuncPtr)initfn)(ctx);
@@ -138,15 +165,22 @@ error:
 
 static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = {"name", "path", "debug", NULL};
+    static char *kwlist[] = {"name", "path", "debug", "mode", NULL};
     PyObject *name_unicode;
     PyObject *path;
     int debug = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|p", kwlist,
-                                     &name_unicode, &path, &debug)) {
+    int mode = -1;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|pi", kwlist,
+                                     &name_unicode, &path, &debug, &mode)) {
         return NULL;
     }
-    return do_load(name_unicode, path, debug);
+    HPyMode hmode = debug ? MODE_DEBUG : MODE_UNIVERSAL;
+    // 'mode' just overwrites 'debug'
+    if (mode > 0)
+    {
+        hmode = (HPyMode) mode;
+    }
+    return do_load(name_unicode, path, hmode);
 }
 
 static PyObject *get_version(PyObject *self, PyObject *ignored)
@@ -191,6 +225,21 @@ int exec_module(PyObject* mod) {
 
     if (PyModule_AddObject(mod, "_debug", _debug_mod) < 0)
         return -1;
+
+    HPy h_trace_mod = HPyInit__trace(ctx);
+    if (HPy_IsNull(h_trace_mod))
+        return -1;
+    PyObject *_trace_mod = HPy_AsPyObject(ctx, h_trace_mod);
+    HPy_Close(ctx, h_trace_mod);
+
+    if (PyModule_AddObject(mod, "_trace", _trace_mod) < 0)
+        return -1;
+
+    for (int i=0; hpy_mode_names[i]; i++)
+    {
+        if (PyModule_AddIntConstant(mod, hpy_mode_names[i], i) < 0)
+            return -1;
+    }
 
     return 0;
 }
