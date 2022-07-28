@@ -117,12 +117,12 @@ class autogen_tracer_wrappers(AutoGenFile):
         w(f'    struct timespec _ts_start, _ts_end;')
         w(f'    int cr;')
         w(f'    tctx_info->call_counts[{func.ctx_index}]++;')
-        w(f'    cr = clock_gettime(CLOCK_MONOTONIC, &_ts_start);')
+        w(f'    cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);')
         if rettype == 'void':
             w(f'    {func.name}({params});')
         else:
             w(f'    {rettype} res = {func.name}({params});')
-        w(f'    cr += clock_gettime(CLOCK_MONOTONIC, &_ts_end);')
+        w(f'    cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);')
         w(f'    if (cr)')
         w(f'        HPy_FatalError(tctx_info->{UCTX_ARG}, "could not get monotonic clock");')
         w(f'    tctx_info->durations[{func.ctx_index}] += _ts_end.tv_nsec - _ts_start.tv_nsec;')
