@@ -23,6 +23,9 @@ from .hpyslot import autogen_hpyslot_h
 from .debug import (autogen_debug_ctx_init_h,
                     autogen_debug_wrappers,
                     autogen_debug_ctx_call_i)
+from .trace import (autogen_tracer_ctx_init_h,
+                    autogen_tracer_wrappers,
+                    autogen_trace_func_table_c)
 from .pypy import autogen_pypy_txt
 
 def main():
@@ -49,6 +52,9 @@ def main():
                 autogen_debug_ctx_init_h,
                 autogen_debug_wrappers,
                 autogen_debug_ctx_call_i,
+                autogen_tracer_ctx_init_h,
+                autogen_tracer_wrappers,
+                autogen_trace_func_table_c,
                 autogen_pypy_txt):
         cls(api).write(outdir)
 

@@ -121,11 +121,16 @@ EXT_MODULES = [
                'hpy/debug/src/stacktrace.c',
                'hpy/debug/src/_debugmod.c',
                'hpy/debug/src/autogen_debug_wrappers.c',
+               'hpy/trace/src/trace_ctx.c',
+               'hpy/trace/src/_tracemod.c',
+               'hpy/trace/src/autogen_trace_wrappers.c',
+               'hpy/trace/src/autogen_trace_func_table.c',
               ],
               include_dirs=[
                   'hpy/devel/include',
                   'hpy/universal/src',
                   'hpy/debug/src/include',
+                  'hpy/trace/src/include',
               ],
               extra_compile_args=[
                   # so we need to enable the HYBRID ABI in order to implement
