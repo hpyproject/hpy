@@ -26,6 +26,7 @@ DEFAULT_HPY_ABI = 'universal'
 if hasattr(sys, 'implementation') and sys.implementation.name == 'cpython':
     DEFAULT_HPY_ABI = 'cpython'
 
+
 class HPyDevel:
     """ Extra sources for building HPy extensions with hpy.devel. """
 
@@ -65,14 +66,14 @@ class HPyDevel:
             Used from both setup.py and hpy/test.
         """
         dist.hpydevel = self
-
         base_build = dist.cmdclass.get("build", build)
-        base_build_ext = dist.cmdclass.get("build_ext", build_ext)
+        build_ext = dist.cmdclass.get("build_ext", build_ext)
         orig_bdist_egg_write_stub = bdist_egg_mod.write_stub
 
-        if isinstance(base_build_ext, type):
+        # check that the supplied build_ext inherits from setuptools
+        if isinstance(build_ext, type):
             assert ('setuptools.command.build_ext', 'build_ext') in [
-                (c.__module__, c.__name__) for c in base_build_ext.__mro__
+                (c.__module__, c.__name__) for c in build_ext.__mro__
             ], (
                 "dist.cmdclass['build_ext'] does not inherit from"
                 " setuptools.command.build_ext.build_ext. The HPy build"
@@ -81,8 +82,7 @@ class HPyDevel:
                 " please use setuptools.commands.build_ext instead."
             )
 
-        class build_hpy_ext(build_hpy_ext_mixin, base_build_ext, object):
-            _base_build_ext = base_build_ext
+        build_ext_hpy = make_mixin(build_ext, build_ext_hpy_mixin)
 
         def dist_has_ext_modules(self):
             if self.ext_modules or self.hpy_ext_modules:
@@ -99,7 +99,7 @@ class HPyDevel:
             orig_bdist_egg_write_stub(resource, pyfile)
 
         # replace build_ext subcommand
-        dist.cmdclass['build_ext'] = build_hpy_ext
+        dist.cmdclass['build_ext'] = build_ext_hpy
         dist.__class__.has_ext_modules = dist_has_ext_modules
         base_build.has_ext_modules = build_has_ext_modules
         # setuptools / distutils store subcommands in .subcommands which
@@ -163,7 +163,7 @@ class HPyExtensionName(str):
 
         The following build_ext command methods are passed only the *name*
         of the extension and not the full extension object. The
-        build_hpy_ext_mixin class needs to detect when HPy are extensions
+        build_ext_hpy_mixin class needs to detect when HPy are extensions
         passed to these methods and override the default behaviour.
 
         This str sub-class allows HPy extensions to be detected, while
@@ -205,10 +205,23 @@ def remember_hpy_extension(f):
     return wrapper
 
 
-class build_hpy_ext_mixin:
-    """ A mixin class for setuptools build_ext to add support for buidling
-        HPy extensions.
+# ====================================
+# Augmented setuptools commands
+# ====================================
+
+def make_mixin(base, mixin):
     """
+    Create a new class which inherits from both mixin and base, so that the
+    methods of mixin effectively override the ones of base
+    """
+    class NewClass(mixin, base, object):
+        _mixin_super = base
+    NewClass.__name__ = base.__name__ + '_hpy'
+    return NewClass
+
+
+class build_ext_hpy_mixin:
+    """ A mixin class to override setuptools.commands.build_ext """
 
     # Ideally we would have simply added the HPy extensions to .extensions
     # at the end of .initialize_options() but the setuptools build_ext
@@ -228,7 +241,7 @@ class build_hpy_ext_mixin:
         pass  # ignore any attempts to change the list of extensions directly
 
     def initialize_options(self):
-        self._base_build_ext.initialize_options(self)
+        self._mixin_super.initialize_options(self)
         self.hpydevel = self.distribution.hpydevel
 
     def _finalize_hpy_ext(self, ext):
@@ -259,35 +272,35 @@ class build_hpy_ext_mixin:
         for ext in hpy_ext_modules:
             self._finalize_hpy_ext(ext)
         self._extensions.extend(hpy_ext_modules)
-        self._base_build_ext.finalize_options(self)
+        self._mixin_super.finalize_options(self)
         for ext in hpy_ext_modules:
             ext._needs_stub = ext._hpy_needs_stub
 
     @remember_hpy_extension
     def get_ext_fullname(self, ext_name):
-        return self._base_build_ext.get_ext_fullname(self, ext_name)
+        return self._mixin_super.get_ext_fullname(self, ext_name)
 
     @remember_hpy_extension
     def get_ext_fullpath(self, ext_name):
-        return self._base_build_ext.get_ext_fullpath(self, ext_name)
+        return self._mixin_super.get_ext_fullpath(self, ext_name)
 
     @remember_hpy_extension
     def get_ext_filename(self, ext_name):
         if not is_hpy_extension(ext_name):
-            return self._base_build_ext.get_ext_filename(self, ext_name)
+            return self._mixin_super.get_ext_filename(self, ext_name)
         if self.distribution.hpy_abi == 'universal':
             ext_path = ext_name.split('.')
             ext_suffix = '.hpy.so'  # XXX Windows?
             ext_filename = os.path.join(*ext_path) + ext_suffix
         else:
-            ext_filename = self._base_build_ext.get_ext_filename(
+            ext_filename = self._mixin_super.get_ext_filename(
                 self, ext_name)
         return ext_filename
 
     def write_stub(self, output_dir, ext, compile=False):
         if (not hasattr(ext, "hpy_abi") or
                 self.distribution.hpy_abi != 'universal'):
-            return self._base_build_ext.write_stub(
+            return self._mixin_super.write_stub(
                 self, output_dir, ext, compile=compile)
         pkgs = ext._full_name.split('.')
         if compile:
@@ -318,7 +331,7 @@ class build_hpy_ext_mixin:
             Only relevant on Windows, where the .pyd file (DLL) must export the
             module "HPyInit_" function.
         """
-        exports = self._base_build_ext.get_export_symbols(self, ext)
+        exports = self._mixin_super.get_export_symbols(self, ext)
         if hasattr(ext, "hpy_abi") and ext.hpy_abi == 'universal':
             exports = [re.sub(r"^PyInit_", "HPyInit_", name) for name in exports]
         return exports
