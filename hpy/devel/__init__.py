@@ -1,16 +1,26 @@
+# NOTE: this file is also imported by PyPy tests, so it must be compatible
+# with both Python 2.7 and Python 3.x
+
 import sys
 import os.path
 import functools
 import re
 from pathlib import Path
+
+# setuptools >= 60.2 ships its own version of distutils, which monkey-patches
+# the stdlib one. Here we ensure that we are using setuptool's.
+import setuptools
+import distutils
+if distutils is not getattr(setuptools, '_distutils', None):
+    raise Exception("setuptools' monkey-patching of distutils did not work. "
+                    "This most likely means that you are using a version which "
+                    "is too old. Try installing setuptools>=60.2")
 from distutils import log
 from distutils.command.build import build
 from distutils.errors import DistutilsError
 from setuptools.command import bdist_egg as bdist_egg_mod
 from setuptools.command.build_ext import build_ext
 
-# NOTE: this file is also imported by PyPy tests, so it must be compatible
-# with both Python 2.7 and Python 3.x
 
 DEFAULT_HPY_ABI = 'universal'
 if hasattr(sys, 'implementation') and sys.implementation.name == 'cpython':
