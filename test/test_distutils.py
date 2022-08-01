@@ -92,8 +92,8 @@ class TestDistutils:
                 .doc = "hpymod docstring",
             };
 
-            HPy_MODINIT(hfoo)
-            static HPy init_hfoo_impl(HPyContext *ctx)
+            HPy_MODINIT(hpymod)
+            static HPy init_hpymod_impl(HPyContext *ctx)
             {
                 return HPyModule_Create(ctx, &moduledef);
             }
@@ -109,8 +109,9 @@ class TestDistutils:
         f = self.hpy_test_project.join('setup.py')
         f.write(src)
 
-    def test_cpymod_only(self):
-        # CPython-only project, no hpy at all
+    def test_cpymod_only_setup_install(self):
+        # CPython-only project, no hpy at all. This is a baseline to check
+        # that everything works even without hpy.
         self.gen_setup_py("""
             setup(name = "hpy_test_project",
                   ext_modules = [cpymod],
@@ -121,7 +122,9 @@ class TestDistutils:
                        capture=True)
         assert out == 'cpymod docstring'
 
-    def test_cpymod_with_empty_hpy_ext_modules(self):
+    def test_cpymod_with_empty_hpy_ext_modules_setup_install(self):
+        # if we have hpy_ext_modules=[] we trigger the hpy.devel monkey
+        # patch. This checks that we don't ext_modules still works after that.
         self.gen_setup_py("""
             setup(name = "hpy_test_project",
                   ext_modules = [cpymod],
@@ -132,3 +135,34 @@ class TestDistutils:
         out = self.run('python', '-c', 'import cpymod; print(cpymod.__doc__)',
                        capture=True)
         assert out == 'cpymod docstring'
+
+    def test_hpy_ext_modules_setup_install(self):
+        # first basic HPy test
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod],
+            )
+        """)
+        self.run('python', 'setup.py', 'install')
+        out = self.run('python', '-c', 'import hpymod; print(hpymod.__doc__)',
+                       capture=True)
+        assert out == 'hpymod docstring'
+
+    def test_hpy_ext_modules_build_platlib(self):
+        # check that if we have only hpy_ext_modules, the distribution is
+        # detected as "platform-specific" and not "platform-neutral". In
+        # particular, we want the end result to be in
+        # e.g. build/lib.linux-x86_64-3.8 and NOT in build/lib.
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod],
+                  install_requires = [],
+            )
+        """)
+        self.run('python', 'setup.py', 'build')
+        build = self.hpy_test_project.join('build')
+        libs = build.listdir('lib*')
+        assert len(libs) == 1
+        libdir = libs[0]
+        # this is something like lib.linux-x86_64-cpython-38
+        assert libdir.basename != 'lib'
