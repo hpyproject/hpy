@@ -89,7 +89,11 @@ class TestDistutils:
             #include <hpy.h>
             static HPyModuleDef moduledef = {
                 .name = "hpymod",
-                .doc = "hpymod docstring",
+            #ifdef HPY_UNIVERSAL_ABI
+                .doc = "hpymod Universal ABI",
+            #else
+                .doc = "hpymod CPython ABI",
+            #endif
             };
 
             HPy_MODINIT(hpymod)
@@ -166,3 +170,23 @@ class TestDistutils:
         libdir = libs[0]
         # this is something like lib.linux-x86_64-cpython-38
         assert libdir.basename != 'lib'
+
+    def test_dont_mix_cpython_and_universal_abis(self):
+        # make sure that the build dirs for cpython and universal ABIs are
+        # distinct
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod],
+                  install_requires = [],
+            )
+        """)
+        self.run('python', 'setup.py', 'install')
+        out = self.run('python', '-c', 'import hpymod; print(hpymod.__doc__)',
+                       capture=True)
+        assert out == 'hpymod CPython ABI'
+        #
+        # now recompile with universal *without* cleaning the build
+        self.run('python', 'setup.py', '--hpy-abi=universal', 'install')
+        out = self.run('python', '-c', 'import hpymod; print(hpymod.__doc__)',
+                       capture=True)
+        assert out == 'hpymod Universal ABI'
