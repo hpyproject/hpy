@@ -174,7 +174,7 @@ class autogen_trace_func_table_c(AutoGenFile):
         w('')
         w('const char * hpy_trace_get_func_name(int idx)')
         w('{')
-        w('    if (idx >= 0 && idx < TRACE_NFUNC)')
+        w(f'    if (idx >= 0 && idx < {n_decls})')
         w('        return trace_func_table[idx];')
         w('    return NULL;')
         w('}')
