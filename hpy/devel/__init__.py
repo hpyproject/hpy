@@ -18,8 +18,9 @@ if distutils is not getattr(setuptools, '_distutils', None):
 from distutils import log
 from distutils.command.build import build
 from distutils.errors import DistutilsError
+import setuptools.command as cmd
+import setuptools.command.build_ext
 from setuptools.command import bdist_egg as bdist_egg_mod
-from setuptools.command.build_ext import build_ext
 
 
 DEFAULT_HPY_ABI = 'universal'
@@ -67,7 +68,7 @@ class HPyDevel:
         """
         dist.hpydevel = self
         base_build = dist.cmdclass.get("build", build)
-        build_ext = dist.cmdclass.get("build_ext", build_ext)
+        build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
         orig_bdist_egg_write_stub = bdist_egg_mod.write_stub
 
         # check that the supplied build_ext inherits from setuptools
