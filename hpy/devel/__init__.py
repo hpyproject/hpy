@@ -20,7 +20,7 @@ from distutils.command.build import build
 from distutils.errors import DistutilsError
 import setuptools.command as cmd
 import setuptools.command.build_ext
-from setuptools.command import bdist_egg as bdist_egg_mod
+import setuptools.command.bdist_egg
 
 
 DEFAULT_HPY_ABI = 'universal'
@@ -69,7 +69,6 @@ class HPyDevel:
         dist.hpydevel = self
         base_build = dist.cmdclass.get("build", build)
         build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
-        orig_bdist_egg_write_stub = bdist_egg_mod.write_stub
 
         # check that the supplied build_ext inherits from setuptools
         if isinstance(build_ext, type):
@@ -93,14 +92,9 @@ class HPyDevel:
         def build_has_ext_modules(self):
             return self.distribution.has_ext_modules()
 
-        def bdist_egg_write_stub(resource, pyfile):
-            if resource.endswith(".hpy.so"):
-                log.info("stub file already created for %s", resource)
-                return
-            orig_bdist_egg_write_stub(resource, pyfile)
-
         # replace build_ext subcommand
         dist.cmdclass['build_ext'] = build_ext_hpy
+
         dist.__class__.has_ext_modules = dist_has_ext_modules
         base_build.has_ext_modules = build_has_ext_modules
         # setuptools / distutils store subcommands in .subcommands which
@@ -108,7 +102,18 @@ class HPyDevel:
         # The two lines below replace .subcommand entry for build_ext.
         idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
         base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
-        bdist_egg_mod.write_stub = bdist_egg_write_stub
+
+        @monkeypatch(setuptools.command.bdist_egg)
+        def write_stub(resource, pyfile):
+            """
+            This is needed because the default bdist_egg unconditionally writes a .py
+            stub, thus overwriting the one which was created by
+            build_ext_hpy_mixin.write_stub.
+            """
+            if resource.endswith(".hpy.so"):
+                log.info("stub file already created for %s", resource)
+                return
+            write_stub.super(resource, pyfile)
 
 
 def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
@@ -206,9 +211,9 @@ def remember_hpy_extension(f):
     return wrapper
 
 
-# ====================================
-# Augmented setuptools commands
-# ====================================
+# ==================================================
+# Augmented setuptools commands and monkeypatching
+# ==================================================
 
 def make_mixin(base, mixin):
     """
@@ -219,6 +224,18 @@ def make_mixin(base, mixin):
         _mixin_super = base
     NewClass.__name__ = base.__name__ + '_hpy'
     return NewClass
+
+def monkeypatch(target):
+    """
+    Decorator to monkey patch a function in a module. The original function
+    will be available as new_function.super()
+    """
+    def decorator(fn):
+        name = fn.__name__
+        fn.super = getattr(target, name)
+        setattr(target, name, fn)
+        return fn
+    return decorator
 
 
 class build_ext_hpy_mixin:
