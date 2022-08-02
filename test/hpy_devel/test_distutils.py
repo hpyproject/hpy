@@ -35,16 +35,12 @@ def venv_template(tmpdir_factory):
         d = tmpdir_factory.mktemp('venv')
 
     venv.create(d, with_pip=True)
-    if os.name == 'nt':
-        d.bin = d.join('Scripts')
-    else:
-        d.bin = d.join('bin')
-    d.python = d.bin.join('python')
-    #
+
     # remove the scripts: they contains a shebang and it will fail subtly
     # after we clone the template. Yes, we could try to fix the shebangs, but
     # it's just easier to use e.g. python -m pip
-    for script in d.join('bin').listdir():
+    attach_python_to_venv(d)
+    for script in d.bin.listdir():
         if script.basename.startswith('python'):
             continue
         script.remove()
@@ -55,6 +51,12 @@ def venv_template(tmpdir_factory):
                     'pip', 'install', '-e', str(HPY_ROOT)], check=True)
     return d
 
+def attach_python_to_venv(d):
+    if os.name == 'nt':
+        d.bin = d.join('Scripts')
+    else:
+        d.bin = d.join('bin')
+    d.python = d.bin.join('python')
 
 @pytest.mark.usefixtures('initargs')
 class TestDistutils:
@@ -65,6 +67,7 @@ class TestDistutils:
         # create a fresh venv by copying the template
         self.venv = tmpdir.join('venv')
         shutil.copytree(venv_template, self.venv)
+        attach_python_to_venv(self.venv)
         # create the files for our test project
         self.hpy_test_project = tmpdir.join('hpy_test_project').ensure(dir=True)
         self.gen_project()
@@ -74,12 +77,11 @@ class TestDistutils:
     def hpy_abi(self, request):
         return request.param
 
-    def run(self, exe, *args, capture=False):
+    def python(self, *args, capture=False):
         """
-        Run a command inside the venv; if capture==True, return stdout
+        Run python inside the venv; if capture==True, return stdout
         """
-        full_exe = self.venv.join('bin', exe)
-        cmd = [str(full_exe)] + list(args)
+        cmd = [str(self.venv.python)] + list(args)
         print('[RUN]', ' '.join(cmd))
         if capture:
             proc = subprocess.run(cmd, stdout=subprocess.PIPE)
@@ -151,7 +153,7 @@ class TestDistutils:
 
     def get_docstring(self, modname):
         cmd = f'import {modname}; print({modname}.__doc__)'
-        return self.run('python', '-c', cmd, capture=True)
+        return self.python('-c', cmd, capture=True)
 
     def test_cpymod_setup_install(self):
         # CPython-only project, no hpy at all. This is a baseline to check
@@ -161,7 +163,7 @@ class TestDistutils:
                   ext_modules = [cpymod],
             )
         """)
-        self.run('python', 'setup.py', 'install')
+        self.python('setup.py', 'install')
         doc = self.get_docstring('cpymod')
         assert doc == 'cpymod docstring'
 
@@ -174,7 +176,7 @@ class TestDistutils:
                   hpy_ext_modules = []
             )
         """)
-        self.run('python', 'setup.py', 'install')
+        self.python('setup.py', 'install')
         doc = self.get_docstring('cpymod')
         assert doc == 'cpymod docstring'
 
@@ -185,7 +187,7 @@ class TestDistutils:
                   hpy_ext_modules = [hpymod],
             )
         """)
-        self.run('python', 'setup.py', '--hpy-abi=universal', 'build')
+        self.python('setup.py', '--hpy-abi=universal', 'build')
         build = self.hpy_test_project.join('build')
         lib = build.listdir('lib*')[0]
         hpymod_py = lib.join('hpymod.py')
@@ -202,7 +204,7 @@ class TestDistutils:
                   hpy_ext_modules = [hpymod],
             )
         """)
-        self.run('python', 'setup.py', 'build')
+        self.python('setup.py', 'build')
         build = self.hpy_test_project.join('build')
         libs = build.listdir('lib*')
         assert len(libs) == 1
@@ -217,7 +219,7 @@ class TestDistutils:
                   hpy_ext_modules = [hpymod],
             )
         """)
-        self.run('python', 'setup.py', f'--hpy-abi={hpy_abi}', 'build_ext', '--inplace')
+        self.python('setup.py', f'--hpy-abi={hpy_abi}', 'build_ext', '--inplace')
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod {hpy_abi} ABI'
 
@@ -228,7 +230,7 @@ class TestDistutils:
                   hpy_ext_modules = [hpymod],
             )
         """)
-        self.run('python', 'setup.py', f'--hpy-abi={hpy_abi}', 'install')
+        self.python('setup.py', f'--hpy-abi={hpy_abi}', 'install')
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod {hpy_abi} ABI'
 
@@ -239,10 +241,10 @@ class TestDistutils:
                   hpy_ext_modules = [hpymod],
             )
         """)
-        self.run('python', 'setup.py', f'--hpy-abi={hpy_abi}', 'bdist_wheel')
+        self.python('setup.py', f'--hpy-abi={hpy_abi}', 'bdist_wheel')
         dist = self.hpy_test_project.join('dist')
         whl = dist.listdir('*.whl')[0]
-        self.run('python', '-m', 'pip', 'install', str(whl))
+        self.python('-m', 'pip', 'install', str(whl))
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod {hpy_abi} ABI'
 
@@ -258,7 +260,7 @@ class TestDistutils:
                   install_requires = [],
             )
         """)
-        self.run('python', 'setup.py', 'install')
+        self.python('setup.py', 'install')
         # in the build/ dir, we should have 2 directories: temp and lib
         build = self.hpy_test_project.join('build')
         temps = build.listdir('temp*')
@@ -270,7 +272,7 @@ class TestDistutils:
         assert doc == 'hpymod cpython ABI'
 
         # now recompile with universal *without* cleaning the build
-        self.run('python', 'setup.py', '--hpy-abi=universal', 'install')
+        self.python('setup.py', '--hpy-abi=universal', 'install')
         # in the build/ dir, we should have 4 directories: 2 temp*, and 2 lib*
         build = self.hpy_test_project.join('build')
         temps = build.listdir('temp*')
