@@ -204,6 +204,17 @@ class TestDistutils:
         # this is something like lib.linux-x86_64-cpython-38
         assert libdir.basename != 'lib'
 
+    def test_hpymod_build_ext_inplace(self, hpy_abi):
+        # check that we can install hpy modules with setup.py build_ext -i
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod],
+            )
+        """)
+        self.run('python', 'setup.py', f'--hpy-abi={hpy_abi}', 'build_ext', '--inplace')
+        doc = self.get_docstring('hpymod')
+        assert doc == f'hpymod {hpy_abi} ABI'
+
     def test_hpymod_setup_install(self, hpy_abi):
         # check that we can install hpy modules with setup.py install
         self.gen_setup_py("""
