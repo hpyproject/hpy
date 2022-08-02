@@ -9,9 +9,13 @@ from pathlib import Path
 
 # setuptools >= 60.2 ships its own version of distutils, which monkey-patches
 # the stdlib one. Here we ensure that we are using setuptool's.
+#
+# But this file needs to be importable also in py27 (for pypy tests), and we
+# don't care about setuptools version in that case.
 import setuptools
 import distutils
-if distutils is not getattr(setuptools, '_distutils', None):
+if (sys.version_info.major > 2 and
+    distutils is not getattr(setuptools, '_distutils', None)):
     raise Exception(
         "setuptools' monkey-patching of distutils did not work. "
         "Most likely this is caused by:\n"
@@ -21,7 +25,11 @@ if distutils is not getattr(setuptools, '_distutils', None):
 from distutils import log
 from distutils.errors import DistutilsError
 import setuptools.command as cmd
-import setuptools.command.build
+try:
+    import setuptools.command.build
+except ImportError:
+    # this happens on py27, because the setuptools version is too old :(
+    setuptools.command.build = None
 import setuptools.command.build_ext
 import setuptools.command.bdist_egg
 
@@ -79,9 +87,10 @@ class HPyDevel:
             return False
 
         # ============= build ==========
-        build = dist.cmdclass.get("build", cmd.build.build)
-        build_hpy = make_mixin(build, build_hpy_mixin)
-        dist.cmdclass['build'] = build_hpy
+        if cmd.build is not None:
+            build = dist.cmdclass.get("build", cmd.build.build)
+            build_hpy = make_mixin(build, build_hpy_mixin)
+            dist.cmdclass['build'] = build_hpy
 
         # ============= build_ext ==========
         build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
