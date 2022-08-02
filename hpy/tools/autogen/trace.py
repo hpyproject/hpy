@@ -12,6 +12,7 @@ TCTX_ARG = 'tctx'
 # manually write a wrapper function. Here we can generate that as well.
 NO_WRAPPER = {
     '_HPy_CallRealFunctionFromTrampoline',
+    'HPy_FatalError',
 }
 
 class Ctx2TctxVisitor(c_ast.NodeVisitor):

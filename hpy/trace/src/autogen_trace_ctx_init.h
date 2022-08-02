@@ -70,7 +70,6 @@ HPy trace_ctx_InPlaceXor(HPyContext *tctx, HPy h1, HPy h2);
 HPy trace_ctx_InPlaceOr(HPyContext *tctx, HPy h1, HPy h2);
 int trace_ctx_Callable_Check(HPyContext *tctx, HPy h);
 HPy trace_ctx_CallTupleDict(HPyContext *tctx, HPy callable, HPy args, HPy kw);
-void trace_ctx_FatalError(HPyContext *tctx, const char *message);
 void trace_ctx_Err_SetString(HPyContext *tctx, HPy h_type, const char *message);
 void trace_ctx_Err_SetObject(HPyContext *tctx, HPy h_type, HPy h_value);
 HPy trace_ctx_Err_SetFromErrnoWithFilename(HPyContext *tctx, HPy h_type, const char *filename_fsencoded);
@@ -336,7 +335,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_InPlaceOr = &trace_ctx_InPlaceOr;
     tctx->ctx_Callable_Check = &trace_ctx_Callable_Check;
     tctx->ctx_CallTupleDict = &trace_ctx_CallTupleDict;
-    tctx->ctx_FatalError = &trace_ctx_FatalError;
+    tctx->ctx_FatalError = uctx->ctx_FatalError;
     tctx->ctx_Err_SetString = &trace_ctx_Err_SetString;
     tctx->ctx_Err_SetObject = &trace_ctx_Err_SetObject;
     tctx->ctx_Err_SetFromErrnoWithFilename = &trace_ctx_Err_SetFromErrnoWithFilename;

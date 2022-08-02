@@ -1031,22 +1031,6 @@ HPy trace_ctx_CallTupleDict(HPyContext *tctx, HPy callable, HPy args, HPy kw)
     return res;
 }
 
-void trace_ctx_FatalError(HPyContext *tctx, const char *message)
-{
-    HPyTraceInfo *tctx_info = get_info(tctx);
-    struct timespec _ts_start, _ts_end;
-    int cr;
-    tctx_info->call_counts[137]++;
-    cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_FatalError(tctx_info->uctx, message);
-    cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
-    if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
-    int64_t duration = diff_ns(_ts_start, _ts_end);
-    assert(duration >= 0);
-    tctx_info->durations[137] += duration;
-}
-
 void trace_ctx_Err_SetString(HPyContext *tctx, HPy h_type, const char *message)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
