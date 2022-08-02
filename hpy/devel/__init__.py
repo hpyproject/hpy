@@ -16,7 +16,6 @@ if distutils is not getattr(setuptools, '_distutils', None):
                     "This most likely means that you are using a version which "
                     "is too old. Try installing setuptools>=60.2")
 from distutils import log
-from distutils.command.build import build
 from distutils.errors import DistutilsError
 import setuptools.command as cmd
 import setuptools.command.build_ext
@@ -67,7 +66,6 @@ class HPyDevel:
             Used from both setup.py and hpy/test.
         """
         dist.hpydevel = self
-        base_build = dist.cmdclass.get("build", build)
         build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
 
         # check that the supplied build_ext inherits from setuptools
@@ -89,19 +87,10 @@ class HPyDevel:
                 return True
             return False
 
-        def build_has_ext_modules(self):
-            return self.distribution.has_ext_modules()
-
         # replace build_ext subcommand
         dist.cmdclass['build_ext'] = build_ext_hpy
 
         dist.__class__.has_ext_modules = dist_has_ext_modules
-        base_build.has_ext_modules = build_has_ext_modules
-        # setuptools / distutils store subcommands in .subcommands which
-        # is a list of tuples of (extension_name, extension_needs_to_run_func).
-        # The two lines below replace .subcommand entry for build_ext.
-        idx = [sub[0] for sub in base_build.sub_commands].index("build_ext")
-        base_build.sub_commands[idx] = ("build_ext", build_has_ext_modules)
 
         @monkeypatch(setuptools.command.bdist_egg)
         def write_stub(resource, pyfile):
