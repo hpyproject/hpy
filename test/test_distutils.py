@@ -8,6 +8,7 @@ itself.
 """
 
 import sys
+import os
 import textwrap
 import subprocess
 from pathlib import Path
@@ -34,10 +35,11 @@ def venv_template(tmpdir_factory):
         d = tmpdir_factory.mktemp('venv')
 
     venv.create(d, with_pip=True)
-    pip = d.join('bin', 'pip')
-    subprocess.run([str(pip), 'install', '-U', 'pip'])
-    subprocess.run([str(pip), 'install', 'wheel'])
-    subprocess.run([str(pip), 'install', '-e', str(HPY_ROOT)], check=True)
+    if os.name == 'nt':
+        d.bin = d.join('Scripts')
+    else:
+        d.bin = d.join('bin')
+    d.python = d.bin.join('python')
     #
     # remove the scripts: they contains a shebang and it will fail subtly
     # after we clone the template. Yes, we could try to fix the shebangs, but
@@ -47,6 +49,10 @@ def venv_template(tmpdir_factory):
             continue
         script.remove()
     #
+    subprocess.run([str(d.python), '-m'
+                    'pip', 'install', '-U', 'pip', 'wheel'], check=True)
+    subprocess.run([str(d.python), '-m'
+                    'pip', 'install', '-e', str(HPY_ROOT)], check=True)
     return d
 
 
