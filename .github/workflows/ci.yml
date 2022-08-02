@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install/Upgrade Python dependencies
-        run: python -m pip install --upgrade pip wheel
+        run: python -m pip install --upgrade pip wheel 'setuptools>=60.2'
 
       - name: Build
         run: python -m pip install .
