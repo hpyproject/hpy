@@ -36,7 +36,17 @@ def venv_template(tmpdir_factory):
     venv.create(d, with_pip=True)
     pip = d.join('bin', 'pip')
     subprocess.run([str(pip), 'install', '-U', 'pip'])
+    subprocess.run([str(pip), 'install', 'wheel'])
     subprocess.run([str(pip), 'install', '-e', str(HPY_ROOT)], check=True)
+    #
+    # remove the scripts: they contains a shebang and it will fail subtly
+    # after we clone the template. Yes, we could try to fix the shebangs, but
+    # it's just easier to use e.g. python -m pip
+    for script in d.join('bin').listdir():
+        if script.basename.startswith('python'):
+            continue
+        script.remove()
+    #
     return d
 
 
@@ -202,6 +212,20 @@ class TestDistutils:
             )
         """)
         self.run('python', 'setup.py', f'--hpy-abi={hpy_abi}', 'install')
+        doc = self.get_docstring('hpymod')
+        assert doc == f'hpymod {hpy_abi} ABI'
+
+    def test_hpymod_wheel(self, hpy_abi):
+        # check that we can build and install wheels
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod],
+            )
+        """)
+        self.run('python', 'setup.py', f'--hpy-abi={hpy_abi}', 'bdist_wheel')
+        dist = self.hpy_test_project.join('dist')
+        whl = dist.listdir('*.whl')[0]
+        self.run('python', '-m', 'pip', 'install', str(whl))
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod {hpy_abi} ABI'
 
