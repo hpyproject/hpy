@@ -12,6 +12,7 @@ _install_hpy() {
     # will want to split those into two separate packages
     local PYTHON="$1"
     pushd ${ROOT}
+    ${PYTHON} -m pip install -U pip
     ${PYTHON} -m pip install wheel
     ${PYTHON} -m pip install .
     popd
