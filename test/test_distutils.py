@@ -12,19 +12,31 @@ import textwrap
 import subprocess
 from pathlib import Path
 import shutil
+import venv
+import py
 import pytest
 
 HPY_ROOT = Path(__file__).parent.parent
 
+# this is only for development: if we set it to true, we don't have to
+# recreate the venv_template between runs, it's much faster
+REUSE_VENV_TEMPLATE = True
+
 @pytest.fixture(scope='session')
 def venv_template(tmpdir_factory):
-    import venv # this is the stdlib module
-    d = tmpdir_factory.mktemp('venv')
+    if REUSE_VENV_TEMPLATE:
+        d = py.path.local('/tmp/venv-for-hpytest')
+        if d.check(dir=True):
+            # if it exists, we assume it's correct. If you want to recreate,
+            # just manually delete /tmp/venv-for-hpytest
+            return d
+    else:
+        d = tmpdir_factory.mktemp('venv')
+
     venv.create(d, with_pip=True)
     pip = d.join('bin', 'pip')
-    proc = subprocess.run(
-        [str(pip), 'install', '-e', str(HPY_ROOT)],
-        check=True)
+    subprocess.run([str(pip), 'install', '-U', 'pip'])
+    subprocess.run([str(pip), 'install', '-e', str(HPY_ROOT)], check=True)
     return d
 
 
