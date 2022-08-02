@@ -65,33 +65,23 @@ class HPyDevel:
 
             Used from both setup.py and hpy/test.
         """
+        # ============= Distribution ==========
         dist.hpydevel = self
-        build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
 
-        # check that the supplied build_ext inherits from setuptools
-        if isinstance(build_ext, type):
-            assert ('setuptools.command.build_ext', 'build_ext') in [
-                (c.__module__, c.__name__) for c in build_ext.__mro__
-            ], (
-                "dist.cmdclass['build_ext'] does not inherit from"
-                " setuptools.command.build_ext.build_ext. The HPy build"
-                " system does not currently support any other build_ext"
-                " classes. If you are using distutils.commands.build_ext,"
-                " please use setuptools.commands.build_ext instead."
-            )
-
-        build_ext_hpy = make_mixin(build_ext, build_ext_hpy_mixin)
-
-        def dist_has_ext_modules(self):
+        @monkeypatch(dist.__class__)
+        def has_ext_modules(self):
             if self.ext_modules or self.hpy_ext_modules:
                 return True
             return False
 
-        # replace build_ext subcommand
+        # ============= build_ext ==========
+        # replace build_ext with our own version. See build_ext_hpy_mixin
+        build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
+        self.build_ext_sanity_check(build_ext)
+        build_ext_hpy = make_mixin(build_ext, build_ext_hpy_mixin)
         dist.cmdclass['build_ext'] = build_ext_hpy
 
-        dist.__class__.has_ext_modules = dist_has_ext_modules
-
+        # ============= bdist_egg ==========
         @monkeypatch(setuptools.command.bdist_egg)
         def write_stub(resource, pyfile):
             """
@@ -103,6 +93,19 @@ class HPyDevel:
                 log.info("stub file already created for %s", resource)
                 return
             write_stub.super(resource, pyfile)
+
+    def build_ext_sanity_check(self, build_ext):
+        # check that the supplied build_ext inherits from setuptools
+        if isinstance(build_ext, type):
+            assert ('setuptools.command.build_ext', 'build_ext') in [
+                (c.__module__, c.__name__) for c in build_ext.__mro__
+            ], (
+                "dist.cmdclass['build_ext'] does not inherit from"
+                " setuptools.command.build_ext.build_ext. The HPy build"
+                " system does not currently support any other build_ext"
+                " classes. If you are using distutils.commands.build_ext,"
+                " please use setuptools.commands.build_ext instead."
+            )
 
 
 def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
