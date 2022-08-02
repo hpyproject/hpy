@@ -17,7 +17,7 @@ import venv
 import py
 import pytest
 
-HPY_ROOT = Path(__file__).parent.parent
+HPY_ROOT = Path(__file__).parent.parent.parent
 
 # this is only for development: if we set it to true, we don't have to
 # recreate the venv_template between runs, it's much faster
