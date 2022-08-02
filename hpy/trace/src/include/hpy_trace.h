@@ -17,6 +17,7 @@
 
 HPyContext * hpy_trace_get_ctx(HPyContext *uctx);
 int hpy_trace_ctx_init(HPyContext *tctx, HPyContext *uctx);
+int hpy_trace_ctx_free(HPyContext *tctx);
 int hpy_trace_get_nfunc(void);
 const char * hpy_trace_get_func_name(int idx);
 

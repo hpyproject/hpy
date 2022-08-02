@@ -56,6 +56,13 @@ class autogen_tracer_ctx_init_h(AutoGenFile):
         w(f'    info->durations = (int64_t *)calloc({n_decls}, sizeof(int64_t));')
         w('}')
         w('')
+        w(f'static inline void trace_ctx_free_info(HPyTraceInfo *info)')
+        w('{')
+        w(f'    assert(info->magic_number == HPY_TRACE_MAGIC);')
+        w(f'    free(info->call_counts);')
+        w(f'    free(info->durations);')
+        w('}')
+        w('')
         w(f'static inline void trace_ctx_init_fields(HPyContext *{TCTX_ARG}, HPyContext *{UCTX_ARG})')
         w('{')
         for var in self.api.variables:

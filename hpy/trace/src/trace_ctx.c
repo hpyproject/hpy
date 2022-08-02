@@ -31,6 +31,12 @@ int hpy_trace_ctx_init(HPyContext *tctx, HPyContext *uctx)
     return 0;
 }
 
+int hpy_trace_ctx_free(HPyContext *tctx)
+{
+    trace_ctx_free_info(get_info(tctx));
+    return 0;
+}
+
 HPyContext * hpy_trace_get_ctx(HPyContext *uctx)
 {
     HPyContext *tctx = &g_trace_ctx;
