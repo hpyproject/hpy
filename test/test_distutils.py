@@ -246,8 +246,10 @@ class TestDistutils:
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod {hpy_abi} ABI'
 
-    @pytest.mark.xfail
     def test_dont_mix_cpython_and_universal_abis(self):
+        """
+        See issue #322
+        """
         # make sure that the build dirs for cpython and universal ABIs are
         # distinct
         self.gen_setup_py("""
@@ -257,10 +259,24 @@ class TestDistutils:
             )
         """)
         self.run('python', 'setup.py', 'install')
+        # in the build/ dir, we should have 2 directories: temp and lib
+        build = self.hpy_test_project.join('build')
+        temps = build.listdir('temp*')
+        libs = build.listdir('lib*')
+        assert len(temps) == 1
+        assert len(libs) == 1
+        #
         doc = self.get_docstring('hpymod')
         assert doc == 'hpymod cpython ABI'
-        #
+
         # now recompile with universal *without* cleaning the build
         self.run('python', 'setup.py', '--hpy-abi=universal', 'install')
+        # in the build/ dir, we should have 4 directories: 2 temp*, and 2 lib*
+        build = self.hpy_test_project.join('build')
+        temps = build.listdir('temp*')
+        libs = build.listdir('lib*')
+        assert len(temps) == 2
+        assert len(libs) == 2
+        #
         doc = self.get_docstring('hpymod')
         assert doc == 'hpymod universal ABI'

@@ -18,6 +18,7 @@ if distutils is not getattr(setuptools, '_distutils', None):
 from distutils import log
 from distutils.errors import DistutilsError
 import setuptools.command as cmd
+import setuptools.command.build
 import setuptools.command.build_ext
 import setuptools.command.bdist_egg
 
@@ -74,8 +75,12 @@ class HPyDevel:
                 return True
             return False
 
+        # ============= build ==========
+        build = dist.cmdclass.get("build", cmd.build.build)
+        build_hpy = make_mixin(build, build_hpy_mixin)
+        dist.cmdclass['build'] = build_hpy
+
         # ============= build_ext ==========
-        # replace build_ext with our own version. See build_ext_hpy_mixin
         build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
         self.build_ext_sanity_check(build_ext)
         build_ext_hpy = make_mixin(build_ext, build_ext_hpy_mixin)
@@ -228,6 +233,17 @@ def monkeypatch(target):
         setattr(target, name, fn)
         return fn
     return decorator
+
+
+class build_hpy_mixin:
+    """ A mixin class to override setuptools.commands.build """
+
+    def finalize_options(self):
+        self._mixin_super.finalize_options(self)
+        if self.distribution.hpy_abi == 'universal':
+            self.build_platlib += '-hpy-universal'
+            self.build_lib += '-hpy-universal'
+            self.build_temp += '-hpy-universal'
 
 
 class build_ext_hpy_mixin:
