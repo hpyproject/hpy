@@ -11,29 +11,33 @@ import sys
 import textwrap
 import subprocess
 from pathlib import Path
+import shutil
 import pytest
 
 HPY_ROOT = Path(__file__).parent.parent
 
 @pytest.fixture(scope='session')
-def hpy_wheel(tmpdir_factory):
-    wheelhouse = tmpdir_factory.mktemp('wheelhouse')
-    proc = subprocess.run([
-        sys.executable, '-m', 'pip', 'wheel', str(HPY_ROOT), '-w', str(wheelhouse)
-        ])
-    wheels = wheelhouse.listdir('hpy*.whl')
-    assert len(wheels) == 1
-    return wheels[0]
+def venv_template(tmpdir_factory):
+    import venv # this is the stdlib module
+    d = tmpdir_factory.mktemp('venv')
+    venv.create(d, with_pip=True)
+    pip = d.join('bin', 'pip')
+    proc = subprocess.run(
+        [str(pip), 'install', '-e', str(HPY_ROOT)],
+        check=True)
+    return d
 
 
 @pytest.mark.usefixtures('initargs')
 class TestDistutils:
 
     @pytest.fixture()
-    def initargs(self, tmpdir, venv, hpy_wheel):
+    def initargs(self, tmpdir, venv_template):
         self.tmpdir = tmpdir
-        self.venv = venv
-        self.run('pip', 'install', str(hpy_wheel))
+        # create a fresh venv by copying the template
+        self.venv = tmpdir.join('venv')
+        shutil.copytree(venv_template, self.venv)
+        # create the files for our test project
         self.hpy_test_project = tmpdir.join('hpy_test_project').ensure(dir=True)
         self.gen_project()
         self.hpy_test_project.chdir()
@@ -42,7 +46,7 @@ class TestDistutils:
         """
         Run a command inside the venv; if capture==True, return stdout
         """
-        full_exe = Path(self.venv.bin).joinpath(exe)
+        full_exe = self.venv.join('bin', exe)
         cmd = [str(full_exe)] + list(args)
         print('[RUN]', ' '.join(cmd))
         if capture:
@@ -150,7 +154,7 @@ class TestDistutils:
         self.run('python', 'setup.py', 'install')
         out = self.run('python', '-c', 'import hpymod; print(hpymod.__doc__)',
                        capture=True)
-        assert out == 'hpymod docstring'
+        assert out == 'hpymod CPython ABI'
 
     def test_hpy_ext_modules_build_platlib(self):
         # check that if we have only hpy_ext_modules, the distribution is
@@ -171,6 +175,7 @@ class TestDistutils:
         # this is something like lib.linux-x86_64-cpython-38
         assert libdir.basename != 'lib'
 
+    @pytest.mark.xfail
     def test_dont_mix_cpython_and_universal_abis(self):
         # make sure that the build dirs for cpython and universal ABIs are
         # distinct
