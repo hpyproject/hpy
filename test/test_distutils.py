@@ -21,7 +21,7 @@ HPY_ROOT = Path(__file__).parent.parent
 
 # this is only for development: if we set it to true, we don't have to
 # recreate the venv_template between runs, it's much faster
-REUSE_VENV_TEMPLATE = True
+REUSE_VENV_TEMPLATE = False
 
 @pytest.fixture(scope='session')
 def venv_template(tmpdir_factory):
