@@ -12,9 +12,12 @@ from pathlib import Path
 import setuptools
 import distutils
 if distutils is not getattr(setuptools, '_distutils', None):
-    raise Exception("setuptools' monkey-patching of distutils did not work. "
-                    "This most likely means that you are using a version which "
-                    "is too old. Try installing setuptools>=60.2")
+    raise Exception(
+        "setuptools' monkey-patching of distutils did not work. "
+        "Most likely this is caused by:\n"
+        "  - a too old setuptools. Try installing setuptools>=60.2\n"
+        "  - the env variable SETUPTOOLS_USE_DISTUTILS=stdlib. Try to unset it."
+        )
 from distutils import log
 from distutils.errors import DistutilsError
 import setuptools.command as cmd
