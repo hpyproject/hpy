@@ -758,6 +758,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
 #if PY_VERSION_HEX < 0x03080000
+    /*
+    py3.7 compatibility
+    Before 3.8, the tp_finalize slot is only considered if the type has
+    Py_TPFLAGS_HAVE_FINALIZE. That flag is ignored in 3.8+ (see bpo-32388).
+    */
     if (((PyTypeObject*)result)->tp_finalize != NULL) {
         ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
     }
