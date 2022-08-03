@@ -308,12 +308,10 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
             if (src->kind != HPyDef_Kind_Member)
                 continue;
             PyMemberDef *dst = &result[dst_idx++];
-            /* for Python <= 3.6 compatibility, we need to remove the 'const'
-               qualifier from src->member.{name,doc} */
-            dst->name = (char *)src->member.name;
+            dst->name = src->member.name;
             dst->type = src->member.type;
             dst->offset = src->member.offset + base_member_offset;
-            dst->doc = (char *)src->member.doc;
+            dst->doc = src->member.doc;
             if (src->member.readonly)
                 dst->flags = READONLY;
             else
@@ -355,12 +353,10 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
             if (src->kind != HPyDef_Kind_GetSet)
                 continue;
             PyGetSetDef *dst = &result[dst_idx++];
-            /* for Python <= 3.6 compatibility, we need to remove the 'const'
-               qualifier from src->getset.{name,doc} */
-            dst->name = (char *)src->getset.name;
+            dst->name = src->getset.name;
             dst->get = src->getset.getter_cpy_trampoline;
             dst->set = src->getset.setter_cpy_trampoline;
-            dst->doc = (char *)src->getset.doc;
+            dst->doc = src->getset.doc;
             dst->closure = src->getset.closure;
         }
     }
@@ -762,6 +758,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
 #if PY_VERSION_HEX < 0x03080000
+    /*
+    py3.7 compatibility
+    Before 3.8, the tp_finalize slot is only considered if the type has
+    Py_TPFLAGS_HAVE_FINALIZE. That flag is ignored in 3.8+ (see bpo-32388).
+    */
     if (((PyTypeObject*)result)->tp_finalize != NULL) {
         ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
     }
