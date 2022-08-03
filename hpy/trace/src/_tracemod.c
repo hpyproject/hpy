@@ -66,11 +66,57 @@ fail:
     return HPy_NULL;
 }
 
+static int check_and_set_func(HPyContext *uctx, HPy arg, HPy *out)
+{
+    if (HPy_IsNull(arg)) {
+        // not provided -> do not change value
+        return 0;
+    } else if (HPy_Is(uctx, arg, uctx->h_None)) {
+        // None -> clear function
+        *out = HPy_NULL;
+        return 0;
+    } else if (!HPyCallable_Check(uctx, arg)) {
+        // not null, not None, not callable -> error
+        HPyErr_SetString(uctx, uctx->h_TypeError, "Expected a callable object or None");
+        return -1;
+    }
+    // a callable -> set function
+    *out = HPy_Dup(uctx, arg);
+    return 0;
+}
+
+HPyDef_METH(set_trace_functions, "set_trace_functions", set_trace_funcs_impl,
+            HPyFunc_KEYWORDS, .doc=
+            "Set the functions to call if an HPy API is entered/exited.")
+static HPy set_trace_funcs_impl(HPyContext *uctx, HPy self, HPy *args,
+        HPy_ssize_t nargs, HPy kw)
+{
+    HPy h_on_enter = HPy_NULL;
+    HPy h_on_exit = HPy_NULL;
+    HPyContext *dctx = hpy_trace_get_ctx(uctx);
+    HPyTraceInfo *info = get_info(dctx);
+    HPyTracker ht;
+
+    static const char *kwlist[] = { "on_enter", "on_exit", NULL };
+    if (!HPyArg_ParseKeywords(uctx, &ht, args, nargs, kw, "|OO", kwlist,
+            &h_on_enter, &h_on_exit)) {
+        return HPy_NULL;
+    }
+
+    if (check_and_set_func(uctx, h_on_enter, &info->on_enter_func) < 0 ||
+            check_and_set_func(uctx, h_on_exit, &info->on_exit_func) < 0) {
+        return HPy_NULL;
+    }
+    return HPy_Dup(uctx, uctx->h_None);
+}
+
+
 /* ~~~~~~ definition of the module hpy.trace._trace ~~~~~~~ */
 
 static HPyDef *module_defines[] = {
     &durations,
     &call_counts,
+    &set_trace_functions,
     NULL
 };
 

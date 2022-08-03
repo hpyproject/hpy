@@ -20,6 +20,8 @@ typedef struct {
     uint64_t *call_counts;
     /* durations (ns) spent in the corresponding HPy API function */
     int64_t *durations;
+    HPy on_enter_func;
+    HPy on_exit_func;
 } HPyTraceInfo;
 
 static inline HPyTraceInfo *get_info(HPyContext *tctx)
@@ -35,5 +37,9 @@ diff_ns(const struct timespec start, const struct timespec end)
     return ((int64_t)end.tv_sec - (int64_t)start.tv_sec) * (int64_t)1000000000
             + ((int64_t)end.tv_nsec - (int64_t)start.tv_nsec);
 }
+
+HPy hpy_trace_create_func_args(HPyContext *uctx, int id);
+void hpy_trace_on_enter(HPyTraceInfo *info, HPyContext *uctx, HPy args);
+void hpy_trace_on_exit(HPyTraceInfo *info, HPyContext *uctx, HPy args);
 
 #endif /* HPY_TRACE_INTERNAL_H */

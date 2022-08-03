@@ -53,3 +53,32 @@ void hpy_trace_set_ctx(HPyContext *tctx)
 {
     g_trace_ctx = *tctx;
 }
+
+HPy hpy_trace_create_func_args(HPyContext *uctx, int id)
+{
+    HPy h_name = HPyUnicode_FromString(uctx, hpy_trace_get_func_name(id));
+    if (HPy_IsNull(h_name))
+        goto fail;
+    HPy h_args = HPyTuple_FromArray(uctx, &h_name, 1);
+    if (HPy_IsNull(h_args))
+        goto fail;
+    HPy_Close(uctx, h_name);
+    return h_args;
+fail:
+    HPy_FatalError(uctx, "could not ");
+}
+
+void hpy_trace_on_enter(HPyTraceInfo *info, HPyContext *uctx, HPy args)
+{
+    HPy res = HPy_CallTupleDict(uctx, info->on_enter_func, args, HPy_NULL);
+    if (HPy_IsNull(res))
+        HPy_FatalError(uctx, "error when executing on-enter trace function");
+}
+
+void hpy_trace_on_exit(HPyTraceInfo *info, HPyContext *uctx, HPy args)
+{
+    HPy res = HPy_CallTupleDict(uctx, info->on_exit_func, args, HPy_NULL);
+    if (HPy_IsNull(res))
+        HPy_FatalError(uctx, "error when executing on-exit trace function");
+}
+

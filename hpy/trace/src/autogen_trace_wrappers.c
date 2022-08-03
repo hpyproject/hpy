@@ -15,2771 +15,4739 @@
 HPy trace_ctx_Module_Create(HPyContext *tctx, HPyModuleDef *def)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[77]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 77);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyModule_Create(tctx_info->uctx, def);
+    HPy res = HPyModule_Create(uctx, def);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[77] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 77);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Dup(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[78]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 78);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Dup(tctx_info->uctx, h);
+    HPy res = HPy_Dup(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[78] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 78);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Close(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[79]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 79);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_Close(tctx_info->uctx, h);
+    HPy_Close(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[79] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 79);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_Long_FromLong(HPyContext *tctx, long value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[80]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 80);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyLong_FromLong(tctx_info->uctx, value);
+    HPy res = HPyLong_FromLong(uctx, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[80] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 80);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Long_FromUnsignedLong(HPyContext *tctx, unsigned long value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[81]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 81);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyLong_FromUnsignedLong(tctx_info->uctx, value);
+    HPy res = HPyLong_FromUnsignedLong(uctx, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[81] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 81);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Long_FromLongLong(HPyContext *tctx, long long v)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[82]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 82);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyLong_FromLongLong(tctx_info->uctx, v);
+    HPy res = HPyLong_FromLongLong(uctx, v);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[82] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 82);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Long_FromUnsignedLongLong(HPyContext *tctx, unsigned long long v)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[83]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 83);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyLong_FromUnsignedLongLong(tctx_info->uctx, v);
+    HPy res = HPyLong_FromUnsignedLongLong(uctx, v);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[83] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 83);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Long_FromSize_t(HPyContext *tctx, size_t value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[84]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 84);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyLong_FromSize_t(tctx_info->uctx, value);
+    HPy res = HPyLong_FromSize_t(uctx, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[84] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 84);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Long_FromSsize_t(HPyContext *tctx, HPy_ssize_t value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[85]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 85);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyLong_FromSsize_t(tctx_info->uctx, value);
+    HPy res = HPyLong_FromSsize_t(uctx, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[85] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 85);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 long trace_ctx_Long_AsLong(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[86]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 86);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    long res = HPyLong_AsLong(tctx_info->uctx, h);
+    long res = HPyLong_AsLong(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[86] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 86);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 unsigned long trace_ctx_Long_AsUnsignedLong(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[87]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 87);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    unsigned long res = HPyLong_AsUnsignedLong(tctx_info->uctx, h);
+    unsigned long res = HPyLong_AsUnsignedLong(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[87] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 87);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 unsigned long trace_ctx_Long_AsUnsignedLongMask(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[88]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 88);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    unsigned long res = HPyLong_AsUnsignedLongMask(tctx_info->uctx, h);
+    unsigned long res = HPyLong_AsUnsignedLongMask(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[88] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 88);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 long long trace_ctx_Long_AsLongLong(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[89]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 89);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    long long res = HPyLong_AsLongLong(tctx_info->uctx, h);
+    long long res = HPyLong_AsLongLong(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[89] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 89);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 unsigned long long trace_ctx_Long_AsUnsignedLongLong(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[90]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 90);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    unsigned long long res = HPyLong_AsUnsignedLongLong(tctx_info->uctx, h);
+    unsigned long long res = HPyLong_AsUnsignedLongLong(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[90] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 90);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 unsigned long long trace_ctx_Long_AsUnsignedLongLongMask(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[91]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 91);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    unsigned long long res = HPyLong_AsUnsignedLongLongMask(tctx_info->uctx, h);
+    unsigned long long res = HPyLong_AsUnsignedLongLongMask(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[91] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 91);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 size_t trace_ctx_Long_AsSize_t(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[92]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 92);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    size_t res = HPyLong_AsSize_t(tctx_info->uctx, h);
+    size_t res = HPyLong_AsSize_t(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[92] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 92);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy_ssize_t trace_ctx_Long_AsSsize_t(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[93]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 93);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_ssize_t res = HPyLong_AsSsize_t(tctx_info->uctx, h);
+    HPy_ssize_t res = HPyLong_AsSsize_t(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[93] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 93);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_Long_AsVoidPtr(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[94]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 94);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = HPyLong_AsVoidPtr(tctx_info->uctx, h);
+    void * res = HPyLong_AsVoidPtr(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[94] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 94);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 double trace_ctx_Long_AsDouble(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[95]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 95);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    double res = HPyLong_AsDouble(tctx_info->uctx, h);
+    double res = HPyLong_AsDouble(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[95] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 95);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Float_FromDouble(HPyContext *tctx, double v)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[96]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 96);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyFloat_FromDouble(tctx_info->uctx, v);
+    HPy res = HPyFloat_FromDouble(uctx, v);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[96] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 96);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 double trace_ctx_Float_AsDouble(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[97]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 97);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    double res = HPyFloat_AsDouble(tctx_info->uctx, h);
+    double res = HPyFloat_AsDouble(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[97] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 97);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Bool_FromLong(HPyContext *tctx, long v)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[98]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 98);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyBool_FromLong(tctx_info->uctx, v);
+    HPy res = HPyBool_FromLong(uctx, v);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[98] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 98);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy_ssize_t trace_ctx_Length(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[99]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 99);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_ssize_t res = HPy_Length(tctx_info->uctx, h);
+    HPy_ssize_t res = HPy_Length(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[99] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 99);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Number_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[100]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 100);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyNumber_Check(tctx_info->uctx, h);
+    int res = HPyNumber_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[100] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 100);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Add(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[101]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 101);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Add(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Add(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[101] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 101);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Subtract(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[102]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 102);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Subtract(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Subtract(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[102] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 102);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Multiply(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[103]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 103);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Multiply(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Multiply(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[103] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 103);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_MatrixMultiply(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[104]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 104);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_MatrixMultiply(tctx_info->uctx, h1, h2);
+    HPy res = HPy_MatrixMultiply(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[104] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 104);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_FloorDivide(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[105]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 105);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_FloorDivide(tctx_info->uctx, h1, h2);
+    HPy res = HPy_FloorDivide(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[105] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 105);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_TrueDivide(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[106]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 106);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_TrueDivide(tctx_info->uctx, h1, h2);
+    HPy res = HPy_TrueDivide(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[106] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 106);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Remainder(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[107]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 107);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Remainder(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Remainder(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[107] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 107);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Divmod(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[108]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 108);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Divmod(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Divmod(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[108] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 108);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Power(HPyContext *tctx, HPy h1, HPy h2, HPy h3)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[109]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 109);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Power(tctx_info->uctx, h1, h2, h3);
+    HPy res = HPy_Power(uctx, h1, h2, h3);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[109] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 109);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Negative(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[110]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 110);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Negative(tctx_info->uctx, h1);
+    HPy res = HPy_Negative(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[110] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 110);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Positive(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[111]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 111);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Positive(tctx_info->uctx, h1);
+    HPy res = HPy_Positive(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[111] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 111);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Absolute(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[112]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 112);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Absolute(tctx_info->uctx, h1);
+    HPy res = HPy_Absolute(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[112] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 112);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Invert(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[113]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 113);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Invert(tctx_info->uctx, h1);
+    HPy res = HPy_Invert(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[113] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 113);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Lshift(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[114]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 114);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Lshift(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Lshift(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[114] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 114);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Rshift(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[115]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 115);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Rshift(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Rshift(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[115] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 115);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_And(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[116]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 116);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_And(tctx_info->uctx, h1, h2);
+    HPy res = HPy_And(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[116] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 116);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Xor(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[117]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 117);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Xor(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Xor(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[117] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 117);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Or(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[118]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 118);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Or(tctx_info->uctx, h1, h2);
+    HPy res = HPy_Or(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[118] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 118);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Index(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[119]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 119);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Index(tctx_info->uctx, h1);
+    HPy res = HPy_Index(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[119] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 119);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Long(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[120]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 120);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Long(tctx_info->uctx, h1);
+    HPy res = HPy_Long(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[120] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 120);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Float(HPyContext *tctx, HPy h1)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[121]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 121);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Float(tctx_info->uctx, h1);
+    HPy res = HPy_Float(uctx, h1);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[121] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 121);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceAdd(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[122]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 122);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceAdd(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceAdd(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[122] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 122);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceSubtract(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[123]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 123);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceSubtract(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceSubtract(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[123] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 123);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceMultiply(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[124]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 124);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceMultiply(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceMultiply(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[124] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 124);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceMatrixMultiply(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[125]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 125);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceMatrixMultiply(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceMatrixMultiply(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[125] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 125);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceFloorDivide(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[126]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 126);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceFloorDivide(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceFloorDivide(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[126] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 126);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceTrueDivide(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[127]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 127);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceTrueDivide(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceTrueDivide(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[127] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 127);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceRemainder(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[128]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 128);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceRemainder(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceRemainder(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[128] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 128);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlacePower(HPyContext *tctx, HPy h1, HPy h2, HPy h3)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[129]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 129);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlacePower(tctx_info->uctx, h1, h2, h3);
+    HPy res = HPy_InPlacePower(uctx, h1, h2, h3);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[129] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 129);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceLshift(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[130]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 130);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceLshift(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceLshift(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[130] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 130);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceRshift(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[131]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 131);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceRshift(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceRshift(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[131] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 131);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceAnd(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[132]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 132);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceAnd(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceAnd(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[132] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 132);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceXor(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[133]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 133);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceXor(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceXor(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[133] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 133);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_InPlaceOr(HPyContext *tctx, HPy h1, HPy h2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[134]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 134);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_InPlaceOr(tctx_info->uctx, h1, h2);
+    HPy res = HPy_InPlaceOr(uctx, h1, h2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[134] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 134);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Callable_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[135]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 135);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyCallable_Check(tctx_info->uctx, h);
+    int res = HPyCallable_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[135] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 135);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_CallTupleDict(HPyContext *tctx, HPy callable, HPy args, HPy kw)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[136]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 136);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_CallTupleDict(tctx_info->uctx, callable, args, kw);
+    HPy res = HPy_CallTupleDict(uctx, callable, args, kw);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[136] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 136);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Err_SetString(HPyContext *tctx, HPy h_type, const char *message)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[138]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 138);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyErr_SetString(tctx_info->uctx, h_type, message);
+    HPyErr_SetString(uctx, h_type, message);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[138] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 138);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 void trace_ctx_Err_SetObject(HPyContext *tctx, HPy h_type, HPy h_value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[139]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 139);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyErr_SetObject(tctx_info->uctx, h_type, h_value);
+    HPyErr_SetObject(uctx, h_type, h_value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[139] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 139);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_Err_SetFromErrnoWithFilename(HPyContext *tctx, HPy h_type, const char *filename_fsencoded)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[140]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 140);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyErr_SetFromErrnoWithFilename(tctx_info->uctx, h_type, filename_fsencoded);
+    HPy res = HPyErr_SetFromErrnoWithFilename(uctx, h_type, filename_fsencoded);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[140] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 140);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *tctx, HPy h_type, HPy filename1, HPy filename2)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[141]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 141);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyErr_SetFromErrnoWithFilenameObjects(tctx_info->uctx, h_type, filename1, filename2);
+    HPyErr_SetFromErrnoWithFilenameObjects(uctx, h_type, filename1, filename2);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[141] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 141);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 int trace_ctx_Err_Occurred(HPyContext *tctx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[142]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 142);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyErr_Occurred(tctx_info->uctx);
+    int res = HPyErr_Occurred(uctx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[142] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 142);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Err_ExceptionMatches(HPyContext *tctx, HPy exc)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[143]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 143);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyErr_ExceptionMatches(tctx_info->uctx, exc);
+    int res = HPyErr_ExceptionMatches(uctx, exc);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[143] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 143);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Err_NoMemory(HPyContext *tctx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[144]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 144);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyErr_NoMemory(tctx_info->uctx);
+    HPyErr_NoMemory(uctx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[144] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 144);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 void trace_ctx_Err_Clear(HPyContext *tctx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[145]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 145);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyErr_Clear(tctx_info->uctx);
+    HPyErr_Clear(uctx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[145] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 145);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_Err_NewException(HPyContext *tctx, const char *name, HPy base, HPy dict)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[146]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 146);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyErr_NewException(tctx_info->uctx, name, base, dict);
+    HPy res = HPyErr_NewException(uctx, name, base, dict);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[146] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 146);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Err_NewExceptionWithDoc(HPyContext *tctx, const char *name, const char *doc, HPy base, HPy dict)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[147]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 147);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyErr_NewExceptionWithDoc(tctx_info->uctx, name, doc, base, dict);
+    HPy res = HPyErr_NewExceptionWithDoc(uctx, name, doc, base, dict);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[147] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 147);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Err_WarnEx(HPyContext *tctx, HPy category, const char *message, HPy_ssize_t stack_level)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[148]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 148);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyErr_WarnEx(tctx_info->uctx, category, message, stack_level);
+    int res = HPyErr_WarnEx(uctx, category, message, stack_level);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[148] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 148);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Err_WriteUnraisable(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[149]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 149);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyErr_WriteUnraisable(tctx_info->uctx, obj);
+    HPyErr_WriteUnraisable(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[149] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 149);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 int trace_ctx_IsTrue(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[150]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 150);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_IsTrue(tctx_info->uctx, h);
+    int res = HPy_IsTrue(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[150] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 150);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Type_FromSpec(HPyContext *tctx, HPyType_Spec *spec, HPyType_SpecParam *params)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[151]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 151);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyType_FromSpec(tctx_info->uctx, spec, params);
+    HPy res = HPyType_FromSpec(uctx, spec, params);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[151] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 151);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[152]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 152);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyType_GenericNew(tctx_info->uctx, type, args, nargs, kw);
+    HPy res = HPyType_GenericNew(uctx, type, args, nargs, kw);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[152] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 152);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_GetAttr(HPyContext *tctx, HPy obj, HPy name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[153]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 153);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_GetAttr(tctx_info->uctx, obj, name);
+    HPy res = HPy_GetAttr(uctx, obj, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[153] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 153);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_GetAttr_s(HPyContext *tctx, HPy obj, const char *name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[154]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 154);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_GetAttr_s(tctx_info->uctx, obj, name);
+    HPy res = HPy_GetAttr_s(uctx, obj, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[154] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 154);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_HasAttr(HPyContext *tctx, HPy obj, HPy name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[155]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 155);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_HasAttr(tctx_info->uctx, obj, name);
+    int res = HPy_HasAttr(uctx, obj, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[155] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 155);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_HasAttr_s(HPyContext *tctx, HPy obj, const char *name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[156]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 156);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_HasAttr_s(tctx_info->uctx, obj, name);
+    int res = HPy_HasAttr_s(uctx, obj, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[156] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 156);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_SetAttr(HPyContext *tctx, HPy obj, HPy name, HPy value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[157]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 157);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_SetAttr(tctx_info->uctx, obj, name, value);
+    int res = HPy_SetAttr(uctx, obj, name, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[157] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 157);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_SetAttr_s(HPyContext *tctx, HPy obj, const char *name, HPy value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[158]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 158);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_SetAttr_s(tctx_info->uctx, obj, name, value);
+    int res = HPy_SetAttr_s(uctx, obj, name, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[158] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 158);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_GetItem(HPyContext *tctx, HPy obj, HPy key)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[159]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 159);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_GetItem(tctx_info->uctx, obj, key);
+    HPy res = HPy_GetItem(uctx, obj, key);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[159] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 159);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_GetItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[160]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 160);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_GetItem_i(tctx_info->uctx, obj, idx);
+    HPy res = HPy_GetItem_i(uctx, obj, idx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[160] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 160);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_GetItem_s(HPyContext *tctx, HPy obj, const char *key)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[161]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 161);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_GetItem_s(tctx_info->uctx, obj, key);
+    HPy res = HPy_GetItem_s(uctx, obj, key);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[161] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 161);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Contains(HPyContext *tctx, HPy container, HPy key)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[162]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 162);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_Contains(tctx_info->uctx, container, key);
+    int res = HPy_Contains(uctx, container, key);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[162] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 162);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_SetItem(HPyContext *tctx, HPy obj, HPy key, HPy value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[163]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 163);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_SetItem(tctx_info->uctx, obj, key, value);
+    int res = HPy_SetItem(uctx, obj, key, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[163] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 163);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_SetItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx, HPy value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[164]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 164);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_SetItem_i(tctx_info->uctx, obj, idx, value);
+    int res = HPy_SetItem_i(uctx, obj, idx, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[164] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 164);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_SetItem_s(HPyContext *tctx, HPy obj, const char *key, HPy value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[165]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 165);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_SetItem_s(tctx_info->uctx, obj, key, value);
+    int res = HPy_SetItem_s(uctx, obj, key, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[165] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 165);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_DelItem(HPyContext *tctx, HPy obj, HPy key)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[236]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 236);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_DelItem(tctx_info->uctx, obj, key);
+    int res = HPy_DelItem(uctx, obj, key);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[236] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 236);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_DelItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[237]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 237);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_DelItem_i(tctx_info->uctx, obj, idx);
+    int res = HPy_DelItem_i(uctx, obj, idx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[237] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 237);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_DelItem_s(HPyContext *tctx, HPy obj, const char *key)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[238]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 238);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_DelItem_s(tctx_info->uctx, obj, key);
+    int res = HPy_DelItem_s(uctx, obj, key);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[238] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 238);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Type(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[166]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 166);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Type(tctx_info->uctx, obj);
+    HPy res = HPy_Type(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[166] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 166);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_TypeCheck(HPyContext *tctx, HPy obj, HPy type)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[167]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 167);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_TypeCheck(tctx_info->uctx, obj, type);
+    int res = HPy_TypeCheck(uctx, obj, type);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[167] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 167);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Is(HPyContext *tctx, HPy obj, HPy other)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[168]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 168);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_Is(tctx_info->uctx, obj, other);
+    int res = HPy_Is(uctx, obj, other);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[168] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 168);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Object(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[169]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 169);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Object(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Object(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[169] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 169);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Legacy(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[170]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 170);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Legacy(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Legacy(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[170] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 170);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Type(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[229]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 229);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Type(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Type(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[229] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 229);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Long(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[230]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 230);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Long(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Long(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[230] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 230);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Float(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[231]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 231);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Float(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Float(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[231] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 231);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Unicode(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[232]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 232);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Unicode(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Unicode(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[232] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 232);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_Tuple(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[233]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 233);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_Tuple(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_Tuple(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[233] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 233);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_AsStruct_List(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[234]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 234);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = _HPy_AsStruct_List(tctx_info->uctx, h);
+    void * res = _HPy_AsStruct_List(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[234] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 234);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPyType_BuiltinShape trace_ctx_Type_GetBuiltinShape(HPyContext *tctx, HPy h_type)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[235]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 235);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyType_BuiltinShape res = _HPyType_GetBuiltinShape(tctx_info->uctx, h_type);
+    HPyType_BuiltinShape res = _HPyType_GetBuiltinShape(uctx, h_type);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[235] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 235);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_New(HPyContext *tctx, HPy h_type, void **data)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[171]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 171);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = _HPy_New(tctx_info->uctx, h_type, data);
+    HPy res = _HPy_New(uctx, h_type, data);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[171] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 171);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Repr(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[172]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 172);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Repr(tctx_info->uctx, obj);
+    HPy res = HPy_Repr(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[172] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 172);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Str(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[173]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 173);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Str(tctx_info->uctx, obj);
+    HPy res = HPy_Str(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[173] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 173);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_ASCII(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[174]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 174);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_ASCII(tctx_info->uctx, obj);
+    HPy res = HPy_ASCII(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[174] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 174);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Bytes(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[175]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 175);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_Bytes(tctx_info->uctx, obj);
+    HPy res = HPy_Bytes(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[175] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 175);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_RichCompare(HPyContext *tctx, HPy v, HPy w, int op)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[176]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 176);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_RichCompare(tctx_info->uctx, v, w, op);
+    HPy res = HPy_RichCompare(uctx, v, w, op);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[176] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 176);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_RichCompareBool(HPyContext *tctx, HPy v, HPy w, int op)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[177]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 177);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPy_RichCompareBool(tctx_info->uctx, v, w, op);
+    int res = HPy_RichCompareBool(uctx, v, w, op);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[177] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 177);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy_hash_t trace_ctx_Hash(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[178]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 178);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_hash_t res = HPy_Hash(tctx_info->uctx, obj);
+    HPy_hash_t res = HPy_Hash(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[178] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 178);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Bytes_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[179]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 179);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyBytes_Check(tctx_info->uctx, h);
+    int res = HPyBytes_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[179] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 179);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy_ssize_t trace_ctx_Bytes_Size(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[180]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 180);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_ssize_t res = HPyBytes_Size(tctx_info->uctx, h);
+    HPy_ssize_t res = HPyBytes_Size(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[180] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 180);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy_ssize_t trace_ctx_Bytes_GET_SIZE(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[181]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 181);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_ssize_t res = HPyBytes_GET_SIZE(tctx_info->uctx, h);
+    HPy_ssize_t res = HPyBytes_GET_SIZE(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[181] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 181);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 char *trace_ctx_Bytes_AsString(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[182]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 182);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    char * res = HPyBytes_AsString(tctx_info->uctx, h);
+    char * res = HPyBytes_AsString(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[182] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 182);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 char *trace_ctx_Bytes_AS_STRING(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[183]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 183);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    char * res = HPyBytes_AS_STRING(tctx_info->uctx, h);
+    char * res = HPyBytes_AS_STRING(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[183] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 183);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Bytes_FromString(HPyContext *tctx, const char *v)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[184]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 184);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyBytes_FromString(tctx_info->uctx, v);
+    HPy res = HPyBytes_FromString(uctx, v);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[184] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 184);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Bytes_FromStringAndSize(HPyContext *tctx, const char *v, HPy_ssize_t len)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[185]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 185);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyBytes_FromStringAndSize(tctx_info->uctx, v, len);
+    HPy res = HPyBytes_FromStringAndSize(uctx, v, len);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[185] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 185);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_FromString(HPyContext *tctx, const char *utf8)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[186]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 186);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_FromString(tctx_info->uctx, utf8);
+    HPy res = HPyUnicode_FromString(uctx, utf8);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[186] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 186);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Unicode_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[187]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 187);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyUnicode_Check(tctx_info->uctx, h);
+    int res = HPyUnicode_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[187] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 187);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_AsASCIIString(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[188]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 188);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_AsASCIIString(tctx_info->uctx, h);
+    HPy res = HPyUnicode_AsASCIIString(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[188] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 188);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_AsLatin1String(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[189]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 189);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_AsLatin1String(tctx_info->uctx, h);
+    HPy res = HPyUnicode_AsLatin1String(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[189] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 189);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_AsUTF8String(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[190]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 190);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_AsUTF8String(tctx_info->uctx, h);
+    HPy res = HPyUnicode_AsUTF8String(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[190] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 190);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 const char *trace_ctx_Unicode_AsUTF8AndSize(HPyContext *tctx, HPy h, HPy_ssize_t *size)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[191]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 191);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    const char * res = HPyUnicode_AsUTF8AndSize(tctx_info->uctx, h, size);
+    const char * res = HPyUnicode_AsUTF8AndSize(uctx, h, size);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[191] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 191);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_FromWideChar(HPyContext *tctx, const wchar_t *w, HPy_ssize_t size)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[192]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 192);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_FromWideChar(tctx_info->uctx, w, size);
+    HPy res = HPyUnicode_FromWideChar(uctx, w, size);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[192] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 192);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_DecodeFSDefault(HPyContext *tctx, const char *v)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[193]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 193);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_DecodeFSDefault(tctx_info->uctx, v);
+    HPy res = HPyUnicode_DecodeFSDefault(uctx, v);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[193] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 193);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *tctx, const char *v, HPy_ssize_t size)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[194]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 194);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_DecodeFSDefaultAndSize(tctx_info->uctx, v, size);
+    HPy res = HPyUnicode_DecodeFSDefaultAndSize(uctx, v, size);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[194] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 194);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_EncodeFSDefault(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[195]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 195);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_EncodeFSDefault(tctx_info->uctx, h);
+    HPy res = HPyUnicode_EncodeFSDefault(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[195] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 195);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy_UCS4 trace_ctx_Unicode_ReadChar(HPyContext *tctx, HPy h, HPy_ssize_t index)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[196]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 196);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_UCS4 res = HPyUnicode_ReadChar(tctx_info->uctx, h, index);
+    HPy_UCS4 res = HPyUnicode_ReadChar(uctx, h, index);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[196] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 196);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_DecodeASCII(HPyContext *tctx, const char *s, HPy_ssize_t size, const char *errors)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[197]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 197);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_DecodeASCII(tctx_info->uctx, s, size, errors);
+    HPy res = HPyUnicode_DecodeASCII(uctx, s, size, errors);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[197] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 197);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Unicode_DecodeLatin1(HPyContext *tctx, const char *s, HPy_ssize_t size, const char *errors)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[198]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 198);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyUnicode_DecodeLatin1(tctx_info->uctx, s, size, errors);
+    HPy res = HPyUnicode_DecodeLatin1(uctx, s, size, errors);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[198] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 198);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_List_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[199]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 199);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyList_Check(tctx_info->uctx, h);
+    int res = HPyList_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[199] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 199);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_List_New(HPyContext *tctx, HPy_ssize_t len)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[200]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 200);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyList_New(tctx_info->uctx, len);
+    HPy res = HPyList_New(uctx, len);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[200] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 200);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_List_Append(HPyContext *tctx, HPy h_list, HPy h_item)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[201]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 201);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyList_Append(tctx_info->uctx, h_list, h_item);
+    int res = HPyList_Append(uctx, h_list, h_item);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[201] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 201);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Dict_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[202]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 202);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyDict_Check(tctx_info->uctx, h);
+    int res = HPyDict_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[202] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 202);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Dict_New(HPyContext *tctx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[203]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 203);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyDict_New(tctx_info->uctx);
+    HPy res = HPyDict_New(uctx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[203] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 203);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Tuple_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[204]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 204);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyTuple_Check(tctx_info->uctx, h);
+    int res = HPyTuple_Check(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[204] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 204);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, HPy items[], HPy_ssize_t n)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[205]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 205);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyTuple_FromArray(tctx_info->uctx, items, n);
+    HPy res = HPyTuple_FromArray(uctx, items, n);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[205] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 205);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Import_ImportModule(HPyContext *tctx, const char *name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[206]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 206);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyImport_ImportModule(tctx_info->uctx, name);
+    HPy res = HPyImport_ImportModule(uctx, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[206] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 206);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_Capsule_New(HPyContext *tctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[245]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 245);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyCapsule_New(tctx_info->uctx, pointer, name, destructor);
+    HPy res = HPyCapsule_New(uctx, pointer, name, destructor);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[245] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 245);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void *trace_ctx_Capsule_Get(HPyContext *tctx, HPy capsule, _HPyCapsule_key key, const char *name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[246]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 246);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    void * res = HPyCapsule_Get(tctx_info->uctx, capsule, key, name);
+    void * res = HPyCapsule_Get(uctx, capsule, key, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[246] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 246);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Capsule_IsValid(HPyContext *tctx, HPy capsule, const char *name)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[247]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 247);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyCapsule_IsValid(tctx_info->uctx, capsule, name);
+    int res = HPyCapsule_IsValid(uctx, capsule, name);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[247] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 247);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Capsule_Set(HPyContext *tctx, HPy capsule, _HPyCapsule_key key, void *value)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[248]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 248);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyCapsule_Set(tctx_info->uctx, capsule, key, value);
+    int res = HPyCapsule_Set(uctx, capsule, key, value);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[248] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 248);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPy trace_ctx_FromPyObject(HPyContext *tctx, cpy_PyObject *obj)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[207]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 207);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPy_FromPyObject(tctx_info->uctx, obj);
+    HPy res = HPy_FromPyObject(uctx, obj);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[207] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 207);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 cpy_PyObject *trace_ctx_AsPyObject(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[208]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 208);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    cpy_PyObject * res = HPy_AsPyObject(tctx_info->uctx, h);
+    cpy_PyObject * res = HPy_AsPyObject(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[208] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 208);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 HPyListBuilder trace_ctx_ListBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[210]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 210);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyListBuilder res = HPyListBuilder_New(tctx_info->uctx, initial_size);
+    HPyListBuilder res = HPyListBuilder_New(uctx, initial_size);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[210] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 210);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_ListBuilder_Set(HPyContext *tctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[211]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 211);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyListBuilder_Set(tctx_info->uctx, builder, index, h_item);
+    HPyListBuilder_Set(uctx, builder, index, h_item);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[211] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 211);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_ListBuilder_Build(HPyContext *tctx, HPyListBuilder builder)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[212]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 212);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyListBuilder_Build(tctx_info->uctx, builder);
+    HPy res = HPyListBuilder_Build(uctx, builder);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[212] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 212);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_ListBuilder_Cancel(HPyContext *tctx, HPyListBuilder builder)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[213]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 213);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyListBuilder_Cancel(tctx_info->uctx, builder);
+    HPyListBuilder_Cancel(uctx, builder);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[213] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 213);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[214]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 214);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyTupleBuilder res = HPyTupleBuilder_New(tctx_info->uctx, initial_size);
+    HPyTupleBuilder res = HPyTupleBuilder_New(uctx, initial_size);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[214] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 214);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_TupleBuilder_Set(HPyContext *tctx, HPyTupleBuilder builder, HPy_ssize_t index, HPy h_item)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[215]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 215);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyTupleBuilder_Set(tctx_info->uctx, builder, index, h_item);
+    HPyTupleBuilder_Set(uctx, builder, index, h_item);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[215] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 215);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_TupleBuilder_Build(HPyContext *tctx, HPyTupleBuilder builder)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[216]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 216);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyTupleBuilder_Build(tctx_info->uctx, builder);
+    HPy res = HPyTupleBuilder_Build(uctx, builder);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[216] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 216);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_TupleBuilder_Cancel(HPyContext *tctx, HPyTupleBuilder builder)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[217]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 217);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyTupleBuilder_Cancel(tctx_info->uctx, builder);
+    HPyTupleBuilder_Cancel(uctx, builder);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[217] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 217);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPyTracker trace_ctx_Tracker_New(HPyContext *tctx, HPy_ssize_t size)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[218]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 218);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyTracker res = HPyTracker_New(tctx_info->uctx, size);
+    HPyTracker res = HPyTracker_New(uctx, size);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[218] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 218);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 int trace_ctx_Tracker_Add(HPyContext *tctx, HPyTracker ht, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[219]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 219);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    int res = HPyTracker_Add(tctx_info->uctx, ht, h);
+    int res = HPyTracker_Add(uctx, ht, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[219] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 219);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Tracker_ForgetAll(HPyContext *tctx, HPyTracker ht)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[220]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 220);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyTracker_ForgetAll(tctx_info->uctx, ht);
+    HPyTracker_ForgetAll(uctx, ht);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[220] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 220);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 void trace_ctx_Tracker_Close(HPyContext *tctx, HPyTracker ht)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[221]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 221);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyTracker_Close(tctx_info->uctx, ht);
+    HPyTracker_Close(uctx, ht);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[221] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 221);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 void trace_ctx_Field_Store(HPyContext *tctx, HPy target_object, HPyField *target_field, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[222]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 222);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyField_Store(tctx_info->uctx, target_object, target_field, h);
+    HPyField_Store(uctx, target_object, target_field, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[222] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 222);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_Field_Load(HPyContext *tctx, HPy source_object, HPyField source_field)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[223]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 223);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyField_Load(tctx_info->uctx, source_object, source_field);
+    HPy res = HPyField_Load(uctx, source_object, source_field);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[223] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 223);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_ReenterPythonExecution(HPyContext *tctx, HPyThreadState state)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[224]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 224);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy_ReenterPythonExecution(tctx_info->uctx, state);
+    HPy_ReenterPythonExecution(uctx, state);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[224] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 224);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPyThreadState trace_ctx_LeavePythonExecution(HPyContext *tctx)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[225]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 225);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyThreadState res = HPy_LeavePythonExecution(tctx_info->uctx);
+    HPyThreadState res = HPy_LeavePythonExecution(uctx);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[225] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 225);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Global_Store(HPyContext *tctx, HPyGlobal *global, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[226]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 226);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPyGlobal_Store(tctx_info->uctx, global, h);
+    HPyGlobal_Store(uctx, global, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[226] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 226);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 
 HPy trace_ctx_Global_Load(HPyContext *tctx, HPyGlobal global)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[227]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 227);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    HPy res = HPyGlobal_Load(tctx_info->uctx, global);
+    HPy res = HPyGlobal_Load(uctx, global);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[227] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 227);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
     return res;
 }
 
 void trace_ctx_Dump(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx= tctx_info->uctx;
     struct timespec _ts_start, _ts_end;
     int cr;
+    HPy trace_func_args = HPy_NULL;
     tctx_info->call_counts[228]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        trace_func_args = hpy_trace_create_func_args(uctx, 228);
+        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);
+    }
     cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);
-    _HPy_Dump(tctx_info->uctx, h);
+    _HPy_Dump(uctx, h);
     cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);
     if (cr)
-        HPy_FatalError(tctx_info->uctx, "could not get monotonic clock");
+        HPy_FatalError(uctx, "could not get monotonic clock");
     int64_t duration = diff_ns(_ts_start, _ts_end);
     assert(duration >= 0);
     tctx_info->durations[228] += duration;
+    if(!HPy_IsNull(tctx_info->on_exit_func)) {
+        if( HPy_IsNull(trace_func_args))
+            trace_func_args = hpy_trace_create_func_args(uctx, 228);
+        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);
+    }
+    HPy_Close(uctx, trace_func_args);
 }
 

@@ -275,7 +275,7 @@ int hpy_trace_get_nfunc(void)
 
 const char * hpy_trace_get_func_name(int idx)
 {
-    if (idx >= 0 && idx < 229)
+    if (idx >= 0 && idx < 249)
         return trace_func_table[idx];
     return NULL;
 }

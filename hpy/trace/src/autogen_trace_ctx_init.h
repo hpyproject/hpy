@@ -181,6 +181,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
     info->uctx = uctx;
     info->call_counts = (uint64_t *)calloc(249, sizeof(uint64_t));
     info->durations = (int64_t *)calloc(249, sizeof(int64_t));
+    info->on_enter_func = HPy_NULL;
+    info->on_exit_func = HPy_NULL;
 }
 
 static inline void trace_ctx_free_info(HPyTraceInfo *info)
@@ -188,6 +190,8 @@ static inline void trace_ctx_free_info(HPyTraceInfo *info)
     assert(info->magic_number == HPY_TRACE_MAGIC);
     free(info->call_counts);
     free(info->durations);
+    HPy_Close(info->uctx, info->on_enter_func);
+    HPy_Close(info->uctx, info->on_exit_func);
 }
 
 static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
