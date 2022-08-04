@@ -22,7 +22,8 @@ static HPy durations_impl(HPyContext *uctx, HPy self)
         /* skip empty names; those indices denote a context handle */
         if (!IS_EMPTY(func_name))
         {
-            HPy value = HPyLong_FromLong(uctx, info->durations[i]);
+            HPy value = HPyLong_FromLongLong(uctx,
+                    (long long)info->durations[i]);
             HPyTracker_Add(uctx, ht, value);
             if (HPy_IsNull(value))
                 goto fail;
