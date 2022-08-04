@@ -337,9 +337,9 @@ class ExtensionCompiler:
         module = self.compile_module(
             main_src, ExtensionTemplate, name, extra_sources)
         so_filename = module.so_filename
-        from hpy.universal import MODE_DEBUG, MODE_TRACE
+        from hpy.universal import MODE_UNIVERSAL, MODE_DEBUG, MODE_TRACE
         if self.hpy_abi in ('universal', 'hybrid'):
-            return self.load_universal_module(name, so_filename)
+            return self.load_universal_module(name, so_filename, mode=MODE_UNIVERSAL)
         elif self.hpy_abi in ('debug', 'hybrid+debug'):
             return self.load_universal_module(name, so_filename, mode=MODE_DEBUG)
         elif self.hpy_abi in ('trace', 'hybrid+trace'):
