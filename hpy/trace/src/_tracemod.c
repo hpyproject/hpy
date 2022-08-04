@@ -103,8 +103,10 @@ static HPy set_trace_funcs_impl(HPyContext *uctx, HPy self, HPy *args,
         return HPy_NULL;
     }
 
-    if (check_and_set_func(uctx, h_on_enter, &info->on_enter_func) < 0 ||
-            check_and_set_func(uctx, h_on_exit, &info->on_exit_func) < 0) {
+    int r = check_and_set_func(uctx, h_on_enter, &info->on_enter_func) < 0 ||
+            check_and_set_func(uctx, h_on_exit, &info->on_exit_func) < 0;
+    HPyTracker_Close(uctx, ht);
+    if (r) {
         return HPy_NULL;
     }
     return HPy_Dup(uctx, uctx->h_None);
