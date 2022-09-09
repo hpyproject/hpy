@@ -90,7 +90,7 @@ class TestDistutils:
             proc = subprocess.run(cmd)
             out = None
         if proc.returncode != 0:
-            raise Exception(f"Command {exe} failed")
+            raise Exception(f"Command {cmd} failed")
         return out
 
 
