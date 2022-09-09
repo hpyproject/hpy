@@ -71,5 +71,8 @@ def python_subprocess(request, hpy_abi):
 @pytest.fixture()
 def hpy_debug_capture(request, hpy_abi):
     assert hpy_abi == 'debug'
+    if sys.implementation.name != "cpython":
+        pytest.skip("'on_invalid_handle' hook usable on cpython only")
+    raise ValueError("don't do this")
     with HPyDebugCapture() as reporter:
         yield reporter
