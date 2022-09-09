@@ -1,4 +1,5 @@
 import pytest
+import sys
 from .support import ExtensionCompiler, DefaultExtensionTemplate,\
     PythonSubprocessRunner, HPyDebugCapture
 from hpy.debug.leakdetector import LeakDetector
@@ -52,7 +53,6 @@ def compiler(request, tmpdir, hpy_devel, hpy_abi, ExtensionTemplate):
 
 @pytest.fixture(scope="session")
 def fatal_exit_code(request):
-    import sys
     return {
         "linux": -6,  # SIGABRT
         # See https://bugs.python.org/issue36116#msg336782 -- the
