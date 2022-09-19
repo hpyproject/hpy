@@ -286,8 +286,29 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 #ifdef HPY_UNIVERSAL_ABI
 static PyObject *member_object_get(PyObject *self, void *closure)
 {
-    intptr_t offset = (intptr_t)closure;
+    HPyMember *member = (HPyMember *)closure;
+    HPy_ssize_t offset = member->offset;
     HPyField *field = (HPyField *)(((char *)self) + offset);
+    if (HPyField_IsNull(*field)) {
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+    PyObject *value = _hf2py(*field);
+    Py_INCREF(value);
+    return value;
+}
+
+static PyObject *member_object_ex_get(PyObject *self, void *closure)
+{
+    HPyMember *member = (HPyMember *)closure;
+    HPy_ssize_t offset = member->offset;
+    HPyField *field = (HPyField *)(((char *)self) + offset);
+    if (HPyField_IsNull(*field)) {
+        PyErr_Format(PyExc_AttributeError,
+                     "'%.50s' object has no attribute '%s'",
+                     Py_TYPE(self)->tp_name, member->name);
+        return NULL;
+    }
     PyObject *value = _hf2py(*field);
     Py_INCREF(value);
     return value;
@@ -295,7 +316,8 @@ static PyObject *member_object_get(PyObject *self, void *closure)
 
 static int member_object_set(PyObject *self, PyObject *value, void *closure)
 {
-    intptr_t offset = (intptr_t)closure;
+    HPyMember *member = (HPyMember *)closure;
+    HPy_ssize_t offset = member->offset;
     HPyField *field = (HPyField *)(((char *)self) + offset);
     PyObject *old_value = _hf2py(*field);
     Py_XINCREF(value);
@@ -334,7 +356,7 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
             // for the universal mode, we need to do load the HPyField that is
             // stored in the object properly. In CPython ABI mode, these can be
             // safely read as PyObject* directly without the overhead of getset.
-            if (src->member.type == HPyMember_OBJECT) {
+            if (src->member.type == HPyMember_OBJECT || src->member.type == HPyMember_OBJECT_EX) {
                 int getsetcnt = 0;
                 while ((*getsets)[getsetcnt].name) {
                     getsetcnt++;
@@ -342,10 +364,17 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
                 *getsets = (PyGetSetDef*)PyMem_Realloc(*getsets, (getsetcnt + 1) * sizeof(PyGetSetDef));
                 PyGetSetDef *dst = &(*getsets)[getsetcnt++];
                 dst->name = src->member.name;
-                dst->get = member_object_get;
-                dst->set = member_object_set;
+                if (src->member.type == HPyMember_OBJECT_EX) {
+                    dst->get = member_object_ex_get;
+                } else {
+                    dst->get = member_object_get;
+                }
+                if (!src->member.readonly) {
+                    dst->set = member_object_set;
+                }
                 dst->doc = src->member.doc;
-                dst->closure = (void *)(src->member.offset + base_member_offset);
+                src->member.offset = src->member.offset + base_member_offset;
+                dst->closure = (void *)&src->member;
                 memset(&(*getsets)[getsetcnt], 0, sizeof(PyGetSetDef));
                 total_count--;
                 continue;
