@@ -569,6 +569,7 @@ class TestType(HPyTest):
                 char CHAR_member;
                 char ISTRING_member[6];
                 char BOOL_member;
+                HPyField OBJECT_member;
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
@@ -586,6 +587,7 @@ class TestType(HPyTest):
                 foo->CHAR_member = 'A';
                 strncpy(foo->ISTRING_member, "Hello", 6);
                 foo->BOOL_member = 0;
+                foo->OBJECT_member = HPyField_NULL;
                 return h_obj;
             }
 
@@ -595,6 +597,7 @@ class TestType(HPyTest):
             HPyDef_MEMBER(Foo_CHAR_member, "CHAR_member", HPyMember_CHAR, offsetof(FooObject, CHAR_member), .readonly=1)
             HPyDef_MEMBER(Foo_ISTRING_member, "ISTRING_member", HPyMember_STRING_INPLACE, offsetof(FooObject, ISTRING_member), .readonly=1)
             HPyDef_MEMBER(Foo_BOOL_member, "BOOL_member", HPyMember_BOOL, offsetof(FooObject, BOOL_member), .readonly=1)
+            HPyDef_MEMBER(Foo_OBJECT_member, "OBJECT_member", HPyMember_OBJECT, offsetof(FooObject, OBJECT_member), .readonly=1)
             HPyDef_MEMBER(Foo_NONE_member, "NONE_member", HPyMember_NONE, offsetof(FooObject, FLOAT_member), .readonly=1)
 
             static HPyDef *Foo_defines[] = {
@@ -605,6 +608,7 @@ class TestType(HPyTest):
                     &Foo_CHAR_member,
                     &Foo_ISTRING_member,
                     &Foo_BOOL_member,
+                    &Foo_OBJECT_member,
                     &Foo_NONE_member,
                     NULL
             };
@@ -654,6 +658,12 @@ class TestType(HPyTest):
             foo.BOOL_member = 1
         with pytest.raises(AttributeError):
             del foo.BOOL_member
+
+        assert foo.OBJECT_member is None
+        with pytest.raises(AttributeError):
+            foo.OBJECT_member = 1
+        with pytest.raises(AttributeError):
+            del foo.OBJECT_member
 
         assert foo.NONE_member is None
         with pytest.raises(AttributeError):
