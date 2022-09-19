@@ -362,6 +362,9 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
                     getsetcnt++;
                 }
                 *getsets = (PyGetSetDef*)PyMem_Realloc(*getsets, (getsetcnt + 1) * sizeof(PyGetSetDef));
+                if (!*getsets) {
+                    return NULL;
+                }
                 PyGetSetDef *dst = &(*getsets)[getsetcnt++];
                 dst->name = src->member.name;
                 if (src->member.type == HPyMember_OBJECT_EX) {
@@ -371,11 +374,13 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
                 }
                 if (!src->member.readonly) {
                     dst->set = member_object_set;
+                } else {
+                    dst->set = NULL;
                 }
                 dst->doc = src->member.doc;
                 src->member.offset = src->member.offset + base_member_offset;
                 dst->closure = (void *)&src->member;
-                memset(&(*getsets)[getsetcnt], 0, sizeof(PyGetSetDef));
+                (*getsets)[getsetcnt] = (PyGetSetDef){NULL};
                 total_count--;
                 continue;
             }
