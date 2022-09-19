@@ -46,7 +46,7 @@ def venv_template(tmpdir_factory):
         script.remove()
     #
     subprocess.run([str(d.python), '-m'
-                    'pip', 'install', '-U', 'pip', 'wheel'], check=True)
+                    'pip', 'install', '-U', 'pip==21.2.4', 'wheel'], check=True)
     subprocess.run([str(d.python), '-m'
                     'pip', 'install', '-e', str(HPY_ROOT)], check=True)
     return d
@@ -90,7 +90,7 @@ class TestDistutils:
             proc = subprocess.run(cmd)
             out = None
         if proc.returncode != 0:
-            raise Exception(f"Command {exe} failed")
+            raise Exception(f"Command {cmd} failed")
         return out
 
 
