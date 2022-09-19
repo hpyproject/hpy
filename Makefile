@@ -53,8 +53,8 @@ valgrind:
 	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/
 
 porting-example-tests:
-	python docs/porting-example/steps/setup.py install
-	pytest docs/porting-example/steps/
+	cd docs/porting-example/steps && python setup.py install
+	python -m pytest docs/porting-example/steps/
 
 docs-examples-tests:
 	cd docs/examples/simple-example && python setup.py --hpy-abi=universal install
