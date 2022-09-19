@@ -1,17 +1,11 @@
 from .support import HPyTest
 
-
-def unsigned_long_bits():
-    """ Return the number of bits in an unsigned long. """
-    import struct
-    unsigned_long_bytes = len(struct.pack('l', 0))
-    return 8 * unsigned_long_bytes
-
-
 class TestLong(HPyTest):
-
-    ULONG_BITS = unsigned_long_bits()
-    LONG_BITS = ULONG_BITS - 1
+    def unsigned_long_bits(self):
+        """ Return the number of bits in an unsigned long. """
+        import struct
+        unsigned_long_bytes = len(struct.pack('l', 0))
+        return 8 * unsigned_long_bytes
 
     def magic_int(self, v):
         """ Return an instance of a class that implements __int__
@@ -39,6 +33,16 @@ class TestLong(HPyTest):
         import sys
         vi = sys.version_info
         return (vi.major > 3 or (vi.major == 3 and vi.minor >= 8))
+
+    def python_supports_magic_int(self):
+        """ Return True if the Python version is 3.9 or earlier and thus
+            should support calling __int__ on non-int based types in some
+            HPyLong_As... methods.
+        """
+        import sys
+        vi = sys.version_info
+        assert vi.major >= 3
+        return (vi.major == 3 and vi.minor <= 9)
 
     def test_Long_FromLong(self):
         mod = self.make_module("""
@@ -70,7 +74,8 @@ class TestLong(HPyTest):
         assert mod.f(45) == 90
         with pytest.raises(TypeError):
             mod.f("this is not a number")
-        assert mod.f(self.magic_int(2)) == 4
+        if self.python_supports_magic_int():
+            assert mod.f(self.magic_int(2)) == 4
         if self.python_supports_magic_index():
             assert mod.f(self.magic_index(2)) == 4
 
@@ -126,10 +131,11 @@ class TestLong(HPyTest):
             @INIT
         """)
         assert mod.f(45) == 45
-        assert mod.f(-1) == 2**self.ULONG_BITS - 1
+        assert mod.f(-1) == 2**self.unsigned_long_bits() - 1
         with pytest.raises(TypeError):
             mod.f("this is not a number")
-        assert mod.f(self.magic_int(2)) == 2
+        if self.python_supports_magic_int():
+            assert mod.f(self.magic_int(2)) == 2
         if self.python_supports_magic_index():
             assert mod.f(self.magic_index(2)) == 2
 
@@ -165,7 +171,8 @@ class TestLong(HPyTest):
         assert mod.f(-2147483648) == -2147483648
         with pytest.raises(TypeError):
             mod.f("this is not a number")
-        assert mod.f(self.magic_int(2)) == 2
+        if self.python_supports_magic_int():
+            assert mod.f(self.magic_int(2)) == 2
         if self.python_supports_magic_index():
             assert mod.f(self.magic_index(2)) == 2
 
@@ -225,7 +232,8 @@ class TestLong(HPyTest):
         assert mod.f(-1) == 2**64 - 1
         with pytest.raises(TypeError):
             mod.f("this is not a number")
-        assert mod.f(self.magic_int(2)) == 2
+        if self.python_supports_magic_int():
+            assert mod.f(self.magic_int(2)) == 2
         if self.python_supports_magic_index():
             assert mod.f(self.magic_index(2)) == 2
 
@@ -302,3 +310,39 @@ class TestLong(HPyTest):
             mod.f(self.magic_int(2))
         with pytest.raises(TypeError):
             mod.f(self.magic_index(2))
+
+    def test_Long_AsVoidPtr(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "is_null", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy val)
+            {
+                void* ptr = HPyLong_AsVoidPtr(ctx, val);
+                if (!ptr) {
+                    return HPy_Dup(ctx, ctx->h_True);
+                } else {
+                    return HPy_Dup(ctx, ctx->h_False);
+                }
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.is_null(0) == True
+        assert mod.is_null(10) == False
+
+    def test_Long_AsDouble(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                double a = HPyLong_AsDouble(ctx, arg);
+                if (a == -1.0 && HPyErr_Occurred(ctx))
+                    return HPy_NULL;
+                return HPyFloat_FromDouble(ctx, a);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(45) == 45.0
+        with pytest.raises(TypeError):
+            mod.f("this is not a number")

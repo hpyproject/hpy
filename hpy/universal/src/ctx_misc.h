@@ -12,6 +12,8 @@ HPyAPI_IMPL void ctx_Field_Store(HPyContext *ctx, HPy target_object,
                                  HPyField *target_field, HPy h);
 HPyAPI_IMPL HPy ctx_Field_Load(HPyContext *ctx, HPy source_object,
                                HPyField source_field);
+HPyAPI_IMPL void ctx_Global_Store(HPyContext *ctx, HPyGlobal *global, HPy h);
+HPyAPI_IMPL HPy ctx_Global_Load(HPyContext *ctx, HPyGlobal global);
 HPyAPI_IMPL void ctx_FatalError(HPyContext *ctx, const char *message);
 
 #endif /* HPY_CTX_MISC_H */

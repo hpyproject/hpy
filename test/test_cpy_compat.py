@@ -38,6 +38,25 @@ class TestCPythonCompatibility(HPyTest):
         if self.supports_refcounts():
             assert x == [1234, +1]
 
+    def test_frompyobject_null(self):
+        mod = self.make_module("""
+            #include <Python.h>
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self)
+            {
+                HPy h = HPy_FromPyObject(ctx, NULL);
+                if (HPy_IsNull(h)) {
+                    return HPy_Dup(ctx, ctx->h_True);
+                }
+                else {
+                    return HPy_Dup(ctx, ctx->h_False);
+                }
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f()
+
     def test_aspyobject(self):
         mod = self.make_module("""
             #include <Python.h>
@@ -53,6 +72,25 @@ class TestCPythonCompatibility(HPyTest):
             @INIT
         """)
         assert mod.f(21) == 42
+
+    def test_aspyobject_null(self):
+        mod = self.make_module("""
+            #include <Python.h>
+            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self)
+            {
+                PyObject *o = HPy_AsPyObject(ctx, HPy_NULL);
+                if (o == NULL) {
+                    return HPy_Dup(ctx, ctx->h_True);
+                }
+                else {
+                    return HPy_Dup(ctx, ctx->h_False);
+                }
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f()
 
     def test_aspyobject_custom_class(self):
         mod = self.make_module("""
@@ -135,6 +173,7 @@ class TestCPythonCompatibility(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 PyObject *o = PyList_New(0);
+                Py_ssize_t final_refcount;
 
                 Py_ssize_t result = -42;
                 HPy handles[NUM_HANDLES];
@@ -147,7 +186,7 @@ class TestCPythonCompatibility(HPyTest):
                         goto error;
                 for (i = 0; i < NUM_HANDLES; i++)
                     HPy_Close(ctx, handles[i]);
-                Py_ssize_t final_refcount = o->ob_refcnt;
+                final_refcount = o->ob_refcnt;
                 result = final_refcount - initial_refcount;
 
              error:

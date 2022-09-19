@@ -1,12 +1,17 @@
 from copy import deepcopy
+import sys
 import attr
 import re
 import py
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
+from distutils.sysconfig import get_config_var
+from .conf import SPECIAL_CASES, RETURN_CONSTANT
 
 PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
+CURRENT_DIR = py.path.local(__file__).dirpath()
+AUTOGEN_H = py.path.local(__file__).dirpath('autogen.h')
 
 
 def toC(node):
@@ -18,6 +23,19 @@ def find_typedecl(node):
         node = node.type
     return node
 
+def get_context_return_type(func_node, const_return):
+    return 'void' if const_return else toC(func_node.type.type)
+
+def make_void(func_node):
+    voidid = c_ast.IdentifierType(names=['void'])
+    func_node.type.type.type = c_ast.TypeDecl(declname='void', quals=[], align=[], type=voidid)
+
+def get_return_constant(func):
+    return RETURN_CONSTANT.get(func.node.name)
+
+def maybe_make_void(func, node):
+    if RETURN_CONSTANT.get(func.node.name):
+        make_void(node)
 
 @attr.s
 class Function:
@@ -25,6 +43,7 @@ class Function:
 
     name = attr.ib()
     cpython_name = attr.ib()
+    ctx_index = attr.ib()
     node = attr.ib(repr=False)
 
     def base_name(self):
@@ -42,6 +61,7 @@ class Function:
 @attr.s
 class GlobalVar:
     name = attr.ib()
+    ctx_index = attr.ib()
     node = attr.ib(repr=False)
 
     def ctx_name(self):
@@ -72,12 +92,36 @@ class HPySlot:
     name = attr.ib()      # "HPy_nb_add"
     value = attr.ib()     # "7"
     hpyfunc = attr.ib()   # "HPyFunc_BINARYFUNC"
+    node = attr.ib(repr=False)
 
 
 class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
     def __init__(self, api, convert_name):
         self.api = api
         self.convert_name = convert_name
+        self.cur_index = -1
+        self.all_indices = []
+
+    def _consume_ctx_index(self):
+        idx = self.cur_index
+        self.all_indices.append(idx)
+        self.cur_index = -1
+        return idx
+
+    def verify_context_indices(self):
+        """
+        Verifies if context indices are without gaps. This function raises an
+        assertion error if not.
+        For example:
+        [0, 1, 2, 3] is valid
+        [0, 1, 3] is invalid
+        """
+        self.all_indices.sort()
+        for i in range(1, len(self.all_indices)):
+            prev = self.all_indices[i-1]
+            cur = self.all_indices[i]
+            assert prev + 1 == cur, \
+                "context indices have gaps: %s -> %s" % (prev, cur)
 
     def _is_function_ptr(self, node):
         return (isinstance(node, c_ast.PtrDecl) and
@@ -96,6 +140,12 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
         elif node.name == 'HPySlot_Slot':
             self._visit_hpyslot_slot(node)
 
+    def visit_Pragma(self, node):
+        parts = node.string.split('=')
+        if len(parts) != 2:
+            raise ValueError('invalid pragma: %s' % node)
+        self.cur_index = int(parts[1])
+
     def _visit_function(self, node):
         name = node.name
         if not name.startswith('HPy') and not name.startswith('_HPy'):
@@ -106,7 +156,10 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
                 raise ValueError("non-named argument in declaration of %s" %
                                  name)
         cpy_name = self.convert_name(name)
-        func = Function(name, cpy_name, node)
+        idx = self._consume_ctx_index()
+        if idx == -1:
+            raise ValueError('missing context index for %s' % name)
+        func = Function(name, cpy_name, idx, node)
         self.api.functions.append(func)
 
     def _visit_global_var(self, node):
@@ -115,7 +168,10 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
             print('WARNING: Ignoring non-hpy variable declaration: %s' % name)
             return
         assert toC(node.type.type) == "HPy"
-        var = GlobalVar(name, node)
+        idx = self._consume_ctx_index()
+        if idx == -1:
+            raise ValueError('missing context index for %s' % name)
+        var = GlobalVar(name, idx, node)
         self.api.variables.append(var)
 
     def _visit_hpyfunc_typedef(self, node):
@@ -132,101 +188,7 @@ class HPyAPIVisitor(pycparser.c_ast.NodeVisitor):
             assert isinstance(id_hpyfunc, c_ast.ID)
             value = const_value.value
             hpyfunc = id_hpyfunc.name
-            self.api.hpyslots.append(HPySlot(e.name, value, hpyfunc))
-
-
-SPECIAL_CASES = {
-    'HPy_Dup': None,
-    'HPy_Close': None,
-    'HPyField_Load': None,
-    'HPyField_Store': None,
-    'HPyModule_Create': None,
-    'HPy_GetAttr': 'PyObject_GetAttr',
-    'HPy_GetAttr_s': 'PyObject_GetAttrString',
-    'HPy_HasAttr': 'PyObject_HasAttr',
-    'HPy_HasAttr_s': 'PyObject_HasAttrString',
-    'HPy_SetAttr': 'PyObject_SetAttr',
-    'HPy_SetAttr_s': 'PyObject_SetAttrString',
-    'HPy_GetItem': 'PyObject_GetItem',
-    'HPy_GetItem_i': None,
-    'HPy_GetItem_s': None,
-    'HPy_SetItem': 'PyObject_SetItem',
-    'HPy_SetItem_i': None,
-    'HPy_SetItem_s': None,
-    'HPy_Length': 'PyObject_Length',
-    'HPy_CallTupleDict': None,
-    'HPy_FromPyObject': None,
-    'HPy_AsPyObject': None,
-    'HPy_AsStruct': None,
-    'HPy_AsStructLegacy': None,
-    '_HPy_CallRealFunctionFromTrampoline': None,
-    '_HPy_CallDestroyAndThenDealloc': None,
-    'HPyErr_Occurred': None,
-    'HPy_FatalError': None,
-    'HPy_Add': 'PyNumber_Add',
-    'HPy_Subtract': 'PyNumber_Subtract',
-    'HPy_Multiply': 'PyNumber_Multiply',
-    'HPy_MatrixMultiply': 'PyNumber_MatrixMultiply',
-    'HPy_FloorDivide': 'PyNumber_FloorDivide',
-    'HPy_TrueDivide': 'PyNumber_TrueDivide',
-    'HPy_Remainder': 'PyNumber_Remainder',
-    'HPy_Divmod': 'PyNumber_Divmod',
-    'HPy_Power': 'PyNumber_Power',
-    'HPy_Negative': 'PyNumber_Negative',
-    'HPy_Positive': 'PyNumber_Positive',
-    'HPy_Absolute': 'PyNumber_Absolute',
-    'HPy_Invert': 'PyNumber_Invert',
-    'HPy_Lshift': 'PyNumber_Lshift',
-    'HPy_Rshift': 'PyNumber_Rshift',
-    'HPy_And': 'PyNumber_And',
-    'HPy_Xor': 'PyNumber_Xor',
-    'HPy_Or': 'PyNumber_Or',
-    'HPy_Index': 'PyNumber_Index',
-    'HPy_Long': 'PyNumber_Long',
-    'HPy_Float': 'PyNumber_Float',
-    'HPy_InPlaceAdd': 'PyNumber_InPlaceAdd',
-    'HPy_InPlaceSubtract': 'PyNumber_InPlaceSubtract',
-    'HPy_InPlaceMultiply': 'PyNumber_InPlaceMultiply',
-    'HPy_InPlaceMatrixMultiply': 'PyNumber_InPlaceMatrixMultiply',
-    'HPy_InPlaceFloorDivide': 'PyNumber_InPlaceFloorDivide',
-    'HPy_InPlaceTrueDivide': 'PyNumber_InPlaceTrueDivide',
-    'HPy_InPlaceRemainder': 'PyNumber_InPlaceRemainder',
-    'HPy_InPlacePower': 'PyNumber_InPlacePower',
-    'HPy_InPlaceLshift': 'PyNumber_InPlaceLshift',
-    'HPy_InPlaceRshift': 'PyNumber_InPlaceRshift',
-    'HPy_InPlaceAnd': 'PyNumber_InPlaceAnd',
-    'HPy_InPlaceXor': 'PyNumber_InPlaceXor',
-    'HPy_InPlaceOr': 'PyNumber_InPlaceOr',
-    '_HPy_New': None,
-    'HPyType_FromSpec': None,
-    'HPyType_GenericNew': None,
-    'HPy_Repr': 'PyObject_Repr',
-    'HPy_Str': 'PyObject_Str',
-    'HPy_ASCII': 'PyObject_ASCII',
-    'HPy_Bytes': 'PyObject_Bytes',
-    'HPy_IsTrue': 'PyObject_IsTrue',
-    'HPy_RichCompare': 'PyObject_RichCompare',
-    'HPy_RichCompareBool': 'PyObject_RichCompareBool',
-    'HPy_Hash': 'PyObject_Hash',
-    'HPyListBuilder_New': None,
-    'HPyListBuilder_Set': None,
-    'HPyListBuilder_Build': None,
-    'HPyListBuilder_Cancel': None,
-    'HPyTuple_FromArray': None,
-    'HPyTupleBuilder_New': None,
-    'HPyTupleBuilder_Set': None,
-    'HPyTupleBuilder_Build': None,
-    'HPyTupleBuilder_Cancel': None,
-    'HPyTracker_New': None,
-    'HPyTracker_Add': None,
-    'HPyTracker_ForgetAll': None,
-    'HPyTracker_Close': None,
-    '_HPy_Dump': None,
-    'HPy_Type': 'PyObject_Type',
-    'HPy_TypeCheck': None,
-    'HPy_Is': None,
-    'HPyBytes_FromStringAndSize': None,
-}
+            self.api.hpyslots.append(HPySlot(e.name, value, hpyfunc, e))
 
 
 def convert_name(hpy_name):
@@ -240,8 +202,16 @@ class HPyAPI:
                             re.DOTALL | re.MULTILINE)
 
     def __init__(self, filename):
-        with open(filename, 'r') as f:
-            csource = f.read()
+        cpp_cmd = get_config_var('CC').split(' ')
+        if sys.platform == 'win32':
+            cpp_cmd += ['/E', '/I%s' % CURRENT_DIR]
+        else:
+            cpp_cmd += ['-E', '-I%s' % CURRENT_DIR]
+
+        csource = pycparser.preprocess_file(filename,
+                                  cpp_path=str(cpp_cmd[0]),
+                                  cpp_args=cpp_cmd[1:])
+
         # Remove comments.  NOTE: this assumes that comments are never inside
         # string literals, but there shouldn't be any here.
         def replace_keeping_newlines(m):
@@ -280,3 +250,17 @@ class HPyAPI:
         self.hpyslots = []
         v = HPyAPIVisitor(self, convert_name)
         v.visit(self.ast)
+
+        v.verify_context_indices()
+
+        # Sort lists such that the generated files are deterministic.
+        # List elements are either 'Function', 'GlobalVar', or 'HPyFunc'. All
+        # of them have a 'node' attribute and the nodes have a 'coord' attr
+        # that provides the line and column number. We use that to sort.
+        def node_key(e):
+            coord = e.node.coord
+            return coord.line, coord.column
+        self.functions.sort(key=node_key)
+        self.variables.sort(key=node_key)
+        self.hpyfunc_typedefs.sort(key=node_key)
+        self.hpyslots.sort(key=node_key)

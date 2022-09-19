@@ -38,6 +38,7 @@ typedef enum {
     HPyFunc_SETTER,
     HPyFunc_OBJOBJPROC,
     HPyFunc_TRAVERSEPROC,
+    HPyFunc_DESTRUCTOR,
 
 } HPyFunc_Signature;
 
@@ -97,9 +98,11 @@ typedef int (*HPyFunc_visitproc)(HPyField *, void *);
  */
 #define HPy_VISIT(hpyfield)                                             \
     do {                                                                \
-        int vret = visit(hpyfield, arg);                                \
-        if (vret)                                                       \
-            return vret;                                                \
+        if (!HPyField_IsNull(*hpyfield)) {                              \
+            int vret = visit(hpyfield, arg);                            \
+            if (vret)                                                   \
+                return vret;                                            \
+            }                                                           \
     } while (0)
 
 

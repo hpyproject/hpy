@@ -14,16 +14,13 @@
 #include "hpy_debug.h"
 
 #ifdef PYPY_VERSION
-#  error "Cannot build hpy.univeral on top of PyPy. PyPy comes with its own version of it"
+#  error "Cannot build hpy.universal on top of PyPy. PyPy comes with its own version of it"
+#endif
+#ifdef GRAALVM_PYTHON
+#  error "Cannot build hpy.universal on top of GraalPython. GraalPython comes with its own version of it"
 #endif
 
 typedef HPy (*InitFuncPtr)(HPyContext *ctx);
-
-static PyObject *set_debug(PyObject *self, PyObject *args)
-{
-    // TODO
-    Py_RETURN_NONE;
-}
 
 static const char *prefix = "HPyInit";
 
@@ -101,8 +98,10 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
     if (mylib == NULL) {
         const char *error = dlerror();
         if (error == NULL)
-            error = "unknown dlopen() error";
-        PyErr_Format(PyExc_RuntimeError, "dlopen: %s", error);
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at path "
+                     "'%s'. Error message from dlopen/WinAPI: %s", soname, error);
         goto error;
     }
 
@@ -110,8 +109,12 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
     if (initfn == NULL) {
         const char *error = dlerror();
         if (error == NULL)
-            error = "unknown dlsym() error";
-        PyErr_Format(PyExc_RuntimeError, "dlsym: %s", error);
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at "
+                     "path '%s' while trying to find symbol '%s'. Did you use"
+                     "the HPy_MODINIT macro to register your module? Error "
+                     "message from dlsym/WinAPI: %s", soname, init_name, error);
         goto error;
     }
 
@@ -152,7 +155,6 @@ static PyObject *get_version(PyObject *self, PyObject *ignored)
 }
 
 static PyMethodDef HPyMethods[] = {
-    {"set_debug", (PyCFunction)set_debug, METH_O, "TODO"},
     {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS, "Load a .hpy.so"},
     {"get_version", (PyCFunction)get_version, METH_NOARGS, "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}
@@ -272,7 +274,9 @@ static void init_universal_ctx(HPyContext *ctx)
     /* Types */
     ctx->h_BaseObjectType = _py2h((PyObject *)&PyBaseObject_Type);
     ctx->h_TypeType = _py2h((PyObject *)&PyType_Type);
+    ctx->h_BoolType = _py2h((PyObject *)&PyBool_Type);
     ctx->h_LongType = _py2h((PyObject *)&PyLong_Type);
+    ctx->h_FloatType  = _py2h((PyObject *)&PyFloat_Type);
     ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
     ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
     ctx->h_ListType = _py2h((PyObject *)&PyList_Type);

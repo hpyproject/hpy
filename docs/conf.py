@@ -24,7 +24,7 @@ copyright = "2019-2020, HPy Collective"
 author = "HPy Collective"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1"
+release = "0.0.4"
 
 
 # -- General configuration ---------------------------------------------------
@@ -39,6 +39,8 @@ extensions = [
     "sphinx_rtd_theme",
 ]
 
+autosectionlabel_prefix_document = True
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
@@ -52,6 +54,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 c_autodoc_roots = [
     "../hpy/devel/include",
     "../hpy/devel/src",
+    "../hpy/tools",
 ]
 
 
@@ -59,7 +62,7 @@ def pre_process(app, filename, contents, *args):
     # remove HPyAPI_HELPER so that the sphinx-c-autodoc and clang
     # find and render the API functions
     contents[:] = [
-        re.sub(r"^HPyAPI_HELPER ", r"", part, flags=re.MULTILINE)
+        re.sub(r"^(HPyAPI_HELPER|HPy_ID\(\d+\))", r"", part, flags=re.MULTILINE)
         for part in contents
     ]
 

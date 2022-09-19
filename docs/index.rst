@@ -20,7 +20,7 @@ internal details which makes it hard:
 
 There are several advantages to write your C extension in HPy:
 
-  - it runs much faster on PyPy, and at native speed on CPython
+  - it runs much faster on PyPy, GraalPython, and at native speed on CPython
 
   - it is possible to compile a single binary which runs unmodified on all
     supported Python implementations and versions
@@ -38,11 +38,12 @@ There are several advantages to write your C extension in HPy:
    :maxdepth: 2
 
    overview
+   api
    porting-guide
-   API <api>
    debug-mode
    api-reference/index
    misc/index
+   changelog
 
 
 Indices and tables

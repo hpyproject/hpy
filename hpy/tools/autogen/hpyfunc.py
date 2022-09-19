@@ -83,7 +83,7 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
             w(f'    {{ \\')
             w(f'        _HPyFunc_args_{NAME} a = {{ {arg_names} }}; \\')
             w(f'        _HPy_CallRealFunctionFromTrampoline( \\')
-            w(f'           _ctx_for_trampolines, HPyFunc_{NAME}, IMPL, &a); \\')
+            w(f'           _ctx_for_trampolines, HPyFunc_{NAME}, (HPyCFunction)IMPL, &a); \\')
             if toC(tramp_node.type) == 'void':
                 w(f'        return; \\')
             else:
@@ -159,19 +159,29 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
             else:
                 result = ''
             args = ['_HPyGetContext()']
+            func_ptr_ret_type = toC(hpyfunc.return_type())
+            func_ptr_sig = ['HPyContext *']
             for i, param in enumerate(hpyfunc.params()[1:]):
                 pname = param.name
                 if pname is None:
                     pname = 'arg%d' % i
+                func_ptr_sig.append(toC(param.type))
                 if toC(param.type) == 'HPy':
                     args.append(f'_py2h({pname})')
                 else:
                     args.append(f'{pname}')
             args = ', '.join(args)
+            func_ptr_sig = ', '.join(func_ptr_sig)
             #
+            w(f'typedef {func_ptr_ret_type} (*_HPyCFunction_{NAME})({func_ptr_sig});')
             w(f'#define _HPyFunc_TRAMPOLINE_HPyFunc_{NAME}(SYM, IMPL) \\')
             w(f'    static {toC(tramp_node)} \\')
             w(f'    {{ \\')
-            w(f'        return {result}(IMPL({args})); \\')
+            w(f'        _HPyCFunction_{NAME} func = (_HPyCFunction_{NAME})IMPL; \\')
+            if toC(tramp_node.type) == 'void':
+                w(f'        func({args}); \\')
+                w(f'        return; \\')
+            else:
+                w(f'        return {result}(func({args})); \\')
             w(f'    }}')
         return '\n'.join(lines)

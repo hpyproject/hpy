@@ -80,6 +80,16 @@ HPyAPI_IMPL HPy_ssize_t ctx_Long_AsSsize_t(HPyContext *ctx, HPy h)
     return PyLong_AsSsize_t(_h2py(h));
 }
 
+HPyAPI_IMPL void *ctx_Long_AsVoidPtr(HPyContext *ctx, HPy h)
+{
+    return PyLong_AsVoidPtr(_h2py(h));
+}
+
+HPyAPI_IMPL double ctx_Long_AsDouble(HPyContext *ctx, HPy h)
+{
+    return PyLong_AsDouble(_h2py(h));
+}
+
 HPyAPI_IMPL HPy ctx_Float_FromDouble(HPyContext *ctx, double v)
 {
     return _py2h(PyFloat_FromDouble(v));
@@ -290,14 +300,24 @@ HPyAPI_IMPL void ctx_Err_SetObject(HPyContext *ctx, HPy h_type, HPy h_value)
     PyErr_SetObject(_h2py(h_type), _h2py(h_value));
 }
 
-HPyAPI_IMPL HPy ctx_Err_SetFromErrno(HPyContext *ctx, HPy h_type)
+HPyAPI_IMPL HPy ctx_Err_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded)
 {
-    return _py2h(PyErr_SetFromErrno(_h2py(h_type)));
+    return _py2h(PyErr_SetFromErrnoWithFilename(_h2py(h_type), filename_fsencoded));
 }
 
-HPyAPI_IMPL HPy ctx_Err_NoMemory(HPyContext *ctx)
+HPyAPI_IMPL void ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2)
 {
-    return _py2h(PyErr_NoMemory());
+    PyErr_SetFromErrnoWithFilenameObjects(_h2py(h_type), _h2py(filename1), _h2py(filename2));
+}
+
+HPyAPI_IMPL int ctx_Err_ExceptionMatches(HPyContext *ctx, HPy exc)
+{
+    return PyErr_ExceptionMatches(_h2py(exc));
+}
+
+HPyAPI_IMPL void ctx_Err_NoMemory(HPyContext *ctx)
+{
+    PyErr_NoMemory();
 }
 
 HPyAPI_IMPL void ctx_Err_Clear(HPyContext *ctx)
@@ -313,6 +333,16 @@ HPyAPI_IMPL HPy ctx_Err_NewException(HPyContext *ctx, const char *name, HPy base
 HPyAPI_IMPL HPy ctx_Err_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict)
 {
     return _py2h(PyErr_NewExceptionWithDoc(name, doc, _h2py(base), _h2py(dict)));
+}
+
+HPyAPI_IMPL int ctx_Err_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level)
+{
+    return PyErr_WarnEx(_h2py(category), message, stack_level);
+}
+
+HPyAPI_IMPL void ctx_Err_WriteUnraisable(HPyContext *ctx, HPy obj)
+{
+    PyErr_WriteUnraisable(_h2py(obj));
 }
 
 HPyAPI_IMPL int ctx_IsTrue(HPyContext *ctx, HPy h)
@@ -353,6 +383,11 @@ HPyAPI_IMPL int ctx_SetAttr_s(HPyContext *ctx, HPy obj, const char *name, HPy va
 HPyAPI_IMPL HPy ctx_GetItem(HPyContext *ctx, HPy obj, HPy key)
 {
     return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
+}
+
+HPyAPI_IMPL int ctx_Contains(HPyContext *ctx, HPy container, HPy key)
+{
+    return PySequence_Contains(_h2py(container), _h2py(key));
 }
 
 HPyAPI_IMPL int ctx_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value)
@@ -440,6 +475,16 @@ HPyAPI_IMPL int ctx_Unicode_Check(HPyContext *ctx, HPy h)
     return PyUnicode_Check(_h2py(h));
 }
 
+HPyAPI_IMPL HPy ctx_Unicode_AsASCIIString(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyUnicode_AsASCIIString(_h2py(h)));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_AsLatin1String(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyUnicode_AsLatin1String(_h2py(h)));
+}
+
 HPyAPI_IMPL HPy ctx_Unicode_AsUTF8String(HPyContext *ctx, HPy h)
 {
     return _py2h(PyUnicode_AsUTF8String(_h2py(h)));
@@ -458,6 +503,31 @@ HPyAPI_IMPL HPy ctx_Unicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_
 HPyAPI_IMPL HPy ctx_Unicode_DecodeFSDefault(HPyContext *ctx, const char *v)
 {
     return _py2h(PyUnicode_DecodeFSDefault(v));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char *v, HPy_ssize_t size)
+{
+    return _py2h(PyUnicode_DecodeFSDefaultAndSize(v, size));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_EncodeFSDefault(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyUnicode_EncodeFSDefault(_h2py(h)));
+}
+
+HPyAPI_IMPL HPy_UCS4 ctx_Unicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index)
+{
+    return PyUnicode_ReadChar(_h2py(h), index);
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors)
+{
+    return _py2h(PyUnicode_DecodeASCII(s, size, errors));
+}
+
+HPyAPI_IMPL HPy ctx_Unicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors)
+{
+    return _py2h(PyUnicode_DecodeLatin1(s, size, errors));
 }
 
 HPyAPI_IMPL int ctx_List_Check(HPyContext *ctx, HPy h)
@@ -493,5 +563,15 @@ HPyAPI_IMPL int ctx_Tuple_Check(HPyContext *ctx, HPy h)
 HPyAPI_IMPL HPy ctx_Import_ImportModule(HPyContext *ctx, const char *name)
 {
     return _py2h(PyImport_ImportModule(name));
+}
+
+HPyAPI_IMPL void ctx_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state)
+{
+    PyEval_RestoreThread(_h2threads(state));
+}
+
+HPyAPI_IMPL HPyThreadState ctx_LeavePythonExecution(HPyContext *ctx)
+{
+    return _threads2h(PyEval_SaveThread());
 }
 

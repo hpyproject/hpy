@@ -48,7 +48,7 @@ typedef struct {
     {                                                                   \
         _HPyFunc_args_NOARGS a = { self };                              \
         _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_NOARGS, IMPL, &a);            \
+            _ctx_for_trampolines, HPyFunc_NOARGS, (HPyCFunction)IMPL, &a);            \
         return a.result;                                                \
     }
 
@@ -58,7 +58,7 @@ typedef struct {
     {                                                                   \
         _HPyFunc_args_O a = { self, arg };                              \
         _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_O, IMPL, &a);                 \
+            _ctx_for_trampolines, HPyFunc_O, (HPyCFunction)IMPL, &a);                 \
         return a.result;                                                \
     }
 
@@ -69,7 +69,7 @@ typedef struct {
     {                                                                   \
         _HPyFunc_args_VARARGS a = { self, args };                       \
         _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_VARARGS, IMPL, &a);           \
+            _ctx_for_trampolines, HPyFunc_VARARGS, (HPyCFunction)IMPL, &a);           \
         return a.result;                                                \
     }
 
@@ -80,7 +80,7 @@ typedef struct {
     {                                                                   \
         _HPyFunc_args_KEYWORDS a = { self, args, kw };                  \
         _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_KEYWORDS, IMPL, &a);          \
+            _ctx_for_trampolines, HPyFunc_KEYWORDS, (HPyCFunction)IMPL, &a);          \
         return a.result;                                                \
     }
 
@@ -90,7 +90,7 @@ typedef struct {
     {                                                                   \
         _HPyFunc_args_INITPROC a = { self, args, kw };                  \
         _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_INITPROC, IMPL, &a);          \
+            _ctx_for_trampolines, HPyFunc_INITPROC, (HPyCFunction)IMPL, &a);          \
         return a.result;                                                \
     }
 
@@ -107,9 +107,9 @@ typedef struct {
     static cpy_PyObject *                                               \
     SYM(cpy_PyObject *self, cpy_PyObject *obj, int op)                  \
     {                                                                   \
-        _HPyFunc_args_RICHCMPFUNC a = { self, obj, op };                \
+        _HPyFunc_args_RICHCMPFUNC a = { self, obj, (HPy_RichCmpOp)op };                \
         _HPy_CallRealFunctionFromTrampoline(                            \
-           _ctx_for_trampolines, HPyFunc_RICHCMPFUNC, IMPL, &a);        \
+           _ctx_for_trampolines, HPyFunc_RICHCMPFUNC, (HPyCFunction)IMPL, &a);        \
         return a.result;                                                \
     }
 
@@ -125,7 +125,7 @@ typedef struct {
     { \
         _HPyFunc_args_GETBUFFERPROC a = {self, view, flags}; \
         _HPy_CallRealFunctionFromTrampoline( \
-           _ctx_for_trampolines, HPyFunc_GETBUFFERPROC, IMPL, &a); \
+           _ctx_for_trampolines, HPyFunc_GETBUFFERPROC, (HPyCFunction)IMPL, &a); \
         return a.result; \
     }
 
@@ -139,7 +139,7 @@ typedef struct {
     { \
         _HPyFunc_args_RELEASEBUFFERPROC a = {self, view}; \
         _HPy_CallRealFunctionFromTrampoline( \
-           _ctx_for_trampolines, HPyFunc_RELEASEBUFFERPROC, IMPL, &a); \
+           _ctx_for_trampolines, HPyFunc_RELEASEBUFFERPROC, (HPyCFunction)IMPL, &a); \
         return; \
     }
 
@@ -156,7 +156,7 @@ typedef struct {
     { \
         _HPyFunc_args_TRAVERSEPROC a = { self, visit, arg }; \
         _HPy_CallRealFunctionFromTrampoline( \
-           _ctx_for_trampolines, HPyFunc_TRAVERSEPROC, IMPL, &a); \
+           _ctx_for_trampolines, HPyFunc_TRAVERSEPROC, (HPyCFunction)IMPL, &a); \
         return a.result; \
     }
 

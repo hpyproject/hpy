@@ -9,7 +9,22 @@
 #  include "handles.h"
 #endif
 
+/* HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE is set automatically on HPy types created
+   with HPyType_FromSpec. This is used internally within HPy to distinguish
+   HPy types.
+
+   Note on the choice of bit: CPython uses bit 0 and all bits from 4 up in
+   ver. 3.11a. Using a random currently unused bit in type flags is a temporary
+   solution. Going forward, HPy may ask CPython to reserve one bit for HPy or
+   find another more reliable solution.
+*/
+#define HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE (1UL << 2)
+
+#define HPy_TYPE_MAGIC 0xba5f
+
+
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
+static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec);
 
 
 /* This is a hack: we need some extra space to store random data on the
@@ -17,32 +32,47 @@ static bool has_tp_traverse(HPyType_Spec *hpyspec);
    of type HPyType_Extra_t, which we never free for now.  We can access
    it because tp->tp_name points to the "name" field at the end... */
 typedef struct {
+    uint16_t magic;
     HPyFunc_traverseproc tp_traverse_impl;
     HPyFunc_destroyfunc tp_destroy_impl;
+    bool is_pure;
     char name[];
 } HPyType_Extra_t;
 
-static inline HPyType_Extra_t *_HPyType_EXTRA(PyTypeObject *tp) {
-    assert(tp->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE);
-    return (HPyType_Extra_t *)(tp->tp_name - offsetof(HPyType_Extra_t, name));
+static inline bool _is_HPyType(PyTypeObject *tp) {
+    return tp->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
 }
 
-static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name)
+static inline HPyType_Extra_t *_HPyType_EXTRA(PyTypeObject *tp) {
+    assert(_is_HPyType(tp));
+    HPyType_Extra_t *result = (HPyType_Extra_t *)(tp->tp_name - offsetof(HPyType_Extra_t, name));
+    assert(result->magic == HPy_TYPE_MAGIC);
+    return result;
+}
+
+static inline bool _is_pure_HPyType(PyTypeObject *tp) {
+    return _is_HPyType(tp) && _HPyType_EXTRA(tp)->is_pure;
+}
+
+static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name, bool is_pure)
 {
-    size_t size = offsetof(HPyType_Extra_t, name) + strlen(name) + 1;
-    HPyType_Extra_t *result = PyMem_Calloc(1, size);
+    size_t name_size = strlen(name) + 1;
+    size_t size = offsetof(HPyType_Extra_t, name) + name_size;
+    HPyType_Extra_t *result = (HPyType_Extra_t*)PyMem_Calloc(1, size);
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    strcpy(result->name, name);
+    memcpy(result->name, name, name_size);
+    result->is_pure = is_pure;
+    result->magic = HPy_TYPE_MAGIC;
     /* XXX the returned struct is never freed */
     return result;
 }
 
 static void *_pyobj_as_struct(PyObject *obj)
 {
-    if (Py_TYPE(obj)->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
+    if (_is_pure_HPyType(Py_TYPE(obj))) {
         return _HPy_PyObject_Payload(obj);
     }
     else {
@@ -64,7 +94,7 @@ static void hpytype_clear(PyObject *self)
     PyTypeObject *tp = Py_TYPE(self);
     PyTypeObject *base = tp;
     while(base) {
-        if (base->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE) {
+        if (_is_HPyType(base)) {
             HPyType_Extra_t *extra = _HPyType_EXTRA(base);
             assert(extra != NULL);
             if (extra->tp_traverse_impl != NULL) {
@@ -79,14 +109,24 @@ static void hpytype_clear(PyObject *self)
    types created by HPyType_FromSpec */
 static void hpytype_dealloc(PyObject *self)
 {
+    PyTypeObject *tp = Py_TYPE(self);
+    // Call finalizer if it exists
+    if (tp->tp_finalize) {
+        // Exit early if resurrected
+        if (PyObject_CallFinalizerFromDealloc(self) < 0) {
+            return;
+        }
+    }
+    if (PyType_IS_GC(tp))
+        PyObject_GC_UnTrack(self);
+
     // decref and clear all the HPyFields
     hpytype_clear(self);
 
     // call tp_destroy on all the HPy types of the hierarchy
-    PyTypeObject *tp = Py_TYPE(self);
     PyTypeObject *base = tp;
     while(base) {
-        if (base->tp_flags & HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE) {
+        if (_is_HPyType(base)) {
             HPyType_Extra_t *extra = _HPyType_EXTRA(base);
             assert(extra != NULL);
             if (extra->tp_destroy_impl != NULL) {
@@ -208,7 +248,7 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
     HPy_ssize_t total_count = hpymeth_count + legacy_count;
 
     // allocate&fill the result
-    PyMethodDef *result = PyMem_Calloc(total_count+1, sizeof(PyMethodDef));
+    PyMethodDef *result = (PyMethodDef*)PyMem_Calloc(total_count+1, sizeof(PyMethodDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -255,7 +295,7 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
     HPy_ssize_t total_count = hpymember_count + legacy_count;
 
     // allocate&fill the result
-    PyMemberDef *result = PyMem_Calloc(total_count+1, sizeof(PyMemberDef));
+    PyMemberDef *result = (PyMemberDef*)PyMem_Calloc(total_count+1, sizeof(PyMemberDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -268,12 +308,10 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
             if (src->kind != HPyDef_Kind_Member)
                 continue;
             PyMemberDef *dst = &result[dst_idx++];
-            /* for Python <= 3.6 compatibility, we need to remove the 'const'
-               qualifier from src->member.{name,doc} */
-            dst->name = (char *)src->member.name;
+            dst->name = src->member.name;
             dst->type = src->member.type;
             dst->offset = src->member.offset + base_member_offset;
-            dst->doc = (char *)src->member.doc;
+            dst->doc = src->member.doc;
             if (src->member.readonly)
                 dst->flags = READONLY;
             else
@@ -302,7 +340,7 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
     HPy_ssize_t total_count = hpygetset_count + legacy_count;
 
     // allocate&fill the result
-    PyGetSetDef *result = PyMem_Calloc(total_count+1, sizeof(PyGetSetDef));
+    PyGetSetDef *result = (PyGetSetDef*)PyMem_Calloc(total_count+1, sizeof(PyGetSetDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -315,12 +353,10 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
             if (src->kind != HPyDef_Kind_GetSet)
                 continue;
             PyGetSetDef *dst = &result[dst_idx++];
-            /* for Python <= 3.6 compatibility, we need to remove the 'const'
-               qualifier from src->getset.{name,doc} */
-            dst->name = (char *)src->getset.name;
+            dst->name = src->getset.name;
             dst->get = src->getset.getter_cpy_trampoline;
             dst->set = src->getset.setter_cpy_trampoline;
-            dst->doc = (char *)src->getset.doc;
+            dst->doc = src->getset.doc;
             dst->closure = src->getset.closure;
         }
     }
@@ -343,22 +379,24 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     PyMethodDef *legacy_method_defs = NULL;
     PyMemberDef *legacy_member_defs = NULL;
     PyGetSetDef *legacy_getset_defs = NULL;
-    legacy_slots_count(hpyspec->legacy_slots, &legacy_slot_count,
+    legacy_slots_count((PyType_Slot*)hpyspec->legacy_slots, &legacy_slot_count,
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
+    bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
 
     if (hpyspec->doc != NULL)
         hpyslot_count++;    // Py_tp_doc
     hpyslot_count++;        // Py_tp_methods
     hpyslot_count++;        // Py_tp_members
     hpyslot_count++;        // Py_tp_getset
-    hpyslot_count++;        // Py_tp_dealloc
+    if (needs_dealloc)
+        hpyslot_count++;        // Py_tp_dealloc
     if (has_tp_traverse(hpyspec))
         hpyslot_count++;    // Py_tp_clear
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
-    PyType_Slot *result = PyMem_Calloc(total_slot_count+1, sizeof(PyType_Slot));
+    PyType_Slot *result = (PyType_Slot*)PyMem_Calloc(total_slot_count+1, sizeof(PyType_Slot));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -381,7 +419,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
             }
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
-            dst->pfunc = src->slot.cpy_trampoline;
+            dst->pfunc = (void*)src->slot.cpy_trampoline;
         }
     }
 
@@ -430,12 +468,14 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     }
     result[dst_idx++] = (PyType_Slot){Py_tp_getset, pygetsets};
 
-    // add a dealloc function
-    result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, hpytype_dealloc};
+    // add a dealloc function, if needed
+    if (needs_dealloc) {
+        result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, (void*)hpytype_dealloc};
+    }
 
     // add a tp_clear, if the user provided a tp_traverse
     if (has_tp_traverse(hpyspec)) {
-        result[dst_idx++] = (PyType_Slot){Py_tp_clear, hpytype_clear};
+        result[dst_idx++] = (PyType_Slot){Py_tp_clear, (void*)hpytype_clear};
     }
 
     // add the NULL sentinel at the end
@@ -447,6 +487,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
 
 // XXX: This is a hack to work-around the missing Py_bf_getbuffer and
 // Py_bf_releasebuffer before 3.9. We shouldn't use it on 3.9+.
+typedef int (*HPyGetBufferProc)(struct _object *, struct bufferinfo *, int);
+typedef void (*HPyReleaseBufferProc)(struct _object *, struct bufferinfo *);
 static PyBufferProcs*
 create_buffer_procs(HPyType_Spec *hpyspec)
 {
@@ -459,23 +501,23 @@ create_buffer_procs(HPyType_Spec *hpyspec)
             switch (src->slot.slot) {
                 case HPy_bf_getbuffer:
                     if (buffer_procs == NULL) {
-                        buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        buffer_procs = (PyBufferProcs*)PyMem_Calloc(1, sizeof(PyBufferProcs));
                         if (buffer_procs == NULL) {
                             PyErr_NoMemory();
                             return NULL;
                         }
                     }
-                    buffer_procs->bf_getbuffer = src->slot.cpy_trampoline;
+                    buffer_procs->bf_getbuffer = (HPyGetBufferProc)src->slot.cpy_trampoline;
                     break;
                 case HPy_bf_releasebuffer:
                     if (buffer_procs == NULL) {
-                        buffer_procs = PyMem_Calloc(1, sizeof(PyBufferProcs));
+                        buffer_procs = (PyBufferProcs*)PyMem_Calloc(1, sizeof(PyBufferProcs));
                         if (buffer_procs == NULL) {
                             PyErr_NoMemory();
                             return NULL;
                         }
                     }
-                    buffer_procs->bf_releasebuffer = src->slot.cpy_trampoline;
+                    buffer_procs->bf_releasebuffer = (HPyReleaseBufferProc)src->slot.cpy_trampoline;
                     break;
                 default:
                     break;
@@ -528,11 +570,16 @@ static int check_legacy_consistent(HPyType_Spec *hpyspec)
             "cannot specify .legacy_slots without setting .legacy=true");
         return -1;
     }
-    if (hpyspec->flags & HPy_TPFLAGS_INTERNAL_PURE) {
-        PyErr_SetString(PyExc_TypeError,
-            "HPy_TPFLAGS_INTERNAL_PURE should not be used directly,"
-            " set .legacy=true instead");
-        return -1;
+    if (hpyspec->legacy_slots && needs_hpytype_dealloc(hpyspec)) {
+        PyType_Slot *legacy_slots = (PyType_Slot *)hpyspec->legacy_slots;
+        for (int i = 0; legacy_slots[i].slot != 0; i++) {
+            if (legacy_slots[i].slot == Py_tp_dealloc) {
+                PyErr_SetString(PyExc_TypeError,
+                    "legacy tp_dealloc is incompatible with HPy_tp_traverse"
+                    " or HPy_tp_destroy.");
+                return -1;
+            }
+        }
     }
     return 0;
 }
@@ -543,6 +590,18 @@ static bool has_tp_traverse(HPyType_Spec *hpyspec)
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *def = hpyspec->defines[i];
             if (def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse)
+                return true;
+        }
+    return false;
+}
+
+static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec)
+{
+    if (hpyspec->defines != NULL)
+        for (int i = 0; hpyspec->defines[i] != NULL; i++) {
+            HPyDef *def = hpyspec->defines[i];
+            if (def->kind == HPyDef_Kind_Slot &&
+                    (def->slot.slot == HPy_tp_destroy || def->slot.slot == HPy_tp_traverse))
                 return true;
         }
     return false;
@@ -562,8 +621,8 @@ static int check_have_gc_and_tp_traverse(HPyContext *ctx, HPyType_Spec *hpyspec)
 
 static int check_inheritance_constraints(PyTypeObject *tp)
 {
-    int tp_pure = tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE;
-    int tp_base_pure = tp->tp_base->tp_flags & HPy_TPFLAGS_INTERNAL_PURE;
+    int tp_pure = _is_pure_HPyType(tp);
+    int tp_base_pure = _is_pure_HPyType(tp->tp_base);
     if (tp_pure) {
         // Pure types may inherit from:
         //
@@ -643,7 +702,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
 
-    PyType_Spec *spec = PyMem_Calloc(1, sizeof(PyType_Spec));
+    PyType_Spec *spec = (PyType_Spec*)PyMem_Calloc(1, sizeof(PyType_Spec));
     if (spec == NULL) {
         PyErr_NoMemory();
         return HPy_NULL;
@@ -652,10 +711,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
 
+    bool is_pure;
     if (hpyspec->legacy != 0) {
         basicsize = hpyspec->basicsize;
         base_member_offset = 0;
-        flags &= ~HPy_TPFLAGS_INTERNAL_PURE;
+        is_pure = false;
     }
     else {
         // _HPy_PyObject_HEAD_SIZE ensures that the custom struct is
@@ -671,9 +731,9 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
             basicsize = 0;
             base_member_offset = 0;
         }
-        flags |= HPy_TPFLAGS_INTERNAL_PURE;
+        is_pure = true;
     }
-    HPyType_Extra_t *extra = _HPyType_Extra_Alloc(hpyspec->name);
+    HPyType_Extra_t *extra = _HPyType_Extra_Alloc(hpyspec->name, is_pure);
     if (extra == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
@@ -697,6 +757,16 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     /* note that we do NOT free the memory which was allocated by
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
+#if PY_VERSION_HEX < 0x03080000
+    /*
+    py3.7 compatibility
+    Before 3.8, the tp_finalize slot is only considered if the type has
+    Py_TPFLAGS_HAVE_FINALIZE. That flag is ignored in 3.8+ (see bpo-32388).
+    */
+    if (((PyTypeObject*)result)->tp_finalize != NULL) {
+        ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
+    }
+#endif
     Py_XDECREF(bases);
     PyMem_Free(spec->slots);
     PyMem_Free(spec);
@@ -716,6 +786,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         Py_DECREF(result);
         return HPy_NULL;
     }
+    assert(_is_HPyType((PyTypeObject*) result));
     return _py2h(result);
 }
 
@@ -754,7 +825,7 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
     Py_INCREF(tp);
 #endif
 
-    if (tp->tp_flags & HPy_TPFLAGS_INTERNAL_PURE) {
+    if (_is_pure_HPyType(tp)) {
         // For pure HPy custom types, we return a pointer to only the custom
         // struct data, without the hidden PyObject header.
         *data = _HPy_PyObject_Payload(result);

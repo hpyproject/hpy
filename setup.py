@@ -1,7 +1,9 @@
 import textwrap
 import sys
+import os
 import os.path
 from setuptools import setup, Extension
+import platform
 
 # this package is supposed to be installed ONLY on CPython. Try to bail out
 # with a meaningful error message in other cases.
@@ -35,8 +37,7 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-
-if 'HPY_DEBUG' in os.environ:
+if 'HPY_DEBUG_BUILD' in os.environ:
     # -fkeep-inline-functions is needed to make sure that the stubs for HPy_*
     # functions are available to call inside GDB
     EXTRA_COMPILE_ARGS = [
@@ -51,6 +52,13 @@ if 'HPY_DEBUG' in os.environ:
 else:
     EXTRA_COMPILE_ARGS = []
 
+if os.name == "posix" and not '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' in os.environ:
+    EXTRA_COMPILE_ARGS += ['-D_HPY_DEBUG_MEM_PROTECT_USEMMAP']
+
+if platform.system() == "Windows":
+    EXTRA_COMPILE_ARGS += ['/WX']
+else:
+    EXTRA_COMPILE_ARGS += ['-Werror']
 
 def get_scm_config():
     """
@@ -92,6 +100,7 @@ EXT_MODULES = [
                'hpy/universal/src/ctx_meth.c',
                'hpy/universal/src/ctx_misc.c',
                'hpy/devel/src/runtime/argparse.c',
+               'hpy/devel/src/runtime/buildvalue.c',
                'hpy/devel/src/runtime/helpers.c',
                'hpy/devel/src/runtime/ctx_bytes.c',
                'hpy/devel/src/runtime/ctx_call.c',
@@ -107,6 +116,8 @@ EXT_MODULES = [
                'hpy/debug/src/debug_ctx_cpython.c',
                'hpy/debug/src/debug_handles.c',
                'hpy/debug/src/dhqueue.c',
+               'hpy/debug/src/memprotect.c',
+               'hpy/debug/src/stacktrace.c',
                'hpy/debug/src/_debugmod.c',
                'hpy/debug/src/autogen_debug_wrappers.c',
               ],
@@ -150,4 +161,5 @@ setup(
     },
     use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
+    install_requires=['setuptools>=60.2'],
 )

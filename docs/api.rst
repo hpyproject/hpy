@@ -1,5 +1,5 @@
-HPy API
-=======
+HPy API introduction
+====================
 
 .. warning::
    HPy is still in the early stages of development and the API may change.
@@ -19,6 +19,26 @@ Similarly, if you need a new handle for an existing object, you can duplicate
 it by calling ``HPy_Dup``, which plays more or less the same role as
 ``Py_INCREF``.
 
+The HPy API strictly follows these rules:
+
+- ``HPy`` handles returned by a function are **never borrowed**, i.e.,
+  the caller must either close or return it.
+- ``HPy`` handles passed as function arguments are **never stolen**;
+  if you receive a ``HPy`` handle argument from your caller, you should never close it.
+
+These rules makes the code simpler to reason about. Moreover, no reference
+borrowing enables the Python implementations to use whatever internal
+representation they wish. For example, the object returned by `HPy_GetItem_i`
+may be created on demand from some compact internal representation, which does
+not need to convert itself to full blown representation in order to hold onto
+the borrowed object.
+
+We strongly encourage the users of HPy to also internally follow these rules
+for their own internal APIs and helper functions. For the sake of simplicity
+and easier local reasoning and also because in the future, code adhering
+to those rules may be suitable target for some scalable and precise static
+analysis tool.
+
 The concept of handles is certainly not unique to HPy. Other examples include
 Unix file descriptors, where you have ``dup()`` and ``close()``, and Windows'
 ``HANDLE``, where you have ``DuplicateHandle()`` and ``CloseHandle()``.
@@ -27,15 +47,14 @@ Unix file descriptors, where you have ``dup()`` and ``close()``, and Windows'
 Handles vs ``PyObject *``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. XXX I don't like this sentence, but I can't come up with anything better
-   right now. Please rephrase/rewrite :)
-
-In the old Python/C API, multiple ``PyObject *`` references to the same object
-are completely equivalent to each other. Therefore they can be passed to Python/C
-API functions interchangeably. As a result, ``Py_INCREF`` an ``Py_DECREF`` can
-be called with any reference to an object as long as the total number of calls
-of `incref` is equal to the number of calls of `decref` at the end of the object
-lifetime.
+In order to fully understand the way HPy handles work, it is useful to discuss
+the Python/C API ``Pyobject *`` pointer. These pointers always
+point to the same object, and a python object's identity is completely given
+by its address in memory, and two pointers with the same address can
+be passed to Python/C API functions interchangeably. As a result, ``Py_INCREF``
+and ``Py_DECREF`` can be called with any reference to an object as long as the
+total number of calls of `incref` is equal to the number of calls of `decref`
+at the end of the object lifetime.
 
 Whereas using HPy API, each handle must be closed independently.
 
@@ -51,43 +70,40 @@ Thus, the following perfectly valid piece of Python/C code::
       Py_DECREF(x);                       // two DECREF on x
   }
 
-Becomes using HPy API::
+Becomes using HPy API:
 
-  void foo(HPyContext *ctx)
-  {
-      HPy x = HPyLong_FromLong(ctx, 42);
-      HPy y = HPy_Dup(ctx, x);
-      /* ... */
-      // we need to close x and y independently
-      HPy_Close(ctx, x);
-      HPy_Close(ctx, y);
-  }
+.. literalinclude:: examples/snippets/snippets.c
+  :start-after: // BEGIN: foo
+  :end-before: // END: foo
 
 Calling any HPy function on a closed handle is an error. Calling
 ``HPy_Close()`` on the same handle twice is an error. Forgetting to call
 ``HPy_Close()`` on a handle results in a memory leak. When running in
-:ref:`debug mode`, HPy actively checks that you that you don't close a handle
-twice and that you don't forget to close any.
+:ref:`debug-mode:debug mode`, HPy actively checks that you don't
+close a handle twice and that you don't forget to close any.
 
 
 .. note::
-  The debug mode is a good example of how powerful it is to decouple the
-  lifetime of handles and the lifetime of an objects.  If you find a memory
-  leak on CPython, you know that you are missing a ``Py_DECREF`` somewhere but
-  the only way to find the corresponding ``Py_INCREF`` is to manually and
-  carefully study the source code.  On the other hand, if you forget to call
-  ``HPy_Close()``, the HPy debug mode is able to tell the precise code
-  location which created the unclosed handle.  Similarly, if you try to
-  operate on a closed handle, it will tell you the precise code locations
-  which created and closed it.
+  Debug mode is a good example of how powerful it is to decouple the
+  identity and therefore the lifetime of handles and those of objects.
+  If you find a memory leak on CPython, you know that you are missing a
+  ``Py_DECREF`` somewhere but the only way to find the corresponding
+  ``Py_INCREF`` is to manually and carefully study the source code.
+  On the other hand, if you forget to call ``HPy_Close()``, debug mode
+  is able to identify the precise code location which created the unclosed
+  handle. Similarly, if you try to operate on a closed handle, it will
+  identify the precise code locations which created and closed it. This is
+  possible because handles are associated with a single call to a C/API
+  function. As a result, given a handle that is leaked or used after freeing,
+  it is possible to identify exactly the C/API function that producted it.
 
 
-The other important difference is that Python/C guarantees that multiple
-references to the same object results in the very same ``PyObject *`` pointer.
-Thus, it is possible to compare C pointers by equality to check whether they
-point to the same object::
+Remember that Python/C guarantees that multiple references to the same
+object results in the very same ``PyObject *`` pointer. Thus, it is
+possible to compare the pointer addresses to check whether they refer
+to the same object::
 
-    void is_same_object(PyObject *x, PyObject *y)
+    int is_same_object(PyObject *x, PyObject *y)
     {
         return x == y;
     }
@@ -97,29 +113,27 @@ two different handles which point to the same underlying object, so comparing
 two handles directly is ill-defined.  To prevent this kind of common error
 (especially when porting existing code to HPy), the ``HPy`` C type is opaque
 and the C compiler actively forbids comparisons between them.  To check for
-identity, you can use ``HPy_Is()``::
+identity, you can use ``HPy_Is()``:
 
-    void is_same_object(HPyContext *ctx, HPy x, HPy y)
-    {
-        // return x == y; // compilation error!
-        return HPy_Is(ctx, x, y);
-    }
+.. literalinclude:: examples/snippets/snippets.c
+  :start-after: // BEGIN: is_same_object
+  :end-before: // END: is_same_object
 
 .. note::
-   The main benefit of the semantics of handles is that it allows
-   implementations to use very different models of memory management.  On
-   CPython, implementing handles is trivial because ``HPy`` is basically
-   ``PyObject *`` in disguise, and ``HPy_Dup()`` and ``HPy_Close()`` are just
-   aliases for ``Py_INCREF`` and ``Py_DECREF``.
+   The main benefit of opaque handle semantics is that implementations are
+   allowed to use very different models of memory management.  On CPython,
+   implementing handles is trivial because ``HPy`` is basically ``PyObject *``
+   in disguise, and ``HPy_Dup()`` and ``HPy_Close()`` are just aliases for
+   ``Py_INCREF`` and ``Py_DECREF``.
 
-   Unlike CPython, PyPy does not use reference counting for memory
-   management: instead, it uses a *moving GC*, which means that the address of
-   an object might change during its lifetime, and this makes it hard to implement
-   semantics like ``PyObject *``'s where the address is directly exposed to
-   the user.  HPy solves this problem: on PyPy, handles are integers which
-   represent indices into a list, which is itself managed by the GC. When an
-   object moves, the GC fixes the address in the list, without having to touch
-   all the handles which have been passed to C.
+   Unlike CPython, PyPy does not use reference counting to manage memory:
+   instead, it uses a *moving GC*, which means that the address of an object
+   might change during its lifetime, and this makes it hard to implement
+   semantics like ``PyObject *``'s where the address *identifies* the object,
+   and this is directly exposed to the user.  HPy solves this problem: on
+   PyPy, handles are integers which represent indices into a list, which
+   is itself managed by the GC. When an address changes, the GC edits the
+   list, without having to touch all the handles which have been passed to C.
 
 
 HPyContext
@@ -134,8 +148,10 @@ Python/C function call, where there is no notion of context.
 One of the reasons to include ``HPyContext`` from the day one is to be
 future-proof: it is conceivable to use it to hold the interpreter or the
 thread state in the future, in particular when there will be support for
-sub-interpreter.  Another possible usage could be to embed different versions
-or implementations of Python inside the same process.
+sub-interpreters.  Another possible usage could be to embed different versions
+or implementations of Python inside the same process. In addition, the
+``HPyContext`` may also be extended by adding new functions to the end without
+breaking any extensions built against the current ``HPyContext``.
 
 Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back
@@ -150,81 +166,79 @@ is assumed that you are already familiar with the existing Python/C API, so we
 will underline the similarities and the differences with it.
 
 We want to create a function named ``myabs`` which takes a single argument and
-computes its absolute value::
+computes its absolute value:
 
-    #include "hpy.h"
-
-    HPy_DEF_METH_O(myabs)
-    static HPy myabs_impl(HPyContext *ctx, HPy self, HPy obj)
-    {
-        return HPy_Absolute(ctx, obj);
-    }
+.. literalinclude:: examples/simple-example/simple.c
+  :start-after: // BEGIN: myabs
+  :end-before: // END: myabs
 
 There are a couple of points which are worth noting:
 
-  * We use the macro ``HPy_DEF_METH_O`` to declare we are going to define a
-    HPy function called ``myabs``, which uses the ``METH_O`` calling
-    convention. As in Python/C, ``METH_O`` means that the function receives a
-    single argument.
+  * We use the macro ``HPyDef_METH`` to declare we are going to define a
+    HPy function called ``myabs``.
+
+  * The function will be available under the name ``"myabs"`` in our Python
+    module.
 
   * The actual C function which implements ``myabs`` is called ``myabs_impl``.
 
-  * It receives two arguments of type ``HPy``, which are handles which are
-    guaranteed to be valid: they are automatically closed by the caller, so
-    there is no need to call ``HPy_Close`` on them.
+  * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in Python/C API,
+    ``HPyFunc_O`` means that the function receives a single argument on top of
+    ``self``.
 
-  * It returns a handle, which has to be closed by the caller.
+  * ``myabs_impl`` takes two arguments of type ``HPy``: handles for ``self``
+    and the argument, which are guaranteed to be valid. They are automatically
+    closed by the caller, so there is no need to call ``HPy_Close`` on them.
+
+  * ``myabs_impl`` returns a handle, which has to be closed by the caller.
 
   * ``HPy_Absolute`` is the equivalent of ``PyNumber_Absolute`` and
     computes the absolute value of the given argument.
 
-The ``HPy_DEF_METH_O`` macro is needed to maintain compatibility with CPython.
-In CPython, C functions and methods have a C signature that is different to
-the one used by HPy: they don't receive an ``HPyContext`` and their arguments
-have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
-generates a trampoline function whose signature is appropriate for CPython and
-which calls the ``myabs_impl``.
+  * We also do not call ``HPy_Close`` on the result returned to the caller.
+    We must return a valid handle.
 
-Now, we can define our module::
+.. note::
+   Among other things,
+   the ``HPyDef_METH`` macro is needed to maintain compatibility with CPython.
+   In CPython, C functions and methods have a C signature that is different to
+   the one used by HPy: they don't receive an ``HPyContext`` and their arguments
+   have the type ``PyObject *`` instead of ``HPy``.  The macro automatically
+   generates a trampoline function whose signature is appropriate for CPython and
+   which calls the ``myabs_impl``. This trampoline is then used from both the
+   CPython ABI and the CPython implementation of the universal ABI, but other
+   implementations of the universal ABI will usually call directly the HPy
+   function itself.
 
-    static HPyMethodDef SimpleMethods[] = {
-        {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
-        {NULL, NULL, 0, NULL}
-    };
+Now, we can define our module:
 
-    static HPyModuleDef moduledef = {
-        HPyModuleDef_HEAD_INIT,
-        .m_name = "simple",
-        .m_doc = "HPy Example",
-        .m_size = -1,
-        .m_methods = SimpleMethods
-    };
+.. literalinclude:: examples/simple-example/simple.c
+  :start-after: // BEGIN: methodsdef
+  :end-before: // END: methodsdef
 
 This part is very similar to the one you would write in Python/C.  Note that
-we specify ``myabs`` (and **not** ``myabs_impl``) in the method table, and
-that we have to indicate the calling convention again.  This is a deliberate
-choice, to minimize the changes needed to port existing extensions, and to
-make it easier to support hybrid extensions in which some of the methods are
-still written using the Python/C API.
+we specify ``myabs`` (and **not** ``myabs_impl``) in the method table. There
+is also the ``.legacy_methods`` field, which allows to add methods that use the
+Python/C API, i.e., the value should be an array of ``PyMethodDef``. This
+feature enables support for hybrid extensions in which some of the methods
+are still written using the Python/C API.
 
-Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``.
+.. This would be perhaps good place to add a link to the porting tutorial
+   once it's merged
+
+Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``:
+
+.. literalinclude:: examples/simple-example/simple.c
+  :start-after: // BEGIN: moduledef
+  :end-before: // END: moduledef
 
 Building the module
 ~~~~~~~~~~~~~~~~~~~~
 
 Let's write a ``setup.py`` to build our extension:
 
-.. code-block:: python
-
-    from setuptools import setup, Extension
-
-    setup(
-        name="hpy-example",
-        hpy_ext_modules=[
-            Extension('simple', sources=['simple.c']),
-        ],
-        setup_requires=['hpy.devel'],
-    )
+.. literalinclude:: examples/simple-example/setup.py
+    :language: python
 
 We can now build the extension by running ``python setup.py build_ext -i``. On
 CPython, it will target the :term:`CPython ABI` by default, so you will end up with
@@ -238,21 +252,21 @@ produce a file called ``simple.hpy.so`` (note that you need to specify
 
   python setup.py --hpy-abi=universal build_ext -i
 
+.. note::
+   This command will also produce a Python file named ``simple.py``, which
+   loads the HPy module using the ``universal.load`` function from
+   the ``hpy`` Python package.
+
 VARARGS calling convention
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If we want to receive more than a single arguments, we need the
 ``HPy_METH_VARARGS`` calling convention. Let's add a function ``add_ints``
-which adds two integers::
+which adds two integers:
 
-    HPy_DEF_METH_VARARGS(add_ints)
-    static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
-    {
-        long a, b;
-        if (!HPyArg_Parse(ctx, args, nargs, "ll", &a, &b))
-            return HPy_NULL;
-        return HPyLong_FromLong(ctx, a+b);
-    }
+.. literalinclude:: examples/snippets/hpyvarargs.c
+  :start-after: // BEGIN: add_ints
+  :end-before: // END: add_ints
 
 There are a few things to note:
 
@@ -274,10 +288,8 @@ There are a few things to note:
     because ``HPy`` is not a pointer type.
 
 Once we have written our function, we can add it to the ``SimpleMethods[]``
-table, which now becomes::
+table, which now becomes:
 
-    static HPyMethodDef SimpleMethods[] = {
-        {"myabs", myabs, HPy_METH_O, "Compute the absolute value of the given argument"},
-        {"add_ints", add_ints, HPy_METH_VARARGS, "Add two integers"},
-        {NULL, NULL, 0, NULL}
-    };
+.. literalinclude:: examples/snippets/hpyvarargs.c
+  :start-after: // BEGIN: methodsdef
+  :end-before: // END: methodsdef
