@@ -122,10 +122,9 @@ static HPyDef *module_defines[] = {
 };
 
 static HPyModuleDef moduledef = {
-    HPyModuleDef_HEAD_INIT,
-    .m_name = "step_01_hpy_legacy",
-    .m_doc = "Point module (Step 1; All legacy methods)",
-    .m_size = -1,
+    .name = "step_01_hpy_legacy",
+    .doc = "Point module (Step 1; All legacy methods)",
+    .size = -1,
     .legacy_methods = PointModuleLegacyMethods,
     .defines = module_defines,
 };
