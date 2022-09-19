@@ -432,6 +432,8 @@ class TestType(HPyTest):
                 char ISTRING_member[6];
                 char BOOL_member;
                 HPyField OBJECT_member;
+                HPyField OBJECT_NULL_member;
+                HPyField OBJECT_EX_member;
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
@@ -451,6 +453,8 @@ class TestType(HPyTest):
                 strncpy(foo->ISTRING_member, "Hello", 6);
                 foo->BOOL_member = 0;
                 HPyField_Store(ctx, h_obj, &foo->OBJECT_member, ctx->h_Ellipsis);
+                foo->OBJECT_NULL_member = HPyField_NULL;
+                foo->OBJECT_EX_member = HPyField_NULL;
                 return h_obj;
             }
 
@@ -462,6 +466,8 @@ class TestType(HPyTest):
             HPyDef_MEMBER(Foo_ISTRING_member, "ISTRING_member", HPyMember_STRING_INPLACE, offsetof(FooObject, ISTRING_member))
             HPyDef_MEMBER(Foo_BOOL_member, "BOOL_member", HPyMember_BOOL, offsetof(FooObject, BOOL_member))
             HPyDef_MEMBER(Foo_OBJECT_member, "OBJECT_member", HPyMember_OBJECT, offsetof(FooObject, OBJECT_member))
+            HPyDef_MEMBER(Foo_OBJECT_NULL_member, "OBJECT_NULL_member", HPyMember_OBJECT, offsetof(FooObject, OBJECT_NULL_member))
+            HPyDef_MEMBER(Foo_OBJECT_EX_member, "OBJECT_EX_member", HPyMember_OBJECT_EX, offsetof(FooObject, OBJECT_EX_member))
             HPyDef_MEMBER(Foo_NONE_member, "NONE_member", HPyMember_NONE, offsetof(FooObject, FLOAT_member))
 
             static HPyDef *Foo_defines[] = {
@@ -474,6 +480,8 @@ class TestType(HPyTest):
                     &Foo_ISTRING_member,
                     &Foo_BOOL_member,
                     &Foo_OBJECT_member,
+                    &Foo_OBJECT_NULL_member,
+                    &Foo_OBJECT_EX_member,
                     &Foo_NONE_member,
                     NULL
             };
@@ -534,6 +542,15 @@ class TestType(HPyTest):
         assert foo.OBJECT_member is ...
         foo.OBJECT_member = 1
         assert foo.OBJECT_member == 1
+
+        assert foo.OBJECT_NULL_member is None
+        foo.OBJECT_NULL_member = 1
+        assert foo.OBJECT_NULL_member == 1
+
+        with pytest.raises(AttributeError):
+            foo.OBJECT_EX_member
+        foo.OBJECT_EX_member = 1
+        assert foo.OBJECT_EX_member == 1
 
         assert foo.NONE_member is None
         with pytest.raises((SystemError, TypeError)):  # CPython quirk/bug
