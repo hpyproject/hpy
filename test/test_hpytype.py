@@ -546,11 +546,16 @@ class TestType(HPyTest):
         assert foo.OBJECT_NULL_member is None
         foo.OBJECT_NULL_member = 1
         assert foo.OBJECT_NULL_member == 1
+        del foo.OBJECT_NULL_member
+        assert foo.OBJECT_NULL_member is None
 
         with pytest.raises(AttributeError):
             foo.OBJECT_EX_member
         foo.OBJECT_EX_member = 1
         assert foo.OBJECT_EX_member == 1
+        del foo.OBJECT_EX_member
+        with pytest.raises(AttributeError):
+            foo.OBJECT_EX_member
 
         assert foo.NONE_member is None
         with pytest.raises((SystemError, TypeError)):  # CPython quirk/bug
