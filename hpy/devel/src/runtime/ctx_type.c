@@ -361,7 +361,7 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
                 while ((*getsets)[getsetcnt].name) {
                     getsetcnt++;
                 }
-                *getsets = (PyGetSetDef*)PyMem_Realloc(*getsets, (getsetcnt + 1) * sizeof(PyGetSetDef));
+                *getsets = (PyGetSetDef*)PyMem_Realloc(*getsets, (getsetcnt + 2) * sizeof(PyGetSetDef));
                 if (!*getsets) {
                     return NULL;
                 }

@@ -470,6 +470,16 @@ class TestType(HPyTest):
             HPyDef_MEMBER(Foo_OBJECT_EX_member, "OBJECT_EX_member", HPyMember_OBJECT_EX, offsetof(FooObject, OBJECT_EX_member))
             HPyDef_MEMBER(Foo_NONE_member, "NONE_member", HPyMember_NONE, offsetof(FooObject, FLOAT_member))
 
+            HPyDef_SLOT(Foo_traverse, Foo_traverse_impl, HPy_tp_traverse)
+            static int Foo_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
+            {
+                FooObject *p = (FooObject *)self;
+                HPy_VISIT(&p->OBJECT_member);
+                HPy_VISIT(&p->OBJECT_NULL_member);
+                HPy_VISIT(&p->OBJECT_EX_member);
+                return 0;
+            }
+
             static HPyDef *Foo_defines[] = {
                     &Foo_new,
                     &Foo_FLOAT_member,
@@ -483,6 +493,7 @@ class TestType(HPyTest):
                     &Foo_OBJECT_NULL_member,
                     &Foo_OBJECT_EX_member,
                     &Foo_NONE_member,
+                    &Foo_traverse,
                     NULL
             };
 
@@ -608,6 +619,14 @@ class TestType(HPyTest):
             HPyDef_MEMBER(Foo_OBJECT_member, "OBJECT_member", HPyMember_OBJECT, offsetof(FooObject, OBJECT_member), .readonly=1)
             HPyDef_MEMBER(Foo_NONE_member, "NONE_member", HPyMember_NONE, offsetof(FooObject, FLOAT_member), .readonly=1)
 
+            HPyDef_SLOT(Foo_traverse, Foo_traverse_impl, HPy_tp_traverse)
+            static int Foo_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
+            {
+                FooObject *p = (FooObject *)self;
+                HPy_VISIT(&p->OBJECT_member);
+                return 0;
+            }
+
             static HPyDef *Foo_defines[] = {
                     &Foo_new,
                     &Foo_FLOAT_member,
@@ -618,6 +637,7 @@ class TestType(HPyTest):
                     &Foo_BOOL_member,
                     &Foo_OBJECT_member,
                     &Foo_NONE_member,
+                    &Foo_traverse,
                     NULL
             };
 
