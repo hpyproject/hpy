@@ -28,7 +28,10 @@ import setuptools.command as cmd
 try:
     import setuptools.command.build
 except ImportError:
-    # this happens on py27, because the setuptools version is too old :(
+    print(
+        "warning: setuptools.command.build does not exist in setuptools",
+        setuptools.__version__, "on", sys.version
+    )
     setuptools.command.build = None
 import setuptools.command.build_ext
 import setuptools.command.bdist_egg

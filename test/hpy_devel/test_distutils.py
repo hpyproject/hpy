@@ -45,10 +45,21 @@ def venv_template(tmpdir_factory):
             continue
         script.remove()
     #
-    subprocess.run([str(d.python), '-m'
-                    'pip', 'install', '-U', 'pip==21.2.4', 'wheel'], check=True)
-    subprocess.run([str(d.python), '-m'
-                    'pip', 'install', '-e', str(HPY_ROOT)], check=True)
+    try:
+        subprocess.run(
+            [str(d.python), '-m', 'pip', 'install', '-U', 'pip', 'wheel', 'setuptools'],
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            [str(d.python), '-m', 'pip', 'install', str(HPY_ROOT)],
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as cpe:
+        print(cpe.stdout.decode("utf8"))
+        print(cpe.stderr.decode("utf8"))
+        raise
     return d
 
 def attach_python_to_venv(d):
