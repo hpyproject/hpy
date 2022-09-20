@@ -17,7 +17,8 @@ typedef struct {
     // other Python implementations (e.g. PyPy) it might no longer exist at
     // all.
     double x;
-    double  y;
+    double y;
+    HPyField obj;
 } PointObject;
 
 // Code using PyPointObject relied on PyObject_HEAD and is no longer valid
@@ -32,18 +33,40 @@ typedef struct {
 // PointObject.
 HPyType_HELPERS(PointObject)
 
+HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
+{
+    HPy_VISIT(&((PointObject*)self)->obj);
+    return 0;
+}
+
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
-    static const char *kwlist[] = {"x", "y", NULL};
+    static const char *kwlist[] = {"x", "y", "obj", NULL};
     PointObject *p = PointObject_AsStruct(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
-    if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
-                              &p->x, &p->y))
+    HPy obj = HPy_NULL;
+    HPyTracker ht;
+    if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "|ddO", kwlist,
+                              &p->x, &p->y, &obj))
         return -1;
+    if (HPy_IsNull(obj))
+        obj = HPy_Dup(ctx, ctx->h_None);
+    // INCREF not needed because HPyArg_ParseKeywords does not steal a reference
+    HPyField_Store(ctx, self, &p->obj, obj);
+    HPyTracker_Close(ctx, ht);
     return 0;
+}
+
+// this is the getter for the associated object
+HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
+HPy Point_obj_get_impl(HPyContext *ctx, HPy self, void* closure)
+{
+    PointObject *p = PointObject_AsStruct(ctx, self);
+    return HPyField_Load(ctx, self, p->obj);
 }
 
 // an HPy method of Point
@@ -91,6 +114,8 @@ HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 static HPyDef *point_defines[] = {
     &Point_init,
     &Point_norm,
+    &Point_obj_get,
+    &Point_traverse,
     NULL
 };
 

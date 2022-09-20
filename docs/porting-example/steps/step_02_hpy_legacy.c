@@ -19,6 +19,9 @@ typedef struct {
     PyObject_HEAD
     double x;
     double y;
+    // HPy handles are shortlived to support all GC strategies
+    // For that reason, PyObject* in C structs are replaced by HPyField
+    HPyField obj;
 } PointObject;
 
 // This defines PyPointObject as an alias of PointObject so that existing
@@ -34,17 +37,31 @@ typedef PointObject PyPointObject;
 // will use HPy_TYPE_HELPERS instead.
 HPyType_LEGACY_HELPERS(PointObject)
 
+HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
+{
+    HPy_VISIT(&((PointObject*)self)->obj);
+    return 0;
+}
+
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
 int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
-    static const char *kwlist[] = {"x", "y", NULL};
+    static const char *kwlist[] = {"x", "y", "obj", NULL};
     PointObject *p = PointObject_AsStruct(ctx, self);
     p->x = 0.0;
     p->y = 0.0;
-    if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "|dd", kwlist,
-                              &p->x, &p->y))
+    HPy obj = HPy_NULL;
+    HPyTracker ht;
+    if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "|ddO", kwlist,
+                              &p->x, &p->y, &obj))
         return -1;
+    if (HPy_IsNull(obj))
+        obj = HPy_Dup(ctx, ctx->h_None);
+    // INCREF not needed because HPyArg_ParseKeywords does not steal a reference
+    HPyField_Store(ctx, self, &p->obj, obj);
+    HPyTracker_Close(ctx, ht);
     return 0;
 }
 
@@ -58,6 +75,14 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
     norm = sqrt(p->x * p->x + p->y * p->y);
     result = HPyFloat_FromDouble(ctx, norm);
     return result;
+}
+
+// this is the getter for the associated object
+HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
+HPy Point_obj_get_impl(HPyContext *ctx, HPy self, void* closure)
+{
+    PointObject *p = PointObject_AsStruct(ctx, self);
+    return HPyField_Load(ctx, self, p->obj);
 }
 
 // this is an LEGACY function which casts a PyObject* into a PyPointObject*
@@ -98,6 +123,8 @@ static PyType_Slot Point_legacy_slots[] = {
 static HPyDef *point_defines[] = {
     &Point_init,
     &Point_norm,
+    &Point_obj_get,
+    &Point_traverse,
     NULL
 };
 

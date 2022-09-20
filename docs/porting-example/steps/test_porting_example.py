@@ -32,3 +32,11 @@ class TestPorting:
         p1 = mod.Point(1, 2)
         p2 = mod.Point(3, 2)
         assert mod.dot(p1, p2) == 7.0
+
+    def test_object(self, step):
+        mod = step.import_step()
+        p1 = mod.Point(23, 42, ...)
+        assert p1.obj is ...
+        p2 = mod.Point(23, 42)
+        assert p2.obj is None
+

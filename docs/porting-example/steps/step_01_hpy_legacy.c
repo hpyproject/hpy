@@ -19,6 +19,7 @@ typedef struct {
     PyObject_HEAD
     double x;
     double y;
+    PyObject *obj;
 } PointObject;
 
 // This defines PyPointObject as an alias of PointObject so that existing
@@ -35,16 +36,35 @@ typedef PointObject PyPointObject;
 // removed (see point_hpy_final.c) we will use HPy_TYPE_HELPERS instead.
 HPyType_LEGACY_HELPERS(PointObject)
 
+int Point_traverse(PyObject *self, visitproc visit, void *arg)
+{
+    Py_VISIT(((PyPointObject*)self)->obj);
+    Py_VISIT(Py_TYPE(self));
+    return 0;
+}
+
+void Point_dealloc(PyObject *self)
+{
+    Py_CLEAR(((PyPointObject*)self)->obj);
+    PyTypeObject *tp = Py_TYPE(self);
+    tp->tp_free(self);
+    Py_DECREF(tp);
+}
+
 // this is a method for creating a Point
 int Point_init(PyObject *self, PyObject *args, PyObject *kw)
 {
-    static char *kwlist[] = {"x", "y", NULL};
+    static char *kwlist[] = {"x", "y", "obj", NULL};
     PyPointObject *p = (PyPointObject *)self;
     p->x = 0.0;
     p->y = 0.0;
-    if (!PyArg_ParseTupleAndKeywords(args, kw, "|dd", kwlist,
-                                     &p->x, &p->y))
+    p->obj = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kw, "|ddO", kwlist,
+                                     &p->x, &p->y, &p->obj))
         return -1;
+    if (p->obj == NULL)
+        p->obj = Py_None;
+    Py_INCREF(p->obj);
     return 0;
 }
 
@@ -57,6 +77,14 @@ PyObject* Point_norm(PyObject *self)
     norm = sqrt(p->x * p->x + p->y * p->y);
     result = PyFloat_FromDouble(norm);
     return result;
+}
+
+// this is the getter for the associated object
+PyObject* Point_obj_get(PyObject *self, void *context)
+{
+    PyPointObject *p = (PyPointObject *)self;
+    Py_INCREF(p->obj);
+    return p->obj;
 }
 
 // this is an LEGACY function which casts a PyObject* into a PyPointObject*
@@ -87,11 +115,20 @@ static PyMethodDef PointMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+// Legacy getsets
+static PyGetSetDef PointGetSets[] = {
+    {"obj", (getter)Point_obj_get, NULL, "Associated object.", NULL},
+    {NULL, NULL, 0, NULL}
+};
+
 // Legacy slots (all slots are still legacy slots)
 static PyType_Slot Point_legacy_slots[] = {
     {Py_tp_doc, "Point (Step 1; All legacy methods)"},
     {Py_tp_init, Point_init},
     {Py_tp_methods, PointMethods},
+    {Py_tp_getset, PointGetSets},
+    {Py_tp_traverse, Point_traverse},
+    {Py_tp_dealloc, Point_dealloc},
     {0, 0}
 };
 
