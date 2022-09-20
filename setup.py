@@ -137,6 +137,7 @@ EXT_MODULES = [
 DEV_REQUIREMENTS = [
     "pytest",
     "pytest-xdist",
+    "filelock",
 ]
 
 setup(
