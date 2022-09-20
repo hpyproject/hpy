@@ -66,7 +66,7 @@ def test_leak_detector_with_traces_output():
     assert 'hpy.debug.leakdetector.HPyLeakError: 1 unclosed handle:' in err
     assert re.search('<DebugHandle 0x[\\da-h]* for 42>', err)
     assert 'Allocation stacktrace:' in err
-    if sys.platform.startswith("linux"):
+    if sys.platform.startswith(("linux", "darwin")):
         assert 'snippets.hpy.so' in err  # Should be somewhere in the stack trace
     else:
         assert 'At the moment this is only supported on Linux with glibc' in err
