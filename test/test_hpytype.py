@@ -452,7 +452,7 @@ class TestType(HPyTest):
                 foo->CHAR_member = 'A';
                 strncpy(foo->ISTRING_member, "Hello", 6);
                 foo->BOOL_member = 0;
-                HPyField_Store(ctx, h_obj, &foo->OBJECT_member, ctx->h_Ellipsis);
+                HPyField_Store(ctx, h_obj, &foo->OBJECT_member, ctx->h_NotImplemented);
                 foo->OBJECT_NULL_member = HPyField_NULL;
                 foo->OBJECT_EX_member = HPyField_NULL;
                 return h_obj;
@@ -550,7 +550,7 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             del foo.BOOL_member
 
-        assert foo.OBJECT_member is ...
+        assert foo.OBJECT_member is NotImplemented
         foo.OBJECT_member = 1
         assert foo.OBJECT_member == 1
 
@@ -560,10 +560,7 @@ class TestType(HPyTest):
         del foo.OBJECT_NULL_member
         assert foo.OBJECT_NULL_member is None
 
-        with pytest.raises(
-                AttributeError,
-                match="'mytest.Foo' object has no attribute 'OBJECT_EX_member'"
-        ):
+        with pytest.raises(AttributeError, match="OBJECT_EX_member"):
             foo.OBJECT_EX_member
         foo.OBJECT_EX_member = 1
         assert foo.OBJECT_EX_member == 1
