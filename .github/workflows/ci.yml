@@ -13,7 +13,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ['3.9', '3.10']
-        # Possible values: ['2.7', '3.6', '3.7', '3.8', '3.9', '3.10.0-rc.2', 'pypy-3.8']
         compiler: [""]
         include:
           - os: ubuntu-latest
@@ -21,11 +20,8 @@ jobs:
           - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
-            python-version: '3.9'
+            python-version: '3.10'
             compiler: 'g++'
-          ## Expected failure
-          # - os: ubuntu-latest
-          #   python-version: '3.10.0-rc.2'
 
     steps:
       - uses: actions/checkout@v2
@@ -60,7 +56,6 @@ jobs:
   main_tests_debug:
     name: Main tests on CPython debug builds
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -92,21 +87,17 @@ jobs:
   poc_tests:
     name: Proof of concept tests
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9']
+        python-version: ['3.10']
         include:
           - os: ubuntu-latest
             python-version: '3.7'
           - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
-            python-version: '3.10'
-          ## Expected failure
-          # - os: ubuntu-latest
-          #   python-version: '3.10.0-rc.2'
+            python-version: '3.9'
 
     steps:
       - uses: actions/checkout@v2
@@ -178,11 +169,10 @@ jobs:
   docs_examples_tests:
     name: Documentation examples tests
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9']
+        python-version: ['3.10']
 
     steps:
       - uses: actions/checkout@v2
