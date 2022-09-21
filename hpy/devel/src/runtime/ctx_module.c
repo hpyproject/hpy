@@ -25,19 +25,24 @@ _HPy_HIDDEN PyModuleDef *create_module_def(HPyModuleDef *hpydef, void *create_fu
     def->m_name = hpydef->name;
     def->m_doc = hpydef->doc;
     def->m_size = hpydef->size;
-    PyModuleDef_Slot slots[] = {
-        {0, NULL},
-        {0, NULL},
-        {0, NULL},
-    };
-    int slotidx = 0;
-    if (create_func) {
-        slots[slotidx++] = (PyModuleDef_Slot){Py_mod_create, create_func};
+
+    size_t slots_count = 0;
+    if (create_func != NULL)
+        slots_count++;
+    if (exec_func != NULL)
+        slots_count++;
+    if (slots_count > 0) {
+        PyModuleDef_Slot *slots = PyMem_Malloc(sizeof(PyModuleDef_Slot) * (slots_count + 1));
+        slots[slots_count] = (PyModuleDef_Slot) {0, NULL};
+        size_t slot_index = 0;
+        if (create_func != NULL)
+            slots[slot_index++] = (PyModuleDef_Slot){Py_mod_create, create_func};
+        if (exec_func != NULL)
+            slots[slot_index++] = (PyModuleDef_Slot){Py_mod_exec, exec_func};
+        def->m_slots = slots;
+    } else {
+        def->m_slots = NULL;
     }
-    if (exec_func) {
-        slots[slotidx++] = (PyModuleDef_Slot){Py_mod_exec, exec_func};
-    }
-    def->m_slots = slots;
     def->m_methods = create_method_defs(hpydef->defines, hpydef->legacy_methods);
     if (def->m_methods == NULL) {
         PyMem_Free(def);
