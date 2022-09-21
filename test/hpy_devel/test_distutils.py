@@ -7,17 +7,16 @@ files in this directory, which all inherit from HPyTest and test the API
 itself.
 """
 
-import sys
 import os
 import textwrap
 import subprocess
-from pathlib import Path
 import shutil
 import venv
 import py
 import pytest
 
-HPY_ROOT = Path(__file__).parent.parent.parent
+
+from test.support import atomic_run, HPY_ROOT
 
 # this is only for development: if we set it to true, we don't have to
 # recreate the venv_template between runs, it's much faster
@@ -45,10 +44,21 @@ def venv_template(tmpdir_factory):
             continue
         script.remove()
     #
-    subprocess.run([str(d.python), '-m'
-                    'pip', 'install', '-U', 'pip', 'wheel'], check=True)
-    subprocess.run([str(d.python), '-m'
-                    'pip', 'install', '-e', str(HPY_ROOT)], check=True)
+    try:
+        atomic_run(
+            [str(d.python), '-m', 'pip', 'install', '-U', 'pip', 'wheel', 'setuptools'],
+            check=True,
+            capture_output=True,
+        )
+        atomic_run(
+            [str(d.python), '-m', 'pip', 'install', str(HPY_ROOT)],
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as cpe:
+        print(cpe.stdout.decode("utf8"))
+        print(cpe.stderr.decode("utf8"))
+        raise
     return d
 
 def attach_python_to_venv(d):
@@ -62,7 +72,7 @@ def attach_python_to_venv(d):
 class TestDistutils:
 
     @pytest.fixture()
-    def initargs(self, tmpdir, venv_template):
+    def initargs(self, pytestconfig, tmpdir, venv_template):
         self.tmpdir = tmpdir
         # create a fresh venv by copying the template
         self.venv = tmpdir.join('venv')
@@ -84,10 +94,10 @@ class TestDistutils:
         cmd = [str(self.venv.python)] + list(args)
         print('[RUN]', ' '.join(cmd))
         if capture:
-            proc = subprocess.run(cmd, stdout=subprocess.PIPE)
+            proc = atomic_run(cmd, stdout=subprocess.PIPE)
             out = proc.stdout.decode('latin-1').strip()
         else:
-            proc = subprocess.run(cmd)
+            proc = atomic_run(cmd)
             out = None
         if proc.returncode != 0:
             raise Exception(f"Command {cmd} failed")

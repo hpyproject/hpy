@@ -28,7 +28,10 @@ import setuptools.command as cmd
 try:
     import setuptools.command.build
 except ImportError:
-    # this happens on py27, because the setuptools version is too old :(
+    print(
+        "warning: setuptools.command.build does not exist in setuptools",
+        setuptools.__version__, "on", sys.version
+    )
     setuptools.command.build = None
 import setuptools.command.build_ext
 import setuptools.command.bdist_egg
@@ -109,6 +112,8 @@ class HPyDevel:
             if resource.endswith(".hpy.so"):
                 log.info("stub file already created for %s", resource)
                 return
+            else:
+                log.info("stub resource didn't match for %s", resource)
             write_stub.super(resource, pyfile)
 
     def build_ext_sanity_check(self, build_ext):
@@ -361,6 +366,24 @@ class build_ext_hpy_mixin:
                 f.write(_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
                     ext_file=ext_file, module_name=module_name)
                 )
+
+    def copy_extensions_to_source(self):
+        """Override from setuptools 64.0.0 to copy our stub instead of recreating it."""
+        build_py = self.get_finalized_command('build_py')
+        build_lib = build_py.build_lib
+        for ext in self.extensions:
+            inplace_file, regular_file = self._get_inplace_equivalent(build_py, ext)
+
+            # Always copy, even if source is older than destination, to ensure
+            # that the right extensions for the current Python/platform are
+            # used.
+            if os.path.exists(regular_file) or not ext.optional:
+                self.copy_file(regular_file, inplace_file, level=self.verbose)
+
+            if ext._needs_stub:
+                source_stub = os.path.join(build_lib, *ext._full_name.split('.')) + '.py'
+                inplace_stub = self._get_equivalent_stub(ext, inplace_file)
+                self.copy_file(source_stub, inplace_stub, level=self.verbose)
 
     def get_export_symbols(self, ext):
         """ Override .get_export_symbols to replace "PyInit_<module_name>"
