@@ -165,7 +165,7 @@ def __bootstrap__():
             print("Loading {module_name!r} in HPy universal mode with a debug context")
         else:
             print("Loading {module_name!r} in HPy universal mode")
-    m = load({module_name!r}, ext_filepath, debug=is_debug)
+    m = load({module_name!r}, ext_filepath, debug=is_debug, loader=modules[__name__])
     m.__file__ = ext_filepath
     m.__loader__ = __loader__
     m.__name__ = __name__
@@ -363,9 +363,8 @@ class build_ext_hpy_mixin:
         module_name = ext_file.split(".")[0]
         if not self.dry_run:
             with open(stub_file, 'w') as f:
-                f.write(_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
-                    ext_file=ext_file, module_name=module_name)
-                )
+                contents = _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(ext_file=ext_file, module_name=module_name)
+                f.write(contents)
 
     def copy_extensions_to_source(self):
         """Override from setuptools 64.0.0 to copy our stub instead of recreating it."""

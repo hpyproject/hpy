@@ -20,9 +20,10 @@
 #  error "Cannot build hpy.universal on top of GraalPython. GraalPython comes with its own version of it"
 #endif
 
-typedef HPy (*InitFuncPtr)(HPyContext *ctx);
+typedef HPyModuleDef* (*GetFuncPtr)(void);
+typedef HPy (*CreateFuncPtr)(HPyContext *ctx, HPy spec, HPyModuleDef *def);
+typedef int (*ExecFuncPtr)(HPyContext *ctx, HPy mod);
 
-static const char *prefix = "HPyInit";
 
 static HPyContext * get_context(int debug)
 {
@@ -75,19 +76,17 @@ error:
     return NULL;
 }
 
-static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
+static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug, PyObject *loader)
 {
     PyObject *name = NULL;
     PyObject *pathbytes = NULL;
+    HPyContext *ctx = NULL;
+    HPy mod = HPy_NULL;
 
     name = get_encoded_name(name_unicode);
     if (name == NULL) {
         goto error;
     }
-    const char *shortname = PyBytes_AS_STRING(name);
-    char init_name[258];
-    PyOS_snprintf(init_name, sizeof(init_name), "%.20s_%.200s",
-            prefix, shortname);
 
     pathbytes = PyUnicode_EncodeFSDefault(path);
     if (pathbytes == NULL)
@@ -105,7 +104,53 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
         goto error;
     }
 
-    void *initfn = dlsym(mylib, init_name);
+    const char *shortname = PyBytes_AS_STRING(name);
+    char def_name[258];
+    PyOS_snprintf(def_name, sizeof(def_name), "%.20s_%.200s",
+                  "HPyModDefGet", shortname);
+    void *mod_def_getter = dlsym(mylib, def_name);
+    if (mod_def_getter == NULL)  {
+        const char *error = dlerror();
+        if (error == NULL)
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension specification at "
+                     "path '%s' while trying to find symbol '%s'. Did you use"
+                     "the HPy_MODINIT macro to register your module? Error "
+                     "message from dlsym/WinAPI: %s", soname, def_name, error);
+        goto error;
+    }
+    HPyModuleDef *mod_def = ((GetFuncPtr) mod_def_getter)();
+    if (mod_def == NULL)  {
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension specification at "
+                     "path '%s'. Function '%s' returned NULL pointer.", soname, def_name);
+        goto error;
+    }
+
+    ctx = get_context(debug);
+    if (ctx == NULL)
+        goto error;
+    
+    char create_name[258];
+    PyOS_snprintf(create_name, sizeof(create_name), "%.20s_%.200s",
+                  "HPyCreate", shortname);
+    void *createfn = dlsym(mylib, create_name);
+    if (createfn == NULL) {
+        // default creation:
+        mod = HPyModule_Create(ctx, mod_def);
+    } else {
+        HPy h_loader = HPy_FromPyObject(ctx, loader);
+        mod = ((CreateFuncPtr) createfn)(ctx, h_loader, mod_def);
+        HPy_Close(ctx, h_loader);
+    }
+    if (HPy_IsNull(mod))
+        goto error;
+    
+    char exec_name[258];
+    PyOS_snprintf(exec_name, sizeof(exec_name), "%.20s_%.200s",
+                  "HPyExec", shortname);
+    void *initfn = dlsym(mylib, exec_name);
     if (initfn == NULL) {
         const char *error = dlerror();
         if (error == NULL)
@@ -114,23 +159,30 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, int debug)
                      "Error during loading of the HPy extension module at "
                      "path '%s' while trying to find symbol '%s'. Did you use"
                      "the HPy_MODINIT macro to register your module? Error "
-                     "message from dlsym/WinAPI: %s", soname, init_name, error);
+                     "message from dlsym/WinAPI: %s", soname, exec_name, error);
+        goto error;
+    }
+    
+    if (((ExecFuncPtr)initfn)(ctx, mod) != 0) {
+        if (!PyErr_Occurred()) {
+            PyErr_Format(PyExc_RuntimeError,
+                         "The module exec function '%s' returned none-zero "
+                         "result, but did not set any Python level exception.",
+                         exec_name);
+        }
         goto error;
     }
 
-    HPyContext *ctx = get_context(debug);
-    if (ctx == NULL)
-        goto error;
-    HPy h_mod = ((InitFuncPtr)initfn)(ctx);
-    if (HPy_IsNull(h_mod))
-        goto error;
-    PyObject *py_mod = HPy_AsPyObject(ctx, h_mod);
-    HPy_Close(ctx, h_mod);
+    PyObject *py_mod = HPy_AsPyObject(ctx, mod);
+    HPy_Close(ctx, mod);
 
     Py_XDECREF(name);
     Py_XDECREF(pathbytes);
     return py_mod;
 error:
+    if (ctx != NULL) {
+        HPy_Close(ctx, mod);
+    }
     Py_XDECREF(name);
     Py_XDECREF(pathbytes);
     return NULL;
@@ -138,15 +190,16 @@ error:
 
 static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = {"name", "path", "debug", NULL};
+    static char *kwlist[] = {"name", "path", "debug", "loader", NULL};
     PyObject *name_unicode;
     PyObject *path;
+    PyObject *loader;
     int debug = 0;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|p", kwlist,
-                                     &name_unicode, &path, &debug)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|pO", kwlist,
+                                     &name_unicode, &path, &debug, &loader)) {
         return NULL;
     }
-    return do_load(name_unicode, path, debug);
+    return do_load(name_unicode, path, debug, loader);
 }
 
 static PyObject *get_version(PyObject *self, PyObject *ignored)
@@ -179,9 +232,19 @@ static struct PyModuleDef hpydef = {
 // module initialization function
 int exec_module(PyObject* mod) {
     HPyContext *ctx  = &g_universal_ctx;
-    HPy h_debug_mod = HPyInit__debug(ctx);
+    HPy h_debug_mod = HPyModule_Create(ctx, HPyModDefGet__debug());
     if (HPy_IsNull(h_debug_mod))
         return -1;
+    int exec_res = HPyExec__debug(ctx, h_debug_mod);
+    if (exec_res != 0) {
+        if (!PyErr_Occurred()) {
+            PyErr_SetString(PyExc_RuntimeError,
+                         "The HPy debug module exec function returned none-zero "
+                         "result, but did not set a Python level exception. This is likely "
+                         "internal error of the HPy debug module.");
+        }
+        return -1;
+    }
     PyObject *_debug_mod = HPy_AsPyObject(ctx, h_debug_mod);
     HPy_Close(ctx, h_debug_mod);
 

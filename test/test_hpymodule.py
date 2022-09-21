@@ -27,14 +27,9 @@ class TestModule(HPyTest):
 
     def test_HPyModule_ModuleInit_with_exec(self):
         mod = self.make_module("""
-        static HPyDef *moduledefs[] = {
-            NULL
-        };
-
         static HPyModuleDef moduledef = {
             .name = "mytest",
-            .doc = "some test for hpy",
-            .defines = moduledefs,
+            .doc = "some test for hpy"
         };
 
         HPy_MODINIT(mytest, moduledef, exec_foo)

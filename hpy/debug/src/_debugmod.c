@@ -387,17 +387,13 @@ static HPyModuleDef moduledef = {
 };
 
 
-HPy_MODINIT(_debug)
-static UHPy init__debug_impl(HPyContext *uctx)
+HPy_MODINIT(_debug, moduledef, init_debug_module)
+static int init_debug_module(HPyContext *uctx, HPy m)
 {
-    UHPy m = HPyModule_Create(uctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-
     UHPy h_DebugHandleType = HPyType_FromSpec(uctx, &DebugHandleType_spec, NULL);
     if (HPy_IsNull(h_DebugHandleType))
-        return HPy_NULL;
+        return -1;
     HPy_SetAttr_s(uctx, m, "DebugHandle", h_DebugHandleType);
     HPy_Close(uctx, h_DebugHandleType);
-    return m;
+    return 0;
 }

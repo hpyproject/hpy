@@ -26,30 +26,52 @@ typedef struct {
 
 
 #if defined(__cplusplus)
-#  define HPyMODINIT_FUNC extern "C" Py_EXPORTED_SYMBOL HPy
+#  define HPy_EXPORTED_SYMBOL extern "C" Py_EXPORTED_SYMBOL
 #else /* __cplusplus */
-#  define HPyMODINIT_FUNC Py_EXPORTED_SYMBOL HPy
+#  define HPy_EXPORTED_SYMBOL Py_EXPORTED_SYMBOL
 #endif /* __cplusplus */
 
 
+#define GET_MACRO(exec_or_create_name, exec_name, NAME, ...) NAME
+#define HPy_MODINIT(modname, moddef, ...) GET_MACRO(__VA_ARGS__, HPy_MODINIT_CREATE_EXEC, HPy_MODINIT_EXEC)(modname, moddef, __VA_ARGS__)
 
 #ifdef HPY_UNIVERSAL_ABI
 
 // module initialization in the universal case
-#define HPy_MODINIT(modname)                                    \
-    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;              \
-    static HPy init_##modname##_impl(HPyContext *ctx);         \
-    HPyMODINIT_FUNC                                            \
-    HPyInit_##modname(HPyContext *ctx)                         \
-    {                                                          \
-        _ctx_for_trampolines = ctx;                            \
-        return init_##modname##_impl(ctx);                     \
+// The loader:
+//  - looks up HPyModDefGet_{modulename} returns HPyModuleDef*
+//  - looks up optional HPyCreate_{modulename}
+//  - looks up HPyExec_{modulename}
+
+#define HPy_MODINIT_EXEC(modname, moddef, exec_name)                  \
+    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;                     \
+    HPy_EXPORTED_SYMBOL                                               \
+    HPyModuleDef *HPyModDefGet_##modname()                            \
+    {                                                                 \
+       return &moddef;                                                \
+    }                                                                 \
+    static int exec_name(HPyContext *ctx, HPy mod);                   \
+    HPy_EXPORTED_SYMBOL                                               \
+    int HPyExec_##modname(HPyContext *ctx, HPy mod)                   \
+    {                                                                 \
+        _ctx_for_trampolines = ctx;                                   \
+        return exec_name(ctx, mod);                                   \
     }
 
-#else // HPY_UNIVERSAL_ABI
+#define HPy_MODINIT_CREATE_EXEC(modname, moddef, create_name, exec_name) \
+    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;                        \
+    static HPy create_name(HPyContext *ctx, HPy spec, HPyModuleDef *def);\
+    HPy_EXPORTED_SYMBOL                                                  \
+    HPy HPyCreate_##modname(HPyContext *ctx, HPy spec,                   \
+                            HPyModuleDef *def)                           \
+    {                                                                    \
+        _ctx_for_trampolines = ctx;                                      \
+        return create_name(ctx, spec, def);                              \
+    }                                                                    \
+    HPy_MODINIT_EXEC(modname, moddef, exec_name)
 
-#define GET_MACRO(exec_or_create_name, exec_name, NAME, ...) NAME
-#define HPy_MODINIT(modname, moddef, ...) GET_MACRO(__VA_ARGS__, HPy_MODINIT_CREATE_EXEC, HPy_MODINIT_EXEC)(modname, moddef, __VA_ARGS__)
+
+#else // HPY_UNIVERSAL_ABI
 
 // module initialization in the CPython case
 // Note: create_module_def is an internal helper from ctx_module.c

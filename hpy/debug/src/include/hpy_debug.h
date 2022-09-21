@@ -54,6 +54,9 @@ void hpy_debug_close_handle(HPyContext *dctx, HPy dh);
 extern "C"
 #endif
 Py_EXPORTED_SYMBOL
-HPy HPyInit__debug(HPyContext *uctx);
+int HPyExec__debug(HPyContext *uctx, HPy mod);
+
+Py_EXPORTED_SYMBOL
+HPyModuleDef *HPyModDefGet__debug();
 
 #endif /* HPY_DEBUG_H */
