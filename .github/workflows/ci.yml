@@ -54,7 +54,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install pytest pytest-xdist
+          python -m pip install pytest pytest-xdist filelock
           python -m pytest --durations=16 -n auto test/
 
   main_tests_debug:
@@ -86,7 +86,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install pytest pytest-xdist
+          python -m pip install pytest pytest-xdist filelock
           python -m pytest --durations=16 -n auto test/
 
   poc_tests:
@@ -172,7 +172,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install pytest pytest-valgrind
+          python -m pip install pytest pytest-valgrind filelock
           make valgrind
 
   docs_examples_tests:
@@ -201,7 +201,7 @@ jobs:
 
       - name: Install pytest
         run: |
-          python -m pip install pytest
+          python -m pip install pytest pytest-xdist filelock
       - name: Run tests
         run: make docs-examples-tests
         shell: bash
@@ -300,7 +300,7 @@ jobs:
 
       - name: check_py27_compat.py
         run: |
-          python -m pip install pytest pathlib
+          python -m pip install pytest pytest-xdist filelock pathlib
           python test/check_py27_compat.py
 
 
