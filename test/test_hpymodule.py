@@ -24,3 +24,39 @@ class TestModule(HPyTest):
         assert m.__spec__ is None
         assert set(vars(m).keys()) == {
             '__name__', '__doc__', '__package__', '__loader__', '__spec__'}
+
+    def test_HPyModule_ModuleInit(self):
+        mod = self.make_module("""
+        static HPyDef *moduledefs[] = {
+            NULL
+        };
+
+        static HPyModuleDef moduledef = {
+            .name = "foo",
+            .doc = "some test for hpy",
+            .size = -1,
+        };
+
+        HPy_MODINIT(moduledef, create_foo, exec_foo)
+
+        static HPy create_foo(HPyContext *ctx, HPy spec, HPyModuleDef *def)
+        {
+            HPy mod = HPy_CreateModule(ctx, def);
+            HPy_SetAttr_s(mod, "create_spec", spec);
+            return mod;
+        }
+
+        static int exec_foo(HPyContext *ctx, HPy module)
+        {
+            if (HPy_HasAttr_s(ctx, mod, "create_spec")) {
+                HPy spec = HPy_GetAttr_s(ctx, mod, "create_spec");
+                HPy_SetAttr_s(ctx, mod, "exec_spec", spec);
+                HPy_Close(ctx, spec);
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+        """)
+        assert hasattr(mod, "create_spec")
+        assert mod.create_spec is getattr(mod, "exec_spec", None)
