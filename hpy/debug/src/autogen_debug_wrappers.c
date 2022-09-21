@@ -11,6 +11,7 @@
 */
 
 #include "debug_internal.h"
+#include <stdio.h>
 
 DHPy debug_ctx_Module_Create(HPyContext *dctx, HPyModuleDef *def)
 {
@@ -19,6 +20,10 @@ DHPy debug_ctx_Module_Create(HPyContext *dctx, HPyModuleDef *def)
 
 DHPy debug_ctx_Dup(HPyContext *dctx, DHPy h)
 {
+    if (!get_info(dctx)->is_active) {
+        fprintf(stderr, "Error: Wrong HPy Context!");
+        abort();
+    }
     return DHPy_open(dctx, HPy_Dup(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
 }
 

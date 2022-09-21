@@ -31,6 +31,7 @@ int hpy_debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
         HPyErr_NoMemory(uctx);
         return -1;
     }
+    info->is_active = true;
     info->magic_number = HPY_DEBUG_MAGIC;
     info->uctx = uctx;
     info->current_generation = 0;

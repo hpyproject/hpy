@@ -25,6 +25,7 @@
 #include "debug_internal.h"
 #include "hpy/runtime/ctx_type.h" // for call_traverseproc_from_trampoline
 #include "handles.h" // for _py2h and _h2py
+#include <string.h>
 #if defined(_MSC_VER)
 # include <malloc.h>   /* for alloca() */
 #endif
@@ -78,8 +79,13 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         HPyFunc_noargs f = (HPyFunc_noargs)func;
         _HPyFunc_args_NOARGS *a = (_HPyFunc_args_NOARGS*)args;
         DHPy dh_self = _py2dh(dctx, a->self);
-        DHPy dh_result = f(dctx, dh_self);
-        DHPy_close_and_check(dctx, dh_self);
+        ((HPyDebugInfo*)dctx->_private)->is_active = false;
+        HPyContext *dctx_copy = malloc(sizeof(struct _HPyContext_s));
+        memcpy(dctx_copy, dctx, sizeof(struct _HPyContext_s));
+        DHPy dh_result = f(dctx_copy, dh_self);
+        ((HPyDebugInfo*)dctx->_private)->is_active = true;
+        free(dctx_copy);
+        DHPy_close_and_check(dctx, dh_self); 
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
         return;

@@ -230,8 +230,8 @@ class ExtensionCompiler:
         else:
             compile_args = [
                 '-g', '-O0',
-                '-Wfatal-errors',    # stop after one error (unrelated to warnings)
-                '-Werror',           # turn warnings into errors (all, for now)
+                #'-Wfatal-errors',    # stop after one error (unrelated to warnings)
+                #'-Werror',           # turn warnings into errors (all, for now)
             ]
             link_args = [
                 '-g',

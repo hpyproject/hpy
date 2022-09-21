@@ -197,6 +197,8 @@ typedef struct {
     HPyContext *uctx;
     long current_generation;
 
+    bool is_active;
+
     // the following should be an HPyField, but it's complicate:
     // HPyFields should be used only on memory which is known by the GC, which
     // happens automatically if you use e.g. HPy_New, but currently
