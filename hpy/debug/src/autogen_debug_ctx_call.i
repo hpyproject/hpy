@@ -14,7 +14,19 @@
         HPyFunc_unaryfunc f = (HPyFunc_unaryfunc)func;
         _HPyFunc_args_UNARYFUNC *a = (_HPyFunc_args_UNARYFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -25,7 +37,19 @@
         _HPyFunc_args_BINARYFUNC *a = (_HPyFunc_args_BINARYFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
-        DHPy dh_result = f(dctx, dh_arg0, dh_arg1);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, dh_arg1);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         a->result = _dh2py(dctx, dh_result);
@@ -38,7 +62,19 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        DHPy dh_result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, dh_arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         DHPy_close_and_check(dctx, dh_arg2);
@@ -50,7 +86,19 @@
         HPyFunc_inquiry f = (HPyFunc_inquiry)func;
         _HPyFunc_args_INQUIRY *a = (_HPyFunc_args_INQUIRY*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        a->result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         return;
     }
@@ -58,7 +106,19 @@
         HPyFunc_lenfunc f = (HPyFunc_lenfunc)func;
         _HPyFunc_args_LENFUNC *a = (_HPyFunc_args_LENFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        a->result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         return;
     }
@@ -66,7 +126,19 @@
         HPyFunc_ssizeargfunc f = (HPyFunc_ssizeargfunc)func;
         _HPyFunc_args_SSIZEARGFUNC *a = (_HPyFunc_args_SSIZEARGFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0, a->arg1);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, a->arg1);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -76,7 +148,19 @@
         HPyFunc_ssizessizeargfunc f = (HPyFunc_ssizessizeargfunc)func;
         _HPyFunc_args_SSIZESSIZEARGFUNC *a = (_HPyFunc_args_SSIZESSIZEARGFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0, a->arg1, a->arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, a->arg1, a->arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -87,7 +171,19 @@
         _HPyFunc_args_SSIZEOBJARGPROC *a = (_HPyFunc_args_SSIZEOBJARGPROC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        a->result = f(dctx, dh_arg0, a->arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, a->arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg2);
         return;
@@ -97,7 +193,19 @@
         _HPyFunc_args_SSIZESSIZEOBJARGPROC *a = (_HPyFunc_args_SSIZESSIZEOBJARGPROC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg3 = _py2dh(dctx, a->arg3);
-        a->result = f(dctx, dh_arg0, a->arg1, a->arg2, dh_arg3);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, a->arg1, a->arg2, dh_arg3);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg3);
         return;
@@ -108,7 +216,19 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        a->result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, dh_arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         DHPy_close_and_check(dctx, dh_arg2);
@@ -117,14 +237,37 @@
     case HPyFunc_FREEFUNC: {
         HPyFunc_freefunc f = (HPyFunc_freefunc)func;
         _HPyFunc_args_FREEFUNC *a = (_HPyFunc_args_FREEFUNC*)args;
-        f(dctx, a->arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        f(next_dctx, a->arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         return;
     }
     case HPyFunc_GETATTRFUNC: {
         HPyFunc_getattrfunc f = (HPyFunc_getattrfunc)func;
         _HPyFunc_args_GETATTRFUNC *a = (_HPyFunc_args_GETATTRFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0, a->arg1);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, a->arg1);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -135,7 +278,19 @@
         _HPyFunc_args_GETATTROFUNC *a = (_HPyFunc_args_GETATTROFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
-        DHPy dh_result = f(dctx, dh_arg0, dh_arg1);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, dh_arg1);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         a->result = _dh2py(dctx, dh_result);
@@ -147,7 +302,19 @@
         _HPyFunc_args_SETATTRFUNC *a = (_HPyFunc_args_SETATTRFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        a->result = f(dctx, dh_arg0, a->arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, a->arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg2);
         return;
@@ -158,7 +325,19 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        a->result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, dh_arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         DHPy_close_and_check(dctx, dh_arg2);
@@ -168,7 +347,19 @@
         HPyFunc_reprfunc f = (HPyFunc_reprfunc)func;
         _HPyFunc_args_REPRFUNC *a = (_HPyFunc_args_REPRFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -178,7 +369,19 @@
         HPyFunc_hashfunc f = (HPyFunc_hashfunc)func;
         _HPyFunc_args_HASHFUNC *a = (_HPyFunc_args_HASHFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        a->result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         return;
     }
@@ -187,7 +390,19 @@
         _HPyFunc_args_RICHCMPFUNC *a = (_HPyFunc_args_RICHCMPFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
-        DHPy dh_result = f(dctx, dh_arg0, dh_arg1, a->arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, dh_arg1, a->arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         a->result = _dh2py(dctx, dh_result);
@@ -198,7 +413,19 @@
         HPyFunc_getiterfunc f = (HPyFunc_getiterfunc)func;
         _HPyFunc_args_GETITERFUNC *a = (_HPyFunc_args_GETITERFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -208,7 +435,19 @@
         HPyFunc_iternextfunc f = (HPyFunc_iternextfunc)func;
         _HPyFunc_args_ITERNEXTFUNC *a = (_HPyFunc_args_ITERNEXTFUNC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -220,7 +459,19 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        DHPy dh_result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, dh_arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         DHPy_close_and_check(dctx, dh_arg2);
@@ -234,7 +485,19 @@
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
         DHPy dh_arg2 = _py2dh(dctx, a->arg2);
-        a->result = f(dctx, dh_arg0, dh_arg1, dh_arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, dh_arg1, dh_arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         DHPy_close_and_check(dctx, dh_arg2);
@@ -244,7 +507,19 @@
         HPyFunc_getter f = (HPyFunc_getter)func;
         _HPyFunc_args_GETTER *a = (_HPyFunc_args_GETTER*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        DHPy dh_result = f(dctx, dh_arg0, a->arg1);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = NULL;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        DHPy dh_result = f(next_dctx, dh_arg0, a->arg1);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         a->result = _dh2py(dctx, dh_result);
         DHPy_close(dctx, dh_result);
@@ -255,7 +530,19 @@
         _HPyFunc_args_SETTER *a = (_HPyFunc_args_SETTER*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
-        a->result = f(dctx, dh_arg0, dh_arg1, a->arg2);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, dh_arg1, a->arg2);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         return;
@@ -265,7 +552,19 @@
         _HPyFunc_args_OBJOBJPROC *a = (_HPyFunc_args_OBJOBJPROC*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
         DHPy dh_arg1 = _py2dh(dctx, a->arg1);
-        a->result = f(dctx, dh_arg0, dh_arg1);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            a->result = -1;
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        a->result = f(next_dctx, dh_arg0, dh_arg1);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         DHPy_close_and_check(dctx, dh_arg1);
         return;
@@ -274,7 +573,18 @@
         HPyFunc_destructor f = (HPyFunc_destructor)func;
         _HPyFunc_args_DESTRUCTOR *a = (_HPyFunc_args_DESTRUCTOR*)args;
         DHPy dh_arg0 = _py2dh(dctx, a->arg0);
-        f(dctx, dh_arg0);
+        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            HPyErr_NoMemory(dctx);
+            get_ctx_info(next_dctx)->is_valid = false;
+            get_ctx_info(dctx)->is_valid = true;
+            return;
+        }
+        get_ctx_info(dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        f(next_dctx, dh_arg0);
+        get_ctx_info(next_dctx)->is_valid = false;
+        get_ctx_info(dctx)->is_valid = true;
         DHPy_close_and_check(dctx, dh_arg0);
         return;
     }
