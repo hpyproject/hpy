@@ -25,28 +25,52 @@ class TestModule(HPyTest):
         assert set(vars(m).keys()) == {
             '__name__', '__doc__', '__package__', '__loader__', '__spec__'}
 
-    def test_HPyModule_ModuleInit(self):
+    def test_HPyModule_ModuleInit_with_exec(self):
         mod = self.make_module("""
         static HPyDef *moduledefs[] = {
             NULL
         };
 
         static HPyModuleDef moduledef = {
-            .name = "foo",
+            .name = "mytest",
             .doc = "some test for hpy",
-            .size = -1,
+            .defines = moduledefs,
         };
 
-        HPy_MODINIT(moduledef, create_foo, exec_foo)
+        HPy_MODINIT(mytest, moduledef, exec_foo)
+        static int exec_foo(HPyContext *ctx, HPy mod)
+        {
+            HPy h_test = HPyUnicode_FromString(ctx, "value to check");
+            HPy_SetAttr_s(ctx, mod, "test", h_test);
+            HPy_Close(ctx, h_test);
+            return 0;
+        }
+        """)
+        assert hasattr(mod, "test")
+        assert mod.test == "value to check"
+
+    def test_HPyModule_ModuleInit_with_create_and_exec(self):
+        mod = self.make_module("""
+        static HPyDef *moduledefs[] = {
+            NULL
+        };
+
+        static HPyModuleDef moduledef = {
+            .name = "mytest",
+            .doc = "some test for hpy",
+            .defines = moduledefs,
+        };
+
+        HPy_MODINIT(mytest, moduledef, create_foo, exec_foo)
 
         static HPy create_foo(HPyContext *ctx, HPy spec, HPyModuleDef *def)
         {
-            HPy mod = HPy_CreateModule(ctx, def);
-            HPy_SetAttr_s(mod, "create_spec", spec);
+            HPy mod = HPyModule_Create(ctx, def);
+            HPy_SetAttr_s(ctx, mod, "create_spec", spec);
             return mod;
         }
 
-        static int exec_foo(HPyContext *ctx, HPy module)
+        static int exec_foo(HPyContext *ctx, HPy mod)
         {
             if (HPy_HasAttr_s(ctx, mod, "create_spec")) {
                 HPy spec = HPy_GetAttr_s(ctx, mod, "create_spec");
