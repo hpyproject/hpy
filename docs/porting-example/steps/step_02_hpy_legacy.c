@@ -119,7 +119,7 @@ static PyType_Slot Point_legacy_slots[] = {
     {0, 0}
 };
 
-// HPy type methods and slots (no methods or slots have been ported yet)
+// HPy type methods and slots
 static HPyDef *point_defines[] = {
     &Point_init,
     &Point_norm,

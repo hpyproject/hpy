@@ -110,7 +110,7 @@ HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 // and .legacy_slots and .legacy_defines have been removed from HPyType_Spec
 // HPyModuleDef respectively.
 
-// HPy type methods and slots (no methods or slots have been ported yet)
+// HPy type methods and slots
 static HPyDef *point_defines[] = {
     &Point_init,
     &Point_norm,

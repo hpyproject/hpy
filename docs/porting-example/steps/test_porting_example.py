@@ -2,6 +2,7 @@
 
 """ Porting example tests. """
 
+import pytest
 import math
 import types
 
@@ -40,3 +41,10 @@ class TestPorting:
         p2 = mod.Point(23, 42)
         assert p2.obj is None
 
+    def test_leak_checker(self, step):
+        if "hpy_final" not in step.name:
+            pytest.skip("Can only check for leaks in universal mode")
+        mod = step.import_step()
+        from hpy.debug import LeakDetector
+        with LeakDetector():
+            assert mod.Point(24, 42, ...).obj is ...
