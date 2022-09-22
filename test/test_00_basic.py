@@ -7,6 +7,7 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
 from .support import HPyTest
+from hpy.devel.abitag import HPY_ABI_VERSION
 
 
 class TestBasic(HPyTest):
@@ -27,6 +28,23 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert type(mod) is type(sys)
+
+    def test_abi_version_check(self):
+        if self.compiler.hpy_abi != 'universal':
+            return
+        try:
+            self.make_module("""
+                // hack: we redefine the version
+                #undef HPY_ABI_VERSION
+                #define HPY_ABI_VERSION 999
+                @INIT
+            """)
+        except RuntimeError as ex:
+            assert str(ex) == "HPy extension module 'mytest' requires unsupported " \
+                              "version of the HPy runtime. Requested version: 999.0. " \
+                              "Current HPy version: {}.0.".format(HPY_ABI_VERSION)
+        else:
+            assert False, "Expected exception"
 
     def test_different_name(self):
         mod = self.make_module("""
