@@ -1,9 +1,15 @@
 import os, sys
-import pytest, py
+from filelock import FileLock
+import pytest
+from pathlib import Path
 import re
+import subprocess
 import textwrap
 
 PY2 = sys.version_info[0] == 2
+
+HPY_ROOT = Path(__file__).parent.parent
+LOCK = FileLock(HPY_ROOT / ".hpy.lock")
 
 # True if `sys.executable` is set to a value that allows a Python equivalent to
 # the current Python to be launched via, e.g., `python_subprocess.run(...)`.
@@ -16,6 +22,10 @@ def reindent(s, indent):
     s = textwrap.dedent(s)
     return ''.join(' '*indent + line if line.strip() else line
         for line in s.splitlines(True))
+
+def atomic_run(*args, **kwargs):
+    with LOCK:
+        return subprocess.run(*args, **kwargs)
 
 class DefaultExtensionTemplate(object):
 
@@ -318,7 +328,6 @@ class PythonSubprocessRunner:
             correct ABI mode and then executes given code snippet. Use
             "--subprocess-v" to enable logging from this.
         """
-        import subprocess
         env = os.environ.copy()
         pythonpath = [os.path.dirname(mod.so_filename)]
         if 'PYTHONPATH' in env:
@@ -338,8 +347,8 @@ class PythonSubprocessRunner:
             load_module = "import {} as mod;".format(mod.name)
         if self.verbose:
             print("\n---\nExecuting in subprocess: {}".format(load_module + code))
-        result = subprocess.run([sys.executable, "-c", load_module + code], env=env,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = atomic_run([sys.executable, "-c", load_module + code], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if self.verbose:
             print("stdout/stderr:")
             try:
