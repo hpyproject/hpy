@@ -9,6 +9,7 @@
 #include <strings.h>
 #endif
 #include <stdio.h>
+#include <inttypes.h>
 
 
 #include "api.h"
@@ -147,6 +148,50 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
         PyErr_Format(PyExc_RuntimeError,
                      "Error during loading of the HPy extension module at path "
                      "'%s'. Error message from dlopen/WinAPI: %s", soname, error);
+        goto error;
+    }
+
+    char minor_version_symbol_name[258];
+    char major_version_symbol_name[258];
+    PyOS_snprintf(minor_version_symbol_name, sizeof(init_name),
+                  "required_hpy_minor_version_%.200s", shortname);
+    PyOS_snprintf(major_version_symbol_name, sizeof(init_name),
+                  "required_hpy_major_version_%.200s", shortname);
+    void *minor_version_ptr = dlsym(mylib, minor_version_symbol_name);
+    void *major_version_ptr = dlsym(mylib, major_version_symbol_name);
+    if (minor_version_ptr == NULL || major_version_ptr == NULL) {
+        const char *error = dlerror();
+        if (error == NULL)
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at path "
+                     "'%s'. Cannot locate the required minimal HPy versions as symbols '%s' and `%s`. "
+                     "Error message from dlopen/WinAPI: %s",
+                     soname, minor_version_symbol_name, major_version_symbol_name, error);
+        goto error;
+    }
+    uint32_t required_minor_version = *((uint32_t*) minor_version_ptr);
+    uint32_t required_major_version = *((uint32_t*) major_version_ptr);
+    if (required_major_version != HPY_ABI_VERSION || required_minor_version > HPY_ABI_VERSION_MINOR) {
+        // For now, we have only one major version, but in the future at this
+        // point we would decide which HPyContext to create
+        PyErr_Format(PyExc_RuntimeError,
+                     "HPy extension module '%s' requires unsupported version of the HPy runtime. "
+                     "Requested version: %" PRIu32 ".%" PRIu32 ". Current HPy version: %" PRIu32 ".%" PRIu32 ".",
+                     shortname, required_major_version, required_minor_version,
+                     HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR);
+        goto error;
+    }
+
+    char expected_tag[16];
+    PyOS_snprintf(expected_tag, sizeof(expected_tag), ".hpy%" PRIu32 ".", required_major_version);
+    // Sanity check of the tag in the shared object filename
+    if (strstr(soname, expected_tag) == NULL) {
+        PyErr_Format(PyExc_RuntimeError,
+                     "HPy extension module '%s' at path '%s': mismatch between the "
+                     "HPy ABI tag encoded in the filename and the major version requested "
+                     "by the HPy extension itself. Requested version: %" PRIu32 ".%" PRIu32 ".",
+                     shortname, soname, required_major_version, required_minor_version);
         goto error;
     }
 

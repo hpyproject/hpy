@@ -6,7 +6,15 @@ extern "C" {
 
 /* ~~~~~~~~~~~~~~~~ HPy ABI version ~~~~~~~~~~~~~~~ */
 // NOTE: these must be kept on sync with the equivalent variables in hpy/devel/abitag.py
+/**
+ * The ABI version.
+ *
+ * Minor version N+1 is binary compatible to minor version N. Major versions
+ * are not binary compatible (note: HPy can run several binary incompatible
+ * versions in one process).
+ */
 #define HPY_ABI_VERSION 0
+#define HPY_ABI_VERSION_MINOR 0
 #define HPY_ABI_TAG "hpy0"
 
 
