@@ -1,3 +1,5 @@
+:orphan:
+
 step_02_hpy_legacy.c
 ====================
 

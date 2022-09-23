@@ -11,13 +11,6 @@ but does contain additional C attributes (the x and y values of the point)
 and an attribute (obj) that contains a Python object (that we will need to
 convert from a `PyObject *` to an `HPyField`).
 
-.. toctree::
-   :hidden:
-   :glob:
-
-   steps/*
-
-
 There is a separate C file illustrating each step of the incremental port:
 
 * :doc:`steps/step_00_c_api`: The original C API version that we are going to
