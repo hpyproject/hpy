@@ -183,8 +183,8 @@ struct _HPyContext_s {
     HPy (*ctx_Type)(HPyContext *ctx, HPy obj);
     int (*ctx_TypeCheck)(HPyContext *ctx, HPy obj, HPy type);
     int (*ctx_Is)(HPyContext *ctx, HPy obj, HPy other);
-    void *(*ctx_AsStruct)(HPyContext *ctx, HPy h);
-    void *(*ctx_AsStructLegacy)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Object)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Legacy)(HPyContext *ctx, HPy h);
     HPy (*ctx_New)(HPyContext *ctx, HPy h_type, void **data);
     HPy (*ctx_Repr)(HPyContext *ctx, HPy obj);
     HPy (*ctx_Str)(HPyContext *ctx, HPy obj);
@@ -243,4 +243,10 @@ struct _HPyContext_s {
     void (*ctx_Global_Store)(HPyContext *ctx, HPyGlobal *global, HPy h);
     HPy (*ctx_Global_Load)(HPyContext *ctx, HPyGlobal global);
     void (*ctx_Dump)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Type)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Long)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Float)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Unicode)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_Tuple)(HPyContext *ctx, HPy h);
+    void *(*ctx_AsStruct_List)(HPyContext *ctx, HPy h);
 };

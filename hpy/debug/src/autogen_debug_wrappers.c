@@ -457,14 +457,44 @@ int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other)
     return HPy_Is(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, other));
 }
 
-void *debug_ctx_AsStruct(HPyContext *dctx, DHPy h)
+void *debug_ctx_AsStruct_Object(HPyContext *dctx, DHPy h)
 {
-    return HPy_AsStruct(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return _HPy_AsStruct_Object(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-void *debug_ctx_AsStructLegacy(HPyContext *dctx, DHPy h)
+void *debug_ctx_AsStruct_Type(HPyContext *dctx, DHPy h)
 {
-    return HPy_AsStructLegacy(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return _HPy_AsStruct_Type(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+void *debug_ctx_AsStruct_Long(HPyContext *dctx, DHPy h)
+{
+    return _HPy_AsStruct_Long(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+void *debug_ctx_AsStruct_Float(HPyContext *dctx, DHPy h)
+{
+    return _HPy_AsStruct_Float(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+void *debug_ctx_AsStruct_Unicode(HPyContext *dctx, DHPy h)
+{
+    return _HPy_AsStruct_Unicode(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+void *debug_ctx_AsStruct_Tuple(HPyContext *dctx, DHPy h)
+{
+    return _HPy_AsStruct_Tuple(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+void *debug_ctx_AsStruct_List(HPyContext *dctx, DHPy h)
+{
+    return _HPy_AsStruct_List(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+}
+
+void *debug_ctx_AsStruct_Legacy(HPyContext *dctx, DHPy h)
+{
+    return _HPy_AsStruct_Legacy(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
 DHPy debug_ctx_New(HPyContext *dctx, DHPy h_type, void **data)

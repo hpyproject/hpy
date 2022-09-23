@@ -311,9 +311,21 @@ HPy_ID(168)
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 
 HPy_ID(169)
-void* HPy_AsStruct(HPyContext *ctx, HPy h);
+void* _HPy_AsStruct_Object(HPyContext *ctx, HPy h);
+HPy_ID(229)
+void* _HPy_AsStruct_Type(HPyContext *ctx, HPy h);
+HPy_ID(230)
+void* _HPy_AsStruct_Long(HPyContext *ctx, HPy h);
+HPy_ID(231)
+void* _HPy_AsStruct_Float(HPyContext *ctx, HPy h);
+HPy_ID(232)
+void* _HPy_AsStruct_Unicode(HPyContext *ctx, HPy h);
+HPy_ID(233)
+void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h);
+HPy_ID(234)
+void* _HPy_AsStruct_List(HPyContext *ctx, HPy h);
 HPy_ID(170)
-void* HPy_AsStructLegacy(HPyContext *ctx, HPy h);
+void* _HPy_AsStruct_Legacy(HPyContext *ctx, HPy h);
 
 HPy_ID(171)
 HPy _HPy_New(HPyContext *ctx, HPy h_type, void **data);
