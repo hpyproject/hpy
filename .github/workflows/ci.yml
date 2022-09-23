@@ -175,6 +175,13 @@ jobs:
         run: make porting-example-tests
         shell: bash
 
+      - name: Run tests of completed port in debug mode
+        env:
+          HPY_DEBUG: "1"
+          TEST_ARGS: "-s -k hpy_final"
+        run: make porting-example-tests
+        shell: bash
+
 
   valgrind_tests:
     name: Valgrind tests
