@@ -48,3 +48,4 @@ class TestPorting:
         from hpy.debug import LeakDetector
         with LeakDetector():
             assert mod.Point(24, 42, ...).obj is ...
+            assert mod.Point(24, 42).obj is None

@@ -53,8 +53,9 @@ int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy
     if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "|ddO", kwlist,
                               &p->x, &p->y, &obj))
         return -1;
-    if (HPy_IsNull(obj))
-        obj = HPy_Dup(ctx, ctx->h_None);
+    if (HPy_IsNull(obj)) {
+        obj = ctx->h_None;
+    }
     // INCREF not needed because HPyArg_ParseKeywords does not steal a reference
     HPyField_Store(ctx, self, &p->obj, obj);
     HPyTracker_Close(ctx, ht);
