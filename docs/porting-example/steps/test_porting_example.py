@@ -45,7 +45,16 @@ class TestPorting:
         if "hpy_final" not in step.name:
             pytest.skip("Can only check for leaks in universal mode")
         mod = step.import_step()
-        from hpy.debug import LeakDetector
-        with LeakDetector():
-            assert mod.Point(24, 42, ...).obj is ...
-            assert mod.Point(24, 42).obj is None
+        import hpy.debug
+        hpy.debug.set_handle_stack_trace_limit(10)
+        with hpy.debug.LeakDetector():
+            p1 = mod.Point(1, 2, ...)
+            p2 = mod.Point(3, 2)
+
+            assert p1.obj is ...
+            assert p2.obj is None
+            assert p1.norm() == math.sqrt(5.0)
+            assert mod.dot(p1, p2) == 7.0
+
+            del p1
+            del p2
