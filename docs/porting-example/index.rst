@@ -126,3 +126,123 @@ is replaced by `HPyType_FromSpec`.
 
 `HPy_SetAttr_s` is used to add the `Point` class to the module. HPy requires no
 special `PyModule_AddObject` method.
+
+
+Step 02: Transition some methods to HPy
+---------------------------------------
+
+In the previous step we put in place the type and module definitions required
+to create an HPy extension module. In this step we will port some individual
+methods.
+
+Let us start by migrating `Point_traverse`. First we need to change
+`PyObject *obj` in the `PointObject` struct to `HPyField obj`:
+
+.. literalinclude:: steps/step_02_hpy_legacy.c
+    :lineno-match:
+    :start-at: typedef struct {
+    :end-at: } PointObject;
+
+`HPy` handles can only be short-lived -- i.e. local variables, arguments to
+functions or return values. `HPyField` is the way to store long-lived
+references to Python objects.
+
+Now we can update `Point_traverse`:
+
+.. literalinclude:: steps/step_02_hpy_legacy.c
+    :lineno-match:
+    :start-at: HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+    :end-before: // this is a method for creating a Point
+
+In the first line we used the `HPyDef_SLOT` macro to define a small structure
+that describes the slot being implemented. The first argument, `Point_traverse`,
+is the name to assign the structure to. The second, `Point_traverse_impl`,
+is the name of the function implementing the slot. The last, `HPy_tp_traverse`,
+specifies the kind of slot.
+
+This is a change from how slots are defined in the old C API. In the old API,
+the kind of slot is only specified much lower down in `Point_legacy_slots`. In
+HPy the implementation and kind are defined in one place using a syntax
+reminiscent of Python decorators.
+
+The implementation of traverse is now a bit simpler than in the old C API.
+We no longer need to visit `Py_TYPE(self)` and need only `HPy_VISIT`
+`self->obj`. HPy ensures that interpreter knows that the type of the instance
+is still referenced.
+
+Only struct members of type `HPyField` can be visited with `HPy_VISIT`, which
+is why we needed to convert `obj` to an `HPyField` before we implemented the
+HPy traverse.
+
+Note that only should *never* create a local variable of type `HPyField`
+because this local reference would not be visited by `tp_traverse`.
+
+Next we must update `Point_init` to store the value of `obj` as an `HPyField`:
+
+.. literalinclude:: steps/step_02_hpy_legacy.c
+    :lineno-match:
+    :start-at: HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
+    :end-before: // an HPy method of Point
+
+There are a few new `HPy` constructs used here:
+
+- The kind of the slot passed to `HPyDef_SLOT` is `HPy_tp_init`.
+
+- `PointObject_AsStruct` is defined by `HPyType_LEGACY_HELPERS` and returns
+  an instance of the `PointObject` struct. Because we still include
+  `PyObject_HEAD` at the start of the struct this is still a valid `PyObject *`
+  but once we finish the port the struct will no longer contain `PyObject_HEAD`
+  and this will just be an ordinary C struct with no memory overhead!
+
+- We use `HPyTracker` when parsing the arguments with `HPyArg_ParseKeywords`.
+  The `HPyTracker` keeps track of open handles so that they can be closed
+  easily at the end with `HPyTracker_Close`.
+
+- `HPyArg_ParseKeywords` is the equivalent of `PyArg_ParseTupleAndKeywords`.
+  Note that the `HPy` version does not steal a reference like the Python
+  version.
+
+- `HPyField_Store` is used to store a reference to `obj` in the struct. The
+  arguments are the context (`ctx`), a handle to the object that owns the
+  reference (`self`), the address of the `HPyField` (`&p->obj`), and the
+  handle to the object (`obj`).
+
+The last update we need to make for the change to `HPyField` is to migrate
+`Point_obj_get` which retrieves `obj` from the stored `HPyField`:
+
+.. literalinclude:: steps/step_02_hpy_legacy.c
+    :lineno-match:
+    :start-at: HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
+    :end-before: // this is an LEGACY function which casts a PyObject* into a PyPointObject*
+
+Above we have used `PointObject_AsStruct` again, and then `HPyField_Load` to
+retrieve the value of `obj` from the `HPyField`.
+
+We've now finished all of the changes needed by introducing `HPyField`. We
+could stop here, but let's migrate one ordinary method, `Point_norm`, to end
+off this stage of the port:
+
+.. literalinclude:: steps/step_02_hpy_legacy.c
+    :lineno-match:
+    :start-at: HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
+    :end-before: // this is the getter for the associated object
+
+To define a method we use `HPyDef_METH` instead of `HPyDef_SLOT`. `HPyDef_METH`
+creates a small structure defining the method. The first argument is the name
+to assign to the structure (`Point_norm`). The second is the Python name of
+the method (`norm`). The third is the name of the C function implementing the
+method (`Point_norm_impl`). The fourth specifies the method signature
+(`HPyFunc_NOARGS` -- i.e. no additional arguments in this case). The
+last provides the docstring.
+
+The rest of the implementation remains similar, except that we use
+`HPyFloat_FromDouble` to create a handle to a Python float containing the
+result (i.e. the distance of the point from the origin).
+
+Now we are done and just have to remove the old implementations from
+`Point_legacy_slots` and add them to `point_defines`:
+
+.. literalinclude:: steps/step_02_hpy_legacy.c
+    :lineno-match:
+    :start-at: static HPyDef *point_defines[] = {
+    :end-before: static HPyType_Spec Point_Type_spec = {
