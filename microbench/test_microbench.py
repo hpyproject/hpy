@@ -162,6 +162,17 @@ class TestHeapType:
         The type is named `simple.HTFoo` and is a heap type in all cases.
     """
 
+    def test_allocate_obj(self, simple, timer, N):
+        import gc
+        HTFoo = simple.HTFoo
+        objs = [None] * N
+        gc.collect()
+        with timer:
+            for i in range(N):
+                objs[i] = HTFoo()
+            del objs
+            gc.collect()
+
     def test_method_lookup(self, simple, timer, N):
         obj = simple.HTFoo()
         with timer:
