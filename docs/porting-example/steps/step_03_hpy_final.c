@@ -55,7 +55,7 @@ int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy
                               &p->x, &p->y, &obj))
         return -1;
     if (HPy_IsNull(obj))
-        obj = HPy_Dup(ctx, ctx->h_None);
+        obj = ctx->h_None;
     // INCREF not needed because HPyArg_ParseKeywords does not steal a reference
     HPyField_Store(ctx, self, &p->obj, obj);
     HPyTracker_Close(ctx, ht);
@@ -87,7 +87,7 @@ HPyDef_METH(dot, "dot", dot_impl, HPyFunc_VARARGS, .doc="Dot product.")
 HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     HPy point1, point2;
-    if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO",  &point1, &point2))
+    if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &point1, &point2))
         return HPy_NULL;
     PointObject *p1 = PointObject_AsStruct(ctx, point1);
     PointObject *p2 = PointObject_AsStruct(ctx, point2);
@@ -95,8 +95,6 @@ HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     HPy result;
     dp = p1->x * p2->x + p1->y * p2->y;
     result = HPyFloat_FromDouble(ctx, dp);
-    HPy_Close(ctx, point1);
-    HPy_Close(ctx, point2);
     return result;
 }
 
