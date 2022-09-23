@@ -1,4 +1,5 @@
 #include <math.h>
+// #include <Python.h>  // disallow use of the old C API
 #include <hpy.h>
 
 // Porting to HPy, Step 3: All methods ported
@@ -53,9 +54,8 @@ int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy
     if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "|ddO", kwlist,
                               &p->x, &p->y, &obj))
         return -1;
-    if (HPy_IsNull(obj)) {
-        obj = ctx->h_None;
-    }
+    if (HPy_IsNull(obj))
+        obj = HPy_Dup(ctx, ctx->h_None);
     // INCREF not needed because HPyArg_ParseKeywords does not steal a reference
     HPyField_Store(ctx, self, &p->obj, obj);
     HPyTracker_Close(ctx, ht);
@@ -95,6 +95,8 @@ HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     HPy result;
     dp = p1->x * p2->x + p1->y * p2->y;
     result = HPyFloat_FromDouble(ctx, dp);
+    HPy_Close(ctx, point1);
+    HPy_Close(ctx, point2);
     return result;
 }
 
@@ -129,7 +131,7 @@ static HPyType_Spec Point_Type_spec = {
     .defines = point_defines
 };
 
-// HPy module methods (no methods have been ported yet)
+// HPy module methods
 static HPyDef *module_defines[] = {
     &dot,
     NULL

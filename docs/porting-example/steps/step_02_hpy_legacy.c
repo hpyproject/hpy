@@ -65,6 +65,14 @@ int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy
     return 0;
 }
 
+// this is the getter for the associated object
+HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
+HPy Point_obj_get_impl(HPyContext *ctx, HPy self, void* closure)
+{
+    PointObject *p = PointObject_AsStruct(ctx, self);
+    return HPyField_Load(ctx, self, p->obj);
+}
+
 // an HPy method of Point
 HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext *ctx, HPy self)
@@ -75,14 +83,6 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
     norm = sqrt(p->x * p->x + p->y * p->y);
     result = HPyFloat_FromDouble(ctx, norm);
     return result;
-}
-
-// this is the getter for the associated object
-HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
-HPy Point_obj_get_impl(HPyContext *ctx, HPy self, void* closure)
-{
-    PointObject *p = PointObject_AsStruct(ctx, self);
-    return HPyField_Load(ctx, self, p->obj);
 }
 
 // this is an LEGACY function which casts a PyObject* into a PyPointObject*

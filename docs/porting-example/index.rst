@@ -182,7 +182,7 @@ Next we must update `Point_init` to store the value of `obj` as an `HPyField`:
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
     :start-at: HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
-    :end-before: // an HPy method of Point
+    :end-before: // this is the getter for the associated object
 
 There are a few new `HPy` constructs used here:
 
@@ -213,7 +213,7 @@ The last update we need to make for the change to `HPyField` is to migrate
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
     :start-at: HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
-    :end-before: // this is an LEGACY function which casts a PyObject* into a PyPointObject*
+    :end-before: // an HPy method of Point
 
 Above we have used `PointObject_AsStruct` again, and then `HPyField_Load` to
 retrieve the value of `obj` from the `HPyField`.
@@ -225,7 +225,7 @@ off this stage of the port:
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
     :start-at: HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
-    :end-before: // this is the getter for the associated object
+    :end-before: // this is an LEGACY function which casts a PyObject* into a PyPointObject*
 
 To define a method we use `HPyDef_METH` instead of `HPyDef_SLOT`. `HPyDef_METH`
 creates a small structure defining the method. The first argument is the name
@@ -246,3 +246,79 @@ Now we are done and just have to remove the old implementations from
     :lineno-match:
     :start-at: static HPyDef *point_defines[] = {
     :end-before: static HPyType_Spec Point_Type_spec = {
+
+
+Step 03: Complete the port to HPy
+---------------------------------
+
+In this step we'll complete the port. We'll no longer include Python, remove
+`PyObject_HEAD` from the `PointObject` struct, and port the remaining methods.
+
+First, let's remove the import of `Python.h`:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: // #include <Python.h>  // disallow use of the old C API
+    :end-at: // #include <Python.h>  // disallow use of the old C API
+
+And `PyObject_HEAD` from the struct:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: typedef struct {
+    :end-at: } PointObject;
+
+And the typedef of `PointObject` to `PyPointObject`:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: // typedef PointObject PyPointObject;
+    :end-at: // typedef PointObject PyPointObject;
+
+Now any code that has not been ported should result in a compilation error.
+
+We must also change the type helpers from `HPyType_LEGACY_HELPERS` to
+`HPyType_HELPERS` so that `PointObject_AsStruct` knows that `PyObject_HEAD`
+has been removed:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: HPyType_HELPERS(PointObject)
+    :end-at: HPyType_HELPERS(PointObject)
+
+There is one more method to port, the `dot` method which is a module method
+that implements the dot product between two points:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: HPyDef_METH(dot, "dot", dot_impl, HPyFunc_VARARGS, .doc="Dot product.")
+    :end-before: // Method, type and module definitions. In this porting step all
+
+The changes are similar to those used in porting the `norm` method, except:
+
+- We opted not to use an `HPyTracker` by passing `NULL` as the pointer to the
+  tracker when calling `HPyArg_Parse`. There is no reason not to use a
+  tracker here, but avoiding it allows us to show how to close handles
+  using `HPy_Close` instead.
+
+We use `PointObject_AsStruct` and `HPyFloat_FromDouble` as before.
+
+Now that we have ported everything we can remove `PointMethods`,
+`Point_legacy_slots` and `PointModuleLegacyMethods`. The resulting
+type definition is much cleaner:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: static HPyDef *point_defines[] = {
+    :end-before: // HPy module methods
+
+and the module definition is simpler too:
+
+.. literalinclude:: steps/step_03_hpy_final.c
+    :lineno-match:
+    :start-at: static HPyDef *module_defines[] = {
+    :end-before: HPy_MODINIT(step_03_hpy_final)
+
+Now that the port is complete, when we compile our extension in HPy
+universal mode, we obtain a built extension that depends only on the HPy ABI
+and not on the CPython ABI at all!
