@@ -65,7 +65,8 @@ static HPy allocate_tuple_impl(HPyContext *ctx, HPy self)
 /* Foo type */
 
 typedef struct {
-    PyObject_HEAD
+    long x;
+    long y;
 } FooObject;
 
 HPyDef_SLOT(Foo_getitem, HPy_sq_item)
