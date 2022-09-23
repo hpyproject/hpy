@@ -31,7 +31,7 @@ static void DebugHandle_free_raw_data(HPyDebugInfo *info, DebugHandle *handle, b
     }
 }
 
-static DHPy _DHPy_open(HPyContext *dctx, UHPy uh, bool is_context_contant)
+static DHPy _DHPy_open(HPyContext *dctx, UHPy uh, bool is_immortal)
 {
     UHPy_sanity_check(uh);
     if (HPy_IsNull(uh))
@@ -62,14 +62,14 @@ static DHPy _DHPy_open(HPyContext *dctx, UHPy uh, bool is_context_contant)
     handle->uh = uh;
     handle->generation = info->current_generation;
     handle->is_closed = 0;
-    handle->is_context_constant = is_context_contant;
+    handle->is_immortal = is_immortal;
     handle->associated_data = NULL;
     DHQueue_append(&info->open_handles, handle);
     debug_handles_sanity_check(info);
     return as_DHPy(handle);
 }
 
-DHPy DHPy_open_context_constant(HPyContext *dctx, UHPy uh) {
+DHPy DHPy_open_immortal(HPyContext *dctx, UHPy uh) {
     return _DHPy_open(dctx, uh, true);
 }
 
@@ -93,7 +93,7 @@ void DHPy_invalid_handle(HPyContext *dctx, DHPy dh)
 {
     HPyDebugInfo *info = get_info(dctx);
     HPyContext *uctx = info->uctx;
-    assert(as_DebugHandle(dh)->is_closed || as_DebugHandle(dh)->is_context_constant);
+    assert(as_DebugHandle(dh)->is_closed || as_DebugHandle(dh)->is_immortal);
     if (HPy_IsNull(info->uh_on_invalid_handle)) {
         // default behavior: print an error and abort
         HPy_FatalError(uctx, "Invalid usage of already closed handle");
@@ -148,7 +148,7 @@ void DHPy_close(HPyContext *dctx, DHPy dh)
         return;
 
     // Closing context constants is never allowed
-    if (handle->is_context_constant)
+    if (handle->is_immortal)
         DHPy_invalid_handle(dctx, dh);
 
     // move the handle from open_handles to closed_handles

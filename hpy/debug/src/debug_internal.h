@@ -138,7 +138,7 @@ typedef struct DebugHandle {
     UHPy uh;
     long generation;
     bool is_closed:1;
-    bool is_context_constant:1;
+    bool is_immortal:1;
     // pointer to and size of any raw data associated with
     // the lifetime of the handle:
     void *associated_data;
@@ -159,7 +159,7 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 }
 
 DHPy DHPy_open(HPyContext *dctx, UHPy uh);
-DHPy DHPy_open_context_constant(HPyContext *dctx, UHPy uh);
+DHPy DHPy_open_immortal(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_close_and_check(HPyContext *dctx, DHPy dh);
 void DHPy_free(HPyContext *dctx, DHPy dh);
