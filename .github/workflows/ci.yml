@@ -51,7 +51,7 @@ jobs:
       - name: Run tests
         run: |
           python -m pip install pytest pytest-xdist filelock
-          python -m pytest --durations=16 -n auto test/
+          python -m pytest --basetemp=.tmpdir --durations=16 -n auto test/
 
   main_tests_debug:
     name: Main tests on CPython debug builds
