@@ -200,6 +200,21 @@ There are a few new `HPy` constructs used here:
   reference (`self`), the address of the `HPyField` (`&p->obj`), and the
   handle to the object (`obj`).
 
+.. note::
+
+    An `HPyTracker` is not strictly needed for `HPyArg_ParseKeywords`
+    in `Point_init`. The arguments `x` and `y` are C floats (so there are no
+    handles to close) and the handle stored in `obj` was passed in to the
+    `Point_init` as an argument and so should not be closed.
+
+    We showed the tracker here to demonstrate its use. You can read more
+    about argument parsing in the
+    :doc:`API docs </api-reference/argument-parsing>`.
+
+    If a tracker is needed and one is not provided, `HPyArg_ParseKeywords`
+    will return an error.
+
+
 The last update we need to make for the change to `HPyField` is to migrate
 `Point_obj_get` which retrieves `obj` from the stored `HPyField`:
 
@@ -289,10 +304,13 @@ that implements the dot product between two points:
 
 The changes are similar to those used in porting the `norm` method, except:
 
+- We use `HPyArg_Parse` instead of `HPyArg_ParseKeywords`.
+
 - We opted not to use an `HPyTracker` by passing `NULL` as the pointer to the
   tracker when calling `HPyArg_Parse`. There is no reason not to use a
-  tracker here, but avoiding it allows us to show how to close handles
-  using `HPy_Close` instead.
+  tracker here, but the handles to the two points are passed in as arguments
+  to `dot_impl` and thus there is no need to close them (and they should not
+  be closed).
 
 We use `PointObject_AsStruct` and `HPyFloat_FromDouble` as before.
 
