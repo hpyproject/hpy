@@ -30,6 +30,16 @@ There is a separate C file illustrating each step of the incremental port:
 Take a moment to read through :doc:`steps/step_00_c_api`. Then, once you're
 ready, keep reading.
 
+Each section below corresponds to one of the three porting steps above:
+
+.. contents::
+    :local:
+    :depth: 2
+
+.. note::
+    The steps used here are one approach to porting a module. The specific
+    steps are not required. They're just an example approach.
+
 
 Step 01: Converting the module to a (legacy) HPy module
 -------------------------------------------------------
