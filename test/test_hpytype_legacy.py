@@ -22,7 +22,7 @@ class LegacyPointTemplate(PointTemplate):
         HPyType_LEGACY_HELPERS({struct_name})
     """
 
-    _IS_LEGACY = ".legacy = true,"
+    _IS_LEGACY = ".builtin_shape = HPyType_BuiltinShape_Legacy,"
 
 
 class TestLegacyType(_TestType):
@@ -56,7 +56,7 @@ class TestLegacyType(_TestType):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = true,
+                .builtin_shape = PointObject_SHAPE,
                 .legacy_slots = Point_slots,
                 .defines = Point_defines,
             };
@@ -94,7 +94,7 @@ class TestLegacyType(_TestType):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = true,
+                .builtin_shape = PointObject_SHAPE,
                 .legacy_slots = Point_slots,
                 .defines = Point_defines,
             };
@@ -128,7 +128,7 @@ class TestLegacyType(_TestType):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = true,
+                .builtin_shape = PointObject_SHAPE,
                 .legacy_slots = Point_slots,
                 .defines = Point_defines,
             };
@@ -197,7 +197,7 @@ class TestCustomLegacyFeatures(HPyTest):
 
             static HPyType_Spec LegacyType_spec = {
                 .name = "mytest.LegacyType",
-                .legacy = true,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
             };
 
             static void make_Types(HPyContext *ctx, HPy module)

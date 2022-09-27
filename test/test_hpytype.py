@@ -87,7 +87,7 @@ class PointTemplate(DefaultExtensionTemplate):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = PointObject_IS_LEGACY,
+                .builtin_shape = PointObject_SHAPE,
                 .defines = Point_defines
             };
         """ % defines
@@ -342,7 +342,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = FooObject_SHAPE,
                 .defines = Foo_defines
             };
 
@@ -403,7 +403,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = FooObject_SHAPE,
                 .defines = Foo_defines
             };
 
@@ -500,7 +500,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = FooObject_SHAPE,
                 .defines = Foo_defines
             };
 
@@ -641,7 +641,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = FooObject_SHAPE,
                 .defines = Foo_defines
             };
 

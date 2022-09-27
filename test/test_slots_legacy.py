@@ -48,7 +48,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                .legacy = true,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
                 .legacy_slots = Dummy_type_slots,
                 .defines = Dummy_defines
             };
@@ -94,7 +94,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .legacy = true,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
                 .legacy_slots = dummy_type_slots,
                 .defines = dummy_type_defines
             };
@@ -153,7 +153,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = true,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
                 .legacy_slots = legacy_slots,
                 .defines = Point_defines
             };
@@ -219,7 +219,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = true,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
                 .legacy_slots = legacy_slots,
                 .defines = Point_defines
             };
@@ -253,7 +253,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                .legacy = false,
+                .builtin_shape = HPyType_BuiltinShape_Object,
                 .legacy_slots = dummy_type_slots,
             };
 
@@ -263,4 +263,4 @@ class TestCustomLegacySlotsFeatures(HPyTest):
         with pytest.raises(TypeError) as err:
             self.make_module(mod_src)
         assert str(err.value) == (
-            "cannot specify .legacy_slots without setting .legacy=true")
+            "cannot specify .legacy_slots without setting .builtin_shape=HPyType_BuiltinShape_Legacy")
