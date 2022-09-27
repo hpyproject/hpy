@@ -183,6 +183,36 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
     return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
 }
 
+#define DEBUG_AS_STRUCT(SHAPE) \
+    void *debug_ctx_AsStruct_##SHAPE(HPyContext *dctx, DHPy dh) \
+    { \
+        HPyContext *uctx = get_info(dctx)->uctx; \
+        UHPy uh = DHPy_unwrap(dctx, dh); \
+        void *actual_data_ptr = _HPy_AsStruct_##SHAPE(uctx, uh); \
+        void *expected_data_ptr = _HPy_AsStruct_Slow(uctx, uh); \
+        if (actual_data_ptr != expected_data_ptr) { \
+            HPy_FatalError(uctx, "Invalid usage of _HPy_AsStruct_" #SHAPE \
+                ". The object's type has a different shape."); \
+        } \
+        return actual_data_ptr; \
+    }
+
+DEBUG_AS_STRUCT(Legacy)
+
+DEBUG_AS_STRUCT(Object)
+
+DEBUG_AS_STRUCT(Type)
+
+DEBUG_AS_STRUCT(Long)
+
+DEBUG_AS_STRUCT(Float)
+
+DEBUG_AS_STRUCT(Unicode)
+
+DEBUG_AS_STRUCT(Tuple)
+
+DEBUG_AS_STRUCT(List)
+
 /* ~~~ debug mode implementation of HPyTracker ~~~
 
    This is a bit special and it's worth explaining what is going on.
