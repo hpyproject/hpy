@@ -48,6 +48,7 @@ SPECIAL_CASES = {
     '_HPy_AsStruct_Tuple': None,
     '_HPy_AsStruct_List': None,
     '_HPy_AsStruct_Legacy': None,
+    '_HPy_AsStruct_Slow': None,
     '_HPy_CallRealFunctionFromTrampoline': None,
     '_HPy_CallDestroyAndThenDealloc': None,
     'HPyErr_Occurred': None,

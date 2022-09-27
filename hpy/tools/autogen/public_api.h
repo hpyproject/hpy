@@ -312,6 +312,8 @@ int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 
 HPy_ID(169)
 void* _HPy_AsStruct_Object(HPyContext *ctx, HPy h);
+HPy_ID(170)
+void* _HPy_AsStruct_Legacy(HPyContext *ctx, HPy h);
 HPy_ID(229)
 void* _HPy_AsStruct_Type(HPyContext *ctx, HPy h);
 HPy_ID(230)
@@ -324,8 +326,8 @@ HPy_ID(233)
 void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h);
 HPy_ID(234)
 void* _HPy_AsStruct_List(HPyContext *ctx, HPy h);
-HPy_ID(170)
-void* _HPy_AsStruct_Legacy(HPyContext *ctx, HPy h);
+HPy_ID(235)
+void* _HPy_AsStruct_Slow(HPyContext *ctx, HPy h);
 
 HPy_ID(171)
 HPy _HPy_New(HPyContext *ctx, HPy h_type, void **data);

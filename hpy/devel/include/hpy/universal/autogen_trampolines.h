@@ -378,6 +378,10 @@ HPyAPI_FUNC void *_HPy_AsStruct_Object(HPyContext *ctx, HPy h) {
      return ctx->ctx_AsStruct_Object ( ctx, h ); 
 }
 
+HPyAPI_FUNC void *_HPy_AsStruct_Legacy(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Legacy ( ctx, h ); 
+}
+
 HPyAPI_FUNC void *_HPy_AsStruct_Type(HPyContext *ctx, HPy h) {
      return ctx->ctx_AsStruct_Type ( ctx, h ); 
 }
@@ -402,8 +406,8 @@ HPyAPI_FUNC void *_HPy_AsStruct_List(HPyContext *ctx, HPy h) {
      return ctx->ctx_AsStruct_List ( ctx, h ); 
 }
 
-HPyAPI_FUNC void *_HPy_AsStruct_Legacy(HPyContext *ctx, HPy h) {
-     return ctx->ctx_AsStruct_Legacy ( ctx, h ); 
+HPyAPI_FUNC void *_HPy_AsStruct_Slow(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Slow ( ctx, h ); 
 }
 
 HPyAPI_FUNC HPy HPy_Repr(HPyContext *ctx, HPy obj) {

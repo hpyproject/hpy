@@ -160,7 +160,7 @@ static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name, HPyType_BuiltinSh
     return result;
 }
 
-static void *_pyobj_as_struct(PyObject *obj)
+static inline void *_pyobj_as_struct(PyObject *obj)
 {
     return _HPy_Payload(obj, _HPyType_Get_Shape(Py_TYPE(obj)));
 }
@@ -1068,6 +1068,12 @@ _HPy_HIDDEN void*
 ctx_AsStruct_List(HPyContext *ctx, HPy h)
 {
     return _HPy_Payload(_h2py(h), HPyType_BuiltinShape_List);
+}
+
+_HPy_HIDDEN void*
+ctx_AsStruct_Slow(HPyContext *ctx, HPy h)
+{
+    return _pyobj_as_struct(_h2py(h));
 }
 
 
