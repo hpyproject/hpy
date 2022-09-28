@@ -22,8 +22,8 @@ class LegacyPointTemplate(PointTemplate):
         HPyType_LEGACY_HELPERS({struct_name})
     """
 
-    _IS_LEGACY = ".builtin_shape = HPyType_BuiltinShape_Legacy,"
-
+    def DEFAULT_SHAPE(self):
+        return ".builtin_shape = HPyType_BuiltinShape_Legacy,"
 
 class TestLegacyType(_TestType):
 
