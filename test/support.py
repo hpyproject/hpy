@@ -175,6 +175,7 @@ class HPyModule(object):
 
 class ExtensionCompiler:
     def __init__(self, tmpdir, hpy_devel, hpy_abi, compiler_verbose=False,
+                 dump_dir=None,
                  ExtensionTemplate=DefaultExtensionTemplate,
                  extra_include_dirs=None):
         """
@@ -189,22 +190,28 @@ class ExtensionCompiler:
         system-wide one.
         """
         self.tmpdir = tmpdir
+        self.dump_dir = dump_dir
         self.hpy_devel = hpy_devel
         self.hpy_abi = hpy_abi
         self.compiler_verbose = compiler_verbose
-        self.ExtensionTemplate=ExtensionTemplate
+        self.ExtensionTemplate = ExtensionTemplate
         self.extra_include_dirs = extra_include_dirs
 
     def _expand(self, ExtensionTemplate, name, template):
         source = ExtensionTemplate(template, name).expand()
         filename = self.tmpdir.join(name + '.c')
+        dump_file = self.dump_dir.joinpath(name + '.c') if self.dump_dir else None
         if PY2:
             # this code is used also by pypy tests, which run on python2. In
             # this case, we need to write as binary, because source is
             # "bytes". If we don't and source contains a non-ascii char, we
             # get an UnicodeDecodeError
+            if dump_file:
+                dump_file.write_text(source)
             filename.write(source, mode='wb')
         else:
+            if dump_file:
+                dump_file.write_text(source)
             filename.write(source)
         return name + '.c'
 
@@ -223,6 +230,8 @@ class ExtensionCompiler:
             extra_filename = self._expand(ExtensionTemplate, 'extmod_%d' % i, src)
             sources.append(extra_filename)
         #
+        if self.dump_dir:
+            pytest.skip("dumping test sources only")
         if sys.platform == 'win32':
             # not strictly true, could be mingw
             compile_args = [
