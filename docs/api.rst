@@ -310,3 +310,248 @@ table, which now becomes:
 .. literalinclude:: examples/snippets/hpyvarargs.c
   :start-after: // BEGIN: methodsdef
   :end-before: // END: methodsdef
+
+More Examples
+-------------
+
+HPy usually has tests for each API function. This means that there is lots of
+examples available by looking at the tests. However, the test source is often
+generated and hard to read. To overcome this problem it is possible to dump the
+generated test sources. Since the HPy test are not shipped by default, you need
+to clone the HPy repository from GitHub:
+
+.. code-block:: console
+
+    > git clone https://github.com/hpyproject/hpy.git
+
+After that, install all test requirements and dump the sources:
+
+.. code-block:: console
+
+    > cd hpy
+    > python3 -m pip install pytest filelock
+    > python3 -m pytest --dump-dir=test_sources test/
+
+This will dump the generated test sources into folder ``test_sources``.
+
+Creating types in HPy
+---------------------
+
+Creating Python types in an HPy extension is again very similar to the C API
+with the difference that HPy only supports creating types from a specification.
+This is necessary because there is no such C-level type as ``PyTypeObject``
+since that would expose the internal implementation.
+
+
+Creating a simple type in HPy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section assumes that the user wants to define a type that stores some data
+in a C-level structure. As an example, we will create a simple C structure
+``PointObject`` that represents a two-dimensional point.
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: PointObject
+  :end-before: // END: PointObject
+
+The macro call ``HPyType_HELPERS(PointObject)`` is of particular interest. This
+macro generates useful helper facilities for working with the type. By the time
+of writing this documentation, it generates a C enum ``PointObject_SHAPE`` and a
+helper function ``PointObject_AsStruct``. The enum is meant to be used in the
+type specification. The helper function is intended to be used for efficiently
+retrieving the pointer ``PointObject *`` from an HPy handle to be able to access
+the C structure. We will use this helper function in the following to implement
+the methods, get-set descriptors, and slots.
+
+It makes sense to expose fields ``PointObject.x`` and ``PointObject.y`` as
+Python-level members. To do so, we need to define members by specifying their
+name, type, and location using HPy's convenience macro ``HPyDef_MEMBER`` as the
+following example shows:
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: members
+  :end-before: // END: members
+
+The first argument of the macro is the name for the C glabal variable that will
+store the necessary information. We will need that later for registration at
+the type. The second, third, and fourth argument are the Python-level name, the
+C type of the member, and the offset in the C structure, respectively.
+
+Similarly, methods and get-set descriptors can be define. For example, method
+``foo`` is an instance method that takes no arguments (the self argument is, of
+course, implicit), does some computation with fields ``x`` and ``y`` and
+returns a Python ``int``:
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: methods
+  :end-before: // END: methods
+
+Get-set descriptors are also defined in a very similar way as methods. The
+following example defines a get-set descriptor for attribute ``z``.
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: getset
+  :end-before: // END: getset
+
+It is also possible to just define a get-descriptor or just a set-descriptor by
+using HPy's macros ``HPyDef_GET`` and ``HPyDef_SET`` in the same way.
+
+HPy also supports type slots. In this example, we will define slot
+``HPy_tp_new`` (which corresponds to magic method ``__new__``) to initialize
+fields ``x`` and ``y`` when constructing the object:
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: slots
+  :end-before: // END: slots
+
+After everything was defined, we need to create a list of all defines such that
+we are able to eventually register them to the type:
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: defines
+  :end-before: // END: defines
+
+Please note that it is strictly necessary to terminate the list with ``NULL``.
+We can now create the actual type specification by appropriately filling an
+``HPyType_Spec`` structure:
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: spec
+  :end-before: // END: spec
+
+First, we need to define the name of the type by setting a C string to member
+``name``. Since this type has a C structure, we need to define the
+``basicsize`` and best practice is to just set it to ``sizeof(PointObject)``.
+Also best practice is to set ``builtin_shape`` to ``PointObject_SHAPE`` where
+``PointObject_SHAPE`` is generated by the previous usage of macro
+``HPyType_HELPERS(PointObject)``. Last but not least, we need to register the
+defines by setting field ``defines`` to the previously defined array
+``Point_defines``.
+
+The type specification for the simple type ``simple_type.Point`` represented in
+C by structure ``PointObject`` is now complete. All that remains is to create
+the type object and add it to the module which is easily achieved by using
+:c:func:`HPyHelpers_AddType`:
+
+.. literalinclude:: examples/hpytype-example/simple_type.c
+  :start-after: // BEGIN: add_type
+  :end-before: // END: add_type
+
+Also look at the full example at: :doc:`examples/hpytype-example/simple_type`.
+
+
+Legacy types
+~~~~~~~~~~~~
+
+A type whose struct starts with ``PyObject_HEAD`` (either directly by
+embedding it in the type struct or indirectly by embedding another struct like
+``PyLongObject``) is a *legacy type*. A legacy type must set
+``.builtin_shape = HPyType_BuiltinShape_Legacy``
+in its ``HPyType_Spec``. The counterpart (i.e. a non-legacy type) is called HPy
+pure type.
+
+Legacy types are available to allow gradual porting of existing CPython
+extensions. It is possible to reuse existing ``PyType_Slot`` entities (i.e.
+slots, methods, members, and get/set descriptors). The idea is that you can then
+migrate one after each other while still running the tests.
+
+The major restriction when using legacy types is that you cannot build a
+universal binary (you cannot use HPy's universal ABI) of your HPy extension and
+the resulting binary will be specific to the Python interpreter used for
+building. Therefore, the goal should always be to fully migrate to HPy pure
+types.
+
+A type with ``.legacy_slots != NULL`` is required to have
+``HPyType_BuiltinShape_Legacy`` and to include ``PyObject_HEAD`` at the start of
+its struct. It would be easy to relax this requirement on CPython (where the
+``PyObject_HEAD`` fields are always present) but a large burden on other
+implementations (e.g. PyPy, GraalPython) where a struct starting with
+``PyObject_HEAD`` might not exist.
+
+Types created via the old Python C API are automatically legacy types.
+
+This section does not provide a dedicated example for how to create and use
+legacy types because the :doc:`porting-example/index` already shows how that
+is useful during incremental migration to HPy.
+
+Inherit from a built-in type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+HPy also supports to inherit from following built-in types:
+
+  * ``type``
+
+  * ``int``
+
+  * ``float``
+
+  * ``unicode``
+
+  * ``tuple``
+
+  * ``list``
+
+Inheriting from built-in types is straight forward if you don't have a C
+structure that represents your type. In other words, you can simply inherit
+from, e.g., ``str`` if the ``basicsize`` in your type specification is ``0``.
+For example:
+
+.. literalinclude:: examples/hpytype-example/builtin_type.c
+  :start-after: // BEGIN: spec_Dummy
+  :end-before: // END: spec_Dummy
+
+.. literalinclude:: examples/hpytype-example/builtin_type.c
+  :start-after: // BEGIN: add_Dummy
+  :end-before: // END: add_Dummy
+
+This case is simple because there is no ``Dummy_AsStruct`` since there is no
+associated C-level structure.
+
+It is, however, more involved if your type also defines its own C structure
+(i.e. ``basicsize > 0`` in the type specification). In this case, it is strictly
+necessary to use the right *built-in shape*.
+
+**What is the right built-in shape?**
+
+This question is easy to answer: Each built-in shape (except of
+:c:enumerator:`HPyType_BuiltinShape_Legacy`) represents a built-in type. You
+need to use the built-in shape that fits to the specified base class. The
+mapping is described in :c:enum:`HPyType_BuiltinShape`.
+
+Let's do an example. Assume we want to define a type that stores the natural
+language of a unicode string to the unicode object but the object should still
+just behave like a Python unicode object. So, we define struct
+``LanguageObject``:
+
+.. literalinclude:: examples/hpytype-example/builtin_type.c
+  :start-after: // BEGIN: LanguageObject
+  :end-before: // END: LanguageObject
+
+As you can see, we already specify the built-in shape here using
+``HPyType_HELPERS(LanguageObject, HPyType_BuiltinShape_Unicode)``. Then, in the
+type specification, we do:
+
+.. literalinclude:: examples/hpytype-example/builtin_type.c
+  :start-after: // BEGIN: spec_Language
+  :end-before: // END: spec_Language
+
+In the last step, when actually creatign the type from the specification, we
+need to define that its base class is ``str`` (aka. ``UnicodeType``):
+
+.. literalinclude:: examples/hpytype-example/builtin_type.c
+  :start-after: // BEGIN: add_Language
+  :end-before: // END: add_Language
+
+Function ``LanguageObject_AsStruct`` (which is generated by ``HPyType_HELPERS``)
+will then return a pointer to ``LanguageObject``.
+
+To summarize this: Specifying a type that inherits from a built-in type needs to
+be considered in three places:
+
+1. Pass the appropriate built-in shape to :c:macro:`HPyType_HELPERS`.
+2. Assign ``SHAPE(TYPE)`` to :c:member:`HPyType_Spec.builtin_shape`.
+3. Specify the desired base class in the type specification parameters.
+
+For more information about the built-in shape and for a technical explanation
+for why it is required, see :c:member:`HPyType_Spec.builtin_shape` and
+:c:enum:`HPyType_BuiltinShape`.
