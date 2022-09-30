@@ -129,7 +129,8 @@ typedef struct {
 
 #define _HPyType_GENERIC_HELPERS(TYPE, SHAPE) \
                                               \
-enum { TYPE##_SHAPE = SHAPE };                \
+_HPy_UNUSED static const                      \
+HPyType_BuiltinShape TYPE##_SHAPE = SHAPE;    \
                                               \
 HPyAPI_UNUSED TYPE *                          \
 TYPE##_AsStruct(HPyContext *ctx, HPy h)       \

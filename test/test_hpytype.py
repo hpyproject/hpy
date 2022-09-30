@@ -922,7 +922,7 @@ class TestPureHPyType(HPyTest):
             self.make_module("""
                 static HPyType_Spec Dummy_spec = {
                     .name = "mytest.Dummy",
-                    .builtin_shape = 123
+                    .builtin_shape = (HPyType_BuiltinShape)123
                 };
                 
                 @EXPORT_TYPE("Dummy", Dummy_spec)
