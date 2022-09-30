@@ -135,6 +135,49 @@ def test_keeping_and_reusing_argument_handle(compiler, hpy_debug_capture):
     assert hpy_debug_capture.invalid_handles_count == 1
 
 
+def test_return_ctx_constant_without_dup(compiler, python_subprocess, fatal_exit_code):
+    # Since this puts the context->h_None into an inconsistent state, we run
+    # this test in a subprocess and check fatal error instead
+    if not SUPPORTS_SYS_EXECUTABLE:
+        pytest.skip("no sys.executable")
+
+    mod = compiler.compile_module("""
+        HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self)
+        {
+            return ctx->h_None;
+        }
+
+        @EXPORT(f)
+        @INIT
+    """)
+    result = python_subprocess.run(mod, "mod.f();")
+    assert result.returncode == fatal_exit_code
+    assert b"Invalid usage of already closed handle" in result.stderr
+
+
+def test_close_ctx_constant(compiler, python_subprocess, fatal_exit_code):
+    # Since this puts the context->h_True into an inconsistent state, we run
+    # this test in a subprocess and check fatal error instead
+    if not SUPPORTS_SYS_EXECUTABLE:
+        pytest.skip("no sys.executable")
+
+    mod = compiler.compile_module("""
+        HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self)
+        {
+            HPy_Close(ctx, ctx->h_True);
+            return HPy_Dup(ctx, ctx->h_False);
+        }
+
+        @EXPORT(f)
+        @INIT
+    """)
+    result = python_subprocess.run(mod, "mod.f();")
+    assert result.returncode == fatal_exit_code
+    assert b"Invalid usage of already closed handle" in result.stderr
+
+
 def test_invalid_handle_crashes_python_if_no_hook(compiler, python_subprocess, fatal_exit_code):
     if not SUPPORTS_SYS_EXECUTABLE:
         pytest.skip("no sys.executable")
@@ -154,3 +197,4 @@ def test_invalid_handle_crashes_python_if_no_hook(compiler, python_subprocess, f
     """)
     result = python_subprocess.run(mod, "mod.f(42);")
     assert result.returncode == fatal_exit_code
+    assert b"Invalid usage of already closed handle" in result.stderr

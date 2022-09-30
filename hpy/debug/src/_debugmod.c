@@ -15,6 +15,8 @@ HPyDef_METH(new_generation, "new_generation", new_generation_impl, HPyFunc_NOARG
 static UHPy new_generation_impl(HPyContext *uctx, UHPy self)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     info->current_generation++;
     return HPyLong_FromLong(uctx, info->current_generation);
@@ -65,6 +67,8 @@ HPyDef_METH(get_open_handles, "get_open_handles", get_open_handles_impl, HPyFunc
 static UHPy get_open_handles_impl(HPyContext *uctx, UHPy u_self, UHPy u_gen)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
 
     long gen = HPyLong_AsLong(uctx, u_gen);
@@ -80,6 +84,8 @@ HPyDef_METH(get_closed_handles, "get_closed_handles", get_closed_handles_impl,
 static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self, HPy *args, HPy_ssize_t nargs)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     long gen = 0;
     if (nargs > 0) {
@@ -101,6 +107,8 @@ HPyDef_METH(get_closed_handles_queue_max_size, "get_closed_handles_queue_max_siz
 static UHPy get_closed_handles_queue_max_size_impl(HPyContext *uctx, UHPy u_self)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     return HPyLong_FromSsize_t(uctx, info->closed_handles_queue_max_size);
 }
@@ -111,6 +119,8 @@ HPyDef_METH(set_closed_handles_queue_max_size, "set_closed_handles_queue_max_siz
 static UHPy set_closed_handles_queue_max_size_impl(HPyContext *uctx, UHPy u_self, UHPy u_size)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     HPy_ssize_t size = HPyLong_AsSize_t(uctx, u_size);
     if (HPyErr_Occurred(uctx))
@@ -125,6 +135,8 @@ get_protected_raw_data_max_size_impl, HPyFunc_NOARGS, .doc=
 static UHPy get_protected_raw_data_max_size_impl(HPyContext *uctx, UHPy u_self)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     return HPyLong_FromSsize_t(uctx, info->protected_raw_data_max_size);
 }
@@ -135,6 +147,8 @@ set_protected_raw_data_max_size_impl, HPyFunc_O, .doc=
 static UHPy set_protected_raw_data_max_size_impl(HPyContext *uctx, UHPy u_self, UHPy u_size)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     HPy_ssize_t size = HPyLong_AsSize_t(uctx, u_size);
     if (HPyErr_Occurred(uctx))
@@ -149,6 +163,8 @@ HPyDef_METH(set_on_invalid_handle, "set_on_invalid_handle", set_on_invalid_handl
 static UHPy set_on_invalid_handle_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPyDebugInfo *info = get_info(dctx);
     if (HPy_Is(uctx, u_arg, uctx->h_None)) {
         info->uh_on_invalid_handle = HPy_NULL;
@@ -331,6 +347,8 @@ static UHPy DebugHandle__force_close_impl(HPyContext *uctx, UHPy self)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
     HPy_Close(dctx, as_DHPy(dh->handle));
     return HPy_Dup(uctx, uctx->h_None);
 }
