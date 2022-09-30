@@ -873,7 +873,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     int basicsize;
-    HPy_ssize_t base_member_offset;
+    int base_member_offset;
     unsigned long flags = hpyspec->flags;
 
     int head_size = _HPy_GetHeaderSize(hpyspec->builtin_shape);
@@ -906,7 +906,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     spec->basicsize = basicsize;
     spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec, base_member_offset, extra);
+    spec->slots = create_slot_defs(hpyspec, (HPy_ssize_t)base_member_offset, extra);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
