@@ -8,6 +8,8 @@
 #define HPyAPI_UNUSED static inline
 #endif /* __GNUC__ */
 
+// NOTE: HPyType_BuiltinShape_Object == 0, which means it's the default
+// if it's not specified in HPyType_spec
 typedef enum {
     HPyType_BuiltinShape_Legacy = -1,
     HPyType_BuiltinShape_Object = 0,
@@ -25,7 +27,8 @@ typedef struct {
     int itemsize;
     unsigned long flags;
     /*
-       A type whose struct starts with PyObject_HEAD is a legacy type. A legacy
+       A type whose struct starts with PyObject_HEAD or equivalent is a legacy
+       type. A legacy
        type must set .builtin_shape = HPyType_BuiltinShape_Legacy in its
        HPyType_Spec. A type is a non-legacy type, also called HPy pure type, if
        its struct does not include PyObject_HEAD. Using pure types should be
