@@ -183,7 +183,7 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
     return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
 }
 
-#define DEBUG_AS_STRUCT(SHAPE) \
+#define MAKE_debug_ctx_AsStruct(SHAPE) \
     void *debug_ctx_AsStruct_##SHAPE(HPyContext *dctx, DHPy dh) \
     { \
         HPyContext *uctx = get_info(dctx)->uctx; \
@@ -197,21 +197,21 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
         return actual_data_ptr; \
     }
 
-DEBUG_AS_STRUCT(Legacy)
+MAKE_debug_ctx_AsStruct(Legacy)
 
-DEBUG_AS_STRUCT(Object)
+MAKE_debug_ctx_AsStruct(Object)
 
-DEBUG_AS_STRUCT(Type)
+MAKE_debug_ctx_AsStruct(Type)
 
-DEBUG_AS_STRUCT(Long)
+MAKE_debug_ctx_AsStruct(Long)
 
-DEBUG_AS_STRUCT(Float)
+MAKE_debug_ctx_AsStruct(Float)
 
-DEBUG_AS_STRUCT(Unicode)
+MAKE_debug_ctx_AsStruct(Unicode)
 
-DEBUG_AS_STRUCT(Tuple)
+MAKE_debug_ctx_AsStruct(Tuple)
 
-DEBUG_AS_STRUCT(List)
+MAKE_debug_ctx_AsStruct(List)
 
 /* ~~~ debug mode implementation of HPyTracker ~~~
 
