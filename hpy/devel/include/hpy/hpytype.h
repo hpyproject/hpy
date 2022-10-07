@@ -102,10 +102,12 @@ typedef struct {
      inline function that uses HPy_AsStruct to return the PointObject struct
      associated with a given handle. The behaviour is undefined if `h`
      is associated with an object that is not an instance of PointObject.
+     However, debug mode will catch an incorrect usage.
 
-   * `PointObject_SHAPE`: an enum value set to 0 so that in the HPyType_Spec
-     for PointObject one can write `.builtin_shape = PointObject_SHAPE` and not
-     have to remember to update the spec when the helpers used changes.
+   * `SHAPE(PointObject)`: a macro that is meant to be used as static
+     initializer in the corresponding HPyType_Spec. It is recommended to write
+     `.builtin_shape = SHPAE(PointObject)` such that you don't have to remember
+     to update the spec when the helpers used changes.
 
    Example for a legacy custom type:
 
@@ -115,7 +117,7 @@ typedef struct {
 
    * `_HPy_AsStruct_Legacy` is used instead of `_HPy_AsStruct_Object`.
 
-   * `PointObject_SHAPE` is set to `HPyType_BuiltinShape_Legacy`.
+   * `SHAPE(PointObject)` would be `HPyType_BuiltinShape_Legacy`.
 */
 
 #define HPyType_LEGACY_HELPERS(TYPE) \
@@ -124,12 +126,11 @@ typedef struct {
 #define _HPyType_HELPER_TYPE(TYPE, ...) TYPE *
 #define _HPyType_HELPER_FUNC_NAME(TYPE, ...) TYPE##_AsStruct
 #define _HPyType_HELPER_DEFINE_SHAPE(TYPE, SHAPE, ...) \
-    HPyType_BuiltinShape TYPE##_SHAPE = SHAPE
+    enum { TYPE##_SHAPE = (int)SHAPE }
 #define _HPyType_HELPER_AS_STRUCT(TYPE, SHAPE, ...) SHAPE##_AsStruct
 
 #define HPyType_HELPERS(...)                                                \
                                                                             \
-_HPy_UNUSED static const                                                    \
 _HPyType_HELPER_DEFINE_SHAPE(__VA_ARGS__, HPyType_BuiltinShape_Object);     \
                                                                             \
 HPyAPI_UNUSED _HPyType_HELPER_TYPE(__VA_ARGS__)                             \
@@ -139,6 +140,8 @@ _HPyType_HELPER_FUNC_NAME(__VA_ARGS__)(HPyContext *ctx, HPy h)              \
             _HPyType_HELPER_AS_STRUCT(__VA_ARGS__,                          \
                                       HPyType_BuiltinShape_Object)(ctx, h); \
 }
+
+#define SHAPE(TYPE) ((HPyType_BuiltinShape)TYPE##_SHAPE)
 
 #define HPyType_BuiltinShape_Legacy_AsStruct _HPy_AsStruct_Legacy
 #define HPyType_BuiltinShape_Object_AsStruct _HPy_AsStruct_Object

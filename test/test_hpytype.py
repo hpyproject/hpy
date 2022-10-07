@@ -92,7 +92,7 @@ class PointTemplate(DefaultExtensionTemplate):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .builtin_shape = PointObject_SHAPE,
+                .builtin_shape = SHAPE(PointObject),
                 .defines = Point_defines
             };
         """ % defines
@@ -347,7 +347,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .builtin_shape = FooObject_SHAPE,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -408,7 +408,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .builtin_shape = FooObject_SHAPE,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -505,7 +505,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .builtin_shape = FooObject_SHAPE,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -646,7 +646,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .builtin_shape = FooObject_SHAPE,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -880,7 +880,7 @@ class TestPureHPyType(HPyTest):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .builtin_shape = PointObject_SHAPE,
+                .builtin_shape = SHAPE(PointObject),
                 .defines = Point_defines
             };
             

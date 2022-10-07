@@ -56,7 +56,7 @@ class TestLegacyType(_TestType):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .builtin_shape = PointObject_SHAPE,
+                .builtin_shape = SHAPE(PointObject),
                 .legacy_slots = Point_slots,
                 .defines = Point_defines,
             };
@@ -94,7 +94,7 @@ class TestLegacyType(_TestType):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .builtin_shape = PointObject_SHAPE,
+                .builtin_shape = SHAPE(PointObject),
                 .legacy_slots = Point_slots,
                 .defines = Point_defines,
             };
@@ -128,7 +128,7 @@ class TestLegacyType(_TestType):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .builtin_shape = PointObject_SHAPE,
+                .builtin_shape = SHAPE(PointObject),
                 .legacy_slots = Point_slots,
                 .defines = Point_defines,
             };
