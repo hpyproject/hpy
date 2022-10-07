@@ -249,5 +249,5 @@ struct _HPyContext_s {
     void *(*ctx_AsStruct_Unicode)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStruct_Tuple)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStruct_List)(HPyContext *ctx, HPy h);
-    void *(*ctx_AsStruct_Slow)(HPyContext *ctx, HPy h);
+    HPyType_BuiltinShape (*ctx_Type_GetBuiltinShape)(HPyContext *ctx, HPy h_type);
 };

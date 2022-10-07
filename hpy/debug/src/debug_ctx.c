@@ -183,18 +183,47 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
     return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
 }
 
+static const char *get_builtin_shape_name(HPyType_BuiltinShape shape)
+{
+#define SHAPE_NAME(SHAPE) \
+    case SHAPE:           \
+        return #SHAPE;    \
+
+    /* Note: we use a switch here because then the compiler will warn us about
+       missing cases if shapes are added to enum 'HPyType_BuiltinShape' */
+    switch (shape)
+    {
+    SHAPE_NAME(HPyType_BuiltinShape_Legacy)
+    SHAPE_NAME(HPyType_BuiltinShape_Object)
+    SHAPE_NAME(HPyType_BuiltinShape_Type)
+    SHAPE_NAME(HPyType_BuiltinShape_Long)
+    SHAPE_NAME(HPyType_BuiltinShape_Float)
+    SHAPE_NAME(HPyType_BuiltinShape_Unicode)
+    SHAPE_NAME(HPyType_BuiltinShape_Tuple)
+    SHAPE_NAME(HPyType_BuiltinShape_List)
+    }
+    return "<unknown shape>";
+#undef SHAPE_NAME
+}
+
 #define MAKE_debug_ctx_AsStruct(SHAPE) \
     void *debug_ctx_AsStruct_##SHAPE(HPyContext *dctx, DHPy dh) \
     { \
         HPyContext *uctx = get_info(dctx)->uctx; \
         UHPy uh = DHPy_unwrap(dctx, dh); \
-        void *actual_data_ptr = _HPy_AsStruct_##SHAPE(uctx, uh); \
-        void *expected_data_ptr = _HPy_AsStruct_Slow(uctx, uh); \
-        if (actual_data_ptr != expected_data_ptr) { \
-            HPy_FatalError(uctx, "Invalid usage of _HPy_AsStruct_" #SHAPE \
-                ". The object's type has a different shape."); \
+        UHPy uh_type = HPy_Type(uctx, uh); \
+        HPyType_BuiltinShape actual_shape = _HPyType_GetBuiltinShape(uctx, uh_type); \
+        HPy_Close(uctx, uh_type); \
+        if (actual_shape != HPyType_BuiltinShape_##SHAPE) { \
+            const char *actual_shape_name = get_builtin_shape_name(actual_shape); \
+            static const char *fmt = "Invalid usage of _HPy_AsStruct_%s" \
+                ". Expected shape HPyType_BuiltinShape_%s but got %s"; \
+            size_t nbuf = strlen(fmt) + 2 * strlen(#SHAPE) + strlen(actual_shape_name) + 1; \
+            char *buf = (char *)alloca(nbuf); \
+            snprintf(buf, nbuf, fmt, #SHAPE, #SHAPE, actual_shape_name); \
+            HPy_FatalError(uctx, buf); \
         } \
-        return actual_data_ptr; \
+        return _HPy_AsStruct_##SHAPE(uctx, uh); \
     }
 
 MAKE_debug_ctx_AsStruct(Legacy)

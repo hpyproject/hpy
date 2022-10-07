@@ -110,7 +110,7 @@ void *debug_ctx_AsStruct_Float(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStruct_Unicode(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStruct_Tuple(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStruct_List(HPyContext *dctx, DHPy h);
-void *debug_ctx_AsStruct_Slow(HPyContext *dctx, DHPy h);
+HPyType_BuiltinShape debug_ctx_Type_GetBuiltinShape(HPyContext *dctx, DHPy h_type);
 DHPy debug_ctx_New(HPyContext *dctx, DHPy h_type, void **data);
 DHPy debug_ctx_Repr(HPyContext *dctx, DHPy obj);
 DHPy debug_ctx_Str(HPyContext *dctx, DHPy obj);
@@ -349,7 +349,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_AsStruct_Unicode = &debug_ctx_AsStruct_Unicode;
     dctx->ctx_AsStruct_Tuple = &debug_ctx_AsStruct_Tuple;
     dctx->ctx_AsStruct_List = &debug_ctx_AsStruct_List;
-    dctx->ctx_AsStruct_Slow = &debug_ctx_AsStruct_Slow;
+    dctx->ctx_Type_GetBuiltinShape = &debug_ctx_Type_GetBuiltinShape;
     dctx->ctx_New = &debug_ctx_New;
     dctx->ctx_Repr = &debug_ctx_Repr;
     dctx->ctx_Str = &debug_ctx_Str;

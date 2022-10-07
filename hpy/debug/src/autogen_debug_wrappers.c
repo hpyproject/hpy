@@ -457,9 +457,9 @@ int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other)
     return HPy_Is(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, other));
 }
 
-void *debug_ctx_AsStruct_Slow(HPyContext *dctx, DHPy h)
+HPyType_BuiltinShape debug_ctx_Type_GetBuiltinShape(HPyContext *dctx, DHPy h_type)
 {
-    return _HPy_AsStruct_Slow(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return _HPyType_GetBuiltinShape(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type));
 }
 
 DHPy debug_ctx_New(HPyContext *dctx, DHPy h_type, void **data)

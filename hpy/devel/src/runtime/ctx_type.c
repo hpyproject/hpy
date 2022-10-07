@@ -1145,3 +1145,14 @@ _HPy_HIDDEN int call_traverseproc_from_trampoline(HPyFunc_traverseproc tp_traver
     hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
     return tp_traverse(_pyobj_as_struct(self), hpy2cpy_visit, &args);
 }
+
+_HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx, HPy h_type)
+{
+    PyTypeObject *tp = (PyTypeObject*) _h2py(h_type);
+    assert(tp != NULL);
+    if (!PyType_Check(tp)) {
+        PyErr_SetString(PyExc_TypeError, "arg must be a type");
+        return (HPyType_BuiltinShape) -2;
+    }
+    return _HPyType_Get_Shape((PyTypeObject *)tp);
+}

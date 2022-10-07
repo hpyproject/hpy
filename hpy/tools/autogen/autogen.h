@@ -26,5 +26,6 @@ typedef int HPy_buffer;
 typedef int HPyFunc_visitproc;
 typedef int HPy_UCS4;
 typedef int HPyThreadState;
+typedef int HPyType_BuiltinShape;
 
 #include "public_api.h"

@@ -69,5 +69,8 @@ _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
 _HPy_HIDDEN HPy ctx_New(HPyContext *ctx, HPy h_type, void **data);
 _HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
                                     HPy_ssize_t nargs, HPy kw);
+_HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
+                                                          HPy h_type);
+
 
 #endif /* HPY_RUNTIME_CTX_FUNCS_H */

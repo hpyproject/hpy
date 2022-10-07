@@ -327,7 +327,7 @@ void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h);
 HPy_ID(234)
 void* _HPy_AsStruct_List(HPyContext *ctx, HPy h);
 HPy_ID(235)
-void* _HPy_AsStruct_Slow(HPyContext *ctx, HPy h);
+HPyType_BuiltinShape _HPyType_GetBuiltinShape(HPyContext *ctx, HPy h_type);
 
 HPy_ID(171)
 HPy _HPy_New(HPyContext *ctx, HPy h_type, void **data);
