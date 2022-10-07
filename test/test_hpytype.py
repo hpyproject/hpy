@@ -37,7 +37,7 @@ class PointTemplate(DefaultExtensionTemplate):
         struct_name = self._CURRENT_STRUCT
         self._CURRENT_STRUCT = None
         if builtin_shape:
-            type_helpers = "HPyType_BUILTIN_HELPERS({struct_name}, {builtin_shape})"\
+            type_helpers = "HPyType_HELPERS({struct_name}, {builtin_shape})"\
                 .format(struct_name=struct_name, builtin_shape=builtin_shape)
         else:
             type_helpers = "HPyType_HELPERS({struct_name})"\

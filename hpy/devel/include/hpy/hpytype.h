@@ -118,27 +118,26 @@ typedef struct {
    * `PointObject_SHAPE` is set to `HPyType_BuiltinShape_Legacy`.
 */
 
-/* Just a few helper macros to select the appropriate argument from the
-   variadic-macro's arguments. */
-
-#define HPyType_BUILTIN_HELPERS(TYPE, SHAPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, SHAPE)
-
-#define HPyType_HELPERS(TYPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, HPyType_BuiltinShape_Object)
-
 #define HPyType_LEGACY_HELPERS(TYPE) \
-    _HPyType_GENERIC_HELPERS(TYPE, HPyType_BuiltinShape_Legacy)
+    HPyType_HELPERS(TYPE, HPyType_BuiltinShape_Legacy)
 
-#define _HPyType_GENERIC_HELPERS(TYPE, SHAPE) \
-                                              \
-_HPy_UNUSED static const                      \
-HPyType_BuiltinShape TYPE##_SHAPE = SHAPE;    \
-                                              \
-HPyAPI_UNUSED TYPE *                          \
-TYPE##_AsStruct(HPyContext *ctx, HPy h)       \
-{                                             \
-    return (TYPE*) SHAPE##_AsStruct(ctx, h);  \
+#define _HPyType_HELPER_TYPE(TYPE, ...) TYPE *
+#define _HPyType_HELPER_FUNC_NAME(TYPE, ...) TYPE##_AsStruct
+#define _HPyType_HELPER_DEFINE_SHAPE(TYPE, SHAPE, ...) \
+    HPyType_BuiltinShape TYPE##_SHAPE = SHAPE
+#define _HPyType_HELPER_AS_STRUCT(TYPE, SHAPE, ...) SHAPE##_AsStruct
+
+#define HPyType_HELPERS(...)                                                \
+                                                                            \
+_HPy_UNUSED static const                                                    \
+_HPyType_HELPER_DEFINE_SHAPE(__VA_ARGS__, HPyType_BuiltinShape_Object);     \
+                                                                            \
+HPyAPI_UNUSED _HPyType_HELPER_TYPE(__VA_ARGS__)                             \
+_HPyType_HELPER_FUNC_NAME(__VA_ARGS__)(HPyContext *ctx, HPy h)              \
+{                                                                           \
+    return (_HPyType_HELPER_TYPE(__VA_ARGS__))                              \
+            _HPyType_HELPER_AS_STRUCT(__VA_ARGS__,                          \
+                                      HPyType_BuiltinShape_Object)(ctx, h); \
 }
 
 #define HPyType_BuiltinShape_Legacy_AsStruct _HPy_AsStruct_Legacy

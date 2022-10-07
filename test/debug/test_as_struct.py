@@ -12,7 +12,7 @@ def test_use_invalid_as_struct(compiler, python_subprocess):
         typedef struct {
             int value;
         } DummyObject;
-        HPyType_BUILTIN_HELPERS(DummyObject, HPyType_BuiltinShape_Object)
+        HPyType_HELPERS(DummyObject, HPyType_BuiltinShape_Object)
         
         static HPyType_Spec Dummy_spec = {
             .name = "mytest.Dummy",
