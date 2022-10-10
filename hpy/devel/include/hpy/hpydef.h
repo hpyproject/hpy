@@ -118,6 +118,10 @@ typedef struct {
     enum { SYM##_slot = SLOT };                                 \
     _HPyDef_SLOT(SYM, IMPL, SLOT, HPySlot_SIG(SLOT))
 
+#define HPyDef_SLOT2(SYM, SLOT)                                 \
+    HPyDef_SLOT(SYM, SYM##_impl, SLOT)
+
+
 // this is the actual implementation, after we determined the SIG
 #define _HPyDef_SLOT(SYM, IMPL, SLOT, SIG)                              \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
@@ -146,6 +150,9 @@ typedef struct {
         }                                                               \
     };
 
+#define HPyDef_METH2(SYM, NAME, SIG, ...)       \
+    HPyDef_METH(SYM, NAME, SYM##_impl, SIG, __VA_ARGS__)
+
 #define HPyDef_MEMBER(SYM, NAME, TYPE, OFFSET, ...) \
     HPyDef SYM = {                                  \
         .kind = HPyDef_Kind_Member,                 \
@@ -170,6 +177,9 @@ typedef struct {
         }                                                                       \
     };
 
+#define HPyDef_GET2(SYM, NAME, ...)         \
+    HPyDef_GET(SYM, NAME, SYM##_get, __VA_ARGS__)
+
 #define HPyDef_SET(SYM, NAME, SETIMPL, ...)                                     \
     HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                                   \
     HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER); \
@@ -182,6 +192,9 @@ typedef struct {
             __VA_ARGS__                                                         \
         }                                                                       \
     };
+
+#define HPyDef_SET2(SYM, NAME, ...)      \
+    HPyDef_SET(SYM, NAME, SYM##_set, __VA_ARGS__)
 
 #define HPyDef_GETSET(SYM, NAME, GETIMPL, SETIMPL, ...)                         \
     HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                                   \
@@ -199,6 +212,9 @@ typedef struct {
             __VA_ARGS__                                                         \
         }                                                                       \
     };
+
+#define HPyDef_GETSET2(SYM, NAME, ...)      \
+    HPyDef_GETSET(SYM, NAME, SYM##_get, SYM##_set, __VA_ARGS__)
 
 #ifdef __cplusplus
 }
