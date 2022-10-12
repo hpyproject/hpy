@@ -114,12 +114,12 @@ typedef struct {
    more detailed explanation in the comments around HPyFunc_DECLARE in
    hpyfunc.h
 */
-#define HPyDef_SLOT(SYM, IMPL, SLOT)                            \
+#define HPyDef_SLOT_IMPL(SYM, IMPL, SLOT)                            \
     enum { SYM##_slot = SLOT };                                 \
     _HPyDef_SLOT(SYM, IMPL, SLOT, HPySlot_SIG(SLOT))
 
-#define HPyDef_SLOT2(SYM, SLOT)                                 \
-    HPyDef_SLOT(SYM, SYM##_impl, SLOT)
+#define HPyDef_SLOT(SYM, SLOT)                                 \
+    HPyDef_SLOT_IMPL(SYM, SYM##_impl, SLOT)
 
 
 // this is the actual implementation, after we determined the SIG
@@ -136,7 +136,7 @@ typedef struct {
     };
 
 
-#define HPyDef_METH(SYM, NAME, IMPL, SIG, ...)                          \
+#define HPyDef_METH_IMPL(SYM, NAME, IMPL, SIG, ...)                          \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
     HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);             \
     HPyDef SYM = {                                                      \
@@ -151,7 +151,7 @@ typedef struct {
     };
 
 #define HPyDef_METH2(SYM, NAME, SIG, ...)       \
-    HPyDef_METH(SYM, NAME, SYM##_impl, SIG, __VA_ARGS__)
+    HPyDef_METH_IMPL(SYM, NAME, SYM##_impl, SIG, __VA_ARGS__)
 
 #define HPyDef_MEMBER(SYM, NAME, TYPE, OFFSET, ...) \
     HPyDef SYM = {                                  \
@@ -164,7 +164,7 @@ typedef struct {
         }                                           \
     };
 
-#define HPyDef_GET(SYM, NAME, GETIMPL, ...)                                     \
+#define HPyDef_GET_IMPL(SYM, NAME, GETIMPL, ...)                                     \
     HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                                   \
     HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER); \
     HPyDef SYM = {                                                              \
@@ -177,10 +177,10 @@ typedef struct {
         }                                                                       \
     };
 
-#define HPyDef_GET2(SYM, NAME, ...)         \
-    HPyDef_GET(SYM, NAME, SYM##_get, __VA_ARGS__)
+#define HPyDef_GET(SYM, NAME, ...)         \
+    HPyDef_GET_IMPL(SYM, NAME, SYM##_get, __VA_ARGS__)
 
-#define HPyDef_SET(SYM, NAME, SETIMPL, ...)                                     \
+#define HPyDef_SET_IMPL(SYM, NAME, SETIMPL, ...)                                     \
     HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                                   \
     HPyFunc_TRAMPOLINE(SYM##_set_trampoline, SETIMPL, HPyFunc_SETTER); \
     HPyDef SYM = {                                                              \
@@ -193,10 +193,10 @@ typedef struct {
         }                                                                       \
     };
 
-#define HPyDef_SET2(SYM, NAME, ...)      \
-    HPyDef_SET(SYM, NAME, SYM##_set, __VA_ARGS__)
+#define HPyDef_SET(SYM, NAME, ...)      \
+    HPyDef_SET_IMPL(SYM, NAME, SYM##_set, __VA_ARGS__)
 
-#define HPyDef_GETSET(SYM, NAME, GETIMPL, SETIMPL, ...)                         \
+#define HPyDef_GETSET_IMPL(SYM, NAME, GETIMPL, SETIMPL, ...)                         \
     HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                                   \
     HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER); \
     HPyFunc_DECLARE(SETIMPL, HPyFunc_SETTER);                                   \
@@ -213,8 +213,8 @@ typedef struct {
         }                                                                       \
     };
 
-#define HPyDef_GETSET2(SYM, NAME, ...)      \
-    HPyDef_GETSET(SYM, NAME, SYM##_get, SYM##_set, __VA_ARGS__)
+#define HPyDef_GETSET(SYM, NAME, ...)      \
+    HPyDef_GETSET_IMPL(SYM, NAME, SYM##_get, SYM##_set, __VA_ARGS__)
 
 #ifdef __cplusplus
 }
