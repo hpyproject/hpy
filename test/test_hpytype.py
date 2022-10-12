@@ -24,28 +24,33 @@ class PointTemplate(DefaultExtensionTemplate):
 
     _STRUCT_END_FORMAT = """
         }} {struct_name};
-        HPyType_HELPERS({struct_name})
+        {type_helpers}
     """
-
-    _IS_LEGACY = "/* not a legacy type */"
 
     def TYPE_STRUCT_BEGIN(self, struct_name):
         assert self._CURRENT_STRUCT is None
         self._CURRENT_STRUCT = struct_name
         return self._STRUCT_BEGIN_FORMAT.format(struct_name=struct_name)
 
-    def TYPE_STRUCT_END(self):
+    def TYPE_STRUCT_END(self, builtin_shape=None):
         assert self._CURRENT_STRUCT is not None
         struct_name = self._CURRENT_STRUCT
         self._CURRENT_STRUCT = None
-        return self._STRUCT_END_FORMAT.format(struct_name=struct_name)
+        if builtin_shape:
+            type_helpers = "HPyType_HELPERS({struct_name}, {builtin_shape})"\
+                .format(struct_name=struct_name, builtin_shape=builtin_shape)
+        else:
+            type_helpers = "HPyType_HELPERS({struct_name})"\
+                .format(struct_name=struct_name)
+        return self._STRUCT_END_FORMAT.format(struct_name=struct_name,
+                                              type_helpers=type_helpers)
 
-    def IS_LEGACY(self):
-        return self._IS_LEGACY
+    def DEFAULT_SHAPE(self):
+        return "/* default object shape */"
 
-    def DEFINE_PointObject(self):
+    def DEFINE_PointObject(self, builtin_shape=None):
         type_begin = self.TYPE_STRUCT_BEGIN("PointObject")
-        type_end = self.TYPE_STRUCT_END()
+        type_end = self.TYPE_STRUCT_END(builtin_shape=builtin_shape)
         return """
             {type_begin}
                 long x;
@@ -87,7 +92,7 @@ class PointTemplate(DefaultExtensionTemplate):
             static HPyType_Spec Point_spec = {
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
-                .legacy = PointObject_IS_LEGACY,
+                .builtin_shape = SHAPE(PointObject),
                 .defines = Point_defines
             };
         """ % defines
@@ -103,7 +108,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
-                @IS_LEGACY
+                @DEFAULT_SHAPE
             };
 
             @EXPORT_TYPE("Dummy", Dummy_spec)
@@ -124,7 +129,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
-                @IS_LEGACY
+                @DEFAULT_SHAPE
                 .doc = "A succinct description.",
             };
 
@@ -154,7 +159,7 @@ class TestType(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                @IS_LEGACY
+                @DEFAULT_SHAPE
                 .defines = Dummy_defines,
             };
 
@@ -195,7 +200,7 @@ class TestType(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                @IS_LEGACY
+                @DEFAULT_SHAPE
                 .defines = dummy_type_defines,
             };
 
@@ -342,7 +347,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -403,7 +408,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "test_%(kind)s.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -500,7 +505,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -641,7 +646,7 @@ class TestType(HPyTest):
             static HPyType_Spec Foo_spec = {
                 .name = "mytest.Foo",
                 .basicsize = sizeof(FooObject),
-                .legacy = FooObject_IS_LEGACY,
+                .builtin_shape = SHAPE(FooObject),
                 .defines = Foo_defines
             };
 
@@ -787,7 +792,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
-                @IS_LEGACY
+                @DEFAULT_SHAPE
             };
 
             static void make_Dummy(HPyContext *ctx, HPy module)
@@ -823,7 +828,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = 0,
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
-                @IS_LEGACY
+                @DEFAULT_SHAPE
             };
 
             static void make_Dummy(HPyContext *ctx, HPy module)
@@ -856,3 +861,70 @@ class TestType(HPyTest):
         class Sub(mod.Dummy):
             pass
         assert isinstance(Sub(), mod.Dummy)
+
+class TestPureHPyType(HPyTest):
+
+    ExtensionTemplate = PointTemplate
+
+    def test_builtin_shape(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject(HPyType_BuiltinShape_Long)
+            @DEFINE_Point_xy
+            
+            static HPyDef *Point_defines[] = { 
+                &Point_x,
+                &Point_y,
+                NULL
+            };
+
+            static HPyType_Spec Point_spec = {
+                .name = "mytest.Point",
+                .basicsize = sizeof(PointObject),
+                .builtin_shape = SHAPE(PointObject),
+                .defines = Point_defines
+            };
+            
+            static void make_Point(HPyContext *ctx, HPy module)
+            {
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_Base, ctx->h_LongType },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+                HPy h_Point = HPyType_FromSpec(ctx, &Point_spec, param);
+                if (HPy_IsNull(h_Point))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Point", h_Point);
+                HPy_Close(ctx, h_Point);
+            }
+            @EXTRA_INIT_FUNC(make_Point)
+            @INIT
+        """)
+        assert isinstance(mod.Point, type)
+        assert mod.Point.__name__ == 'Point'
+        assert mod.Point.__module__ == 'mytest'
+        assert issubclass(mod.Point, int)
+        assert isinstance(mod.Point(), mod.Point)
+        p0 = mod.Point()
+        assert p0 == 0
+        assert p0.x == 0
+        assert p0.y == 0
+
+        p42 = mod.Point(42)
+        p42.x = 123
+        p42.y = 456
+        assert p42 == 42
+        assert p42.x == 123
+        assert p42.y == 456
+
+    def test_invalid_shape(self):
+        import pytest
+        with pytest.raises(ValueError):
+            self.make_module("""
+                static HPyType_Spec Dummy_spec = {
+                    .name = "mytest.Dummy",
+                    .builtin_shape = (HPyType_BuiltinShape)123
+                };
+                
+                @EXPORT_TYPE("Dummy", Dummy_spec)
+                @INIT
+            """)

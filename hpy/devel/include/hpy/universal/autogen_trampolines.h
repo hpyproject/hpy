@@ -374,12 +374,40 @@ HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy obj, HPy other) {
      return ctx->ctx_Is ( ctx, obj, other ); 
 }
 
-HPyAPI_FUNC void *HPy_AsStruct(HPyContext *ctx, HPy h) {
-     return ctx->ctx_AsStruct ( ctx, h ); 
+HPyAPI_FUNC void *_HPy_AsStruct_Object(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Object ( ctx, h ); 
 }
 
-HPyAPI_FUNC void *HPy_AsStructLegacy(HPyContext *ctx, HPy h) {
-     return ctx->ctx_AsStructLegacy ( ctx, h ); 
+HPyAPI_FUNC void *_HPy_AsStruct_Legacy(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Legacy ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Type(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Type ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Long(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Long ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Float(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Float ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Unicode(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Unicode ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Tuple(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Tuple ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_List(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_List ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPyType_BuiltinShape _HPyType_GetBuiltinShape(HPyContext *ctx, HPy h_type) {
+     return ctx->ctx_Type_GetBuiltinShape ( ctx, h_type ); 
 }
 
 HPyAPI_FUNC HPy HPy_Repr(HPyContext *ctx, HPy obj) {
