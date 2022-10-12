@@ -73,7 +73,7 @@ FULLY_ALIGNED_SPACE(PyListObject)
 #define _HPy_HEAD_SIZE(HEAD) (offsetof(_HPy_FullyAlignedSpaceFor##HEAD, payload))
 
 
-static inline int
+static inline HPy_ssize_t
 _HPy_GetHeaderSize(HPyType_BuiltinShape shape)
 {
     switch (shape)
@@ -101,7 +101,7 @@ _HPy_GetHeaderSize(HPyType_BuiltinShape shape)
 // Return a pointer to the area of memory AFTER the header
 static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape)
 {
-    const int header_size = _HPy_GetHeaderSize(shape);
+    const HPy_ssize_t header_size = _HPy_GetHeaderSize(shape);
     /* Here we may assume that the shape is valid because it is provided from a
        trusted source. The shape is validated when creating the type from the
        specification. */
@@ -872,11 +872,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         PyErr_NoMemory();
         return HPy_NULL;
     }
-    int basicsize;
-    int base_member_offset;
+    HPy_ssize_t basicsize;
+    HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
 
-    int head_size = _HPy_GetHeaderSize(hpyspec->builtin_shape);
+    HPy_ssize_t head_size = _HPy_GetHeaderSize(hpyspec->builtin_shape);
     if (head_size < 0) {
         // an invalid shape was specified
         PyErr_Format(PyExc_ValueError, "invalid shape: %d", hpyspec->builtin_shape);
@@ -903,10 +903,10 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     spec->name = extra->name;
-    spec->basicsize = basicsize;
+    spec->basicsize = (int)basicsize;
     spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec, (HPy_ssize_t)base_member_offset, extra);
+    spec->slots = create_slot_defs(hpyspec, base_member_offset, extra);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
