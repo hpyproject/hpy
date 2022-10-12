@@ -8,16 +8,27 @@
 // BEGIN: myabs
 #include "hpy.h"
 
-HPyDef_METH(myabs, "myabs", myabs_impl, HPyFunc_O)
+HPyDef_METH(myabs, "myabs", HPyFunc_O)
 static HPy myabs_impl(HPyContext *ctx, HPy self, HPy arg)
 {
     return HPy_Absolute(ctx, arg);
 }
 // END: myabs
 
+// BEGIN: thisabs
+#include "hpy.h"
+
+HPyDef_METH_IMPL(thisabs, "thisabs", thisabs_impl HPyFunc_O)
+static HPy myabs_impl(HPyContext *ctx, HPy self, HPy arg)
+{
+    return HPy_Absolute(ctx, arg);
+}
+// END: thisabs
+
 // BEGIN: methodsdef
 static HPyDef *SimpleMethods[] = {
         &myabs,
+        &thisabs,
         NULL,
 };
 
