@@ -106,7 +106,7 @@ typedef struct {
 
    * `SHAPE(PointObject)`: a macro that is meant to be used as static
      initializer in the corresponding HPyType_Spec. It is recommended to write
-     `.builtin_shape = SHPAE(PointObject)` such that you don't have to remember
+     `.builtin_shape = SHAPE(PointObject)` such that you don't have to remember
      to update the spec when the helpers used changes.
 
    Example for a legacy custom type:
