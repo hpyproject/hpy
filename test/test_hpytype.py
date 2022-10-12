@@ -55,7 +55,7 @@ class PointTemplate(DefaultExtensionTemplate):
 
     def DEFINE_Point_new(self):
         return """
-            HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Point_new, HPy_tp_new)
             static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -133,15 +133,15 @@ class TestType(HPyTest):
         """)
         assert mod.Dummy.__doc__ == "A succinct description."
 
-    def test_HPyDef_SLOT(self):
+    def test_HPyDef_SLOT_IMPL(self):
         mod = self.make_module("""
-            HPyDef_SLOT(Dummy_repr, Dummy_repr_impl, HPy_tp_repr);
+            HPyDef_SLOT_IMPL(Dummy_repr, Dummy_repr_impl, HPy_tp_repr);
             static HPy Dummy_repr_impl(HPyContext *ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "<Dummy>");
             }
 
-            HPyDef_SLOT(Dummy_abs, Dummy_abs_impl, HPy_nb_absolute);
+            HPyDef_SLOT_IMPL(Dummy_abs, Dummy_abs_impl, HPy_nb_absolute);
             static HPy Dummy_abs_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -165,22 +165,103 @@ class TestType(HPyTest):
         assert repr(d) == '<Dummy>'
         assert abs(d) == 1234
 
-    def test_HPyDef_METH(self):
+    def test_HPyDef_SLOT(self):
+        mod = self.make_module("""
+            HPyDef_SLOT(Dummy_repr, HPy_tp_repr);
+            static HPy Dummy_repr_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyUnicode_FromString(ctx, "<Dummy>");
+            }
+
+            HPyDef_SLOT(Dummy_abs, HPy_nb_absolute);
+            static HPy Dummy_abs_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, 1234);
+            }
+
+            static HPyDef *Dummy_defines[] = {
+                &Dummy_repr,
+                &Dummy_abs,
+                NULL
+            };
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                @IS_LEGACY
+                .defines = Dummy_defines,
+            };
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @INIT
+        """)
+        d = mod.Dummy()
+        assert repr(d) == '<Dummy>'
+        assert abs(d) == 1234
+
+    def test_HPyDef_METH_IMPL(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O, .doc="hello")
+            HPyDef_METH_IMPL(Dummy_foo, "foo", Dummy_foo_impl, HPyFunc_O, .doc="hello")
             static HPy Dummy_foo_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPy_Add(ctx, arg, arg);
             }
 
-            HPyDef_METH(Dummy_bar, "bar", Dummy_bar_impl, HPyFunc_NOARGS)
+            HPyDef_METH_IMPL(Dummy_bar, "bar", Dummy_bar_impl, HPyFunc_NOARGS)
             static HPy Dummy_bar_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
             }
 
-            HPyDef_METH(Dummy_identity, "identity", Dummy_identity_impl, HPyFunc_NOARGS)
+            HPyDef_METH_IMPL(Dummy_identity, "identity", Dummy_identity_impl, HPyFunc_NOARGS)
+            static HPy Dummy_identity_impl(HPyContext *ctx, HPy self)
+            {
+                return HPy_Dup(ctx, self);
+            }
+
+            static HPyDef *dummy_type_defines[] = {
+                    &Dummy_foo,
+                    &Dummy_bar,
+                    &Dummy_identity,
+                    NULL
+            };
+
+            static HPyType_Spec dummy_type_spec = {
+                .name = "mytest.Dummy",
+                @IS_LEGACY
+                .defines = dummy_type_defines,
+            };
+
+            @EXPORT_TYPE("Dummy", dummy_type_spec)
+            @INIT
+        """)
+        d = mod.Dummy()
+        assert d.foo.__doc__ == 'hello'
+        assert d.bar.__doc__ is None
+        assert d.foo(21) == 42
+        assert d.bar() == 1234
+        assert d.identity() is d
+        with pytest.raises(TypeError):
+            mod.Dummy.identity()
+        class A: pass
+        with pytest.raises(TypeError):
+            mod.Dummy.identity(A())
+
+    def test_HPyDef_METH(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(Dummy_foo, "foo", HPyFunc_O, .doc="hello")
+            static HPy Dummy_foo_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPy_Add(ctx, arg, arg);
+            }
+
+            HPyDef_METH(Dummy_bar, "bar", HPyFunc_NOARGS)
+            static HPy Dummy_bar_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, 1234);
+            }
+
+            HPyDef_METH(Dummy_identity, "identity", HPyFunc_NOARGS)
             static HPy Dummy_identity_impl(HPyContext *ctx, HPy self)
             {
                 return HPy_Dup(ctx, self);
@@ -219,7 +300,7 @@ class TestType(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_new
 
-            HPyDef_METH(Point_foo, "foo", Point_foo_impl, HPyFunc_NOARGS)
+            HPyDef_METH(Point_foo, "foo", HPyFunc_NOARGS)
             static HPy Point_foo_impl(HPyContext *ctx, HPy self)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
@@ -239,7 +320,7 @@ class TestType(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_xy
 
-            HPyDef_METH(newPoint, "newPoint", newPoint_impl, HPyFunc_NOARGS)
+            HPyDef_METH(newPoint, "newPoint", HPyFunc_NOARGS)
             static HPy newPoint_impl(HPyContext *ctx, HPy self)
             {
                 HPy h_pointClass = HPy_GetAttr_s(ctx, self, "Point");
@@ -319,7 +400,7 @@ class TestType(HPyTest):
                 %(c_type)s member;
             @TYPE_STRUCT_END
 
-            HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Foo_new, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -380,7 +461,7 @@ class TestType(HPyTest):
                 %(c_type)s member;
             @TYPE_STRUCT_END
 
-            HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Foo_new, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -436,7 +517,7 @@ class TestType(HPyTest):
                 HPyField OBJECT_EX_member;
             @TYPE_STRUCT_END
 
-            HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Foo_new, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -470,7 +551,7 @@ class TestType(HPyTest):
             HPyDef_MEMBER(Foo_OBJECT_EX_member, "OBJECT_EX_member", HPyMember_OBJECT_EX, offsetof(FooObject, OBJECT_EX_member))
             HPyDef_MEMBER(Foo_NONE_member, "NONE_member", HPyMember_NONE, offsetof(FooObject, FLOAT_member))
 
-            HPyDef_SLOT(Foo_traverse, Foo_traverse_impl, HPy_tp_traverse)
+            HPyDef_SLOT(Foo_traverse, HPy_tp_traverse)
             static int Foo_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
             {
                 FooObject *p = (FooObject *)self;
@@ -588,7 +669,7 @@ class TestType(HPyTest):
                 HPyField OBJECT_member;
             @TYPE_STRUCT_END
 
-            HPyDef_SLOT(Foo_new, Foo_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Foo_new, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -616,7 +697,7 @@ class TestType(HPyTest):
             HPyDef_MEMBER(Foo_OBJECT_member, "OBJECT_member", HPyMember_OBJECT, offsetof(FooObject, OBJECT_member), .readonly=1)
             HPyDef_MEMBER(Foo_NONE_member, "NONE_member", HPyMember_NONE, offsetof(FooObject, FLOAT_member), .readonly=1)
 
-            HPyDef_SLOT(Foo_traverse, Foo_traverse_impl, HPy_tp_traverse)
+            HPyDef_SLOT(Foo_traverse, HPy_tp_traverse)
             static int Foo_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
             {
                 FooObject *p = (FooObject *)self;
@@ -702,7 +783,7 @@ class TestType(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_xy
 
-            HPyDef_SLOT(Point_new, HPyType_GenericNew, HPy_tp_new)
+            HPyDef_SLOT_IMPL(Point_new, HPyType_GenericNew, HPy_tp_new)
 
             @EXPORT_POINT_TYPE(&Point_new, &Point_x, &Point_y)
             @INIT
@@ -716,7 +797,7 @@ class TestType(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_new
 
-            HPyDef_GET(Point_z, "z", Point_z_get)
+            HPyDef_GET(Point_z, "z")
             static HPy Point_z_get(HPyContext *ctx, HPy self, void *closure)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
@@ -734,7 +815,7 @@ class TestType(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_new
 
-            HPyDef_GETSET(Point_z, "z", Point_z_get, Point_z_set, .closure=(void *)1000)
+            HPyDef_GETSET(Point_z, "z", .closure=(void *)1000)
             static HPy Point_z_get(HPyContext *ctx, HPy self, void *closure)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
@@ -763,7 +844,77 @@ class TestType(HPyTest):
             @DEFINE_Point_new
             @DEFINE_Point_xy
 
-            HPyDef_SET(Point_z, "z", Point_z_set, .closure=(void *)1000)
+            HPyDef_SET(Point_z, "z", .closure=(void *)1000)
+            static int Point_z_set(HPyContext *ctx, HPy self, HPy value, void *closure)
+            {
+                PointObject *point = PointObject_AsStruct(ctx, self);
+                long current = point->x*10 + point->y + (long)(HPy_ssize_t)closure;
+                long target = HPyLong_AsLong(ctx, value);  // assume no exception
+                point->y += target - current;
+                return 0;
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_x, &Point_y, &Point_z)
+            @INIT
+        """)
+        p = mod.Point(7, 3)
+        assert p.y == 3
+        p.z = 1075
+        assert p.y == 5
+
+    def test_HPyDef_GET_IMPL(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+
+            HPyDef_GET_IMPL(Point_z, "z", Point_z_get)
+            static HPy Point_z_get(HPyContext *ctx, HPy self, void *closure)
+            {
+                PointObject *point = PointObject_AsStruct(ctx, self);
+                return HPyLong_FromLong(ctx, point->x*10 + point->y);
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_z)
+            @INIT
+        """)
+        p = mod.Point(7, 3)
+        assert p.z == 73
+
+    def test_HPyDef_GETSET_IMPL(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+
+            HPyDef_GETSET_IMPL(Point_z, "z", Point_z_get, Point_z_set, .closure=(void *)1000)
+            static HPy Point_z_get(HPyContext *ctx, HPy self, void *closure)
+            {
+                PointObject *point = PointObject_AsStruct(ctx, self);
+                return HPyLong_FromLong(ctx, point->x*10 + point->y + (long)(HPy_ssize_t)closure);
+            }
+            static int Point_z_set(HPyContext *ctx, HPy self, HPy value, void *closure)
+            {
+                PointObject *point = PointObject_AsStruct(ctx, self);
+                long current = point->x*10 + point->y + (long)(HPy_ssize_t)closure;
+                long target = HPyLong_AsLong(ctx, value);  // assume no exception
+                point->y += target - current;
+                return 0;
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_z)
+            @INIT
+        """)
+        p = mod.Point(7, 3)
+        assert p.z == 1073
+        p.z = 1075
+        assert p.z == 1075
+
+    def test_HPyDef_SET_IMPL(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            @DEFINE_Point_xy
+
+            HPyDef_SET_IMPL(Point_z, "z", Point_z_set, .closure=(void *)1000)
             static int Point_z_set(HPyContext *ctx, HPy self, HPy value, void *closure)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);

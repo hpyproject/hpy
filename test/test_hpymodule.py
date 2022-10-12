@@ -3,7 +3,7 @@ from .support import HPyTest
 class TestModule(HPyTest):
     def test_HPyModule_Create(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 HPyModuleDef def = {

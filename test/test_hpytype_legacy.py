@@ -34,7 +34,7 @@ class TestLegacyType(_TestType):
         mod = self.make_module("""
             static long dealloc_counter = 0;
 
-            HPyDef_METH(get_counter, "get_counter", get_counter_impl, HPyFunc_NOARGS)
+            HPyDef_METH(get_counter, "get_counter", HPyFunc_NOARGS)
             static HPy get_counter_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, dealloc_counter);
@@ -76,7 +76,7 @@ class TestLegacyType(_TestType):
         mod_src = """
             @DEFINE_PointObject
             @DEFINE_Point_new
-            HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+            HPyDef_SLOT(Point_traverse, HPy_tp_traverse)
             static int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
             {
                 return 0;
@@ -110,7 +110,7 @@ class TestLegacyType(_TestType):
         mod_src = """
             @DEFINE_PointObject
             @DEFINE_Point_new
-            HPyDef_SLOT(Point_destroy, Point_destroy_impl, HPy_tp_destroy)
+            HPyDef_SLOT(Point_destroy, HPy_tp_destroy)
             static void Point_destroy_impl(void *obj)
             {
                 return;

@@ -31,7 +31,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
                 return Py_BuildValue("OO", self, other);
             }
 
-            HPyDef_SLOT(Dummy_abs, Dummy_abs_impl, HPy_nb_absolute);
+            HPyDef_SLOT(Dummy_abs, HPy_nb_absolute);
             static HPy Dummy_abs_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -71,7 +71,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
                 return arg;
             }
 
-            HPyDef_METH(Dummy_bar, "bar", Dummy_bar_impl, HPyFunc_NOARGS)
+            HPyDef_METH(Dummy_bar, "bar", HPyFunc_NOARGS)
             static HPy Dummy_bar_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 1234);
@@ -118,7 +118,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
                 long y;
             } PointObject;
 
-            HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Point_new, HPy_tp_new)
             static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
@@ -182,7 +182,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
                 long y;
             } PointObject;
 
-            HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
+            HPyDef_SLOT(Point_new, HPy_tp_new)
             static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
