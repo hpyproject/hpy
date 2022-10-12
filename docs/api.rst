@@ -165,7 +165,7 @@ In this section, we will see how to write a simple C extension using HPy. It
 is assumed that you are already familiar with the existing Python/C API, so we
 will underline the similarities and the differences with it.
 
-We want to create a function named ``myabs`` and ``thisabs`` which takes a
+We want to create a function named ``myabs`` and ``double`` which takes a
 single argument and computes its absolute value:
 
 .. literalinclude:: examples/simple-example/simple.c
@@ -213,11 +213,11 @@ There are a couple of points which are worth noting:
    function itself.
 
 .. literalinclude:: examples/simple-example/simple.c
-  :start-after: // BEGIN: thisabs
-  :end-before: // END: thisabs
+  :start-after: // BEGIN: double
+  :end-before: // END: double
 
   * This example is much the same but the difference is that we use
-    ``HPyDef_METH_IMPL`` to define a function names ``thisabs``.
+    ``HPyDef_METH_IMPL`` to define a function named ``double``.
   
   * The difference between ``HPyDef_METH_IMPL`` and ``HPyDef_METH`` is that
     the former needs to be given a name for a the functions as the third

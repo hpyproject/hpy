@@ -15,20 +15,20 @@ static HPy myabs_impl(HPyContext *ctx, HPy self, HPy arg)
 }
 // END: myabs
 
-// BEGIN: thisabs
+// BEGIN: double
 #include "hpy.h"
 
-HPyDef_METH_IMPL(thisabs, "thisabs", thisabs_impl HPyFunc_O)
-static HPy myabs_impl(HPyContext *ctx, HPy self, HPy arg)
+HPyDef_METH_IMPL(double_num, "double", double_impl HPyFunc_O)
+static HPy double_impl(HPyContext *ctx, HPy self, HPy arg)
 {
-    return HPy_Absolute(ctx, arg);
+    return HPy_Add(ctx, arg, arg);
 }
-// END: thisabs
+// END: double
 
 // BEGIN: methodsdef
 static HPyDef *SimpleMethods[] = {
         &myabs,
-        &thisabs,
+        &double_num,
         NULL,
 };
 
