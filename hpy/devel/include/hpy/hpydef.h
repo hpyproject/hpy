@@ -150,7 +150,7 @@ typedef struct {
         }                                                               \
     };
 
-#define HPyDef_METH2(SYM, NAME, SIG, ...)       \
+#define HPyDef_METH(SYM, NAME, SIG, ...)       \
     HPyDef_METH_IMPL(SYM, NAME, SYM##_impl, SIG, __VA_ARGS__)
 
 #define HPyDef_MEMBER(SYM, NAME, TYPE, OFFSET, ...) \
