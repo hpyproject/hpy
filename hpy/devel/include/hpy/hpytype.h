@@ -28,12 +28,12 @@ typedef struct {
     unsigned long flags;
     /*
        A type whose struct starts with PyObject_HEAD or equivalent is a legacy
-       type. A legacy
-       type must set .builtin_shape = HPyType_BuiltinShape_Legacy in its
-       HPyType_Spec. A type is a non-legacy type, also called HPy pure type, if
-       its struct does not include PyObject_HEAD. Using pure types should be
-       preferred. Legacy types are available to allow gradual porting of
-       existing CPython extensions.
+       type. A legacy type must set
+       `.builtin_shape = HPyType_BuiltinShape_Legacy` in its HPyType_Spec. A
+       type is a non-legacy type, also called HPy pure type, if its struct does
+       not include PyObject_HEAD. Using pure types should be preferred. Legacy
+       types are available to allow gradual porting of existing CPython
+       extensions.
 
        A type with .legacy_slots != NULL is required to have
        HPyType_BuiltinShape_Legacy and to include PyObject_HEAD at the start of
@@ -79,6 +79,19 @@ typedef struct {
    GC-based alternative implementations */
 #define HPy_TPFLAGS_HAVE_GC (1UL << 14)
 
+/* Convenience macro which is equivalent to:
+   `HPyType_HELPERS(SomeType, HPyType_BuiltinShape_Legacy)` */
+#define HPyType_LEGACY_HELPERS(TYPE) \
+    HPyType_HELPERS(TYPE, HPyType_BuiltinShape_Legacy)
+
+#define _HPyType_HELPER_TYPE(TYPE, ...) TYPE *
+#define _HPyType_HELPER_FNAME(TYPE, ...) TYPE##_AsStruct
+#define _HPyType_HELPER_DEFINE_SHAPE(TYPE, SHAPE, ...) \
+    enum { TYPE##_SHAPE = (int)SHAPE }
+#define _HPyType_HELPER_AS_STRUCT(TYPE, SHAPE, ...) SHAPE##_AsStruct
+// helper macro make MSVC's preprocessor work with our variadic macros
+#define _HPyType_HELPER_X(X) X
+
 /* A macro for creating (static inline) helper functions for custom types.
 
    Two versions of the helper exist. One for legacy types and one for pure
@@ -119,26 +132,17 @@ typedef struct {
 
    * `SHAPE(PointObject)` would be `HPyType_BuiltinShape_Legacy`.
 */
-
-#define HPyType_LEGACY_HELPERS(TYPE) \
-    HPyType_HELPERS(TYPE, HPyType_BuiltinShape_Legacy)
-
-#define _HPyType_HELPER_TYPE(TYPE, ...) TYPE *
-#define _HPyType_HELPER_FUNC_NAME(TYPE, ...) TYPE##_AsStruct
-#define _HPyType_HELPER_DEFINE_SHAPE(TYPE, SHAPE, ...) \
-    enum { TYPE##_SHAPE = (int)SHAPE }
-#define _HPyType_HELPER_AS_STRUCT(TYPE, SHAPE, ...) SHAPE##_AsStruct
-
-#define HPyType_HELPERS(...)                                                \
-                                                                            \
-_HPyType_HELPER_DEFINE_SHAPE(__VA_ARGS__, HPyType_BuiltinShape_Object);     \
-                                                                            \
-HPyAPI_UNUSED _HPyType_HELPER_TYPE(__VA_ARGS__)                             \
-_HPyType_HELPER_FUNC_NAME(__VA_ARGS__)(HPyContext *ctx, HPy h)              \
-{                                                                           \
-    return (_HPyType_HELPER_TYPE(__VA_ARGS__))                              \
-            _HPyType_HELPER_AS_STRUCT(__VA_ARGS__,                          \
-                                      HPyType_BuiltinShape_Object)(ctx, h); \
+#define HPyType_HELPERS(...)                                                  \
+                                                                              \
+_HPyType_HELPER_X(                                                            \
+    _HPyType_HELPER_DEFINE_SHAPE(__VA_ARGS__, HPyType_BuiltinShape_Object));  \
+                                                                              \
+HPyAPI_UNUSED _HPyType_HELPER_X(_HPyType_HELPER_TYPE(__VA_ARGS__))            \
+_HPyType_HELPER_X(_HPyType_HELPER_FNAME(__VA_ARGS__))(HPyContext *ctx, HPy h) \
+{                                                                             \
+    return (_HPyType_HELPER_X(_HPyType_HELPER_TYPE(__VA_ARGS__)))             \
+            _HPyType_HELPER_X(_HPyType_HELPER_AS_STRUCT(__VA_ARGS__,          \
+                                      HPyType_BuiltinShape_Object))(ctx, h);  \
 }
 
 #define SHAPE(TYPE) ((HPyType_BuiltinShape)TYPE##_SHAPE)
