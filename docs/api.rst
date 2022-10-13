@@ -218,6 +218,8 @@ The second function definition is a bit different:
   :start-after: // BEGIN: double
   :end-before: // END: double
 
+This shows off the other way of creating functions.
+
   * This example is much the same but the difference is that we use
     ``HPyDef_METH_IMPL`` to define a function named ``double``.
   
