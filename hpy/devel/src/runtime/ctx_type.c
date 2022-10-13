@@ -895,8 +895,12 @@ static inline Py_ssize_t count_members(PyType_Spec *spec) {
     return nmembers;
 }
 
-/* On older Python versions, we need to workaround the missing support for
-   metaclasses. We create a temporary heap type using
+#define HAVE_FROM_METACLASS (PY_VERSION_HEX >= 0x030C0000)
+
+#if !HAVE_FROM_METACLASS
+
+/* On older Python versions (before 3.12), we need to workaround the missing
+   support for metaclasses. We create a temporary heap type using
    'PyType_FromSpecWithBases' and if a metaclass was provided, we use it to
    allocate the appropriate type object and memcpy most of the contents from
    the heap type to the manually allocated one. Then we clear some key slots
@@ -1029,6 +1033,8 @@ fail:
     return temp;
 }
 
+#endif /* HAVE_FROM_METACLASS */
+
 HPy
 ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                   HPyType_SpecParam *params)
@@ -1095,7 +1101,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     }
     struct _typeobject *metatype = get_metatype(params);
 
-#if PY_VERSION_HEX >= 0x030C0000
+#if HAVE_FROM_METACLASS
     /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
     PyObject *result = PyType_FromMetaclass(meta, NULL, spec, bases);
 #else
