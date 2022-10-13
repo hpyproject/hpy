@@ -1144,6 +1144,30 @@ class TestType(HPyTest):
             pass
         assert isinstance(Sub(), mod.Dummy)
 
+    def test_specparam_multiple_metaclass_fails(self):
+        import pytest
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+            };
+            
+            HPyDef_METH(make_dummy, "make_dummy", make_dummy_impl, HPyFunc_NOARGS)
+            static HPy make_dummy_impl(HPyContext *ctx, HPy module)
+            {
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_Metaclass, ctx->h_TypeType },
+                    { HPyType_SpecParam_Metaclass, ctx->h_LongType },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+                return HPyType_FromSpec(ctx, &Dummy_spec, param);
+            }
+            @EXPORT(make_dummy)
+            @INIT
+        """)
+
+        with pytest.raises(ValueError):
+            mod.make_dummy()
+
     def test_metaclass(self):
         import pytest
         mod = self.make_module("""

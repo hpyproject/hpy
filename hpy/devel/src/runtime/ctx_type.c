@@ -861,11 +861,16 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
 }
 
 _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
+    struct _typeobject *res = NULL;
     if (params != NULL) {
         for (HPyType_SpecParam *p = params; p->kind != 0; p++) {
             switch (p->kind) {
                 case HPyType_SpecParam_Metaclass:
-                    return (struct _typeobject*) _h2py(p->object);
+                    if (res) {
+                        PyErr_SetString(PyExc_ValueError, "metaclass was specified multiple times");
+                        return NULL;
+                    }
+                    res = (struct _typeobject*) _h2py(p->object);
                     break;
                 default:
                     // other values are intentionally ignored
@@ -877,7 +882,7 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
        has not explicitly been specified. We could default here to &PyType_Type
        but we actually want to use the bare 'PyType_FromSpecWithBases' if
        nothing was specified. */
-    return NULL;
+    return res;
 }
 
 static inline Py_ssize_t count_members(PyType_Spec *spec) {
@@ -1100,6 +1105,11 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     struct _typeobject *metatype = get_metatype(params);
+    if (metatype == NULL && PyErr_Occurred()) {
+        PyMem_Free(spec->slots);
+        PyMem_Free(spec);
+        return HPy_NULL;
+    }
 
 #if HAVE_FROM_METACLASS
     /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
