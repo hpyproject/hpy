@@ -211,6 +211,8 @@ There are a couple of points which are worth noting:
    CPython ABI and the CPython implementation of the universal ABI, but other
    implementations of the universal ABI will usually call directly the HPy
    function itself.
+  
+The second function definition is a bit different:
 
 .. literalinclude:: examples/simple-example/simple.c
   :start-after: // BEGIN: double
