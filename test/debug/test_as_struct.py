@@ -21,7 +21,7 @@ def test_use_invalid_as_struct(compiler, python_subprocess):
         };
                 
 
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             DummyObject *data = DummyObject_AsStruct(ctx, arg);

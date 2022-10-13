@@ -191,7 +191,6 @@ class TestType(HPyTest):
             };
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
-                @IS_LEGACY
                 .defines = Dummy_defines,
             };
 
@@ -232,7 +231,6 @@ class TestType(HPyTest):
 
             static HPyType_Spec dummy_type_spec = {
                 .name = "mytest.Dummy",
-                @IS_LEGACY
                 .defines = dummy_type_defines,
             };
 
