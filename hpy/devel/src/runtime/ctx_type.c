@@ -878,27 +878,37 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
     return NULL;
 }
 
-static PyObject *
-_PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases, struct _typeobject *meta)
+/* On older Python versions, we need to workaround the missing support for
+   metaclasses. We create a temporary heap type using
+   'PyType_FromSpecWithBases' and if a metaclass was provided, we use it to
+   allocate the appropriate type object and memcpy most of the contents from
+   the heap type to the manually allocated one. Then we clear some key slots
+   and call 'PyType_Ready' on it to re-initialize everything. The temporary
+   heap type is then expired. */
+static PyObject*
+_PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
+        struct _typeobject *meta)
 {
-#if PY_VERSION_HEX >= 0x030C0000
-    /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
-    return PyType_FromMetaclass(meta, NULL, spec, bases);
-#else
-    /* On older Python versions, we need to workaround the missing support for
-       metaclasses. We create a temporary heap type using
-       'PyType_FromSpecWithBases' and if a metaclass was provided, we use it to
-       allocate the appropriate type object and memcpy most of the contents
-       from the heap type to the manually allocated one. Then we clear some key
-       slots and call 'PyType_Ready' on it to re-initialize everything. The
-       temporary heap type is then expired. */
 
+    PyObject *result = NULL;
     PyObject *temp = PyType_FromSpecWithBases(spec, bases);
     if (!temp)
         return NULL;
 
-    if (meta)
-    {
+    /* If no metaclass was provided, we avoid this path since it is rather
+       expensive and slow. */
+    if (meta) {
+        if (!PyType_Check(meta)) {
+            PyErr_Format(PyExc_TypeError,
+                    "Metaclass '%R' is not a subclass of 'type'.",
+                    meta);
+            goto fail;
+        }
+        if (meta->tp_new != PyType_Type.tp_new) {
+            PyErr_SetString(PyExc_TypeError,
+                    "Metaclasses with custom tp_new are not supported.");
+            goto fail;
+        }
         PyHeapTypeObject *temp_ht = (PyHeapTypeObject *) temp;
         PyTypeObject *temp_tp = &temp_ht->ht_type;
 
@@ -921,7 +931,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases, struct _typeobject *me
             }
         }
 
-        PyObject *result = PyType_GenericAlloc(meta, nmembers);
+        result = meta->tp_alloc(meta, nmembers);
         if (!result)
             goto fail;
 
@@ -959,8 +969,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases, struct _typeobject *me
         /* Refresh 'tp_doc'. This is necessary because
            'PyType_FromSpecWithBases' allocates its own buffer which will be
            free'd. */
-        if (temp_tp->tp_doc)
-        {
+        if (temp_tp->tp_doc) {
             size_t len = strlen(temp_tp->tp_doc)+1;
             char *tp_doc = PyObject_MALLOC(len);
             if (!tp_doc)
@@ -973,7 +982,8 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases, struct _typeobject *me
            'tp_clear'. */
         assert(!PyType_IS_GC(tp) || tp->tp_traverse != NULL || tp->tp_clear != NULL);
 
-        PyType_Ready(tp);
+        if (PyType_Ready(tp) < 0)
+            goto fail;
 
         /* The following is the tail of 'PyType_FromSpecWithBases'. */
 
@@ -1003,7 +1013,6 @@ fail:
         return NULL;
     }
     return temp;
-#endif
 }
 
 HPy
@@ -1072,7 +1081,12 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     }
     struct _typeobject *metatype = get_metatype(params);
 
+#if PY_VERSION_HEX >= 0x030C0000
+    /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
+    PyObject *result = PyType_FromMetaclass(meta, NULL, spec, bases);
+#else
     PyObject *result = _PyType_FromMetaclass(spec, bases, metatype);
+#endif
 
     /* note that we do NOT free the memory which was allocated by
        create_method_defs, because that one is referenced internally by
