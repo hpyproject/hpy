@@ -304,14 +304,44 @@ HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssi
     return ctx_Type_GenericNew(ctx, type, args, nargs, kw);
 }
 
-HPyAPI_FUNC void* HPy_AsStruct(HPyContext *ctx, HPy h)
+HPyAPI_FUNC void* _HPy_AsStruct_Object(HPyContext *ctx, HPy h)
 {
-    return ctx_AsStruct(ctx, h);
+    return ctx_AsStruct_Object(ctx, h);
 }
 
-HPyAPI_FUNC void* HPy_AsStructLegacy(HPyContext *ctx, HPy h)
+HPyAPI_FUNC void* _HPy_AsStruct_Legacy(HPyContext *ctx, HPy h)
 {
-    return ctx_AsStructLegacy(ctx, h);
+    return ctx_AsStruct_Legacy(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_Type(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_Type(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_Long(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_Long(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_Float(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_Float(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_Unicode(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_Unicode(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_Tuple(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_List(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_List(ctx, h);
 }
 
 HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
