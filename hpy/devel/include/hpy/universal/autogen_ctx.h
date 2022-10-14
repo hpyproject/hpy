@@ -250,4 +250,7 @@ struct _HPyContext_s {
     void *(*ctx_AsStruct_Tuple)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStruct_List)(HPyContext *ctx, HPy h);
     HPyType_BuiltinShape (*ctx_Type_GetBuiltinShape)(HPyContext *ctx, HPy h_type);
+    int (*ctx_DelItem)(HPyContext *ctx, HPy obj, HPy key);
+    int (*ctx_DelItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
+    int (*ctx_DelItem_s)(HPyContext *ctx, HPy obj, const char *key);
 };

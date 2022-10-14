@@ -362,6 +362,18 @@ HPyAPI_FUNC int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy val
      return ctx->ctx_SetItem_s ( ctx, obj, key, value ); 
 }
 
+HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key) {
+     return ctx->ctx_DelItem ( ctx, obj, key ); 
+}
+
+HPyAPI_FUNC int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
+     return ctx->ctx_DelItem_i ( ctx, obj, idx ); 
+}
+
+HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key) {
+     return ctx->ctx_DelItem_s ( ctx, obj, key ); 
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {
      return ctx->ctx_Type ( ctx, obj ); 
 }

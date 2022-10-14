@@ -399,6 +399,11 @@ HPyAPI_FUNC int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value)
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key)
+{
+    return PyObject_DelItem(_h2py(obj), _h2py(key));
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Type(_h2py(obj)));

@@ -301,6 +301,13 @@ int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 HPy_ID(165)
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
 
+HPy_ID(236)
+int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key);
+HPy_ID(237)
+int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
+HPy_ID(238)
+int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key);
+
 HPy_ID(166)
 HPy HPy_Type(HPyContext *ctx, HPy obj);
 // WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
