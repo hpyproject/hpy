@@ -12,7 +12,7 @@ def hpy_abi():
 def test_no_invalid_handle(compiler, hpy_debug_capture):
     # Basic sanity check that valid code does not trigger any error reports
     mod = compiler.make_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy x = HPyLong_FromLong(ctx, 42);
@@ -35,7 +35,7 @@ def test_no_invalid_handle(compiler, hpy_debug_capture):
 
 def test_cant_use_closed_handle(compiler, hpy_debug_capture):
     mod = compiler.make_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O, .doc="double close")
+        HPyDef_METH(f, "f", HPyFunc_O, .doc="double close")
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy h = HPy_Dup(ctx, arg);
@@ -44,7 +44,7 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
             return HPy_Dup(ctx, ctx->h_None);
         }
 
-        HPyDef_METH(g, "g", g_impl, HPyFunc_O, .doc="use after close")
+        HPyDef_METH(g, "g", HPyFunc_O, .doc="use after close")
         static HPy g_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy h = HPy_Dup(ctx, arg);
@@ -52,7 +52,7 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
             return HPy_Repr(ctx, h);
         }
 
-        HPyDef_METH(h, "h", h_impl, HPyFunc_O, .doc="closing argument")
+        HPyDef_METH(h, "h", HPyFunc_O, .doc="closing argument")
         static HPy h_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             // Argument is implicitly closed by the caller
@@ -60,21 +60,21 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
             return HPy_Dup(ctx, ctx->h_None);
         }
 
-        HPyDef_METH(f_noargs, "f_noargs", f_noargs_impl, HPyFunc_NOARGS, .doc="returns arg w/o dupping it")
+        HPyDef_METH(f_noargs, "f_noargs", HPyFunc_NOARGS, .doc="returns arg w/o dupping it")
         static HPy f_noargs_impl(HPyContext *ctx, HPy self)
         {
             // should be: return HPy_Dup(ctx, self);
             return self;
         }
 
-        HPyDef_METH(f0, "f0", f0_impl, HPyFunc_O, .doc="returns arg w/o dupping it")
+        HPyDef_METH(f0, "f0", HPyFunc_O, .doc="returns arg w/o dupping it")
         static HPy f0_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             // should be: return HPy_Dup(ctx, arg);
             return arg;
         }
 
-        HPyDef_METH(f_varargs, "f_varargs", f_varargs_impl, HPyFunc_VARARGS, .doc="returns arg w/o dupping it")
+        HPyDef_METH(f_varargs, "f_varargs", HPyFunc_VARARGS, .doc="returns arg w/o dupping it")
         static HPy f_varargs_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
         {
             // should be: return HPy_Dup(ctx, args[0]);
@@ -110,14 +110,14 @@ def test_keeping_and_reusing_argument_handle(compiler, hpy_debug_capture):
     mod = compiler.make_module("""
         HPy keep;
 
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             keep = arg;
             return HPy_Dup(ctx, ctx->h_None);
         }
 
-        HPyDef_METH(g, "g", g_impl, HPyFunc_NOARGS)
+        HPyDef_METH(g, "g", HPyFunc_NOARGS)
         static HPy g_impl(HPyContext *ctx, HPy self)
         {
             HPy_ssize_t len = HPy_Length(ctx, keep);
@@ -142,7 +142,7 @@ def test_return_ctx_constant_without_dup(compiler, python_subprocess, fatal_exit
         pytest.skip("no sys.executable")
 
     mod = compiler.compile_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+        HPyDef_METH(f, "f", HPyFunc_NOARGS)
         static HPy f_impl(HPyContext *ctx, HPy self)
         {
             return ctx->h_None;
@@ -163,7 +163,7 @@ def test_close_ctx_constant(compiler, python_subprocess, fatal_exit_code):
         pytest.skip("no sys.executable")
 
     mod = compiler.compile_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+        HPyDef_METH(f, "f", HPyFunc_NOARGS)
         static HPy f_impl(HPyContext *ctx, HPy self)
         {
             HPy_Close(ctx, ctx->h_True);
@@ -183,7 +183,7 @@ def test_invalid_handle_crashes_python_if_no_hook(compiler, python_subprocess, f
         pytest.skip("no sys.executable")
 
     mod = compiler.compile_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O, .doc="double close")
+        HPyDef_METH(f, "f", HPyFunc_O, .doc="double close")
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy h = HPy_Dup(ctx, arg);

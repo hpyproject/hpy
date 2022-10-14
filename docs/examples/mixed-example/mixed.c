@@ -6,7 +6,7 @@
 #include "hpy.h"
 
 /* a HPy style function */
-HPyDef_METH(add_ints, "add_ints", add_ints_impl, HPyFunc_VARARGS)
+HPyDef_METH(add_ints, "add_ints", HPyFunc_VARARGS)
 static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     long a, b;
