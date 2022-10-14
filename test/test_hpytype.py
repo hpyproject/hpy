@@ -197,7 +197,7 @@ class PointTemplate(DefaultExtensionTemplate):
 
     def DEFINE_meta_data_accessors(self):
         return """
-            HPyDef_METH(set_meta_data, "set_meta_data", set_meta_data_impl, HPyFunc_O)
+            HPyDef_METH(set_meta_data, "set_meta_data", HPyFunc_O)
             static HPy set_meta_data_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 DummyMeta *data = DummyMeta_AsStruct(ctx, arg);
@@ -208,7 +208,7 @@ class PointTemplate(DefaultExtensionTemplate):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
-            HPyDef_METH(get_meta_data, "get_meta_data", get_meta_data_impl, HPyFunc_O)
+            HPyDef_METH(get_meta_data, "get_meta_data", HPyFunc_O)
             static HPy get_meta_data_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 DummyMeta *data = DummyMeta_AsStruct(ctx, arg);
@@ -221,7 +221,7 @@ class PointTemplate(DefaultExtensionTemplate):
                 return HPyLong_FromLong(ctx, data->meta_magic + data->meta_member);
             }
 
-            HPyDef_METH(set_member, "set_member", set_member_impl, HPyFunc_O)
+            HPyDef_METH(set_member, "set_member", HPyFunc_O)
             static HPy set_member_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 Dummy *data = Dummy_AsStruct(ctx, arg);
@@ -1151,7 +1151,7 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
             };
             
-            HPyDef_METH(make_dummy, "make_dummy", make_dummy_impl, HPyFunc_NOARGS)
+            HPyDef_METH(make_dummy, "make_dummy", HPyFunc_NOARGS)
             static HPy make_dummy_impl(HPyContext *ctx, HPy module)
             {
                 HPyType_SpecParam param[] = {
@@ -1178,8 +1178,7 @@ class TestType(HPyTest):
             @DEFINE_Dummy
             @DEFINE_meta_data_accessors
 
-            HPyDef_METH(create_type, "create_type", create_type_impl, 
-                            HPyFunc_VARARGS)
+            HPyDef_METH(create_type, "create_type", HPyFunc_VARARGS)
             static HPy create_type_impl(HPyContext *ctx, HPy module, 
                                             HPy *args, HPy_ssize_t nargs)
             {
