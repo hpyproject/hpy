@@ -22,8 +22,17 @@ class LegacyPointTemplate(PointTemplate):
         HPyType_LEGACY_HELPERS({struct_name})
     """
 
+    _METACLASS_STRUCT_BEGIN_FORMAT = """
+        #include <Python.h>
+        typedef struct {{
+            PyHeapTypeObject super;
+    """
+
+    _METACLASS_STRUCT_END_FORMAT = _STRUCT_END_FORMAT
+
     def DEFAULT_SHAPE(self):
         return ".builtin_shape = HPyType_BuiltinShape_Legacy,"
+
 
 class TestLegacyType(_TestType):
 
@@ -139,6 +148,87 @@ class TestLegacyType(_TestType):
             mod = self.make_module(mod_src)
         assert "legacy tp_dealloc" in str(err.value)
 
+    def test_metaclass_as_legacy_static_type(self):
+        mod = self.make_module("""
+            #include <Python.h>
+            #include <structmember.h>
+
+            @DEFINE_DummyMeta_struct
+
+            /* This module is compiled as a shared library and some compilers
+               don't allow addresses of Python objects defined in other
+               libraries to be used in static initializers here. The
+               DEFERRED_ADDRESS macro is just used for documentation and we
+               need to set the actual value before we call PyType_Ready. */
+            #define DEFERRED_ADDRESS(x) NULL
+
+            static PyTypeObject DummyMetaType = {
+                PyVarObject_HEAD_INIT(DEFERRED_ADDRESS(&PyType_Type), 0)
+                .tp_name = "mytest.DummyMeta",
+                .tp_basicsize = sizeof(DummyMeta),
+                .tp_flags = Py_TPFLAGS_DEFAULT,
+                .tp_base = DEFERRED_ADDRESS(&PyType_Type),
+            };
+            
+            @DEFINE_Dummy_struct
+
+            static PyMemberDef members[] = {
+                    {"member", T_INT, offsetof(Dummy, member), 0, NULL},
+                    {NULL, 0, 0, 0, NULL},
+            };
+
+            static PyType_Slot DummySlots[] = {
+                {Py_tp_members, members},
+                {0, NULL},
+            };
+
+            static HPyType_Spec Dummy_legacy_spec = {
+                .name = "mytest.Dummy",
+                .basicsize = sizeof(Dummy),
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
+                .legacy_slots = DummySlots,
+            };
+
+            void setup_types(HPyContext *ctx, HPy module) {
+                HPy h_DummyMeta;
+                DummyMetaType.ob_base.ob_base.ob_type = &PyType_Type;
+                DummyMetaType.tp_base = &PyType_Type;
+                if (PyType_Ready(&DummyMetaType))
+                    return;
+                h_DummyMeta = HPy_FromPyObject(ctx, (PyObject*) &DummyMetaType);
+
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_Metaclass, h_DummyMeta },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+                HPy h_Dummy = HPyType_FromSpec(ctx, &Dummy_legacy_spec, param);
+                if (!HPy_IsNull(h_Dummy)) {
+                    HPy_SetAttr_s(ctx, module, "Dummy", h_Dummy);
+                    HPy_SetAttr_s(ctx, module, "DummyMeta", h_DummyMeta);
+                }
+
+                HPy_Close(ctx, h_Dummy);
+                HPy_Close(ctx, h_DummyMeta);
+            }
+
+            @DEFINE_meta_data_accessors
+
+            @EXPORT(set_meta_data)
+            @EXPORT(get_meta_data)
+            @EXPORT(set_member)
+            @EXTRA_INIT_FUNC(setup_types)
+            @INIT
+        """)
+
+        assert isinstance(mod.Dummy, type)
+        assert mod.DummyMeta is type(mod.Dummy)
+        assert mod.set_meta_data(mod.Dummy) is None
+        assert mod.get_meta_data(mod.Dummy) == 42 + 11
+
+        d = mod.Dummy()
+        mod.set_member(d)
+        assert d.member == 123614
 
 class TestCustomLegacyFeatures(HPyTest):
 

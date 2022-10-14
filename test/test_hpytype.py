@@ -27,6 +27,15 @@ class PointTemplate(DefaultExtensionTemplate):
         {type_helpers}
     """
 
+    _METACLASS_STRUCT_BEGIN_FORMAT = """
+        typedef struct {{
+    """
+
+    _METACLASS_STRUCT_END_FORMAT = """
+        }} {struct_name};
+        HPyType_HELPERS({struct_name}, HPyType_BuiltinShape_Type)
+    """
+
     def TYPE_STRUCT_BEGIN(self, struct_name):
         assert self._CURRENT_STRUCT is None
         self._CURRENT_STRUCT = struct_name
@@ -96,6 +105,130 @@ class PointTemplate(DefaultExtensionTemplate):
                 .defines = Point_defines
             };
         """ % defines
+
+
+    def METACLASS_STRUCT_BEGIN(self, struct_name):
+        assert self._CURRENT_STRUCT is None
+        self._CURRENT_STRUCT = struct_name
+        return self._METACLASS_STRUCT_BEGIN_FORMAT.format(struct_name=struct_name)
+
+    def METACLASS_STRUCT_END(self):
+        assert self._CURRENT_STRUCT is not None
+        struct_name = self._CURRENT_STRUCT
+        self._CURRENT_STRUCT = None
+        return self._METACLASS_STRUCT_END_FORMAT.format(struct_name=struct_name)
+
+    def DEFINE_DummyMeta_struct(self):
+        type_begin = self.METACLASS_STRUCT_BEGIN("DummyMeta")
+        type_end = self.METACLASS_STRUCT_END()
+        return """
+            {type_begin}
+                int meta_magic;
+                int meta_member;
+                char some_more[64];
+            {type_end}
+        """.format(type_begin=type_begin, type_end=type_end)
+
+    def DEFINE_DummyMeta(self):
+        struct = self.DEFINE_DummyMeta_struct()
+        return """
+            {struct}
+
+            static HPyType_Spec DummyMeta_spec = {{
+                .name = "mytest.DummyMeta",
+                .basicsize = sizeof(DummyMeta),
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                .builtin_shape = SHAPE(DummyMeta),
+            }};
+
+            static HPy make_DummyMeta(HPyContext *ctx)
+            {{
+                HPyType_SpecParam param[] = {{
+                    {{ HPyType_SpecParam_Base, ctx->h_TypeType }},
+                    {{ (HPyType_SpecParam_Kind)0 }}
+                }};
+                return HPyType_FromSpec(ctx, &DummyMeta_spec, param);
+            }}
+        """.format(struct=struct)
+
+    def EXPORT_DummyMeta(self):
+        self.EXTRA_INIT_FUNC("register_DummyMeta")
+        return """
+            static void register_DummyMeta(HPyContext *ctx, HPy module)
+            {
+                HPy h_DummyMeta = make_DummyMeta(ctx);
+                if (HPy_IsNull(h_DummyMeta))
+                    return;
+                HPy_SetAttr_s(ctx, module, "DummyMeta", h_DummyMeta);
+                HPy_Close(ctx, h_DummyMeta);
+            }
+        """
+
+    def DEFINE_Dummy_struct(self):
+        type_begin = self.TYPE_STRUCT_BEGIN("Dummy")
+        type_end = self.TYPE_STRUCT_END()
+        return """
+            {type_begin}
+                int member;
+            {type_end}
+            """.format(type_begin=type_begin, type_end=type_end)
+
+    def DEFINE_Dummy(self):
+        struct = self.DEFINE_Dummy_struct()
+        return """
+            {struct}
+
+            HPyDef_MEMBER(member, "member", HPyMember_INT, offsetof(Dummy, member))
+
+            static HPyDef *Dummy_defines[] = {{
+                &member,
+                NULL
+            }};
+
+            static HPyType_Spec Dummy_spec = {{
+                .name = "mytest.Dummy",
+                .basicsize = sizeof(Dummy),
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                .builtin_shape = SHAPE(Dummy),
+                .defines = Dummy_defines,
+            }};
+            """.format(struct=struct)
+
+    def DEFINE_meta_data_accessors(self):
+        return """
+            HPyDef_METH(set_meta_data, "set_meta_data", HPyFunc_O)
+            static HPy set_meta_data_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                DummyMeta *data = DummyMeta_AsStruct(ctx, arg);
+                data->meta_magic = 42;
+                data->meta_member = 11;
+                for (size_t i = 0; i < 64; ++i)
+                    data->some_more[i] = (char) i;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            HPyDef_METH(get_meta_data, "get_meta_data", HPyFunc_O)
+            static HPy get_meta_data_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                DummyMeta *data = DummyMeta_AsStruct(ctx, arg);
+                for (size_t i = 0; i < 64; ++i) {
+                    if (data->some_more[i] != (char) i) {
+                        HPyErr_SetString(ctx, ctx->h_RuntimeError, "some_more got mangled");
+                        return HPy_NULL;
+                    }
+                }
+                return HPyLong_FromLong(ctx, data->meta_magic + data->meta_member);
+            }
+
+            HPyDef_METH(set_member, "set_member", HPyFunc_O)
+            static HPy set_member_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                Dummy *data = Dummy_AsStruct(ctx, arg);
+                data->member = 123614;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            """
 
 
 class TestType(HPyTest):
@@ -1010,6 +1143,103 @@ class TestType(HPyTest):
         class Sub(mod.Dummy):
             pass
         assert isinstance(Sub(), mod.Dummy)
+
+    def test_specparam_multiple_metaclass_fails(self):
+        import pytest
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+            };
+            
+            HPyDef_METH(make_dummy, "make_dummy", HPyFunc_NOARGS)
+            static HPy make_dummy_impl(HPyContext *ctx, HPy module)
+            {
+                HPyType_SpecParam param[] = {
+                    { HPyType_SpecParam_Metaclass, ctx->h_TypeType },
+                    { HPyType_SpecParam_Metaclass, ctx->h_LongType },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+                return HPyType_FromSpec(ctx, &Dummy_spec, param);
+            }
+            @EXPORT(make_dummy)
+            @INIT
+        """)
+
+        with pytest.raises(ValueError):
+            mod.make_dummy()
+
+    def test_metaclass(self):
+        import pytest
+        mod = self.make_module("""
+            #include <Python.h>
+            #include <structmember.h>
+
+            @DEFINE_DummyMeta
+            @DEFINE_Dummy
+            @DEFINE_meta_data_accessors
+
+            HPyDef_METH(create_type, "create_type", HPyFunc_VARARGS)
+            static HPy create_type_impl(HPyContext *ctx, HPy module, 
+                                            HPy *args, HPy_ssize_t nargs)
+            {
+                HPy metaclass;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "sO", 
+                        &Dummy_spec.name, &metaclass))
+                    return HPy_NULL;
+
+                HPyType_SpecParam specparam[] = {
+                    { HPyType_SpecParam_Metaclass, metaclass },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+
+                const char *bare_name = strrchr(Dummy_spec.name, '.');
+                if (bare_name == NULL)
+                    bare_name = Dummy_spec.name;
+                else
+                    bare_name++;
+
+                if (!HPyHelpers_AddType(ctx, module, bare_name,
+                                            &Dummy_spec, specparam))
+                    return HPy_NULL;
+
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT_DummyMeta
+            @EXPORT(set_meta_data)
+            @EXPORT(get_meta_data)
+            @EXPORT(set_member)
+            @EXPORT(create_type)
+            @INIT
+        """)
+
+        assert type(mod.DummyMeta) is type
+        mod.create_type("mytest.Dummy", mod.DummyMeta)
+        assert mod.DummyMeta is type(mod.Dummy), "type(mod.Dummy) == %r" % (type(mod.Dummy), )
+        assert isinstance(mod.Dummy, type)
+        assert mod.set_meta_data(mod.Dummy) is None
+        assert mod.get_meta_data(mod.Dummy) == 42 + 11
+
+        d = mod.Dummy()
+        mod.set_member(d)
+        assert d.member == 123614
+
+        # metaclasses must inherit from 'type'
+        with pytest.raises(TypeError):
+            mod.create_type("mytest.DummyFail0", "hello")
+
+        class WithCustomNew:
+            def __new__(self):
+                print("hello")
+
+        # types with custom 'tp_new' cannot be used as metaclass
+        with pytest.raises(TypeError):
+            mod.create_type("mytest.DummyFail1", WithCustomNew)
+
+        # type 'int' also has a custom new
+        with pytest.raises(TypeError):
+            mod.create_type("mytest.DummyIntMeta", int)
+
 
 class TestPureHPyType(HPyTest):
 

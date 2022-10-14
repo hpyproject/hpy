@@ -98,6 +98,8 @@ _HPy_GetHeaderSize(HPyType_BuiltinShape shape)
     return -1;
 }
 
+#define _HPy_OFFSET(OBJ, OFFSET) ((void*) ((char*) (OBJ) + (OFFSET)))
+
 // Return a pointer to the area of memory AFTER the header
 static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape)
 {
@@ -106,7 +108,7 @@ static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape
        trusted source. The shape is validated when creating the type from the
        specification. */
     assert(header_size >= 0);
-    return (void*) ((char*) obj + header_size);
+    return _HPy_OFFSET(obj, header_size);
 }
 
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
@@ -706,6 +708,8 @@ static int check_unknown_params(HPyType_SpecParam *params, const char *name)
             case HPyType_SpecParam_BasesTuple:
                 found_basestuple++;
                 break;
+            case HPyType_SpecParam_Metaclass:
+                break;
 
             default:
                 PyErr_Format(PyExc_TypeError,
@@ -832,6 +836,9 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
                 tup = _h2py(p->object);
                 Py_INCREF(tup);
                 return tup;
+            case HPyType_SpecParam_Metaclass:
+                // intentionally ignored
+                break;
         }
     }
     if (found_base == 0)
@@ -853,7 +860,187 @@ static PyObject *build_bases_from_params(HPyType_SpecParam *params)
     return tup;
 }
 
-_HPy_HIDDEN HPy
+_HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
+    struct _typeobject *res = NULL;
+    if (params != NULL) {
+        for (HPyType_SpecParam *p = params; p->kind != 0; p++) {
+            switch (p->kind) {
+                case HPyType_SpecParam_Metaclass:
+                    if (res) {
+                        PyErr_SetString(PyExc_ValueError, "metaclass was specified multiple times");
+                        return NULL;
+                    }
+                    res = (struct _typeobject*) _h2py(p->object);
+                    break;
+                default:
+                    // other values are intentionally ignored
+                    break;
+            }
+        }
+    }
+    /* Returning NULL here does not indicate an error but that the metaclass
+       has not explicitly been specified. We could default here to &PyType_Type
+       but we actually want to use the bare 'PyType_FromSpecWithBases' if
+       nothing was specified. */
+    return res;
+}
+
+static inline Py_ssize_t count_members(PyType_Spec *spec) {
+    Py_ssize_t nmembers = 0;
+    PyType_Slot *slot;
+    PyMemberDef *memb;
+    for (slot = spec->slots; slot->slot; slot++) {
+        if (slot->slot == Py_tp_members) {
+            nmembers = 0;
+            for (memb = (PyMemberDef *) slot->pfunc; memb->name != NULL; memb++) {
+                nmembers++;
+            }
+        }
+    }
+    return nmembers;
+}
+
+#define HAVE_FROM_METACLASS (PY_VERSION_HEX >= 0x030C0000)
+
+#if !HAVE_FROM_METACLASS
+
+/* On older Python versions (before 3.12), we need to workaround the missing
+   support for metaclasses. We create a temporary heap type using
+   'PyType_FromSpecWithBases' and if a metaclass was provided, we use it to
+   allocate the appropriate type object and memcpy most of the contents from
+   the heap type to the manually allocated one. Then we clear some key slots
+   and call 'PyType_Ready' on it to re-initialize everything. The temporary
+   heap type is then expired. */
+static PyObject*
+_PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
+        struct _typeobject *meta)
+{
+    PyObject *temp, *result;
+    PyHeapTypeObject *temp_ht, *ht;
+    PyTypeObject *temp_tp, *tp;
+    Py_ssize_t nmembers;
+    const char *s;
+
+    temp = PyType_FromSpecWithBases(spec, bases);
+    if (!temp)
+        return NULL;
+
+    /* If no metaclass was provided, we avoid this path since it is rather
+       expensive and slow. */
+    if (meta) {
+        result = NULL;
+        if (!PyType_Check(meta)) {
+            PyErr_Format(PyExc_TypeError,
+                    "Metaclass '%R' is not a subclass of 'type'.",
+                    meta);
+            goto fail;
+        }
+        if (meta->tp_new != PyType_Type.tp_new) {
+            PyErr_SetString(PyExc_TypeError,
+                    "Metaclasses with custom tp_new are not supported.");
+            goto fail;
+        }
+        temp_ht = (PyHeapTypeObject *) temp;
+        temp_tp = &temp_ht->ht_type;
+
+        Py_INCREF(temp_ht->ht_name);
+        Py_INCREF(temp_ht->ht_qualname);
+        Py_XINCREF(temp_ht->ht_slots);
+        Py_INCREF(temp_tp->tp_base);
+
+        /* Count the members as 'PyType_FromSpecWithBases' does such that we
+           can properly allocate the size later when allocating the type. */
+        nmembers = count_members(spec);
+
+        result = meta->tp_alloc(meta, nmembers);
+        if (!result)
+            goto fail;
+
+        ht = (PyHeapTypeObject *) result;
+        tp = &ht->ht_type;
+
+        /* IMPORTANT: CPython debug builds may store additional information in
+           the object header (i.e. before 'ob_refcnt') for tracing references
+           or whatever. In this case, we MUST NOT copy the object header. So we
+           don't copy the whole embedded 'PyVarObject' chunk at the beginning
+           of the 'PyHeapTypeObject'. The appropriate 'PyVarObject' fields are
+           set explicitly right below. */
+        memcpy(_HPy_OFFSET(tp, sizeof(PyVarObject)),
+                _HPy_OFFSET(temp_tp, sizeof(PyVarObject)),
+                sizeof(PyHeapTypeObject) - sizeof(PyVarObject));
+
+        tp->ob_base.ob_base.ob_type = meta;
+        tp->ob_base.ob_base.ob_refcnt = 1;
+        tp->ob_base.ob_size = 0;
+        tp->tp_as_async = &ht->as_async;
+        tp->tp_as_number = &ht->as_number;
+        tp->tp_as_sequence = &ht->as_sequence;
+        tp->tp_as_mapping = &ht->as_mapping;
+        tp->tp_as_buffer = &ht->as_buffer;
+        tp->tp_flags = spec->flags | Py_TPFLAGS_HEAPTYPE;
+
+        tp->tp_dict = NULL;
+        tp->tp_bases = NULL;
+        tp->tp_mro = NULL;
+        tp->tp_cache = NULL;
+        tp->tp_subclasses = NULL;
+        tp->tp_weaklist = NULL;
+        ht->ht_cached_keys = NULL;
+        tp->tp_version_tag = 0;
+
+        /* Refresh 'tp_doc'. This is necessary because
+           'PyType_FromSpecWithBases' allocates its own buffer which will be
+           free'd. */
+        if (temp_tp->tp_doc) {
+            size_t len = strlen(temp_tp->tp_doc)+1;
+            char *tp_doc = (char *)PyObject_MALLOC(len);
+            if (!tp_doc)
+                goto fail;
+            memcpy(tp_doc, temp_tp->tp_doc, len);
+            tp->tp_doc = tp_doc;
+        }
+
+        /* Sanity check: GC objects need to provide 'tp_traverse' and
+           'tp_clear'. */
+        assert(!PyType_IS_GC(tp) || tp->tp_traverse != NULL || tp->tp_clear != NULL);
+
+        if (PyType_Ready(tp) < 0)
+            goto fail;
+
+        /* Restore 'ht_cached_keys' after call to 'PyType_Ready' */
+        if (temp_ht->ht_cached_keys) {
+            Py_INCREF(temp_ht->ht_cached_keys);
+            ht->ht_cached_keys = temp_ht->ht_cached_keys;
+        }
+
+        /* The following is the tail of 'PyType_FromSpecWithBases'. */
+
+        /* Set type.__module__ */
+        s = strrchr(spec->name, '.');
+        if (s != NULL) {
+            int err;
+            PyObject *modname = PyUnicode_FromStringAndSize(
+                    spec->name, (Py_ssize_t)(s - spec->name));
+            if (!modname) {
+                goto fail;
+            }
+            err = PyDict_SetItemString(tp->tp_dict, "__module__", modname);
+            Py_DECREF(modname);
+            if (err != 0)
+                goto fail;
+        }
+        return result;
+fail:
+        Py_DECREF(temp);
+        Py_XDECREF(result);
+        return NULL;
+    }
+    return temp;
+}
+
+#endif /* HAVE_FROM_METACLASS */
+
+HPy
 ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                   HPyType_SpecParam *params)
 {
@@ -917,10 +1104,32 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         PyMem_Free(spec);
         return HPy_NULL;
     }
-    PyObject *result = PyType_FromSpecWithBases(spec, bases);
+    struct _typeobject *metatype = get_metatype(params);
+    if (metatype == NULL && PyErr_Occurred()) {
+        PyMem_Free(spec->slots);
+        PyMem_Free(spec);
+        return HPy_NULL;
+    }
+
+#if HAVE_FROM_METACLASS
+    /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
+    PyObject *result = PyType_FromMetaclass(meta, NULL, spec, bases);
+#else
+    /* On Python 3.11 an older, we need to use our own
+       '_PyType_FromMetaclass'. */
+    PyObject *result = _PyType_FromMetaclass(spec, bases, metatype);
+#endif
+
     /* note that we do NOT free the memory which was allocated by
        create_method_defs, because that one is referenced internally by
        CPython (which probably assumes it's statically allocated) */
+    Py_XDECREF(bases);
+    PyMem_Free(spec->slots);
+    PyMem_Free(spec);
+    if (result == NULL) {
+        return HPy_NULL;
+    }
+
 #if PY_VERSION_HEX < 0x03080000
     /*
     py3.7 compatibility
@@ -931,12 +1140,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
     }
 #endif
-    Py_XDECREF(bases);
-    PyMem_Free(spec->slots);
-    PyMem_Free(spec);
-    if (result == NULL) {
-        return HPy_NULL;
-    }
+
     PyBufferProcs* buffer_procs = create_buffer_procs(hpyspec);
     if (buffer_procs) {
         ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
