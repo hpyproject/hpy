@@ -68,6 +68,7 @@ def attach_python_to_venv(d):
         d.bin = d.join('bin')
     d.python = d.bin.join('python')
 
+
 @pytest.mark.usefixtures('initargs')
 class TestDistutils:
 
@@ -137,11 +138,7 @@ class TestDistutils:
             #include <hpy.h>
             static HPyModuleDef moduledef = {
                 .name = "hpymod",
-            #ifdef HPY_UNIVERSAL_ABI
-                .doc = "hpymod universal ABI",
-            #else
-                .doc = "hpymod cpython ABI",
-            #endif
+                .doc = "hpymod with HPy ABI: " HPY_ABI,
             };
 
             HPy_MODINIT(hpymod)
@@ -231,7 +228,7 @@ class TestDistutils:
         """)
         self.python('setup.py', f'--hpy-abi={hpy_abi}', 'build_ext', '--inplace')
         doc = self.get_docstring('hpymod')
-        assert doc == f'hpymod {hpy_abi} ABI'
+        assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
     def test_hpymod_setup_install(self, hpy_abi):
         # check that we can install hpy modules with setup.py install
@@ -242,7 +239,7 @@ class TestDistutils:
         """)
         self.python('setup.py', f'--hpy-abi={hpy_abi}', 'install')
         doc = self.get_docstring('hpymod')
-        assert doc == f'hpymod {hpy_abi} ABI'
+        assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
     def test_hpymod_wheel(self, hpy_abi):
         # check that we can build and install wheels
@@ -256,7 +253,7 @@ class TestDistutils:
         whl = dist.listdir('*.whl')[0]
         self.python('-m', 'pip', 'install', str(whl))
         doc = self.get_docstring('hpymod')
-        assert doc == f'hpymod {hpy_abi} ABI'
+        assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
     def test_dont_mix_cpython_and_universal_abis(self):
         """
@@ -279,7 +276,7 @@ class TestDistutils:
         assert len(libs) == 1
         #
         doc = self.get_docstring('hpymod')
-        assert doc == 'hpymod cpython ABI'
+        assert doc == 'hpymod with HPy ABI: cpython'
 
         # now recompile with universal *without* cleaning the build
         self.python('setup.py', '--hpy-abi=universal', 'install')
@@ -291,4 +288,4 @@ class TestDistutils:
         assert len(libs) == 2
         #
         doc = self.get_docstring('hpymod')
-        assert doc == 'hpymod universal ABI'
+        assert doc == 'hpymod with HPy ABI: universal'

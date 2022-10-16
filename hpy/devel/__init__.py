@@ -296,6 +296,7 @@ class build_ext_hpy_mixin:
         ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
+            ext.define_macros.append(('HPY_CPYTHON_ABI', None))
             ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
         elif ext.hpy_abi == 'universal':
