@@ -15,16 +15,17 @@ import venv
 import py
 import pytest
 
-
 from test.support import atomic_run, HPY_ROOT
 
-# this is only for development: if we set it to true, we don't have to
-# recreate the venv_template between runs, it's much faster
-REUSE_VENV_TEMPLATE = False
+# ====== IMPORTANT DEVELOPMENT TIP =====
+# You can use py.test --reuse-venv to speed up local testing.
+#
+# The env is created once in /tmp/venv-for-hpytest and reused among tests and
+# sessions. If you want to recreate it, simply rm -r /tmp/venv-for-hpytest
 
 @pytest.fixture(scope='session')
-def venv_template(tmpdir_factory):
-    if REUSE_VENV_TEMPLATE:
+def venv_template(request, tmpdir_factory):
+    if request.config.option.reuse_venv:
         d = py.path.local('/tmp/venv-for-hpytest')
         if d.check(dir=True):
             # if it exists, we assume it's correct. If you want to recreate,
