@@ -96,13 +96,12 @@ class TestDistutils:
         cmd = [str(self.venv.python)] + list(args)
         print('[RUN]', ' '.join(cmd))
         if capture:
-            proc = atomic_run(cmd, stdout=subprocess.PIPE)
+            proc = atomic_run(cmd, capture_output=True)
             out = proc.stdout.decode('latin-1').strip()
         else:
             proc = atomic_run(cmd)
             out = None
-        if proc.returncode != 0:
-            raise Exception(f"Command {cmd} failed")
+        proc.check_returncode()
         return out
 
 
@@ -332,3 +331,17 @@ class TestDistutils:
         src = 'import hpymod_legacy; print(hpymod_legacy.f())'
         out = self.python('-c', src, capture=True)
         assert out == '1234'
+
+    def test_hpymod_legacy_fails_with_universal(self):
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod_legacy],
+                  install_requires = [],
+            )
+        """)
+        with pytest.raises(subprocess.CalledProcessError) as exc:
+            self.python('setup.py', '--hpy-abi=universal', 'install', capture=True)
+        stderr = exc.value.stderr.decode('latin-1')
+        expected_msg = ("It is forbidden to #include <Python.h> when "
+                        "targeting the HPy Universal ABI")
+        assert expected_msg in stderr

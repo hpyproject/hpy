@@ -19,7 +19,10 @@ extern "C" {
    cases in which you want to do "#ifdef HPY_UNIVERSAL_ABI", because in 99% of
    the cases you want to treate the universal and hybrid cases similarly.
 
-   In addition, we also define HPY_ABI which is a string literal containing a
+   Moreover, we also define HPY_UNIVERSAL_STRICT_ABI as an alias for
+   defined(HPY_UNIVERSAL_ABI) && !defined(HPY_HYBRID_ABI)
+
+   Finally, we also define HPY_ABI which is a string literal containing a
    string representation of it.
 */
 
@@ -37,6 +40,7 @@ extern "C" {
 #  define HPY_ABI "hybrid"
 
 #elif defined(HPY_UNIVERSAL_ABI)
+#  define HPY_UNIVERSAL_STRICT_ABI
 #  define HPY_ABI "universal"
 
 #else

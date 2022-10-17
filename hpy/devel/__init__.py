@@ -60,6 +60,9 @@ class HPyDevel:
             self.include_dir,
         ]))
 
+    def get_include_dir_forbid_python_h(self):
+        return self.include_dir.joinpath('hpy', 'forbid_python_h')
+
     def get_extra_sources(self):
         """ Extra sources needed by extensions in both CPython and Universal
             modes.
@@ -306,6 +309,8 @@ class build_ext_hpy_mixin:
         elif ext.hpy_abi == 'universal':
             ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
             ext._hpy_needs_stub = True
+            forbid_python_h = self.hpydevel.get_include_dir_forbid_python_h()
+            ext.include_dirs.insert(0, forbid_python_h)
         else:
             raise DistutilsError('Unknown HPy ABI: %s. Valid values are: '
                                  'cpython, hybrid, universal' % ext.hpy_abi)
