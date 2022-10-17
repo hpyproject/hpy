@@ -149,11 +149,39 @@ class TestDistutils:
             }
         """)
 
+        self.writefile('hpymod_legacy.c', """
+            // the simplest possible HPy+legacy module
+            #include <hpy.h>
+            #include <Python.h>
+
+            static PyObject *f(PyObject *self, PyObject *args)
+            {
+                return PyLong_FromLong(1234);
+            }
+            static PyMethodDef my_legacy_methods[] = {
+                {"f", (PyCFunction)f, METH_NOARGS},
+                {NULL}
+            };
+
+            static HPyModuleDef moduledef = {
+                .name = "hpymod_legacy",
+                .doc = "hpymod_legacy with HPy ABI: " HPY_ABI,
+                .legacy_methods = my_legacy_methods,
+            };
+
+            HPy_MODINIT(hpymod_legacy)
+            static HPy init_hpymod_legacy_impl(HPyContext *ctx)
+            {
+                return HPyModule_Create(ctx, &moduledef);
+            }
+        """)
+
     def gen_setup_py(self, src):
         preamble = textwrap.dedent("""
             from setuptools import setup, Extension
             cpymod = Extension("cpymod", ["cpymod.c"])
             hpymod = Extension("hpymod", ["hpymod.c"])
+            hpymod_legacy = Extension("hpymod_legacy", ["hpymod_legacy.c"])
         """)
         src = preamble + textwrap.dedent(src)
         f = self.hpy_test_project.join('setup.py')
@@ -290,3 +318,17 @@ class TestDistutils:
         #
         doc = self.get_docstring('hpymod')
         assert doc == 'hpymod with HPy ABI: universal'
+
+    def test_hpymod_legacy(self, hpy_abi):
+        if hpy_abi == 'universal':
+            pytest.skip('only for cpython and hybrid ABIs')
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod_legacy],
+                  install_requires = [],
+            )
+        """)
+        self.python('setup.py', 'install')
+        src = 'import hpymod_legacy; print(hpymod_legacy.f())'
+        out = self.python('-c', src, capture=True)
+        assert out == '1234'
