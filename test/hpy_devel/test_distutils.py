@@ -84,7 +84,7 @@ class TestDistutils:
         self.gen_project()
         self.hpy_test_project.chdir()
 
-    @pytest.fixture(params=['cpython', 'universal'])
+    @pytest.fixture(params=['cpython', 'hybrid', 'universal'])
     def hpy_abi(self, request):
         return request.param
 
