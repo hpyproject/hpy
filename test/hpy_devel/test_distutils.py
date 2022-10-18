@@ -349,7 +349,6 @@ class TestDistutils:
         out = self.python('-c', src, capture=True)
         assert out == '1234'
 
-    #@pytest.mark.xfail(sys.platform=='win32', reason='FIXME')
     def test_hpymod_legacy_fails_with_universal(self):
         self.gen_setup_py("""
             setup(name = "hpy_test_project",
@@ -359,9 +358,14 @@ class TestDistutils:
         """)
         with pytest.raises(subprocess.CalledProcessError) as exc:
             self.python('setup.py', '--hpy-abi=universal', 'install', capture=True)
-        stderr = exc.value.stderr.decode('latin-1')
-        expected_msg = ("xxxIt is forbidden to #include <Python.h> when "
+        expected_msg = ("It is forbidden to #include <Python.h> when "
                         "targeting the HPy Universal ABI")
-        if expected_msg not in stderr:
+
+        # gcc/clang prints the #error on stderr, MSVC prints it on
+        # stdout. Here we check that the error is printed "somewhere", we
+        # don't care exactly where.
+        out = exc.value.stdout + b'\n' + exc.value.stderr
+        out = out.decode('latin-1')
+        if expected_msg not in out:
             print_CalledProcessError(exc.value)
-        assert expected_msg in stderr
+        assert expected_msg in out
