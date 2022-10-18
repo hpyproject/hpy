@@ -24,6 +24,23 @@ from test.support import atomic_run, HPY_ROOT
 # The env is created once in /tmp/venv-for-hpytest and reused among tests and
 # sessions. If you want to recreate it, simply rm -r /tmp/venv-for-hpytest
 
+def print_CalledProcessError(p):
+    """
+    Print all information about a CalledProcessError
+    """
+    print('========== subprocess failed ==========')
+    print('command:', ' '.join(p.cmd))
+    print('argv:   ', p.cmd)
+    print('return code:', p.returncode)
+    print()
+    print('---------- <stdout> ----------')
+    print(p.stdout.decode('latin-1'))
+    print('---------- </stdout> ---------')
+    print()
+    print('---------- <stderr> ----------')
+    print(p.stderr.decode('latin-1'))
+    print('---------- </stderr> ---------')
+
 @pytest.fixture(scope='session')
 def venv_template(request, tmpdir_factory):
     if request.config.option.reuse_venv:
@@ -58,8 +75,7 @@ def venv_template(request, tmpdir_factory):
             capture_output=True,
         )
     except subprocess.CalledProcessError as cpe:
-        print(cpe.stdout.decode("utf8"))
-        print(cpe.stderr.decode("utf8"))
+        print_CalledProcessError(cpe)
         raise
     return d
 
@@ -333,7 +349,7 @@ class TestDistutils:
         out = self.python('-c', src, capture=True)
         assert out == '1234'
 
-    @pytest.mark.xfail(sys.platform=='win32', reason='FIXME')
+    #@pytest.mark.xfail(sys.platform=='win32', reason='FIXME')
     def test_hpymod_legacy_fails_with_universal(self):
         self.gen_setup_py("""
             setup(name = "hpy_test_project",
@@ -344,6 +360,8 @@ class TestDistutils:
         with pytest.raises(subprocess.CalledProcessError) as exc:
             self.python('setup.py', '--hpy-abi=universal', 'install', capture=True)
         stderr = exc.value.stderr.decode('latin-1')
-        expected_msg = ("It is forbidden to #include <Python.h> when "
+        expected_msg = ("xxxIt is forbidden to #include <Python.h> when "
                         "targeting the HPy Universal ABI")
+        if expected_msg not in stderr:
+            print_CalledProcessError(exc.value)
         assert expected_msg in stderr
