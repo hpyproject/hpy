@@ -15,14 +15,7 @@ extern "C" {
      - HPY_UNIVERSAL_ABI
      - HPY_HYBRID_ABI
 
-   Note that HPY_HYBRID_ABI *implies* HPY_UNIVERSAL_ABI. This is useful in all
-   cases in which you want to do "#ifdef HPY_UNIVERSAL_ABI", because in 99% of
-   the cases you want to treate the universal and hybrid cases similarly.
-
-   Moreover, we also define HPY_UNIVERSAL_STRICT_ABI as an alias for
-   defined(HPY_UNIVERSAL_ABI) && !defined(HPY_HYBRID_ABI)
-
-   Finally, we also define HPY_ABI which is a string literal containing a
+   In addition we also define HPY_ABI which is a string literal containing a
    string representation of it.
 */
 
@@ -36,11 +29,12 @@ extern "C" {
 #  define HPY_ABI "cpython"
 
 #elif defined(HPY_HYBRID_ABI)
-#  define HPY_UNIVERSAL_ABI  // HPY_HYBRID_ABI implies HPY_UNIVERSAL_ABI
+#  if defined(HPY_UNIVERSAL_ABI)
+#    error "Conflicting macros are defined: HPY_HYBRID_ABI and HPY_UNIVERSAL_ABI"
+#  endif
 #  define HPY_ABI "hybrid"
 
 #elif defined(HPY_UNIVERSAL_ABI)
-#  define HPY_UNIVERSAL_STRICT_ABI
 #  define HPY_ABI "universal"
 
 #else

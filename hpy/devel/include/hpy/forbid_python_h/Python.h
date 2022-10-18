@@ -1,5 +1,5 @@
 // sanity check
-#ifndef HPY_UNIVERSAL_STRICT_ABI
+#ifndef HPY_UNIVERSAL_ABI
 #  error "Internal HPy error, something is wrong with your build system. The directory hpy/forbid_python_h has been added to the include_dirs but the target ABI does not seems to be 'universal'"
 #endif
 
