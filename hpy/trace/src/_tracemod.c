@@ -9,8 +9,8 @@
 
 #define IS_EMPTY(_s) ((_s)[0] == '\0')
 
-HPyDef_METH(durations, "durations", durations_impl, HPyFunc_NOARGS)
-static HPy durations_impl(HPyContext *uctx, HPy self)
+HPyDef_METH(get_durations, "get_durations", get_durations_impl, HPyFunc_NOARGS)
+static HPy get_durations_impl(HPyContext *uctx, HPy self)
 {
     HPyContext *tctx = hpy_trace_get_ctx(uctx);
     HPyTraceInfo *info = get_info(tctx);
@@ -38,8 +38,8 @@ fail:
     return HPy_NULL;
 }
 
-HPyDef_METH(call_counts, "call_counts", call_counts_impl, HPyFunc_NOARGS)
-static HPy call_counts_impl(HPyContext *uctx, HPy self)
+HPyDef_METH(get_call_counts, "get_call_counts", get_call_counts_impl, HPyFunc_NOARGS)
+static HPy get_call_counts_impl(HPyContext *uctx, HPy self)
 {
     HPyContext *tctx = hpy_trace_get_ctx(uctx);
     HPyTraceInfo *info = get_info(tctx);
@@ -117,8 +117,8 @@ static HPy set_trace_funcs_impl(HPyContext *uctx, HPy self, HPy *args,
 /* ~~~~~~ definition of the module hpy.trace._trace ~~~~~~~ */
 
 static HPyDef *module_defines[] = {
-    &durations,
-    &call_counts,
+    &get_durations,
+    &get_call_counts,
     &set_trace_functions,
     NULL
 };

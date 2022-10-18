@@ -1,12 +1,12 @@
 import pytest
-from hpy.trace import call_counts, durations, set_trace_functions
+from hpy.trace import get_call_counts, get_durations, set_trace_functions
 
 @pytest.fixture
 def hpy_abi():
     return "trace"
 
 def _relative_call_count(name, call_count_0, diff):
-    return call_counts()[name] == call_count_0[name] + diff
+    return get_call_counts()[name] == call_count_0[name] + diff
 
 
 def _assert_unchanged_except(expected, actual, *ignore):
@@ -14,10 +14,10 @@ def _assert_unchanged_except(expected, actual, *ignore):
     for x in expected.keys():
         if x not in ignore and actual[x] != expected[x]:
             pytest.fail("Call count of %s unexpectedly changed (expected %d but was %d)." %
-                        (x, expected[x], call_counts()[x]))
+                        (x, expected[x], get_call_counts()[x]))
 
 
-def test_call_counts(compiler):
+def test_get_call_counts(compiler):
     import pytest
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
@@ -35,25 +35,25 @@ def test_call_counts(compiler):
     """)
     # Don't rely on absolute call count numbers since the module setup could
     # already do some API calls we don't expect.
-    call_counts_0 = call_counts().copy()
+    call_counts_0 = get_call_counts().copy()
 
     assert mod.f(1, 2) == 3
     assert _relative_call_count("ctx_Add", call_counts_0, 1)
-    _assert_unchanged_except(call_counts_0, call_counts(), "ctx_Add")
+    _assert_unchanged_except(call_counts_0, get_call_counts(), "ctx_Add")
     assert mod.f(10, 20) == 30
     assert _relative_call_count("ctx_Add", call_counts_0, 2)
-    _assert_unchanged_except(call_counts_0, call_counts(), "ctx_Add")
+    _assert_unchanged_except(call_counts_0, get_call_counts(), "ctx_Add")
     with pytest.raises(TypeError):
         mod.f(1, 2, 3)
     assert _relative_call_count("ctx_Add", call_counts_0, 2)
-    _assert_unchanged_except(call_counts_0, call_counts(),
+    _assert_unchanged_except(call_counts_0, get_call_counts(),
                              "ctx_Add", "ctx_Err_SetString")
     assert _relative_call_count("ctx_Err_SetString", call_counts_0, 1)
-    _assert_unchanged_except(call_counts_0, call_counts(),
+    _assert_unchanged_except(call_counts_0, get_call_counts(),
                              "ctx_Add", "ctx_Err_SetString")
 
 
-def test_durations(compiler):
+def test_get_durations(compiler):
     import time
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", f_impl, HPyFunc_O)
@@ -71,15 +71,15 @@ def test_durations(compiler):
     """)
     # Don't rely on absolute durations numbers since the module setup could
     # already do some API calls we don't expect.
-    durations0 = durations().copy()
+    durations0 = get_durations().copy()
 
     def callback():
         time.sleep(0.3)
         return 123
 
     assert mod.f(callback) == 123
-    assert durations()["ctx_CallTupleDict"] >= durations0["ctx_CallTupleDict"] + 3e5
-    _assert_unchanged_except(durations0, durations(), "ctx_CallTupleDict", "ctx_Callable_Check")
+    assert get_durations()["ctx_CallTupleDict"] >= durations0["ctx_CallTupleDict"] + 3e5
+    _assert_unchanged_except(durations0, get_durations(), "ctx_CallTupleDict", "ctx_Callable_Check")
 
 
 def test_trace_funcs(compiler):
