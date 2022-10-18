@@ -25,7 +25,10 @@ class TestCPythonCompatibility(HPyTest):
             @INIT
         """)
         hpy_abi = mod.f()
-        assert hpy_abi == self.compiler.hpy_abi
+        expected = self.compiler.hpy_abi
+        if expected == 'hybrid+debug':
+            expected = 'hybrid'
+        assert hpy_abi == expected
 
     def test_frompyobject(self):
         mod = self.make_module("""
