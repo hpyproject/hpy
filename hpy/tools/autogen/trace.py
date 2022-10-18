@@ -4,8 +4,6 @@ from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl, get_context_return_type, \
     maybe_make_void, make_void, get_return_constant
 
-UCTX_ARG = 'uctx'
-TCTX_ARG = 'tctx'
 
 # We will call the delegate context's function but we still need to unwrap
 # the context. This is in contrast to, e.g., the debug mode, where you would
@@ -20,7 +18,7 @@ class Ctx2TctxVisitor(c_ast.NodeVisitor):
 
     def visit_TypeDecl(self, node):
         if node.declname == 'ctx':
-            node.declname = TCTX_ARG
+            node.declname = 'tctx'
         self.generic_visit(node)
 
 def funcnode_with_new_name(node, name):
@@ -64,22 +62,22 @@ class autogen_tracer_ctx_init_h(AutoGenFile):
         w(f'    assert(info->magic_number == HPY_TRACE_MAGIC);')
         w(f'    free(info->call_counts);')
         w(f'    free(info->durations);')
-        w(f'    HPy_Close(info->{UCTX_ARG}, info->on_enter_func);')
-        w(f'    HPy_Close(info->{UCTX_ARG}, info->on_exit_func);')
+        w(f'    HPy_Close(info->uctx, info->on_enter_func);')
+        w(f'    HPy_Close(info->uctx, info->on_exit_func);')
         w('}')
         w('')
-        w(f'static inline void trace_ctx_init_fields(HPyContext *{TCTX_ARG}, HPyContext *{UCTX_ARG})')
+        w(f'static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)')
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    {TCTX_ARG}->{name} = {UCTX_ARG}->{name};')
+            w(f'    tctx->{name} = uctx->{name};')
         for func in self.api.functions:
             if func.name in NO_WRAPPER:
                 name = func.ctx_name()
-                w(f'    {TCTX_ARG}->{name} = {UCTX_ARG}->{name};')
+                w(f'    tctx->{name} = uctx->{name};')
             else:
                 name = func.ctx_name()
-                w(f'    {TCTX_ARG}->{name} = &trace_{name};')
+                w(f'    tctx->{name} = &trace_{name};')
         w('}')
         return '\n'.join(lines)
 
@@ -115,7 +113,7 @@ class autogen_tracer_wrappers(AutoGenFile):
             lst = []
             for p in node.type.args.params:
                 if p.name == 'ctx':
-                    lst.append(f'{UCTX_ARG}')
+                    lst.append('uctx')
                 else:
                     lst.append(p.name)
             return ', '.join(lst)
@@ -125,15 +123,15 @@ class autogen_tracer_wrappers(AutoGenFile):
         w = lines.append
         w(signature)
         w('{')
-        w(f'    HPyTraceInfo *tctx_info = get_info({TCTX_ARG});')
-        w(f'    HPyContext *{UCTX_ARG}= tctx_info->{UCTX_ARG};')
+        w(f'    HPyTraceInfo *tctx_info = get_info(tctx);')
+        w(f'    HPyContext *uctx= tctx_info->uctx;')
         w(f'    struct timespec _ts_start, _ts_end;')
         w(f'    int cr;')
         w(f'    HPy trace_func_args = HPy_NULL;')
         w(f'    tctx_info->call_counts[{func.ctx_index}]++;')
         w(f'    if(!HPy_IsNull(tctx_info->on_enter_func)) {{')
-        w(f'        trace_func_args = hpy_trace_create_func_args({UCTX_ARG}, {func.ctx_index});')
-        w(f'        hpy_trace_on_enter(tctx_info, {UCTX_ARG}, trace_func_args);')
+        w(f'        trace_func_args = hpy_trace_create_func_args(uctx, {func.ctx_index});')
+        w(f'        hpy_trace_on_enter(tctx_info, uctx, trace_func_args);')
         w(f'    }}')
         w(f'    cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);')
         if rettype == 'void':
@@ -142,16 +140,16 @@ class autogen_tracer_wrappers(AutoGenFile):
             w(f'    {rettype} res = {func.name}({params});')
         w(f'    cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);')
         w(f'    if (cr)')
-        w(f'        HPy_FatalError({UCTX_ARG}, "could not get monotonic clock");')
+        w(f'        HPy_FatalError(uctx, "could not get monotonic clock");')
         w(f'    int64_t duration = diff_ns(_ts_start, _ts_end);')
         w(f'    assert(duration >= 0);')
         w(f'    tctx_info->durations[{func.ctx_index}] += duration;')
         w(f'    if(!HPy_IsNull(tctx_info->on_exit_func)) {{')
         w(f'        if( HPy_IsNull(trace_func_args))')
-        w(f'            trace_func_args = hpy_trace_create_func_args({UCTX_ARG}, {func.ctx_index});')
-        w(f'        hpy_trace_on_exit(tctx_info, {UCTX_ARG}, trace_func_args);')
+        w(f'            trace_func_args = hpy_trace_create_func_args(uctx, {func.ctx_index});')
+        w(f'        hpy_trace_on_exit(tctx_info, uctx, trace_func_args);')
         w(f'    }}')
-        w(f'    HPy_Close({UCTX_ARG}, trace_func_args);')
+        w(f'    HPy_Close(uctx, trace_func_args);')
         if rettype != 'void':
             w(f'    return res;')
         w('}')
