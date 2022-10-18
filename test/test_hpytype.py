@@ -1150,7 +1150,7 @@ class TestType(HPyTest):
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
             };
-            
+
             HPyDef_METH(make_dummy, "make_dummy", HPyFunc_NOARGS)
             static HPy make_dummy_impl(HPyContext *ctx, HPy module)
             {
@@ -1171,19 +1171,18 @@ class TestType(HPyTest):
     def test_metaclass(self):
         import pytest
         mod = self.make_module("""
-            #include <Python.h>
-            #include <structmember.h>
+            #include <string.h>
 
             @DEFINE_DummyMeta
             @DEFINE_Dummy
             @DEFINE_meta_data_accessors
 
             HPyDef_METH(create_type, "create_type", HPyFunc_VARARGS)
-            static HPy create_type_impl(HPyContext *ctx, HPy module, 
+            static HPy create_type_impl(HPyContext *ctx, HPy module,
                                             HPy *args, HPy_ssize_t nargs)
             {
                 HPy metaclass;
-                if (!HPyArg_Parse(ctx, NULL, args, nargs, "sO", 
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "sO",
                         &Dummy_spec.name, &metaclass))
                     return HPy_NULL;
 
@@ -1249,8 +1248,8 @@ class TestPureHPyType(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject(HPyType_BuiltinShape_Long)
             @DEFINE_Point_xy
-            
-            static HPyDef *Point_defines[] = { 
+
+            static HPyDef *Point_defines[] = {
                 &Point_x,
                 &Point_y,
                 NULL
@@ -1262,7 +1261,7 @@ class TestPureHPyType(HPyTest):
                 .builtin_shape = SHAPE(PointObject),
                 .defines = Point_defines
             };
-            
+
             static void make_Point(HPyContext *ctx, HPy module)
             {
                 HPyType_SpecParam param[] = {
@@ -1303,7 +1302,7 @@ class TestPureHPyType(HPyTest):
                     .name = "mytest.Dummy",
                     .builtin_shape = (HPyType_BuiltinShape)123
                 };
-                
+
                 @EXPORT_TYPE("Dummy", Dummy_spec)
                 @INIT
             """)
