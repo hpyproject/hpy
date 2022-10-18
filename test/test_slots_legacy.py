@@ -1,9 +1,10 @@
 """ HPyType slot tests on legacy types. """
 
-from .support import HPyTest
+from .support import HPyTest, hpy_abi_with_legacy
 from .test_hpytype_legacy import LegacyPointTemplate
 from .test_slots import TestSlots as _TestSlots, TestSqSlots as _TestSqSlots
 
+hpy_abi = hpy_abi_with_legacy
 
 class TestLegacySlots(_TestSlots):
 

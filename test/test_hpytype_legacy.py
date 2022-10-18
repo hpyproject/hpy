@@ -1,9 +1,10 @@
 """ HPyType tests on legacy types. """
 
 import pytest
-from .support import HPyTest
+from .support import HPyTest, hpy_abi_with_legacy
 from .test_hpytype import PointTemplate, TestType as _TestType
 
+hpy_abi = hpy_abi_with_legacy
 
 class LegacyPointTemplate(PointTemplate):
     """
@@ -169,7 +170,7 @@ class TestLegacyType(_TestType):
                 .tp_flags = Py_TPFLAGS_DEFAULT,
                 .tp_base = DEFERRED_ADDRESS(&PyType_Type),
             };
-            
+
             @DEFINE_Dummy_struct
 
             static PyMemberDef members[] = {
