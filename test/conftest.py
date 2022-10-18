@@ -38,14 +38,21 @@ def hpy_devel(request):
     from hpy.devel import HPyDevel
     return HPyDevel()
 
+@pytest.fixture
+def leakdetector(hpy_abi):
+    """
+    Automatically detect leaks when the hpy_abi == 'debug'
+    """
+    if hpy_abi == 'debug':
+        with LeakDetector() as ld:
+            yield ld
+    else:
+        yield None
+
 @pytest.fixture(params=['cpython', 'universal', 'debug'])
 def hpy_abi(request):
     abi = request.param
-    if abi == 'debug':
-        with LeakDetector():
-            yield abi
-    else:
-        yield abi
+    yield abi
 
 @pytest.fixture
 def ExtensionTemplate():

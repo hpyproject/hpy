@@ -374,8 +374,9 @@ class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
 
     @pytest.fixture()
-    def initargs(self, compiler):
+    def initargs(self, compiler, leakdetector):
         self.compiler = compiler
+        self.leakdetector = leakdetector
 
     def make_module(self, main_src, name='mytest', extra_sources=()):
         ExtensionTemplate = self.ExtensionTemplate
