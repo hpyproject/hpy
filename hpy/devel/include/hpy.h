@@ -11,38 +11,38 @@ extern "C" {
    -D...`). This is the approach used by the setuptools support provided by
    hpy.devel:
 
-     - HPY_CPYTHON_ABI
-     - HPY_UNIVERSAL_ABI
-     - HPY_HYBRID_ABI
+     - HPY_ABI_CPYTHON
+     - HPY_ABI_UNIVERSAL
+     - HPY_ABI_HYBRID
 
    In addition we also define HPY_ABI which is a string literal containing a
    string representation of it.
 */
 
-#if defined(HPY_CPYTHON_ABI)
-#  if defined(HPY_HYBRID_ABI)
-#    error "Conflicting macros are defined: HPY_CPYTHON_ABI and HPY_HYBRID_ABI"
+#if defined(HPY_ABI_CPYTHON)
+#  if defined(HPY_ABI_HYBRID)
+#    error "Conflicting macros are defined: HPY_ABI_CPYTHON and HPY_ABI_HYBRID"
 #  endif
-#  if defined(HPY_UNIVERSAL_ABI)
-#    error "Conflicting macros are defined: HPY_CPYTHON_ABI and HPY_UNIVERSAL_ABI"
+#  if defined(HPY_ABI_UNIVERSAL)
+#    error "Conflicting macros are defined: HPY_ABI_CPYTHON and HPY_ABI_UNIVERSAL"
 #  endif
 #  define HPY_ABI "cpython"
 
-#elif defined(HPY_HYBRID_ABI)
-#  if defined(HPY_UNIVERSAL_ABI)
-#    error "Conflicting macros are defined: HPY_HYBRID_ABI and HPY_UNIVERSAL_ABI"
+#elif defined(HPY_ABI_HYBRID)
+#  if defined(HPY_ABI_UNIVERSAL)
+#    error "Conflicting macros are defined: HPY_ABI_HYBRID and HPY_ABI_UNIVERSAL"
 #  endif
 #  define HPY_ABI "hybrid"
 
-#elif defined(HPY_UNIVERSAL_ABI)
+#elif defined(HPY_ABI_UNIVERSAL)
 #  define HPY_ABI "universal"
 
 #else
-#  error "Cannot determine the desired HPy ABI: you must set one of HPY_CPYTHON_ABI, HPY_UNIVERSAL_ABI or HPY_HYBRID_ABI"
+#  error "Cannot determine the desired HPy ABI: you must set one of HPY_ABI_CPYTHON, HPY_ABI_UNIVERSAL or HPY_ABI_HYBRID"
 #endif
 
 
-#ifdef HPY_CPYTHON_ABI
+#ifdef HPY_ABI_CPYTHON
 /*  It would be nice if we could include hpy.h WITHOUT bringing in all the
     stuff from Python.h, to make sure that people don't use the CPython API by
     mistake. How to achieve it, though? */
@@ -175,7 +175,7 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 typedef struct _HPyContext_s HPyContext;
 
-#ifdef HPY_CPYTHON_ABI
+#ifdef HPY_ABI_CPYTHON
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;
     typedef Py_UCS4 HPy_UCS4;
@@ -198,7 +198,7 @@ typedef struct _HPyContext_s HPyContext;
 #include "hpy/runtime/buildvalue.h"
 #include "hpy/runtime/helpers.h"
 
-#ifdef HPY_CPYTHON_ABI
+#ifdef HPY_ABI_CPYTHON
 #   include "hpy/runtime/ctx_funcs.h"
 #   include "hpy/runtime/ctx_type.h"
 #   include "hpy/cpython/misc.h"

@@ -127,7 +127,7 @@ EXT_MODULES = [
                   'hpy/debug/src/include',
               ],
               extra_compile_args=[
-                  '-DHPY_UNIVERSAL_ABI',
+                  '-DHPY_ABI_UNIVERSAL',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
               ] + EXTRA_COMPILE_ARGS
               )

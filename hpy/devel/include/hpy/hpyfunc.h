@@ -109,12 +109,12 @@ typedef int (*HPyFunc_visitproc)(HPyField *, void *);
 
 #include "autogen_hpyfunc_declare.h"
 
-#ifdef HPY_CPYTHON_ABI
+#ifdef HPY_ABI_CPYTHON
 #  include "cpython/hpyfunc_trampolines.h"
 #  include "cpython/autogen_hpyfunc_trampolines.h"
 #else
 #  include "universal/hpyfunc_trampolines.h"
 #  include "universal/autogen_hpyfunc_trampolines.h"
-#endif // HPY_CPYTHON_ABI
+#endif // HPY_ABI_CPYTHON
 
 #endif /* HPY_UNIVERSAL_HPYFUNC_H */

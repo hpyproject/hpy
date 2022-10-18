@@ -2,7 +2,7 @@
 #include <Python.h>
 #include "hpy.h"
 
-#ifndef HPY_CPYTHON_ABI
+#ifndef HPY_ABI_CPYTHON
    // for _h2py and _py2h
 #  include "handles.h"
 #endif

@@ -300,14 +300,14 @@ class build_ext_hpy_mixin:
         ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
-            ext.define_macros.append(('HPY_CPYTHON_ABI', None))
+            ext.define_macros.append(('HPY_ABI_CPYTHON', None))
             ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
         elif ext.hpy_abi == 'hybrid':
-            ext.define_macros.append(('HPY_HYBRID_ABI', None))
+            ext.define_macros.append(('HPY_ABI_HYBRID', None))
             ext._hpy_needs_stub = True
         elif ext.hpy_abi == 'universal':
-            ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
+            ext.define_macros.append(('HPY_ABI_UNIVERSAL', None))
             ext._hpy_needs_stub = True
             forbid_python_h = self.hpydevel.get_include_dir_forbid_python_h()
             ext.include_dirs.insert(0, forbid_python_h)

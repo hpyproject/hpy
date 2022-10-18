@@ -4,7 +4,7 @@
 #include "hpy.h"
 #include "hpy/runtime/ctx_type.h"
 
-#ifndef HPY_CPYTHON_ABI
+#ifndef HPY_ABI_CPYTHON
    // for _h2py and _py2h
 #  include "handles.h"
 #endif
@@ -370,7 +370,7 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
 }
 
 // see the comment in create_member_defs below
-#ifndef HPY_CPYTHON_ABI
+#ifndef HPY_ABI_CPYTHON
 static PyObject *member_object_get(PyObject *self, void *closure)
 {
     HPyMember *member = (HPyMember *)closure;
@@ -439,7 +439,7 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
             HPyDef *src = hpydefs[i];
             if (src->kind != HPyDef_Kind_Member)
                 continue;
-#ifndef HPY_CPYTHON_ABI
+#ifndef HPY_ABI_CPYTHON
             // for the universal mode, we need to do load the HPyField that is
             // stored in the object properly. In CPython ABI mode, these can be
             // safely read as PyObject* directly without the overhead of getset.

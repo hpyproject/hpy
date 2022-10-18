@@ -31,7 +31,7 @@ typedef struct {
 #  define HPyMODINIT_FUNC Py_EXPORTED_SYMBOL HPy
 #endif /* __cplusplus */
 
-#ifdef HPY_CPYTHON_ABI
+#ifdef HPY_ABI_CPYTHON
 
 // module initialization in the CPython case
 #define HPy_MODINIT(modname)                                   \
@@ -42,7 +42,7 @@ typedef struct {
         return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
-#else // HPY_CPYTHON_ABI
+#else // HPY_ABI_CPYTHON
 
 // module initialization in the universal case
 #define HPy_MODINIT(modname)                                   \
@@ -55,6 +55,6 @@ typedef struct {
         return init_##modname##_impl(ctx);                     \
     }
 
-#endif // HPY_CPYTHON_ABI
+#endif // HPY_ABI_CPYTHON
 
 #endif // HPY_UNIVERSAL_HPYMODULE_H
