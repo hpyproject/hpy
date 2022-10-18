@@ -7,7 +7,10 @@
 #include "hpy.h"
 #include "trace_internal.h"
 
-#define IS_EMPTY(_s) ((_s)[0] == '\0')
+static inline int is_empty(const char *s)
+{
+    return s[0] == '\0';
+}
 
 HPyDef_METH(get_durations, "get_durations", get_durations_impl, HPyFunc_NOARGS)
 static HPy get_durations_impl(HPyContext *uctx, HPy self)
@@ -20,7 +23,7 @@ static HPy get_durations_impl(HPyContext *uctx, HPy self)
     for (int i=0; (func_name = hpy_trace_get_func_name(i)); i++)
     {
         /* skip empty names; those indices denote a context handle */
-        if (!IS_EMPTY(func_name))
+        if (!is_empty(func_name))
         {
             HPy value = HPyLong_FromLongLong(uctx,
                     (long long)info->durations[i]);
@@ -49,7 +52,7 @@ static HPy get_call_counts_impl(HPyContext *uctx, HPy self)
     for (int i=0; (func_name = hpy_trace_get_func_name(i)); i++)
     {
         /* skip empty names; those indices denote a context handle */
-        if (!IS_EMPTY(func_name))
+        if (!is_empty(func_name))
         {
             HPy value = HPyLong_FromUnsignedLongLong(uctx,
                     (unsigned long long)info->call_counts[i]);
