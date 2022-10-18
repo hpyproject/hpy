@@ -27,9 +27,34 @@ def atomic_run(*args, **kwargs):
     with LOCK:
         return subprocess.run(*args, **kwargs)
 
+
+@pytest.fixture(params=['cpython', 'universal', 'debug'])
+def hpy_abi_default(request):
+    """
+    This is the default hpy_abi fixture, as defined by conftest.py:
+        hpy_abi = hpy_abi_default
+    """
+    abi = request.param
+    yield abi
+
+@pytest.fixture(params=['cpython', 'hybrid']) # 'hybrid+debug'
+def hpy_abi_with_legacy(request):
+    """
+    Use this fixture to override 'hpy_abi' whenever you need legacy
+    features. It causes to use the 'hybrid' ABI instead of 'universal'.
+    Expected usage:
+
+        from .support import hpy_abi_with_legacy
+        hpy_abi = hpy_abi_with_legacy
+    """
+    abi = request.param
+    yield abi
+
+
 class DefaultExtensionTemplate(object):
 
-    INIT_TEMPLATE = textwrap.dedent("""
+    INIT_TEMPLATE = textwrap.dedent(
+    """
     static HPyDef *moduledefs[] = {
         %(defines)s
         NULL
@@ -289,7 +314,7 @@ class ExtensionCompiler:
         module = self.compile_module(
             main_src, ExtensionTemplate, name, extra_sources)
         so_filename = module.so_filename
-        if self.hpy_abi == 'universal':
+        if self.hpy_abi in ('universal', 'hybrid'):
             return self.load_universal_module(name, so_filename, debug=False)
         elif self.hpy_abi == 'debug':
             return self.load_universal_module(name, so_filename, debug=True)
@@ -299,7 +324,7 @@ class ExtensionCompiler:
             assert False
 
     def load_universal_module(self, name, so_filename, debug):
-        assert self.hpy_abi in ('universal', 'debug')
+        assert self.hpy_abi in ('universal', 'hybrid', 'debug')
         import sys
         import hpy.universal
         assert name not in sys.modules

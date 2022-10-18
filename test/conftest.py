@@ -1,6 +1,6 @@
 import pytest
 from .support import ExtensionCompiler, DefaultExtensionTemplate,\
-    PythonSubprocessRunner, HPyDebugCapture
+    PythonSubprocessRunner, HPyDebugCapture, hpy_abi_default
 from hpy.debug.leakdetector import LeakDetector
 from pathlib import Path
 
@@ -49,15 +49,11 @@ def leakdetector(hpy_abi):
     else:
         yield None
 
-@pytest.fixture(params=['cpython', 'universal', 'debug'])
-def hpy_abi(request):
-    abi = request.param
-    yield abi
-
 @pytest.fixture
 def ExtensionTemplate():
     return DefaultExtensionTemplate
 
+hpy_abi = hpy_abi_default
 
 @pytest.fixture
 def compiler(request, tmpdir, hpy_devel, hpy_abi, ExtensionTemplate):
