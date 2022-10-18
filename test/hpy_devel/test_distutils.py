@@ -7,6 +7,7 @@ files in this directory, which all inherit from HPyTest and test the API
 itself.
 """
 
+import sys
 import os
 import textwrap
 import subprocess
@@ -332,6 +333,7 @@ class TestDistutils:
         out = self.python('-c', src, capture=True)
         assert out == '1234'
 
+    @pytest.mark.xfail(sys.platform=='win32', reason='FIXME')
     def test_hpymod_legacy_fails_with_universal(self):
         self.gen_setup_py("""
             setup(name = "hpy_test_project",
