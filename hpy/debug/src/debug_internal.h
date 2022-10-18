@@ -137,7 +137,8 @@ static inline void UHPy_sanity_check(UHPy uh) {
 typedef struct DebugHandle {
     UHPy uh;
     long generation;
-    bool is_closed;
+    bool is_closed:1;
+    bool is_immortal:1;
     // pointer to and size of any raw data associated with
     // the lifetime of the handle:
     void *associated_data;
@@ -158,6 +159,7 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
 }
 
 DHPy DHPy_open(HPyContext *dctx, UHPy uh);
+DHPy DHPy_open_immortal(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_close_and_check(HPyContext *dctx, DHPy dh);
 void DHPy_free(HPyContext *dctx, DHPy dh);
@@ -197,13 +199,15 @@ typedef struct {
     HPyContext *uctx;
     long current_generation;
 
-    // the following should be an HPyField, but it's complicate:
+    // the following should be an HPyField, but it's complicated:
     // HPyFields should be used only on memory which is known by the GC, which
     // happens automatically if you use e.g. HPy_New, but currently
     // HPy_DebugInfo is malloced(). We need either:
     //   1. a generic HPy_GcMalloc() OR
     //   2. HPy_{Un}TrackMemory(), so that we can add manually allocated
     //      memory as a GC root
+    // Alternative is to put it into a module state or to put it into HPyGlobal
+    // once those features are implemented
     UHPy uh_on_invalid_handle;
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
     HPy_ssize_t protected_raw_data_max_size;

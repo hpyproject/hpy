@@ -21,7 +21,7 @@ class TestCall(HPyTest):
     def test_hpy_calltupledict(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(call, "call", call_impl, HPyFunc_KEYWORDS)
+            HPyDef_METH(call, "call", HPyFunc_KEYWORDS)
             static HPy call_impl(HPyContext *ctx, HPy self,
                                  HPy *args, HPy_ssize_t nargs, HPy kw)
             {
@@ -90,7 +90,7 @@ class TestCall(HPyTest):
 
     def test_hpycallable_check(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 if (HPyCallable_Check(ctx, arg))

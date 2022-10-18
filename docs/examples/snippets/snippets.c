@@ -29,8 +29,7 @@ int is_same_object(HPyContext *ctx, HPy x, HPy y)
 // END: is_same_object
 
 // dummy entry point so that we can test the snippets:
-HPyDef_METH(test_foo_and_is_same_object, "test_foo_and_is_same_object",
-            test_foo_and_is_same_object_impl, HPyFunc_VARARGS)
+HPyDef_METH(test_foo_and_is_same_object, "test_foo_and_is_same_object", HPyFunc_VARARGS)
 static HPy test_foo_and_is_same_object_impl(HPyContext *ctx, HPy self,
                                             HPy *args, HPy_ssize_t nargs)
 {
@@ -39,8 +38,7 @@ static HPy test_foo_and_is_same_object_impl(HPyContext *ctx, HPy self,
 }
 
 // BEGIN: test_leak_stacktrace
-HPyDef_METH(test_leak_stacktrace, "test_leak_stacktrace",
-            test_leak_stacktrace_impl, HPyFunc_NOARGS)
+HPyDef_METH(test_leak_stacktrace, "test_leak_stacktrace", HPyFunc_NOARGS)
 static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
 {
     HPy num = HPyLong_FromLong(ctx, 42);

@@ -13,7 +13,7 @@ class TestObject(HPyTest):
     def test_getattr(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy name, result;
@@ -55,7 +55,7 @@ class TestObject(HPyTest):
     def test_getattr_s(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy result;
@@ -92,7 +92,7 @@ class TestObject(HPyTest):
 
     def test_hasattr(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy name;
@@ -142,7 +142,7 @@ class TestObject(HPyTest):
 
     def test_hasattr_s(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 int result;
@@ -186,7 +186,7 @@ class TestObject(HPyTest):
     def test_setattr(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy name;
@@ -245,7 +245,7 @@ class TestObject(HPyTest):
     def test_setattr_s(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 int result;
@@ -299,7 +299,7 @@ class TestObject(HPyTest):
     def test_getitem(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy key, result;
@@ -327,7 +327,7 @@ class TestObject(HPyTest):
     def test_getitem_i(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy result;
@@ -351,7 +351,7 @@ class TestObject(HPyTest):
     def test_getitem_s(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy result;
@@ -374,7 +374,7 @@ class TestObject(HPyTest):
     def test_setitem(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy key;
@@ -402,7 +402,7 @@ class TestObject(HPyTest):
     def test_setitem_i(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 int result;
@@ -425,7 +425,7 @@ class TestObject(HPyTest):
     def test_setitem_s(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 int result;
@@ -446,7 +446,7 @@ class TestObject(HPyTest):
 
     def test_length(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t result;
@@ -463,7 +463,7 @@ class TestObject(HPyTest):
 
     def test_contains(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 int result = HPy_Contains(ctx, args[0], args[1]);
@@ -516,7 +516,7 @@ class TestObject(HPyTest):
         # implementation-specific. As such, it's hard to write a meaningful
         # test: let's just call it an check it doesn't crash.
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 _HPy_Dump(ctx, arg);
@@ -529,7 +529,7 @@ class TestObject(HPyTest):
 
     def test_type(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPy_Type(ctx, arg);
@@ -542,7 +542,7 @@ class TestObject(HPyTest):
 
     def test_typecheck(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy a, b;
@@ -562,7 +562,7 @@ class TestObject(HPyTest):
 
     def test_is(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy obj, other;

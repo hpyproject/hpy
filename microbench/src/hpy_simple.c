@@ -2,25 +2,25 @@
 
 /* module-level functions */
 
-HPyDef_METH(noargs, "noargs", noargs_impl, HPyFunc_NOARGS)
+HPyDef_METH(noargs, "noargs", HPyFunc_NOARGS)
 static HPy noargs_impl(HPyContext *ctx, HPy self)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
-HPyDef_METH(onearg, "onearg", onearg_impl, HPyFunc_O)
+HPyDef_METH(onearg, "onearg", HPyFunc_O)
 static HPy onearg_impl(HPyContext *ctx, HPy self, HPy arg)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
-HPyDef_METH(varargs, "varargs", varargs_impl, HPyFunc_VARARGS)
+HPyDef_METH(varargs, "varargs", HPyFunc_VARARGS)
 static HPy varargs_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
-HPyDef_METH(call_with_tuple, "call_with_tuple", call_with_tuple_impl, HPyFunc_VARARGS)
+HPyDef_METH(call_with_tuple, "call_with_tuple", HPyFunc_VARARGS)
 static HPy call_with_tuple_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     HPy f, f_args;
@@ -33,7 +33,7 @@ static HPy call_with_tuple_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_
     return HPy_CallTupleDict(ctx, f, f_args, HPy_NULL);
 }
 
-HPyDef_METH(call_with_tuple_and_dict, "call_with_tuple_and_dict", call_with_tuple_and_dict_impl, HPyFunc_VARARGS)
+HPyDef_METH(call_with_tuple_and_dict, "call_with_tuple_and_dict", HPyFunc_VARARGS)
 static HPy call_with_tuple_and_dict_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     HPy f, f_args, f_kw;
@@ -47,13 +47,13 @@ static HPy call_with_tuple_and_dict_impl(HPyContext *ctx, HPy self, HPy *args, H
     return HPy_CallTupleDict(ctx, f, f_args, f_kw);
 }
 
-HPyDef_METH(allocate_int, "allocate_int", allocate_int_impl, HPyFunc_NOARGS)
+HPyDef_METH(allocate_int, "allocate_int", HPyFunc_NOARGS)
 static HPy allocate_int_impl(HPyContext *ctx, HPy self)
 {
     return HPyLong_FromLong(ctx, 2048);
 }
 
-HPyDef_METH(allocate_tuple, "allocate_tuple", allocate_tuple_impl, HPyFunc_NOARGS)
+HPyDef_METH(allocate_tuple, "allocate_tuple", HPyFunc_NOARGS)
 static HPy allocate_tuple_impl(HPyContext *ctx, HPy self)
 {
     //return Py_BuildValue("ii", 2048, 2049);
@@ -68,13 +68,13 @@ typedef struct {
     PyObject_HEAD
 } FooObject;
 
-HPyDef_SLOT(Foo_getitem, Foo_getitem_impl, HPy_sq_item)
+HPyDef_SLOT(Foo_getitem, HPy_sq_item)
 static HPy Foo_getitem_impl(HPyContext *ctx, HPy self, HPy_ssize_t i)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
-HPyDef_SLOT(Foo_len, Foo_len_impl, HPy_sq_length)
+HPyDef_SLOT(Foo_len, HPy_sq_length)
 static HPy_ssize_t Foo_len_impl(HPyContext *ctx, HPy self)
 {
     return 42;
