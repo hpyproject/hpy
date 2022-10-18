@@ -183,7 +183,7 @@ class TestObject(HPyTest):
         assert mod.f(PropAttr()) is True
         assert mod.f(PropAttrRaising()) is False
 
-    def test_setattr_delattr(self):
+    def test_setattr(self):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_O)
@@ -200,7 +200,105 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            
+            @EXPORT(f)
+            @INIT
+        """)
+
+        class Attrs:
+            pass
+
+        class ClassAttr:
+            pass
+
+        class ReadOnlyPropAttr:
+            @property
+            def foo(self):
+                return 11
+
+        class WritablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+        a = Attrs()
+        mod.f(a)
+        assert a.foo is True
+
+        mod.f(ClassAttr)
+        assert ClassAttr.foo is True
+        assert ClassAttr().foo is True
+
+        with pytest.raises(AttributeError):
+            mod.f(object())
+
+        with pytest.raises(AttributeError):
+            mod.f(ReadOnlyPropAttr())
+
+        b = WritablePropAttr()
+        mod.f(b)
+        assert b.foo is True
+
+    def test_setattr_s(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_SetAttr_s(ctx, arg, "foo", ctx->h_True);
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+
+        class Attrs:
+            pass
+
+        class ClassAttr:
+            pass
+
+        class ReadOnlyPropAttr:
+            @property
+            def foo(self):
+                return 11
+
+        class WritablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+        a = Attrs()
+        mod.f(a)
+        assert a.foo is True
+
+        mod.f(ClassAttr)
+        assert ClassAttr.foo is True
+        assert ClassAttr().foo is True
+
+        with pytest.raises(AttributeError):
+            mod.f(object())
+
+        with pytest.raises(AttributeError):
+            mod.f(ReadOnlyPropAttr())
+
+        b = WritablePropAttr()
+        mod.f(b)
+        assert b.foo is True
+
+    def test_delattr(self):
+        import pytest
+        mod = self.make_module("""
             HPyDef_METH(del_foo, "del_foo", HPyFunc_O)
             static HPy del_foo_impl(HPyContext *ctx, HPy self, HPy arg)
             {
@@ -215,7 +313,6 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT(f)
             @EXPORT(del_foo)
             @INIT
         """)
@@ -225,11 +322,6 @@ class TestObject(HPyTest):
 
         class ClassAttr:
             pass
-
-        class ReadOnlyPropAttr:
-            @property
-            def foo(self):
-                return 11
 
         class WritablePropAttr:
             @property
@@ -253,14 +345,17 @@ class TestObject(HPyTest):
             def foo(self):
                 del self._foo
 
+        def set_foo(obj):
+            obj.foo = True
+
         a = Attrs()
-        mod.f(a)
+        set_foo(a)
         assert a.foo is True
         mod.del_foo(a)
         with pytest.raises(AttributeError):
             a.foo
 
-        mod.f(ClassAttr)
+        set_foo(ClassAttr)
         assert ClassAttr.foo is True
         assert ClassAttr().foo is True
         mod.del_foo(ClassAttr)
@@ -269,39 +364,23 @@ class TestObject(HPyTest):
         with pytest.raises(AttributeError):
             ClassAttr().foo
 
-        with pytest.raises(AttributeError):
-            mod.f(object())
-
-        with pytest.raises(AttributeError):
-            mod.f(ReadOnlyPropAttr())
-
         b = WritablePropAttr()
-        mod.f(b)
+        set_foo(b)
         assert b.foo is True
         with pytest.raises(AttributeError):
             # does not provide a delete function, so it fails
             mod.del_foo(b)
 
         c = DeletablePropAttr()
-        mod.f(c)
+        set_foo(c)
         assert c.foo is True
         mod.del_foo(c)
         with pytest.raises(AttributeError):
             c.foo
 
-    def test_setattr_delattr_s(self):
+    def test_delattr_s(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", HPyFunc_O)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                int result;
-                result = HPy_SetAttr_s(ctx, arg, "foo", ctx->h_True);
-                if (result < 0)
-                    return HPy_NULL;
-                return HPy_Dup(ctx, ctx->h_None);
-            }
-            
             HPyDef_METH(del_foo, "del_foo", HPyFunc_O)
             static HPy del_foo_impl(HPyContext *ctx, HPy self, HPy arg)
             {
@@ -311,7 +390,6 @@ class TestObject(HPyTest):
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
-            @EXPORT(f)
             @EXPORT(del_foo)
             @INIT
         """)
@@ -321,11 +399,6 @@ class TestObject(HPyTest):
 
         class ClassAttr:
             pass
-
-        class ReadOnlyPropAttr:
-            @property
-            def foo(self):
-                return 11
 
         class WritablePropAttr:
             @property
@@ -349,14 +422,17 @@ class TestObject(HPyTest):
             def foo(self):
                 del self._foo
 
+        def set_foo(obj):
+            obj.foo = True
+
         a = Attrs()
-        mod.f(a)
+        set_foo(a)
         assert a.foo is True
         mod.del_foo(a)
         with pytest.raises(AttributeError):
             a.foo
 
-        mod.f(ClassAttr)
+        set_foo(ClassAttr)
         assert ClassAttr.foo is True
         assert ClassAttr().foo is True
         mod.del_foo(ClassAttr)
@@ -365,21 +441,15 @@ class TestObject(HPyTest):
         with pytest.raises(AttributeError):
             ClassAttr().foo
 
-        with pytest.raises(AttributeError):
-            mod.f(object())
-
-        with pytest.raises(AttributeError):
-            mod.f(ReadOnlyPropAttr())
-
         b = WritablePropAttr()
-        mod.f(b)
+        set_foo(b)
         assert b.foo is True
         with pytest.raises(AttributeError):
             # does not provide a delete function, so it fails
             mod.del_foo(b)
 
         c = DeletablePropAttr()
-        mod.f(c)
+        set_foo(c)
         assert c.foo is True
         mod.del_foo(c)
         with pytest.raises(AttributeError):
