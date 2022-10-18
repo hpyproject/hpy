@@ -43,7 +43,7 @@ def leakdetector(hpy_abi):
     """
     Automatically detect leaks when the hpy_abi == 'debug'
     """
-    if hpy_abi == 'debug':
+    if 'debug' in hpy_abi:
         with LeakDetector() as ld:
             yield ld
     else:

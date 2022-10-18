@@ -37,7 +37,7 @@ def hpy_abi_default(request):
     abi = request.param
     yield abi
 
-@pytest.fixture(params=['cpython', 'hybrid']) # 'hybrid+debug'
+@pytest.fixture(params=['cpython', 'hybrid', 'hybrid+debug'])
 def hpy_abi_with_legacy(request):
     """
     Use this fixture to override 'hpy_abi' whenever you need legacy
@@ -293,6 +293,8 @@ class ExtensionCompiler:
             # there is no compile-time difference between universal and debug
             # extensions. The only difference happens at load time
             hpy_abi = 'universal'
+        elif hpy_abi == 'hybrid+debug':
+            hpy_abi = 'hybrid'
         so_filename = c_compile(str(self.tmpdir), ext,
                                 hpy_devel=self.hpy_devel,
                                 hpy_abi=hpy_abi,
@@ -316,7 +318,7 @@ class ExtensionCompiler:
         so_filename = module.so_filename
         if self.hpy_abi in ('universal', 'hybrid'):
             return self.load_universal_module(name, so_filename, debug=False)
-        elif self.hpy_abi == 'debug':
+        elif self.hpy_abi in ('debug', 'hybrid+debug'):
             return self.load_universal_module(name, so_filename, debug=True)
         elif self.hpy_abi == 'cpython':
             return self.load_cpython_module(name, so_filename)
@@ -324,7 +326,7 @@ class ExtensionCompiler:
             assert False
 
     def load_universal_module(self, name, so_filename, debug):
-        assert self.hpy_abi in ('universal', 'hybrid', 'debug')
+        assert self.hpy_abi in ('universal', 'hybrid', 'debug', 'hybrid+debug')
         import sys
         import hpy.universal
         assert name not in sys.modules
