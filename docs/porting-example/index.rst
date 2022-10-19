@@ -179,9 +179,6 @@ Only struct members of type `HPyField` can be visited with `HPy_VISIT`, which
 is why we needed to convert `obj` to an `HPyField` before we implemented the
 HPy traverse.
 
-Note that only should *never* create a local variable of type `HPyField`
-because this local reference would not be visited by `tp_traverse`.
-
 Next we must update `Point_init` to store the value of `obj` as an `HPyField`:
 
 .. literalinclude:: steps/step_02_hpy_legacy.c
