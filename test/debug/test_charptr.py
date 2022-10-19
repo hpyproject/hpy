@@ -21,7 +21,7 @@ def test_charptr_use_after_implicit_arg_handle_close(compiler, python_subprocess
     mod = compiler.compile_module("""
         const char *keep;
 
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy_ssize_t size;
@@ -29,7 +29,7 @@ def test_charptr_use_after_implicit_arg_handle_close(compiler, python_subprocess
             return HPy_Dup(ctx, ctx->h_None);
         }
 
-        HPyDef_METH(g, "g", g_impl, HPyFunc_NOARGS)
+        HPyDef_METH(g, "g", HPyFunc_NOARGS)
         static HPy g_impl(HPyContext *ctx, HPy self)
         {
             return HPyUnicode_FromString(ctx, keep);
@@ -56,7 +56,7 @@ def test_charptr_use_after_implicit_arg_handle_close(compiler, python_subprocess
 @pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
 def test_charptr_use_after_handle_close(compiler, python_subprocess):
     mod = compiler.compile_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy arg_dup = HPy_Dup(ctx, arg);
@@ -90,7 +90,7 @@ def test_charptr_use_after_handle_close(compiler, python_subprocess):
 @pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
 def test_charptr_write_ptr(compiler, python_subprocess):
     mod = compiler.compile_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy_ssize_t size;
@@ -113,7 +113,7 @@ def test_charptr_correct_usage(compiler):
         #include <string.h>
         #include <stdio.h>
 
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy arg_dup = HPy_Dup(ctx, arg);
@@ -136,7 +136,7 @@ def test_charptr_correct_usage(compiler):
 def test_charptr_limit_stress_test(compiler):
     from hpy.universal import _debug
     mod = compiler.make_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             HPy_ssize_t size;
@@ -149,7 +149,7 @@ def test_charptr_limit_stress_test(compiler):
 
         // Dummy function just to force handle creation, but should not create
         // any raw data attached to those handles
-        HPyDef_METH(g, "g", g_impl, HPyFunc_O)
+        HPyDef_METH(g, "g", HPyFunc_O)
         static HPy g_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             int len = HPyLong_AsLong(ctx, arg);

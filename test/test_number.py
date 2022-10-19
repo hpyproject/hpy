@@ -5,7 +5,7 @@ class TestNumber(HPyTest):
 
     def test_bool_from_long(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 long x = HPyLong_AsLong(ctx, arg);
@@ -32,7 +32,7 @@ class TestNumber(HPyTest):
                 ('Float', float),
                 ]:
             mod = self.make_module("""
-                HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+                HPyDef_METH(f, "f", HPyFunc_O)
                 static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
                 {
                     return HPy_%s(ctx, arg);
@@ -67,7 +67,7 @@ class TestNumber(HPyTest):
                 ('Or', operator.or_),
                 ]:
             mod = self.make_module("""
-                HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+                HPyDef_METH(f, "f", HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext *ctx, HPy self,
                                   HPy *args, HPy_ssize_t nargs)
                 {
@@ -84,7 +84,7 @@ class TestNumber(HPyTest):
 
     def test_power(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -106,7 +106,7 @@ class TestNumber(HPyTest):
         m1 = Mat()
         m2 = Mat()
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -136,7 +136,7 @@ class TestNumber(HPyTest):
                 ('Or', '__ior__'),
                 ]:
             mod = self.make_module("""
-                HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+                HPyDef_METH(f, "f", HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext *ctx, HPy self,
                                   HPy *args, HPy_ssize_t nargs)
                 {
@@ -156,7 +156,7 @@ class TestNumber(HPyTest):
 
     def test_inplace_power(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -185,7 +185,7 @@ class TestNumber(HPyTest):
         m1 = Mat()
         m2 = Mat()
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -201,7 +201,7 @@ class TestNumber(HPyTest):
 
     def test_number_check(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 int cond = HPyNumber_Check(ctx, arg);

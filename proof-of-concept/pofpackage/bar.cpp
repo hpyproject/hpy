@@ -15,7 +15,7 @@ class Bar
         }
 };
 
-HPyDef_METH(hello, "hello", hello_impl, HPyFunc_O)
+HPyDef_METH(hello, "hello", HPyFunc_O)
 static HPy hello_impl(HPyContext *ctx, HPy self, HPy obj)
 {
     Bar b(21);

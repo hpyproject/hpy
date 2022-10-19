@@ -55,12 +55,22 @@ _HPy_HIDDEN void ctx_TupleBuilder_Cancel(HPyContext *ctx,
 _HPy_HIDDEN HPy ctx_Tuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 
 // ctx_type.c
-_HPy_HIDDEN void* ctx_AsStruct(HPyContext *ctx, HPy h);
-_HPy_HIDDEN void* ctx_AsStructLegacy(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Object(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Legacy(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Type(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Long(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Float(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Unicode(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Tuple(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_List(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Slow(HPyContext *ctx, HPy h);
 _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                                   HPyType_SpecParam *params);
 _HPy_HIDDEN HPy ctx_New(HPyContext *ctx, HPy h_type, void **data);
 _HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
                                     HPy_ssize_t nargs, HPy kw);
+_HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
+                                                          HPy h_type);
+
 
 #endif /* HPY_RUNTIME_CTX_FUNCS_H */

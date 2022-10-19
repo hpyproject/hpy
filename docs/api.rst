@@ -165,8 +165,8 @@ In this section, we will see how to write a simple C extension using HPy. It
 is assumed that you are already familiar with the existing Python/C API, so we
 will underline the similarities and the differences with it.
 
-We want to create a function named ``myabs`` which takes a single argument and
-computes its absolute value:
+We want to create a function named ``myabs`` and ``double`` which takes a
+single argument and computes its absolute value:
 
 .. literalinclude:: examples/simple-example/simple.c
   :start-after: // BEGIN: myabs
@@ -174,13 +174,15 @@ computes its absolute value:
 
 There are a couple of points which are worth noting:
 
-  * We use the macro ``HPyDef_METH`` to declare we are going to define a
-    HPy function called ``myabs``.
+  * We use the macro ``HPyDef_METH`` to declare we are going to define a HPy
+    function called ``myabs``.
 
   * The function will be available under the name ``"myabs"`` in our Python
     module.
 
-  * The actual C function which implements ``myabs`` is called ``myabs_impl``.
+  * The actual C function which implements ``myabs`` is called ``myabs_impl``
+    and is infered by the macro. The macro takes the name and adds ``_impl``
+    to the end of it.
 
   * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in Python/C API,
     ``HPyFunc_O`` means that the function receives a single argument on top of
@@ -209,6 +211,21 @@ There are a couple of points which are worth noting:
    CPython ABI and the CPython implementation of the universal ABI, but other
    implementations of the universal ABI will usually call directly the HPy
    function itself.
+  
+The second function definition is a bit different:
+
+.. literalinclude:: examples/simple-example/simple.c
+  :start-after: // BEGIN: double
+  :end-before: // END: double
+
+This shows off the other way of creating functions.
+
+  * This example is much the same but the difference is that we use
+    ``HPyDef_METH_IMPL`` to define a function named ``double``.
+  
+  * The difference between ``HPyDef_METH_IMPL`` and ``HPyDef_METH`` is that
+    the former needs to be given a name for a the functions as the third
+    argument.
 
 Now, we can define our module:
 

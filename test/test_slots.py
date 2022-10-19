@@ -11,9 +11,9 @@ class TestSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_xy
-            HPyDef_SLOT(Point_new, HPyType_GenericNew, HPy_tp_new)
+            HPyDef_SLOT_IMPL(Point_new, HPyType_GenericNew, HPy_tp_new)
 
-            HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
+            HPyDef_SLOT(Point_init, HPy_tp_init)
             static int Point_init_impl(HPyContext *ctx, HPy self, HPy *args,
                                        HPy_ssize_t nargs, HPy kw)
             {
@@ -43,14 +43,14 @@ class TestSlots(HPyTest):
 
             static long destroyed_x;
 
-            HPyDef_SLOT(Point_destroy, Point_destroy_impl, HPy_tp_destroy)
+            HPyDef_SLOT(Point_destroy, HPy_tp_destroy)
             static void Point_destroy_impl(void *obj)
             {
                 PointObject *point = (PointObject *)obj;
                 destroyed_x += point->x;
             }
 
-            HPyDef_METH(get_destroyed_x, "get_destroyed_x", get_destroyed_x_impl, HPyFunc_NOARGS)
+            HPyDef_METH(get_destroyed_x, "get_destroyed_x", HPyFunc_NOARGS)
             static HPy get_destroyed_x_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, destroyed_x);
@@ -77,14 +77,14 @@ class TestSlots(HPyTest):
 
             static long finalized_x;
 
-            HPyDef_SLOT(Point_finalize, Point_finalize_impl, HPy_tp_finalize)
+            HPyDef_SLOT(Point_finalize, HPy_tp_finalize)
             static void Point_finalize_impl(HPyContext *ctx, HPy obj)
             {
                 PointObject *point = PointObject_AsStruct(ctx, obj);
                 finalized_x += point->x;
             }
 
-            HPyDef_METH(get_finalized_x, "get_finalized_x", get_finalized_x_impl, HPyFunc_NOARGS)
+            HPyDef_METH(get_finalized_x, "get_finalized_x", HPyFunc_NOARGS)
             static HPy get_finalized_x_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, finalized_x);
@@ -111,14 +111,14 @@ class TestSlots(HPyTest):
 
             static long finalized_x;
 
-            HPyDef_SLOT(Point_finalize, Point_finalize_impl, HPy_tp_finalize)
+            HPyDef_SLOT(Point_finalize, HPy_tp_finalize)
             static void Point_finalize_impl(HPyContext *ctx, HPy obj)
             {
                 PointObject *point = PointObject_AsStruct(ctx, obj);
                 finalized_x += point->x;
             }
 
-            HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+            HPyDef_SLOT(Point_traverse, HPy_tp_traverse)
             static int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
             {
                 return 0;
@@ -130,12 +130,12 @@ class TestSlots(HPyTest):
                 .name = "mytest.Point",
                 .basicsize = sizeof(PointObject),
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_GC,
-                .legacy = PointObject_IS_LEGACY,
+                .builtin_shape = SHAPE(PointObject),
                 .defines = Point_defines,
             };
             @EXPORT_TYPE("Point", Point_spec)
 
-            HPyDef_METH(get_finalized_x, "get_finalized_x", get_finalized_x_impl, HPyFunc_NOARGS)
+            HPyDef_METH(get_finalized_x, "get_finalized_x", HPyFunc_NOARGS)
             static HPy get_finalized_x_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, finalized_x);
@@ -158,7 +158,7 @@ class TestSlots(HPyTest):
             @DEFINE_PointObject
 
             #define MYSLOT(NAME)                                               \
-                HPyDef_SLOT(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
+                HPyDef_SLOT_IMPL(p_##NAME, NAME##_impl, HPy_nb_##NAME)             \
                 static HPy NAME##_impl(HPyContext *ctx, HPy self, HPy other)    \
                 {                                                              \
                     HPy s = HPyUnicode_FromString(ctx, #NAME);                 \
@@ -206,7 +206,7 @@ class TestSlots(HPyTest):
             @DEFINE_PointObject
 
             #define MYSLOT(NAME)                                               \
-                HPyDef_SLOT(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
+                HPyDef_SLOT_IMPL(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
                 static HPy NAME##_impl(HPyContext *ctx, HPy self, HPy other)    \
                 {                                                              \
                     HPy s = HPyUnicode_FromString(ctx, #NAME);                 \
@@ -254,7 +254,7 @@ class TestSlots(HPyTest):
             @DEFINE_PointObject
 
             #define MYSLOT(NAME)                                               \
-                HPyDef_SLOT(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
+                HPyDef_SLOT_IMPL(p_##NAME, NAME##_impl, HPy_nb_##NAME);             \
                 static HPy NAME##_impl(HPyContext *ctx, HPy self)               \
                 {                                                              \
                     HPy s = HPyUnicode_FromString(ctx, #NAME);                 \
@@ -283,25 +283,25 @@ class TestSlots(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_new
 
-            HPyDef_SLOT(p_int, p_int_impl, HPy_nb_int);
+            HPyDef_SLOT(p_int, HPy_nb_int);
             static HPy p_int_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, 42);
             }
 
-            HPyDef_SLOT(p_float, p_float_impl, HPy_nb_float);
+            HPyDef_SLOT(p_float, HPy_nb_float);
             static HPy p_float_impl(HPyContext *ctx, HPy self)
             {
                 return HPyFloat_FromDouble(ctx, 123.4);
             }
 
-            HPyDef_SLOT(p_index, p_index_impl, HPy_nb_index);
+            HPyDef_SLOT(p_index, HPy_nb_index);
             static HPy p_index_impl(HPyContext *ctx, HPy self)
             {
                 return HPyLong_FromLong(ctx, -456);
             }
 
-            HPyDef_SLOT(p_bool, p_bool_impl, HPy_nb_bool);
+            HPyDef_SLOT(p_bool, HPy_nb_bool);
             static int p_bool_impl(HPyContext *ctx, HPy self)
             {
                 PointObject *point = PointObject_AsStruct(ctx, self);
@@ -323,7 +323,7 @@ class TestSlots(HPyTest):
         mod = self.make_module(r"""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(p_power, p_power_impl, HPy_nb_power);
+            HPyDef_SLOT(p_power, HPy_nb_power);
             static HPy p_power_impl(HPyContext *ctx, HPy self, HPy x, HPy y)
             {
                 HPy s = HPyUnicode_FromString(ctx, "power");
@@ -332,7 +332,7 @@ class TestSlots(HPyTest):
                 return res;
             }
 
-            HPyDef_SLOT(p_inplace_power, p_inplace_power_impl, HPy_nb_inplace_power);
+            HPyDef_SLOT(p_inplace_power, HPy_nb_inplace_power);
             static HPy p_inplace_power_impl(HPyContext *ctx, HPy self, HPy x, HPy y)
             {
                 HPy s = HPyUnicode_FromString(ctx, "inplace_power");
@@ -363,7 +363,7 @@ class TestSlots(HPyTest):
             static HPy_ssize_t _shape[1] = {12};
             static HPy_ssize_t _strides[1] = {1};
 
-            HPyDef_SLOT(FakeArray_getbuffer, _getbuffer_impl, HPy_bf_getbuffer)
+            HPyDef_SLOT_IMPL(FakeArray_getbuffer, _getbuffer_impl, HPy_bf_getbuffer)
             static int _getbuffer_impl(HPyContext *ctx, HPy self, HPy_buffer* buf, int flags) {
                 FakeArrayObject *arr = FakeArrayObject_AsStruct(ctx, self);
                 if (arr->exports > 0) {
@@ -387,7 +387,7 @@ class TestSlots(HPyTest):
                 return 0;
             }
 
-            HPyDef_SLOT(FakeArray_releasebuffer, _relbuffer_impl, HPy_bf_releasebuffer)
+            HPyDef_SLOT_IMPL(FakeArray_releasebuffer, _relbuffer_impl, HPy_bf_releasebuffer)
             static void _relbuffer_impl(HPyContext *ctx, HPy h_obj, HPy_buffer* buf) {
                 FakeArrayObject *arr = FakeArrayObject_AsStruct(ctx, h_obj);
                 arr->exports--;
@@ -402,7 +402,7 @@ class TestSlots(HPyTest):
             static HPyType_Spec FakeArray_Spec = {
                 .name = "mytest.FakeArray",
                 .basicsize = sizeof(FakeArrayObject),
-                .legacy = FakeArrayObject_IS_LEGACY,
+                .builtin_shape = SHAPE(FakeArrayObject),
                 .defines = FakeArray_defines,
             };
 
@@ -432,7 +432,7 @@ class TestSqSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(Point_getitem, Point_getitem_impl, HPy_mp_subscript);
+            HPyDef_SLOT(Point_getitem, HPy_mp_subscript);
             static HPy Point_getitem_impl(HPyContext *ctx, HPy self, HPy key)
             {
                 HPy prefix = HPyUnicode_FromString(ctx, "key was: ");
@@ -443,7 +443,7 @@ class TestSqSlots(HPyTest):
                 return res;
             }
 
-            HPyDef_SLOT(Point_length, Point_length_impl, HPy_mp_length);
+            HPyDef_SLOT(Point_length, HPy_mp_length);
             static HPy_ssize_t Point_length_impl(HPyContext *ctx, HPy self)
             {
                 return 1234;
@@ -468,13 +468,13 @@ class TestSqSlots(HPyTest):
             @DEFINE_Point_new
             @DEFINE_Point_xy
 
-            HPyDef_SLOT(Point_len, Point_len_impl, HPy_mp_length);
+            HPyDef_SLOT(Point_len, HPy_mp_length);
             static HPy_ssize_t Point_len_impl(HPyContext *ctx, HPy self)
             {
                 return 2;
             }
 
-            HPyDef_SLOT(Point_setitem, Point_setitem_impl, HPy_mp_ass_subscript);
+            HPyDef_SLOT(Point_setitem, HPy_mp_ass_subscript);
             static int Point_setitem_impl(HPyContext *ctx, HPy self, HPy key,
                                           HPy h_value)
             {
@@ -525,13 +525,13 @@ class TestSqSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(Point_getitem, Point_getitem_impl, HPy_sq_item);
+            HPyDef_SLOT(Point_getitem, HPy_sq_item);
             static HPy Point_getitem_impl(HPyContext *ctx, HPy self, HPy_ssize_t idx)
             {
                 return HPyLong_FromLong(ctx, (long)idx*2);
             }
 
-            HPyDef_SLOT(Point_length, Point_length_impl, HPy_sq_length);
+            HPyDef_SLOT(Point_length, HPy_sq_length);
             static HPy_ssize_t Point_length_impl(HPyContext *ctx, HPy self)
             {
                 return 1234;
@@ -553,13 +553,13 @@ class TestSqSlots(HPyTest):
             @DEFINE_Point_new
             @DEFINE_Point_xy
 
-            HPyDef_SLOT(Point_len, Point_len_impl, HPy_sq_length);
+            HPyDef_SLOT(Point_len, HPy_sq_length);
             static HPy_ssize_t Point_len_impl(HPyContext *ctx, HPy self)
             {
                 return 2;
             }
 
-            HPyDef_SLOT(Point_setitem, Point_setitem_impl, HPy_sq_ass_item);
+            HPyDef_SLOT(Point_setitem, HPy_sq_ass_item);
             static int Point_setitem_impl(HPyContext *ctx, HPy self, HPy_ssize_t idx,
                                           HPy h_value)
             {
@@ -613,7 +613,7 @@ class TestSqSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(Point_concat, Point_concat_impl, HPy_sq_concat);
+            HPyDef_SLOT(Point_concat, HPy_sq_concat);
             static HPy Point_concat_impl(HPyContext *ctx, HPy self, HPy other)
             {
                 HPy s = HPyUnicode_FromString(ctx, "sq_concat");
@@ -622,8 +622,7 @@ class TestSqSlots(HPyTest):
                 return res;
             }
 
-            HPyDef_SLOT(Point_inplace_concat, Point_inplace_concat_impl,
-                        HPy_sq_inplace_concat);
+            HPyDef_SLOT(Point_inplace_concat, HPy_sq_inplace_concat);
             static HPy Point_inplace_concat_impl(HPyContext *ctx, HPy self, HPy other)
             {
                 HPy s = HPyUnicode_FromString(ctx, "sq_inplace_concat");
@@ -647,7 +646,7 @@ class TestSqSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(Point_repeat, Point_repeat_impl, HPy_sq_repeat);
+            HPyDef_SLOT(Point_repeat, HPy_sq_repeat);
             static HPy Point_repeat_impl(HPyContext *ctx, HPy self, HPy_ssize_t t)
             {
                 HPy s = HPyUnicode_FromString(ctx, "sq_repeat");
@@ -658,8 +657,7 @@ class TestSqSlots(HPyTest):
                 return res;
             }
 
-            HPyDef_SLOT(Point_inplace_repeat, Point_inplace_repeat_impl,
-                        HPy_sq_inplace_repeat);
+            HPyDef_SLOT(Point_inplace_repeat, HPy_sq_inplace_repeat);
             static HPy Point_inplace_repeat_impl(HPyContext *ctx, HPy self, HPy_ssize_t t)
             {
                 HPy s = HPyUnicode_FromString(ctx, "sq_inplace_repeat");
@@ -686,7 +684,7 @@ class TestSqSlots(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
 
-            HPyDef_SLOT(Point_contains, Point_contains_impl, HPy_sq_contains);
+            HPyDef_SLOT(Point_contains, HPy_sq_contains);
             static int Point_contains_impl(HPyContext *ctx, HPy self, HPy other)
             {
                 long val = HPyLong_AsLong(ctx, other);
@@ -712,7 +710,7 @@ class TestSqSlots(HPyTest):
             @DEFINE_PointObject
             @DEFINE_Point_new
 
-            HPyDef_SLOT(Point_cmp, Point_cmp_impl, HPy_tp_richcompare);
+            HPyDef_SLOT(Point_cmp, HPy_tp_richcompare);
             static HPy Point_cmp_impl(HPyContext *ctx, HPy self, HPy o, HPy_RichCmpOp op)
             {
                 // XXX we should check the type of o

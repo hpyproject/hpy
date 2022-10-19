@@ -6,7 +6,7 @@ class TestUnicode(HPyTest):
 
     def test_Check(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 if (HPyUnicode_Check(ctx, arg))
@@ -25,7 +25,7 @@ class TestUnicode(HPyTest):
 
     def test_FromString(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 return HPyUnicode_FromString(ctx, "foobar");
@@ -37,7 +37,7 @@ class TestUnicode(HPyTest):
 
     def test_FromWideChar(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 const wchar_t buf[] = { 'h', 'e', 'l', 'l', 0xf2, ' ',
@@ -55,7 +55,7 @@ class TestUnicode(HPyTest):
 
     def test_AsUTF8String(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPyUnicode_AsUTF8String(ctx, arg);
@@ -70,7 +70,7 @@ class TestUnicode(HPyTest):
 
     def test_AsASCIIString(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPyUnicode_AsASCIIString(ctx, arg);
@@ -85,7 +85,7 @@ class TestUnicode(HPyTest):
 
     def test_AsLatin1String(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPyUnicode_AsLatin1String(ctx, arg);
@@ -118,14 +118,14 @@ class TestUnicode(HPyTest):
                 return HPyLong_FromLong(ctx, res);
             }
 
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t n;
                 return as_utf8_and_size(ctx, arg, &n);
             }
 
-            HPyDef_METH(g, "g", g_impl, HPyFunc_O)
+            HPyDef_METH(g, "g", HPyFunc_O)
             static HPy g_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return as_utf8_and_size(ctx, arg, NULL);
@@ -142,7 +142,7 @@ class TestUnicode(HPyTest):
 
     def test_DecodeLatin1(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 const char* buf = HPyBytes_AS_STRING(ctx, arg);
@@ -156,7 +156,7 @@ class TestUnicode(HPyTest):
 
     def test_DecodeASCII(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 const char* buf = HPyBytes_AS_STRING(ctx, arg);
@@ -170,7 +170,7 @@ class TestUnicode(HPyTest):
 
     def test_ReadChar(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 long c = HPyUnicode_ReadChar(ctx, arg, 1);
@@ -183,7 +183,7 @@ class TestUnicode(HPyTest):
 
     def test_EncodeFSDefault(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 return HPyUnicode_EncodeFSDefault(ctx, arg);
@@ -195,7 +195,7 @@ class TestUnicode(HPyTest):
 
     def test_DecodeFSDefault(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t n;
@@ -203,7 +203,7 @@ class TestUnicode(HPyTest):
                 return HPyUnicode_DecodeFSDefault(ctx, buf);
             }
 
-            HPyDef_METH(g, "g", g_impl, HPyFunc_NOARGS)
+            HPyDef_METH(g, "g", HPyFunc_NOARGS)
             static HPy g_impl(HPyContext *ctx, HPy self)
             {
                 const char buf[5] = { 'a', 'b', '\\0', 'c' };

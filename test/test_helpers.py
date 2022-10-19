@@ -16,7 +16,7 @@ class TestHPyModuleAddType(HPyTest):
                 .name = "mytest.Dummy",
             };
 
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 if (!HPyHelpers_AddType(ctx, self, "Dummy", &dummy_spec, NULL))
@@ -41,7 +41,7 @@ class TestHPyModuleAddType(HPyTest):
                 .name = "mytest.Dummy",
             };
 
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 HPyType_SpecParam param[] = {
