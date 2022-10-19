@@ -79,10 +79,8 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
 {
     PointObject *p = PointObject_AsStruct(ctx, self);
     double norm;
-    HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);
-    result = HPyFloat_FromDouble(ctx, norm);
-    return result;
+    return HPyFloat_FromDouble(ctx, norm);
 }
 
 // this is an LEGACY function which casts a PyObject* into a PyPointObject*
@@ -96,10 +94,8 @@ PyObject* dot(PyObject *self, PyObject *args)
     PyPointObject *p2 = (PyPointObject *)point2;
 
     double dp;
-    PyObject *result;
     dp = p1->x * p2->x + p1->y * p2->y;
-    result = PyFloat_FromDouble(dp);
-    return result;
+    return PyFloat_FromDouble(dp);
 }
 
 // Method, type and module definitions. In this porting step .norm()

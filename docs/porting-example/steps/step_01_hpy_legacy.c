@@ -73,10 +73,8 @@ PyObject* Point_norm(PyObject *self)
 {
     PyPointObject *p = (PyPointObject *)self;
     double norm;
-    PyObject *result;
     norm = sqrt(p->x * p->x + p->y * p->y);
-    result = PyFloat_FromDouble(norm);
-    return result;
+    return PyFloat_FromDouble(norm);
 }
 
 // this is the getter for the associated object
@@ -98,10 +96,8 @@ PyObject* dot(PyObject *self, PyObject *args)
     PyPointObject *p2 = (PyPointObject *)point2;
 
     double dp;
-    PyObject *result;
     dp = p1->x * p2->x + p1->y * p2->y;
-    result = PyFloat_FromDouble(dp);
-    return result;
+    return PyFloat_FromDouble(dp);
 }
 
 

@@ -76,10 +76,8 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
 {
     PointObject *p = PointObject_AsStruct(ctx, self);
     double norm;
-    HPy result;
     norm = sqrt(p->x * p->x + p->y * p->y);
-    result = HPyFloat_FromDouble(ctx, norm);
-    return result;
+    return HPyFloat_FromDouble(ctx, norm);
 }
 
 // this is an HPy function that uses Point
@@ -92,10 +90,8 @@ HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
     PointObject *p1 = PointObject_AsStruct(ctx, point1);
     PointObject *p2 = PointObject_AsStruct(ctx, point2);
     double dp;
-    HPy result;
     dp = p1->x * p2->x + p1->y * p2->y;
-    result = HPyFloat_FromDouble(ctx, dp);
-    return result;
+    return HPyFloat_FromDouble(ctx, dp);
 }
 
 // Method, type and module definitions. In this porting step all
