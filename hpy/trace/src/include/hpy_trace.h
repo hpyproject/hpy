@@ -27,18 +27,10 @@ const char * hpy_trace_get_func_name(int idx);
 // CPython does for its own built-in modules. But we must use the same
 // signature as HPy_MODINIT
 
-// Copied from Python's exports.h, pyport.h
-#ifndef Py_EXPORTED_SYMBOL
-    #if defined(_WIN32) || defined(__CYGWIN__)
-        #define Py_EXPORTED_SYMBOL __declspec(dllexport)
-    #else
-        #define Py_EXPORTED_SYMBOL __attribute__ ((visibility ("default")))
-    #endif
-#endif
 #ifdef ___cplusplus
 extern "C"
 #endif
-Py_EXPORTED_SYMBOL
+HPy_EXPORTED_SYMBOL
 HPy HPyInit__trace(HPyContext *uctx);
 
 #endif /* HPY_TRACE_H */

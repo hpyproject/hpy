@@ -1,14 +1,5 @@
 #ifndef HPY_UNIVERSAL_HPYMODULE_H
 #define HPY_UNIVERSAL_HPYMODULE_H
-// Copied from Python's exports.h
-#ifndef Py_EXPORTED_SYMBOL
-    #if defined(_WIN32) || defined(__CYGWIN__)
-        #define Py_EXPORTED_SYMBOL __declspec(dllexport)
-    #else
-        #define Py_EXPORTED_SYMBOL __attribute__ ((visibility ("default")))
-    #endif
-#endif
-
 
 // this is defined by HPy_MODINIT
 extern HPyContext *_ctx_for_trampolines;
@@ -26,9 +17,9 @@ typedef struct {
 
 
 #if defined(__cplusplus)
-#  define HPyMODINIT_FUNC extern "C" Py_EXPORTED_SYMBOL HPy
+#  define HPyMODINIT_FUNC extern "C" HPy_EXPORTED_SYMBOL HPy
 #else /* __cplusplus */
-#  define HPyMODINIT_FUNC Py_EXPORTED_SYMBOL HPy
+#  define HPyMODINIT_FUNC HPy_EXPORTED_SYMBOL HPy
 #endif /* __cplusplus */
 
 #ifdef HPY_ABI_CPYTHON
