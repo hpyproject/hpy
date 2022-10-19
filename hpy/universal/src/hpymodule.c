@@ -155,7 +155,7 @@ static PyObject *get_version(PyObject *self, PyObject *ignored)
 }
 
 static PyMethodDef HPyMethods[] = {
-    {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS, "Load a .hpy.so"},
+    {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS, "Load a .hpy0.so"},
     {"get_version", (PyCFunction)get_version, METH_NOARGS, "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}
 };

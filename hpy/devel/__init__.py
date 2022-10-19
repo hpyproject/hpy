@@ -36,6 +36,7 @@ except ImportError:
 import setuptools.command.build_ext
 import setuptools.command.bdist_egg
 
+from .abitag import get_hpy_ext_suffix
 
 DEFAULT_HPY_ABI = 'universal'
 if hasattr(sys, 'implementation') and sys.implementation.name == 'cpython':
@@ -112,12 +113,14 @@ class HPyDevel:
             stub, thus overwriting the one which was created by
             build_ext_hpy_mixin.write_stub.
             """
-            if resource.endswith(".hpy.so"):
+            ext_suffix = None
+            if dist.hpy_abi != 'cpython':
+                ext_suffix = get_hpy_ext_suffix(dist.hpy_abi)
+            #
+            if ext_suffix and resource.endswith(ext_suffix):
                 log.info("stub file already created for %s", resource)
-                return
             else:
-                log.info("stub resource didn't match for %s", resource)
-            write_stub.super(resource, pyfile)
+                write_stub.super(resource, pyfile)
 
     def build_ext_sanity_check(self, build_ext):
         # check that the supplied build_ext inherits from setuptools
@@ -339,23 +342,16 @@ class build_ext_hpy_mixin:
 
     @remember_hpy_extension
     def get_ext_filename(self, ext_name):
-        if not is_hpy_extension(ext_name):
+        hpy_abi = self.distribution.hpy_abi
+        if not is_hpy_extension(ext_name) or hpy_abi == 'cpython':
             return self._mixin_super.get_ext_filename(self, ext_name)
-        if self.distribution.hpy_abi == 'universal':
-            ext_path = ext_name.split('.')
-            ext_suffix = '.hpy.so'  # XXX Windows?
-            ext_filename = os.path.join(*ext_path) + ext_suffix
-        elif self.distribution.hpy_abi == 'hybrid':
-            # XXX: for now we use the same as universal, but eventually we
-            # want an unique filename, e.g. .hpy-cpython38.so or something
-            # like that
-            ext_path = ext_name.split('.')
-            ext_suffix = '.hpy.so'
-            ext_filename = os.path.join(*ext_path) + ext_suffix
         else:
-            ext_filename = self._mixin_super.get_ext_filename(
-                self, ext_name)
-        return ext_filename
+            assert is_hpy_extension(ext_name)
+            assert hpy_abi in ('universal', 'hybrid')
+            ext_path = ext_name.split('.')
+            ext_suffix = get_hpy_ext_suffix(hpy_abi)
+            ext_filename = os.path.join(*ext_path) + ext_suffix
+            return ext_filename
 
     def write_stub(self, output_dir, ext, compile=False):
         if (not hasattr(ext, "hpy_abi") or
