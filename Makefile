@@ -42,7 +42,7 @@ cppcheck: cppcheck-build-dir
 		-I hpy/debug/src/ \
 		--force \
 		-D NULL=0 \
-		-D HPY_CPYTHON_ABI \
+		-D HPY_ABI_CPYTHON \
 		. || (cat $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt && false)
 
 infer:
