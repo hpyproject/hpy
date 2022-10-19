@@ -5,16 +5,18 @@ from hpy.trace import get_call_counts, get_durations, set_trace_functions
 def hpy_abi():
     return "trace"
 
-def _relative_call_count(name, call_count_0, diff):
-    return get_call_counts()[name] == call_count_0[name] + diff
+
+def get_call_counter():
+    from collections import Counter
+    return Counter(get_call_counts())
 
 
 def _assert_unchanged_except(expected, actual, *ignore):
     import pytest
     for x in expected.keys():
         if x not in ignore and actual[x] != expected[x]:
-            pytest.fail("Call count of %s unexpectedly changed (expected %d but was %d)." %
-                        (x, expected[x], get_call_counts()[x]))
+            pytest.fail("%s unexpectedly changed (expected %d but was %d)." %
+                        (x, expected[x], actual[x]))
 
 
 def test_get_call_counts(compiler):
@@ -35,22 +37,15 @@ def test_get_call_counts(compiler):
     """)
     # Don't rely on absolute call count numbers since the module setup could
     # already do some API calls we don't expect.
-    call_counts_0 = get_call_counts().copy()
+    call_counter_0 = get_call_counter()
 
     assert mod.f(1, 2) == 3
-    assert _relative_call_count("ctx_Add", call_counts_0, 1)
-    _assert_unchanged_except(call_counts_0, get_call_counts(), "ctx_Add")
+    assert get_call_counter() - call_counter_0 == {"ctx_Add": 1}
     assert mod.f(10, 20) == 30
-    assert _relative_call_count("ctx_Add", call_counts_0, 2)
-    _assert_unchanged_except(call_counts_0, get_call_counts(), "ctx_Add")
+    assert get_call_counter() - call_counter_0 == {"ctx_Add": 2}
     with pytest.raises(TypeError):
         mod.f(1, 2, 3)
-    assert _relative_call_count("ctx_Add", call_counts_0, 2)
-    _assert_unchanged_except(call_counts_0, get_call_counts(),
-                             "ctx_Add", "ctx_Err_SetString")
-    assert _relative_call_count("ctx_Err_SetString", call_counts_0, 1)
-    _assert_unchanged_except(call_counts_0, get_call_counts(),
-                             "ctx_Add", "ctx_Err_SetString")
+    assert get_call_counter() - call_counter_0 == {"ctx_Add": 2, "ctx_Err_SetString": 1}
 
 
 def test_get_durations(compiler):
