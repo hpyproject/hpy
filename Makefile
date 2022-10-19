@@ -50,10 +50,17 @@ infer:
 	@infer --fail-on-issue --compilation-database compile_commands.json --report-blacklist-path-regex "hpy/debug/src/debug_ctx.c"
 
 valgrind:
-	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/
+	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python3 -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/
+
+porting-example-tests:
+	cd docs/porting-example/steps && python3 setup00.py build_ext -i
+	cd docs/porting-example/steps && python3 setup01.py build_ext -i
+	cd docs/porting-example/steps && python3 setup02.py build_ext -i
+	cd docs/porting-example/steps && python3 setup03.py --hpy-abi=universal build_ext -i
+	python3 -m pytest docs/porting-example/steps/ ${TEST_ARGS}
 
 docs-examples-tests:
-	cd docs/examples/simple-example && python setup.py --hpy-abi=universal install
-	cd docs/examples/mixed-example  && python setup.py install
-	cd docs/examples/snippets       && python setup.py --hpy-abi=universal install
-	python -m pytest docs/examples/tests.py
+	cd docs/examples/simple-example && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/mixed-example  && python3 setup.py install
+	cd docs/examples/snippets       && python3 setup.py --hpy-abi=universal install
+	python3 -m pytest docs/examples/tests.py ${TEST_ARGS}

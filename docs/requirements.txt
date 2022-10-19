@@ -4,5 +4,5 @@ sphinx==3.3.1
 sphinx-rtd-theme==0.5.0
 sphinx-autobuild==0.7.1
 sphinx-c-autodoc==0.3.1
-clang==10.0.1
+clang==11.0
 docutils==0.16  # docutils >= 0.17 fails to render bullet lists :/
