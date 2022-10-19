@@ -150,7 +150,8 @@ Let us start by migrating `Point_traverse`. First we need to change
 
 `HPy` handles can only be short-lived -- i.e. local variables, arguments to
 functions or return values. `HPyField` is the way to store long-lived
-references to Python objects.
+references to Python objects. For more information, please refer to the
+documentation of :ref:`api-reference/hpy-field:HPyField`.
 
 Now we can update `Point_traverse`:
 
