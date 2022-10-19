@@ -25,8 +25,8 @@ static const char *hpy_mode_names[] = {
         "MODE_UNIVERSAL",
         "MODE_DEBUG",
         "MODE_TRACE",
-        "MODE_DEBUG_TRACE",
-        "MODE_TRACE_DEBUG",
+        // "MODE_DEBUG_TRACE",
+        // "MODE_TRACE_DEBUG",
         NULL
 };
 
@@ -34,8 +34,10 @@ typedef enum {
     MODE_UNIVERSAL = 0,
     MODE_DEBUG = 1,
     MODE_TRACE = 2,
-    MODE_DEBUG_TRACE = 3,
-    MODE_TRACE_DEBUG = 4
+    /* We do currently not test the combinations of debug and trace mode, so we
+       do not offer them right now. This may change in future. */
+    // MODE_DEBUG_TRACE = 3,
+    // MODE_TRACE_DEBUG = 4
 } HPyMode;
 
 typedef HPy (*InitFuncPtr)(HPyContext *ctx);
@@ -50,10 +52,10 @@ static HPyContext * get_context(HPyMode mode)
         return hpy_debug_get_ctx(&g_universal_ctx);
     case MODE_TRACE:
         return hpy_trace_get_ctx(&g_universal_ctx);
-    case MODE_DEBUG_TRACE:
-        return hpy_debug_get_ctx(hpy_trace_get_ctx(&g_universal_ctx));
-    case MODE_TRACE_DEBUG:
-        return hpy_trace_get_ctx(hpy_debug_get_ctx(&g_universal_ctx));
+    // case MODE_DEBUG_TRACE:
+    //     return hpy_debug_get_ctx(hpy_trace_get_ctx(&g_universal_ctx));
+    // case MODE_TRACE_DEBUG:
+    //     return hpy_trace_get_ctx(hpy_debug_get_ctx(&g_universal_ctx));
     default:
         return &g_universal_ctx;
     }
