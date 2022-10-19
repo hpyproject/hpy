@@ -34,7 +34,7 @@ typedef struct {
 // PointObject.
 HPyType_HELPERS(PointObject)
 
-HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+HPyDef_SLOT(Point_traverse, HPy_tp_traverse)
 int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
 {
     HPy_VISIT(&((PointObject*)self)->obj);
@@ -42,7 +42,7 @@ int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
 }
 
 // this is a method for creating a Point
-HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
+HPyDef_SLOT(Point_init, HPy_tp_init)
 int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", "obj", NULL};
@@ -63,15 +63,15 @@ int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy
 }
 
 // this is the getter for the associated object
-HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
-HPy Point_obj_get_impl(HPyContext *ctx, HPy self, void* closure)
+HPyDef_GET(Point_obj, "obj", .doc="Associated object.")
+HPy Point_obj_get(HPyContext *ctx, HPy self, void* closure)
 {
     PointObject *p = PointObject_AsStruct(ctx, self);
     return HPyField_Load(ctx, self, p->obj);
 }
 
 // an HPy method of Point
-HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
+HPyDef_METH(Point_norm, "norm", HPyFunc_NOARGS, .doc="Distance from origin.")
 HPy Point_norm_impl(HPyContext *ctx, HPy self)
 {
     PointObject *p = PointObject_AsStruct(ctx, self);
@@ -83,7 +83,7 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
 }
 
 // this is an HPy function that uses Point
-HPyDef_METH(dot, "dot", dot_impl, HPyFunc_VARARGS, .doc="Dot product.")
+HPyDef_METH(dot, "dot", HPyFunc_VARARGS, .doc="Dot product.")
 HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     HPy point1, point2;
@@ -115,7 +115,7 @@ HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 static HPyDef *point_defines[] = {
     &Point_init,
     &Point_norm,
-    &Point_obj_get,
+    &Point_obj,
     &Point_traverse,
     NULL
 };

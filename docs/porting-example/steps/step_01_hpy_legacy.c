@@ -142,7 +142,7 @@ static HPyType_Spec Point_Type_spec = {
     .basicsize = sizeof(PointObject),
     .itemsize = 0,
     .flags = HPy_TPFLAGS_DEFAULT,
-    .legacy = PointObject_IS_LEGACY,
+    .builtin_shape = SHAPE(PointObject),
     .legacy_slots = Point_legacy_slots,
     .defines = point_defines,
 };

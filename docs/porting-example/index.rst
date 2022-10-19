@@ -95,10 +95,12 @@ Initially the list of ported methods in `point_defines` is empty and all of
 the methods are still in `Point_slots` which we have renamed to
 `Point_legacy_slots` for clarity.
 
-The `PointObject_IS_LEGACY` is defined by the `HPyType_LEGACY_HELPERS` macro
-and will be set to true until we replace the legacy macro with the
+`SHAPE(PointObject)` is a macro that retrieves the shape of `PointObject` as it
+was defined by the `HPyType_LEGACY_HELPERS` macro and will be set to
+`HPyType_BuiltinShape_Legacy` until we replace the legacy macro with the
 `HPyType_HELPERS` one. Any type with `legacy_slots` or that still includes
-`PyObject_HEAD` in its struct should have `legacy` set to true.
+`PyObject_HEAD` in its struct should have `.builtin_shape` set to
+`HPyType_BuiltinShape_Legacy`.
 
 Similarly we must replace `PyModuleDef` with `HPyModuleDef`:
 
@@ -154,14 +156,14 @@ Now we can update `Point_traverse`:
 
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
-    :start-at: HPyDef_SLOT(Point_traverse, Point_traverse_impl, HPy_tp_traverse)
+    :start-at: HPyDef_SLOT(Point_traverse, HPy_tp_traverse)
     :end-before: // this is a method for creating a Point
 
 In the first line we used the `HPyDef_SLOT` macro to define a small structure
 that describes the slot being implemented. The first argument, `Point_traverse`,
-is the name to assign the structure to. The second, `Point_traverse_impl`,
-is the name of the function implementing the slot. The last, `HPy_tp_traverse`,
-specifies the kind of slot.
+is the name to assign the structure to. By convention, the `HPyDef_SLOT` macro
+expects a function called `Point_traverse_impl` implementing the slot. The
+second argument, `HPy_tp_traverse`, specifies the kind of slot.
 
 This is a change from how slots are defined in the old C API. In the old API,
 the kind of slot is only specified much lower down in `Point_legacy_slots`. In
@@ -184,7 +186,7 @@ Next we must update `Point_init` to store the value of `obj` as an `HPyField`:
 
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
-    :start-at: HPyDef_SLOT(Point_init, Point_init_impl, HPy_tp_init)
+    :start-at: HPyDef_SLOT(Point_init, HPy_tp_init)
     :end-before: // this is the getter for the associated object
 
 There are a few new `HPy` constructs used here:
@@ -230,7 +232,7 @@ The last update we need to make for the change to `HPyField` is to migrate
 
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
-    :start-at: HPyDef_GET(Point_obj_get, "obj", Point_obj_get_impl, .doc="Associated object.")
+    :start-at: HPyDef_GET(Point_obj, "obj", .doc="Associated object.")
     :end-before: // an HPy method of Point
 
 Above we have used `PointObject_AsStruct` again, and then `HPyField_Load` to
@@ -242,16 +244,16 @@ off this stage of the port:
 
 .. literalinclude:: steps/step_02_hpy_legacy.c
     :lineno-match:
-    :start-at: HPyDef_METH(Point_norm, "norm", Point_norm_impl, HPyFunc_NOARGS, .doc="Distance from origin.")
+    :start-at: HPyDef_METH(Point_norm, "norm", HPyFunc_NOARGS, .doc="Distance from origin.")
     :end-before: // this is an LEGACY function which casts a PyObject* into a PyPointObject*
 
 To define a method we use `HPyDef_METH` instead of `HPyDef_SLOT`. `HPyDef_METH`
 creates a small structure defining the method. The first argument is the name
 to assign to the structure (`Point_norm`). The second is the Python name of
-the method (`norm`). The third is the name of the C function implementing the
-method (`Point_norm_impl`). The fourth specifies the method signature
-(`HPyFunc_NOARGS` -- i.e. no additional arguments in this case). The
-last provides the docstring.
+the method (`norm`). The third specifies the method signature (`HPyFunc_NOARGS`
+-- i.e. no additional arguments in this case). The last provides the docstring.
+The macro then expects a function named `Point_norm_impl` implementing the
+method.
 
 The rest of the implementation remains similar, except that we use
 `HPyFloat_FromDouble` to create a handle to a Python float containing the
@@ -309,7 +311,7 @@ that implements the dot product between two points:
 
 .. literalinclude:: steps/step_03_hpy_final.c
     :lineno-match:
-    :start-at: HPyDef_METH(dot, "dot", dot_impl, HPyFunc_VARARGS, .doc="Dot product.")
+    :start-at: HPyDef_METH(dot, "dot", HPyFunc_VARARGS, .doc="Dot product.")
     :end-before: // Method, type and module definitions. In this porting step all
 
 The changes are similar to those used in porting the `norm` method, except:
