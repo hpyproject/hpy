@@ -37,6 +37,7 @@ static HPy get_durations_impl(HPyContext *uctx, HPy self)
     HPyTracker_Close(uctx, ht);
     return res;
 fail:
+    HPy_Close(uctx, res);
     HPyTracker_Close(uctx, ht);
     return HPy_NULL;
 }
@@ -66,6 +67,7 @@ static HPy get_call_counts_impl(HPyContext *uctx, HPy self)
     HPyTracker_Close(uctx, ht);
     return res;
 fail:
+    HPy_Close(uctx, res);
     HPyTracker_Close(uctx, ht);
     return HPy_NULL;
 }
