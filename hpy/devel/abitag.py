@@ -58,6 +58,6 @@ def get_hpy_ext_suffix(hpy_abi, ext_suffix=None):
     if hpy_abi == 'cpython':
         return sysconfig.get_config_var('EXT_SUFFIX')
     elif hpy_abi == 'universal':
-        return f'.{HPY_ABI_TAG}.{ext}'
+        return '.%s.%s' % (HPY_ABI_TAG, ext)
     else:
-        return f'.{HPY_ABI_TAG}-{cpy_abi_tag}.{ext}'
+        return '.%s-%s.%s' % (HPY_ABI_TAG, cpy_abi_tag, ext)
