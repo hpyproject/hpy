@@ -127,7 +127,9 @@ EXT_MODULES = [
                   'hpy/debug/src/include',
               ],
               extra_compile_args=[
-                  '-DHPY_ABI_UNIVERSAL',
+                  # so we need to enable the HYBRID ABI in order to implement
+                  # the legacy features
+                  '-DHPY_ABI_HYBRID',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
               ] + EXTRA_COMPILE_ARGS
               )

@@ -42,10 +42,7 @@ extern "C" {
 #endif
 
 
-#ifdef HPY_ABI_CPYTHON
-/*  It would be nice if we could include hpy.h WITHOUT bringing in all the
-    stuff from Python.h, to make sure that people don't use the CPython API by
-    mistake. How to achieve it, though? */
+#if defined(HPY_ABI_CPYTHON) || defined(HPY_ABI_HYBRID)
 #   define PY_SSIZE_T_CLEAN
 #   include <Python.h>
 #endif
