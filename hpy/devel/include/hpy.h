@@ -72,12 +72,17 @@ extern "C" {
 #  define _HPy_NO_RETURN
 #endif
 
+
+// clang and gcc supports __has_attribute, MSVC doesn't. This should be enough
+// to be able to use it portably
+#ifdef __has_attribute
+#   define _HPY_compiler_has_attribute(x) __has_attribute(x)
+#else
+#   define _HPY_compiler_has_attribute(x) 0
+#endif
+
 #ifdef HPY_ABI_UNIVERSAL
-#  if defined(_MSC_VER)
-     // unfortunately MSVC doesn't seem to have the equivalent of "error", so
-     // we just mark it as "deprecated", too bad
-#    define _HPY_LEGACY __declspec(deprecated("Cannot use legacy functions when targeting the HPy Universal ABI")))
-#  elif __has_attribute(error)
+#  if __has_attribute(error)
      // gcc, clang>=14
 #    define _HPY_LEGACY __attribute__((error("Cannot use legacy functions when targeting the HPy Universal ABI")))
 #  else
