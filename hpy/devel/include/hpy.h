@@ -81,6 +81,7 @@ extern "C" {
 #  else
      // gcc, clang
 #    define _HPY_LEGACY __attribute__((error(_MESSAGE)))
+#  endif
 #else
    // in non-universal modes, we don't attach any attribute
 #  define _HPY_LEGACY
