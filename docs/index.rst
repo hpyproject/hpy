@@ -8,7 +8,8 @@ HPy: a better API for Python
 
 HPy provides a new API for extending Python in C.
 
-The official `Python/C API <https://docs.python.org/3/c-api/index.html>`_ is
+The official `Python/C API <https://docs.python.org/3/c-api/index.html>`_,
+also informally known as ``#include <Python.h>``, is
 specific to the current implementation of CPython: it exposes a lot of
 internal details which makes it hard:
 
@@ -25,7 +26,7 @@ There are several advantages to write your C extension in HPy:
   - it is possible to compile a single binary which runs unmodified on all
     supported Python implementations and versions
 
-  - it is simpler and more manageable than the Python/C API
+  - it is simpler and more manageable than the ``Python.h`` API
 
   - it provides an improved debugging experience: in "debug mode", HPy
     actively checks for many common mistakes such as reference leaks and
