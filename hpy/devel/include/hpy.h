@@ -72,6 +72,12 @@ extern "C" {
 #  define _HPy_NO_RETURN
 #endif
 
+#ifdef HPY_ABI_UNIVERSAL
+#  define _HPY_LEGACY __attribute__((error("Cannot use legacy functions when targeting the HPy Universal ABI")))
+#else
+#  define _HPY_LEGACY
+#endif
+
 #if defined(_MSC_VER) && defined(__cplusplus) // MSVC C4576
 #  define _hconv(h) {h}
 #  define _hfconv(h) {h}
