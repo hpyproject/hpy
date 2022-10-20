@@ -8,17 +8,17 @@ The superpower of the Python ecosystem is its libraries, which are
 developed by users. Over time, these libraries have grown in number,
 quality, and applicability. While it is possible to write python libraries
 entirely in python, many of them, especially in the scientific community,
-are written in C and exposed to Python using the `Python/C API <https://docs.python.org/3/c-api/index.html>`_.
-The existence of these C extensions using the Python/C API leads to some issues:
+are written in C and exposed to Python using the ```Python.h`` API <https://docs.python.org/3/c-api/index.html>`_.
+The existence of these C extensions using the ``Python.h`` API leads to some issues:
 
   1. Usually, alternative implementation of the Python programming language
      want to support C extensions. To do so, they must implement the same
-     Python/C API or provide a compatibility layer.
+     ``Python.h`` API or provide a compatibility layer.
 
   2. CPython developers cannot experiment with new designs or refactoring
      without breaking compatibility with existing extensions.
 
-Over the years, it has become evident that emulating the Python/C API in an
+Over the years, it has become evident that emulating ``Python.h`` in an
 efficient way is `challenging, if not impossible
 <https://www.pypy.org/posts/2018/09/inside-cpyext-why-emulating-cpython-c-8083064623681286567.html>`_.
 To summarize, it is mainly due to leaking of implementation details of CPython
@@ -37,7 +37,7 @@ The following is a list of sub-goals.
 
 Performance on CPython
   HPy is usable on CPython from day 1 with no performance impact compared to
-  the existing Python/C API.
+  the existing ``Python.h`` API.
 
 
 Incremental adoption
@@ -48,7 +48,7 @@ Incremental adoption
 Easy migration
   It should be easy to migrate existing C extensions to HPy. Thanks to an
   appropriate and regular naming convention it should be obvious what the
-  HPy equivalent of any existing Python/C API is. When a perfect replacement
+  HPy equivalent of any existing ``Python.h`` API is. When a perfect replacement
   does not exist, the documentation explains what the alternative options are.
 
 
@@ -61,7 +61,7 @@ Better debugging
 
 Simplicity
   The HPy API aims to be smaller and easier to study/use/manage than the
-  existing Python/C API. Sometimes there is a trade-off between this goal and
+  existing ``Python.h`` API. Sometimes there is a trade-off between this goal and
   the others above, in particular *Performance on CPython* and *Easy migration*.
   The general approach is to have an API which is "as simple as possible" while
   not violating the other goals.
@@ -102,21 +102,44 @@ libraries, each one targeting a different ABI. :pep:`3149` states that the
 filename of the compiled extension should contain the *ABI tag* to specify
 what the target ABI is. For example, if you compile an extension called
 ``simple.c`` on CPython 3.7, you get a DLL called
-``simple.cpython-37m-x86_64-linux-gnu.so``:
+``simple.cpython-38-x86_64-linux-gnu.so``:
 
-  - ``cpython-37m`` is the ABI tag, in this case CPython 3.7
+  - ``cpython-38`` is the ABI tag, in this case CPython 3.8
 
   - ``x86_64`` is the CPU architecture
 
   - ``linux-gnu`` is the operating system
 
 The same source code compiled on PyPy3.6 7.2.0 results in a file called
-``simple.pypy3-72-x86_64-linux-gnu.so``:
+``simple.pypy38-pp73-x86_64-linux-gnu.so``:
 
-  - ``pypy3-72`` is the ABI tag, in this case "PyPy3.x", version "7.2.x"
+  - ``pypy38-pp73`` is the ABI tag, in this case "PyPy3.8", version "7.3.x"
 
 The HPy C API is exposed to the user by including ``hpy.h`` and it is
 explained in its own section of the documentation.
+
+
+Legacy and compatibility features
+---------------------------------
+
+To allow an incremental transition to HPy, it is possible to use both
+``hpy.h`` and ``Python.h`` API calls in the same extension.  Using *HPy legacy
+features* you can:
+
+  - mix ``Python.h`` and HPy method defs in the same HPy module
+
+  - mix ``Python.h`` and HPy method defs and slots in the same HPy type
+
+  - convert ``HPy`` handles to and from ``PyObject *`` using
+    ``HPy_AsPyObject()`` and ``HPy_FromPyObject()``
+
+
+Thanks to this, you can port your code to HPy one method and one type at a
+time, while keeping the extension fully functional during the transition
+period. See the :ref:`porting-guide:Porting guide` for a concrete example.
+
+Legacy features are available only if you target the CPython or HPy Hybrid
+ABIs, as explained in the next section.
 
 
 .. _hpy-target-abis:
@@ -134,8 +157,12 @@ different ABIs:
       functions which translate the HPy API into the CPython API at compile
       time. The result is a compiled extension which is indistinguishable from a
       "normal" one and can be distributed using all the standard tools and will
-      run at the very same speed. The ABI tag is defined by the version of CPython
-      which is used to compile it (e.g., ``cpython-37m``).
+      run at the very same speed.
+
+      *Legacy features* are available.
+
+      The output filename is e.g. ``simple.cpython-38-x86_64-linux-gnu.so``.
+
 
     HPy Universal ABI
       As the name suggests, the HPy Universal ABI is designed to be loaded and
@@ -143,18 +170,30 @@ different ABIs:
       extensions can be loaded unmodified on all the interpreters which support
       it. PyPy and GraalPython support it natively. CPython supports it by using the
       ``hpy.universal`` package, and there is a small speed penalty [#f1]_ compared to
-      the CPython ABI. The ABI tag has not been formally defined yet.
+      the CPython ABI.
+
+      *Legacy features* are **not** available and it is forbidden to ``#include <Python.h>``.
+
+      The resulting filename is e.g. ``simple.hpy0.so``.
 
     HPy Hybrid ABI
-      To allow an incremental transition to HPy, it is possible to use both HPy
-      and Python/C API calls in the same extension. In this case, it is not
-      possible to target the Universal ABI because the resulting compiled library
-      also needs to be compatible with a specific CPython version. The ABI tag
-      will be something like ``hpy-1_cpython-37m``. Note: the tag is not implemented
-      yet. Currently, the approach to use HPy in hybrid mode is to build the extension
-      in HPy universal mode, which, for now, still allows mixing the HPy and CPython APIs.
-      Extensions mixing the HPy and CPython APIs will not work on Pythons that do not
-      support the hybrid ABI.
+
+      The HPy Hybrid ABI is essentially the same as the Universal ABI, with
+      the big difference that it allows to ``#include <Python.h>``, to use the
+      legacy features and thus to allow incremental porting.
+
+      At the ABI level the resulting binary depends on *both* HPy and the
+      specific Python implementation which was used to compile the extension.
+      As the name suggests, this means that the binary is not "universal",
+      thus negating some of the benefits of HPy.  The main benefit of using
+      the HPy Hybrid ABI instead of the CPython ABI is being able to use the
+      :ref:`debug-mode:Debug mode` on the HPy parts, and faster speed on
+      alternative implementations.
+
+      *Legacy features* are available.
+
+      The resulting filename is e.g. ``simple.hpy0-cp38.so``.
+
 
 Moreover, each alternative Python implementation could decide to implement its
 own non-universal ABI if it makes sense for them. For example, a hypothetical
@@ -185,7 +224,7 @@ users and to library developers.
   - C extensions can achieve much better speed on alternative implementions,
     including PyPy and GraalPython: according to early :ref:`benchmarks`, an
     extension written in HPy can be ~3x faster than the equivalent extension
-    written in Python/C.
+    written using ``Python.h``.
   - Improved debugging: when you load extensions in :ref:`debug-mode:debug mode`,
     many common mistakes are checked and reported automatically.
   - Universal binaries: libraries can choose to distribute only Universal ABI
@@ -209,7 +248,7 @@ Cython extensions
 
 If you use Cython, you can't use HPy directly. There is a
 `work in progress <https://github.com/cython/cython/pull/4490>`_ to
-add Cython backend which emits HPy code instead of Python/C code: once this is
+add Cython backend which emits HPy code instead of using ``Python.h`` code: once this is
 done, you will get the benefits of HPy automatically.
 
 
@@ -230,7 +269,7 @@ Benefits for alternative Python implementations
 -----------------------------------------------
 
 If you are writing an alternative Python implementation, there is a good
-chance that you already know how painful it is to support the Python/C API.
+chance that you already know how painful it is to support the ``Python.h`` API.
 HPy is designed to be both faster and easier to implement!
 
 You have two choices:
@@ -293,12 +332,12 @@ However, there is still a long road before HPy is usable for the general
 public. In particular, the following features are on our roadmap but have not
 been implemented yet:
 
-  - many of the original Python/C functions have not been ported to
+  - many of the original ``Python.h`` functions have not been ported to
     HPy yet. Porting most of them is straightforward, so for now the priority
     is to test HPy with real-world Python packages and primarily resolve the
     "hard" features to prove that the HPy approach works.
 
-  - add C-level module state to complement the `HPyGlobal` approach. While `HPyGlobal`
+  - add C-level module state to complement the ``HPyGlobal`` approach. While ``HPyGlobal``
     is easier to use, it will make the migration simpler for existing extensions that
     use CPython module state.
 
@@ -350,7 +389,7 @@ Projects involved
 -----------------
 
 HPy was born during EuroPython 2019, were a small group of people started to
-discuss the problems of the Python/C API and how it would be nice to
+discuss the problems of the ``Python.h`` API and how it would be nice to
 have a way to fix them.  Since then, it has gathered the attention and interest
 of people who are involved in many projects within the Python ecosystem.  The
 following is a (probably incomplete) list of projects whose core developers
@@ -375,7 +414,7 @@ code/design/discussions of HPy:
 Related work
 -------------
 
-A partial list of alternative implementations which offer a Python/C
+A partial list of alternative implementations which offer a ``Python.h``
 compatibility layer include:
 
   - `PyPy <https://doc.pypy.org/en/latest/faq.html#do-cpython-extension-modules-work-with-pypy>`_
