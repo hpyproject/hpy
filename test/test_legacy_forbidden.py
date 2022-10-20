@@ -3,8 +3,18 @@ In this file we check that if we use legacy features in universal mode, we
 get the expected compile time errors
 """
 
+import sys
 import pytest
 from .support import HPyTest, make_hpy_abi_fixture
+
+# this is not strictly correct, we should check whether the actualy compiler
+# is GCC. But for the CI and most cases, it's enough to assume that if we are
+# on linux we are using GCC.
+#
+# We need this because some of the nice compilation errors (such as the ones
+# causes by _HPY_LEGACY) are triggered only by gcc. Would be nice to have them
+# also for other compilers
+ONLY_GCC = pytest.mark.skipif(sys.platform!='linux', reason='GCC only')
 
 
 class TestLegacyForbidden(HPyTest):
@@ -28,6 +38,7 @@ class TestLegacyForbidden(HPyTest):
             "It is forbidden to #include <Python.h> "
             "when targeting the HPy Universal ABI")
 
+    @ONLY_GCC
     def test_HPy_AsPyObject(self, capfd):
         # NOTE: in this test we don't include Python.h. We want to test that
         # we get a nice compile-time error by just calling HPy_AsPyObject.
@@ -46,6 +57,7 @@ class TestLegacyForbidden(HPyTest):
         """
         self.expect_make_error(src, self.LEGACY_ERROR)
 
+    @ONLY_GCC
     def test_HPy_FromPyObject(self, capfd):
         # NOTE: in this test we don't include Python.h. We want to test that
         # we get a nice compile-time error by just calling HPy_AsPyObject.
