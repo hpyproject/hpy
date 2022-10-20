@@ -73,8 +73,16 @@ extern "C" {
 #endif
 
 #ifdef HPY_ABI_UNIVERSAL
-#  define _HPY_LEGACY __attribute__((error("Cannot use legacy functions when targeting the HPy Universal ABI")))
+#  define _MESSAGE "Cannot use legacy functions when targeting the HPy Universal ABI"
+#  if defined(_MSC_VER)
+     // unfortunately MSVC doesn't seem to have the equivalent of "error", so
+     // we just mark it as "deprecated", too bad
+#    define _HPY_LEGACY __declspec(deprecated(_MESSAGE))
+#  else
+     // gcc, clang
+#    define _HPY_LEGACY __attribute__((error(_MESSAGE)))
 #else
+   // in non-universal modes, we don't attach any attribute
 #  define _HPY_LEGACY
 #endif
 
