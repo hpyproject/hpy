@@ -82,7 +82,7 @@ extern "C" {
 #endif
 
 #ifdef HPY_ABI_UNIVERSAL
-#  if __has_attribute(error)
+#  if _HPY_compiler_has_attribute(error)
      // gcc, clang>=14
 #    define _HPY_LEGACY __attribute__((error("Cannot use legacy functions when targeting the HPy Universal ABI")))
 #  else
