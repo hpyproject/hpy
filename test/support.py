@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import subprocess
 import textwrap
+import distutils
 
 PY2 = sys.version_info[0] == 2
 
@@ -46,6 +47,15 @@ def hpy_abi_with_legacy(request):
 
         from .support import hpy_abi_with_legacy
         hpy_abi = hpy_abi_with_legacy
+    """
+    abi = request.param
+    yield abi
+
+@pytest.fixture(params=['universal'])
+def hpy_abi_only_universal(request):
+    """
+    Expected usage:
+        hpy_abi = hpy_abi_only_universal
     """
     abi = request.param
     yield abi
@@ -401,9 +411,10 @@ class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
 
     @pytest.fixture()
-    def initargs(self, compiler, leakdetector):
+    def initargs(self, compiler, leakdetector, capfd):
         self.compiler = compiler
         self.leakdetector = leakdetector
+        self.capfd = capfd
 
     def make_module(self, main_src, name='mytest', extra_sources=()):
         ExtensionTemplate = self.ExtensionTemplate
@@ -414,6 +425,25 @@ class HPyTest:
         ExtensionTemplate = self.ExtensionTemplate
         return self.compiler.compile_module(main_src, ExtensionTemplate, name,
                                      extra_sources)
+
+    def expect_make_error(self, main_src, error):
+        with pytest.raises(distutils.errors.CompileError):
+            self.make_module(main_src)
+        #
+        # capfd.readouterr() "eats" the output, but we want to still see it in
+        # case of failure. Just print it again
+        cap = self.capfd.readouterr()
+        sys.stdout.write(cap.out)
+        sys.stderr.write(cap.err)
+        #
+        # gcc prints compiler errors to stderr, but MSVC seems to print them
+        # to stdout. Let's just check both
+        if error in cap.out or error in cap.err:
+            # the error was found, we are good
+            return
+        raise Exception("The following error message was not found in the compiler "
+                        "output:\n    " + error)
+
 
     def supports_refcounts(self):
         """ Returns True if the underlying Python implementation supports
