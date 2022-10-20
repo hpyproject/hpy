@@ -1,6 +1,6 @@
 import pytest
 from .support import ExtensionCompiler, DefaultExtensionTemplate,\
-    PythonSubprocessRunner, HPyDebugCapture, hpy_abi_default
+    PythonSubprocessRunner, HPyDebugCapture, make_hpy_abi_fixture
 from hpy.debug.leakdetector import LeakDetector
 from pathlib import Path
 
@@ -33,6 +33,11 @@ def pytest_configure(config):
         "markers", "syncgc: Mark tests that rely on a synchronous GC."
     )
 
+# this is the default set of hpy_abi for all the tests. Individual files and
+# classes can override it.
+hpy_abi = make_hpy_abi_fixture('default')
+
+
 @pytest.fixture(scope='session')
 def hpy_devel(request):
     from hpy.devel import HPyDevel
@@ -52,8 +57,6 @@ def leakdetector(hpy_abi):
 @pytest.fixture
 def ExtensionTemplate():
     return DefaultExtensionTemplate
-
-hpy_abi = hpy_abi_default
 
 @pytest.fixture
 def compiler(request, tmpdir, hpy_devel, hpy_abi, ExtensionTemplate):

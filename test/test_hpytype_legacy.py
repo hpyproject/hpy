@@ -1,10 +1,10 @@
 """ HPyType tests on legacy types. """
 
 import pytest
-from .support import HPyTest, hpy_abi_with_legacy
+from .support import HPyTest, make_hpy_abi_fixture
 from .test_hpytype import PointTemplate, TestType as _TestType
 
-hpy_abi = hpy_abi_with_legacy
+hpy_abi = make_hpy_abi_fixture('with hybrid')
 
 class LegacyPointTemplate(PointTemplate):
     """

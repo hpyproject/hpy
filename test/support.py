@@ -29,36 +29,43 @@ def atomic_run(*args, **kwargs):
         return subprocess.run(*args, **kwargs)
 
 
-@pytest.fixture(params=['cpython', 'universal', 'debug'])
-def hpy_abi_default(request):
+def make_hpy_abi_fixture(ABIs, class_fixture=False):
     """
-    This is the default hpy_abi fixture, as defined by conftest.py:
-        hpy_abi = hpy_abi_default
-    """
-    abi = request.param
-    yield abi
+    Make an hpy_abi fixture.
 
-@pytest.fixture(params=['cpython', 'hybrid', 'hybrid+debug'])
-def hpy_abi_with_legacy(request):
-    """
-    Use this fixture to override 'hpy_abi' whenever you need legacy
-    features. It causes to use the 'hybrid' ABI instead of 'universal'.
-    Expected usage:
+    conftest.py defines a default hpy_abi for all tests, but individual files
+    and classes can override the set of ABIs they want to use. The indented
+    usage is the following:
 
-        from .support import hpy_abi_with_legacy
-        hpy_abi = hpy_abi_with_legacy
-    """
-    abi = request.param
-    yield abi
+    # at the top of a file
+    hpy_abi = make_hpy_abi_fixture(['universal', 'debug'])
 
-@pytest.fixture(params=['universal'])
-def hpy_abi_only_universal(request):
+    # in a class
+    class TestFoo(HPyTest):
+        hpy_abi = make_hpy_abi_fixture('with hybrid', class_fixture=True)
     """
-    Expected usage:
-        hpy_abi = hpy_abi_only_universal
-    """
-    abi = request.param
-    yield abi
+    if ABIs == 'default':
+        ABIs = ['cpython', 'universal', 'debug']
+    elif ABIs == 'with hybrid':
+        ABIs = ['cpython', 'hybrid', 'hybrid+debug']
+    elif isinstance(ABIs, list):
+        pass
+    else:
+        raise ValueError("ABIs must be 'default', 'with hybrid' "
+                         "or a list of strings. Got: %s" % ABIs)
+
+    if class_fixture:
+        @pytest.fixture(params=ABIs)
+        def hpy_abi(self, request):
+            abi = request.param
+            yield abi
+    else:
+        @pytest.fixture(params=ABIs)
+        def hpy_abi(request):
+            abi = request.param
+            yield abi
+
+    return hpy_abi
 
 
 class DefaultExtensionTemplate(object):

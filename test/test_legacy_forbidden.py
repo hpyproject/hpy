@@ -4,11 +4,12 @@ get the expected compile time errors
 """
 
 import pytest
-from .support import HPyTest, hpy_abi_only_universal
+from .support import HPyTest, make_hpy_abi_fixture
 
-hpy_abi = hpy_abi_only_universal
 
 class TestLegacyForbidden(HPyTest):
+
+    hpy_abi = make_hpy_abi_fixture(['universal'], class_fixture=True)
 
     LEGACY_ERROR = "Cannot use legacy functions when targeting the HPy Universal ABI"
 

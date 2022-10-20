@@ -1,8 +1,8 @@
-from .support import HPyTest, hpy_abi_with_legacy
-
-hpy_abi = hpy_abi_with_legacy
+from .support import HPyTest, make_hpy_abi_fixture
 
 class TestCPythonCompatibility(HPyTest):
+
+    hpy_abi = make_hpy_abi_fixture('with hybrid', class_fixture=True)
 
     # One note about the supports_refcounts() in the tests below: on
     # CPython, handles are actually implemented as INCREF/DECREF, so we can
