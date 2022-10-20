@@ -54,7 +54,7 @@ void hpy_trace_set_ctx(HPyContext *tctx)
     g_trace_ctx = *tctx;
 }
 
-HPy hpy_trace_create_func_args(HPyContext *uctx, int id)
+static HPy create_trace_func_args(HPyContext *uctx, int id)
 {
     HPy h_name = HPyUnicode_FromString(uctx, hpy_trace_get_func_name(id));
     if (HPy_IsNull(h_name))
@@ -65,20 +65,53 @@ HPy hpy_trace_create_func_args(HPyContext *uctx, int id)
     HPy_Close(uctx, h_name);
     return h_args;
 fail:
-    HPy_FatalError(uctx, "could not ");
+    HPy_FatalError(uctx, "could not create arguments for user trace function");
+    return HPy_NULL;
 }
 
-void hpy_trace_on_enter(HPyTraceInfo *info, HPyContext *uctx, HPy args)
+static inline int64_t diff_ns(struct timespec *start, struct timespec *end)
 {
-    HPy res = HPy_CallTupleDict(uctx, info->on_enter_func, args, HPy_NULL);
-    if (HPy_IsNull(res))
-        HPy_FatalError(uctx, "error when executing on-enter trace function");
+    return ((int64_t)end->tv_sec - (int64_t)start->tv_sec) * (int64_t)1000000000
+            + ((int64_t)end->tv_nsec - (int64_t)start->tv_nsec);
 }
 
-void hpy_trace_on_exit(HPyTraceInfo *info, HPyContext *uctx, HPy args)
+HPyTraceInfo *hpy_trace_on_enter(HPyContext *tctx, int id)
 {
-    HPy res = HPy_CallTupleDict(uctx, info->on_exit_func, args, HPy_NULL);
-    if (HPy_IsNull(res))
-        HPy_FatalError(uctx, "error when executing on-exit trace function");
+    HPyTraceInfo *tctx_info = get_info(tctx);
+    HPyContext *uctx = tctx_info->uctx;
+    HPy args, res;
+    tctx_info->call_counts[id]++;
+    if(!HPy_IsNull(tctx_info->on_enter_func)) {
+        args = create_trace_func_args(uctx, id);
+        res = HPy_CallTupleDict(
+                uctx, tctx_info->on_enter_func, args, HPy_NULL);
+        HPy_Close(uctx, args);
+        if (HPy_IsNull(res)) {
+            HPy_FatalError(uctx,
+                    "error when executing on-enter trace function");
+        }
+    }
+    return tctx_info;
+}
+
+void hpy_trace_on_exit(HPyTraceInfo *info, int id, int cr,
+        struct timespec *_ts_start, struct timespec *_ts_end)
+{
+    HPyContext *uctx = info->uctx;
+    HPy args, res;
+    if (cr)
+        HPy_FatalError(uctx, "could not get monotonic clock");
+    int64_t duration = diff_ns(_ts_start, _ts_end);
+    assert(duration >= 0);
+    info->durations[id] += duration;
+    if(!HPy_IsNull(info->on_exit_func)) {
+        args = create_trace_func_args(uctx, id);
+        res = HPy_CallTupleDict(uctx, info->on_exit_func, args, HPy_NULL);
+        HPy_Close(uctx, args);
+        if (HPy_IsNull(res)) {
+            HPy_FatalError(uctx,
+                    "error when executing on-exit trace function");
+        }
+    }
 }
 

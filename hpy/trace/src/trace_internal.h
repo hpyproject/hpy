@@ -31,15 +31,8 @@ static inline HPyTraceInfo *get_info(HPyContext *tctx)
     return info;
 }
 
-static inline int64_t
-diff_ns(const struct timespec start, const struct timespec end)
-{
-    return ((int64_t)end.tv_sec - (int64_t)start.tv_sec) * (int64_t)1000000000
-            + ((int64_t)end.tv_nsec - (int64_t)start.tv_nsec);
-}
-
-HPy hpy_trace_create_func_args(HPyContext *uctx, int id);
-void hpy_trace_on_enter(HPyTraceInfo *info, HPyContext *uctx, HPy args);
-void hpy_trace_on_exit(HPyTraceInfo *info, HPyContext *uctx, HPy args);
+HPyTraceInfo *hpy_trace_on_enter(HPyContext *tctx, int id);
+void hpy_trace_on_exit(HPyTraceInfo *info, int id, int cr,
+        struct timespec *_ts_start, struct timespec *_ts_end);
 
 #endif /* HPY_TRACE_INTERNAL_H */
