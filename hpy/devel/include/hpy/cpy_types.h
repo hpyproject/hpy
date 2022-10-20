@@ -23,8 +23,8 @@ typedef struct FORBIDDEN_bufferinfo cpy_Py_buffer;
 
 // declare the following API functions as _HPY_LEGACY, which triggers an
 // #error if they are used
-HPyAPI_FUNC cpy_PyObject *HPy_AsPyObject(HPyContext *ctx, HPy h) _HPY_LEGACY;
-HPyAPI_FUNC HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj) _HPY_LEGACY;
+HPyAPI_FUNC _HPY_LEGACY cpy_PyObject *HPy_AsPyObject(HPyContext *ctx, HPy h);
+HPyAPI_FUNC _HPY_LEGACY HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);
 
 #else
 
