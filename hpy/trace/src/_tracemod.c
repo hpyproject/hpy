@@ -7,10 +7,51 @@
 #include "hpy.h"
 #include "trace_internal.h"
 
+#ifndef _WIN32
+#include <limits.h>
+#define MAX_SEC (LLONG_MAX / FREQ_NSEC)
+#endif
+
 static inline int is_empty(const char *s)
 {
     return s[0] == '\0';
 }
+
+#ifdef _WIN32
+static inline HPy win_time_to_ns(HPyContext *uctx, const LONGLONG to_ns, _HPyTime_t t)
+{
+        return HPyLong_FromLongLong(uctx, t.QuadPart * to_ns);
+}
+
+#else
+static inline HPy posix_time_to_ns(HPyContext *uctx, HPy *s_to_ns, _HPyTime_t t)
+{
+    /* Fast-path: If we can fit into a signed 64-bit integer, then do the
+       computation in C. This is the case if we can do 't.tv_sec * FREQ_SEC'
+       (i.e. converting seconds to nanoseconds) and add 'tv.tv_nsec' without
+       overflowing. */
+    if (t.tv_sec < MAX_SEC) {
+        return HPyLong_FromLongLong(uctx, (long long)t.tv_sec * FREQ_NSEC +
+                (long long)t.tv_nsec);
+    } else {
+        /* Slow-path: do the computation with an (unbound) Python long */
+        if (HPy_IsNull(*s_to_ns)) {
+            *s_to_ns = HPyLong_FromLongLong(uctx, FREQ_NSEC);
+        }
+
+        HPy h_tv_sec = HPyLong_FromLongLong(uctx, t.tv_sec);
+        HPy h_tv_sec_as_ns = HPy_Multiply(uctx, h_tv_sec, *s_to_ns);
+        HPy_Close(uctx, h_tv_sec);
+
+        HPy tv_nsec = HPyLong_FromLong(uctx, t.tv_nsec);
+        HPy res = HPy_Add(uctx, h_tv_sec_as_ns, tv_nsec);
+        HPy_Close(uctx, h_tv_sec_as_ns);
+        HPy_Close(uctx, tv_nsec);
+
+        return res;
+    }
+}
+#endif
 
 HPyDef_METH(get_durations, "get_durations", get_durations_impl, HPyFunc_NOARGS)
 static HPy get_durations_impl(HPyContext *uctx, HPy self)
@@ -18,6 +59,12 @@ static HPy get_durations_impl(HPyContext *uctx, HPy self)
     HPyContext *tctx = hpy_trace_get_ctx(uctx);
     HPyTraceInfo *info = get_info(tctx);
     HPyTracker ht = HPyTracker_New(uctx, hpy_trace_get_nfunc());
+
+#ifdef _WIN32
+    const LONGLONG to_ns = FREQ_NSEC / info->counter_freq.QuadPart;
+#else
+    HPy s_to_ns = HPy_NULL;
+#endif
     HPy res = HPyDict_New(uctx);
     const char *func_name;
     for (int i=0; (func_name = hpy_trace_get_func_name(i)); i++)
@@ -25,8 +72,11 @@ static HPy get_durations_impl(HPyContext *uctx, HPy self)
         /* skip empty names; those indices denote a context handle */
         if (!is_empty(func_name))
         {
-            HPy value = HPyLong_FromLongLong(uctx,
-                    (long long)info->durations[i]);
+#ifdef _WIN32
+            HPy value = win_time_to_ns(uctx, to_ns, info->durations[i]);
+#else
+            HPy value = posix_time_to_ns(uctx, &s_to_ns, info->durations[i]);
+#endif
             HPyTracker_Add(uctx, ht, value);
             if (HPy_IsNull(value))
                 goto fail;
@@ -34,6 +84,9 @@ static HPy get_durations_impl(HPyContext *uctx, HPy self)
                 goto fail;
         }
     }
+#ifndef _WIN32
+    HPy_Close(uctx, s_to_ns);
+#endif
     HPyTracker_Close(uctx, ht);
     return res;
 fail:

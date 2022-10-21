@@ -52,7 +52,7 @@ class autogen_tracer_ctx_init_h(AutoGenFile):
         w(f'    info->magic_number = HPY_TRACE_MAGIC;')
         w(f'    info->uctx = uctx;')
         w(f'    info->call_counts = (uint64_t *)calloc({n_decls}, sizeof(uint64_t));')
-        w(f'    info->durations = (int64_t *)calloc({n_decls}, sizeof(int64_t));')
+        w(f'    info->durations = (_HPyTime_t *)calloc({n_decls}, sizeof(_HPyTime_t));')
         w(f'    info->on_enter_func = HPy_NULL;')
         w(f'    info->on_exit_func = HPy_NULL;')
         w('}')
@@ -125,13 +125,13 @@ class autogen_tracer_wrappers(AutoGenFile):
         w('{')
         w(f'    HPyTraceInfo *info = hpy_trace_on_enter(tctx, {func.ctx_index});')
         w(f'    HPyContext *uctx = info->uctx;')
-        w(f'    struct timespec _ts_start, _ts_end;')
-        w(f'    int cr = clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_start);')
+        w(f'    _HPyTime_t _ts_start, _ts_end;')
+        w(f'    int cr = get_monotonic_clock(&_ts_start);')
         if rettype == 'void':
             w(f'    {func.name}({params});')
         else:
             w(f'    {rettype} res = {func.name}({params});')
-        w(f'    cr += clock_gettime(CLOCK_MONOTONIC_RAW, &_ts_end);')
+        w(f'    cr += get_monotonic_clock(&_ts_end);')
         w(f'    hpy_trace_on_exit(info, {func.ctx_index}, cr, &_ts_start, &_ts_end);')
         if rettype != 'void':
             w(f'    return res;')

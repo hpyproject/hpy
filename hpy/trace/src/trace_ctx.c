@@ -25,6 +25,11 @@ int hpy_trace_ctx_init(HPyContext *tctx, HPyContext *uctx)
         HPyErr_NoMemory(uctx);
         return -1;
     }
+#ifdef _WIN32
+    (void)QueryPerformanceFrequency(&info->counter_freq);
+#else
+    clock_getres(CLOCK_MONOTONIC_RAW, &info->counter_freq);
+#endif
     trace_ctx_init_info(info, uctx);
     tctx->_private = info;
     trace_ctx_init_fields(tctx, uctx);
@@ -69,10 +74,27 @@ fail:
     return HPy_NULL;
 }
 
-static inline int64_t diff_ns(struct timespec *start, struct timespec *end)
+static inline void
+update_duration(_HPyTime_t *res, _HPyTime_t *start, _HPyTime_t *end)
 {
-    return ((int64_t)end->tv_sec - (int64_t)start->tv_sec) * (int64_t)1000000000
-            + ((int64_t)end->tv_nsec - (int64_t)start->tv_nsec);
+#ifdef _WIN32
+    res->QuadPart += end->QuadPart - start->QuadPart;
+    assert(res->QuadPart >= 0);
+#else
+    /* Normalize: since the clock is guaranteed to be monotonic, we know that
+       'end >= start'. It can still happen that 'end->tv_nsec < start->tv_nsec'
+       but in this case, we know that 'end->tv_sec > start->tv_sec'. */
+    if (end->tv_nsec < start->tv_nsec) {
+        assert(end->tv_sec > start->tv_sec);
+        res->tv_sec += end->tv_sec - start->tv_sec - 1,
+        res->tv_nsec += end->tv_nsec - start->tv_nsec + FREQ_NSEC;
+    } else {
+        res->tv_sec += end->tv_sec - start->tv_sec,
+        res->tv_nsec += end->tv_nsec - start->tv_nsec;
+    }
+    assert(res->tv_sec >= 0);
+    assert(res->tv_nsec >= 0);
+#endif
 }
 
 HPyTraceInfo *hpy_trace_on_enter(HPyContext *tctx, int id)
@@ -95,15 +117,13 @@ HPyTraceInfo *hpy_trace_on_enter(HPyContext *tctx, int id)
 }
 
 void hpy_trace_on_exit(HPyTraceInfo *info, int id, int cr,
-        struct timespec *_ts_start, struct timespec *_ts_end)
+        _HPyTime_t *_ts_start, _HPyTime_t *_ts_end)
 {
     HPyContext *uctx = info->uctx;
     HPy args, res;
     if (cr)
         HPy_FatalError(uctx, "could not get monotonic clock");
-    int64_t duration = diff_ns(_ts_start, _ts_end);
-    assert(duration >= 0);
-    info->durations[id] += duration;
+    update_duration(&info->durations[id], _ts_start, _ts_end);
     if(!HPy_IsNull(info->on_exit_func)) {
         args = create_trace_func_args(uctx, id);
         res = HPy_CallTupleDict(uctx, info->on_exit_func, args, HPy_NULL);

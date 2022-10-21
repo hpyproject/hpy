@@ -180,7 +180,7 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
     info->call_counts = (uint64_t *)calloc(249, sizeof(uint64_t));
-    info->durations = (int64_t *)calloc(249, sizeof(int64_t));
+    info->durations = (_HPyTime_t *)calloc(249, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
