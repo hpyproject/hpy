@@ -171,6 +171,21 @@ static HPy set_trace_funcs_impl(HPyContext *uctx, HPy self, HPy *args,
     return HPy_Dup(uctx, uctx->h_None);
 }
 
+HPyDef_METH(get_frequency, "get_frequency", get_frequency_impl, HPyFunc_NOARGS,
+        .doc="Resolution of the used clock in Hertz.")
+static HPy get_frequency_impl(HPyContext *uctx, HPy self)
+{
+    HPyContext *tctx = hpy_trace_get_ctx(uctx);
+    HPyTraceInfo *info = get_info(tctx);
+#ifdef _WIN32
+    long long f = (long long) info->counter_freq.QuadPart;
+#else
+    long long f = (long long) info->counter_freq.tv_sec +
+            (long long)info->counter_freq.tv_nsec * FREQ_NSEC;
+#endif
+    return HPyLong_FromLongLong(uctx, f);
+}
+
 
 /* ~~~~~~ definition of the module hpy.trace._trace ~~~~~~~ */
 
@@ -178,6 +193,7 @@ static HPyDef *module_defines[] = {
     &get_durations,
     &get_call_counts,
     &set_trace_functions,
+    &get_frequency,
     NULL
 };
 
