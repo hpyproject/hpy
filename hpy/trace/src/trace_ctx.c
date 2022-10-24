@@ -116,13 +116,23 @@ HPyTraceInfo *hpy_trace_on_enter(HPyContext *tctx, int id)
     return tctx_info;
 }
 
-void hpy_trace_on_exit(HPyTraceInfo *info, int id, int cr,
-        _HPyTime_t *_ts_start, _HPyTime_t *_ts_end)
+#ifdef _WIN32
+#define CLOCK_FAILED(_R0, _R1) (!(_R0) || !(_R1))
+#else
+#define CLOCK_FAILED(_R0, _R1) ((_R0) + (_R1))
+#endif
+
+void hpy_trace_on_exit(HPyTraceInfo *info, int id, _HPyClockStatus_t r0,
+        _HPyClockStatus_t r1, _HPyTime_t *_ts_start, _HPyTime_t *_ts_end)
 {
     HPyContext *uctx = info->uctx;
     HPy args, res;
-    if (cr)
-        HPy_FatalError(uctx, "could not get monotonic clock");
+    if (CLOCK_FAILED(r0, r1))
+    {
+        printf("Could not get monotonic clock in %s\n", hpy_trace_get_func_name(id));
+        fflush(stdout);
+        HPy_FatalError(uctx, "could not get monotonic clock123");
+    }
     update_duration(&info->durations[id], _ts_start, _ts_end);
     if(!HPy_IsNull(info->on_exit_func)) {
         args = create_trace_func_args(uctx, id);

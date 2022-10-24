@@ -23,8 +23,10 @@
 
 #ifdef _WIN32
 typedef LARGE_INTEGER _HPyTime_t;
+typedef BOOL _HPyClockStatus_t;
 #else
 typedef struct timespec _HPyTime_t;
+typedef int _HPyClockStatus_t;
 #endif
 
 typedef struct {
@@ -54,7 +56,7 @@ static inline HPyTraceInfo *get_info(HPyContext *tctx)
 
 /* Get the current value of the monotonic clock.  This is a platform-dependent
    operation. */
-static inline int get_monotonic_clock(_HPyTime_t *t)
+static inline _HPyClockStatus_t get_monotonic_clock(_HPyTime_t *t)
 {
 #ifdef _WIN32
     return (int)QueryPerformanceCounter(t);
@@ -64,7 +66,7 @@ static inline int get_monotonic_clock(_HPyTime_t *t)
 }
 
 HPyTraceInfo *hpy_trace_on_enter(HPyContext *tctx, int id);
-void hpy_trace_on_exit(HPyTraceInfo *info, int id, int cr,
-        _HPyTime_t *_ts_start, _HPyTime_t *_ts_end);
+void hpy_trace_on_exit(HPyTraceInfo *info, int id, _HPyClockStatus_t r0,
+        _HPyClockStatus_t r1, _HPyTime_t *_ts_start, _HPyTime_t *_ts_end);
 
 #endif /* HPY_TRACE_INTERNAL_H */

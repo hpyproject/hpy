@@ -126,13 +126,14 @@ class autogen_tracer_wrappers(AutoGenFile):
         w(f'    HPyTraceInfo *info = hpy_trace_on_enter(tctx, {func.ctx_index});')
         w(f'    HPyContext *uctx = info->uctx;')
         w(f'    _HPyTime_t _ts_start, _ts_end;')
-        w(f'    int cr = get_monotonic_clock(&_ts_start);')
+        w(f'    _HPyClockStatus_t r0, r1;')
+        w(f'    r0 = get_monotonic_clock(&_ts_start);')
         if rettype == 'void':
             w(f'    {func.name}({params});')
         else:
             w(f'    {rettype} res = {func.name}({params});')
-        w(f'    cr += get_monotonic_clock(&_ts_end);')
-        w(f'    hpy_trace_on_exit(info, {func.ctx_index}, cr, &_ts_start, &_ts_end);')
+        w(f'    r1 = get_monotonic_clock(&_ts_end);')
+        w(f'    hpy_trace_on_exit(info, {func.ctx_index}, r0, r1, &_ts_start, &_ts_end);')
         if rettype != 'void':
             w(f'    return res;')
         w('}')

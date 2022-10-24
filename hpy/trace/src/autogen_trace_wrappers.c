@@ -17,10 +17,11 @@ HPy trace_ctx_Module_Create(HPyContext *tctx, HPyModuleDef *def)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 77);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyModule_Create(uctx, def);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 77, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 77, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -29,10 +30,11 @@ HPy trace_ctx_Dup(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 78);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Dup(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 78, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 78, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -41,10 +43,11 @@ void trace_ctx_Close(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 79);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_Close(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 79, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 79, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_Long_FromLong(HPyContext *tctx, long value)
@@ -52,10 +55,11 @@ HPy trace_ctx_Long_FromLong(HPyContext *tctx, long value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 80);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyLong_FromLong(uctx, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 80, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 80, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -64,10 +68,11 @@ HPy trace_ctx_Long_FromUnsignedLong(HPyContext *tctx, unsigned long value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 81);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyLong_FromUnsignedLong(uctx, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 81, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 81, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -76,10 +81,11 @@ HPy trace_ctx_Long_FromLongLong(HPyContext *tctx, long long v)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 82);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyLong_FromLongLong(uctx, v);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 82, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 82, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -88,10 +94,11 @@ HPy trace_ctx_Long_FromUnsignedLongLong(HPyContext *tctx, unsigned long long v)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 83);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyLong_FromUnsignedLongLong(uctx, v);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 83, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 83, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -100,10 +107,11 @@ HPy trace_ctx_Long_FromSize_t(HPyContext *tctx, size_t value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 84);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyLong_FromSize_t(uctx, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 84, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 84, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -112,10 +120,11 @@ HPy trace_ctx_Long_FromSsize_t(HPyContext *tctx, HPy_ssize_t value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 85);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyLong_FromSsize_t(uctx, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 85, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 85, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -124,10 +133,11 @@ long trace_ctx_Long_AsLong(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 86);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     long res = HPyLong_AsLong(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 86, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 86, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -136,10 +146,11 @@ unsigned long trace_ctx_Long_AsUnsignedLong(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 87);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     unsigned long res = HPyLong_AsUnsignedLong(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 87, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 87, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -148,10 +159,11 @@ unsigned long trace_ctx_Long_AsUnsignedLongMask(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 88);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     unsigned long res = HPyLong_AsUnsignedLongMask(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 88, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 88, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -160,10 +172,11 @@ long long trace_ctx_Long_AsLongLong(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 89);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     long long res = HPyLong_AsLongLong(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 89, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 89, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -172,10 +185,11 @@ unsigned long long trace_ctx_Long_AsUnsignedLongLong(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 90);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     unsigned long long res = HPyLong_AsUnsignedLongLong(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 90, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 90, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -184,10 +198,11 @@ unsigned long long trace_ctx_Long_AsUnsignedLongLongMask(HPyContext *tctx, HPy h
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 91);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     unsigned long long res = HPyLong_AsUnsignedLongLongMask(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 91, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 91, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -196,10 +211,11 @@ size_t trace_ctx_Long_AsSize_t(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 92);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     size_t res = HPyLong_AsSize_t(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 92, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 92, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -208,10 +224,11 @@ HPy_ssize_t trace_ctx_Long_AsSsize_t(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 93);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_ssize_t res = HPyLong_AsSsize_t(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 93, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 93, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -220,10 +237,11 @@ void *trace_ctx_Long_AsVoidPtr(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 94);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = HPyLong_AsVoidPtr(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 94, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 94, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -232,10 +250,11 @@ double trace_ctx_Long_AsDouble(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 95);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     double res = HPyLong_AsDouble(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 95, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 95, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -244,10 +263,11 @@ HPy trace_ctx_Float_FromDouble(HPyContext *tctx, double v)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 96);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyFloat_FromDouble(uctx, v);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 96, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 96, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -256,10 +276,11 @@ double trace_ctx_Float_AsDouble(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 97);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     double res = HPyFloat_AsDouble(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 97, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 97, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -268,10 +289,11 @@ HPy trace_ctx_Bool_FromLong(HPyContext *tctx, long v)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 98);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyBool_FromLong(uctx, v);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 98, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 98, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -280,10 +302,11 @@ HPy_ssize_t trace_ctx_Length(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 99);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_ssize_t res = HPy_Length(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 99, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 99, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -292,10 +315,11 @@ int trace_ctx_Number_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 100);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyNumber_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 100, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 100, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -304,10 +328,11 @@ HPy trace_ctx_Add(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 101);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Add(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 101, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 101, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -316,10 +341,11 @@ HPy trace_ctx_Subtract(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 102);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Subtract(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 102, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 102, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -328,10 +354,11 @@ HPy trace_ctx_Multiply(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 103);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Multiply(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 103, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 103, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -340,10 +367,11 @@ HPy trace_ctx_MatrixMultiply(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 104);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_MatrixMultiply(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 104, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 104, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -352,10 +380,11 @@ HPy trace_ctx_FloorDivide(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 105);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_FloorDivide(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 105, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 105, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -364,10 +393,11 @@ HPy trace_ctx_TrueDivide(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 106);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_TrueDivide(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 106, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 106, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -376,10 +406,11 @@ HPy trace_ctx_Remainder(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 107);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Remainder(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 107, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 107, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -388,10 +419,11 @@ HPy trace_ctx_Divmod(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 108);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Divmod(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 108, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 108, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -400,10 +432,11 @@ HPy trace_ctx_Power(HPyContext *tctx, HPy h1, HPy h2, HPy h3)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 109);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Power(uctx, h1, h2, h3);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 109, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 109, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -412,10 +445,11 @@ HPy trace_ctx_Negative(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 110);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Negative(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 110, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 110, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -424,10 +458,11 @@ HPy trace_ctx_Positive(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 111);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Positive(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 111, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 111, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -436,10 +471,11 @@ HPy trace_ctx_Absolute(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 112);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Absolute(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 112, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 112, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -448,10 +484,11 @@ HPy trace_ctx_Invert(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 113);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Invert(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 113, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 113, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -460,10 +497,11 @@ HPy trace_ctx_Lshift(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 114);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Lshift(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 114, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 114, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -472,10 +510,11 @@ HPy trace_ctx_Rshift(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 115);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Rshift(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 115, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 115, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -484,10 +523,11 @@ HPy trace_ctx_And(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 116);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_And(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 116, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 116, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -496,10 +536,11 @@ HPy trace_ctx_Xor(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 117);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Xor(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 117, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 117, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -508,10 +549,11 @@ HPy trace_ctx_Or(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 118);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Or(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 118, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 118, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -520,10 +562,11 @@ HPy trace_ctx_Index(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 119);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Index(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 119, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 119, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -532,10 +575,11 @@ HPy trace_ctx_Long(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 120);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Long(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 120, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 120, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -544,10 +588,11 @@ HPy trace_ctx_Float(HPyContext *tctx, HPy h1)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 121);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Float(uctx, h1);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 121, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 121, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -556,10 +601,11 @@ HPy trace_ctx_InPlaceAdd(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 122);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceAdd(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 122, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 122, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -568,10 +614,11 @@ HPy trace_ctx_InPlaceSubtract(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 123);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceSubtract(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 123, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 123, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -580,10 +627,11 @@ HPy trace_ctx_InPlaceMultiply(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 124);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceMultiply(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 124, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 124, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -592,10 +640,11 @@ HPy trace_ctx_InPlaceMatrixMultiply(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 125);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceMatrixMultiply(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 125, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 125, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -604,10 +653,11 @@ HPy trace_ctx_InPlaceFloorDivide(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 126);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceFloorDivide(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 126, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 126, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -616,10 +666,11 @@ HPy trace_ctx_InPlaceTrueDivide(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 127);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceTrueDivide(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 127, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 127, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -628,10 +679,11 @@ HPy trace_ctx_InPlaceRemainder(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 128);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceRemainder(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 128, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 128, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -640,10 +692,11 @@ HPy trace_ctx_InPlacePower(HPyContext *tctx, HPy h1, HPy h2, HPy h3)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 129);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlacePower(uctx, h1, h2, h3);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 129, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 129, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -652,10 +705,11 @@ HPy trace_ctx_InPlaceLshift(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 130);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceLshift(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 130, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 130, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -664,10 +718,11 @@ HPy trace_ctx_InPlaceRshift(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 131);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceRshift(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 131, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 131, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -676,10 +731,11 @@ HPy trace_ctx_InPlaceAnd(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 132);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceAnd(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 132, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 132, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -688,10 +744,11 @@ HPy trace_ctx_InPlaceXor(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 133);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceXor(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 133, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 133, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -700,10 +757,11 @@ HPy trace_ctx_InPlaceOr(HPyContext *tctx, HPy h1, HPy h2)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 134);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_InPlaceOr(uctx, h1, h2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 134, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 134, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -712,10 +770,11 @@ int trace_ctx_Callable_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 135);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyCallable_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 135, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 135, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -724,10 +783,11 @@ HPy trace_ctx_CallTupleDict(HPyContext *tctx, HPy callable, HPy args, HPy kw)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 136);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_CallTupleDict(uctx, callable, args, kw);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 136, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 136, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -736,10 +796,11 @@ void trace_ctx_Err_SetString(HPyContext *tctx, HPy h_type, const char *message)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 138);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyErr_SetString(uctx, h_type, message);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 138, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 138, r0, r1, &_ts_start, &_ts_end);
 }
 
 void trace_ctx_Err_SetObject(HPyContext *tctx, HPy h_type, HPy h_value)
@@ -747,10 +808,11 @@ void trace_ctx_Err_SetObject(HPyContext *tctx, HPy h_type, HPy h_value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 139);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyErr_SetObject(uctx, h_type, h_value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 139, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 139, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_Err_SetFromErrnoWithFilename(HPyContext *tctx, HPy h_type, const char *filename_fsencoded)
@@ -758,10 +820,11 @@ HPy trace_ctx_Err_SetFromErrnoWithFilename(HPyContext *tctx, HPy h_type, const c
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 140);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyErr_SetFromErrnoWithFilename(uctx, h_type, filename_fsencoded);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 140, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 140, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -770,10 +833,11 @@ void trace_ctx_Err_SetFromErrnoWithFilenameObjects(HPyContext *tctx, HPy h_type,
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 141);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyErr_SetFromErrnoWithFilenameObjects(uctx, h_type, filename1, filename2);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 141, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 141, r0, r1, &_ts_start, &_ts_end);
 }
 
 int trace_ctx_Err_Occurred(HPyContext *tctx)
@@ -781,10 +845,11 @@ int trace_ctx_Err_Occurred(HPyContext *tctx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 142);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyErr_Occurred(uctx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 142, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 142, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -793,10 +858,11 @@ int trace_ctx_Err_ExceptionMatches(HPyContext *tctx, HPy exc)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 143);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyErr_ExceptionMatches(uctx, exc);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 143, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 143, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -805,10 +871,11 @@ void trace_ctx_Err_NoMemory(HPyContext *tctx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 144);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyErr_NoMemory(uctx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 144, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 144, r0, r1, &_ts_start, &_ts_end);
 }
 
 void trace_ctx_Err_Clear(HPyContext *tctx)
@@ -816,10 +883,11 @@ void trace_ctx_Err_Clear(HPyContext *tctx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 145);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyErr_Clear(uctx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 145, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 145, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_Err_NewException(HPyContext *tctx, const char *name, HPy base, HPy dict)
@@ -827,10 +895,11 @@ HPy trace_ctx_Err_NewException(HPyContext *tctx, const char *name, HPy base, HPy
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 146);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyErr_NewException(uctx, name, base, dict);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 146, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 146, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -839,10 +908,11 @@ HPy trace_ctx_Err_NewExceptionWithDoc(HPyContext *tctx, const char *name, const 
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 147);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyErr_NewExceptionWithDoc(uctx, name, doc, base, dict);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 147, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 147, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -851,10 +921,11 @@ int trace_ctx_Err_WarnEx(HPyContext *tctx, HPy category, const char *message, HP
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 148);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyErr_WarnEx(uctx, category, message, stack_level);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 148, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 148, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -863,10 +934,11 @@ void trace_ctx_Err_WriteUnraisable(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 149);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyErr_WriteUnraisable(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 149, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 149, r0, r1, &_ts_start, &_ts_end);
 }
 
 int trace_ctx_IsTrue(HPyContext *tctx, HPy h)
@@ -874,10 +946,11 @@ int trace_ctx_IsTrue(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 150);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_IsTrue(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 150, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 150, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -886,10 +959,11 @@ HPy trace_ctx_Type_FromSpec(HPyContext *tctx, HPyType_Spec *spec, HPyType_SpecPa
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 151);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyType_FromSpec(uctx, spec, params);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 151, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 151, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -898,10 +972,11 @@ HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, HPy *args, HPy_ssize_t
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 152);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyType_GenericNew(uctx, type, args, nargs, kw);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 152, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 152, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -910,10 +985,11 @@ HPy trace_ctx_GetAttr(HPyContext *tctx, HPy obj, HPy name)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 153);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_GetAttr(uctx, obj, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 153, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 153, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -922,10 +998,11 @@ HPy trace_ctx_GetAttr_s(HPyContext *tctx, HPy obj, const char *name)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 154);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_GetAttr_s(uctx, obj, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 154, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 154, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -934,10 +1011,11 @@ int trace_ctx_HasAttr(HPyContext *tctx, HPy obj, HPy name)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 155);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_HasAttr(uctx, obj, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 155, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 155, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -946,10 +1024,11 @@ int trace_ctx_HasAttr_s(HPyContext *tctx, HPy obj, const char *name)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 156);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_HasAttr_s(uctx, obj, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 156, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 156, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -958,10 +1037,11 @@ int trace_ctx_SetAttr(HPyContext *tctx, HPy obj, HPy name, HPy value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 157);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_SetAttr(uctx, obj, name, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 157, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 157, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -970,10 +1050,11 @@ int trace_ctx_SetAttr_s(HPyContext *tctx, HPy obj, const char *name, HPy value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 158);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_SetAttr_s(uctx, obj, name, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 158, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 158, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -982,10 +1063,11 @@ HPy trace_ctx_GetItem(HPyContext *tctx, HPy obj, HPy key)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 159);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_GetItem(uctx, obj, key);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 159, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 159, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -994,10 +1076,11 @@ HPy trace_ctx_GetItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 160);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_GetItem_i(uctx, obj, idx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 160, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 160, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1006,10 +1089,11 @@ HPy trace_ctx_GetItem_s(HPyContext *tctx, HPy obj, const char *key)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 161);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_GetItem_s(uctx, obj, key);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 161, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 161, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1018,10 +1102,11 @@ int trace_ctx_Contains(HPyContext *tctx, HPy container, HPy key)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 162);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_Contains(uctx, container, key);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 162, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 162, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1030,10 +1115,11 @@ int trace_ctx_SetItem(HPyContext *tctx, HPy obj, HPy key, HPy value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 163);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_SetItem(uctx, obj, key, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 163, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 163, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1042,10 +1128,11 @@ int trace_ctx_SetItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx, HPy value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 164);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_SetItem_i(uctx, obj, idx, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 164, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 164, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1054,10 +1141,11 @@ int trace_ctx_SetItem_s(HPyContext *tctx, HPy obj, const char *key, HPy value)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 165);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_SetItem_s(uctx, obj, key, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 165, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 165, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1066,10 +1154,11 @@ int trace_ctx_DelItem(HPyContext *tctx, HPy obj, HPy key)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 236);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_DelItem(uctx, obj, key);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 236, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 236, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1078,10 +1167,11 @@ int trace_ctx_DelItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 237);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_DelItem_i(uctx, obj, idx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 237, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 237, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1090,10 +1180,11 @@ int trace_ctx_DelItem_s(HPyContext *tctx, HPy obj, const char *key)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 238);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_DelItem_s(uctx, obj, key);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 238, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 238, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1102,10 +1193,11 @@ HPy trace_ctx_Type(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 166);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Type(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 166, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 166, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1114,10 +1206,11 @@ int trace_ctx_TypeCheck(HPyContext *tctx, HPy obj, HPy type)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 167);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_TypeCheck(uctx, obj, type);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 167, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 167, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1126,10 +1219,11 @@ int trace_ctx_Is(HPyContext *tctx, HPy obj, HPy other)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 168);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_Is(uctx, obj, other);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 168, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 168, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1138,10 +1232,11 @@ void *trace_ctx_AsStruct_Object(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 169);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Object(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 169, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 169, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1150,10 +1245,11 @@ void *trace_ctx_AsStruct_Legacy(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 170);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Legacy(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 170, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 170, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1162,10 +1258,11 @@ void *trace_ctx_AsStruct_Type(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 229);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Type(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 229, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 229, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1174,10 +1271,11 @@ void *trace_ctx_AsStruct_Long(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 230);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Long(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 230, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 230, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1186,10 +1284,11 @@ void *trace_ctx_AsStruct_Float(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 231);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Float(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 231, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 231, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1198,10 +1297,11 @@ void *trace_ctx_AsStruct_Unicode(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 232);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Unicode(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 232, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 232, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1210,10 +1310,11 @@ void *trace_ctx_AsStruct_Tuple(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 233);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_Tuple(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 233, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 233, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1222,10 +1323,11 @@ void *trace_ctx_AsStruct_List(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 234);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = _HPy_AsStruct_List(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 234, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 234, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1234,10 +1336,11 @@ HPyType_BuiltinShape trace_ctx_Type_GetBuiltinShape(HPyContext *tctx, HPy h_type
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 235);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyType_BuiltinShape res = _HPyType_GetBuiltinShape(uctx, h_type);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 235, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 235, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1246,10 +1349,11 @@ HPy trace_ctx_New(HPyContext *tctx, HPy h_type, void **data)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 171);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = _HPy_New(uctx, h_type, data);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 171, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 171, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1258,10 +1362,11 @@ HPy trace_ctx_Repr(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 172);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Repr(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 172, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 172, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1270,10 +1375,11 @@ HPy trace_ctx_Str(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 173);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Str(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 173, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 173, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1282,10 +1388,11 @@ HPy trace_ctx_ASCII(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 174);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_ASCII(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 174, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 174, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1294,10 +1401,11 @@ HPy trace_ctx_Bytes(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 175);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_Bytes(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 175, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 175, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1306,10 +1414,11 @@ HPy trace_ctx_RichCompare(HPyContext *tctx, HPy v, HPy w, int op)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 176);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_RichCompare(uctx, v, w, op);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 176, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 176, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1318,10 +1427,11 @@ int trace_ctx_RichCompareBool(HPyContext *tctx, HPy v, HPy w, int op)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 177);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPy_RichCompareBool(uctx, v, w, op);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 177, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 177, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1330,10 +1440,11 @@ HPy_hash_t trace_ctx_Hash(HPyContext *tctx, HPy obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 178);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_hash_t res = HPy_Hash(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 178, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 178, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1342,10 +1453,11 @@ int trace_ctx_Bytes_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 179);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyBytes_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 179, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 179, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1354,10 +1466,11 @@ HPy_ssize_t trace_ctx_Bytes_Size(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 180);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_ssize_t res = HPyBytes_Size(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 180, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 180, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1366,10 +1479,11 @@ HPy_ssize_t trace_ctx_Bytes_GET_SIZE(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 181);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_ssize_t res = HPyBytes_GET_SIZE(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 181, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 181, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1378,10 +1492,11 @@ char *trace_ctx_Bytes_AsString(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 182);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     char * res = HPyBytes_AsString(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 182, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 182, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1390,10 +1505,11 @@ char *trace_ctx_Bytes_AS_STRING(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 183);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     char * res = HPyBytes_AS_STRING(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 183, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 183, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1402,10 +1518,11 @@ HPy trace_ctx_Bytes_FromString(HPyContext *tctx, const char *v)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 184);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyBytes_FromString(uctx, v);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 184, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 184, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1414,10 +1531,11 @@ HPy trace_ctx_Bytes_FromStringAndSize(HPyContext *tctx, const char *v, HPy_ssize
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 185);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyBytes_FromStringAndSize(uctx, v, len);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 185, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 185, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1426,10 +1544,11 @@ HPy trace_ctx_Unicode_FromString(HPyContext *tctx, const char *utf8)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 186);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_FromString(uctx, utf8);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 186, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 186, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1438,10 +1557,11 @@ int trace_ctx_Unicode_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 187);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyUnicode_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 187, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 187, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1450,10 +1570,11 @@ HPy trace_ctx_Unicode_AsASCIIString(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 188);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_AsASCIIString(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 188, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 188, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1462,10 +1583,11 @@ HPy trace_ctx_Unicode_AsLatin1String(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 189);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_AsLatin1String(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 189, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 189, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1474,10 +1596,11 @@ HPy trace_ctx_Unicode_AsUTF8String(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 190);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_AsUTF8String(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 190, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 190, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1486,10 +1609,11 @@ const char *trace_ctx_Unicode_AsUTF8AndSize(HPyContext *tctx, HPy h, HPy_ssize_t
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 191);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     const char * res = HPyUnicode_AsUTF8AndSize(uctx, h, size);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 191, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 191, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1498,10 +1622,11 @@ HPy trace_ctx_Unicode_FromWideChar(HPyContext *tctx, const wchar_t *w, HPy_ssize
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 192);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_FromWideChar(uctx, w, size);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 192, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 192, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1510,10 +1635,11 @@ HPy trace_ctx_Unicode_DecodeFSDefault(HPyContext *tctx, const char *v)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 193);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_DecodeFSDefault(uctx, v);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 193, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 193, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1522,10 +1648,11 @@ HPy trace_ctx_Unicode_DecodeFSDefaultAndSize(HPyContext *tctx, const char *v, HP
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 194);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_DecodeFSDefaultAndSize(uctx, v, size);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 194, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 194, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1534,10 +1661,11 @@ HPy trace_ctx_Unicode_EncodeFSDefault(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 195);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_EncodeFSDefault(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 195, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 195, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1546,10 +1674,11 @@ HPy_UCS4 trace_ctx_Unicode_ReadChar(HPyContext *tctx, HPy h, HPy_ssize_t index)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 196);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_UCS4 res = HPyUnicode_ReadChar(uctx, h, index);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 196, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 196, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1558,10 +1687,11 @@ HPy trace_ctx_Unicode_DecodeASCII(HPyContext *tctx, const char *s, HPy_ssize_t s
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 197);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_DecodeASCII(uctx, s, size, errors);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 197, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 197, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1570,10 +1700,11 @@ HPy trace_ctx_Unicode_DecodeLatin1(HPyContext *tctx, const char *s, HPy_ssize_t 
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 198);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyUnicode_DecodeLatin1(uctx, s, size, errors);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 198, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 198, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1582,10 +1713,11 @@ int trace_ctx_List_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 199);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyList_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 199, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 199, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1594,10 +1726,11 @@ HPy trace_ctx_List_New(HPyContext *tctx, HPy_ssize_t len)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 200);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyList_New(uctx, len);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 200, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 200, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1606,10 +1739,11 @@ int trace_ctx_List_Append(HPyContext *tctx, HPy h_list, HPy h_item)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 201);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyList_Append(uctx, h_list, h_item);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 201, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 201, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1618,10 +1752,11 @@ int trace_ctx_Dict_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 202);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyDict_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 202, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 202, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1630,10 +1765,11 @@ HPy trace_ctx_Dict_New(HPyContext *tctx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 203);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyDict_New(uctx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 203, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 203, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1642,10 +1778,11 @@ int trace_ctx_Tuple_Check(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 204);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyTuple_Check(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 204, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 204, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1654,10 +1791,11 @@ HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, HPy items[], HPy_ssize_t n)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 205);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyTuple_FromArray(uctx, items, n);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 205, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 205, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1666,10 +1804,11 @@ HPy trace_ctx_Import_ImportModule(HPyContext *tctx, const char *name)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 206);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyImport_ImportModule(uctx, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 206, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 206, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1678,10 +1817,11 @@ HPy trace_ctx_Capsule_New(HPyContext *tctx, void *pointer, const char *name, HPy
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 245);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyCapsule_New(uctx, pointer, name, destructor);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 245, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 245, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1690,10 +1830,11 @@ void *trace_ctx_Capsule_Get(HPyContext *tctx, HPy capsule, _HPyCapsule_key key, 
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 246);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     void * res = HPyCapsule_Get(uctx, capsule, key, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 246, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 246, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1702,10 +1843,11 @@ int trace_ctx_Capsule_IsValid(HPyContext *tctx, HPy capsule, const char *name)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 247);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyCapsule_IsValid(uctx, capsule, name);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 247, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 247, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1714,10 +1856,11 @@ int trace_ctx_Capsule_Set(HPyContext *tctx, HPy capsule, _HPyCapsule_key key, vo
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 248);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyCapsule_Set(uctx, capsule, key, value);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 248, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 248, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1726,10 +1869,11 @@ HPy trace_ctx_FromPyObject(HPyContext *tctx, cpy_PyObject *obj)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 207);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPy_FromPyObject(uctx, obj);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 207, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 207, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1738,10 +1882,11 @@ cpy_PyObject *trace_ctx_AsPyObject(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 208);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     cpy_PyObject * res = HPy_AsPyObject(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 208, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 208, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1750,10 +1895,11 @@ HPyListBuilder trace_ctx_ListBuilder_New(HPyContext *tctx, HPy_ssize_t initial_s
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 210);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyListBuilder res = HPyListBuilder_New(uctx, initial_size);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 210, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 210, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1762,10 +1908,11 @@ void trace_ctx_ListBuilder_Set(HPyContext *tctx, HPyListBuilder builder, HPy_ssi
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 211);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyListBuilder_Set(uctx, builder, index, h_item);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 211, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 211, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_ListBuilder_Build(HPyContext *tctx, HPyListBuilder builder)
@@ -1773,10 +1920,11 @@ HPy trace_ctx_ListBuilder_Build(HPyContext *tctx, HPyListBuilder builder)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 212);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyListBuilder_Build(uctx, builder);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 212, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 212, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1785,10 +1933,11 @@ void trace_ctx_ListBuilder_Cancel(HPyContext *tctx, HPyListBuilder builder)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 213);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyListBuilder_Cancel(uctx, builder);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 213, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 213, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size)
@@ -1796,10 +1945,11 @@ HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t initial
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 214);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyTupleBuilder res = HPyTupleBuilder_New(uctx, initial_size);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 214, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 214, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1808,10 +1958,11 @@ void trace_ctx_TupleBuilder_Set(HPyContext *tctx, HPyTupleBuilder builder, HPy_s
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 215);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyTupleBuilder_Set(uctx, builder, index, h_item);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 215, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 215, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_TupleBuilder_Build(HPyContext *tctx, HPyTupleBuilder builder)
@@ -1819,10 +1970,11 @@ HPy trace_ctx_TupleBuilder_Build(HPyContext *tctx, HPyTupleBuilder builder)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 216);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyTupleBuilder_Build(uctx, builder);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 216, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 216, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1831,10 +1983,11 @@ void trace_ctx_TupleBuilder_Cancel(HPyContext *tctx, HPyTupleBuilder builder)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 217);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyTupleBuilder_Cancel(uctx, builder);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 217, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 217, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPyTracker trace_ctx_Tracker_New(HPyContext *tctx, HPy_ssize_t size)
@@ -1842,10 +1995,11 @@ HPyTracker trace_ctx_Tracker_New(HPyContext *tctx, HPy_ssize_t size)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 218);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyTracker res = HPyTracker_New(uctx, size);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 218, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 218, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1854,10 +2008,11 @@ int trace_ctx_Tracker_Add(HPyContext *tctx, HPyTracker ht, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 219);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     int res = HPyTracker_Add(uctx, ht, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 219, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 219, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1866,10 +2021,11 @@ void trace_ctx_Tracker_ForgetAll(HPyContext *tctx, HPyTracker ht)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 220);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyTracker_ForgetAll(uctx, ht);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 220, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 220, r0, r1, &_ts_start, &_ts_end);
 }
 
 void trace_ctx_Tracker_Close(HPyContext *tctx, HPyTracker ht)
@@ -1877,10 +2033,11 @@ void trace_ctx_Tracker_Close(HPyContext *tctx, HPyTracker ht)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 221);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyTracker_Close(uctx, ht);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 221, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 221, r0, r1, &_ts_start, &_ts_end);
 }
 
 void trace_ctx_Field_Store(HPyContext *tctx, HPy target_object, HPyField *target_field, HPy h)
@@ -1888,10 +2045,11 @@ void trace_ctx_Field_Store(HPyContext *tctx, HPy target_object, HPyField *target
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 222);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyField_Store(uctx, target_object, target_field, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 222, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 222, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_Field_Load(HPyContext *tctx, HPy source_object, HPyField source_field)
@@ -1899,10 +2057,11 @@ HPy trace_ctx_Field_Load(HPyContext *tctx, HPy source_object, HPyField source_fi
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 223);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyField_Load(uctx, source_object, source_field);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 223, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 223, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1911,10 +2070,11 @@ void trace_ctx_ReenterPythonExecution(HPyContext *tctx, HPyThreadState state)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 224);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy_ReenterPythonExecution(uctx, state);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 224, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 224, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPyThreadState trace_ctx_LeavePythonExecution(HPyContext *tctx)
@@ -1922,10 +2082,11 @@ HPyThreadState trace_ctx_LeavePythonExecution(HPyContext *tctx)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 225);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyThreadState res = HPy_LeavePythonExecution(uctx);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 225, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 225, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1934,10 +2095,11 @@ void trace_ctx_Global_Store(HPyContext *tctx, HPyGlobal *global, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 226);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPyGlobal_Store(uctx, global, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 226, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 226, r0, r1, &_ts_start, &_ts_end);
 }
 
 HPy trace_ctx_Global_Load(HPyContext *tctx, HPyGlobal global)
@@ -1945,10 +2107,11 @@ HPy trace_ctx_Global_Load(HPyContext *tctx, HPyGlobal global)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 227);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     HPy res = HPyGlobal_Load(uctx, global);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 227, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 227, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 
@@ -1957,9 +2120,10 @@ void trace_ctx_Dump(HPyContext *tctx, HPy h)
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 228);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
-    int cr = get_monotonic_clock(&_ts_start);
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
     _HPy_Dump(uctx, h);
-    cr += get_monotonic_clock(&_ts_end);
-    hpy_trace_on_exit(info, 228, cr, &_ts_start, &_ts_end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 228, r0, r1, &_ts_start, &_ts_end);
 }
 
