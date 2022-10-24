@@ -251,7 +251,7 @@ static int mapping_get_item(PyObject *mapping, const char *skey, PyObject **valu
  * MODULE_NAME := IDENTIFIER
  * MODE := 'debug' | 'trace' | 'universal'
  */
-static HPyMode get_hpy_mode_from_environ(const char *s_name, PyObject *environ)
+static HPyMode get_hpy_mode_from_environ(const char *s_name, PyObject *env)
 {
     PyObject *key = PyUnicode_FromString("HPY");
     PyObject *value;
@@ -261,12 +261,12 @@ static HPyMode get_hpy_mode_from_environ(const char *s_name, PyObject *environ)
     if (key == NULL)
         return MODE_INVALID;
 
-    if (mapping_get_item(environ, "HPY", &value)) {
+    if (mapping_get_item(env, "HPY", &value)) {
         return MODE_INVALID;
     }
 
     /* 'value == NULL' is not an error; this just means that the key was not
-       present in 'environ'. */
+       present in 'env'. */
     if (value == NULL) {
         return MODE_UNIVERSAL;
     }
@@ -316,14 +316,14 @@ static PyObject *
 load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = {"name", "ext_name", "package", "file", "loader", "spec",
-                                 "environ", NULL};
-    PyObject *name, *ext_name, *package, *file, *loader, *spec, *environ;
+                                 "env", NULL};
+    PyObject *name, *ext_name, *package, *file, *loader, *spec, *env;
     PyObject *log_obj, *m;
     HPyMode hmode;
     const char *s_name, *log_msg;
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OOOOOOO", kwlist,
                                      &name, &ext_name, &package, &file,
-                                     &loader, &spec, &environ)) {
+                                     &loader, &spec, &env)) {
         return NULL;
     }
 
@@ -332,11 +332,11 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
         return NULL;
     }
 
-    hmode = get_hpy_mode_from_environ(s_name, environ);
+    hmode = get_hpy_mode_from_environ(s_name, env);
     if (hmode == MODE_INVALID)
         return NULL;
 
-    if (mapping_get_item(environ, "HPY_LOG", &log_obj))
+    if (mapping_get_item(env, "HPY_LOG", &log_obj))
         return NULL;
 
     if (log_obj != NULL) {
