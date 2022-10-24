@@ -5,8 +5,11 @@
 # include "misc_win32.h"
 #else
 # include <dlfcn.h>
+// required for strncasecmp
+#include <strings.h>
 #endif
 #include <stdio.h>
+
 
 #include "api.h"
 #include "handles.h"
@@ -31,6 +34,7 @@ static const char *hpy_mode_names[] = {
 };
 
 typedef enum {
+    MODE_INVALID = -1,
     MODE_UNIVERSAL = 0,
     MODE_DEBUG = 1,
     MODE_TRACE = 2,
@@ -44,10 +48,22 @@ typedef HPy (*InitFuncPtr)(HPyContext *ctx);
 
 static const char *prefix = "HPyInit";
 
+static inline int
+_hpy_strncmp_ignore_case(const char *s0, const char *s1, size_t n)
+{
+#ifdef MS_WIN32
+    return _strnicmp(s0, s1, n);
+#else
+    return strncasecmp(s0, s1, n);
+#endif
+}
+
 static HPyContext * get_context(HPyMode mode)
 {
     switch (mode)
     {
+    case MODE_INVALID:
+        return NULL;
     case MODE_DEBUG:
         return hpy_debug_get_ctx(&g_universal_ctx);
     case MODE_TRACE:
@@ -185,15 +201,194 @@ static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
     return do_load(name_unicode, path, hmode);
 }
 
+static HPyMode get_mode_from_string(const char *s, Py_ssize_t n)
+{
+    if (_hpy_strncmp_ignore_case("debug", s, n) == 0)
+        return MODE_DEBUG;
+    if (_hpy_strncmp_ignore_case("trace", s, n) == 0)
+        return MODE_TRACE;
+    // if (_hpy_strncmp_ignore_case("debug+trace", s, n) == 0)
+    //     return MODE_DEBUG_TRACE;
+    // if (_hpy_strncmp_ignore_case("trace+debug", s, n) == 0)
+    //     return MODE_TRACE_DEBUG;
+    if (_hpy_strncmp_ignore_case("universal", s, n) == 0)
+        return MODE_UNIVERSAL;
+    return MODE_INVALID;
+}
+
+/*
+ * A little helper that does a fast-path if 'mapping' is a dict.
+ */
+static int mapping_get_item(PyObject *mapping, const char *skey, PyObject **value)
+{
+    PyObject *key = PyUnicode_FromString(skey);
+    if (key == NULL)
+        return 1;
+
+    // fast-path if 'mapping' is a dict
+    if (PyDict_Check(mapping)) {
+        *value = PyDict_GetItem(mapping, key);
+        Py_DECREF(key);
+        /* 'NULL' means, the key is not present in the dict, so just return
+           'NULL'. Since PyDict_GetItem does not set an error, we don't need to
+           clear any error. */
+    } else {
+        *value = PyObject_GetItem(mapping, key);
+        Py_DECREF(key);
+        if (*value == NULL) {
+            if (PyErr_ExceptionMatches(PyExc_KeyError)) {
+                PyErr_Clear();
+            } else {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+/*
+ * HPY_MODE := MODE | (MODULE_NAME ':' MODE { ',' MODULE_NAME ':' MODE })
+ * MODULE_NAME := IDENTIFIER
+ * MODE := 'debug' | 'trace' | 'universal'
+ */
+static HPyMode get_hpy_mode_from_environ(const char *s_name, PyObject *environ)
+{
+    PyObject *key = PyUnicode_FromString("HPY");
+    PyObject *value;
+    Py_ssize_t size;
+    HPyMode res;
+    const char *s_value;
+    if (key == NULL)
+        return MODE_INVALID;
+
+    if (mapping_get_item(environ, "HPY", &value)) {
+        return MODE_INVALID;
+    }
+
+    /* 'value == NULL' is not an error; this just means that the key was not
+       present in 'environ'. */
+    if (value == NULL) {
+        return MODE_UNIVERSAL;
+    }
+
+    s_value = PyUnicode_AsUTF8AndSize(value, &size);
+    if (s_value == NULL) {
+        Py_DECREF(value);
+        return MODE_INVALID;
+    }
+    res = MODE_INVALID;
+    char *colon = strchr(s_value, ':');
+    if (colon) {
+        // case 2: modes are specified per module
+        char *name_start = (char *)s_value;
+        char *comma;
+        size_t mode_len;
+        while (colon) {
+            comma = strchr(colon + 1, ',');
+            if (comma) {
+                mode_len = comma - colon - 1;
+            } else {
+                mode_len = (s_value + size) - colon - 1;
+            }
+            if (strncmp(s_name, name_start, colon - name_start) == 0) {
+                res = get_mode_from_string(colon + 1, mode_len);
+                break;
+            }
+            if (comma) {
+                name_start = comma + 1;
+                colon = strchr(name_start, ':');
+            } else {
+                colon = NULL;
+            }
+        }
+    } else {
+        // case 1: mode was globally specified
+        res = get_mode_from_string(s_value, size);
+    }
+
+    if (res == MODE_INVALID)
+        PyErr_Format(PyExc_ValueError, "invalid HPy mode: %.50s", s_value);
+    Py_DECREF(value);
+    return res;
+}
+
+static PyObject *
+load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = {"name", "ext_name", "package", "file", "loader", "spec",
+                                 "environ", NULL};
+    PyObject *name, *ext_name, *package, *file, *loader, *spec, *environ;
+    PyObject *log_obj, *m;
+    HPyMode hmode;
+    const char *s_name, *log_msg;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OOOOOOO", kwlist,
+                                     &name, &ext_name, &package, &file,
+                                     &loader, &spec, &environ)) {
+        return NULL;
+    }
+
+    s_name = PyUnicode_AsUTF8AndSize(name, NULL);
+    if (s_name == NULL) {
+        return NULL;
+    }
+
+    hmode = get_hpy_mode_from_environ(s_name, environ);
+    if (hmode == MODE_INVALID)
+        return NULL;
+
+    if (mapping_get_item(environ, "HPY_LOG", &log_obj))
+        return NULL;
+
+    if (log_obj != NULL) {
+        Py_DECREF(log_obj);
+        switch (hmode) {
+        case MODE_INVALID:
+            // that's not possible but required for the compiler
+            return NULL;
+        case MODE_DEBUG:
+            log_msg = " with a debug context";
+            break;
+        case MODE_TRACE:
+            log_msg = " with a trace context";
+            break;
+        case MODE_UNIVERSAL:
+            log_msg = "";
+            break;
+        }
+        PySys_FormatStdout("Loading '%.200s' in HPy universal mode%.200s\n", s_name, log_msg);
+    }
+
+    m = do_load(ext_name, file, hmode);
+    if (m == NULL)
+        return NULL;
+
+    PyObject_SetAttrString(m, "__file__", file);
+    PyObject_SetAttrString(m, "__loader__", loader);
+    PyObject_SetAttrString(m, "__name__", name);
+    PyObject_SetAttrString(m, "__package__", package);
+    PyObject_SetAttrString(spec, "origin", file);
+    PyObject_SetAttrString(m, "__spec__", spec);
+
+    // register module to 'sys.modules'
+    _PyImport_SetModule(name, m);
+
+    return m;
+}
+
 static PyObject *get_version(PyObject *self, PyObject *ignored)
 {
     return Py_BuildValue("ss", HPY_VERSION, HPY_GIT_REVISION);
 }
 
+PyDoc_STRVAR(load_bootstrap_doc, "Internal function intended to be used by "
+        "the stub loader. This function will honor env var 'HPY' and correctly"
+        " set the attributes of the module.");
 
 static PyMethodDef HPyMethods[] = {
     {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS,
      ("Load a ." HPY_ABI_TAG ".so file")},
+    {"_load_bootstrap", (PyCFunction)load_bootstrap,
+     METH_VARARGS | METH_KEYWORDS, load_bootstrap_doc},
     {"get_version", (PyCFunction)get_version, METH_NOARGS,
      "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}

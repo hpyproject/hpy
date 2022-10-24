@@ -159,35 +159,12 @@ _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE = """
 
 def __bootstrap__():
 
-    from sys import modules
     from os import environ
     from pkg_resources import resource_filename
-    import hpy.universal
-    from hpy.universal import load
-    env_debug = environ.get('HPY_DEBUG')
-    is_debug = env_debug is not None and (env_debug == "1" or __name__ in env_debug.split(","))
-    env_mode = environ.get('HPY_MODE')
-    str_mode = "UNIVERSAL" if env_mode is None else str(env_mode)
+    from hpy.universal import _load_bootstrap
     ext_filepath = resource_filename(__name__, {ext_file!r})
-    if 'HPY_LOG' in environ:
-        if is_debug:
-            print("Loading {module_name!r} in HPy universal mode with a debug context")
-        else:
-            print("Loading {module_name!r} in HPy universal mode")
-    if str_mode:
-        d_mode = getattr(hpy.universal, "MODE_" + str_mode, -1)
-        if d_mode == -1:
-            raise ValueError("Invalid HPy mode: %s" % str_mode)
-        m = load({module_name!r}, ext_filepath, mode=d_mode)
-    else:
-        m = load({module_name!r}, ext_filepath, debug=is_debug)
-    m.__file__ = ext_filepath
-    m.__loader__ = __loader__
-    m.__name__ = __name__
-    m.__package__ = __package__
-    m.__spec__ = __spec__
-    m.__spec__.origin = ext_filepath
-    modules[__name__] = m
+    _load_bootstrap({module_name!r}, __name__, __package__, ext_filepath,
+                        __loader__, __spec__, environ)
 
 __bootstrap__()
 """
