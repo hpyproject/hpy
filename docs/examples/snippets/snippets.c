@@ -50,12 +50,25 @@ static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
 }
 // END: test_leak_stacktrace
 
+// BEGIN: add
+HPyDef_METH(add, "add", add_impl, HPyFunc_VARARGS)
+static HPy add_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+{
+    if (nargs != 2) {
+        HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly two args");
+        return HPy_NULL;
+    }
+    return HPy_Add(ctx, args[0], args[1]);
+}
+// END: add
+
 // ------------------------------------
 // Dummy module definition, so that we can test the snippets
 
 static HPyDef *Methods[] = {
         &test_foo_and_is_same_object,
         &test_leak_stacktrace,
+        &add,
         NULL,
 };
 

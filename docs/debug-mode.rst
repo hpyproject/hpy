@@ -33,10 +33,10 @@ Activating Debug Mode
 
 Debug mode works *only* for extensions built with HPy universal ABI.
 
-To enable debug mode, use environment variable ``HPY_DEBUG``. If
-``HPY_DEBUG=1``, then all HPy modules are loaded with the debug context.
-Alternatively ``HPY_DEBUG`` can be set to a comma separated list of names
-of the modules that should be loaded in debug mode.
+To enable debug mode, use environment variable ``HPY``. If ``HPY=debug``, then
+all HPy modules are loaded with the trace context. Alternatively, it is also
+possible to specify the mode per module like this:
+``HPY=modA:debug,modB=debug``.
 
 In order to verify that your extension is being loaded in debug mode, use
 environment variable ``HPY_LOG``. If this variable is set, then all HPy
@@ -52,12 +52,15 @@ extensions built in universal ABI mode print a message when loaded, such as:
 If the extension is built in CPython ABI mode, then the ``HPY_LOG`` environment
 variable has no effect.
 
-An HPy extension module may be also explicitly loaded in debug mode using::
+An HPy extension module may be also explicitly loaded in debug mode using:
 
-  mod = hpy.universal.load(module_name, so_filename, debug=True)
+.. code-block:: python
+
+   from hpy.universal import load, MODE_DEBUG
+   mod = load(module_name, so_filename, mode=MODE_DEBUG)
 
 When loading HPy extensions explicitly, environment variables ``HPY_LOG``
-and ``HPY_DEBUG`` have no effect for that extension.
+and ``HPY`` have no effect for that extension.
 
 
 Using Debug Mode
