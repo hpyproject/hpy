@@ -22,7 +22,7 @@ def _assert_unchanged_except(expected, actual, *ignore):
 def test_get_call_counts(compiler):
     import pytest
     mod = compiler.make_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
         {
             if (nargs != 2) {
@@ -51,7 +51,7 @@ def test_get_call_counts(compiler):
 def test_get_durations(compiler):
     import time
     mod = compiler.make_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+        HPyDef_METH(f, "f", HPyFunc_O)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
         {
             if (!HPyCallable_Check(ctx, arg)) {
@@ -80,7 +80,7 @@ def test_get_durations(compiler):
 def test_trace_funcs(compiler):
     import pytest
     mod = compiler.make_module("""
-        HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
         static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
         {
             if (nargs != 2) {

@@ -55,7 +55,7 @@ static inline HPy posix_time_to_ns(HPyContext *uctx, HPy *s_to_ns, _HPyTime_t t)
 }
 #endif
 
-HPyDef_METH(get_durations, "get_durations", get_durations_impl, HPyFunc_NOARGS)
+HPyDef_METH(get_durations, "get_durations", HPyFunc_NOARGS)
 static HPy get_durations_impl(HPyContext *uctx, HPy self)
 {
     HPyContext *tctx = hpy_trace_get_ctx(uctx);
@@ -97,7 +97,7 @@ fail:
     return HPy_NULL;
 }
 
-HPyDef_METH(get_call_counts, "get_call_counts", get_call_counts_impl, HPyFunc_NOARGS)
+HPyDef_METH(get_call_counts, "get_call_counts", HPyFunc_NOARGS)
 static HPy get_call_counts_impl(HPyContext *uctx, HPy self)
 {
     HPyContext *tctx = hpy_trace_get_ctx(uctx);
@@ -146,10 +146,9 @@ static int check_and_set_func(HPyContext *uctx, HPy arg, HPy *out)
     return 0;
 }
 
-HPyDef_METH(set_trace_functions, "set_trace_functions", set_trace_funcs_impl,
-            HPyFunc_KEYWORDS, .doc=
-            "Set the functions to call if an HPy API is entered/exited.")
-static HPy set_trace_funcs_impl(HPyContext *uctx, HPy self, HPy *args,
+HPyDef_METH(set_trace_functions, "set_trace_functions", HPyFunc_KEYWORDS,
+        .doc="Set the functions to call if an HPy API is entered/exited.")
+static HPy set_trace_functions_impl(HPyContext *uctx, HPy self, HPy *args,
         HPy_ssize_t nargs, HPy kw)
 {
     HPy h_on_enter = HPy_NULL;
@@ -173,7 +172,7 @@ static HPy set_trace_funcs_impl(HPyContext *uctx, HPy self, HPy *args,
     return HPy_Dup(uctx, uctx->h_None);
 }
 
-HPyDef_METH(get_frequency, "get_frequency", get_frequency_impl, HPyFunc_NOARGS,
+HPyDef_METH(get_frequency, "get_frequency", HPyFunc_NOARGS,
         .doc="Resolution of the used clock in Hertz.")
 static HPy get_frequency_impl(HPyContext *uctx, HPy self)
 {

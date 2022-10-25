@@ -51,7 +51,7 @@ static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
 // END: test_leak_stacktrace
 
 // BEGIN: add
-HPyDef_METH(add, "add", add_impl, HPyFunc_VARARGS)
+HPyDef_METH(add, "add", HPyFunc_VARARGS)
 static HPy add_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     if (nargs != 2) {
