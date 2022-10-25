@@ -1,8 +1,23 @@
 #ifndef HPY_UNIVERSAL_HPYMODULE_H
 #define HPY_UNIVERSAL_HPYMODULE_H
 
+/* If 'HPY_EMBEDDED_MODULES' is defined, this means that there will be several
+   embedded HPy modules (and so, several 'HPy_MODINIT' usages) in the same
+   binary. In this case, some restrictions apply: (1) all of the module's
+   methods/member/slots/... must be defined in the same file, and (2) the
+   embedder *MUST* declare the module to be "embeddable" by using macro
+   'HPY_MOD_EMBEDDABLE(modname)'. */
+#ifdef HPY_EMBEDDED_MODULES
+#define _HPy_CTX_MODIFIER static
+#define HPY_MOD_EMBEDDABLE(modname) \
+    _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;
+#else
+#define _HPy_CTX_MODIFIER _HPy_HIDDEN
+#define HPY_MOD_EMBEDDABLE(modname)
 // this is defined by HPy_MODINIT
 extern HPyContext *_ctx_for_trampolines;
+#endif
+
 
 typedef struct {
     const char* name;
@@ -37,10 +52,10 @@ typedef struct {
 
 // module initialization in the universal and hybrid case
 #define HPy_MODINIT(modname)                                   \
-    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;              \
+    _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;        \
     static HPy init_##modname##_impl(HPyContext *ctx);         \
-    HPyMODINIT_FUNC                                         \
-    HPyInit_##modname(HPyContext *ctx)                     \
+    HPyMODINIT_FUNC                                            \
+    HPyInit_##modname(HPyContext *ctx)                         \
     {                                                          \
         _ctx_for_trampolines = ctx;                            \
         return init_##modname##_impl(ctx);                     \

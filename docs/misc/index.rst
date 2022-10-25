@@ -5,3 +5,4 @@ Misc notes
    :maxdepth: 2
 
    str-builder-api
+   embedding

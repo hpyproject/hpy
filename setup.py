@@ -137,6 +137,7 @@ EXT_MODULES = [
                   # the legacy features
                   '-DHPY_ABI_HYBRID',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
+                  '-DHPY_EMBEDDED_MODULES',
               ] + EXTRA_COMPILE_ARGS
               )
     ]

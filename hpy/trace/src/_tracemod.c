@@ -12,6 +12,8 @@
 #define MAX_SEC (LLONG_MAX / FREQ_NSEC)
 #endif
 
+HPY_MOD_EMBEDDABLE(_trace)
+
 static inline int is_empty(const char *s)
 {
     return s[0] == '\0';
