@@ -158,7 +158,7 @@ setup(
     description='A better C API for Python',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    packages = ['hpy.devel', 'hpy.debug'],
+    packages = ['hpy.devel', 'hpy.debug', 'hpy.trace'],
     include_package_data=True,
     extras_require={
         "dev": DEV_REQUIREMENTS,
