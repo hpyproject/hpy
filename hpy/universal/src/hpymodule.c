@@ -342,9 +342,6 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
     if (log_obj != NULL) {
         Py_DECREF(log_obj);
         switch (hmode) {
-        case MODE_INVALID:
-            // that's not possible but required for the compiler
-            return NULL;
         case MODE_DEBUG:
             log_msg = " with a debug context";
             break;
@@ -354,6 +351,9 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
         case MODE_UNIVERSAL:
             log_msg = "";
             break;
+        default:
+            // that's not possible but required for the compiler
+            return NULL;
         }
         PySys_FormatStdout("Loading '%.200s' in HPy universal mode%.200s\n", s_name, log_msg);
     }
