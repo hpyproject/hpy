@@ -317,22 +317,22 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = {"name", "ext_name", "package", "file", "loader", "spec",
                                  "env", NULL};
-    PyObject *name, *ext_name, *package, *file, *loader, *spec, *env;
+    PyObject *module_name, *name, *package, *file, *loader, *spec, *env;
     PyObject *log_obj, *m;
     HPyMode hmode;
-    const char *s_name, *log_msg;
+    const char *s_module_name, *log_msg;
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OOOOOOO", kwlist,
-                                     &name, &ext_name, &package, &file,
+                                     &module_name, &name, &package, &file,
                                      &loader, &spec, &env)) {
         return NULL;
     }
 
-    s_name = PyUnicode_AsUTF8AndSize(name, NULL);
-    if (s_name == NULL) {
+    s_module_name = PyUnicode_AsUTF8AndSize(module_name, NULL);
+    if (s_module_name == NULL) {
         return NULL;
     }
 
-    hmode = get_hpy_mode_from_environ(s_name, env);
+    hmode = get_hpy_mode_from_environ(s_module_name, env);
     if (hmode == MODE_INVALID)
         return NULL;
 
@@ -355,10 +355,11 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
             // that's not possible but required for the compiler
             return NULL;
         }
-        PySys_FormatStdout("Loading '%.200s' in HPy universal mode%.200s\n", s_name, log_msg);
+        PySys_FormatStdout("Loading '%.200s' in HPy universal mode%.200s\n",
+                s_module_name, log_msg);
     }
 
-    m = do_load(ext_name, file, hmode);
+    m = do_load(module_name, file, hmode);
     if (m == NULL)
         return NULL;
 
