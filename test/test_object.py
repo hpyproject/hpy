@@ -296,6 +296,165 @@ class TestObject(HPyTest):
         mod.f(b)
         assert b.foo is True
 
+    def test_delattr(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(del_foo, "del_foo", HPyFunc_O)
+            static HPy del_foo_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy name;
+                int result;
+                name = HPyUnicode_FromString(ctx, "foo");
+                if (HPy_IsNull(name))
+                    return HPy_NULL;
+                result = HPy_DelAttr(ctx, arg, name);
+                HPy_Close(ctx, name);
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(del_foo)
+            @INIT
+        """)
+
+        class Attrs:
+            pass
+
+        class ClassAttr:
+            pass
+
+        class WritablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+        class DeletablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+            @foo.deleter
+            def foo(self):
+                del self._foo
+
+        def set_foo(obj):
+            obj.foo = True
+
+        a = Attrs()
+        set_foo(a)
+        assert a.foo is True
+        mod.del_foo(a)
+        with pytest.raises(AttributeError):
+            a.foo
+
+        set_foo(ClassAttr)
+        assert ClassAttr.foo is True
+        assert ClassAttr().foo is True
+        mod.del_foo(ClassAttr)
+        with pytest.raises(AttributeError):
+            ClassAttr.foo
+        with pytest.raises(AttributeError):
+            ClassAttr().foo
+
+        b = WritablePropAttr()
+        set_foo(b)
+        assert b.foo is True
+        with pytest.raises(AttributeError):
+            # does not provide a delete function, so it fails
+            mod.del_foo(b)
+
+        c = DeletablePropAttr()
+        set_foo(c)
+        assert c.foo is True
+        mod.del_foo(c)
+        with pytest.raises(AttributeError):
+            c.foo
+
+    def test_delattr_s(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(del_foo, "del_foo", HPyFunc_O)
+            static HPy del_foo_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_DelAttr_s(ctx, arg, "foo");
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+            @EXPORT(del_foo)
+            @INIT
+        """)
+
+        class Attrs:
+            pass
+
+        class ClassAttr:
+            pass
+
+        class WritablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+        class DeletablePropAttr:
+            @property
+            def foo(self):
+                return self._foo
+
+            @foo.setter
+            def foo(self, value):
+                self._foo = value
+
+            @foo.deleter
+            def foo(self):
+                del self._foo
+
+        def set_foo(obj):
+            obj.foo = True
+
+        a = Attrs()
+        set_foo(a)
+        assert a.foo is True
+        mod.del_foo(a)
+        with pytest.raises(AttributeError):
+            a.foo
+
+        set_foo(ClassAttr)
+        assert ClassAttr.foo is True
+        assert ClassAttr().foo is True
+        mod.del_foo(ClassAttr)
+        with pytest.raises(AttributeError):
+            ClassAttr.foo
+        with pytest.raises(AttributeError):
+            ClassAttr().foo
+
+        b = WritablePropAttr()
+        set_foo(b)
+        assert b.foo is True
+        with pytest.raises(AttributeError):
+            # does not provide a delete function, so it fails
+            mod.del_foo(b)
+
+        c = DeletablePropAttr()
+        set_foo(c)
+        assert c.foo is True
+        mod.del_foo(c)
+        with pytest.raises(AttributeError):
+            c.foo
+
     def test_getitem(self):
         import pytest
         mod = self.make_module("""
@@ -443,6 +602,78 @@ class TestObject(HPyTest):
 
         with pytest.raises(TypeError):
             mod.f([])
+
+    def test_delitem(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(delitem3, "delitem3", HPyFunc_O)
+            static HPy delitem3_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy key;
+                int result;
+                key = HPyLong_FromLong(ctx, 3);
+                if (HPy_IsNull(key))
+                    return HPy_NULL;
+                result = HPy_DelItem(ctx, arg, key);
+                HPy_Close(ctx, key);
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, arg);
+            }
+            
+            HPyDef_METH(delitem_i3, "delitem_i3", HPyFunc_O)
+            static HPy delitem_i3_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_DelItem_i(ctx, arg, 3);
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, arg);
+            }
+            
+            HPyDef_METH(delitem_s3, "delitem_s3", HPyFunc_O)
+            static HPy delitem_s3_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                int result;
+                result = HPy_DelItem_s(ctx, arg, "3");
+                if (result < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, arg);
+            }
+            
+            @EXPORT(delitem3)
+            @EXPORT(delitem_i3)
+            @EXPORT(delitem_s3)
+            @INIT
+        """)
+        # HPy_DelItem
+        assert mod.delitem3({3: False, 4: True}) == {4: True}
+        with pytest.raises(KeyError):
+            mod.delitem3({})
+        with pytest.raises(TypeError):
+            mod.delitem3((1, 2, 3, 4))
+        assert mod.delitem3([0, 1, 2, False]) == [0, 1, 2]
+        with pytest.raises(IndexError):
+            mod.delitem3([])
+
+        # HPy_DelItem_i
+        assert mod.delitem_i3({3: False, 4: True}) == {4: True}
+        with pytest.raises(KeyError):
+            mod.delitem_i3({})
+        with pytest.raises(TypeError):
+            mod.delitem_i3((1, 2, 3, 4))
+        assert mod.delitem_i3([0, 1, 2, False]) == [0, 1, 2]
+        with pytest.raises(IndexError):
+            mod.delitem_i3([])
+
+        # HPy_DelItem_s
+        assert mod.delitem_s3({'3': False, '4': True}) == {'4': True}
+        with pytest.raises(KeyError):
+            mod.delitem_s3({})
+        with pytest.raises(TypeError):
+            mod.delitem_s3((1, 2, 3, 4))
+        with pytest.raises(TypeError):
+            mod.delitem_s3([1, 2, 3, 4])
 
     def test_length(self):
         mod = self.make_module("""

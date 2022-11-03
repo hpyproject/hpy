@@ -442,6 +442,21 @@ int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *key, DHPy value)
     return HPy_SetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key, DHPy_unwrap(dctx, value));
 }
 
+int debug_ctx_DelItem(HPyContext *dctx, DHPy obj, DHPy key)
+{
+    return HPy_DelItem(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, key));
+}
+
+int debug_ctx_DelItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx)
+{
+    return HPy_DelItem_i(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), idx);
+}
+
+int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *key)
+{
+    return HPy_DelItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key);
+}
+
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj)
 {
     return DHPy_open(dctx, HPy_Type(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj)));

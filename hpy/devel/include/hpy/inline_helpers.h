@@ -35,4 +35,12 @@ HPyAPI_FUNC HPy HPyTuple_Pack(HPyContext *ctx, HPy_ssize_t n, ...) {
     return HPyTuple_FromArray(ctx, array, n);
 }
 
+HPyAPI_FUNC int HPy_DelAttr(HPyContext *ctx, HPy obj, HPy name) {
+    return HPy_SetAttr(ctx, obj, name, HPy_NULL);
+}
+
+HPyAPI_FUNC int HPy_DelAttr_s(HPyContext *ctx, HPy obj, const char *name) {
+    return HPy_SetAttr_s(ctx, obj, name, HPy_NULL);
+}
+
 #endif //HPY_INLINE_HELPERS_H
