@@ -159,12 +159,14 @@ _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE = """
 
 def __bootstrap__():
 
+    from sys import modules
     from os import environ
     from pkg_resources import resource_filename
     from hpy.universal import _load_bootstrap
     ext_filepath = resource_filename(__name__, {ext_file!r})
-    _load_bootstrap({module_name!r}, __name__, __package__, ext_filepath,
+    m = _load_bootstrap({module_name!r}, __name__, __package__, ext_filepath,
                         __loader__, __spec__, environ)
+    modules[__name__] = m
 
 __bootstrap__()
 """

@@ -370,9 +370,6 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
     PyObject_SetAttrString(spec, "origin", file);
     PyObject_SetAttrString(m, "__spec__", spec);
 
-    // register module to 'sys.modules'
-    _PyImport_SetModule(name, m);
-
     return m;
 }
 
