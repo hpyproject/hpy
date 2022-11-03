@@ -343,7 +343,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Install Cppcheck
         run: sudo apt-get -qq -y install cppcheck
@@ -363,7 +363,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Install/Upgrade Python dependencies
         run: python -m pip install --upgrade pip wheel
