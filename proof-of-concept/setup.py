@@ -14,6 +14,8 @@ else:
 
 setup(
     name="hpy-pof",
+    packages = ['pofpackage'],
+    zip_safe=False,
     hpy_ext_modules=[
         Extension('pof', 
                     sources=['pof.c'],
