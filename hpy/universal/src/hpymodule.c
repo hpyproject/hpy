@@ -253,13 +253,10 @@ static int mapping_get_item(PyObject *mapping, const char *skey, PyObject **valu
  */
 static HPyMode get_hpy_mode_from_environ(const char *s_name, PyObject *env)
 {
-    PyObject *key = PyUnicode_FromString("HPY");
     PyObject *value;
     Py_ssize_t size;
     HPyMode res;
     const char *s_value;
-    if (key == NULL)
-        return MODE_INVALID;
 
     if (mapping_get_item(env, "HPY", &value)) {
         return MODE_INVALID;
