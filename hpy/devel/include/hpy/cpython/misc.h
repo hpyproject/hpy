@@ -129,6 +129,11 @@ struct _HPyContext_s {
     HPy h_UnicodeType;
     HPy h_TupleType;
     HPy h_ListType;
+    HPy h_ComplexType;
+    HPy h_BytesType;
+    HPy h_MemoryViewType;
+    HPy h_CapsuleType;
+    HPy h_SliceType;
 };
 
 /* XXX! should be defined only once, not once for every .c! */
