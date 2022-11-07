@@ -102,6 +102,9 @@ HPy_ID(241) HPy h_MemoryViewType;  /* built-in 'memoryview' */
 HPy_ID(242) HPy h_CapsuleType;     /* built-in 'capsule' */
 HPy_ID(243) HPy h_SliceType;       /* built-in 'slice' */
 
+/* Reflection */
+HPy_ID(244) HPy h_Builtins;        /* dict of builtins */
+
 #endif
 
 HPy_ID(77)

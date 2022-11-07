@@ -208,6 +208,7 @@ class TestBasic(HPyTest):
                     case 19: h = ctx->h_BytesType; break;
                     case 20: h = ctx->h_MemoryViewType; break;
                     case 21: h = ctx->h_SliceType; break;
+                    case 22: h = ctx->h_Builtins; break;
                     case 2048: h = ctx->h_CapsuleType; break;
                     default:
                         HPyErr_SetString(ctx, ctx->h_ValueError, "invalid choice");
@@ -218,11 +219,13 @@ class TestBasic(HPyTest):
             @EXPORT(f)
             @INIT
         """)
+        import builtins
 
         builtin_objs = (
             '<NULL>', None, False, True, ValueError, TypeError, IndexError,
             SystemError, object, type, bool, int, float, str, tuple, list,
-            NotImplemented, Ellipsis, complex, bytes, memoryview, slice
+            NotImplemented, Ellipsis, complex, bytes, memoryview, slice,
+            builtins.__dict__
         )
         for i, obj in enumerate(builtin_objs):
             if i == 0:

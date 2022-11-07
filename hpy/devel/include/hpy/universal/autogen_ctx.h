@@ -258,4 +258,5 @@ struct _HPyContext_s {
     HPy h_MemoryViewType;
     HPy h_CapsuleType;
     HPy h_SliceType;
+    HPy h_Builtins;
 };
