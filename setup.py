@@ -1,8 +1,8 @@
-import textwrap
 import sys
-import os
 import os.path
 from setuptools import setup, Extension
+from setuptools.command.build_clib import build_clib
+import sysconfig
 import platform
 
 # this package is supposed to be installed ONLY on CPython. Try to bail out
@@ -60,6 +60,7 @@ if platform.system() == "Windows":
 else:
     EXTRA_COMPILE_ARGS += ['-Werror']
 
+
 def get_scm_config():
     """
     We use this function as a hook to generate version.h before building.
@@ -93,15 +94,68 @@ def get_scm_config():
 
     return {}  # use the default config
 
+HPY_HELPER_SOURCES = [
+    'hpy/devel/src/runtime/argparse.c',
+    'hpy/devel/src/runtime/buildvalue.c',
+    'hpy/devel/src/runtime/helpers.c',
+]
+
+HPY_INCLUDE_DIRS = [
+    'hpy/devel/include',
+    'hpy/universal/src',
+    'hpy/debug/src/include',
+    'hpy/trace/src/include',
+]
+
+HPY_HELPERS_LIB_NAME = "hpyhelpers"
+HPY_CTX_LIB_NAME = "hpyctx"
+LIB_OUTPUT_DIR = os.path.join("build", "lib")
+helpers_lib_filename = None
+
+
+def get_hpy_runtime_includes():
+    default_include = sysconfig.get_path("include")
+    plat_include = sysconfig.get_path("platinclude")
+    if default_include != plat_include:
+        return [default_include, plat_include] + HPY_INCLUDE_DIRS
+    return [default_include] + HPY_INCLUDE_DIRS
+
+
+class build_hpyhelpers(build_clib):
+
+    def build_libraries(self, libraries):
+        # call super's build_libraries to build everything
+        super().build_libraries(libraries)
+
+        build = self.get_finalized_command('build')
+        # dest = os.path.join(build.build_lib, "hpy", "devel")
+        # self.copy_tree(self.build_clib, dest)
+
+        for (lib_name, build_info) in libraries:
+            # this is also what 'create_static_lib' uses
+            output_path = self.compiler.library_filename(lib_name, output_dir=self.build_clib)
+            output_filename = os.path.basename(output_path)
+            package = build_info.get('package')
+            if package:
+                dest_dir = os.path.join(build.build_lib, *package.split('.'))
+                self.mkpath(dest_dir)
+            else:
+                dest_dir = build.build_lib
+            self.copy_file(output_path, os.path.join(dest_dir, output_filename))
+
+
+STATIC_LIBS = [(HPY_HELPERS_LIB_NAME,
+                {'sources': HPY_HELPER_SOURCES,
+                 'include_dirs': get_hpy_runtime_includes(),
+                 'package': 'hpy.devel.lib.universal',
+                 'macros': [('HPY_UNIVERSAL_ABI', None)]})]
+
 EXT_MODULES = [
     Extension('hpy.universal',
               ['hpy/universal/src/hpymodule.c',
                'hpy/universal/src/ctx.c',
                'hpy/universal/src/ctx_meth.c',
                'hpy/universal/src/ctx_misc.c',
-               'hpy/devel/src/runtime/argparse.c',
-               'hpy/devel/src/runtime/buildvalue.c',
-               'hpy/devel/src/runtime/helpers.c',
                'hpy/devel/src/runtime/ctx_bytes.c',
                'hpy/devel/src/runtime/ctx_call.c',
                'hpy/devel/src/runtime/ctx_capsule.c',
@@ -126,12 +180,7 @@ EXT_MODULES = [
                'hpy/trace/src/autogen_trace_wrappers.c',
                'hpy/trace/src/autogen_trace_func_table.c',
               ],
-              include_dirs=[
-                  'hpy/devel/include',
-                  'hpy/universal/src',
-                  'hpy/debug/src/include',
-                  'hpy/trace/src/include',
-              ],
+              include_dirs=HPY_INCLUDE_DIRS,
               extra_compile_args=[
                   # so we need to enable the HYBRID ABI in order to implement
                   # the legacy features
@@ -141,7 +190,6 @@ EXT_MODULES = [
               ] + EXTRA_COMPILE_ARGS
               )
     ]
-
 
 DEV_REQUIREMENTS = [
     "pytest",
@@ -158,17 +206,19 @@ setup(
     description='A better C API for Python',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    packages = ['hpy.devel', 'hpy.debug', 'hpy.trace'],
+    packages=['hpy.devel', 'hpy.debug', 'hpy.trace'],
     include_package_data=True,
     extras_require={
         "dev": DEV_REQUIREMENTS,
     },
+    libraries=STATIC_LIBS,
     ext_modules=EXT_MODULES,
     entry_points={
         "distutils.setup_keywords": [
             "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
         ],
     },
+    cmdclass={"build_clib": build_hpyhelpers},
     use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
     install_requires=['setuptools>=64.0'],
