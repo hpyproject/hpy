@@ -9,7 +9,9 @@ if version.parse(pycparser.__version__) < version.parse('2.21'):
     raise ImportError('You need pycparser>=2.21 to run autogen')
 
 from .parse import HPyAPI, AUTOGEN_H
-from .ctx import autogen_ctx_h, autogen_ctx_def_h
+from .ctx import (autogen_ctx_h,
+                  autogen_ctx_def_h,
+                  cpython_autogen_ctx_h)
 from .trampolines import (autogen_trampolines_h,
                           cpython_autogen_api_impl_h,
                           universal_autogen_ctx_impl_h)
@@ -35,6 +37,7 @@ def main():
 
     for cls in (autogen_ctx_h,
                 autogen_ctx_def_h,
+                cpython_autogen_ctx_h,
                 autogen_trampolines_h,
                 cpython_autogen_api_impl_h,
                 universal_autogen_ctx_impl_h,

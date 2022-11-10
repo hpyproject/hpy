@@ -253,4 +253,10 @@ struct _HPyContext_s {
     int (*ctx_DelItem)(HPyContext *ctx, HPy obj, HPy key);
     int (*ctx_DelItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
     int (*ctx_DelItem_s)(HPyContext *ctx, HPy obj, const char *key);
+    HPy h_ComplexType;
+    HPy h_BytesType;
+    HPy h_MemoryViewType;
+    HPy h_CapsuleType;
+    HPy h_SliceType;
+    HPy h_Builtins;
 };

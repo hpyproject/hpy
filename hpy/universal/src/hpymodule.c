@@ -280,6 +280,13 @@ static void init_universal_ctx(HPyContext *ctx)
     ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
     ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
     ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
+    ctx->h_ComplexType = _py2h((PyObject *)&PyComplex_Type);
+    ctx->h_BytesType = _py2h((PyObject *)&PyBytes_Type);
+    ctx->h_MemoryViewType = _py2h((PyObject *)&PyMemoryView_Type);
+    ctx->h_CapsuleType = _py2h((PyObject *)&PyCapsule_Type);
+    ctx->h_SliceType = _py2h((PyObject *)&PySlice_Type);
+    /* Reflection */
+    ctx->h_Builtins = _py2h(PyEval_GetBuiltins());
 }
 
 

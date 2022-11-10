@@ -166,6 +166,7 @@ typedef struct _HPyContext_s HPyContext;
 #   include "hpy/universal/misc_trampolines.h"
 #else
 //  CPython-ABI
+#   include "hpy/cpython/autogen_ctx.h"
 #   include "hpy/runtime/ctx_funcs.h"
 #   include "hpy/runtime/ctx_type.h"
 #   include "hpy/cpython/misc.h"

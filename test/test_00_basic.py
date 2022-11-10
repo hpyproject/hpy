@@ -204,6 +204,12 @@ class TestBasic(HPyTest):
                     case 15: h = ctx->h_ListType; break;
                     case 16: h = ctx->h_NotImplemented; break;
                     case 17: h = ctx->h_Ellipsis; break;
+                    case 18: h = ctx->h_ComplexType; break;
+                    case 19: h = ctx->h_BytesType; break;
+                    case 20: h = ctx->h_MemoryViewType; break;
+                    case 21: h = ctx->h_SliceType; break;
+                    case 22: h = ctx->h_Builtins; break;
+                    case 2048: h = ctx->h_CapsuleType; break;
                     default:
                         HPyErr_SetString(ctx, ctx->h_ValueError, "invalid choice");
                         return HPy_NULL;
@@ -213,14 +219,23 @@ class TestBasic(HPyTest):
             @EXPORT(f)
             @INIT
         """)
+        import builtins
+
         builtin_objs = (
             '<NULL>', None, False, True, ValueError, TypeError, IndexError,
-            SystemError, object, type, bool, int, float, str, tuple, list, NotImplemented, Ellipsis,
+            SystemError, object, type, bool, int, float, str, tuple, list,
+            NotImplemented, Ellipsis, complex, bytes, memoryview, slice,
+            builtins.__dict__
         )
         for i, obj in enumerate(builtin_objs):
             if i == 0:
                 continue
             assert mod.f(i) is obj
+
+        # we cannot be sure if 'datetime_CAPI' is available
+        import datetime
+        if hasattr(datetime, "datetime_CAPI"):
+            assert mod.f(2048) is type(datetime.datetime_CAPI)
 
     def test_extern_def(self):
         import pytest
