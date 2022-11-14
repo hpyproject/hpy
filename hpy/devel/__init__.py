@@ -52,6 +52,7 @@ class HPyDevel:
         self.base_dir = Path(base_dir)
         self.include_dir = self.base_dir.joinpath('include')
         self.src_dir = self.base_dir.joinpath('src', 'runtime')
+        self._available_static_libs = None
 
     def get_extra_include_dirs(self):
         """ Extra include directories needed by extensions in both CPython and
@@ -73,6 +74,36 @@ class HPyDevel:
             self.src_dir.joinpath('buildvalue.c'),
             self.src_dir.joinpath('helpers.c'),
         ]))
+
+    def _scan_static_lib_dir(self):
+        """ Scan the static library directory and build a dict for all
+            available static libraries. The library directory contains
+            subdirectories for each ABI and the ABI folders then contain
+            the static libraries.
+        """
+        available_libs = {}
+        lib_dir = self.base_dir.joinpath('lib')
+        if lib_dir.exists():
+            for abi_dir in lib_dir.iterdir():
+                if abi_dir.is_dir():
+                    abi = abi_dir.name
+                    # All files in '.../lib/<abi>/' are considered to be static
+                    # libraries.
+                    available_libs[abi] = \
+                        [str(x) for x in abi_dir.iterdir() if x.is_file()]
+        return available_libs
+
+    def get_static_libs(self, hpy_abi):
+        """ A list of extra static libraries to compile with. For example,
+            there is library 'hpyhelpers' which contains compiled HPy helper
+            functions like 'HPyArg_Parse' and such. Libraries are always
+            specific to an ABI. The list may be empty if no libraries are
+            available for a certain ABI.
+        """
+        if not self._available_static_libs:
+            # lazily initialize the dict of available (=shipped) static libs
+            self._available_static_libs = self._scan_static_lib_dir()
+        return self._available_static_libs.get(hpy_abi, [])
 
     def get_ctx_sources(self):
         """ Extra sources needed only in the CPython ABI mode.
@@ -288,11 +319,16 @@ class build_ext_hpy_mixin:
         ext.name = HPyExtensionName(ext.name)
         ext.hpy_abi = self.distribution.hpy_abi
         ext.include_dirs += self.hpydevel.get_extra_include_dirs()
-        ext.sources += self.hpydevel.get_extra_sources()
+        static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
+        if static_libs:
+            ext.extra_objects += self.hpydevel.get_static_libs(ext.hpy_abi)
+        else:
+            ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
+            if not static_libs:
+                ext.sources += self.hpydevel.get_ctx_sources()
             ext.define_macros.append(('HPY_ABI_CPYTHON', None))
-            ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
         elif ext.hpy_abi == 'hybrid':
             ext.define_macros.append(('HPY_ABI_HYBRID', None))
