@@ -177,8 +177,10 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
 
     # add a global option --hpy-abi to setup.py
     dist.__class__.hpy_abi = DEFAULT_HPY_ABI
+    dist.__class__.hpy_no_static_libs = False
     dist.__class__.global_options += [
-        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)' % DEFAULT_HPY_ABI)
+        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)' % DEFAULT_HPY_ABI),
+        ('hpy-no-static-libs', None, 'Compile context and extra sources with extension (default: False)')
     ]
     hpydevel = HPyDevel()
     hpydevel.fix_distribution(dist)
@@ -319,13 +321,26 @@ class build_ext_hpy_mixin:
         ext.name = HPyExtensionName(ext.name)
         ext.hpy_abi = self.distribution.hpy_abi
         ext.include_dirs += self.hpydevel.get_extra_include_dirs()
-        static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
-        if static_libs:
-            ext.extra_objects += self.hpydevel.get_static_libs(ext.hpy_abi)
+        # If we may use static libs (default), then add all available libs (for
+        # the given ABI) to the extra objects. The libs will then just be added
+        # in the linking phase but nothing will be compiled in addition.
+        use_static_libs = not self.distribution.hpy_no_static_libs
+        if use_static_libs:
+            static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
         else:
+            static_libs = None
+
+        if static_libs:
+            ext.extra_objects += static_libs
+        else:
+            # If we should not use (pre-compiled) static libs or if they are
+            # not available, we just add the sources of the helpers to the
+            # extension. They are then compiler with the extension.
             ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
+            # If the user disabled using static libs, we need to add the
+            # context sources in this case.
             if not static_libs:
                 ext.sources += self.hpydevel.get_ctx_sources()
             ext.define_macros.append(('HPY_ABI_CPYTHON', None))

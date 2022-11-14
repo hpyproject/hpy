@@ -540,6 +540,7 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
 
     # this is the equivalent of passing --hpy-abi from setup.py's command line
     dist.hpy_abi = hpy_abi
+    dist.hpy_no_static_libs = False
     dist.hpy_ext_modules = [ext]
     hpy_devel.fix_distribution(dist)
 
