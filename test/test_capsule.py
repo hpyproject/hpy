@@ -58,8 +58,8 @@ class CapsuleTemplate(DefaultExtensionTemplate):
 
             #define CAPSULE_NAME _capsule_name
 
-            HPyDef_METH(Capsule_New, "capsule_new", capsule_new_impl, HPyFunc_VARARGS)
-            static HPy capsule_new_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(Capsule_New, "capsule_new", HPyFunc_VARARGS)
+            static HPy Capsule_New_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 int value;
                 char *message;
@@ -86,8 +86,8 @@ class CapsuleTemplate(DefaultExtensionTemplate):
         return """
             #include <string.h>
 
-            HPyDef_METH(Payload_Free, "payload_free", payload_free_impl, HPyFunc_O)
-            static HPy payload_free_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Payload_Free, "payload_free", HPyFunc_O)
+            static HPy Payload_Free_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 const char *name = HPyCapsule_GetName(ctx, arg);
                 if (name == NULL && HPyErr_Occurred(ctx)) {
@@ -112,8 +112,8 @@ class CapsuleTemplate(DefaultExtensionTemplate):
 
     def DEFINE_Capsule_GetName(self):
         return """
-            HPyDef_METH(Capsule_GetName, "capsule_getname", capsule_getname_impl, HPyFunc_O)
-            static HPy capsule_getname_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Capsule_GetName, "capsule_getname", HPyFunc_O)
+            static HPy Capsule_GetName_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 const char *name = HPyCapsule_GetName(ctx, arg);
                 if (name == NULL) {
@@ -135,8 +135,8 @@ class CapsuleTemplate(DefaultExtensionTemplate):
                 return result;
             }
 
-            HPyDef_METH(Capsule_GetPointer, "capsule_getpointer", capsule_get_payload_impl, HPyFunc_O)
-            static HPy capsule_get_payload_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Capsule_GetPointer, "capsule_getpointer", HPyFunc_O)
+            static HPy Capsule_GetPointer_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 SomeObject *pointer = (SomeObject *) HPyCapsule_GetPointer(ctx, arg, CAPSULE_NAME);
                 if (pointer == NULL) {
@@ -184,8 +184,8 @@ class TestHPyCapsule(HPyTest):
             @DEFINE_Capsule_GetName
             @DEFINE_Payload_Free
 
-            HPyDef_METH(Capsule_SetPointer, "capsule_setpointer", capsule_set_payload_impl, HPyFunc_VARARGS)
-            static HPy capsule_set_payload_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(Capsule_SetPointer, "capsule_setpointer", HPyFunc_VARARGS)
+            static HPy Capsule_SetPointer_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy capsule;
                 int value;
@@ -221,8 +221,8 @@ class TestHPyCapsule(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
-            HPyDef_METH(Capsule_GetContext, "capsule_getcontext", capsule_get_context_impl, HPyFunc_O)
-            static HPy capsule_get_context_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Capsule_GetContext, "capsule_getcontext", HPyFunc_O)
+            static HPy Capsule_GetContext_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 SomeObject *context = (SomeObject *) HPyCapsule_GetContext(ctx, arg);
                 if (context == NULL) {
@@ -231,8 +231,8 @@ class TestHPyCapsule(HPyTest):
                 return payload_as_tuple(ctx, context);
             }
 
-            HPyDef_METH(Capsule_SetContext, "capsule_setcontext", capsule_set_context_impl, HPyFunc_VARARGS)
-            static HPy capsule_set_context_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(Capsule_SetContext, "capsule_setcontext", HPyFunc_VARARGS)
+            static HPy Capsule_SetContext_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy capsule;
                 int value;
@@ -259,8 +259,8 @@ class TestHPyCapsule(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
-            HPyDef_METH(Capsule_SetName, "capsule_setname", capsule_set_name_impl, HPyFunc_VARARGS)
-            static HPy capsule_set_name_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(Capsule_SetName, "capsule_setname", HPyFunc_VARARGS)
+            static HPy Capsule_SetName_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy capsule;
                 const char *name;
@@ -289,8 +289,8 @@ class TestHPyCapsule(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
-            HPyDef_METH(Capsule_free_name, "capsule_freename", capsule_free_name_impl, HPyFunc_O)
-            static HPy capsule_free_name_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Capsule_free_name, "capsule_freename", HPyFunc_O)
+            static HPy Capsule_free_name_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 /* avoid memleak; get and free previous context */
                 const char *old_name = HPyCapsule_GetName(ctx, arg);
@@ -357,8 +357,8 @@ class TestHPyCapsule(HPyTest):
             @DEFINE_Capsule_GetName
             @DEFINE_Payload_Free
 
-            HPyDef_METH(Capsule_isvalid, "capsule_isvalid", capsule_isvalid_impl, HPyFunc_VARARGS)
-            static HPy capsule_isvalid_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(Capsule_isvalid, "capsule_isvalid", HPyFunc_VARARGS)
+            static HPy Capsule_isvalid_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy capsule;
                 const char *name;
@@ -404,8 +404,8 @@ class TestHPyCapsule(HPyTest):
                 pointer_freed = 1;
             }
 
-            HPyDef_METH(Pointer_freed, "pointer_freed", pointer_freed_impl, HPyFunc_NOARGS)
-            static HPy pointer_freed_impl(HPyContext *ctx, HPy self)
+            HPyDef_METH(Pointer_freed, "pointer_freed", HPyFunc_NOARGS)
+            static HPy Pointer_freed_impl(HPyContext *ctx, HPy self)
             {
                 return HPyBool_FromLong(ctx, pointer_freed);
             }
@@ -442,8 +442,8 @@ class TestHPyCapsuleLegacy(HPyTest):
                 free((void *) PyCapsule_GetName(capsule));
             }
 
-            HPyDef_METH(Create_pycapsule, "create_pycapsule", create_pycapsule_impl, HPyFunc_O)
-            static HPy create_pycapsule_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Create_pycapsule, "create_pycapsule", HPyFunc_O)
+            static HPy Create_pycapsule_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t n;
                 const char *name = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
@@ -459,8 +459,8 @@ class TestHPyCapsuleLegacy(HPyTest):
                 return res;
             }
 
-            HPyDef_METH(Capsule_get, "get", get_impl, HPyFunc_O)
-            static HPy get_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(Capsule_get, "get", HPyFunc_O)
+            static HPy Capsule_get_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy res = HPy_NULL;
                 HPy h_value = HPy_NULL;
