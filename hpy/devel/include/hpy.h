@@ -141,11 +141,22 @@ typedef struct _HPyContext_s HPyContext;
     typedef intptr_t HPy_ssize_t;
     typedef intptr_t HPy_hash_t;
     typedef uint32_t HPy_UCS4;
+
+    /* HPyCapsule field keys */
+    typedef enum {
+        HPyCapsule_key_Pointer = 0,
+        HPyCapsule_key_Name = 1,
+        HPyCapsule_key_Context = 2,
+        HPyCapsule_key_Destructor = 3,
+    } _HPyCapsule_key;
+
 #else
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;
     typedef Py_UCS4 HPy_UCS4;
 #endif
+
+typedef void (*HPyCapsule_Destructor)(const char *name, void *pointer, void *context);
 
 
 /* ~~~~~~~~~~~~~~~~ Additional #includes ~~~~~~~~~~~~~~~~ */

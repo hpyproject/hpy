@@ -574,6 +574,11 @@ HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name)
     return _py2h(PyImport_ImportModule(name));
 }
 
+HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name)
+{
+    return PyCapsule_IsValid(_h2py(capsule), name);
+}
+
 HPyAPI_FUNC void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state)
 {
     PyEval_RestoreThread(_h2threads(state));

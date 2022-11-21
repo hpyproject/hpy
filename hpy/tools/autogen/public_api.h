@@ -433,6 +433,16 @@ HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 HPy_ID(206)
 HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
 
+/* pycapsule.h */
+HPy_ID(245)
+HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
+HPy_ID(246)
+void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
+HPy_ID(247)
+int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name);
+HPy_ID(248)
+int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
+
 /* integration with the old CPython API */
 HPy_ID(207)
 HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj);
