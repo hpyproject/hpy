@@ -67,28 +67,32 @@ hpy_get_destructor_registry(void)
 static HPyCapsule_Destructor
 get_hpy_destructor_function(PyObject *capsule, int remove)
 {
+    PyObject *hpy_destructor_registry;
+    PyObject *key;
+    PyObject *hpy_destructor_capsule;
+    void *ptr;
+
     /* we only register this destructor if the user provided a destructor
        function at creation time */
-    PyObject *hpy_destructor_registry = hpy_get_destructor_registry();
+    hpy_destructor_registry = hpy_get_destructor_registry();
     if (hpy_destructor_registry == NULL) {
         return NULL;
     }
 
-    PyObject *key = PyLong_FromVoidPtr(capsule);
+    key = PyLong_FromVoidPtr(capsule);
     if (key == NULL) {
         return NULL;
     }
 
     /* borrowed ref */
-    PyObject *hpy_destructor_capsule =
-            PyDict_GetItem(hpy_destructor_registry, key);
+    hpy_destructor_capsule = PyDict_GetItem(hpy_destructor_registry, key);
     if (hpy_destructor_capsule == NULL) {
         PyErr_Format(PyExc_SystemError,
                 "could not get destructor for %R", capsule);
         goto error;
     }
 
-    void *ptr = PyCapsule_GetPointer(hpy_destructor_capsule, NULL);
+    ptr = PyCapsule_GetPointer(hpy_destructor_capsule, NULL);
     if (ptr == NULL) {
         goto error;
     }

@@ -466,6 +466,7 @@ class TestHPyCapsuleLegacy(HPyTest):
                 HPy h_value = HPy_NULL;
                 HPy has_destructor = HPy_NULL;
                 HPyCapsule_Destructor destr = NULL;
+                int *ptr = NULL;
 
                 const char *name = HPyCapsule_GetName(ctx, arg);
                 if (name == NULL && HPyErr_Occurred(ctx)) {
@@ -476,7 +477,7 @@ class TestHPyCapsuleLegacy(HPyTest):
                     goto finish;
                 }
 
-                int *ptr = (int *) HPyCapsule_GetPointer(ctx, arg, name);
+                ptr = (int *) HPyCapsule_GetPointer(ctx, arg, name);
                 if (ptr == NULL && HPyErr_Occurred(ctx)) {
                     goto finish;
                 }
