@@ -399,6 +399,11 @@ HPyAPI_FUNC int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value)
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key)
+{
+    return PyObject_DelItem(_h2py(obj), _h2py(key));
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Type(_h2py(obj)));
@@ -567,6 +572,11 @@ HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h)
 HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name)
 {
     return _py2h(PyImport_ImportModule(name));
+}
+
+HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name)
+{
+    return PyCapsule_IsValid(_h2py(capsule), name);
 }
 
 HPyAPI_FUNC void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state)

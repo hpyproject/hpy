@@ -82,3 +82,24 @@ class autogen_ctx_def_h(AutoGenFile):
             w('    .%s = &%s,' % (func.ctx_name(), func.ctx_name()))
         w('};')
         return '\n'.join(lines)
+
+
+class cpython_autogen_ctx_h(AutoGenFile):
+    PATH = 'hpy/devel/include/hpy/cpython/autogen_ctx.h'
+
+    def generate(self):
+        # Put all variable declarations into a list in order
+        # to be able to sort them by their given context index.
+        var_decls = list(self.api.variables)
+
+        # sort the list of var declaration by 'decl.ctx_index'
+        var_decls.sort(key=lambda x: x.ctx_index)
+
+        lines = []
+        w = lines.append
+        w('struct _HPyContext_s {')
+        w('    const char *name;')
+        for var in var_decls:
+            w('    %s;' % toC(var.node))
+        w('};')
+        return '\n'.join(lines)

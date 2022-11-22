@@ -250,4 +250,17 @@ struct _HPyContext_s {
     void *(*ctx_AsStruct_Tuple)(HPyContext *ctx, HPy h);
     void *(*ctx_AsStruct_List)(HPyContext *ctx, HPy h);
     HPyType_BuiltinShape (*ctx_Type_GetBuiltinShape)(HPyContext *ctx, HPy h_type);
+    int (*ctx_DelItem)(HPyContext *ctx, HPy obj, HPy key);
+    int (*ctx_DelItem_i)(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
+    int (*ctx_DelItem_s)(HPyContext *ctx, HPy obj, const char *key);
+    HPy h_ComplexType;
+    HPy h_BytesType;
+    HPy h_MemoryViewType;
+    HPy h_CapsuleType;
+    HPy h_SliceType;
+    HPy h_Builtins;
+    HPy (*ctx_Capsule_New)(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
+    void *(*ctx_Capsule_Get)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
+    int (*ctx_Capsule_IsValid)(HPyContext *ctx, HPy capsule, const char *name);
+    int (*ctx_Capsule_Set)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
 };

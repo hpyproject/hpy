@@ -35,6 +35,8 @@ _HPy_HIDDEN HPy ctx_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 _HPy_HIDDEN HPy ctx_GetItem_s(HPyContext *ctx, HPy obj, const char *key);
 _HPy_HIDDEN int ctx_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 _HPy_HIDDEN int ctx_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
+_HPy_HIDDEN int ctx_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
+_HPy_HIDDEN int ctx_DelItem_s(HPyContext *ctx, HPy obj, const char *key);
 
 // ctx_tracker.c
 _HPy_HIDDEN HPyTracker ctx_Tracker_New(HPyContext *ctx, HPy_ssize_t size);
@@ -53,6 +55,27 @@ _HPy_HIDDEN void ctx_TupleBuilder_Cancel(HPyContext *ctx,
 
 // ctx_tuple.c
 _HPy_HIDDEN HPy ctx_Tuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
+
+// ctx_capsule.c
+_HPy_HIDDEN HPy ctx_Capsule_New(HPyContext *ctx,
+                                void *pointer,
+                                const char *name,
+                                HPyCapsule_Destructor destructor);
+_HPy_HIDDEN HPyCapsule_Destructor ctx_Capsule_GetDestructor(HPyContext *ctx,
+                                                            HPy h_capsule);
+_HPy_HIDDEN int ctx_Capsule_SetDestructor(HPyContext *ctx,
+                                          HPy h_capsule,
+                                          HPyCapsule_Destructor destructor);
+#ifndef HPY_ABI_CPYTHON
+_HPy_HIDDEN void* ctx_Capsule_Get(HPyContext *ctx,
+                                  HPy capsule,
+                                  _HPyCapsule_key key,
+                                  const char *name);
+_HPy_HIDDEN int ctx_Capsule_Set(HPyContext *ctx,
+                                HPy capsule,
+                                _HPyCapsule_key key,
+                                void *value);
+#endif
 
 // ctx_type.c
 _HPy_HIDDEN void* ctx_AsStruct_Object(HPyContext *ctx, HPy h);

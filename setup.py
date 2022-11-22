@@ -104,6 +104,7 @@ EXT_MODULES = [
                'hpy/devel/src/runtime/helpers.c',
                'hpy/devel/src/runtime/ctx_bytes.c',
                'hpy/devel/src/runtime/ctx_call.c',
+               'hpy/devel/src/runtime/ctx_capsule.c',
                'hpy/devel/src/runtime/ctx_err.c',
                'hpy/devel/src/runtime/ctx_module.c',
                'hpy/devel/src/runtime/ctx_object.c',

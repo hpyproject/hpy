@@ -96,6 +96,14 @@ HPy_ID(73) HPy h_FloatType;        /* built-in 'float' */
 HPy_ID(74) HPy h_UnicodeType;      /* built-in 'str' */
 HPy_ID(75) HPy h_TupleType;        /* built-in 'tuple' */
 HPy_ID(76) HPy h_ListType;         /* built-in 'list' */
+HPy_ID(239) HPy h_ComplexType;     /* built-in 'complex' */
+HPy_ID(240) HPy h_BytesType;       /* built-in 'bytes' */
+HPy_ID(241) HPy h_MemoryViewType;  /* built-in 'memoryview' */
+HPy_ID(242) HPy h_CapsuleType;     /* built-in 'capsule' */
+HPy_ID(243) HPy h_SliceType;       /* built-in 'slice' */
+
+/* Reflection */
+HPy_ID(244) HPy h_Builtins;        /* dict of builtins */
 
 #endif
 
@@ -301,6 +309,13 @@ int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 HPy_ID(165)
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
 
+HPy_ID(236)
+int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key);
+HPy_ID(237)
+int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
+HPy_ID(238)
+int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key);
+
 HPy_ID(166)
 HPy HPy_Type(HPyContext *ctx, HPy obj);
 // WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
@@ -417,6 +432,16 @@ HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 /* import.h */
 HPy_ID(206)
 HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
+
+/* pycapsule.h */
+HPy_ID(245)
+HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor);
+HPy_ID(246)
+void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
+HPy_ID(247)
+int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name);
+HPy_ID(248)
+int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
 
 /* integration with the old CPython API */
 HPy_ID(207)

@@ -442,6 +442,21 @@ int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *key, DHPy value)
     return HPy_SetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key, DHPy_unwrap(dctx, value));
 }
 
+int debug_ctx_DelItem(HPyContext *dctx, DHPy obj, DHPy key)
+{
+    return HPy_DelItem(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, key));
+}
+
+int debug_ctx_DelItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx)
+{
+    return HPy_DelItem_i(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), idx);
+}
+
+int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *key)
+{
+    return HPy_DelItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key);
+}
+
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj)
 {
     return DHPy_open(dctx, HPy_Type(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj)));
@@ -630,6 +645,26 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
 DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name)
 {
     return DHPy_open(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, name));
+}
+
+DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
+{
+    return DHPy_open(dctx, HPyCapsule_New(get_info(dctx)->uctx, pointer, name, destructor));
+}
+
+void *debug_ctx_Capsule_Get(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, const char *name)
+{
+    return HPyCapsule_Get(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), key, name);
+}
+
+int debug_ctx_Capsule_IsValid(HPyContext *dctx, DHPy capsule, const char *name)
+{
+    return HPyCapsule_IsValid(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), name);
+}
+
+int debug_ctx_Capsule_Set(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, void *value)
+{
+    return HPyCapsule_Set(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), key, value);
 }
 
 DHPy debug_ctx_FromPyObject(HPyContext *dctx, cpy_PyObject *obj)

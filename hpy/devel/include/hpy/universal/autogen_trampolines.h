@@ -362,6 +362,18 @@ HPyAPI_FUNC int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy val
      return ctx->ctx_SetItem_s ( ctx, obj, key, value ); 
 }
 
+HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key) {
+     return ctx->ctx_DelItem ( ctx, obj, key ); 
+}
+
+HPyAPI_FUNC int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
+     return ctx->ctx_DelItem_i ( ctx, obj, idx ); 
+}
+
+HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key) {
+     return ctx->ctx_DelItem_s ( ctx, obj, key ); 
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {
      return ctx->ctx_Type ( ctx, obj ); 
 }
@@ -548,6 +560,22 @@ HPyAPI_FUNC HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n) 
 
 HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name) {
      return ctx->ctx_Import_ImportModule ( ctx, name ); 
+}
+
+HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor) {
+     return ctx->ctx_Capsule_New ( ctx, pointer, name, destructor ); 
+}
+
+HPyAPI_FUNC void *HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name) {
+     return ctx->ctx_Capsule_Get ( ctx, capsule, key, name ); 
+}
+
+HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name) {
+     return ctx->ctx_Capsule_IsValid ( ctx, capsule, name ); 
+}
+
+HPyAPI_FUNC int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value) {
+     return ctx->ctx_Capsule_Set ( ctx, capsule, key, value ); 
 }
 
 HPyAPI_FUNC HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj) {

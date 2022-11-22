@@ -35,6 +35,9 @@ SPECIAL_CASES = {
     'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
+    'HPy_DelItem': 'PyObject_DelItem',
+    'HPy_DelItem_i': None,
+    'HPy_DelItem_s': None,
     'HPy_Contains': 'PySequence_Contains',
     'HPy_Length': 'PyObject_Length',
     'HPy_CallTupleDict': None,
@@ -120,4 +123,7 @@ SPECIAL_CASES = {
     'HPy_ReenterPythonExecution': 'PyEval_RestoreThread',
     'HPyGlobal_Load': None,
     'HPyGlobal_Store': None,
+    'HPyCapsule_New': None,
+    'HPyCapsule_Get': None,
+    'HPyCapsule_Set': None,
 }
