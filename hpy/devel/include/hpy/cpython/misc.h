@@ -384,7 +384,7 @@ HPyAPI_FUNC int HPyErr_Occurred(HPyContext *ctx) {
     return ctx_Err_Occurred(ctx);
 }
 
-HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
+HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor)
 {
     return ctx_Capsule_New(ctx, pointer, name, destructor);
 }
@@ -404,11 +404,6 @@ HPyAPI_FUNC void * HPyCapsule_GetContext(HPyContext *ctx, HPy capsule)
     return PyCapsule_GetContext(_h2py(capsule));
 }
 
-HPyAPI_FUNC HPyCapsule_Destructor HPyCapsule_GetDestructor(HPyContext *ctx, HPy capsule)
-{
-    return ctx_Capsule_GetDestructor(ctx, capsule);
-}
-
 HPyAPI_FUNC int HPyCapsule_SetPointer(HPyContext *ctx, HPy capsule, void *pointer)
 {
     return PyCapsule_SetPointer(_h2py(capsule), pointer);
@@ -424,7 +419,7 @@ HPyAPI_FUNC int HPyCapsule_SetContext(HPyContext *ctx, HPy capsule, void *contex
     return PyCapsule_SetContext(_h2py(capsule), context);
 }
 
-HPyAPI_FUNC int HPyCapsule_SetDestructor(HPyContext *ctx, HPy capsule, HPyCapsule_Destructor destructor)
+HPyAPI_FUNC int HPyCapsule_SetDestructor(HPyContext *ctx, HPy capsule, HPyCapsule_Destructor *destructor)
 {
     return ctx_Capsule_SetDestructor(ctx, capsule, destructor);
 }

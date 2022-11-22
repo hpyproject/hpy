@@ -647,7 +647,7 @@ DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name)
     return DHPy_open(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, name));
 }
 
-DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
+DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor)
 {
     return DHPy_open(dctx, HPyCapsule_New(get_info(dctx)->uctx, pointer, name, destructor));
 }

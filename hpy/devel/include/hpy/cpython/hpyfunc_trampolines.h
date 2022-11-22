@@ -107,4 +107,12 @@ typedef int (*_HPyCFunction_RELEASEBUFFERPROC)(HPyContext *, HPy, HPy_buffer *);
                                                  visit, arg);           \
     }
 
+#define HPyCapsule_DESTRUCTOR_TRAMPOLINE(SYM, IMPL)                            \
+    static void SYM(PyObject *capsule)                                         \
+    {                                                                          \
+        const char *name = PyCapsule_GetName(capsule);                         \
+        IMPL(name, PyCapsule_GetPointer(capsule, name),                        \
+                PyCapsule_GetContext(capsule));                                \
+    }
+
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
