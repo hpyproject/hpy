@@ -39,7 +39,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             static SomeObject *create_payload(int value, char *message)
             {
                 size_t n_message = strlen(message) + 1;
-                SomeObject *pointer = (SomeObject *) 
+                SomeObject *pointer = (SomeObject *)
                         malloc(sizeof(SomeObject) + n_message * sizeof(char));
                 if (pointer == NULL) {
                     return NULL;
@@ -191,7 +191,7 @@ class TestHPyCapsule(HPyTest):
                 int value;
                 char *message;
                 int non_null_pointer;
-                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Oisi", 
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Oisi",
                                   &capsule, &value, &message, &non_null_pointer)) {
                     return HPy_NULL;
                 }
@@ -420,97 +420,3 @@ class TestHPyCapsule(HPyTest):
         assert mod.capsule_getname(p) == "some_capsule"
         del p
         assert mod.pointer_freed()
-
-class TestHPyCapsuleLegacy(HPyTest):
-
-    ExtensionTemplate = CapsuleTemplate
-
-    def test_legacy_capsule_compat(self):
-        import pytest
-        mod = self.make_module("""
-            @DEFINE_strdup
-
-            #include <Python.h>
-            #include <string.h>
-
-            static int dummy = 123;
-
-            static void legacy_destructor(PyObject *capsule)
-            {
-                /* We need to use C lib 'free' because the string was
-                   created with 'strdup0'. */
-                free((void *) PyCapsule_GetName(capsule));
-            }
-
-            HPyDef_METH(Create_pycapsule, "create_pycapsule", HPyFunc_O)
-            static HPy Create_pycapsule_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                HPy_ssize_t n;
-                const char *name = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
-                char *name_copy = strdup0(name);
-                if (name_copy == NULL) {
-                    HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
-                    return HPy_NULL;
-                }
-                PyObject *legacy_caps = PyCapsule_New(&dummy, (const char *) name_copy, 
-                                                      legacy_destructor);
-                HPy res = HPy_FromPyObject(ctx, legacy_caps);
-                Py_DECREF(legacy_caps);
-                return res;
-            }
-
-            HPyDef_METH(Capsule_get, "get", HPyFunc_O)
-            static HPy Capsule_get_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                HPy res = HPy_NULL;
-                HPy h_value = HPy_NULL;
-                HPy has_destructor = HPy_NULL;
-                HPyCapsule_Destructor destr = NULL;
-                int *ptr = NULL;
-
-                const char *name = HPyCapsule_GetName(ctx, arg);
-                if (name == NULL && HPyErr_Occurred(ctx)) {
-                    return HPy_NULL;
-                }
-                HPy h_name = HPyUnicode_FromString(ctx, name);
-                if (HPy_IsNull(h_name)) {
-                    goto finish;
-                }
-
-                ptr = (int *) HPyCapsule_GetPointer(ctx, arg, name);
-                if (ptr == NULL && HPyErr_Occurred(ctx)) {
-                    goto finish;
-                }
-
-                h_value = HPyLong_FromLong(ctx, *ptr);
-                if (HPy_IsNull(h_value)) {
-                    goto finish;
-                }
-
-                destr = HPyCapsule_GetDestructor(ctx, arg);
-                if (destr == NULL && HPyErr_Occurred(ctx)) {
-                    goto finish;
-                }
-
-                has_destructor = HPyBool_FromLong(ctx, destr != NULL);
-                if (HPy_IsNull(has_destructor)) {
-                    goto finish;
-                }
-
-                res = HPyTuple_Pack(ctx, 3, h_name, h_value, has_destructor);
-
-            finish:
-                HPy_Close(ctx, h_name);
-                HPy_Close(ctx, h_value);
-                HPy_Close(ctx, has_destructor);
-                return res;
-            }
-
-            @EXPORT(Create_pycapsule)
-            @EXPORT(Capsule_get)
-
-            @INIT
-        """)
-        name = "legacy_capsule"
-        p = mod.create_pycapsule(name)
-        assert mod.get(p) == (name, 123, False)
