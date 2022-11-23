@@ -142,23 +142,10 @@ class build_clib_hpy(build_clib):
         super().finalize_options()
         self.force = 1
 
-    def _filter_libraries(self, libraries):
-        filtered_libs = []
-        for lib in libraries:
-            lib_name, build_info = lib
-            if lib_name not in (HPY_EXTRA_LIB_NAME, HPY_CTX_LIB_NAME):
-                filtered_libs.append(lib)
-        return filtered_libs
-
     def get_library_names(self):
-        libraries = self._filter_libraries(self.libraries)
-        if not libraries:
-            return None
-
-        lib_names = []
-        for lib_name, build_info in libraries:
-            lib_names.append(lib_name)
-        return lib_names
+        # We only build static libraries for shipping. We don't want that our
+        # extensions (i.e. 'hpy.universal' etc) link to these libs.
+        return None
 
     def build_libraries(self, libraries):
         build = self.get_finalized_command('build')
