@@ -3,7 +3,7 @@ all: hpy.universal
 
 .PHONY: hpy.universal
 hpy.universal:
-	python3 setup.py build_ext -if
+	python3 setup.py build_clib -f build_ext -if
 
 .PHONY: dist-info
 dist-info:
