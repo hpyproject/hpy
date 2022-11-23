@@ -94,16 +94,17 @@ class HPyDevel:
         return available_libs
 
     def get_static_libs(self, hpy_abi):
-        """ A list of extra static libraries to compile with. For example,
-            there is library 'hpyhelpers' which contains compiled HPy helper
-            functions like 'HPyArg_Parse' and such. Libraries are always
-            specific to an ABI. The list may be empty if no libraries are
-            available for a certain ABI.
+        """ The list of necessary static libraries an HPy extension needs to
+            link to or 'None' (if not available). The HPy ext needs to link to
+            all static libraries in the list otherwise some function may stay
+            unresolved. For example, there is library 'hpyextra' which contains
+            compiled HPy helper functions like 'HPyArg_Parse' and such.
+            Libraries are always specific to an ABI.
         """
         if not self._available_static_libs:
             # lazily initialize the dict of available (=shipped) static libs
             self._available_static_libs = self._scan_static_lib_dir()
-        return self._available_static_libs.get(hpy_abi, [])
+        return self._available_static_libs.get(hpy_abi, None)
 
     def get_ctx_sources(self):
         """ Extra sources needed only in the CPython ABI mode.
