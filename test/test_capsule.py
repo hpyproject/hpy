@@ -425,7 +425,7 @@ class TestHPyCapsule(HPyTest):
         mod = self.make_module("""
             static int pointer_freed = 0;
             
-            HPyDef_CAPSULE_DESTRUCTOR(mydtor)
+            HPyCapsule_DESTRUCTOR(mydtor)
             static void mydtor_impl(const char *name, void *pointer, void *context)
             {
                 free(pointer);

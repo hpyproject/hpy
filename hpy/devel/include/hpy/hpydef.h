@@ -223,7 +223,7 @@ typedef struct {
 #define HPyDef_GETSET(SYM, NAME, ...) \
     HPyDef_GETSET_IMPL(SYM, NAME, SYM##_get, SYM##_set, __VA_ARGS__)
 
-#define HPyDef_CAPSULE_DESTRUCTOR(SYM)                                         \
+#define HPyCapsule_DESTRUCTOR(SYM)                                             \
     static void SYM##_impl(const char *name, void *pointer, void *context);    \
     HPyCapsule_DESTRUCTOR_TRAMPOLINE(SYM##_trampoline, SYM##_impl);            \
     static HPyCapsule_Destructor SYM = {                                       \
