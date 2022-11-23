@@ -128,9 +128,13 @@ HPY_CTX_LIB_NAME = "hpyctx"
 def get_hpy_runtime_includes():
     default_include = sysconfig.get_path("include")
     plat_include = sysconfig.get_path("platinclude")
+    config_h_dir = os.path.dirname(sysconfig.get_config_h_filename())
+    include_dirs = [default_include]
     if default_include != plat_include:
-        return [default_include, plat_include] + HPY_INCLUDE_DIRS
-    return [default_include] + HPY_INCLUDE_DIRS
+        include_dirs.append(plat_include)
+    if config_h_dir not in (default_include, plat_include):
+        include_dirs.append(config_h_dir)
+    return include_dirs + HPY_INCLUDE_DIRS
 
 
 class build_clib_hpy(build_clib):
