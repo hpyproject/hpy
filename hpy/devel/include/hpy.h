@@ -156,8 +156,6 @@ typedef struct _HPyContext_s HPyContext;
     typedef Py_UCS4 HPy_UCS4;
 #endif
 
-typedef void (*HPyCapsule_Destructor)(const char *name, void *pointer, void *context);
-
 
 /* ~~~~~~~~~~~~~~~~ Additional #includes ~~~~~~~~~~~~~~~~ */
 

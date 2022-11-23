@@ -61,6 +61,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             HPyDef_METH(Capsule_New, "capsule_new", HPyFunc_VARARGS)
             static HPy Capsule_New_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
+                HPy res;
                 int value;
                 char *message;
                 void *ptr;
@@ -75,7 +76,11 @@ class CapsuleTemplate(DefaultExtensionTemplate):
                         HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
                         return HPy_NULL;
                     }
-                    return HPyCapsule_New(ctx, ptr, CAPSULE_NAME, (HPyCapsule_Destructor) %s);
+                    res = HPyCapsule_New(ctx, ptr, CAPSULE_NAME, %s);
+                    if (HPy_IsNull(res)) {
+                        free(ptr);
+                    }
+                    return res;
                 }
                 /* just for error case testing */
                 return HPyCapsule_New(ctx, NULL, CAPSULE_NAME, NULL);
@@ -167,7 +172,6 @@ class TestHPyCapsule(HPyTest):
         try:
             assert mod.capsule_getname(p) == "some_capsule"
         finally:
-            # since HPy's capsule API does not allow a destructor, we need to
             # manually free the payload to avoid a memleak
             mod.payload_free(p)
         with pytest.raises(ValueError):
@@ -289,6 +293,30 @@ class TestHPyCapsule(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
+            static HPyCapsule_Destructor invalid_dtor = { NULL, NULL };
+
+            HPyDef_METH(Capsule_SetDestructor, "capsule_set_destructor", HPyFunc_VARARGS)
+            static HPy Capsule_SetDestructor_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                HPy capsule;
+                HPy null_dtor;
+                HPyCapsule_Destructor *dtor;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &capsule, &null_dtor)) {
+                    return HPy_NULL;
+                }
+
+                if (HPy_IsTrue(ctx, null_dtor)) {
+                    dtor = NULL;
+                } else {
+                    dtor = &invalid_dtor;
+                }
+
+                if (HPyCapsule_SetDestructor(ctx, capsule, dtor) < 0) {
+                    return HPy_NULL;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
             HPyDef_METH(Capsule_free_name, "capsule_freename", HPyFunc_O)
             static HPy Capsule_free_name_impl(HPyContext *ctx, HPy self, HPy arg)
             {
@@ -310,6 +338,7 @@ class TestHPyCapsule(HPyTest):
             @EXPORT(Capsule_SetContext)
             @EXPORT(Capsule_GetName)
             @EXPORT(Capsule_SetName)
+            @EXPORT(Capsule_SetDestructor)
             @EXPORT(Capsule_free_name)
             @EXPORT(Payload_Free)
 
@@ -329,6 +358,8 @@ class TestHPyCapsule(HPyTest):
             assert mod.capsule_setname(p, "foo") is None
             assert mod.capsule_getname(p) == "foo"
 
+            assert mod.capsule_set_destructor(p, True) is None
+
             not_a_capsule = "hello"
             with pytest.raises(ValueError):
                 mod.capsule_getpointer(not_a_capsule)
@@ -336,16 +367,19 @@ class TestHPyCapsule(HPyTest):
                 mod.capsule_setpointer(not_a_capsule, 0, "", True)
             with pytest.raises(ValueError):
                 mod.capsule_setpointer(p, 456, "lorem ipsum", False)
-            #with pytest.raises(ValueError):
-            #    mod.capsule_getcontext(not_a_capsule)
-            #with pytest.raises(ValueError):
-            #    mod.capsule_setcontext(not_a_capsule, 0, "")
-            #with pytest.raises(ValueError):
-            #    mod.capsule_getname(not_a_capsule)
-            #with pytest.raises(ValueError):
-            #    mod.capsule_setname(not_a_capsule, "")
+            with pytest.raises(ValueError):
+               mod.capsule_getcontext(not_a_capsule)
+            with pytest.raises(ValueError):
+               mod.capsule_setcontext(not_a_capsule, 0, "")
+            with pytest.raises(ValueError):
+               mod.capsule_getname(not_a_capsule)
+            with pytest.raises(ValueError):
+               mod.capsule_setname(not_a_capsule, "")
+            with pytest.raises(ValueError):
+                mod.capsule_set_destructor(not_a_capsule, True)
+            with pytest.raises(ValueError):
+                mod.capsule_set_destructor(p, False)
         finally:
-            # since HPy's capsule API does not allow a destructor, we need to
             # manually free the payload to avoid a memleak
             mod.payload_free(p)
             mod.capsule_freename(p)
@@ -389,20 +423,19 @@ class TestHPyCapsule(HPyTest):
     @pytest.mark.syncgc
     def test_capsule_new_with_destructor(self):
         mod = self.make_module("""
-            static void my_destructor(const char *name, void *pointer, void *context);
-
-            @DEFINE_SomeObject
-            @DEFINE_Capsule_New(my_destructor)
-            @DEFINE_Capsule_GetName
-            @DEFINE_Payload_Free
-
             static int pointer_freed = 0;
-
-            static void my_destructor(const char *name, void *pointer, void *context)
+            
+            HPyCapsule_DESTRUCTOR(mydtor)
+            static void mydtor_impl(const char *name, void *pointer, void *context)
             {
                 free(pointer);
                 pointer_freed = 1;
             }
+
+            @DEFINE_SomeObject
+            @DEFINE_Capsule_New(&mydtor)
+            @DEFINE_Capsule_GetName
+            @DEFINE_Payload_Free
 
             HPyDef_METH(Pointer_freed, "pointer_freed", HPyFunc_NOARGS)
             static HPy Pointer_freed_impl(HPyContext *ctx, HPy self)
@@ -420,6 +453,18 @@ class TestHPyCapsule(HPyTest):
         assert mod.capsule_getname(p) == "some_capsule"
         del p
         assert mod.pointer_freed()
+
+    def test_capsule_new_with_invalid_destructor(self):
+        mod = self.make_module("""
+            static HPyCapsule_Destructor mydtor = { NULL, NULL };
+
+            @DEFINE_SomeObject
+            @DEFINE_Capsule_New(&mydtor)
+            @EXPORT(Capsule_New)
+            @INIT
+        """)
+        with pytest.raises(ValueError):
+            mod.capsule_new(789, "Hello, World!")
 
 class TestHPyCapsuleLegacy(HPyTest):
 
@@ -464,8 +509,6 @@ class TestHPyCapsuleLegacy(HPyTest):
             {
                 HPy res = HPy_NULL;
                 HPy h_value = HPy_NULL;
-                HPy has_destructor = HPy_NULL;
-                HPyCapsule_Destructor destr = NULL;
                 int *ptr = NULL;
 
                 const char *name = HPyCapsule_GetName(ctx, arg);
@@ -487,22 +530,11 @@ class TestHPyCapsuleLegacy(HPyTest):
                     goto finish;
                 }
 
-                destr = HPyCapsule_GetDestructor(ctx, arg);
-                if (destr == NULL && HPyErr_Occurred(ctx)) {
-                    goto finish;
-                }
-
-                has_destructor = HPyBool_FromLong(ctx, destr != NULL);
-                if (HPy_IsNull(has_destructor)) {
-                    goto finish;
-                }
-
-                res = HPyTuple_Pack(ctx, 3, h_name, h_value, has_destructor);
+                res = HPyTuple_Pack(ctx, 2, h_name, h_value);
 
             finish:
                 HPy_Close(ctx, h_name);
                 HPy_Close(ctx, h_value);
-                HPy_Close(ctx, has_destructor);
                 return res;
             }
 
@@ -513,4 +545,4 @@ class TestHPyCapsuleLegacy(HPyTest):
         """)
         name = "legacy_capsule"
         p = mod.create_pycapsule(name)
-        assert mod.get(p) == (name, 123, False)
+        assert mod.get(p) == (name, 123)
