@@ -163,20 +163,14 @@ class build_clib_hpy(build_clib):
             abi = build_info.get('abi')
             # call super's build_libraries to build everything
             orig_build_temp = self.build_temp
-            self.build_temp = os.path.join(orig_build_temp, abi)
+            orig_build_clib = self.build_clib
+            self.build_temp = os.path.join(orig_build_temp, 'lib', abi)
+            self.build_clib = os.path.join(lib_dir, 'lib', abi)
             try:
                 super().build_libraries([lib])
             finally:
                 self.build_temp = orig_build_temp
-
-            # this is also what 'create_static_lib' uses
-            output_path = self.compiler.library_filename(lib_name, output_dir=self.build_clib)
-            output_filename = os.path.basename(output_path)
-            if abi:
-                dest_dir = os.path.join(lib_dir, 'lib', abi)
-                self.mkpath(dest_dir)
-                self.copy_file(output_path, os.path.join(dest_dir, output_filename))
-
+                self.build_clib = orig_build_clib
 
 
 STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
