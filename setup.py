@@ -126,6 +126,9 @@ HPY_CTX_LIB_NAME = "hpyctx"
 
 
 def get_hpy_runtime_includes():
+    """ Computes a list of include directories for building the static
+        libraries. This only uses module 'sysconfig'.
+    """
     default_include = sysconfig.get_path("include")
     plat_include = sysconfig.get_path("platinclude")
     config_h_dir = os.path.dirname(sysconfig.get_config_h_filename())
@@ -138,6 +141,19 @@ def get_hpy_runtime_includes():
 
 
 class build_clib_hpy(build_clib):
+    """ Special build_clib command for building HPy's static libraries defined
+        by 'STATIC_LIBS' below. The behavior differs in following points:
+        (1) Option 'force' is set such that static libs will always be renewed.
+        (2) Method 'get_library_names' always returns 'None'. This is because
+            we only use this command to build static libraries for shipping
+            them. We don't need them for linking here.
+        (3) This command consumes a custom build info key 'abi' that is used
+            to create a separate build temp directories for each ABI and an
+            ABI-specific output directory. This is necessary to avoid incorrect
+            sharing of (temporary) build artifacts.
+        (4) The resulting static library is written to build_ext's output
+            directory. Currently, we use hard-coded sub-directory 'hpy/devel'.
+    """
     def finalize_options(self):
         super().finalize_options()
         self.force = 1
@@ -149,6 +165,7 @@ class build_clib_hpy(build_clib):
 
     def build_libraries(self, libraries):
         build = self.get_finalized_command('build')
+        # we just inherit the 'inplace' option from 'build_ext'
         inplace = self.get_finalized_command('build_ext').inplace
         if inplace:
             # the inplace option requires to find the package directory
@@ -161,7 +178,8 @@ class build_clib_hpy(build_clib):
         for lib in libraries:
             lib_name, build_info = lib
             abi = build_info.get('abi')
-            # call super's build_libraries to build everything
+            # Call super's build_libraries with just one library in the list
+            # such that we can temporarily change the 'build_temp'.
             orig_build_temp = self.build_temp
             orig_build_clib = self.build_clib
             self.build_temp = os.path.join(orig_build_temp, 'lib', abi)
