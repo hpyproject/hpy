@@ -76,7 +76,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
                         HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
                         return HPy_NULL;
                     }
-                    res = HPyCapsule_New(ctx, ptr, CAPSULE_NAME, (HPyCapsule_Destructor *) %s);
+                    res = HPyCapsule_New(ctx, ptr, CAPSULE_NAME, %s);
                     if (HPy_IsNull(res)) {
                         free(ptr);
                     }
