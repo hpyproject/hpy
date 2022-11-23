@@ -138,6 +138,9 @@ def get_hpy_runtime_includes():
 
 
 class build_clib_hpy(build_clib):
+    def finalize_options(self):
+        super().finalize_options()
+        self.force = 1
 
     def _filter_libraries(self, libraries):
         filtered_libs = []
@@ -158,9 +161,6 @@ class build_clib_hpy(build_clib):
         return lib_names
 
     def build_libraries(self, libraries):
-        # call super's build_libraries to build everything
-        super().build_libraries(libraries)
-
         build = self.get_finalized_command('build')
         inplace = self.get_finalized_command('build_ext').inplace
         if inplace:
@@ -171,15 +171,25 @@ class build_clib_hpy(build_clib):
         else:
             lib_dir = os.path.join(build.build_lib, 'hpy', 'devel')
 
-        for (lib_name, build_info) in libraries:
+        for lib in libraries:
+            lib_name, build_info = lib
+            abi = build_info.get('abi')
+            # call super's build_libraries to build everything
+            orig_build_temp = self.build_temp
+            self.build_temp = os.path.join(orig_build_temp, abi)
+            try:
+                super().build_libraries([lib])
+            finally:
+                self.build_temp = orig_build_temp
+
             # this is also what 'create_static_lib' uses
             output_path = self.compiler.library_filename(lib_name, output_dir=self.build_clib)
             output_filename = os.path.basename(output_path)
-            abi = build_info.get('abi')
             if abi:
                 dest_dir = os.path.join(lib_dir, 'lib', abi)
                 self.mkpath(dest_dir)
                 self.copy_file(output_path, os.path.join(dest_dir, output_filename))
+
 
 
 STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
