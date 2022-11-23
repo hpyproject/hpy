@@ -94,10 +94,24 @@ def get_scm_config():
 
     return {}  # use the default config
 
-HPY_HELPER_SOURCES = [
+HPY_EXTRA_SOURCES = [
     'hpy/devel/src/runtime/argparse.c',
     'hpy/devel/src/runtime/buildvalue.c',
     'hpy/devel/src/runtime/helpers.c',
+]
+
+HPY_CTX_SOURCES = [
+    'hpy/devel/src/runtime/ctx_bytes.c',
+    'hpy/devel/src/runtime/ctx_call.c',
+    'hpy/devel/src/runtime/ctx_capsule.c',
+    'hpy/devel/src/runtime/ctx_err.c',
+    'hpy/devel/src/runtime/ctx_module.c',
+    'hpy/devel/src/runtime/ctx_object.c',
+    'hpy/devel/src/runtime/ctx_type.c',
+    'hpy/devel/src/runtime/ctx_tracker.c',
+    'hpy/devel/src/runtime/ctx_listbuilder.c',
+    'hpy/devel/src/runtime/ctx_tuple.c',
+    'hpy/devel/src/runtime/ctx_tuplebuilder.c',
 ]
 
 HPY_INCLUDE_DIRS = [
@@ -107,10 +121,8 @@ HPY_INCLUDE_DIRS = [
     'hpy/trace/src/include',
 ]
 
-HPY_HELPERS_LIB_NAME = "hpyhelpers"
+HPY_EXTRA_LIB_NAME = "hpyextra"
 HPY_CTX_LIB_NAME = "hpyctx"
-LIB_OUTPUT_DIR = os.path.join("build", "lib")
-helpers_lib_filename = None
 
 
 def get_hpy_runtime_includes():
@@ -121,34 +133,60 @@ def get_hpy_runtime_includes():
     return [default_include] + HPY_INCLUDE_DIRS
 
 
-class build_hpyhelpers(build_clib):
+class build_clib_hpy(build_clib):
+
+    def _filter_libraries(self, libraries):
+        filtered_libs = []
+        for lib in libraries:
+            lib_name, build_info = lib
+            if lib_name not in (HPY_EXTRA_LIB_NAME, HPY_CTX_LIB_NAME):
+                filtered_libs.append(lib)
+        return filtered_libs
+
+    def get_library_names(self):
+        libraries = self._filter_libraries(self.libraries)
+        if not libraries:
+            return None
+
+        lib_names = []
+        for lib_name, build_info in libraries:
+            lib_names.append(lib_name)
+        return lib_names
 
     def build_libraries(self, libraries):
         # call super's build_libraries to build everything
         super().build_libraries(libraries)
 
         build = self.get_finalized_command('build')
-        # dest = os.path.join(build.build_lib, "hpy", "devel")
-        # self.copy_tree(self.build_clib, dest)
+        inplace = self.get_finalized_command('build_ext').inplace
+        if inplace:
+            # the inplace option requires to find the package directory
+            # using the build_py command for that
+            build_py = self.get_finalized_command('build_py')
+            lib_dir = os.path.abspath(build_py.get_package_dir('hpy.devel'))
+        else:
+            lib_dir = os.path.join(build.build_lib, 'hpy', 'devel')
 
         for (lib_name, build_info) in libraries:
             # this is also what 'create_static_lib' uses
             output_path = self.compiler.library_filename(lib_name, output_dir=self.build_clib)
             output_filename = os.path.basename(output_path)
-            package = build_info.get('package')
-            if package:
-                dest_dir = os.path.join(build.build_lib, *package.split('.'))
+            abi = build_info.get('abi')
+            if abi:
+                dest_dir = os.path.join(lib_dir, 'lib', abi)
                 self.mkpath(dest_dir)
-            else:
-                dest_dir = build.build_lib
-            self.copy_file(output_path, os.path.join(dest_dir, output_filename))
+                self.copy_file(output_path, os.path.join(dest_dir, output_filename))
 
 
-STATIC_LIBS = [(HPY_HELPERS_LIB_NAME,
-                {'sources': HPY_HELPER_SOURCES,
+STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
+                {'sources': HPY_EXTRA_SOURCES,
                  'include_dirs': get_hpy_runtime_includes(),
-                 'package': 'hpy.devel.lib.universal',
-                 'macros': [('HPY_UNIVERSAL_ABI', None)]})]
+                 'abi': 'universal',
+                 'macros': [('HPY_UNIVERSAL_ABI', None)]}),
+               (HPY_CTX_LIB_NAME,
+                {'sources': HPY_EXTRA_SOURCES + HPY_CTX_SOURCES,
+                 'include_dirs': get_hpy_runtime_includes(),
+                 'abi': 'cpython'})]
 
 EXT_MODULES = [
     Extension('hpy.universal',
@@ -156,17 +194,6 @@ EXT_MODULES = [
                'hpy/universal/src/ctx.c',
                'hpy/universal/src/ctx_meth.c',
                'hpy/universal/src/ctx_misc.c',
-               'hpy/devel/src/runtime/ctx_bytes.c',
-               'hpy/devel/src/runtime/ctx_call.c',
-               'hpy/devel/src/runtime/ctx_capsule.c',
-               'hpy/devel/src/runtime/ctx_err.c',
-               'hpy/devel/src/runtime/ctx_module.c',
-               'hpy/devel/src/runtime/ctx_object.c',
-               'hpy/devel/src/runtime/ctx_type.c',
-               'hpy/devel/src/runtime/ctx_tracker.c',
-               'hpy/devel/src/runtime/ctx_listbuilder.c',
-               'hpy/devel/src/runtime/ctx_tuple.c',
-               'hpy/devel/src/runtime/ctx_tuplebuilder.c',
                'hpy/debug/src/debug_ctx.c',
                'hpy/debug/src/debug_ctx_cpython.c',
                'hpy/debug/src/debug_handles.c',
@@ -178,8 +205,9 @@ EXT_MODULES = [
                'hpy/trace/src/trace_ctx.c',
                'hpy/trace/src/_tracemod.c',
                'hpy/trace/src/autogen_trace_wrappers.c',
-               'hpy/trace/src/autogen_trace_func_table.c',
-              ],
+               'hpy/trace/src/autogen_trace_func_table.c']
+              + HPY_EXTRA_SOURCES
+              + HPY_CTX_SOURCES,
               include_dirs=HPY_INCLUDE_DIRS,
               extra_compile_args=[
                   # so we need to enable the HYBRID ABI in order to implement
@@ -218,7 +246,7 @@ setup(
             "hpy_ext_modules = hpy.devel:handle_hpy_ext_modules",
         ],
     },
-    cmdclass={"build_clib": build_hpyhelpers},
+    cmdclass={"build_clib": build_clib_hpy},
     use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
     install_requires=['setuptools>=64.0'],
