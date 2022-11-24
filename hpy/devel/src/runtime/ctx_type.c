@@ -158,7 +158,7 @@ static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name, HPyType_BuiltinSh
     memcpy(result->name, name, name_size);
     result->shape = shape;
     result->magic = HPy_TYPE_MAGIC;
-    /* XXX the returned struct is never freed */
+    /* XXX On Python 3.10 and older, the returned struct is never freed */
     return result;
 }
 
@@ -1135,6 +1135,18 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     if (result == NULL) {
         return HPy_NULL;
     }
+
+#if PY_VERSION_HEX >= 0x030B0000
+    /* Since Python 3.11, the name will be copied into a fresh buffer such that
+       the type objects owns this buffer. Hence we need to patch the pointer
+       again. The nice thing is that Python will then free out HPyType_Extra
+       for us. The internal field '_ht_tpname' is only used for freeing. So, we
+       can set it to 'extra'. */
+    PyHeapTypeObject *ht = (PyHeapTypeObject *) result;
+    PyMem_Free(ht->_ht_tpname);
+    ht->_ht_tpname = (char *) extra;
+    ht->ht_type.tp_name = (const char *)extra->name;
+#endif
 
 #if PY_VERSION_HEX < 0x03080000
     /*
