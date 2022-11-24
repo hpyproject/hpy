@@ -44,7 +44,7 @@ typedef struct {
 
 #else // HPY_ABI_CPYTHON
 
-// module initialization in the universal case
+// module initialization in the universal and hybrid case
 #define HPy_MODINIT(modname)                                   \
     _HPy_HIDDEN HPyContext *_ctx_for_trampolines;              \
     static HPy init_##modname##_impl(HPyContext *ctx);         \
