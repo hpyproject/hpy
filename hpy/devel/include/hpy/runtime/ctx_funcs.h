@@ -60,12 +60,11 @@ _HPy_HIDDEN HPy ctx_Tuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n)
 _HPy_HIDDEN HPy ctx_Capsule_New(HPyContext *ctx,
                                 void *pointer,
                                 const char *name,
-                                HPyCapsule_Destructor destructor);
-_HPy_HIDDEN HPyCapsule_Destructor ctx_Capsule_GetDestructor(HPyContext *ctx,
-                                                            HPy h_capsule);
+                                HPyCapsule_Destructor *destructor);
 _HPy_HIDDEN int ctx_Capsule_SetDestructor(HPyContext *ctx,
                                           HPy h_capsule,
-                                          HPyCapsule_Destructor destructor);
+                                          HPyCapsule_Destructor *destructor);
+
 #ifndef HPY_ABI_CPYTHON
 _HPy_HIDDEN void* ctx_Capsule_Get(HPyContext *ctx,
                                   HPy capsule,

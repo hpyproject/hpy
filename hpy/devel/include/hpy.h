@@ -218,8 +218,6 @@ typedef struct _HPyContext_s HPyContext;
     } _HPyCapsule_key;
 #endif
 
-typedef void (*HPyCapsule_Destructor)(const char *name, void *pointer, void *context);
-
 
 /* ~~~~~~~~~~~~~~~~ Additional #includes ~~~~~~~~~~~~~~~~ */
 

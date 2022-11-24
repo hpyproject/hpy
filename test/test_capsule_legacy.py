@@ -47,8 +47,6 @@ class TestHPyCapsuleLegacy(HPyTest):
             {
                 HPy res = HPy_NULL;
                 HPy h_value = HPy_NULL;
-                HPy has_destructor = HPy_NULL;
-                HPyCapsule_Destructor destr = NULL;
                 int *ptr = NULL;
 
                 const char *name = HPyCapsule_GetName(ctx, arg);
@@ -70,22 +68,11 @@ class TestHPyCapsuleLegacy(HPyTest):
                     goto finish;
                 }
 
-                destr = HPyCapsule_GetDestructor(ctx, arg);
-                if (destr == NULL && HPyErr_Occurred(ctx)) {
-                    goto finish;
-                }
-
-                has_destructor = HPyBool_FromLong(ctx, destr != NULL);
-                if (HPy_IsNull(has_destructor)) {
-                    goto finish;
-                }
-
-                res = HPyTuple_Pack(ctx, 3, h_name, h_value, has_destructor);
+                res = HPyTuple_Pack(ctx, 2, h_name, h_value);
 
             finish:
                 HPy_Close(ctx, h_name);
                 HPy_Close(ctx, h_value);
-                HPy_Close(ctx, has_destructor);
                 return res;
             }
 
@@ -96,4 +83,4 @@ class TestHPyCapsuleLegacy(HPyTest):
         """)
         name = "legacy_capsule"
         p = mod.create_pycapsule(name)
-        assert mod.get(p) == (name, 123, False)
+        assert mod.get(p) == (name, 123)

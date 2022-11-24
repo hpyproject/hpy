@@ -160,6 +160,12 @@ typedef struct {
         return a.result; \
     }
 
+#define HPyCapsule_DESTRUCTOR_TRAMPOLINE(SYM, IMPL)                            \
+    static void SYM(cpy_PyObject *capsule)                                     \
+    {                                                                          \
+        _HPy_CallRealFunctionFromTrampoline(_ctx_for_trampolines,              \
+                HPyFunc_CAPSULE_DESTRUCTOR, (HPyCFunction)IMPL, capsule);      \
+    }
 
 
 #endif // HPY_UNIVERSAL_HPYFUNC_TRAMPOLINES_H

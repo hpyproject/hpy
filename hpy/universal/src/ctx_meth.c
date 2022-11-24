@@ -113,6 +113,14 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
                                                       a->visit, a->arg);
         return;
     }
+    case HPyFunc_CAPSULE_DESTRUCTOR: {
+        HPyFunc_Capsule_Destructor f = (HPyFunc_Capsule_Destructor)func;
+        PyObject *capsule = (PyObject *)args;
+        const char *name = PyCapsule_GetName(capsule);
+        f(name, PyCapsule_GetPointer(capsule, name),
+                PyCapsule_GetContext(capsule));
+        return;
+    }
 #include "autogen_ctx_call.i"
     default:
         Py_FatalError("Unsupported HPyFunc_Signature in ctx_meth.c");
