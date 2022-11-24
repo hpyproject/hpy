@@ -19,6 +19,10 @@ SUPPORTS_SYS_EXECUTABLE = bool(getattr(sys, "executable", None))
 # True if we are running on the CPython debug build
 IS_PYTHON_DEBUG_BUILD = hasattr(sys, 'gettotalrefcount')
 
+# pytest marker to run tests only on linux
+ONLY_LINUX = pytest.mark.skipif(sys.platform!='linux', reason='linux only')
+
+
 def reindent(s, indent):
     s = textwrap.dedent(s)
     return ''.join(' '*indent + line if line.strip() else line

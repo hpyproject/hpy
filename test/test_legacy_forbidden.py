@@ -5,7 +5,7 @@ get the expected compile time errors
 
 import sys
 import pytest
-from .support import HPyTest, make_hpy_abi_fixture
+from .support import HPyTest, make_hpy_abi_fixture, ONLY_LINUX
 
 # this is not strictly correct, we should check whether the actualy compiler
 # is GCC. But for the CI and most cases, it's enough to assume that if we are
@@ -14,7 +14,7 @@ from .support import HPyTest, make_hpy_abi_fixture
 # We need this because some of the nice compilation errors (such as the ones
 # causes by _HPY_LEGACY) are triggered only by gcc. Would be nice to have them
 # also for other compilers
-ONLY_GCC = pytest.mark.skipif(sys.platform!='linux', reason='GCC only')
+ONLY_GCC = ONLY_LINUX
 
 
 class TestLegacyForbidden(HPyTest):
