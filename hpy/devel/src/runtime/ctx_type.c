@@ -158,7 +158,7 @@ static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name, HPyType_BuiltinSh
     memcpy(result->name, name, name_size);
     result->shape = shape;
     result->magic = HPy_TYPE_MAGIC;
-    /* XXX the returned struct is never freed */
+    /* XXX On Python 3.10 and older, the returned struct is never freed */
     return result;
 }
 
@@ -652,10 +652,16 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     return result;
 }
 
-// XXX: This is a hack to work-around the missing Py_bf_getbuffer and
-// Py_bf_releasebuffer before 3.9. We shouldn't use it on 3.9+.
-typedef int (*HPyGetBufferProc)(struct _object *, struct bufferinfo *, int);
-typedef void (*HPyReleaseBufferProc)(struct _object *, struct bufferinfo *);
+/* Python 3.8 and older is the missing Py_bf_getbuffer and Py_bf_releasebuffer
+   so we need to define those functions here. Since Python 3.9, we can just use
+   the function pointer types from Python. */
+#if PY_VERSION_HEX < 0x03009000
+typedef int (*cpy_getbufferproc)(cpy_PyObject *, cpy_Py_buffer *, int);
+typedef void (*cpy_releasebufferproc)(cpy_PyObject *, cpy_Py_buffer *);
+#else
+typedef getbufferproc cpy_getbufferproc;
+typedef releasebufferproc cpy_releasebufferproc;
+#endif
 static PyBufferProcs*
 create_buffer_procs(HPyType_Spec *hpyspec)
 {
@@ -674,7 +680,7 @@ create_buffer_procs(HPyType_Spec *hpyspec)
                             return NULL;
                         }
                     }
-                    buffer_procs->bf_getbuffer = (HPyGetBufferProc)src->slot.cpy_trampoline;
+                    buffer_procs->bf_getbuffer = (cpy_getbufferproc)src->slot.cpy_trampoline;
                     break;
                 case HPy_bf_releasebuffer:
                     if (buffer_procs == NULL) {
@@ -684,7 +690,7 @@ create_buffer_procs(HPyType_Spec *hpyspec)
                             return NULL;
                         }
                     }
-                    buffer_procs->bf_releasebuffer = (HPyReleaseBufferProc)src->slot.cpy_trampoline;
+                    buffer_procs->bf_releasebuffer = (cpy_releasebufferproc)src->slot.cpy_trampoline;
                     break;
                 default:
                     break;
@@ -1129,6 +1135,18 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     if (result == NULL) {
         return HPy_NULL;
     }
+
+#if PY_VERSION_HEX >= 0x030B0000
+    /* Since Python 3.11, the name will be copied into a fresh buffer such that
+       the type objects owns this buffer. Hence we need to patch the pointer
+       again. The nice thing is that Python will then free out HPyType_Extra
+       for us. The internal field '_ht_tpname' is only used for freeing. So, we
+       can set it to 'extra'. */
+    PyHeapTypeObject *ht = (PyHeapTypeObject *) result;
+    PyMem_Free(ht->_ht_tpname);
+    ht->_ht_tpname = (char *) extra;
+    ht->ht_type.tp_name = (const char *)extra->name;
+#endif
 
 #if PY_VERSION_HEX < 0x03080000
     /*
