@@ -154,11 +154,15 @@ static PyObject *get_version(PyObject *self, PyObject *ignored)
     return Py_BuildValue("ss", HPY_VERSION, HPY_GIT_REVISION);
 }
 
+
 static PyMethodDef HPyMethods[] = {
-    {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS, "Load a .hpy0.so"},
-    {"get_version", (PyCFunction)get_version, METH_NOARGS, "Return a tuple ('version', 'git revision')"},
+    {"load", (PyCFunction)load, METH_VARARGS | METH_KEYWORDS,
+     ("Load a ." HPY_ABI_TAG ".so file")},
+    {"get_version", (PyCFunction)get_version, METH_NOARGS,
+     "Return a tuple ('version', 'git revision')"},
     {NULL, NULL, 0, NULL}
 };
+
 
 static int exec_module(PyObject *mod);
 static PyModuleDef_Slot hpymodule_slots[] = {

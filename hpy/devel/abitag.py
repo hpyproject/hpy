@@ -1,7 +1,9 @@
 import sys
 from distutils import sysconfig
 
-HPY_ABI_TAG = 'hpy0'
+# NOTE: these must be kept on sync with the equivalent defines in hpy.h
+HPY_ABI_VERSION = 0
+HPY_ABI_TAG = 'hpy%d' % HPY_ABI_VERSION
 
 def parse_ext_suffix(ext_suffix=None):
     """

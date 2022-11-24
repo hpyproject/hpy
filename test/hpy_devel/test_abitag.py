@@ -1,4 +1,4 @@
-from hpy.devel.abitag import parse_ext_suffix, get_hpy_ext_suffix
+from hpy.devel.abitag import parse_ext_suffix, get_hpy_ext_suffix, HPY_ABI_TAG
 
 def test_parse_ext_suffix_ext():
     _, ext = parse_ext_suffix('.cpython-310-x86_64-linux-gnu.so')
@@ -20,5 +20,6 @@ def test_parse_ext_suffix_abi_tag():
 
 def test_get_hpy_ext_suffix():
     get = get_hpy_ext_suffix
-    assert get('universal', '.cpython-38-x86_64-linux-gnu.so') == '.hpy0.so'
-    assert get('hybrid', '.cpython-38-x86_64-linux-gnu.so') == '.hpy0-cp38.so'
+    hpy0 = HPY_ABI_TAG
+    assert get('universal', '.cpython-38-x86_64-linux-gnu.so') == f'.{hpy0}.so'
+    assert get('hybrid', '.cpython-38-x86_64-linux-gnu.so') == f'.{hpy0}-cp38.so'

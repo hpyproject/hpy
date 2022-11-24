@@ -4,6 +4,12 @@
 extern "C" {
 #endif
 
+/* ~~~~~~~~~~~~~~~~ HPy ABI version ~~~~~~~~~~~~~~~ */
+// NOTE: these must be kept on sync with the equivalent variables in hpy/devel/abitag.py
+#define HPY_ABI_VERSION 0
+#define HPY_ABI_TAG "hpy0"
+
+
 /* ~~~~~~~~~~~~~~~~ HPy ABI macros ~~~~~~~~~~~~~~~~ */
 
 /* The following macros are used to determine which kind of module we want to
