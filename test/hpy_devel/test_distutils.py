@@ -7,6 +7,7 @@ files in this directory, which all inherit from HPyTest and test the API
 itself.
 """
 
+import sys
 import os
 import textwrap
 import subprocess
@@ -15,16 +16,34 @@ import venv
 import py
 import pytest
 
-
 from test.support import atomic_run, HPY_ROOT
 
-# this is only for development: if we set it to true, we don't have to
-# recreate the venv_template between runs, it's much faster
-REUSE_VENV_TEMPLATE = False
+# ====== IMPORTANT DEVELOPMENT TIP =====
+# You can use py.test --reuse-venv to speed up local testing.
+#
+# The env is created once in /tmp/venv-for-hpytest and reused among tests and
+# sessions. If you want to recreate it, simply rm -r /tmp/venv-for-hpytest
+
+def print_CalledProcessError(p):
+    """
+    Print all information about a CalledProcessError
+    """
+    print('========== subprocess failed ==========')
+    print('command:', ' '.join(p.cmd))
+    print('argv:   ', p.cmd)
+    print('return code:', p.returncode)
+    print()
+    print('---------- <stdout> ----------')
+    print(p.stdout.decode('latin-1'))
+    print('---------- </stdout> ---------')
+    print()
+    print('---------- <stderr> ----------')
+    print(p.stderr.decode('latin-1'))
+    print('---------- </stderr> ---------')
 
 @pytest.fixture(scope='session')
-def venv_template(tmpdir_factory):
-    if REUSE_VENV_TEMPLATE:
+def venv_template(request, tmpdir_factory):
+    if request.config.option.reuse_venv:
         d = py.path.local('/tmp/venv-for-hpytest')
         if d.check(dir=True):
             # if it exists, we assume it's correct. If you want to recreate,
@@ -56,8 +75,7 @@ def venv_template(tmpdir_factory):
             capture_output=True,
         )
     except subprocess.CalledProcessError as cpe:
-        print(cpe.stdout.decode("utf8"))
-        print(cpe.stderr.decode("utf8"))
+        print_CalledProcessError(cpe)
         raise
     return d
 
@@ -67,6 +85,7 @@ def attach_python_to_venv(d):
     else:
         d.bin = d.join('bin')
     d.python = d.bin.join('python')
+
 
 @pytest.mark.usefixtures('initargs')
 class TestDistutils:
@@ -83,7 +102,7 @@ class TestDistutils:
         self.gen_project()
         self.hpy_test_project.chdir()
 
-    @pytest.fixture(params=['cpython', 'universal'])
+    @pytest.fixture(params=['cpython', 'hybrid', 'universal'])
     def hpy_abi(self, request):
         return request.param
 
@@ -94,13 +113,12 @@ class TestDistutils:
         cmd = [str(self.venv.python)] + list(args)
         print('[RUN]', ' '.join(cmd))
         if capture:
-            proc = atomic_run(cmd, stdout=subprocess.PIPE)
+            proc = atomic_run(cmd, capture_output=True)
             out = proc.stdout.decode('latin-1').strip()
         else:
             proc = atomic_run(cmd)
             out = None
-        if proc.returncode != 0:
-            raise Exception(f"Command {cmd} failed")
+        proc.check_returncode()
         return out
 
 
@@ -137,15 +155,38 @@ class TestDistutils:
             #include <hpy.h>
             static HPyModuleDef moduledef = {
                 .name = "hpymod",
-            #ifdef HPY_UNIVERSAL_ABI
-                .doc = "hpymod universal ABI",
-            #else
-                .doc = "hpymod cpython ABI",
-            #endif
+                .doc = "hpymod with HPy ABI: " HPY_ABI,
             };
 
             HPy_MODINIT(hpymod)
             static HPy init_hpymod_impl(HPyContext *ctx)
+            {
+                return HPyModule_Create(ctx, &moduledef);
+            }
+        """)
+
+        self.writefile('hpymod_legacy.c', """
+            // the simplest possible HPy+legacy module
+            #include <hpy.h>
+            #include <Python.h>
+
+            static PyObject *f(PyObject *self, PyObject *args)
+            {
+                return PyLong_FromLong(1234);
+            }
+            static PyMethodDef my_legacy_methods[] = {
+                {"f", (PyCFunction)f, METH_NOARGS},
+                {NULL}
+            };
+
+            static HPyModuleDef moduledef = {
+                .name = "hpymod_legacy",
+                .doc = "hpymod_legacy with HPy ABI: " HPY_ABI,
+                .legacy_methods = my_legacy_methods,
+            };
+
+            HPy_MODINIT(hpymod_legacy)
+            static HPy init_hpymod_legacy_impl(HPyContext *ctx)
             {
                 return HPyModule_Create(ctx, &moduledef);
             }
@@ -156,6 +197,7 @@ class TestDistutils:
             from setuptools import setup, Extension
             cpymod = Extension("cpymod", ["cpymod.c"])
             hpymod = Extension("hpymod", ["hpymod.c"])
+            hpymod_legacy = Extension("hpymod_legacy", ["hpymod_legacy.c"])
         """)
         src = preamble + textwrap.dedent(src)
         f = self.hpy_test_project.join('setup.py')
@@ -231,7 +273,7 @@ class TestDistutils:
         """)
         self.python('setup.py', f'--hpy-abi={hpy_abi}', 'build_ext', '--inplace')
         doc = self.get_docstring('hpymod')
-        assert doc == f'hpymod {hpy_abi} ABI'
+        assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
     def test_hpymod_setup_install(self, hpy_abi):
         # check that we can install hpy modules with setup.py install
@@ -242,7 +284,7 @@ class TestDistutils:
         """)
         self.python('setup.py', f'--hpy-abi={hpy_abi}', 'install')
         doc = self.get_docstring('hpymod')
-        assert doc == f'hpymod {hpy_abi} ABI'
+        assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
     def test_hpymod_wheel(self, hpy_abi):
         # check that we can build and install wheels
@@ -256,7 +298,7 @@ class TestDistutils:
         whl = dist.listdir('*.whl')[0]
         self.python('-m', 'pip', 'install', str(whl))
         doc = self.get_docstring('hpymod')
-        assert doc == f'hpymod {hpy_abi} ABI'
+        assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
     def test_dont_mix_cpython_and_universal_abis(self):
         """
@@ -279,7 +321,7 @@ class TestDistutils:
         assert len(libs) == 1
         #
         doc = self.get_docstring('hpymod')
-        assert doc == 'hpymod cpython ABI'
+        assert doc == 'hpymod with HPy ABI: cpython'
 
         # now recompile with universal *without* cleaning the build
         self.python('setup.py', '--hpy-abi=universal', 'install')
@@ -291,4 +333,39 @@ class TestDistutils:
         assert len(libs) == 2
         #
         doc = self.get_docstring('hpymod')
-        assert doc == 'hpymod universal ABI'
+        assert doc == 'hpymod with HPy ABI: universal'
+
+    def test_hpymod_legacy(self, hpy_abi):
+        if hpy_abi == 'universal':
+            pytest.skip('only for cpython and hybrid ABIs')
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod_legacy],
+                  install_requires = [],
+            )
+        """)
+        self.python('setup.py', 'install')
+        src = 'import hpymod_legacy; print(hpymod_legacy.f())'
+        out = self.python('-c', src, capture=True)
+        assert out == '1234'
+
+    def test_hpymod_legacy_fails_with_universal(self):
+        self.gen_setup_py("""
+            setup(name = "hpy_test_project",
+                  hpy_ext_modules = [hpymod_legacy],
+                  install_requires = [],
+            )
+        """)
+        with pytest.raises(subprocess.CalledProcessError) as exc:
+            self.python('setup.py', '--hpy-abi=universal', 'install', capture=True)
+        expected_msg = ("It is forbidden to #include <Python.h> when "
+                        "targeting the HPy Universal ABI")
+
+        # gcc/clang prints the #error on stderr, MSVC prints it on
+        # stdout. Here we check that the error is printed "somewhere", we
+        # don't care exactly where.
+        out = exc.value.stdout + b'\n' + exc.value.stderr
+        out = out.decode('latin-1')
+        if expected_msg not in out:
+            print_CalledProcessError(exc.value)
+        assert expected_msg in out

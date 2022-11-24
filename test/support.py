@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import subprocess
 import textwrap
+import distutils
 
 PY2 = sys.version_info[0] == 2
 
@@ -18,6 +19,10 @@ SUPPORTS_SYS_EXECUTABLE = bool(getattr(sys, "executable", None))
 # True if we are running on the CPython debug build
 IS_PYTHON_DEBUG_BUILD = hasattr(sys, 'gettotalrefcount')
 
+# pytest marker to run tests only on linux
+ONLY_LINUX = pytest.mark.skipif(sys.platform!='linux', reason='linux only')
+
+
 def reindent(s, indent):
     s = textwrap.dedent(s)
     return ''.join(' '*indent + line if line.strip() else line
@@ -27,9 +32,50 @@ def atomic_run(*args, **kwargs):
     with LOCK:
         return subprocess.run(*args, **kwargs)
 
+
+def make_hpy_abi_fixture(ABIs, class_fixture=False):
+    """
+    Make an hpy_abi fixture.
+
+    conftest.py defines a default hpy_abi for all tests, but individual files
+    and classes can override the set of ABIs they want to use. The indented
+    usage is the following:
+
+    # at the top of a file
+    hpy_abi = make_hpy_abi_fixture(['universal', 'debug'])
+
+    # in a class
+    class TestFoo(HPyTest):
+        hpy_abi = make_hpy_abi_fixture('with hybrid', class_fixture=True)
+    """
+    if ABIs == 'default':
+        ABIs = ['cpython', 'universal', 'debug']
+    elif ABIs == 'with hybrid':
+        ABIs = ['cpython', 'hybrid', 'hybrid+debug']
+    elif isinstance(ABIs, list):
+        pass
+    else:
+        raise ValueError("ABIs must be 'default', 'with hybrid' "
+                         "or a list of strings. Got: %s" % ABIs)
+
+    if class_fixture:
+        @pytest.fixture(params=ABIs)
+        def hpy_abi(self, request):
+            abi = request.param
+            yield abi
+    else:
+        @pytest.fixture(params=ABIs)
+        def hpy_abi(request):
+            abi = request.param
+            yield abi
+
+    return hpy_abi
+
+
 class DefaultExtensionTemplate(object):
 
-    INIT_TEMPLATE = textwrap.dedent("""
+    INIT_TEMPLATE = textwrap.dedent(
+    """
     static HPyDef *moduledefs[] = {
         %(defines)s
         NULL
@@ -268,6 +314,8 @@ class ExtensionCompiler:
             # there is no compile-time difference between universal and debug
             # extensions. The only difference happens at load time
             hpy_abi = 'universal'
+        elif hpy_abi == 'hybrid+debug':
+            hpy_abi = 'hybrid'
         so_filename = c_compile(str(self.tmpdir), ext,
                                 hpy_devel=self.hpy_devel,
                                 hpy_abi=hpy_abi,
@@ -289,9 +337,9 @@ class ExtensionCompiler:
         module = self.compile_module(
             main_src, ExtensionTemplate, name, extra_sources)
         so_filename = module.so_filename
-        if self.hpy_abi == 'universal':
+        if self.hpy_abi in ('universal', 'hybrid'):
             return self.load_universal_module(name, so_filename, debug=False)
-        elif self.hpy_abi == 'debug':
+        elif self.hpy_abi in ('debug', 'hybrid+debug'):
             return self.load_universal_module(name, so_filename, debug=True)
         elif self.hpy_abi == 'cpython':
             return self.load_cpython_module(name, so_filename)
@@ -299,7 +347,7 @@ class ExtensionCompiler:
             assert False
 
     def load_universal_module(self, name, so_filename, debug):
-        assert self.hpy_abi in ('universal', 'debug')
+        assert self.hpy_abi in ('universal', 'hybrid', 'debug', 'hybrid+debug')
         import sys
         import hpy.universal
         assert name not in sys.modules
@@ -374,8 +422,10 @@ class HPyTest:
     ExtensionTemplate = DefaultExtensionTemplate
 
     @pytest.fixture()
-    def initargs(self, compiler):
+    def initargs(self, compiler, leakdetector, capfd):
         self.compiler = compiler
+        self.leakdetector = leakdetector
+        self.capfd = capfd
 
     def make_module(self, main_src, name='mytest', extra_sources=()):
         ExtensionTemplate = self.ExtensionTemplate
@@ -386,6 +436,25 @@ class HPyTest:
         ExtensionTemplate = self.ExtensionTemplate
         return self.compiler.compile_module(main_src, ExtensionTemplate, name,
                                      extra_sources)
+
+    def expect_make_error(self, main_src, error):
+        with pytest.raises(distutils.errors.CompileError):
+            self.make_module(main_src)
+        #
+        # capfd.readouterr() "eats" the output, but we want to still see it in
+        # case of failure. Just print it again
+        cap = self.capfd.readouterr()
+        sys.stdout.write(cap.out)
+        sys.stderr.write(cap.err)
+        #
+        # gcc prints compiler errors to stderr, but MSVC seems to print them
+        # to stdout. Let's just check both
+        if error in cap.out or error in cap.err:
+            # the error was found, we are good
+            return
+        raise Exception("The following error message was not found in the compiler "
+                        "output:\n    " + error)
+
 
     def supports_refcounts(self):
         """ Returns True if the underlying Python implementation supports

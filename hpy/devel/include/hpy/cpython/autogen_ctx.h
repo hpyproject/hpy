@@ -12,6 +12,7 @@
 
 struct _HPyContext_s {
     const char *name;
+    int abi_version;
     HPy h_None;
     HPy h_True;
     HPy h_False;

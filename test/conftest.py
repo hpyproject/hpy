@@ -1,6 +1,6 @@
 import pytest
 from .support import ExtensionCompiler, DefaultExtensionTemplate,\
-    PythonSubprocessRunner, HPyDebugCapture
+    PythonSubprocessRunner, HPyDebugCapture, make_hpy_abi_fixture
 from hpy.debug.leakdetector import LeakDetector
 from pathlib import Path
 
@@ -19,6 +19,10 @@ def pytest_addoption(parser):
         help="Enables dump mode and specifies where to write generated test "
              "sources. This will then only generate the sources and skip "
              "evaluation of the tests.")
+    parser.addoption(
+        '--reuse-venv', action="store_true",
+        help="Development only: reuse the venv for test_distutils.py instead of "
+             "creating a new one for every test")
 
 
 @pytest.hookimpl(trylast=True)
@@ -29,24 +33,30 @@ def pytest_configure(config):
         "markers", "syncgc: Mark tests that rely on a synchronous GC."
     )
 
+# this is the default set of hpy_abi for all the tests. Individual files and
+# classes can override it.
+hpy_abi = make_hpy_abi_fixture('default')
+
+
 @pytest.fixture(scope='session')
 def hpy_devel(request):
     from hpy.devel import HPyDevel
     return HPyDevel()
 
-@pytest.fixture(params=['cpython', 'universal', 'debug'])
-def hpy_abi(request):
-    abi = request.param
-    if abi == 'debug':
-        with LeakDetector():
-            yield abi
+@pytest.fixture
+def leakdetector(hpy_abi):
+    """
+    Automatically detect leaks when the hpy_abi == 'debug'
+    """
+    if 'debug' in hpy_abi:
+        with LeakDetector() as ld:
+            yield ld
     else:
-        yield abi
+        yield None
 
 @pytest.fixture
 def ExtensionTemplate():
     return DefaultExtensionTemplate
-
 
 @pytest.fixture
 def compiler(request, tmpdir, hpy_devel, hpy_abi, ExtensionTemplate):

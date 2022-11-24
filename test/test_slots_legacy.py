@@ -1,17 +1,16 @@
 """ HPyType slot tests on legacy types. """
 
-from .support import HPyTest
+from .support import HPyTest, make_hpy_abi_fixture
 from .test_hpytype_legacy import LegacyPointTemplate
 from .test_slots import TestSlots as _TestSlots, TestSqSlots as _TestSqSlots
 
+hpy_abi = make_hpy_abi_fixture('with hybrid')
 
 class TestLegacySlots(_TestSlots):
-
     ExtensionTemplate = LegacyPointTemplate
 
 
 class TestLegacySqSlots(_TestSqSlots):
-
     ExtensionTemplate = LegacyPointTemplate
 
 

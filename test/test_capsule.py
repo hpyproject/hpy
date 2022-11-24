@@ -39,7 +39,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             static SomeObject *create_payload(int value, char *message)
             {
                 size_t n_message = strlen(message) + 1;
-                SomeObject *pointer = (SomeObject *) 
+                SomeObject *pointer = (SomeObject *)
                         malloc(sizeof(SomeObject) + n_message * sizeof(char));
                 if (pointer == NULL) {
                     return NULL;
@@ -195,7 +195,7 @@ class TestHPyCapsule(HPyTest):
                 int value;
                 char *message;
                 int non_null_pointer;
-                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Oisi", 
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Oisi",
                                   &capsule, &value, &message, &non_null_pointer)) {
                     return HPy_NULL;
                 }
@@ -424,7 +424,7 @@ class TestHPyCapsule(HPyTest):
     def test_capsule_new_with_destructor(self):
         mod = self.make_module("""
             static int pointer_freed = 0;
-            
+
             HPyCapsule_DESTRUCTOR(mydtor)
             static void mydtor_impl(const char *name, void *pointer, void *context)
             {
@@ -465,84 +465,3 @@ class TestHPyCapsule(HPyTest):
         """)
         with pytest.raises(ValueError):
             mod.capsule_new(789, "Hello, World!")
-
-class TestHPyCapsuleLegacy(HPyTest):
-
-    ExtensionTemplate = CapsuleTemplate
-
-    def test_legacy_capsule_compat(self):
-        import pytest
-        mod = self.make_module("""
-            @DEFINE_strdup
-
-            #include <Python.h>
-            #include <string.h>
-
-            static int dummy = 123;
-
-            static void legacy_destructor(PyObject *capsule)
-            {
-                /* We need to use C lib 'free' because the string was
-                   created with 'strdup0'. */
-                free((void *) PyCapsule_GetName(capsule));
-            }
-
-            HPyDef_METH(Create_pycapsule, "create_pycapsule", HPyFunc_O)
-            static HPy Create_pycapsule_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                HPy_ssize_t n;
-                const char *name = HPyUnicode_AsUTF8AndSize(ctx, arg, &n);
-                char *name_copy = strdup0(name);
-                if (name_copy == NULL) {
-                    HPyErr_SetString(ctx, ctx->h_MemoryError, "out of memory");
-                    return HPy_NULL;
-                }
-                PyObject *legacy_caps = PyCapsule_New(&dummy, (const char *) name_copy, 
-                                                      legacy_destructor);
-                HPy res = HPy_FromPyObject(ctx, legacy_caps);
-                Py_DECREF(legacy_caps);
-                return res;
-            }
-
-            HPyDef_METH(Capsule_get, "get", HPyFunc_O)
-            static HPy Capsule_get_impl(HPyContext *ctx, HPy self, HPy arg)
-            {
-                HPy res = HPy_NULL;
-                HPy h_value = HPy_NULL;
-                int *ptr = NULL;
-
-                const char *name = HPyCapsule_GetName(ctx, arg);
-                if (name == NULL && HPyErr_Occurred(ctx)) {
-                    return HPy_NULL;
-                }
-                HPy h_name = HPyUnicode_FromString(ctx, name);
-                if (HPy_IsNull(h_name)) {
-                    goto finish;
-                }
-
-                ptr = (int *) HPyCapsule_GetPointer(ctx, arg, name);
-                if (ptr == NULL && HPyErr_Occurred(ctx)) {
-                    goto finish;
-                }
-
-                h_value = HPyLong_FromLong(ctx, *ptr);
-                if (HPy_IsNull(h_value)) {
-                    goto finish;
-                }
-
-                res = HPyTuple_Pack(ctx, 2, h_name, h_value);
-
-            finish:
-                HPy_Close(ctx, h_name);
-                HPy_Close(ctx, h_value);
-                return res;
-            }
-
-            @EXPORT(Create_pycapsule)
-            @EXPORT(Capsule_get)
-
-            @INIT
-        """)
-        name = "legacy_capsule"
-        p = mod.create_pycapsule(name)
-        assert mod.get(p) == (name, 123)

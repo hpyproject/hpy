@@ -64,7 +64,8 @@ _HPy_HIDDEN HPy ctx_Capsule_New(HPyContext *ctx,
 _HPy_HIDDEN int ctx_Capsule_SetDestructor(HPyContext *ctx,
                                           HPy h_capsule,
                                           HPyCapsule_Destructor *destructor);
-#ifdef HPY_UNIVERSAL_ABI
+
+#ifndef HPY_ABI_CPYTHON
 _HPy_HIDDEN void* ctx_Capsule_Get(HPyContext *ctx,
                                   HPy capsule,
                                   _HPyCapsule_key key,

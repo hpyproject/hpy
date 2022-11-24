@@ -435,6 +435,42 @@ class TestBasic(HPyTest):
         else:
             assert False, 'unexpected hpy_abi: %s' % hpy_abi
 
+    def test_abi_version(self):
+        """
+        Check that all the various ABI version info that we have around match.
+        """
+        from hpy.devel import abitag
+        mod = self.make_module(
+        """
+            HPyDef_METH(get_ABI_VERSION, "get_ABI_VERSION", HPyFunc_NOARGS)
+            static HPy get_ABI_VERSION_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, HPY_ABI_VERSION);
+            }
+
+            HPyDef_METH(get_ABI_TAG, "get_ABI_TAG", HPyFunc_NOARGS)
+            static HPy get_ABI_TAG_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyUnicode_FromString(ctx, HPY_ABI_TAG);
+            }
+
+            HPyDef_METH(get_ctx_version, "get_ctx_version", HPyFunc_NOARGS)
+            static HPy get_ctx_version_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, ctx->abi_version);
+            }
+
+            @EXPORT(get_ABI_VERSION)
+            @EXPORT(get_ABI_TAG)
+            @EXPORT(get_ctx_version)
+            @INIT
+        """)
+        c_HPY_ABI_VERSION = mod.get_ABI_VERSION()
+        c_HPY_ABI_TAG = mod.get_ABI_TAG()
+        ctx_version = mod.get_ctx_version()
+        assert c_HPY_ABI_VERSION == ctx_version == abitag.HPY_ABI_VERSION
+        assert c_HPY_ABI_TAG == abitag.HPY_ABI_TAG
+
     def test_FromVoidP_AsVoidP(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_O)

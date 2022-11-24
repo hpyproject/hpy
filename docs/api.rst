@@ -10,7 +10,7 @@ Handles
 
 The "H" in HPy stands for **handle**, which is a central concept: handles are
 used to hold a C reference to Python objects, and they are represented by the
-C ``HPy`` type.  They play the same role as ``PyObject *`` in the Python/C
+C ``HPy`` type.  They play the same role as ``PyObject *`` in the ``Python.h``
 API, albeit with some important differences which are detailed below.
 
 When they are no longer needed, handles must be closed by calling
@@ -48,17 +48,17 @@ Handles vs ``PyObject *``
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to fully understand the way HPy handles work, it is useful to discuss
-the Python/C API ``Pyobject *`` pointer. These pointers always
+the ``Pyobject *`` pointer in ``Python.h``. These pointers always
 point to the same object, and a python object's identity is completely given
 by its address in memory, and two pointers with the same address can
-be passed to Python/C API functions interchangeably. As a result, ``Py_INCREF``
+be passed to ``Python.h`` API functions interchangeably. As a result, ``Py_INCREF``
 and ``Py_DECREF`` can be called with any reference to an object as long as the
 total number of calls of `incref` is equal to the number of calls of `decref`
 at the end of the object lifetime.
 
 Whereas using HPy API, each handle must be closed independently.
 
-Thus, the following perfectly valid piece of Python/C code::
+Thus, the following perfectly valid piece of code using ``Python.h``::
 
   void foo(void)
   {
@@ -98,7 +98,7 @@ close a handle twice and that you don't forget to close any.
   it is possible to identify exactly the C/API function that producted it.
 
 
-Remember that Python/C guarantees that multiple references to the same
+Remember that ``Python.h`` guarantees that multiple references to the same
 object results in the very same ``PyObject *`` pointer. Thus, it is
 possible to compare the pointer addresses to check whether they refer
 to the same object::
@@ -143,7 +143,7 @@ All HPy function calls take an ``HPyContext`` as a first argument, which
 represents the Python interpreter all the handles belong to.  Strictly
 speaking, it would be possible to design the HPy API without using
 ``HPyContext``: after all, all HPy function calls are ultimately mapped to
-Python/C function call, where there is no notion of context.
+``Python.h`` function call, where there is no notion of context.
 
 One of the reasons to include ``HPyContext`` from the day one is to be
 future-proof: it is conceivable to use it to hold the interpreter or the
@@ -162,7 +162,7 @@ A simple example
 -----------------
 
 In this section, we will see how to write a simple C extension using HPy. It
-is assumed that you are already familiar with the existing Python/C API, so we
+is assumed that you are already familiar with the existing ``Python.h`` API, so we
 will underline the similarities and the differences with it.
 
 We want to create a function named ``myabs`` and ``double`` which takes a
@@ -184,7 +184,7 @@ There are a couple of points which are worth noting:
     and is infered by the macro. The macro takes the name and adds ``_impl``
     to the end of it.
 
-  * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in Python/C API,
+  * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in ``Python.h``,
     ``HPyFunc_O`` means that the function receives a single argument on top of
     ``self``.
 
@@ -211,7 +211,7 @@ There are a couple of points which are worth noting:
    CPython ABI and the CPython implementation of the universal ABI, but other
    implementations of the universal ABI will usually call directly the HPy
    function itself.
-  
+
 The second function definition is a bit different:
 
 .. literalinclude:: examples/simple-example/simple.c
@@ -222,7 +222,7 @@ This shows off the other way of creating functions.
 
   * This example is much the same but the difference is that we use
     ``HPyDef_METH_IMPL`` to define a function named ``double``.
-  
+
   * The difference between ``HPyDef_METH_IMPL`` and ``HPyDef_METH`` is that
     the former needs to be given a name for a the functions as the third
     argument.
@@ -233,12 +233,12 @@ Now, we can define our module:
   :start-after: // BEGIN: methodsdef
   :end-before: // END: methodsdef
 
-This part is very similar to the one you would write in Python/C.  Note that
+This part is very similar to the one you would write with ``Python.h``.  Note that
 we specify ``myabs`` (and **not** ``myabs_impl``) in the method table. There
 is also the ``.legacy_methods`` field, which allows to add methods that use the
-Python/C API, i.e., the value should be an array of ``PyMethodDef``. This
+``Python.h`` API, i.e., the value should be an array of ``PyMethodDef``. This
 feature enables support for hybrid extensions in which some of the methods
-are still written using the Python/C API.
+are still written using the ``Python.h`` API.
 
 .. This would be perhaps good place to add a link to the porting tutorial
    once it's merged
@@ -287,7 +287,7 @@ which adds two integers:
 
 There are a few things to note:
 
-  * The C signature is different than the corresponding Python/C
+  * The C signature is different than the corresponding ``Python.h``
     ``METH_VARARGS``: in particular, instead of taking a ``PyObject *args``,
     we take an array of ``HPy`` and its size.  This allows e.g. PyPy to do a
     call more efficiently, because you don't need to create a tuple just to

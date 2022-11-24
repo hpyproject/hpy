@@ -13,7 +13,7 @@
 struct _HPyContext_s g_universal_ctx = {
     .name = "HPy Universal ABI (CPython backend)",
     ._private = NULL,
-    .ctx_version = 1,
+    .abi_version = HPY_ABI_VERSION,
     /* h_None & co. are initialized by init_universal_ctx() */
     .ctx_Module_Create = &ctx_Module_Create,
     .ctx_Dup = &ctx_Dup,

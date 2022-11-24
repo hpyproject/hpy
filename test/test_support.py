@@ -3,11 +3,6 @@ from pathlib import Path
 from . import support
 
 
-@pytest.fixture
-def hpy_abi():
-    return "universal"
-
-
 def expand_template(template, name):
     return support.DefaultExtensionTemplate(template, name).expand()
 

@@ -4,10 +4,51 @@
 extern "C" {
 #endif
 
-#ifndef HPY_UNIVERSAL_ABI
-/*  It would be nice if we could include hpy.h WITHOUT bringing in all the
-    stuff from Python.h, to make sure that people don't use the CPython API by
-    mistake. How to achieve it, though? */
+/* ~~~~~~~~~~~~~~~~ HPy ABI version ~~~~~~~~~~~~~~~ */
+// NOTE: these must be kept on sync with the equivalent variables in hpy/devel/abitag.py
+#define HPY_ABI_VERSION 0
+#define HPY_ABI_TAG "hpy0"
+
+
+/* ~~~~~~~~~~~~~~~~ HPy ABI macros ~~~~~~~~~~~~~~~~ */
+
+/* The following macros are used to determine which kind of module we want to
+   compile. The build system must set one of these (e.g. by using `gcc
+   -D...`). This is the approach used by the setuptools support provided by
+   hpy.devel:
+
+     - HPY_ABI_CPYTHON
+     - HPY_ABI_UNIVERSAL
+     - HPY_ABI_HYBRID
+
+   In addition we also define HPY_ABI which is a string literal containing a
+   string representation of it.
+*/
+
+#if defined(HPY_ABI_CPYTHON)
+#  if defined(HPY_ABI_HYBRID)
+#    error "Conflicting macros are defined: HPY_ABI_CPYTHON and HPY_ABI_HYBRID"
+#  endif
+#  if defined(HPY_ABI_UNIVERSAL)
+#    error "Conflicting macros are defined: HPY_ABI_CPYTHON and HPY_ABI_UNIVERSAL"
+#  endif
+#  define HPY_ABI "cpython"
+
+#elif defined(HPY_ABI_HYBRID)
+#  if defined(HPY_ABI_UNIVERSAL)
+#    error "Conflicting macros are defined: HPY_ABI_HYBRID and HPY_ABI_UNIVERSAL"
+#  endif
+#  define HPY_ABI "hybrid"
+
+#elif defined(HPY_ABI_UNIVERSAL)
+#  define HPY_ABI "universal"
+
+#else
+#  error "Cannot determine the desired HPy ABI: you must set one of HPY_ABI_CPYTHON, HPY_ABI_UNIVERSAL or HPY_ABI_HYBRID"
+#endif
+
+
+#if defined(HPY_ABI_CPYTHON) || defined(HPY_ABI_HYBRID)
 #   define PY_SSIZE_T_CLEAN
 #   include <Python.h>
 #endif
@@ -35,6 +76,28 @@ extern "C" {
 #  define _HPy_NO_RETURN __declspec(noreturn)
 #else
 #  define _HPy_NO_RETURN
+#endif
+
+
+// clang and gcc supports __has_attribute, MSVC doesn't. This should be enough
+// to be able to use it portably
+#ifdef __has_attribute
+#   define _HPY_compiler_has_attribute(x) __has_attribute(x)
+#else
+#   define _HPY_compiler_has_attribute(x) 0
+#endif
+
+#ifdef HPY_ABI_UNIVERSAL
+#  if _HPY_compiler_has_attribute(error)
+     // gcc, clang>=14
+#    define _HPY_LEGACY __attribute__((error("Cannot use legacy functions when targeting the HPy Universal ABI")))
+#  else
+     // we don't have any diagnostic feature, too bad
+#    define _HPY_LEGACY
+#  endif
+#else
+   // in non-universal modes, we don't attach any attribute
+#  define _HPY_LEGACY
 #endif
 
 #if defined(_MSC_VER) && defined(__cplusplus) // MSVC C4576
@@ -137,7 +200,11 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 typedef struct _HPyContext_s HPyContext;
 
-#ifdef HPY_UNIVERSAL_ABI
+#ifdef HPY_ABI_CPYTHON
+    typedef Py_ssize_t HPy_ssize_t;
+    typedef Py_hash_t HPy_hash_t;
+    typedef Py_UCS4 HPy_UCS4;
+#else
     typedef intptr_t HPy_ssize_t;
     typedef intptr_t HPy_hash_t;
     typedef uint32_t HPy_UCS4;
@@ -149,11 +216,6 @@ typedef struct _HPyContext_s HPyContext;
         HPyCapsule_key_Context = 2,
         HPyCapsule_key_Destructor = 3,
     } _HPyCapsule_key;
-
-#else
-    typedef Py_ssize_t HPy_ssize_t;
-    typedef Py_hash_t HPy_hash_t;
-    typedef Py_UCS4 HPy_UCS4;
 #endif
 
 
@@ -169,17 +231,16 @@ typedef struct _HPyContext_s HPyContext;
 #include "hpy/runtime/buildvalue.h"
 #include "hpy/runtime/helpers.h"
 
-#ifdef HPY_UNIVERSAL_ABI
-#   include "hpy/universal/autogen_ctx.h"
-#   include "hpy/universal/autogen_trampolines.h"
-#   include "hpy/universal/misc_trampolines.h"
-#else
-//  CPython-ABI
+#ifdef HPY_ABI_CPYTHON
 #   include "hpy/cpython/autogen_ctx.h"
 #   include "hpy/runtime/ctx_funcs.h"
 #   include "hpy/runtime/ctx_type.h"
 #   include "hpy/cpython/misc.h"
 #   include "hpy/cpython/autogen_api_impl.h"
+#else
+#   include "hpy/universal/autogen_ctx.h"
+#   include "hpy/universal/autogen_trampolines.h"
+#   include "hpy/universal/misc_trampolines.h"
 #endif
 
 #include "hpy/inline_helpers.h"

@@ -31,20 +31,7 @@ typedef struct {
 #  define HPyMODINIT_FUNC Py_EXPORTED_SYMBOL HPy
 #endif /* __cplusplus */
 
-#ifdef HPY_UNIVERSAL_ABI
-
-// module initialization in the universal case
-#define HPy_MODINIT(modname)                                   \
-    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;              \
-    static HPy init_##modname##_impl(HPyContext *ctx);         \
-    HPyMODINIT_FUNC                                         \
-    HPyInit_##modname(HPyContext *ctx)                     \
-    {                                                          \
-        _ctx_for_trampolines = ctx;                            \
-        return init_##modname##_impl(ctx);                     \
-    }
-
-#else // HPY_UNIVERSAL_ABI
+#ifdef HPY_ABI_CPYTHON
 
 // module initialization in the CPython case
 #define HPy_MODINIT(modname)                                   \
@@ -55,6 +42,19 @@ typedef struct {
         return _h2py(init_##modname##_impl(_HPyGetContext())); \
     }
 
-#endif // HPY_UNIVERSAL_ABI
+#else // HPY_ABI_CPYTHON
+
+// module initialization in the universal and hybrid case
+#define HPy_MODINIT(modname)                                   \
+    _HPy_HIDDEN HPyContext *_ctx_for_trampolines;              \
+    static HPy init_##modname##_impl(HPyContext *ctx);         \
+    HPyMODINIT_FUNC                                         \
+    HPyInit_##modname(HPyContext *ctx)                     \
+    {                                                          \
+        _ctx_for_trampolines = ctx;                            \
+        return init_##modname##_impl(ctx);                     \
+    }
+
+#endif // HPY_ABI_CPYTHON
 
 #endif // HPY_UNIVERSAL_HPYMODULE_H

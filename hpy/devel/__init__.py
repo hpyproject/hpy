@@ -36,6 +36,7 @@ except ImportError:
 import setuptools.command.build_ext
 import setuptools.command.bdist_egg
 
+from .abitag import get_hpy_ext_suffix
 
 DEFAULT_HPY_ABI = 'universal'
 if hasattr(sys, 'implementation') and sys.implementation.name == 'cpython':
@@ -59,6 +60,9 @@ class HPyDevel:
         return list(map(str, [
             self.include_dir,
         ]))
+
+    def get_include_dir_forbid_python_h(self):
+        return self.include_dir.joinpath('hpy', 'forbid_python_h')
 
     def get_extra_sources(self):
         """ Extra sources needed by extensions in both CPython and Universal
@@ -109,12 +113,14 @@ class HPyDevel:
             stub, thus overwriting the one which was created by
             build_ext_hpy_mixin.write_stub.
             """
-            if resource.endswith(".hpy.so"):
+            ext_suffix = None
+            if dist.hpy_abi != 'cpython':
+                ext_suffix = get_hpy_ext_suffix(dist.hpy_abi)
+            #
+            if ext_suffix and resource.endswith(ext_suffix):
                 log.info("stub file already created for %s", resource)
-                return
             else:
-                log.info("stub resource didn't match for %s", resource)
-            write_stub.super(resource, pyfile)
+                write_stub.super(resource, pyfile)
 
     def build_ext_sanity_check(self, build_ext):
         # check that the supplied build_ext inherits from setuptools
@@ -257,10 +263,11 @@ class build_hpy_mixin:
 
     def finalize_options(self):
         self._mixin_super.finalize_options(self)
-        if self.distribution.hpy_abi == 'universal':
-            self.build_platlib += '-hpy-universal'
-            self.build_lib += '-hpy-universal'
-            self.build_temp += '-hpy-universal'
+        if self.distribution.hpy_abi != 'cpython':
+            suffix = '-hpy-%s' % self.distribution.hpy_abi
+            self.build_platlib += suffix
+            self.build_lib += suffix
+            self.build_temp += suffix
 
 
 class build_ext_hpy_mixin:
@@ -296,14 +303,20 @@ class build_ext_hpy_mixin:
         ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
+            ext.define_macros.append(('HPY_ABI_CPYTHON', None))
             ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
-        elif ext.hpy_abi == 'universal':
-            ext.define_macros.append(('HPY_UNIVERSAL_ABI', None))
+        elif ext.hpy_abi == 'hybrid':
+            ext.define_macros.append(('HPY_ABI_HYBRID', None))
             ext._hpy_needs_stub = True
+        elif ext.hpy_abi == 'universal':
+            ext.define_macros.append(('HPY_ABI_UNIVERSAL', None))
+            ext._hpy_needs_stub = True
+            forbid_python_h = self.hpydevel.get_include_dir_forbid_python_h()
+            ext.include_dirs.insert(0, forbid_python_h)
         else:
             raise DistutilsError('Unknown HPy ABI: %s. Valid values are: '
-                                 'cpython, universal' % ext.hpy_abi)
+                                 'cpython, hybrid, universal' % ext.hpy_abi)
 
     def finalize_options(self):
         self._extensions = self.distribution.ext_modules or []
@@ -329,20 +342,20 @@ class build_ext_hpy_mixin:
 
     @remember_hpy_extension
     def get_ext_filename(self, ext_name):
-        if not is_hpy_extension(ext_name):
+        hpy_abi = self.distribution.hpy_abi
+        if not is_hpy_extension(ext_name) or hpy_abi == 'cpython':
             return self._mixin_super.get_ext_filename(self, ext_name)
-        if self.distribution.hpy_abi == 'universal':
-            ext_path = ext_name.split('.')
-            ext_suffix = '.hpy.so'  # XXX Windows?
-            ext_filename = os.path.join(*ext_path) + ext_suffix
         else:
-            ext_filename = self._mixin_super.get_ext_filename(
-                self, ext_name)
-        return ext_filename
+            assert is_hpy_extension(ext_name)
+            assert hpy_abi in ('universal', 'hybrid')
+            ext_path = ext_name.split('.')
+            ext_suffix = get_hpy_ext_suffix(hpy_abi)
+            ext_filename = os.path.join(*ext_path) + ext_suffix
+            return ext_filename
 
     def write_stub(self, output_dir, ext, compile=False):
         if (not hasattr(ext, "hpy_abi") or
-                self.distribution.hpy_abi != 'universal'):
+                self.distribution.hpy_abi not in ('universal', 'hybrid')):
             return self._mixin_super.write_stub(
                 self, output_dir, ext, compile=compile)
         pkgs = ext._full_name.split('.')
@@ -393,6 +406,6 @@ class build_ext_hpy_mixin:
             module "HPyInit_" function.
         """
         exports = self._mixin_super.get_export_symbols(self, ext)
-        if hasattr(ext, "hpy_abi") and ext.hpy_abi == 'universal':
+        if hasattr(ext, "hpy_abi") and ext.hpy_abi in ('universal', 'hybrid'):
             exports = [re.sub(r"^PyInit_", "HPyInit_", name) for name in exports]
         return exports
