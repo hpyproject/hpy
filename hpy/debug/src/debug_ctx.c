@@ -10,7 +10,7 @@
 static struct _HPyContext_s g_debug_ctx = {
     .name = "HPy Debug Mode ABI",
     ._private = NULL,
-    .ctx_version = 1,
+    .abi_version = HPY_ABI_VERSION,
 };
 
 // NOTE: at the moment this function assumes that uctx is always the

@@ -51,7 +51,8 @@ static struct _HPyContext_s _global_ctx;
 HPyAPI_FUNC HPyContext * _HPyGetContext(void) {
     HPyContext *ctx = &_global_ctx;
     if (!ctx->name) {
-        ctx->name = "HPy CPython ABI",
+        ctx->name = "HPy CPython ABI";
+        ctx->abi_version = HPY_ABI_VERSION;
         /* Constants */
         ctx->h_None = _py2h(Py_None);
         ctx->h_True = _py2h(Py_True);

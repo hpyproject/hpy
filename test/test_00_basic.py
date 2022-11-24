@@ -454,15 +454,22 @@ class TestBasic(HPyTest):
                 return HPyUnicode_FromString(ctx, HPY_ABI_TAG);
             }
 
+            HPyDef_METH(get_ctx_version, "get_ctx_version", HPyFunc_NOARGS)
+            static HPy get_ctx_version_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyLong_FromLong(ctx, ctx->abi_version);
+            }
+
             @EXPORT(get_ABI_VERSION)
             @EXPORT(get_ABI_TAG)
+            @EXPORT(get_ctx_version)
             @INIT
         """)
         c_HPY_ABI_VERSION = mod.get_ABI_VERSION()
         c_HPY_ABI_TAG = mod.get_ABI_TAG()
-        assert c_HPY_ABI_VERSION == abitag.HPY_ABI_VERSION
+        ctx_version = mod.get_ctx_version()
+        assert c_HPY_ABI_VERSION == ctx_version == abitag.HPY_ABI_VERSION
         assert c_HPY_ABI_TAG == abitag.HPY_ABI_TAG
-
 
     def test_FromVoidP_AsVoidP(self):
         mod = self.make_module("""

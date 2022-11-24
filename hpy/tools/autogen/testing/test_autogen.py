@@ -129,7 +129,7 @@ class TestAutoGen(BaseTestAutogen):
             struct _HPyContext_s {
                 const char *name; // used just to make debugging and testing easier
                 void *_private;   // used by implementations to store custom data
-                int ctx_version;
+                int abi_version;
                 HPy h_None;
                 HPy (*ctx_Add)(HPyContext *ctx, HPy h1, HPy h2);
             };
@@ -146,7 +146,7 @@ class TestAutoGen(BaseTestAutogen):
             struct _HPyContext_s g_universal_ctx = {
                 .name = "HPy Universal ABI (CPython backend)",
                 ._private = NULL,
-                .ctx_version = 1,
+                .abi_version = HPY_ABI_VERSION,
                 /* h_None & co. are initialized by init_universal_ctx() */
                 .ctx_Add = &ctx_Add,
             };
