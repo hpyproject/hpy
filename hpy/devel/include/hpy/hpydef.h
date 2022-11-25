@@ -145,7 +145,7 @@ typedef struct {
 
 #define HPyDef_METH_IMPL(SYM, NAME, IMPL, SIG, ...)                     \
     HPyFunc_DECLARE(IMPL, SIG);                                         \
-    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG);                    \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, IMPL, SIG)                     \
     HPyDef SYM = {                                                      \
         .kind = HPyDef_Kind_Meth,                                       \
         .meth = {                                                       \
