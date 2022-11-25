@@ -432,6 +432,8 @@ class TestBasic(HPyTest):
             assert ctx_name.startswith('HPy Universal ABI')
         elif hpy_abi == 'debug':
             assert ctx_name.startswith('HPy Debug Mode ABI')
+        elif hpy_abi == 'trace':
+            assert ctx_name.startswith('HPy Trace Mode ABI')
         else:
             assert False, 'unexpected hpy_abi: %s' % hpy_abi
 

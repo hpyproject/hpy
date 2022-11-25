@@ -222,6 +222,7 @@ typedef struct _HPyContext_s HPyContext;
 /* ~~~~~~~~~~~~~~~~ Additional #includes ~~~~~~~~~~~~~~~~ */
 
 #include "hpy/cpy_types.h"
+#include "hpy/hpyexports.h"
 #include "hpy/macros.h"
 #include "hpy/hpyfunc.h"
 #include "hpy/hpydef.h"

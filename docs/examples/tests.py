@@ -54,7 +54,7 @@ def test_leak_detector_with_traces():
 def test_leak_detector_with_traces_output():
     # Update the debug documentation if anything here changes!
     env = os.environ.copy()
-    env['HPY_DEBUG'] = '1'
+    env['HPY'] = 'debug'
     env['HPY_LOG'] = '1'
     script = os.path.join(os.path.dirname(__file__), 'debug-example.py')
     result = subprocess.run([sys.executable, script], env=env,
@@ -70,3 +70,15 @@ def test_leak_detector_with_traces_output():
         assert 'snippets.hpy0.so' in err  # Should be somewhere in the stack trace
     else:
         assert 'At the moment this is only supported on Linux with glibc' in err
+
+def test_trace_mode_output():
+    # Update the trace mode documentation if anything here changes!
+    env = os.environ.copy()
+    env['HPY'] = 'trace'
+    env['HPY_LOG'] = '1'
+    script = os.path.join(os.path.dirname(__file__), 'trace-example.py')
+    result = subprocess.run([sys.executable, script], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Rudimentary check that the output contains what we have in the documentation
+    out = result.stdout.decode('latin-1')
+    assert 'get_call_counts()["ctx_Add"] == 1' in out

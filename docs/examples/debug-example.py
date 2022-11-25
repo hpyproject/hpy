@@ -1,4 +1,4 @@
-# Run with HPY_DEBUG=1
+# Run with HPY=debug
 import hpy.debug
 import snippets
 

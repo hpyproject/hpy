@@ -310,11 +310,11 @@ class ExtensionCompiler:
             extra_link_args=link_args)
 
         hpy_abi = self.hpy_abi
-        if hpy_abi == 'debug':
+        if hpy_abi == 'debug' or hpy_abi == 'trace':
             # there is no compile-time difference between universal and debug
             # extensions. The only difference happens at load time
             hpy_abi = 'universal'
-        elif hpy_abi == 'hybrid+debug':
+        elif hpy_abi in ('hybrid+debug', 'hybrid+trace'):
             hpy_abi = 'hybrid'
         so_filename = c_compile(str(self.tmpdir), ext,
                                 hpy_devel=self.hpy_devel,
@@ -337,21 +337,25 @@ class ExtensionCompiler:
         module = self.compile_module(
             main_src, ExtensionTemplate, name, extra_sources)
         so_filename = module.so_filename
+        from hpy.universal import MODE_UNIVERSAL, MODE_DEBUG, MODE_TRACE
         if self.hpy_abi in ('universal', 'hybrid'):
-            return self.load_universal_module(name, so_filename, debug=False)
+            return self.load_universal_module(name, so_filename, mode=MODE_UNIVERSAL)
         elif self.hpy_abi in ('debug', 'hybrid+debug'):
-            return self.load_universal_module(name, so_filename, debug=True)
+            return self.load_universal_module(name, so_filename, mode=MODE_DEBUG)
+        elif self.hpy_abi in ('trace', 'hybrid+trace'):
+            return self.load_universal_module(name, so_filename, mode=MODE_TRACE)
         elif self.hpy_abi == 'cpython':
             return self.load_cpython_module(name, so_filename)
         else:
             assert False
 
-    def load_universal_module(self, name, so_filename, debug):
-        assert self.hpy_abi in ('universal', 'hybrid', 'debug', 'hybrid+debug')
+    def load_universal_module(self, name, so_filename, mode):
+        assert self.hpy_abi in ('universal', 'hybrid', 'debug', 'hybrid+debug',
+                                'trace', 'hybrid+trace')
         import sys
         import hpy.universal
         assert name not in sys.modules
-        mod = hpy.universal.load(name, so_filename, debug=debug)
+        mod = hpy.universal.load(name, so_filename, mode=mode)
         mod.__file__ = so_filename
         return mod
 
