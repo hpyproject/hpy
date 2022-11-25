@@ -314,7 +314,7 @@ class ExtensionCompiler:
             # there is no compile-time difference between universal and debug
             # extensions. The only difference happens at load time
             hpy_abi = 'universal'
-        elif hpy_abi == 'hybrid+debug':
+        elif hpy_abi in ('hybrid+debug', 'hybrid+trace'):
             hpy_abi = 'hybrid'
         so_filename = c_compile(str(self.tmpdir), ext,
                                 hpy_devel=self.hpy_devel,

@@ -26,7 +26,7 @@ class TestCPythonCompatibility(HPyTest):
         """)
         hpy_abi = mod.f()
         expected = self.compiler.hpy_abi
-        if expected == 'hybrid+debug':
+        if expected in ('hybrid+debug', 'hybrid+trace'):
             expected = 'hybrid'
         assert hpy_abi == expected
 
