@@ -532,16 +532,6 @@ HPy_ssize_t debug_ctx_Bytes_GET_SIZE(HPyContext *dctx, DHPy h)
     return HPyBytes_GET_SIZE(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-const char *debug_ctx_Bytes_AsString(HPyContext *dctx, DHPy h)
-{
-    return HPyBytes_AsString(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
-}
-
-const char *debug_ctx_Bytes_AS_STRING(HPyContext *dctx, DHPy h)
-{
-    return HPyBytes_AS_STRING(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
-}
-
 DHPy debug_ctx_Bytes_FromString(HPyContext *dctx, const char *v)
 {
     return DHPy_open(dctx, HPyBytes_FromString(get_info(dctx)->uctx, v));

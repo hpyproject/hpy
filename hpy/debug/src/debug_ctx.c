@@ -121,25 +121,58 @@ void debug_ctx_Close(HPyContext *dctx, DHPy dh)
     HPy_Close(get_info(dctx)->uctx, uh);
 }
 
-const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_t *size)
+static void *
+protect_and_associate_data_ptr(DHPy h, void *ptr, HPy_ssize_t data_size)
 {
-    const char *ptr = HPyUnicode_AsUTF8AndSize(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), size);
     DebugHandle *handle = as_DebugHandle(h);
-    HPy_ssize_t data_size;
-    char* new_ptr;
+    void *new_ptr;
     if (ptr != NULL)
     {
-        data_size = size != NULL ? *size + 1 : (HPy_ssize_t) strlen(ptr) + 1;
-        new_ptr = (char*) raw_data_copy(ptr, data_size, true);
+        new_ptr = raw_data_copy(ptr, data_size, true);
+        handle->associated_data = new_ptr;
+        handle->associated_data_size = data_size;
+        return new_ptr;
     }
     else
     {
-        data_size = 0;
-        new_ptr = NULL;
+        handle->associated_data = NULL;
+        handle->associated_data_size = 0;
     }
-    handle->associated_data = new_ptr;
-    handle->associated_data_size = data_size;
-    return new_ptr;
+    return NULL;
+}
+
+const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_t *size)
+{
+    const char *ptr = HPyUnicode_AsUTF8AndSize(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), size);
+    HPy_ssize_t data_size = 0;
+    if (ptr != NULL) {
+        data_size = size != NULL ? *size + 1 : (HPy_ssize_t) strlen(ptr) + 1;
+    }
+    return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
+}
+
+const char *debug_ctx_Bytes_AsString(HPyContext *dctx, DHPy h)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh = DHPy_unwrap(dctx, h);
+    const char *ptr = HPyBytes_AsString(uctx, uh);
+    HPy_ssize_t data_size = 0;
+    if (ptr != NULL) {
+        data_size = HPyBytes_Size(uctx, uh);
+    }
+    return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
+}
+
+const char *debug_ctx_Bytes_AS_STRING(HPyContext *dctx, DHPy h)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh = DHPy_unwrap(dctx, h);
+    const char *ptr = HPyBytes_AS_STRING(uctx, uh);
+    HPy_ssize_t data_size = 0;
+    if (ptr != NULL) {
+        data_size = HPyBytes_GET_SIZE(uctx, uh);
+    }
+    return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
 }
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)

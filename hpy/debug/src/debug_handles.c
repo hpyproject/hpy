@@ -64,6 +64,7 @@ static DHPy _DHPy_open(HPyContext *dctx, UHPy uh, bool is_immortal)
     handle->is_closed = 0;
     handle->is_immortal = is_immortal;
     handle->associated_data = NULL;
+    handle->associated_data_size = 0;
     DHQueue_append(&info->open_handles, handle);
     debug_handles_sanity_check(info);
     return as_DHPy(handle);
