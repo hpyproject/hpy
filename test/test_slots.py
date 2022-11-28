@@ -423,6 +423,44 @@ class TestSlots(HPyTest):
             assert sys.getrefcount(arr) == init_refcount
         mv2 = memoryview(arr)  # doesn't raise
 
+    def test_tp_repr_and_tp_str(self):
+        mod = self.make_module("""
+            #include <stdio.h>
+
+            #define BUF_SIZE 128
+
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+
+            static HPy
+            point_str_repr(HPyContext *ctx, HPy h, int str)
+            {
+                char buf[BUF_SIZE];
+                PointObject *p = PointObject_AsStruct(ctx, h);
+                snprintf(buf, BUF_SIZE, "%s(Point(%ld, %ld))",
+                            (str ? "str" : "repr"), p->x, p->y);
+                return HPyUnicode_FromString(ctx, buf);
+            }
+
+            HPyDef_SLOT(Point_repr, HPy_tp_repr)
+            static HPy Point_repr_impl(HPyContext *ctx, HPy self)
+            {
+                return point_str_repr(ctx, self, 0);
+            }
+
+            HPyDef_SLOT(Point_str, HPy_tp_str)
+            static HPy Point_str_impl(HPyContext *ctx, HPy self)
+            {
+                return point_str_repr(ctx, self, 1);
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_str, &Point_repr)
+            @INIT
+        """)
+        p = mod.Point(1, 2)
+        assert str(p) == 'str(Point(1, 2))'
+        assert repr(p) == 'repr(Point(1, 2))'
+
 
 class TestSqSlots(HPyTest):
 
