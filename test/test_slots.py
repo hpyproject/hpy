@@ -461,6 +461,34 @@ class TestSlots(HPyTest):
         assert str(p) == 'str(Point(1, 2))'
         assert repr(p) == 'repr(Point(1, 2))'
 
+    def test_tp_hash(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+
+            HPyDef_SLOT(Point_hash, HPy_tp_hash)
+            static HPy_ssize_t Point_hash_impl(HPyContext *ctx, HPy self)
+            {
+                PointObject *p = PointObject_AsStruct(ctx, self);
+                if (p->x < 0) {
+                    HPyErr_SetString(ctx, ctx->h_ValueError, "cannot hash Point object with negative x");
+                    return -1;
+                }
+                return p->x + p->y;
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_hash)
+            @INIT
+        """)
+        p = mod.Point(1, 10)
+        assert p.__hash__() == 11
+        assert hash(p) == 11
+        # We expect that the slot wrapper accepts hash code -1 without
+        # complaining. This is not the case for built-in function 'hash'.
+        assert mod.Point(0, -1).__hash__() == -1
+        with pytest.raises(ValueError):
+            hash(mod.Point(-1, 10))
+
 
 class TestSqSlots(HPyTest):
 
