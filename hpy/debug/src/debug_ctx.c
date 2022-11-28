@@ -158,7 +158,8 @@ const char *debug_ctx_Bytes_AsString(HPyContext *dctx, DHPy h)
     const char *ptr = HPyBytes_AsString(uctx, uh);
     HPy_ssize_t data_size = 0;
     if (ptr != NULL) {
-        data_size = HPyBytes_Size(uctx, uh);
+        // '+ 1' accountd for the implicit null byte termination
+        data_size = HPyBytes_Size(uctx, uh) + 1;
     }
     return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
 }
@@ -170,7 +171,8 @@ const char *debug_ctx_Bytes_AS_STRING(HPyContext *dctx, DHPy h)
     const char *ptr = HPyBytes_AS_STRING(uctx, uh);
     HPy_ssize_t data_size = 0;
     if (ptr != NULL) {
-        data_size = HPyBytes_GET_SIZE(uctx, uh);
+        // '+ 1' accountd for the implicit null byte termination
+        data_size = HPyBytes_GET_SIZE(uctx, uh) + 1;
     }
     return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
 }
