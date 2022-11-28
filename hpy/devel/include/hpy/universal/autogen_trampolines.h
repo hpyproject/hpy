@@ -462,11 +462,11 @@ HPyAPI_FUNC HPy_ssize_t HPyBytes_GET_SIZE(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_GET_SIZE ( ctx, h ); 
 }
 
-HPyAPI_FUNC char *HPyBytes_AsString(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC const char *HPyBytes_AsString(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_AsString ( ctx, h ); 
 }
 
-HPyAPI_FUNC char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC const char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_AS_STRING ( ctx, h ); 
 }
 

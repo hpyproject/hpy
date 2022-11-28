@@ -52,7 +52,7 @@ if 'HPY_DEBUG_BUILD' in os.environ:
 else:
     EXTRA_COMPILE_ARGS = []
 
-if os.name == "posix" and not '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' in os.environ:
+if '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ:
     EXTRA_COMPILE_ARGS += ['-D_HPY_DEBUG_MEM_PROTECT_USEMMAP']
 
 if platform.system() == "Windows":

@@ -42,7 +42,7 @@ class TestBytes(HPyTest):
             {
                 long res = 0;
                 HPy_ssize_t n = HPyBytes_Size(ctx, arg);
-                char *buf = HPyBytes_AsString(ctx, arg);
+                const char *buf = HPyBytes_AsString(ctx, arg);
                 for(int i=0; i<n; i++)
                     res = (res * 10) + buf[i];
                 return HPyLong_FromLong(ctx, res);
@@ -59,7 +59,7 @@ class TestBytes(HPyTest):
             {
                 long res = 0;
                 HPy_ssize_t n = HPyBytes_Size(ctx, arg);
-                char *buf = HPyBytes_AS_STRING(ctx, arg);
+                const char *buf = HPyBytes_AS_STRING(ctx, arg);
                 for(int i=0; i<n; i++)
                     res = (res * 10) + buf[i];
                 return HPyLong_FromLong(ctx, res);
@@ -74,7 +74,7 @@ class TestBytes(HPyTest):
             HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                char *buf;
+                const char *buf;
                 buf = HPyBytes_AsString(ctx, arg);
                 return HPyBytes_FromString(ctx, buf);
             }
@@ -94,7 +94,7 @@ class TestBytes(HPyTest):
             {
                 HPy src;
                 long len;
-                char *buf;
+                const char *buf;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "Ol", &src, &len)) {
                     return HPy_NULL;
                 }

@@ -372,9 +372,9 @@ HPy_ssize_t HPyBytes_Size(HPyContext *ctx, HPy h);
 HPy_ID(181)
 HPy_ssize_t HPyBytes_GET_SIZE(HPyContext *ctx, HPy h);
 HPy_ID(182)
-char* HPyBytes_AsString(HPyContext *ctx, HPy h);
+const char* HPyBytes_AsString(HPyContext *ctx, HPy h);
 HPy_ID(183)
-char* HPyBytes_AS_STRING(HPyContext *ctx, HPy h);
+const char* HPyBytes_AS_STRING(HPyContext *ctx, HPy h);
 HPy_ID(184)
 HPy HPyBytes_FromString(HPyContext *ctx, const char *v);
 HPy_ID(185)

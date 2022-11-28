@@ -78,6 +78,8 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyTracker_Add',
         'HPyTracker_ForgetAll',
         'HPyTracker_Close',
+        'HPyBytes_AsString',
+        'HPyBytes_AS_STRING'
     }
 
     def generate(self):

@@ -455,12 +455,12 @@ HPyAPI_IMPL HPy_ssize_t ctx_Bytes_GET_SIZE(HPyContext *ctx, HPy h)
     return PyBytes_GET_SIZE(_h2py(h));
 }
 
-HPyAPI_IMPL char *ctx_Bytes_AsString(HPyContext *ctx, HPy h)
+HPyAPI_IMPL const char *ctx_Bytes_AsString(HPyContext *ctx, HPy h)
 {
     return PyBytes_AsString(_h2py(h));
 }
 
-HPyAPI_IMPL char *ctx_Bytes_AS_STRING(HPyContext *ctx, HPy h)
+HPyAPI_IMPL const char *ctx_Bytes_AS_STRING(HPyContext *ctx, HPy h)
 {
     return PyBytes_AS_STRING(_h2py(h));
 }
