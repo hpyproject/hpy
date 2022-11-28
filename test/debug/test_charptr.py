@@ -6,8 +6,7 @@ import pytest
 # closed handles. For now, the debug mode does not provide any hook for this
 # error, so we have to run the tests from subprocess and check the return code.
 
-SUPPORTS_MEM_PROTECTION = os.name == 'posix' and \
-                          '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ
+SUPPORTS_MEM_PROTECTION = '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ
 
 @pytest.fixture
 def hpy_abi():
@@ -125,9 +124,7 @@ def test_charptr_use_after_handle_close(compiler, python_subprocess):
 
 
 @pytest.mark.skipif(not SUPPORTS_MEM_PROTECTION, reason=
-                    "Could be implemented by checking the contents on "
-                    "close, but long term it would be better to provide"
-                    "proper protection on Windows in the future")
+                    "Could be implemented by checking the contents on close.")
 @pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
 def test_charptr_write_ptr(compiler, python_subprocess):
     mod = compiler.compile_module("""
