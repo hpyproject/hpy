@@ -36,12 +36,10 @@ typedef Py_buffer cpy_Py_buffer;
 #endif /* HPY_ABI_UNIVERSAL */
 
 
-typedef cpy_PyObject *(*cpy_PyCFunction)(cpy_PyObject *, cpy_PyObject *);
+typedef cpy_PyObject *(*cpy_PyCFunction)(cpy_PyObject *, cpy_PyObject *const *, HPy_ssize_t);
 typedef int (*cpy_visitproc)(cpy_PyObject *, void *);
-typedef cpy_PyObject *(*cpy_PyCFunction)(cpy_PyObject *, cpy_PyObject *);
 typedef cpy_PyObject *(*cpy_getter)(cpy_PyObject *, void *);
 typedef int (*cpy_setter)(cpy_PyObject *, cpy_PyObject *, void *);
 typedef void (*cpy_PyCapsule_Destructor)(cpy_PyObject *);
-
 
 #endif /* HPY_UNIVERSAL_CPY_TYPES_H */

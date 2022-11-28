@@ -236,7 +236,7 @@ static int
 sig2flags(HPyFunc_Signature sig)
 {
     switch(sig) {
-        case HPyFunc_VARARGS:  return METH_VARARGS;
+        case HPyFunc_VARARGS:  return METH_FASTCALL;
         case HPyFunc_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
         case HPyFunc_NOARGS:   return METH_NOARGS;
         case HPyFunc_O:        return METH_O;
@@ -349,7 +349,7 @@ create_method_defs(HPyDef *hpydefs[], PyMethodDef *legacy_methods)
                 continue;
             PyMethodDef *dst = &result[dst_idx++];
             dst->ml_name = src->meth.name;
-            dst->ml_meth = src->meth.cpy_trampoline;
+            dst->ml_meth = (PyCFunction)src->meth.cpy_trampoline;
             dst->ml_flags = sig2flags(src->meth.signature);
             if (dst->ml_flags == -1) {
                 PyMem_Free(result);

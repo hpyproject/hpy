@@ -288,10 +288,10 @@ which adds two integers:
 There are a few things to note:
 
   * The C signature is different than the corresponding ``Python.h``
-    ``METH_VARARGS``: in particular, instead of taking a ``PyObject *args``,
-    we take an array of ``HPy`` and its size.  This allows e.g. PyPy to do a
-    call more efficiently, because you don't need to create a tuple just to
-    pass the arguments.
+    ``METH_VARARGS``: in particular, instead of taking a tuple ``PyObject *args``,
+    we take an array of ``HPy`` and its size. This allows the call to happen
+    more efficiently, because you don't need to create a tuple just to pass the
+    arguments.
 
   * We call ``HPyArg_Parse`` to parse the arguments. Contrarily to almost all
     the other HPy functions, this is **not** a thin wrapper around
