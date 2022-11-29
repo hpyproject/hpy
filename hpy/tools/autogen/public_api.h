@@ -738,7 +738,7 @@ typedef enum {
     //HPy_tp_doc = SLOT(56, HPyFunc_X),
     //HPy_tp_getattr = SLOT(57, HPyFunc_X),
     //HPy_tp_getattro = SLOT(58, HPyFunc_X),
-    //HPy_tp_hash = SLOT(59, HPyFunc_X),
+    HPy_tp_hash = SLOT(59, HPyFunc_HASHFUNC),
     HPy_tp_init = SLOT(60, HPyFunc_INITPROC),
     //HPy_tp_is_gc = SLOT(61, HPyFunc_X),
     //HPy_tp_iter = SLOT(62, HPyFunc_X),
@@ -749,7 +749,7 @@ typedef enum {
     HPy_tp_richcompare = SLOT(67, HPyFunc_RICHCMPFUNC),
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),
     //HPy_tp_setattro = SLOT(69, HPyFunc_X),
-    //HPy_tp_str = SLOT(70, HPyFunc_X),
+    HPy_tp_str = SLOT(70, HPyFunc_REPRFUNC),
     HPy_tp_traverse = SLOT(71, HPyFunc_TRAVERSEPROC),
     //HPy_tp_members = SLOT(72, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_getset = SLOT(73, HPyFunc_X),     NOT SUPPORTED
