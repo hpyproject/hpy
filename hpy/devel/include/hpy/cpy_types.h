@@ -43,5 +43,7 @@ typedef int (*cpy_visitproc)(cpy_PyObject *, void *);
 typedef cpy_PyObject *(*cpy_getter)(cpy_PyObject *, void *);
 typedef int (*cpy_setter)(cpy_PyObject *, cpy_PyObject *, void *);
 typedef void (*cpy_PyCapsule_Destructor)(cpy_PyObject *);
+typedef cpy_PyObject *(*cpy_vectorcallfunc)(cpy_PyObject *callable, cpy_PyObject *const *args,
+                                    size_t nargsf, cpy_PyObject *kwnames);
 
 #endif /* HPY_UNIVERSAL_CPY_TYPES_H */

@@ -56,6 +56,18 @@ typedef HPy (*_HPyCFunction_RICHCMPFUNC)(HPyContext *, HPy, HPy, int);
         return _h2py(func(_HPyGetContext(), _py2h(self), _py2h(obj), op)); \
     }
 
+typedef HPy(*_HPyCFunction_VECTORCALLFUNC)(HPyContext *ctx, HPy callable,
+            HPy const *args, HPy_ssize_t nargsf, HPy kwnames);
+#define HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                   \
+    static cpy_PyObject *                                                      \
+    SYM(cpy_PyObject *callable, cpy_PyObject *const *args, size_t nargsf,      \
+            cpy_PyObject *kwnames)                                             \
+    {                                                                          \
+        _HPyCFunction_VECTORCALLFUNC f = (_HPyCFunction_VECTORCALLFUNC)IMPL;   \
+        return _h2py(f(_HPyGetContext(), _py2h(callable),                      \
+                          (HPy *)args, nargsf, _py2h(kwnames)));               \
+    }
+
 /* With the cpython ABI, Py_buffer and HPy_buffer are ABI-compatible.
  * Even though casting between them is technically undefined behavior, it
  * should always work. That way, we avoid a costly allocation and copy. */

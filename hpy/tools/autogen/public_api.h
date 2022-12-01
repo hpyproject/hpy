@@ -1073,6 +1073,8 @@ typedef int (*HPyFunc_traverseproc)(void *object, HPyFunc_visitproc visit, void 
 typedef void (*HPyFunc_destructor)(HPyContext *ctx, HPy);
 
 typedef void (*HPyFunc_destroyfunc)(void *);
+typedef HPy(*HPyFunc_vectorcallfunc)(HPyContext *ctx, HPy callable, HPy *args,
+                                    HPy_ssize_t nargsf, HPy kwnames);
 
 // Note: separate type, because we need a different trampoline
 typedef HPy (*HPyFunc_mod_create)(HPyContext *ctx, HPy);

@@ -4,7 +4,8 @@ from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
 
 NO_CALL = ('VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
-           'GETBUFFERPROC', 'RELEASEBUFFERPROC', 'TRAVERSEPROC', 'MOD_CREATE')
+           'GETBUFFERPROC', 'RELEASEBUFFERPROC', 'TRAVERSEPROC', 'MOD_CREATE',
+           'VECTORCALLFUNC')
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
 class autogen_hpyfunc_declare_h(AutoGenFile):

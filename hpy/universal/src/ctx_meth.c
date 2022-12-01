@@ -116,6 +116,20 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
             _HPyModule_CheckCreateSlotResult(&a->result);
             return;
     }
+    case HPyFunc_VECTORCALLFUNC: {
+        HPyFunc_vectorcallfunc f = (HPyFunc_vectorcallfunc)func;
+        _HPyFunc_args_VECTORCALLFUNC *a = (_HPyFunc_args_VECTORCALLFUNC*)args;
+        Py_ssize_t n_kwnames = a->kwnames != NULL ? PyTuple_GET_SIZE(a->kwnames) : 0;
+        Py_ssize_t nargs_with_kw = PyVectorcall_NARGS(a->nargsf) + n_kwnames;
+        HPy *h_args = (HPy *)alloca(nargs_with_kw * sizeof(HPy));
+        for (Py_ssize_t i = 0; i < nargs_with_kw; i++) {
+            h_args[i] = _py2h(a->args[i]);
+        }
+        a->result = _h2py(f(ctx, _py2h(a->callable), h_args,
+                            _vectorcall_nargsf_py2hpy(a->nargsf),
+                            _py2h(a->kwnames)));
+        return;
+    }
 #include "autogen_ctx_call.i"
     default:
         Py_FatalError("Unsupported HPyFunc_Signature in ctx_meth.c");

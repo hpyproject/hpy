@@ -55,4 +55,13 @@ static inline PyObject * _hg2py(HPyGlobal hf)
     return _h2py(h);
 }
 
+static inline size_t
+_vectorcall_nargsf_py2hpy(size_t py_nargsf)
+{
+    if (PY_VECTORCALL_ARGUMENTS_OFFSET != HPy_VECTORCALL_ARGUMENTS_OFFSET
+            && (py_nargsf & PY_VECTORCALL_ARGUMENTS_OFFSET))
+        return PyVectorcall_NARGS(py_nargsf) | HPy_VECTORCALL_ARGUMENTS_OFFSET;
+    return py_nargsf;
+}
+
 #endif /* HPY_HANDLES_H */

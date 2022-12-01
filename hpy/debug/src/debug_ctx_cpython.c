@@ -260,6 +260,28 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         DHPy_close(dctx, dh_result);
         return;
     }
+    case HPyFunc_VECTORCALLFUNC: {
+        HPyFunc_vectorcallfunc f = (HPyFunc_vectorcallfunc)func;
+        _HPyFunc_args_VECTORCALLFUNC *a = (_HPyFunc_args_VECTORCALLFUNC*)args;
+        DHPy dh_callable = _py2dh(dctx, a->callable);
+        Py_ssize_t n_kwnames = a->kwnames != NULL ? PyTuple_GET_SIZE(a->kwnames) : 0;
+        Py_ssize_t nargs_with_kw = PyVectorcall_NARGS(a->nargsf) + n_kwnames;
+        DHPy *dh_args = (DHPy *)alloca(nargs_with_kw * sizeof(DHPy));
+        for (Py_ssize_t i = 0; i < nargs_with_kw; i++) {
+            dh_args[i] = _py2dh(dctx, a->args[i]);
+        }
+        DHPy dh_kwnames = _py2dh(dctx, a->kwnames);
+        DHPy dh_result = f(dctx, dh_callable, dh_args,
+                           _vectorcall_nargsf_py2hpy(a->nargsf), dh_kwnames);
+        DHPy_close_and_check(dctx, dh_callable);
+        for (Py_ssize_t i = 0; i < nargs_with_kw; i++) {
+            DHPy_close_and_check(dctx, dh_args[i]);
+        }
+        DHPy_close_and_check(dctx, dh_kwnames);
+        a->result = _dh2py(dctx, dh_result);
+        DHPy_close(dctx, dh_result);
+        return;
+    }
 #include "autogen_debug_ctx_call.i"
     default:
         Py_FatalError("Unsupported HPyFunc_Signature in debug_ctx_cpython.c");

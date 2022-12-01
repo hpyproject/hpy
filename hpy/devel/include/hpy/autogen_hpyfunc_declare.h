@@ -45,6 +45,7 @@
 #define _HPyFunc_DECLARE_HPyFunc_TRAVERSEPROC(SYM) static int SYM(void *object, HPyFunc_visitproc visit, void *arg)
 #define _HPyFunc_DECLARE_HPyFunc_DESTRUCTOR(SYM) static void SYM(HPyContext *ctx, HPy)
 #define _HPyFunc_DECLARE_HPyFunc_DESTROYFUNC(SYM) static void SYM(void *)
+#define _HPyFunc_DECLARE_HPyFunc_VECTORCALLFUNC(SYM) static HPy SYM(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
 #define _HPyFunc_DECLARE_HPyFunc_MOD_CREATE(SYM) static HPy SYM(HPyContext *ctx, HPy)
 
 typedef HPy (*HPyFunc_noargs)(HPyContext *ctx, HPy self);
@@ -82,4 +83,5 @@ typedef void (*HPyFunc_releasebufferproc)(HPyContext *ctx, HPy, HPy_buffer *);
 typedef int (*HPyFunc_traverseproc)(void *object, HPyFunc_visitproc visit, void *arg);
 typedef void (*HPyFunc_destructor)(HPyContext *ctx, HPy);
 typedef void (*HPyFunc_destroyfunc)(void *);
+typedef HPy (*HPyFunc_vectorcallfunc)(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames);
 typedef HPy (*HPyFunc_mod_create)(HPyContext *ctx, HPy);

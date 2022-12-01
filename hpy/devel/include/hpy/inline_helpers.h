@@ -458,5 +458,8 @@ HPySlice_AdjustIndices(HPyContext *_HPy_UNUSED_ARG(ctx), HPy_ssize_t length,
     }
     return 0;
 }
+HPyAPI_FUNC HPy_ssize_t HPyVectorcall_NARGS(size_t n) {
+    return n & ~HPy_VECTORCALL_ARGUMENTS_OFFSET;
+}
 
 #endif //HPY_INLINE_HELPERS_H

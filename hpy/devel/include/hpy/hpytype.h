@@ -76,6 +76,11 @@ typedef enum {
 } HPyType_BuiltinShape;
 
 typedef struct {
+    cpy_vectorcallfunc cpy_trampoline;
+    HPyFunc_vectorcallfunc impl;
+} HPyType_Vectorcall;
+
+typedef struct {
     /** The Python name of type (UTF-8 encoded) */
     const char* name;
 
@@ -183,12 +188,21 @@ typedef struct {
 /** Default type flags for HPy types. */
 #define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
 
+/** Set if the type implements the vectorcall protocol (PEP 590) */
+#define HPy_TPFLAGS_HAVE_VECTORCALL (1UL << 11)
+
+/** Set if the type allows subclassing */
+#define HPy_TPFLAGS_BASETYPE (1UL << 10)
+
 /** Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)
 
 /** If set, the object will be tracked by CPython's GC. Probably irrelevant for
     GC-based alternative implementations. */
 #define HPy_TPFLAGS_HAVE_GC (1UL << 14)
+
+#define HPy_VECTORCALL_ARGUMENTS_OFFSET \
+    (_HPy_STATIC_CAST(size_t, 1) << (8 * sizeof(size_t) - 1))
 
 /** Convenience macro which is equivalent to:
     ``HPyType_HELPERS(TYPE, HPyType_BuiltinShape_Legacy)`` */
@@ -272,5 +286,13 @@ _HPyType_HELPER_X(_HPyType_HELPER_FNAME(__VA_ARGS__))(HPyContext *ctx, HPy h) \
 #define HPyType_BuiltinShape_Unicode_AsStruct _HPy_AsStruct_Unicode
 #define HPyType_BuiltinShape_Tuple_AsStruct _HPy_AsStruct_Tuple
 #define HPyType_BuiltinShape_List_AsStruct _HPy_AsStruct_List
+
+#define HPyType_VECTORCALL(SYM)                                              \
+    _HPyFunc_DECLARE_HPyFunc_VECTORCALLFUNC(SYM##_impl);                     \
+    HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM##_trampoline, SYM##_impl); \
+    static HPyType_Vectorcall SYM = {                                        \
+        .cpy_trampoline = SYM##_trampoline,                                  \
+        .impl = SYM##_impl                                                   \
+    };
 
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */

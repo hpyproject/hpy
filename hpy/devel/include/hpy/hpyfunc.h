@@ -40,6 +40,7 @@ typedef enum {
     HPyFunc_TRAVERSEPROC,
     HPyFunc_DESTRUCTOR,
     HPyFunc_CAPSULE_DESTRUCTOR,
+    HPyFunc_VECTORCALLFUNC,
 
     HPyFunc_MOD_CREATE,
 

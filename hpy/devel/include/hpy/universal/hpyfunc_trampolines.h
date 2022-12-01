@@ -31,6 +31,14 @@ typedef struct {
     cpy_PyObject * result;
 } _HPyFunc_args_RICHCMPFUNC;
 
+typedef struct {
+    cpy_PyObject *callable;
+    cpy_PyObject *const *args;
+    size_t nargsf;
+    cpy_PyObject *kwnames;
+    cpy_PyObject *result;
+} _HPyFunc_args_VECTORCALLFUNC;
+
 
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                  \
     static cpy_PyObject *                                               \
@@ -80,6 +88,18 @@ typedef struct {
         _HPy_CallRealFunctionFromTrampoline(                            \
            _ctx_for_trampolines, HPyFunc_RICHCMPFUNC, (HPyCFunction)IMPL, &a);        \
         return a.result;                                                \
+    }
+
+#define HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                  \
+    static cpy_PyObject *                                                     \
+    SYM(cpy_PyObject *callable, cpy_PyObject *const *args, size_t nargsf,     \
+            cpy_PyObject *kwnames)                                            \
+    {                                                                         \
+        _HPyFunc_args_VECTORCALLFUNC a = { callable, args, nargsf, kwnames }; \
+        _HPy_CallRealFunctionFromTrampoline(                                  \
+            _ctx_for_trampolines, HPyFunc_VECTORCALLFUNC, (HPyCFunction)IMPL, \
+            &a);                                                              \
+        return a.result;                                                      \
     }
 
 typedef struct {
