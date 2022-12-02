@@ -121,6 +121,34 @@ error:
     return NULL;
 }
 
+static bool validate_abi_tag(const char *shortname, const char *soname,
+                             uint32_t required_major_version, uint32_t required_minor_version) {
+    char *substr = strstr(soname, ".hpy");
+    if (substr != NULL) {
+        substr += strlen(".hpy");
+        if (*substr >= '0' && *substr <= '9') {
+            // It is a number w/o sign and whitespace, we can now parse it with atoi
+            uint32_t abi_tag = (uint32_t) atoi(substr);
+            if (abi_tag == required_major_version) {
+                return true;
+            }
+            PyErr_Format(PyExc_RuntimeError,
+                         "HPy extension module '%s' at path '%s': mismatch between the "
+                         "HPy ABI tag encoded in the filename and the major version requested "
+                         "by the HPy extension itself. Major version tag parsed from "
+                         "filename: %" PRIu32 ". Requested version: %" PRIu32 ".%" PRIu32 ".",
+                         shortname, soname, abi_tag, required_major_version, required_minor_version);
+            return false;
+        }
+    }
+    PyErr_Format(PyExc_RuntimeError,
+                 "HPy extension module '%s' at path '%s': could not find "
+                 "HPy ABI tag encoded in the filename. The extension claims to be compiled with "
+                 "HPy ABI version: %" PRIu32 ".%" PRIu32 ".",
+                 shortname, soname, required_major_version, required_minor_version);
+    return false;
+}
+
 static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
 {
     PyObject *name = NULL;
@@ -183,15 +211,8 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
         goto error;
     }
 
-    char expected_tag[16];
-    PyOS_snprintf(expected_tag, sizeof(expected_tag), ".hpy%" PRIu32 ".", required_major_version);
     // Sanity check of the tag in the shared object filename
-    if (strstr(soname, expected_tag) == NULL) {
-        PyErr_Format(PyExc_RuntimeError,
-                     "HPy extension module '%s' at path '%s': mismatch between the "
-                     "HPy ABI tag encoded in the filename and the major version requested "
-                     "by the HPy extension itself. Requested version: %" PRIu32 ".%" PRIu32 ".",
-                     shortname, soname, required_major_version, required_minor_version);
+    if (!validate_abi_tag(shortname, soname, required_major_version, required_minor_version)) {
         goto error;
     }
 
