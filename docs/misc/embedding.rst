@@ -43,8 +43,4 @@ Also refer to the API reference :ref:`api-reference/hpy-type:hpy module`.
         // ...
     }
 
-    HPy_MODINIT(hpymodA)
-    static HPy init_hpymodA_impl(HPyContext *ctx)
-    {
-        // ...
-    }
+    HPy_MODINIT(extension_name, hpymodA)

@@ -26,14 +26,30 @@ extern HPyContext *_ctx_for_trampolines;
 #endif
 
 
+/**
+ * Definition of a Python module. Pointer to this struct is returned from
+ * the HPy initialization function ``HPyInit_{extname}`` and the Python
+ * interpreter creates a Python module from it. HPy supports only the
+ * multi-phase module initialization approach (PEP 451).
+ *
+ * There is no HPy API to create a Python module manually, i.e., equivalent
+ * of ``PyModule_Create`` or ``PyModule_FromDefAndSpec``, for the time being,
+ * but may be added if a use-case arises.
+ *
+ * Note: unlike Python/C API, HPy module definition does not specify module
+ * name. The name if always taken from the ModuleSpec, which is also the case
+ * in multi-phase module initialization on Python/C API.
+ */
 typedef struct {
-    /** The Python name of module (UTF-8 encoded) */
-    const char* name;
-
     /** Docstring of the type (UTF-8 encoded; may be ``NULL``) */
     const char* doc;
 
-    /** The size (in bytes) of the module state structure. */
+    /**
+     * The size  (in bytes) of the module state structure. If set to zero,
+     * then the module will not get allocated and assigned any HPy module state.
+     * Negative size, unlike in Python/C API, does not have any specific meaning
+     * and will produce a runtime error.
+     */
     HPy_ssize_t size;
 
     /**
@@ -63,22 +79,22 @@ typedef struct {
 
 
 #if defined(__cplusplus)
-#  define HPyVERSION_FUNC extern "C" HPy_EXPORTED_SYMBOL uint32_t
-#  define HPyMODINIT_FUNC extern "C" HPy_EXPORTED_SYMBOL HPy
+#  define HPy_EXPORTED_FUNC extern "C" HPy_EXPORTED_SYMBOL
 #else /* __cplusplus */
-#  define HPyVERSION_FUNC HPy_EXPORTED_SYMBOL uint32_t
-#  define HPyMODINIT_FUNC HPy_EXPORTED_SYMBOL HPy
+#  define HPy_EXPORTED_FUNC HPy_EXPORTED_SYMBOL
 #endif /* __cplusplus */
 
 #ifdef HPY_ABI_CPYTHON
 
+// helpers provided by HPy runtime:
+#include "hpy/runtime/ctx_module.h"
+
 // module initialization in the CPython case
-#define HPy_MODINIT(modname)                                      \
-    static HPy init_##modname##_impl(HPyContext *ctx);            \
-    PyMODINIT_FUNC                                                \
-    PyInit_##modname(void)                                        \
-    {                                                             \
-        return _h2py(init_##modname##_impl(_HPyGetContext()));    \
+#define HPy_MODINIT(ext_name, mod_def)                         \
+    PyMODINIT_FUNC                                             \
+    PyInit_##ext_name(void)                                    \
+    {                                                          \
+        return _HPyModuleDef_AsPyInit(&mod_def);               \
     }
 
 #else // HPY_ABI_CPYTHON
@@ -96,41 +112,46 @@ typedef struct {
  * ``get_required_hpy_minor_version_<modname>``
  *   The HPy minor version this module was built with.
  *
- * ``HPyInit_<modname>``
- *   The init function that will be called by the interpreter.
- *
- * The macro expects that there is a function ``init_<modname>`` that does
- * the actual initialization of the module.
+ * ``HPyModuleDef* HPyInit_<extname>``
+ *   The init function that will be called by the interpreter. This function
+ *   does not have an access to HPyContext and thus cannot call any HPy APIs.
+ *   The purpose of this function is to return a pointer to a HPyModuleDef
+ *   structure that will serve as a specification of the module that should be
+ *   created by the interpreter. HPy supports only multi-phase module
+ *   initialization (PEP 451). Any module initialization code can be added
+ *   to the HPy_mod_execute slot of the module if needed.
  *
  * Example:
  *
  * .. code-block:: c
  *
- *   HPy_MODINIT(mymodule)
- *   static HPy init_mymodule(HPyContext *ctx)
- *   {
- *     // ...
- *   }
+ *   HPy_MODINIT(myextension_shared_library_filename, my_hpy_module_def)
  */
-#define HPy_MODINIT(modname)                                      \
-    HPyVERSION_FUNC                                               \
-    get_required_hpy_major_version_##modname()                    \
-    {                                                             \
-        return HPY_ABI_VERSION;                                   \
-    }                                                             \
-    HPyVERSION_FUNC                                               \
-    get_required_hpy_minor_version_##modname()                    \
-    {                                                             \
-        return HPY_ABI_VERSION_MINOR;                             \
-    }                                                             \
-    _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;           \
-    static HPy init_##modname##_impl(HPyContext *ctx);            \
-    HPyMODINIT_FUNC                                               \
-    HPyInit_##modname(HPyContext *ctx)                            \
-    {                                                             \
-        _ctx_for_trampolines = ctx;                               \
-        return init_##modname##_impl(ctx);                        \
+#define HPy_MODINIT(ext_name, mod_def)                         \
+    HPy_EXPORTED_FUNC uint32_t                                 \
+    get_required_hpy_major_version_##ext_name()                \
+    {                                                          \
+        return HPY_ABI_VERSION;                                \
+    }                                                          \
+    HPy_EXPORTED_FUNC uint32_t                                 \
+    get_required_hpy_minor_version_##ext_name()                \
+    {                                                          \
+        return HPY_ABI_VERSION_MINOR;                          \
+    }                                                          \
+    _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;        \
+    HPy_EXPORTED_FUNC void                                     \
+    HPyInitGlobalContext_##ext_name(HPyContext *ctx)           \
+    {                                                          \
+        _ctx_for_trampolines = ctx;                            \
+    }                                                          \
+    HPy_EXPORTED_FUNC HPyModuleDef*                            \
+    HPyInit_##ext_name()                                       \
+    {                                                          \
+        return &mod_def;                                       \
     }
+
+// Implementation note: the global HPyContext is used by the CPython
+// trampolines generated by the HPyDef_XXX macros
 
 #endif // HPY_ABI_CPYTHON
 

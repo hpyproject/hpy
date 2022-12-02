@@ -9,7 +9,6 @@
 HPy Core API Function Index
 ###########################
 
-* :c:func:`HPyModule_Create`
 * :c:func:`HPy_Dup`
 * :c:func:`HPy_Close`
 * :c:func:`HPyLong_FromInt32_t`

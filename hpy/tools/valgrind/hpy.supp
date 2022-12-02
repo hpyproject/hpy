@@ -1,9 +1,9 @@
 {
-   <ctx_Module_Create_leak>
+   <_HPyModuleDef_CreatePyModuleDef_leak>
    Memcheck:Leak
    match-leak-kinds: definite,indirect
    ...
-   fun:ctx_Module_Create
+   fun:_HPyModuleDef_CreatePyModuleDef
    ...
 }
 

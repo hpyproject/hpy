@@ -12,18 +12,9 @@ static HPyDef *module_defines[] = {
     NULL
 };
 static HPyModuleDef moduledef = {
-    .name = "foo",
     .doc = "HPy Proof of Concept",
-    .size = -1,
+    .size = 0,
     .defines = module_defines
 };
 
-HPy_MODINIT(foo)
-static HPy init_foo_impl(HPyContext *ctx)
-{
-    HPy m;
-    m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    return m;
-}
+HPy_MODINIT(foo, moduledef)

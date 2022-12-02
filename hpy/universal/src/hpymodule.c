@@ -17,6 +17,7 @@
 #include "hpy/version.h"
 #include "hpy_debug.h"
 #include "hpy_trace.h"
+#include "hpy/runtime/ctx_module.h"
 
 #ifdef PYPY_VERSION
 #  error "Cannot build hpy.universal on top of PyPy. PyPy comes with its own version of it"
@@ -45,9 +46,12 @@ typedef enum {
     // MODE_TRACE_DEBUG = 4
 } HPyMode;
 
-typedef HPy (*InitFuncPtr)(HPyContext *ctx);
+typedef uint32_t (*VersionGetterFuncPtr)(void);
+typedef HPyModuleDef* (*InitFuncPtr)(void);
+typedef void (*InitContextFuncPtr)(HPyContext*);
 
-static const char *prefix = "HPyInit";
+static const char *init_prefix = "HPyInit";
+static const char *init_ctx_prefix = "HPyInitGlobalContext_";
 
 static inline int
 _hpy_strncmp_ignore_case(const char *s0, const char *s1, size_t n)
@@ -149,21 +153,28 @@ static bool validate_abi_tag(const char *shortname, const char *soname,
     return false;
 }
 
-typedef uint32_t (*version_getter)(void);
+static void dlsym_error(const char *soname, const char *symbol_name) {
+    const char *error = dlerror();
+    if (error == NULL)
+        error = "no error message provided by the system";
+    PyErr_Format(PyExc_RuntimeError,
+                 "Error during loading of the HPy extension module at "
+                 "path '%s' while trying to find symbol '%s'. Did you use"
+                 "the HPy_MODINIT macro to register your module? Error "
+                 "message from dlsym/WinAPI: %s", soname, symbol_name, error);
+}
 
-static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
+static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode, PyObject *spec)
 {
     PyObject *name = NULL;
     PyObject *pathbytes = NULL;
+    PyModuleDef *pydef = NULL;
+    PyObject *py_mod = NULL;
 
     name = get_encoded_name(name_unicode);
     if (name == NULL) {
         goto error;
     }
-    const char *shortname = PyBytes_AS_STRING(name);
-    char init_name[258];
-    PyOS_snprintf(init_name, sizeof(init_name), "%.20s_%.200s",
-            prefix, shortname);
 
     pathbytes = PyUnicode_EncodeFSDefault(path);
     if (pathbytes == NULL)
@@ -181,11 +192,12 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
         goto error;
     }
 
+    const char *shortname = PyBytes_AS_STRING(name);
     char minor_version_symbol_name[258];
     char major_version_symbol_name[258];
-    PyOS_snprintf(minor_version_symbol_name, sizeof(init_name),
+    PyOS_snprintf(minor_version_symbol_name, sizeof(minor_version_symbol_name),
                   "get_required_hpy_minor_version_%.200s", shortname);
-    PyOS_snprintf(major_version_symbol_name, sizeof(init_name),
+    PyOS_snprintf(major_version_symbol_name, sizeof(major_version_symbol_name),
                   "get_required_hpy_major_version_%.200s", shortname);
     void *minor_version_ptr = dlsym(mylib, minor_version_symbol_name);
     void *major_version_ptr = dlsym(mylib, major_version_symbol_name);
@@ -200,8 +212,8 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
                      soname, minor_version_symbol_name, major_version_symbol_name, error);
         goto error;
     }
-    uint32_t required_minor_version = ((version_getter) minor_version_ptr)();
-    uint32_t required_major_version = ((version_getter) major_version_ptr)();
+    uint32_t required_minor_version = ((VersionGetterFuncPtr) minor_version_ptr)();
+    uint32_t required_major_version = ((VersionGetterFuncPtr) major_version_ptr)();
     if (required_major_version != HPY_ABI_VERSION || required_minor_version > HPY_ABI_VERSION_MINOR) {
         // For now, we have only one major version, but in the future at this
         // point we would decide which HPyContext to create
@@ -218,32 +230,58 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
         goto error;
     }
 
-    void *initfn = dlsym(mylib, init_name);
-    if (initfn == NULL) {
-        const char *error = dlerror();
-        if (error == NULL)
-            error = "no error message provided by the system";
-        PyErr_Format(PyExc_RuntimeError,
-                     "Error during loading of the HPy extension module at "
-                     "path '%s' while trying to find symbol '%s'. Did you use"
-                     "the HPy_MODINIT macro to register your module? Error "
-                     "message from dlsym/WinAPI: %s", soname, init_name, error);
-        goto error;
-    }
-
     HPyContext *ctx = get_context(mode);
     if (ctx == NULL)
         goto error;
-    HPy h_mod = ((InitFuncPtr)initfn)(ctx);
-    if (HPy_IsNull(h_mod))
+
+    char init_ctx_name[258];
+    PyOS_snprintf(init_ctx_name, sizeof(init_ctx_name), "%.20s_%.200s",
+                  init_ctx_prefix, shortname);
+    void *initctxfn = dlsym(mylib, init_ctx_name);
+    if (initctxfn == NULL) {
+        dlsym_error(soname, init_ctx_name);
         goto error;
-    PyObject *py_mod = HPy_AsPyObject(ctx, h_mod);
-    HPy_Close(ctx, h_mod);
+    }
+    ((InitContextFuncPtr)initctxfn)(ctx);
+
+    char init_name[258];
+    PyOS_snprintf(init_name, sizeof(init_name), "%.20s_%.200s",
+                  init_prefix, shortname);
+    void *initfn = dlsym(mylib, init_name);
+    if (initfn == NULL) {
+        dlsym_error(soname, init_name);
+        goto error;
+    }
+
+    HPyModuleDef* hpydef = ((InitFuncPtr)initfn)();
+    if (hpydef == NULL) {
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at "
+                     "path '%s'. Function '%s' returned NULL.", soname, init_name);
+        goto error;
+    }
+
+    pydef = _HPyModuleDef_CreatePyModuleDef(hpydef);
+    if (pydef == NULL) {
+        goto error;
+    }
+
+    py_mod = PyModule_FromDefAndSpec(pydef, spec);
+    if (py_mod == NULL)
+        goto error;
+
+    if (PyModule_Check(py_mod)) {
+        if (PyModule_ExecDef(py_mod, pydef) != 0)
+            goto error;
+    }
 
     Py_XDECREF(name);
     Py_XDECREF(pathbytes);
     return py_mod;
 error:
+    Py_XDECREF(py_mod);
+    if (pydef != NULL)
+        PyMem_Free(pydef);
     Py_XDECREF(name);
     Py_XDECREF(pathbytes);
     return NULL;
@@ -251,13 +289,14 @@ error:
 
 static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = {"name", "path", "debug", "mode", NULL};
+    static char *kwlist[] = {"name", "path", "spec", "debug", "mode", NULL};
     PyObject *name_unicode;
     PyObject *path;
+    PyObject *spec;
     int debug = 0;
     int mode = -1;
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OO|pi", kwlist,
-                                     &name_unicode, &path, &debug, &mode)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OOO|pi", kwlist,
+                                     &name_unicode, &path, &spec, &debug, &mode)) {
         return NULL;
     }
     HPyMode hmode = debug ? MODE_DEBUG : MODE_UNIVERSAL;
@@ -266,7 +305,7 @@ static PyObject *load(PyObject *self, PyObject *args, PyObject *kwargs)
     {
         hmode = (HPyMode) mode;
     }
-    return do_load(name_unicode, path, hmode);
+    return do_load(name_unicode, path, hmode, spec);
 }
 
 static HPyMode get_mode_from_string(const char *s, Py_ssize_t n)
@@ -424,7 +463,7 @@ load_bootstrap(PyObject *self, PyObject *args, PyObject *kwargs)
                 s_module_name, log_msg);
     }
 
-    m = do_load(module_name, file, hmode);
+    m = do_load(module_name, file, hmode, spec);
     if (m == NULL)
         return NULL;
 
@@ -464,7 +503,7 @@ static PyModuleDef_Slot hpymodule_slots[] = {
     {0, NULL},
 };
 
-static struct PyModuleDef hpydef = {
+static struct PyModuleDef hpy_pydef = {
     PyModuleDef_HEAD_INIT,
     .m_name = "hpy.universal",
     .m_doc = "HPy universal runtime for CPython",
@@ -473,27 +512,66 @@ static struct PyModuleDef hpydef = {
     .m_slots = hpymodule_slots,
 };
 
+static int initialize_module(HPyContext *ctx, PyObject *hpy_universal, const char* name,
+         const char *full_name, HPyModuleDef *hpydef,
+         PyObject* spec_from_file_and_location, PyObject *location)
+{
+    PyObject *spec = NULL, *new_mod = NULL;
+    int result = -1;
+
+    spec = PyObject_CallFunction(spec_from_file_and_location, "sO", full_name, location);
+    PyModuleDef *pydef = _HPyModuleDef_CreatePyModuleDef(hpydef);
+    new_mod = PyModule_FromDefAndSpec(pydef, spec);
+    if (new_mod == NULL)
+        goto cleanup;
+
+    if (PyModule_ExecDef(new_mod, pydef) != 0)
+        goto cleanup;
+
+    Py_INCREF(new_mod); // PyModule_AddObject steals the reference
+    if (PyModule_AddObject(hpy_universal, name, new_mod) < 0)
+        goto cleanup;
+
+    result = 0;
+
+cleanup:
+    Py_XDECREF(new_mod);
+    Py_XDECREF(spec);
+    return result;
+}
 
 // module initialization function
 int exec_module(PyObject* mod) {
     HPyContext *ctx  = &g_universal_ctx;
-    HPy h_debug_mod = HPyInit__debug(ctx);
-    if (HPy_IsNull(h_debug_mod))
-        return -1;
-    PyObject *_debug_mod = HPy_AsPyObject(ctx, h_debug_mod);
-    HPy_Close(ctx, h_debug_mod);
 
-    if (PyModule_AddObject(mod, "_debug", _debug_mod) < 0)
+    PyObject *importlib_util = PyImport_ImportModule("importlib.util");
+    if (importlib_util == NULL)
         return -1;
 
-    HPy h_trace_mod = HPyInit__trace(ctx);
-    if (HPy_IsNull(h_trace_mod))
+    PyObject *spec_from_file_and_location = PyObject_GetAttrString(importlib_util, "spec_from_file_location");
+    Py_DecRef(importlib_util);
+    if (spec_from_file_and_location == NULL)
         return -1;
-    PyObject *_trace_mod = HPy_AsPyObject(ctx, h_trace_mod);
-    HPy_Close(ctx, h_trace_mod);
 
-    if (PyModule_AddObject(mod, "_trace", _trace_mod) < 0)
+    PyObject *current_mod_spec = PyObject_GetAttrString(mod, "__spec__");
+    if (current_mod_spec == NULL)
         return -1;
+
+    PyObject *location = PyObject_GetAttrString(current_mod_spec, "origin");
+    if (location == NULL)
+        return -1;
+
+    HPyInitGlobalContext__debug(ctx);
+    int result = initialize_module(ctx, mod, "_debug", "hpy.debug._debug",
+                      HPyInit__debug(), spec_from_file_and_location, location);
+    if (result != 0)
+        return result;
+
+    HPyInitGlobalContext__trace(ctx);
+    result = initialize_module(ctx, mod, "_trace", "hpy.trace._trace",
+                      HPyInit__trace(), spec_from_file_and_location, location);
+    if (result != 0)
+        return result;
 
     for (int i=0; hpy_mode_names[i]; i++)
     {
@@ -607,6 +685,6 @@ PyMODINIT_FUNC
 PyInit_universal(void)
 {
     init_universal_ctx(&g_universal_ctx);
-    PyObject *mod = PyModuleDef_Init(&hpydef);
+    PyObject *mod = PyModuleDef_Init(&hpy_pydef);
     return mod;
 }

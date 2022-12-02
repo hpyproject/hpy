@@ -199,15 +199,9 @@ static HPyDef *module_defines[] = {
 };
 
 static HPyModuleDef moduledef = {
-    .name = "hpy.trace._trace",
     .doc = "HPy trace mode",
-    .size = -1,
+    .size = 0,
     .defines = module_defines
 };
 
-
-HPy_MODINIT(_trace)
-static HPy init__trace_impl(HPyContext *uctx)
-{
-    return HPyModule_Create(uctx, &moduledef);
-}
+HPy_MODINIT(_trace, moduledef)

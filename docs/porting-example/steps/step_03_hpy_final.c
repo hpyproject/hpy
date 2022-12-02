@@ -125,30 +125,27 @@ static HPyType_Spec Point_Type_spec = {
     .defines = point_defines
 };
 
+HPyDef_SLOT(module_exec, HPy_mod_exec)
+static int module_exec_impl(HPyContext *ctx, HPy mod)
+{
+    HPy point_type = HPyType_FromSpec(ctx, &Point_Type_spec, NULL);
+    if (HPy_IsNull(point_type))
+        return -1;
+    HPy_SetAttr_s(ctx, mod, "Point", point_type);
+    return 0;
+}
+
 // HPy module methods
 static HPyDef *module_defines[] = {
+        &module_exec,
     &dot,
     NULL
 };
 
 static HPyModuleDef moduledef = {
-    .name = "step_03_hpy_final",
     .doc = "Point module (Step 3; Porting complete)",
-    .size = -1,
+    .size = 0,
     .defines = module_defines,
 };
 
-HPy_MODINIT(step_03_hpy_final)
-static HPy init_step_03_hpy_final_impl(HPyContext *ctx)
-{
-    HPy m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-
-    HPy point_type = HPyType_FromSpec(ctx, &Point_Type_spec, NULL);
-    if (HPy_IsNull(point_type))
-      return HPy_NULL;
-    HPy_SetAttr_s(ctx, m, "Point", point_type);
-
-    return m;
-}
+HPy_MODINIT(step_03_hpy_final, moduledef)

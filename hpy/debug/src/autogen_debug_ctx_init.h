@@ -10,7 +10,6 @@
 
 */
 
-DHPy debug_ctx_Module_Create(HPyContext *dctx, HPyModuleDef *def);
 DHPy debug_ctx_Dup(HPyContext *dctx, DHPy h);
 void debug_ctx_Close(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Long_FromInt32_t(HPyContext *dctx, int32_t value);
@@ -262,7 +261,6 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->h_CapsuleType = DHPy_open_immortal(dctx, uctx->h_CapsuleType);
     dctx->h_SliceType = DHPy_open_immortal(dctx, uctx->h_SliceType);
     dctx->h_Builtins = DHPy_open_immortal(dctx, uctx->h_Builtins);
-    dctx->ctx_Module_Create = &debug_ctx_Module_Create;
     dctx->ctx_Dup = &debug_ctx_Dup;
     dctx->ctx_Close = &debug_ctx_Close;
     dctx->ctx_Long_FromInt32_t = &debug_ctx_Long_FromInt32_t;

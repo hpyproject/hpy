@@ -10,7 +10,6 @@
 
 */
 
-HPy trace_ctx_Module_Create(HPyContext *tctx, HPyModuleDef *def);
 HPy trace_ctx_Dup(HPyContext *tctx, HPy h);
 void trace_ctx_Close(HPyContext *tctx, HPy h);
 HPy trace_ctx_Long_FromInt32_t(HPyContext *tctx, int32_t value);
@@ -179,8 +178,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(249, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(249, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(248, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(248, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -279,7 +278,6 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->h_CapsuleType = uctx->h_CapsuleType;
     tctx->h_SliceType = uctx->h_SliceType;
     tctx->h_Builtins = uctx->h_Builtins;
-    tctx->ctx_Module_Create = &trace_ctx_Module_Create;
     tctx->ctx_Dup = &trace_ctx_Dup;
     tctx->ctx_Close = &trace_ctx_Close;
     tctx->ctx_Long_FromInt32_t = &trace_ctx_Long_FromInt32_t;

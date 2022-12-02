@@ -76,36 +76,35 @@ class DefaultExtensionTemplate(object):
 
     INIT_TEMPLATE = textwrap.dedent(
     """
+    HPyDef_SLOT(generated_init, HPy_mod_exec)
+    static int generated_init_impl(HPyContext *ctx, HPy m)
+    {
+        // Shouldn't really happen, but jut to silence the unused label warning
+        if (HPy_IsNull(m))
+            goto MODINIT_ERROR;
+    
+        %(init_types)s
+        return 0;
+
+        MODINIT_ERROR:
+        return -1;
+    }
+    
     static HPyDef *moduledefs[] = {
         %(defines)s
+        &generated_init,
         NULL
     };
     %(globals_defs)s
     static HPyModuleDef moduledef = {
-        .name = "%(name)s",
         .doc = "some test for hpy",
-        .size = -1,
+        .size = 0,
         .legacy_methods = %(legacy_methods)s,
         .defines = moduledefs,
         %(globals_field)s
     };
 
-    HPy_MODINIT(%(name)s)
-    static HPy init_%(name)s_impl(HPyContext *ctx)
-    {
-        HPy m = HPy_NULL;
-        m = HPyModule_Create(ctx, &moduledef);
-        if (HPy_IsNull(m))
-            goto MODINIT_ERROR;
-        %(init_types)s
-        return m;
-
-        MODINIT_ERROR:
-
-        if (!HPy_IsNull(m))
-            HPy_Close(ctx, m);
-        return HPy_NULL;
-    }
+    HPy_MODINIT(%(name)s, moduledef)
     """)
 
     r_marker = re.compile(r"^\s*@([A-Za-z_]+)(\(.*\))?$")
@@ -205,6 +204,9 @@ class DefaultExtensionTemplate(object):
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(func=func))
+
+    def HPy_MODINIT(self, mod):
+        return "HPy_MODINIT({}, {})".format(self.name, mod)
 
 
 class Spec(object):
@@ -354,9 +356,12 @@ class ExtensionCompiler:
                                 'trace', 'hybrid+trace')
         import sys
         import hpy.universal
+        import importlib.util
         assert name not in sys.modules
-        mod = hpy.universal.load(name, so_filename, mode=mode)
+        spec = importlib.util.spec_from_file_location(name, so_filename)
+        mod = hpy.universal.load(name, so_filename, spec, mode=mode)
         mod.__file__ = so_filename
+        mod.__spec__ = spec
         return mod
 
     def load_cpython_module(self, name, so_filename):
@@ -398,7 +403,9 @@ class PythonSubprocessRunner:
             # HPy module
             load_module = "import sys;" + \
                           "import hpy.universal;" + \
-                          "mod = hpy.universal.load('{name}', '{so_filename}', debug={debug});"
+                          "import importlib.util;" + \
+                          "spec = importlib.util.spec_from_file_location('{name}', '{so_filename}');" + \
+                          "mod = hpy.universal.load('{name}', '{so_filename}', spec, debug={debug});"
             escaped_filename = mod.so_filename.replace("\\", "\\\\")  # Needed for Windows paths
             load_module = load_module.format(name=mod.name, so_filename=escaped_filename,
                                              debug=self.hpy_abi == 'debug')

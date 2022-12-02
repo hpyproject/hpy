@@ -397,6 +397,17 @@ static UHPy new_DebugHandleObj(HPyContext *uctx, UHPy u_DebugHandleType,
 
 /* ~~~~~~ definition of the module hpy.debug._debug ~~~~~~~ */
 
+HPyDef_SLOT(module_exec, HPy_mod_exec)
+static int module_exec_impl(HPyContext *uctx, HPy m)
+{
+    UHPy h_DebugHandleType = HPyType_FromSpec(uctx, &DebugHandleType_spec, NULL);
+    if (HPy_IsNull(h_DebugHandleType))
+        return -1;
+    HPy_SetAttr_s(uctx, m, "DebugHandle", h_DebugHandleType);
+    HPy_Close(uctx, h_DebugHandleType);
+    return 0;
+}
+
 static HPyDef *module_defines[] = {
     &new_generation,
     &get_open_handles,
@@ -408,28 +419,14 @@ static HPyDef *module_defines[] = {
     &set_on_invalid_handle,
     &set_on_invalid_builder_handle,
     &set_handle_stack_trace_limit,
+    &module_exec,
     NULL
 };
 
 static HPyModuleDef moduledef = {
-    .name = "hpy.debug._debug",
     .doc = "HPy debug mode",
-    .size = -1,
+    .size = 0,
     .defines = module_defines
 };
 
-
-HPy_MODINIT(_debug)
-static UHPy init__debug_impl(HPyContext *uctx)
-{
-    UHPy m = HPyModule_Create(uctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-
-    UHPy h_DebugHandleType = HPyType_FromSpec(uctx, &DebugHandleType_spec, NULL);
-    if (HPy_IsNull(h_DebugHandleType))
-        return HPy_NULL;
-    HPy_SetAttr_s(uctx, m, "DebugHandle", h_DebugHandleType);
-    HPy_Close(uctx, h_DebugHandleType);
-    return m;
-}
+HPy_MODINIT(_debug, moduledef)

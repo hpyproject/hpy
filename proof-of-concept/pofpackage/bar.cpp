@@ -28,9 +28,8 @@ static HPyDef *module_defines[] = {
     NULL
 };
 static HPyModuleDef moduledef = {
-    .name = "bar",
     .doc = "HPy C++ Proof of Concept",
-    .size = -1,
+    .size = 0,
     .defines = module_defines
 };
 
@@ -39,15 +38,7 @@ extern "C" {
 #endif
 
 
-HPy_MODINIT(bar)
-static HPy init_bar_impl(HPyContext *ctx)
-{
-    HPy m;
-    m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    return m;
-}
+HPy_MODINIT(bar, moduledef)
 
 #ifdef __cplusplus
 }

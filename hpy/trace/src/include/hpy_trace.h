@@ -31,6 +31,12 @@ const char * hpy_trace_get_func_name(int idx);
 extern "C"
 #endif
 HPy_EXPORTED_SYMBOL
-HPy HPyInit__trace(HPyContext *uctx);
+HPyModuleDef* HPyInit__trace();
+
+#ifdef ___cplusplus
+extern "C"
+#endif
+HPy_EXPORTED_SYMBOL
+void HPyInitGlobalContext__trace(HPyContext *ctx);
 
 #endif /* HPY_TRACE_H */
