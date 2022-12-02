@@ -901,15 +901,28 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
 
 #if !HAVE_FROM_METACLASS
 
-static inline Py_ssize_t count_members(PyType_Spec *spec) {
+static inline Py_ssize_t count_members(PyType_Spec *spec, Py_ssize_t *vectorcalloffset) {
     Py_ssize_t nmembers = 0;
-    PyType_Slot *slot;
-    PyMemberDef *memb;
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+    *vectorcalloffset = 0;
+#endif /* Python 3.8.x */
+    const PyType_Slot *slot;
     for (slot = spec->slots; slot->slot; slot++) {
         if (slot->slot == Py_tp_members) {
             nmembers = 0;
-            for (memb = (PyMemberDef *) slot->pfunc; memb->name != NULL; memb++) {
+            for (const PyMemberDef *memb = (const PyMemberDef *)slot->pfunc; memb->name != NULL; memb++) {
                 nmembers++;
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+                /* Python 3.8 already supports vectorcalls but does not
+                   consider the '__vectorcalloffset__' member. So we need to do
+                   it manually. */
+                if (strcmp(memb->name, "__vectorcalloffset__") == 0) {
+                    // The PyMemberDef must be a Py_ssize_t and readonly
+                    assert(memb->type == T_PYSSIZET);
+                    assert(memb->flags == READONLY);
+                    *vectorcalloffset = memb->offset;
+                }
+#endif /* Python 3.8.x */
             }
         }
     }
@@ -930,8 +943,17 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
     PyObject *temp, *result;
     PyHeapTypeObject *temp_ht, *ht;
     PyTypeObject *temp_tp, *tp;
-    Py_ssize_t nmembers;
+    Py_ssize_t nmembers, vectorcalloffset;
     const char *s;
+
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+    /* Python 3.8 does not support specifying the vectorcall offset via the
+       type spec. Therefore, if the flag is set, 'PyType_Ready' will fail an
+       assert later on. So, we clear the flag and set the flags manually after
+       'PyType_Ready' when 'tp_vectorcall_offset' is also set. */
+    unsigned int restore_vectorcall_flag = spec->flags & _Py_TPFLAGS_HAVE_VECTORCALL;
+    spec->flags &= ~_Py_TPFLAGS_HAVE_VECTORCALL;
+#endif /* Python 3.8.x */
 
     temp = PyType_FromSpecWithBases(spec, bases);
     if (!temp)
@@ -958,7 +980,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
 
         /* Count the members as 'PyType_FromSpecWithBases' does such that we
            can properly allocate the size later when allocating the type. */
-        nmembers = count_members(spec);
+        nmembers = count_members(spec, &vectorcalloffset);
 
         result = meta->tp_alloc(meta, nmembers);
         if (!result)
@@ -1042,6 +1064,21 @@ fail:
         Py_DECREF(temp);
         Py_XDECREF(result);
         return NULL;
+#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+    } else {
+        tp = (PyTypeObject *) temp;
+        nmembers = count_members(spec, &vectorcalloffset);
+    }
+
+    if (vectorcalloffset) {
+        tp->tp_vectorcall_offset = vectorcalloffset;
+    }
+
+    if (restore_vectorcall_flag) {
+        tp->tp_flags |= _Py_TPFLAGS_HAVE_VECTORCALL;
+        _PyObject_ASSERT((PyObject *)tp, tp->tp_vectorcall_offset > 0);
+        _PyObject_ASSERT((PyObject *)tp, tp->tp_call != NULL);
+#endif /* Python 3.8.x */
     }
     return temp;
 }

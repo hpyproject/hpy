@@ -914,6 +914,10 @@ class TestType(HPyTest):
             del foo.NONE_member
 
     def test_vectorcall(self):
+        import pytest
+        if not self.supports_vectorcall():
+            pytest.skip("vectorcall not supported")
+
         mod = self.make_module("""
             @TYPE_STRUCT_BEGIN(VCallObject)
                 long x;
