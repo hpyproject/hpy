@@ -53,9 +53,13 @@ typedef struct {
 // module initialization in the universal and hybrid case
 #define HPy_MODINIT(modname)                                      \
     HPy_EXPORTED_SYMBOL uint32_t                                  \
-    required_hpy_major_version_##modname = HPY_ABI_VERSION;       \
+    get_required_hpy_major_version_##modname() {                  \
+        return HPY_ABI_VERSION;                                   \
+    }                                                             \
     HPy_EXPORTED_SYMBOL uint32_t                                  \
-    required_hpy_minor_version_##modname = HPY_ABI_VERSION_MINOR; \
+    get_required_hpy_minor_version_##modname() {                  \
+        return HPY_ABI_VERSION_MINOR;                             \
+    }                                                             \
     _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;           \
     static HPy init_##modname##_impl(HPyContext *ctx);            \
     HPyMODINIT_FUNC                                               \

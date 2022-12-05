@@ -149,6 +149,8 @@ static bool validate_abi_tag(const char *shortname, const char *soname,
     return false;
 }
 
+typedef uint32_t (*version_getter)(void);
+
 static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
 {
     PyObject *name = NULL;
@@ -182,9 +184,9 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
     char minor_version_symbol_name[258];
     char major_version_symbol_name[258];
     PyOS_snprintf(minor_version_symbol_name, sizeof(init_name),
-                  "required_hpy_minor_version_%.200s", shortname);
+                  "get_required_hpy_minor_version_%.200s", shortname);
     PyOS_snprintf(major_version_symbol_name, sizeof(init_name),
-                  "required_hpy_major_version_%.200s", shortname);
+                  "get_required_hpy_major_version_%.200s", shortname);
     void *minor_version_ptr = dlsym(mylib, minor_version_symbol_name);
     void *major_version_ptr = dlsym(mylib, major_version_symbol_name);
     if (minor_version_ptr == NULL || major_version_ptr == NULL) {
@@ -198,8 +200,8 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
                      soname, minor_version_symbol_name, major_version_symbol_name, error);
         goto error;
     }
-    uint32_t required_minor_version = *((uint32_t*) minor_version_ptr);
-    uint32_t required_major_version = *((uint32_t*) major_version_ptr);
+    uint32_t required_minor_version = ((version_getter) minor_version_ptr)();
+    uint32_t required_major_version = ((version_getter) major_version_ptr)();
     if (required_major_version != HPY_ABI_VERSION || required_minor_version > HPY_ABI_VERSION_MINOR) {
         // For now, we have only one major version, but in the future at this
         // point we would decide which HPyContext to create
