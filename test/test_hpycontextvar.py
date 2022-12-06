@@ -4,19 +4,19 @@ from .support import HPyTest
 class TestContextVar(HPyTest):
     def test_ContextVar_basics(self):
         mod = self.make_module("""
-            HPyDef_METH(create_ctxvar, "create_ctxvar", create_ctxvar_impl, HPyFunc_O)
+            HPyDef_METH(create_ctxvar, "create_ctxvar", HPyFunc_O)
             static HPy create_ctxvar_impl(HPyContext *ctx, HPy self, HPy default_value)
             {
                 return HPyContextVar_New(ctx, "testctxvar", default_value);
             }
 
-            HPyDef_METH(create_ctxvar_null, "create_ctxvar_null", create_ctxvar_null_impl, HPyFunc_NOARGS)
+            HPyDef_METH(create_ctxvar_null, "create_ctxvar_null", HPyFunc_NOARGS)
             static HPy create_ctxvar_null_impl(HPyContext *ctx, HPy self)
             {
                 return HPyContextVar_New(ctx, "testctxvar", HPy_NULL);
             }
 
-            HPyDef_METH(ctxvar_get, "ctxvar_get", ctxvar_get_impl, HPyFunc_O)
+            HPyDef_METH(ctxvar_get, "ctxvar_get", HPyFunc_O)
             static HPy ctxvar_get_impl(HPyContext *ctx, HPy self, HPy ctxvar)
             {
                 HPy result;
@@ -27,7 +27,7 @@ class TestContextVar(HPyTest):
                 return result;
             }
 
-            HPyDef_METH(ctxvar_set, "ctxvar_set", ctxvar_set_impl, HPyFunc_VARARGS)
+            HPyDef_METH(ctxvar_set, "ctxvar_set", HPyFunc_VARARGS)
             static HPy ctxvar_set_impl(HPyContext *ctx, HPy self,
                     HPy *args, HPy_ssize_t nargs)
             {

@@ -9,8 +9,10 @@ from packaging import version
 if version.parse(pycparser.__version__) < version.parse('2.21'):
     raise ImportError('You need pycparser>=2.21 to run autogen')
 
-from .parse import HPyAPI, CURRENT_DIR, AUTOGEN_H
-from .ctx import autogen_ctx_h, autogen_ctx_def_h
+from .parse import HPyAPI, AUTOGEN_H
+from .ctx import (autogen_ctx_h,
+                  autogen_ctx_def_h,
+                  cpython_autogen_ctx_h)
 from .trampolines import (autogen_trampolines_h,
                           cpython_autogen_api_impl_h,
                           universal_autogen_ctx_impl_h)
@@ -22,6 +24,9 @@ from .hpyslot import autogen_hpyslot_h
 from .debug import (autogen_debug_ctx_init_h,
                     autogen_debug_wrappers,
                     autogen_debug_ctx_call_i)
+from .trace import (autogen_tracer_ctx_init_h,
+                    autogen_tracer_wrappers,
+                    autogen_trace_func_table_c)
 from .pypy import autogen_pypy_txt
 
 def main():
@@ -30,19 +35,13 @@ def main():
         sys.exit(1)
     outdir = py.path.local(sys.argv[1])
 
-    try:
-        content = subprocess.check_output(['gcc', '-E', '-I' + str(CURRENT_DIR), str(AUTOGEN_H)], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        print("Preprocessing '%s' failed: " % AUTOGEN_H, file=sys.stderr)
-        print(e.output, file=sys.stderr)
-        raise e
-
-    api = HPyAPI.parse(content.decode('utf-8'))
+    api = HPyAPI.parse(AUTOGEN_H)
     ## for func in api.functions:
     ##     print(func)
 
     for cls in (autogen_ctx_h,
                 autogen_ctx_def_h,
+                cpython_autogen_ctx_h,
                 autogen_trampolines_h,
                 cpython_autogen_api_impl_h,
                 universal_autogen_ctx_impl_h,
@@ -54,6 +53,9 @@ def main():
                 autogen_debug_ctx_init_h,
                 autogen_debug_wrappers,
                 autogen_debug_ctx_call_i,
+                autogen_tracer_ctx_init_h,
+                autogen_tracer_wrappers,
+                autogen_trace_func_table_c,
                 autogen_pypy_txt):
         cls(api).write(outdir)
 

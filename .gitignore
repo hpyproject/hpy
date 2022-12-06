@@ -59,6 +59,7 @@ test-output.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.hpy.lock
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -84,3 +85,6 @@ venv.bak/
 
 # Sphinx
 docs/_build/
+
+# vscode
+.vscode

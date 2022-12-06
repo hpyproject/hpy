@@ -17,7 +17,7 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
     for (i = 0; desc->fields[i].name != NULL; i++) {
     }
 
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     HPy collections = HPyImport_ImportModule(ctx, "collections");
     if (HPy_IsNull(collections)) {
         return HPy_NULL;
@@ -121,7 +121,7 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
     HPy_Close(ctx, defs);
     HPy_Close(ctx, docstring);
     return result;
-#else    
+#else
     PyStructSequence_Desc d = {
         .name = desc->name,
         .doc = desc->doc,
@@ -135,7 +135,7 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
 HPyAPI_HELPER HPyStructSequenceBuilder
 HPyStructSequenceBuilder_New(HPyContext *ctx, HPy type)
 {
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     HPy fields = HPy_GetAttr_s(ctx, type, "_fields");
     if (HPy_IsNull(fields)) {
         return (HPyTupleBuilder){(HPy_ssize_t)0};
@@ -155,7 +155,7 @@ HPyStructSequenceBuilder_New(HPyContext *ctx, HPy type)
 HPyAPI_HELPER void
 HPyStructSequenceBuilder_Set(HPyContext *ctx, HPyStructSequenceBuilder self, HPy_ssize_t i, HPy value)
 {
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     HPyTupleBuilder_Set(ctx, self, i, value);
 #else
     PyObject *v = _h2py(value);
@@ -167,7 +167,7 @@ HPyStructSequenceBuilder_Set(HPyContext *ctx, HPyStructSequenceBuilder self, HPy
 HPyAPI_HELPER void
 HPyStructSequenceBuilder_Set_i(HPyContext *ctx, HPyStructSequenceBuilder self, HPy_ssize_t i, long value)
 {
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     HPy v = HPyLong_FromLong(ctx, value);
     HPyTupleBuilder_Set(ctx, self, i, v);
     HPy_Close(ctx, v);
@@ -179,7 +179,7 @@ HPyStructSequenceBuilder_Set_i(HPyContext *ctx, HPyStructSequenceBuilder self, H
 HPyAPI_HELPER HPy
 HPyStructSequenceBuilder_Build(HPyContext *ctx, HPyStructSequenceBuilder self, HPy type)
 {
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     HPy tuple = HPyTupleBuilder_Build(ctx, self);
     if (HPy_IsNull(tuple)) {
         return HPy_NULL;
@@ -201,7 +201,7 @@ HPyStructSequenceBuilder_Build(HPyContext *ctx, HPyStructSequenceBuilder self, H
 HPyAPI_HELPER void
 HPyStructSequenceBuilder_Cancel(HPyContext *ctx, HPyStructSequenceBuilder self)
 {
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     HPyTupleBuilder_Cancel(ctx, self);
 #else
     Py_DECREF((PyObject *)self._tup);
@@ -212,7 +212,7 @@ HPyStructSequenceBuilder_Cancel(HPyContext *ctx, HPyStructSequenceBuilder self)
 HPyAPI_HELPER HPy
 HPyStructSequence_GetItem(HPyContext *ctx, HPy self, HPy_ssize_t i)
 {
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
     return HPy_GetItem_i(ctx, self, i);
 #else
     PyObject *v = PyStructSequence_GetItem(_h2py(self), i);

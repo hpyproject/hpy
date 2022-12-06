@@ -12,7 +12,8 @@ in C. The current API is specific to the current implementation of CPython: it
 exposes a lot of internal details which makes it hard:
 
   - to implement it for other Python implementations (e.g. PyPy, GraalPython,
-    Jython, IronPython, etc.)
+    Jython, IronPython, etc.). The implementation for CPython is in this repo,
+    but other implementations sometimes have to [implement some things](https://github.com/hpyproject/hpy/issues?q=label%3A%22HPy+update+in+GraalPy%22+label%3A%22HPy+update+in+PyPy%22+) in their HPy layer.
 
   - to experiment with new things inside CPython itself: e.g. using a GC
     instead of refcounting, or to remove the GIL

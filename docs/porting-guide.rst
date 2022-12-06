@@ -46,7 +46,7 @@ Back to ``HPy`` vs ``HPyField`` vs ``HPyGlobal``:
 
   * In PyPy and GraalPython, `HPy` handles are implemented using an indirection:
     they are indexes inside a big list of GC-managed objects: this big list is
-    tracked by the GC, so when an object move its pointer is correctly updated.
+    tracked by the GC, so when an object moves its pointer is correctly updated.
 
   * ``HPyField`` is for long-lived references, and the GC must be aware of
     their location in memory. In PyPy, an ``HPyField`` is implemented as a
@@ -57,7 +57,7 @@ Back to ``HPy`` vs ``HPyField`` vs ``HPyGlobal``:
   * ``HPyGlobal`` is for long-lived references that are supposed to be closed
     implicitly when the module is unloaded (once module unloading is actually
     implemented). ``HPyGlobal`` provides indirection to isolate subinterpreters.
-    Implementation wise, ``HPyGlobal`` will usually contain index to a table
+    Implementation wise, ``HPyGlobal`` will usually contain an index to a table
     with Python objects stored in the interpreter state.
 
   * On CPython without subinterpreters support, ``HPy``, ``HPyGlobal``,
@@ -71,7 +71,7 @@ Back to ``HPy`` vs ``HPyField`` vs ``HPyGlobal``:
 
 **IMPORTANT**: if you write a custom type having ``HPyField`` s, you **MUST**
 also write a ``tp_traverse`` slot. Note that this is different than the old
-Python/C API, where you need ``tp_traverse`` only under certain
+``Python.h`` API, where you need ``tp_traverse`` only under certain
 conditions. See the next section for more details.
 
 **IMPORTANT**: the contract of ``tp_traverse`` is that it must visit all the
@@ -85,10 +85,10 @@ check this contract.
 ``tp_traverse``, ``tp_clear``, ``Py_TPFLAGS_HAVE_GC``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's quote the Python/C documentation about `GC support
+Let's quote the ``Python.h`` documentation about `GC support
 <https://docs.python.org/3/c-api/gcsupport.html>`_
 
-  Python’s support for detecting and collecting garbage which involves
+  Python's support for detecting and collecting garbage which involves
   circular references requires support from object types which are
   “containers” for other objects which may also be containers. Types which do
   not store references to other objects, or which only store references to
@@ -130,7 +130,7 @@ In HPy the rules are slightly different:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Generally speaking, if you have one or more ``PyObject *`` fields in the old
-Python/C, you must provide a ``tp_dealloc`` slot where you ``Py_DECREF`` all
+``Python.h``, you must provide a ``tp_dealloc`` slot where you ``Py_DECREF`` all
 of them. In HPy this is not needed and will be handled automatically by the
 system.
 

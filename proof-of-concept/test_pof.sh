@@ -1,10 +1,9 @@
 #!/bin/bash
 set -e
 ROOT=`pwd` # we expect this script to be run from the repo root
-if [ -z ${PYTHON+x} ]; then
-  # Allow the caller to override the Python runtime used
-  PYTHON=python
-fi
+
+# Allow the caller to override the Python runtime used
+PYTHON=${PYTHON:-python3}
 
 _install_hpy() {
     echo "Installing hpy"
@@ -12,6 +11,7 @@ _install_hpy() {
     # will want to split those into two separate packages
     local PYTHON="$1"
     pushd ${ROOT}
+    ${PYTHON} -m pip install -U pip
     ${PYTHON} -m pip install wheel
     ${PYTHON} -m pip install .
     popd

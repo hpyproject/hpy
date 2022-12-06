@@ -53,12 +53,11 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
     case HPyFunc_VARARGS: {
         HPyFunc_varargs f = (HPyFunc_varargs)func;
         _HPyFunc_args_VARARGS *a = (_HPyFunc_args_VARARGS*)args;
-        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
-        for (Py_ssize_t i = 0; i < nargs; i++) {
-            h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
+        HPy *h_args = (HPy *)alloca(a->nargs * sizeof(HPy));
+        for (HPy_ssize_t i = 0; i < a->nargs; i++) {
+            h_args[i] = _py2h(a->args[i]);
         }
-        a->result = _h2py(f(ctx, _py2h(a->self), h_args, nargs));
+        a->result = _h2py(f(ctx, _py2h(a->self), h_args, a->nargs));
         return;
     }
     case HPyFunc_KEYWORDS: {
@@ -111,6 +110,14 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
         a->result = call_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
+        return;
+    }
+    case HPyFunc_CAPSULE_DESTRUCTOR: {
+        HPyFunc_Capsule_Destructor f = (HPyFunc_Capsule_Destructor)func;
+        PyObject *capsule = (PyObject *)args;
+        const char *name = PyCapsule_GetName(capsule);
+        f(name, PyCapsule_GetPointer(capsule, name),
+                PyCapsule_GetContext(capsule));
         return;
     }
 #include "autogen_ctx_call.i"

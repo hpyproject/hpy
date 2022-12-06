@@ -1,7 +1,7 @@
 #include <Python.h>
 #include "hpy.h"
 
-#ifdef HPY_UNIVERSAL_ABI
+#ifndef HPY_ABI_CPYTHON
    // for _h2py and _py2h
 #  include "handles.h"
 #endif
@@ -113,4 +113,24 @@ ctx_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
         PyErr_Clear();
     }
     return _py2h(res);
+}
+
+_HPy_HIDDEN int
+ctx_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
+    PyObject* key = PyLong_FromSsize_t(idx);
+    if (key == NULL)
+        return -1;
+    int result = PyObject_DelItem(_h2py(obj), key);
+    Py_DECREF(key);
+    return result;
+}
+
+_HPy_HIDDEN int
+ctx_DelItem_s(HPyContext *ctx, HPy obj, const char *key) {
+    PyObject* key_o = PyUnicode_FromString(key);
+    if (key_o == NULL)
+        return -1;
+    int result = PyObject_DelItem(_h2py(obj), key_o);
+    Py_DECREF(key_o);
+    return result;
 }

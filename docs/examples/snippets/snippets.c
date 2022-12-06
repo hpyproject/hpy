@@ -29,8 +29,7 @@ int is_same_object(HPyContext *ctx, HPy x, HPy y)
 // END: is_same_object
 
 // dummy entry point so that we can test the snippets:
-HPyDef_METH(test_foo_and_is_same_object, "test_foo_and_is_same_object",
-            test_foo_and_is_same_object_impl, HPyFunc_VARARGS)
+HPyDef_METH(test_foo_and_is_same_object, "test_foo_and_is_same_object", HPyFunc_VARARGS)
 static HPy test_foo_and_is_same_object_impl(HPyContext *ctx, HPy self,
                                             HPy *args, HPy_ssize_t nargs)
 {
@@ -39,8 +38,7 @@ static HPy test_foo_and_is_same_object_impl(HPyContext *ctx, HPy self,
 }
 
 // BEGIN: test_leak_stacktrace
-HPyDef_METH(test_leak_stacktrace, "test_leak_stacktrace",
-            test_leak_stacktrace_impl, HPyFunc_NOARGS)
+HPyDef_METH(test_leak_stacktrace, "test_leak_stacktrace", HPyFunc_NOARGS)
 static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
 {
     HPy num = HPyLong_FromLong(ctx, 42);
@@ -52,12 +50,25 @@ static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
 }
 // END: test_leak_stacktrace
 
+// BEGIN: add
+HPyDef_METH(add, "add", HPyFunc_VARARGS)
+static HPy add_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+{
+    if (nargs != 2) {
+        HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly two args");
+        return HPy_NULL;
+    }
+    return HPy_Add(ctx, args[0], args[1]);
+}
+// END: add
+
 // ------------------------------------
 // Dummy module definition, so that we can test the snippets
 
 static HPyDef *Methods[] = {
         &test_foo_and_is_same_object,
         &test_leak_stacktrace,
+        &add,
         NULL,
 };
 

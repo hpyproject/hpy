@@ -58,11 +58,13 @@ typedef enum {
     HPy_sq_length = 45,
     HPy_sq_repeat = 46,
     HPy_tp_call = 50,
+    HPy_tp_hash = 59,
     HPy_tp_init = 60,
     HPy_tp_iter = 62,
     HPy_tp_new = 65,
     HPy_tp_repr = 66,
     HPy_tp_richcompare = 67,
+    HPy_tp_str = 70,
     HPy_tp_traverse = 71,
     HPy_nb_matrix_multiply = 75,
     HPy_nb_inplace_matrix_multiply = 76,
@@ -117,11 +119,13 @@ typedef enum {
 #define _HPySlot_SIG__HPy_sq_length HPyFunc_LENFUNC
 #define _HPySlot_SIG__HPy_sq_repeat HPyFunc_SSIZEARGFUNC
 #define _HPySlot_SIG__HPy_tp_call HPyFunc_KEYWORDS
+#define _HPySlot_SIG__HPy_tp_hash HPyFunc_HASHFUNC
 #define _HPySlot_SIG__HPy_tp_init HPyFunc_INITPROC
 #define _HPySlot_SIG__HPy_tp_iter HPyFunc_GETITERFUNC
 #define _HPySlot_SIG__HPy_tp_new HPyFunc_KEYWORDS
 #define _HPySlot_SIG__HPy_tp_repr HPyFunc_REPRFUNC
 #define _HPySlot_SIG__HPy_tp_richcompare HPyFunc_RICHCMPFUNC
+#define _HPySlot_SIG__HPy_tp_str HPyFunc_REPRFUNC
 #define _HPySlot_SIG__HPy_tp_traverse HPyFunc_TRAVERSEPROC
 #define _HPySlot_SIG__HPy_nb_matrix_multiply HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_nb_inplace_matrix_multiply HPyFunc_BINARYFUNC

@@ -370,6 +370,18 @@ HPyAPI_FUNC int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy val
      return ctx->ctx_SetItem_s ( ctx, obj, key, value ); 
 }
 
+HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key) {
+     return ctx->ctx_DelItem ( ctx, obj, key ); 
+}
+
+HPyAPI_FUNC int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
+     return ctx->ctx_DelItem_i ( ctx, obj, idx ); 
+}
+
+HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key) {
+     return ctx->ctx_DelItem_s ( ctx, obj, key ); 
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {
      return ctx->ctx_Type ( ctx, obj ); 
 }
@@ -394,12 +406,40 @@ HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy obj, HPy other) {
      return ctx->ctx_Is ( ctx, obj, other ); 
 }
 
-HPyAPI_FUNC void *HPy_AsStruct(HPyContext *ctx, HPy h) {
-     return ctx->ctx_AsStruct ( ctx, h ); 
+HPyAPI_FUNC void *_HPy_AsStruct_Object(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Object ( ctx, h ); 
 }
 
-HPyAPI_FUNC void *HPy_AsStructLegacy(HPyContext *ctx, HPy h) {
-     return ctx->ctx_AsStructLegacy ( ctx, h ); 
+HPyAPI_FUNC void *_HPy_AsStruct_Legacy(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Legacy ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Type(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Type ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Long(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Long ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Float(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Float ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Unicode(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Unicode ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_Tuple(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Tuple ( ctx, h ); 
+}
+
+HPyAPI_FUNC void *_HPy_AsStruct_List(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_List ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPyType_BuiltinShape _HPyType_GetBuiltinShape(HPyContext *ctx, HPy h_type) {
+     return ctx->ctx_Type_GetBuiltinShape ( ctx, h_type ); 
 }
 
 HPyAPI_FUNC HPy HPy_Repr(HPyContext *ctx, HPy obj) {
@@ -446,11 +486,11 @@ HPyAPI_FUNC HPy_ssize_t HPyBytes_GET_SIZE(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_GET_SIZE ( ctx, h ); 
 }
 
-HPyAPI_FUNC char *HPyBytes_AsString(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC const char *HPyBytes_AsString(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_AsString ( ctx, h ); 
 }
 
-HPyAPI_FUNC char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC const char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_AS_STRING ( ctx, h ); 
 }
 
@@ -582,7 +622,7 @@ HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name) {
      return ctx->ctx_Import_ImportModule ( ctx, name ); 
 }
 
-HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor destructor) {
+HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor) {
      return ctx->ctx_Capsule_New ( ctx, pointer, name, destructor ); 
 }
 

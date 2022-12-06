@@ -29,7 +29,7 @@ class TestParseItem(HPyTest):
                 return HPyBytes_FromStringAndSize(ctx, &a, 1);
             }}
 
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {{
@@ -298,7 +298,7 @@ class TestParseItem(HPyTest):
 class TestArgParse(HPyTest):
     def make_two_arg_add(self, fmt="OO"):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {{
@@ -323,7 +323,7 @@ class TestArgParse(HPyTest):
 
     def test_many_int_arguments(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -341,7 +341,7 @@ class TestArgParse(HPyTest):
 
     def test_many_handle_arguments(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -357,7 +357,7 @@ class TestArgParse(HPyTest):
 
     def test_supplying_hpy_tracker(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_VARARGS)
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs)
             {
@@ -432,7 +432,7 @@ class TestArgParse(HPyTest):
 class TestArgParseKeywords(HPyTest):
     def make_two_arg_add(self, fmt="O+O+"):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_KEYWORDS)
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {{
@@ -458,7 +458,7 @@ class TestArgParseKeywords(HPyTest):
 
     def test_handle_reordered_arguments(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_KEYWORDS)
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
@@ -479,7 +479,7 @@ class TestArgParseKeywords(HPyTest):
 
     def test_handle_optional_arguments(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_KEYWORDS)
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
@@ -538,7 +538,7 @@ class TestArgParseKeywords(HPyTest):
     def test_blank_keyword_argument_exception(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_KEYWORDS)
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {
@@ -559,7 +559,7 @@ class TestArgParseKeywords(HPyTest):
     def test_positional_only_argument(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_KEYWORDS)
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
                               HPy *args, HPy_ssize_t nargs, HPy kw)
             {

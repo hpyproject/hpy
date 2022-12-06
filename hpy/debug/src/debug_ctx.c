@@ -10,7 +10,7 @@
 static struct _HPyContext_s g_debug_ctx = {
     .name = "HPy Debug Mode ABI",
     ._private = NULL,
-    .ctx_version = 1,
+    .abi_version = HPY_ABI_VERSION,
 };
 
 // NOTE: at the moment this function assumes that uctx is always the
@@ -53,8 +53,10 @@ HPyContext * hpy_debug_get_ctx(HPyContext *uctx)
         HPy_FatalError(uctx, "hpy_debug_get_ctx: expected an universal ctx, "
                              "got a debug ctx");
     }
-    if (hpy_debug_ctx_init(dctx, uctx) < 0)
+    if (hpy_debug_ctx_init(dctx, uctx) < 0) {
+        HPyErr_SetString(uctx, uctx->h_SystemError, "Could not create debug context");
         return NULL;
+    }
     return dctx;
 }
 
@@ -119,25 +121,60 @@ void debug_ctx_Close(HPyContext *dctx, DHPy dh)
     HPy_Close(get_info(dctx)->uctx, uh);
 }
 
-const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_t *size)
+static void *
+protect_and_associate_data_ptr(DHPy h, void *ptr, HPy_ssize_t data_size)
 {
-    const char *ptr = HPyUnicode_AsUTF8AndSize(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), size);
     DebugHandle *handle = as_DebugHandle(h);
-    HPy_ssize_t data_size;
-    char* new_ptr;
+    void *new_ptr;
     if (ptr != NULL)
     {
-        data_size = size != NULL ? *size + 1 : (HPy_ssize_t) strlen(ptr) + 1;
-        new_ptr = (char*) raw_data_copy(ptr, data_size, true);
+        new_ptr = raw_data_copy(ptr, data_size, true);
+        handle->associated_data = new_ptr;
+        handle->associated_data_size = data_size;
+        return new_ptr;
     }
     else
     {
-        data_size = 0;
-        new_ptr = NULL;
+        handle->associated_data = NULL;
+        handle->associated_data_size = 0;
     }
-    handle->associated_data = new_ptr;
-    handle->associated_data_size = data_size;
-    return new_ptr;
+    return NULL;
+}
+
+const char *debug_ctx_Unicode_AsUTF8AndSize(HPyContext *dctx, DHPy h, HPy_ssize_t *size)
+{
+    const char *ptr = HPyUnicode_AsUTF8AndSize(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), size);
+    HPy_ssize_t data_size = 0;
+    if (ptr != NULL) {
+        data_size = size != NULL ? *size + 1 : (HPy_ssize_t) strlen(ptr) + 1;
+    }
+    return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
+}
+
+const char *debug_ctx_Bytes_AsString(HPyContext *dctx, DHPy h)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh = DHPy_unwrap(dctx, h);
+    const char *ptr = HPyBytes_AsString(uctx, uh);
+    HPy_ssize_t data_size = 0;
+    if (ptr != NULL) {
+        // '+ 1' accountd for the implicit null byte termination
+        data_size = HPyBytes_Size(uctx, uh) + 1;
+    }
+    return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
+}
+
+const char *debug_ctx_Bytes_AS_STRING(HPyContext *dctx, DHPy h)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh = DHPy_unwrap(dctx, h);
+    const char *ptr = HPyBytes_AS_STRING(uctx, uh);
+    HPy_ssize_t data_size = 0;
+    if (ptr != NULL) {
+        // '+ 1' accountd for the implicit null byte termination
+        data_size = HPyBytes_GET_SIZE(uctx, uh) + 1;
+    }
+    return (const char *)protect_and_associate_data_ptr(h, (void *)ptr, data_size);
 }
 
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
@@ -180,6 +217,65 @@ DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecP
     }
     return DHPy_open(dctx, HPyType_FromSpec(get_info(dctx)->uctx, spec, NULL));
 }
+
+static const char *get_builtin_shape_name(HPyType_BuiltinShape shape)
+{
+#define SHAPE_NAME(SHAPE) \
+    case SHAPE:           \
+        return #SHAPE;    \
+
+    /* Note: we use a switch here because then the compiler will warn us about
+       missing cases if shapes are added to enum 'HPyType_BuiltinShape' */
+    switch (shape)
+    {
+    SHAPE_NAME(HPyType_BuiltinShape_Legacy)
+    SHAPE_NAME(HPyType_BuiltinShape_Object)
+    SHAPE_NAME(HPyType_BuiltinShape_Type)
+    SHAPE_NAME(HPyType_BuiltinShape_Long)
+    SHAPE_NAME(HPyType_BuiltinShape_Float)
+    SHAPE_NAME(HPyType_BuiltinShape_Unicode)
+    SHAPE_NAME(HPyType_BuiltinShape_Tuple)
+    SHAPE_NAME(HPyType_BuiltinShape_List)
+    }
+    return "<unknown shape>";
+#undef SHAPE_NAME
+}
+
+#define MAKE_debug_ctx_AsStruct(SHAPE) \
+    void *debug_ctx_AsStruct_##SHAPE(HPyContext *dctx, DHPy dh) \
+    { \
+        HPyContext *uctx = get_info(dctx)->uctx; \
+        UHPy uh = DHPy_unwrap(dctx, dh); \
+        UHPy uh_type = HPy_Type(uctx, uh); \
+        HPyType_BuiltinShape actual_shape = _HPyType_GetBuiltinShape(uctx, uh_type); \
+        HPy_Close(uctx, uh_type); \
+        if (actual_shape != HPyType_BuiltinShape_##SHAPE) { \
+            const char *actual_shape_name = get_builtin_shape_name(actual_shape); \
+            static const char *fmt = "Invalid usage of _HPy_AsStruct_%s" \
+                ". Expected shape HPyType_BuiltinShape_%s but got %s"; \
+            size_t nbuf = strlen(fmt) + 2 * strlen(#SHAPE) + strlen(actual_shape_name) + 1; \
+            char *buf = (char *)alloca(nbuf); \
+            snprintf(buf, nbuf, fmt, #SHAPE, #SHAPE, actual_shape_name); \
+            HPy_FatalError(uctx, buf); \
+        } \
+        return _HPy_AsStruct_##SHAPE(uctx, uh); \
+    }
+
+MAKE_debug_ctx_AsStruct(Legacy)
+
+MAKE_debug_ctx_AsStruct(Object)
+
+MAKE_debug_ctx_AsStruct(Type)
+
+MAKE_debug_ctx_AsStruct(Long)
+
+MAKE_debug_ctx_AsStruct(Float)
+
+MAKE_debug_ctx_AsStruct(Unicode)
+
+MAKE_debug_ctx_AsStruct(Tuple)
+
+MAKE_debug_ctx_AsStruct(List)
 
 /* ~~~ debug mode implementation of HPyTracker ~~~
 

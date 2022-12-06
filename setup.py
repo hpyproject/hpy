@@ -52,7 +52,7 @@ if 'HPY_DEBUG_BUILD' in os.environ:
 else:
     EXTRA_COMPILE_ARGS = []
 
-if os.name == "posix" and not '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' in os.environ:
+if '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ:
     EXTRA_COMPILE_ARGS += ['-D_HPY_DEBUG_MEM_PROTECT_USEMMAP']
 
 if platform.system() == "Windows":
@@ -124,15 +124,23 @@ EXT_MODULES = [
                'hpy/debug/src/stacktrace.c',
                'hpy/debug/src/_debugmod.c',
                'hpy/debug/src/autogen_debug_wrappers.c',
+               'hpy/trace/src/trace_ctx.c',
+               'hpy/trace/src/_tracemod.c',
+               'hpy/trace/src/autogen_trace_wrappers.c',
+               'hpy/trace/src/autogen_trace_func_table.c',
               ],
               include_dirs=[
                   'hpy/devel/include',
                   'hpy/universal/src',
                   'hpy/debug/src/include',
+                  'hpy/trace/src/include',
               ],
               extra_compile_args=[
-                  '-DHPY_UNIVERSAL_ABI',
+                  # so we need to enable the HYBRID ABI in order to implement
+                  # the legacy features
+                  '-DHPY_ABI_HYBRID',
                   '-DHPY_DEBUG_ENABLE_UHPY_SANITY_CHECK',
+                  '-DHPY_EMBEDDED_MODULES',
               ] + EXTRA_COMPILE_ARGS
               )
     ]
@@ -141,6 +149,7 @@ EXT_MODULES = [
 DEV_REQUIREMENTS = [
     "pytest",
     "pytest-xdist",
+    "filelock",
 ]
 
 setup(
@@ -152,7 +161,7 @@ setup(
     description='A better C API for Python',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    packages = ['hpy.devel', 'hpy.debug'],
+    packages = ['hpy.devel', 'hpy.debug', 'hpy.trace'],
     include_package_data=True,
     extras_require={
         "dev": DEV_REQUIREMENTS,
@@ -165,4 +174,6 @@ setup(
     },
     use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
+    install_requires=['setuptools>=64.0'],
+    python_requires='>=3.7',
 )

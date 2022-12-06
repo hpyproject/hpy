@@ -39,6 +39,7 @@ typedef enum {
     HPyFunc_OBJOBJPROC,
     HPyFunc_TRAVERSEPROC,
     HPyFunc_DESTRUCTOR,
+    HPyFunc_CAPSULE_DESTRUCTOR,
 
 } HPyFunc_Signature;
 
@@ -109,12 +110,12 @@ typedef int (*HPyFunc_visitproc)(HPyField *, void *);
 
 #include "autogen_hpyfunc_declare.h"
 
-#ifdef HPY_UNIVERSAL_ABI
-#  include "universal/hpyfunc_trampolines.h"
-#  include "universal/autogen_hpyfunc_trampolines.h"
-#else
+#ifdef HPY_ABI_CPYTHON
 #  include "cpython/hpyfunc_trampolines.h"
 #  include "cpython/autogen_hpyfunc_trampolines.h"
-#endif // HPY_UNIVERSAL_ABI
+#else
+#  include "universal/hpyfunc_trampolines.h"
+#  include "universal/autogen_hpyfunc_trampolines.h"
+#endif // HPY_ABI_CPYTHON
 
 #endif /* HPY_UNIVERSAL_HPYFUNC_H */

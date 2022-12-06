@@ -100,14 +100,13 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         HPyFunc_varargs f = (HPyFunc_varargs)func;
         _HPyFunc_args_VARARGS *a = (_HPyFunc_args_VARARGS*)args;
         DHPy dh_self = _py2dh(dctx, a->self);
-        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        DHPy *dh_args = (DHPy *)alloca(nargs * sizeof(DHPy));
-        for (Py_ssize_t i = 0; i < nargs; i++) {
-            dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
+        DHPy *dh_args = (DHPy *)alloca(a->nargs * sizeof(DHPy));
+        for (HPy_ssize_t i = 0; i < a->nargs; i++) {
+            dh_args[i] = _py2dh(dctx, a->args[i]);
         }
-        DHPy dh_result = f(dctx, dh_self, dh_args, nargs);
+        DHPy dh_result = f(dctx, dh_self, dh_args, a->nargs);
         DHPy_close_and_check(dctx, dh_self);
-        for (Py_ssize_t i = 0; i < nargs; i++) {
+        for (HPy_ssize_t i = 0; i < a->nargs; i++) {
             DHPy_close_and_check(dctx, dh_args[i]);
         }
         a->result = _dh2py(dctx, dh_result);
@@ -184,6 +183,14 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
         a->result = call_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
+        return;
+    }
+    case HPyFunc_CAPSULE_DESTRUCTOR: {
+        HPyFunc_Capsule_Destructor f = (HPyFunc_Capsule_Destructor)func;
+        PyObject *capsule = (PyObject *)args;
+        const char *name = PyCapsule_GetName(capsule);
+        f(name, PyCapsule_GetPointer(capsule, name),
+                PyCapsule_GetContext(capsule));
         return;
     }
 #include "autogen_debug_ctx_call.i"

@@ -16,7 +16,8 @@ typedef struct {
 
 typedef struct {
     cpy_PyObject *self;
-    cpy_PyObject *args;
+    cpy_PyObject *const *args;
+    HPy_ssize_t nargs;
     cpy_PyObject *result;
 } _HPyFunc_args_VARARGS;
 
@@ -65,9 +66,9 @@ typedef struct {
 
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                  \
     static cpy_PyObject *                                               \
-    SYM(cpy_PyObject *self, cpy_PyObject *args)                         \
+    SYM(cpy_PyObject *self, cpy_PyObject *const *args, HPy_ssize_t nargs)\
     {                                                                   \
-        _HPyFunc_args_VARARGS a = { self, args };                       \
+        _HPyFunc_args_VARARGS a = { self, args, nargs };                \
         _HPy_CallRealFunctionFromTrampoline(                            \
             _ctx_for_trampolines, HPyFunc_VARARGS, (HPyCFunction)IMPL, &a);           \
         return a.result;                                                \
@@ -160,6 +161,12 @@ typedef struct {
         return a.result; \
     }
 
+#define HPyCapsule_DESTRUCTOR_TRAMPOLINE(SYM, IMPL)                            \
+    static void SYM(cpy_PyObject *capsule)                                     \
+    {                                                                          \
+        _HPy_CallRealFunctionFromTrampoline(_ctx_for_trampolines,              \
+                HPyFunc_CAPSULE_DESTRUCTOR, (HPyCFunction)IMPL, capsule);      \
+    }
 
 
 #endif // HPY_UNIVERSAL_HPYFUNC_TRAMPOLINES_H

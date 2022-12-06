@@ -46,7 +46,7 @@ class TestLong(HPyTest):
 
     def test_Long_FromLong(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 long a = 500;
@@ -60,7 +60,7 @@ class TestLong(HPyTest):
     def test_Long_AsLong(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 long a = HPyLong_AsLong(ctx, arg);
@@ -81,7 +81,7 @@ class TestLong(HPyTest):
 
     def test_Long_FromUnsignedLong(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 unsigned long a = 500;
@@ -95,7 +95,7 @@ class TestLong(HPyTest):
     def test_Long_AsUnsignedLong(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 unsigned long a = HPyLong_AsUnsignedLong(ctx, arg);
@@ -119,7 +119,7 @@ class TestLong(HPyTest):
     def test_Long_AsUnsignedLongMask(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 unsigned long a = HPyLong_AsUnsignedLongMask(ctx, arg);
@@ -141,7 +141,7 @@ class TestLong(HPyTest):
 
     def test_Long_FromLongLong(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 // take a value which doesn't fit in 32 bit
@@ -156,7 +156,7 @@ class TestLong(HPyTest):
     def test_Long_AsLongLong(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 long long a = HPyLong_AsLongLong(ctx, arg);
@@ -178,7 +178,7 @@ class TestLong(HPyTest):
 
     def test_Long_FromUnsignedLongLong(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 // take a value which doesn't fit in unsigned 32 bit
@@ -193,7 +193,7 @@ class TestLong(HPyTest):
     def test_Long_AsUnsignedLongLong(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 unsigned long long a = HPyLong_AsUnsignedLongLong(ctx, arg);
@@ -217,7 +217,7 @@ class TestLong(HPyTest):
     def test_Long_AsUnsignedLongLongMask(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 unsigned long long a = HPyLong_AsUnsignedLongLongMask(ctx, arg);
@@ -239,7 +239,7 @@ class TestLong(HPyTest):
 
     def test_Long_FromSize_t(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 // take a value which doesn't fit in 32 bit
@@ -254,7 +254,7 @@ class TestLong(HPyTest):
     def test_Long_AsSize_t(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 size_t a = HPyLong_AsSize_t(ctx, arg);
@@ -277,7 +277,7 @@ class TestLong(HPyTest):
 
     def test_Long_FromSsize_t(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_NOARGS)
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
             static HPy f_impl(HPyContext *ctx, HPy self)
             {
                 HPy_ssize_t a = -42;
@@ -291,7 +291,7 @@ class TestLong(HPyTest):
     def test_Long_AsSsize_t(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 HPy_ssize_t a = HPyLong_AsSsize_t(ctx, arg);
@@ -313,7 +313,7 @@ class TestLong(HPyTest):
 
     def test_Long_AsVoidPtr(self):
         mod = self.make_module("""
-            HPyDef_METH(f, "is_null", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "is_null", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy val)
             {
                 void* ptr = HPyLong_AsVoidPtr(ctx, val);
@@ -332,7 +332,7 @@ class TestLong(HPyTest):
     def test_Long_AsDouble(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_METH(f, "f", f_impl, HPyFunc_O)
+            HPyDef_METH(f, "f", HPyFunc_O)
             static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
             {
                 double a = HPyLong_AsDouble(ctx, arg);

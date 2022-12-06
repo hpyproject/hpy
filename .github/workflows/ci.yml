@@ -13,21 +13,17 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ['3.9', '3.10']
-        # Possible values: ['2.7', '3.6', '3.7', '3.8', '3.9', '3.10.0-rc.2', 'pypy-3.8']
         compiler: [""]
         include:
-          - os: ubuntu-latest
-            python-version: '3.6'
           - os: ubuntu-latest
             python-version: '3.7'
           - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
-            python-version: '3.9'
+            python-version: '3.10'
             compiler: 'g++'
-          ## Expected failure
-          # - os: ubuntu-latest
-          #   python-version: '3.10.0-rc.2'
+          - os: ubuntu-latest
+            python-version: '3.11'
 
     steps:
       - uses: actions/checkout@v2
@@ -40,12 +36,12 @@ jobs:
       #     pythonVersion: $(python.version)
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install/Upgrade Python dependencies
-        run: python -m pip install --upgrade pip wheel
+        run: python -m pip install --upgrade pip wheel 'setuptools>=60.2'
 
       - name: Build
         run: python -m pip install .
@@ -56,20 +52,16 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install pytest pytest-xdist
-          python -m pytest --durations=16 -n auto test/
+          python -m pip install pytest pytest-xdist filelock
+          python -m pytest --basetemp=.tmpdir --durations=16 -n auto test/
 
   main_tests_debug:
     name: Main tests on CPython debug builds
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.10', '3.9', '3.8', '3.7']
-
-    env:
-      SETUPTOOLS_USE_DISTUTILS: stdlib
+        python-version: ['3.11', '3.10', '3.9', '3.8', '3.7']
 
     steps:
       - uses: actions/checkout@v2
@@ -91,29 +83,25 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install pytest pytest-xdist
+          python -m pip install pytest pytest-xdist filelock
           python -m pytest --durations=16 -n auto test/
 
   poc_tests:
     name: Proof of concept tests
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9']
+        python-version: ['3.10']
         include:
-          - os: ubuntu-latest
-            python-version: '3.6'
           - os: ubuntu-latest
             python-version: '3.7'
           - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
-            python-version: '3.10'
-          ## Expected failure
-          # - os: ubuntu-latest
-          #   python-version: '3.10.0-rc.2'
+            python-version: '3.9'
+          - os: ubuntu-latest
+            python-version: '3.11'
 
     steps:
       - uses: actions/checkout@v2
@@ -126,7 +114,7 @@ jobs:
       #     pythonVersion: $(python.version)
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -159,6 +147,46 @@ jobs:
         shell: bash
 
 
+  porting_example_tests:
+    name: Porting example tests
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install/Upgrade Python dependencies
+        run: python -m pip install --upgrade pip wheel
+        shell: bash
+
+      - name: Install HPy
+        run: python -m pip install .
+
+      - name: Install pytest
+        run: |
+          python -m pip install pytest
+
+      - name: Run tests
+        run: make porting-example-tests
+        shell: bash
+
+      - name: Run tests of completed port in debug mode
+        env:
+          HPY_DEBUG: "1"
+          TEST_ARGS: "-s -k hpy_final"
+        run: make porting-example-tests
+        shell: bash
+
+
   valgrind_tests:
     name: Valgrind tests
     runs-on: 'ubuntu-latest'
@@ -179,23 +207,22 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pip install pytest pytest-valgrind
+          python -m pip install pytest pytest-valgrind filelock
           make valgrind
 
   docs_examples_tests:
     name: Documentation examples tests
     runs-on: ${{ matrix.os }}
-    continue-on-error: true
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.9']
+        python-version: ['3.10']
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -208,7 +235,7 @@ jobs:
 
       - name: Install pytest
         run: |
-          python -m pip install pytest
+          python -m pip install pytest pytest-xdist filelock
       - name: Run tests
         run: make docs-examples-tests
         shell: bash
@@ -222,7 +249,7 @@ jobs:
       # - template: azure-templates/python.yml
 
       - name: Install / Upgrade system requirements
-        run: sudo apt update && sudo apt install -y libclang-10-dev
+        run: sudo apt update && sudo apt install -y libclang-11-dev
 
       - name: Install / Upgrade Python requirements
         run: |
@@ -259,7 +286,7 @@ jobs:
     # - template: azure-templates/python.yml
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
@@ -289,7 +316,7 @@ jobs:
 
   check_py27_compat:
     name: Check Python 2.7 compatibility
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - uses: actions/checkout@v2
 
@@ -298,7 +325,7 @@ jobs:
     #     pythonVersion: "2.7"
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '2.7'
 
@@ -307,20 +334,20 @@ jobs:
 
       - name: check_py27_compat.py
         run: |
-          python -m pip install pytest pathlib
+          python -m pip install pytest pytest-xdist filelock pathlib
           python test/check_py27_compat.py
 
 
   cpp_check:
     name: Cppcheck static analysis
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Install Cppcheck
         run: sudo apt-get -qq -y install cppcheck
@@ -338,9 +365,9 @@ jobs:
       # - template: azure-templates/python.yml
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
       - name: Install/Upgrade Python dependencies
         run: python -m pip install --upgrade pip wheel

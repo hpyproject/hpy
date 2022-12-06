@@ -1,7 +1,5 @@
 #define STRINGIFY(X) #X
-#define HPyAPI_HANDLE(X) _Pragma(STRINGIFY(ctx_index=X)) \
-
-#define HPyAPI_FUNC(X) _Pragma(STRINGIFY(ctx_index=X))
+#define HPy_ID(X) _Pragma(STRINGIFY(id=X)) \
 
 #define AUTOGEN 1
 
@@ -28,6 +26,7 @@ typedef int HPy_buffer;
 typedef int HPyFunc_visitproc;
 typedef int HPy_UCS4;
 typedef int HPyThreadState;
+typedef int HPyType_BuiltinShape;
 typedef int _HPyCapsule_key;
 typedef int HPyCapsule_Destructor;
 typedef int HPyDef;

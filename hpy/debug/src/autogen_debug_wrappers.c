@@ -452,6 +452,21 @@ int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *key, DHPy value)
     return HPy_SetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key, DHPy_unwrap(dctx, value));
 }
 
+int debug_ctx_DelItem(HPyContext *dctx, DHPy obj, DHPy key)
+{
+    return HPy_DelItem(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, key));
+}
+
+int debug_ctx_DelItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx)
+{
+    return HPy_DelItem_i(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), idx);
+}
+
+int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *key)
+{
+    return HPy_DelItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key);
+}
+
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj)
 {
     return DHPy_open(dctx, HPy_Type(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj)));
@@ -482,14 +497,9 @@ int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other)
     return HPy_Is(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, other));
 }
 
-void *debug_ctx_AsStruct(HPyContext *dctx, DHPy h)
+HPyType_BuiltinShape debug_ctx_Type_GetBuiltinShape(HPyContext *dctx, DHPy h_type)
 {
-    return HPy_AsStruct(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
-}
-
-void *debug_ctx_AsStructLegacy(HPyContext *dctx, DHPy h)
-{
-    return HPy_AsStructLegacy(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return _HPyType_GetBuiltinShape(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type));
 }
 
 DHPy debug_ctx_New(HPyContext *dctx, DHPy h_type, void **data)
@@ -550,16 +560,6 @@ HPy_ssize_t debug_ctx_Bytes_Size(HPyContext *dctx, DHPy h)
 HPy_ssize_t debug_ctx_Bytes_GET_SIZE(HPyContext *dctx, DHPy h)
 {
     return HPyBytes_GET_SIZE(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
-}
-
-char *debug_ctx_Bytes_AsString(HPyContext *dctx, DHPy h)
-{
-    return HPyBytes_AsString(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
-}
-
-char *debug_ctx_Bytes_AS_STRING(HPyContext *dctx, DHPy h)
-{
-    return HPyBytes_AS_STRING(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
 DHPy debug_ctx_Bytes_FromString(HPyContext *dctx, const char *v)
@@ -707,7 +707,7 @@ DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name)
     return DHPy_open(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, name));
 }
 
-DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor destructor)
+DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor)
 {
     return DHPy_open(dctx, HPyCapsule_New(get_info(dctx)->uctx, pointer, name, destructor));
 }

@@ -1,10 +1,12 @@
 from copy import deepcopy
+import sys
 import attr
 import re
 import py
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
+from distutils.sysconfig import get_config_var
 from .conf import SPECIAL_CASES, RETURN_CONSTANT
 
 CURRENT_DIR = py.path.local(__file__).dirpath()
@@ -198,7 +200,17 @@ class HPyAPI:
     _r_comment = re.compile(r"/\*.*?\*/|//([^\n\\]|\\.)*?$",
                             re.DOTALL | re.MULTILINE)
 
-    def __init__(self, csource):
+    def __init__(self, filename):
+        cpp_cmd = get_config_var('CC').split(' ')
+        if sys.platform == 'win32':
+            cpp_cmd += ['/E', '/I%s' % CURRENT_DIR]
+        else:
+            cpp_cmd += ['-E', '-I%s' % CURRENT_DIR]
+
+        csource = pycparser.preprocess_file(filename,
+                                  cpp_path=str(cpp_cmd[0]),
+                                  cpp_args=cpp_cmd[1:])
+
         # Remove comments.  NOTE: this assumes that comments are never inside
         # string literals, but there shouldn't be any here.
         def replace_keeping_newlines(m):

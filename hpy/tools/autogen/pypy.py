@@ -10,7 +10,7 @@ class autogen_pypy_txt(AutoGenFile):
         lines = []
         w = lines.append
         w("typedef struct _HPyContext_s {")
-        w("    int ctx_version;")
+        w("    int abi_version;")
         for var in self.api.variables:
             w("    struct _HPy_s %s;" % var.ctx_name())
         for func in self.api.functions:

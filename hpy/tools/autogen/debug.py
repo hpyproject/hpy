@@ -47,7 +47,7 @@ class autogen_debug_ctx_init_h(AutoGenFile):
         w('{')
         for var in self.api.variables:
             name = var.name
-            w(f'    dctx->{name} = DHPy_open(dctx, uctx->{name});')
+            w(f'    dctx->{name} = DHPy_open_immortal(dctx, uctx->{name});')
         for func in self.api.functions:
             name = func.ctx_name()
             w(f'    dctx->{name} = &debug_{name};')
@@ -66,10 +66,20 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyTuple_FromArray',
         'HPyType_GenericNew',
         'HPyType_FromSpec',
+        '_HPy_AsStruct_Legacy',
+        '_HPy_AsStruct_Object',
+        '_HPy_AsStruct_Type',
+        '_HPy_AsStruct_Long',
+        '_HPy_AsStruct_Float',
+        '_HPy_AsStruct_Unicode',
+        '_HPy_AsStruct_Tuple',
+        '_HPy_AsStruct_List',
         'HPyTracker_New',
         'HPyTracker_Add',
         'HPyTracker_ForgetAll',
         'HPyTracker_Close',
+        'HPyBytes_AsString',
+        'HPyBytes_AS_STRING',
         'HPyContextVar_Get'
     }
 

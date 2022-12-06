@@ -1,19 +1,19 @@
 #include "hpy.h"
 #include <stdio.h>
 
-HPyDef_METH(do_nothing, "do_nothing", do_nothing_impl, HPyFunc_NOARGS)
+HPyDef_METH(do_nothing, "do_nothing", HPyFunc_NOARGS)
 static HPy do_nothing_impl(HPyContext *ctx, HPy self)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
-HPyDef_METH(double_obj, "double", double_obj_impl, HPyFunc_O)
+HPyDef_METH(double_obj, "double", HPyFunc_O)
 static HPy double_obj_impl(HPyContext *ctx, HPy self, HPy obj)
 {
     return HPy_Add(ctx, obj, obj);
 }
 
-HPyDef_METH(add_ints, "add_ints", add_ints_impl, HPyFunc_VARARGS)
+HPyDef_METH(add_ints, "add_ints", HPyFunc_VARARGS)
 static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
 {
     long a, b;
@@ -22,7 +22,7 @@ static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs
     return HPyLong_FromLong(ctx, a+b);
 }
 
-HPyDef_METH(add_ints_kw, "add_ints_kw", add_ints_kw_impl, HPyFunc_KEYWORDS)
+HPyDef_METH(add_ints_kw, "add_ints_kw", HPyFunc_KEYWORDS)
 static HPy add_ints_kw_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs,
                             HPy kw)
 {
@@ -40,7 +40,7 @@ typedef struct {
 
 HPyType_HELPERS(PointObject)
 
-HPyDef_SLOT(Point_new, Point_new_impl, HPy_tp_new)
+HPyDef_SLOT(Point_new, HPy_tp_new)
 static HPy Point_new_impl (HPyContext *ctx, HPy cls, HPy *args,
                            HPy_ssize_t nargs, HPy Kw)
 {
@@ -56,7 +56,7 @@ static HPy Point_new_impl (HPyContext *ctx, HPy cls, HPy *args,
     return h_point;
 }
 
-HPyDef_SLOT(Point_repr, Point_repr_impl, HPy_tp_repr)
+HPyDef_SLOT(Point_repr, HPy_tp_repr)
 static HPy Point_repr_impl(HPyContext *ctx, HPy self)
 {
     PointObject *point = PointObject_AsStruct(ctx, self);

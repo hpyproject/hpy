@@ -404,6 +404,11 @@ HPyAPI_FUNC int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value)
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key)
+{
+    return PyObject_DelItem(_h2py(obj), _h2py(key));
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Type(_h2py(obj)));
@@ -477,12 +482,12 @@ HPyAPI_FUNC HPy_ssize_t HPyBytes_GET_SIZE(HPyContext *ctx, HPy h)
     return PyBytes_GET_SIZE(_h2py(h));
 }
 
-HPyAPI_FUNC char *HPyBytes_AsString(HPyContext *ctx, HPy h)
+HPyAPI_FUNC const char *HPyBytes_AsString(HPyContext *ctx, HPy h)
 {
     return PyBytes_AsString(_h2py(h));
 }
 
-HPyAPI_FUNC char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h)
+HPyAPI_FUNC const char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h)
 {
     return PyBytes_AS_STRING(_h2py(h));
 }
@@ -649,7 +654,7 @@ HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value)
             char msg[256];
             switch (value->slot.slot) {
                 case HPy_nb_inplace_add:
-                    return t->tp_as_number != NULL && t->tp_as_number->nb_inplace_add == value->slot.cpy_trampoline;
+                    return t->tp_as_number != NULL && (void*) t->tp_as_number->nb_inplace_add == (void*) value->slot.cpy_trampoline;
                 case HPy_nb_power:
                     // TODO: this needs proper cast for C++
                     return t->tp_as_number != NULL && (void*) t->tp_as_number->nb_power == (void*) value->slot.cpy_trampoline;

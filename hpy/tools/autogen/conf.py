@@ -35,13 +35,23 @@ SPECIAL_CASES = {
     'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,
+    'HPy_DelItem': 'PyObject_DelItem',
+    'HPy_DelItem_i': None,
+    'HPy_DelItem_s': None,
     'HPy_Contains': 'PySequence_Contains',
     'HPy_Length': 'PyObject_Length',
     'HPy_CallTupleDict': None,
     'HPy_FromPyObject': None,
     'HPy_AsPyObject': None,
-    'HPy_AsStruct': None,
-    'HPy_AsStructLegacy': None,
+    '_HPy_AsStruct_Object': None,
+    '_HPy_AsStruct_Type': None,
+    '_HPy_AsStruct_Long': None,
+    '_HPy_AsStruct_Float': None,
+    '_HPy_AsStruct_Unicode': None,
+    '_HPy_AsStruct_Tuple': None,
+    '_HPy_AsStruct_List': None,
+    '_HPy_AsStruct_Legacy': None,
+    '_HPyType_GetBuiltinShape': None,
     '_HPy_CallRealFunctionFromTrampoline': None,
     '_HPy_CallDestroyAndThenDealloc': None,
     'HPyErr_Occurred': None,
@@ -147,7 +157,7 @@ INLINE_IMPLEMENTATION = {
             char msg[256];
             switch (value->slot.slot) {
                 case HPy_nb_inplace_add:
-                    return t->tp_as_number != NULL && t->tp_as_number->nb_inplace_add == value->slot.cpy_trampoline;
+                    return t->tp_as_number != NULL && (void*) t->tp_as_number->nb_inplace_add == (void*) value->slot.cpy_trampoline;
                 case HPy_nb_power:
                     // TODO: this needs proper cast for C++
                     return t->tp_as_number != NULL && (void*) t->tp_as_number->nb_power == (void*) value->slot.cpy_trampoline;
