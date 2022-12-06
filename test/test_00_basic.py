@@ -7,7 +7,6 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
 from .support import HPyTest
-from hpy.universal import MODE_UNIVERSAL
 from hpy.devel.abitag import HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR
 import shutil
 
@@ -52,6 +51,7 @@ class TestBasic(HPyTest):
         if self.compiler.hpy_abi != 'universal':
             return
 
+        from hpy.universal import MODE_UNIVERSAL
         def assert_load_raises(filename, message):
             try:
                 self.compiler.load_universal_module('mytest', filename, mode=MODE_UNIVERSAL)
