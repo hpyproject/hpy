@@ -189,21 +189,16 @@ class autogen_debug_ctx_call_i(AutoGenFile):
             for pname in dhpys:
                 w(f'        DHPy dh_{pname} = _py2dh(dctx, a->{pname});')
             #
-            w('        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);')
+            w('        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);')
             w('        if (next_dctx == NULL) {')
-            w('            HPyErr_NoMemory(dctx);')
             if c_ret_type == 'HPy':
                 w('            a->result = NULL;')
             elif c_ret_type == 'int' or c_ret_type == 'HPy_ssize_t' or c_ret_type == 'HPy_hash_t':
                 w('            a->result = -1;')
             else:
                 assert c_ret_type == 'void', c_ret_type + " not implemented"
-            w('            get_ctx_info(next_dctx)->is_valid = false;')
-            w('            get_ctx_info(dctx)->is_valid = true;')
             w('            return;')
             w('        }')
-            w('        get_ctx_info(dctx)->is_valid = false;')
-            w('        get_ctx_info(next_dctx)->is_valid = true;')
             #
             if c_ret_type == 'void':
                 w(f'        f({args});')
@@ -212,8 +207,7 @@ class autogen_debug_ctx_call_i(AutoGenFile):
             else:
                 w(f'        a->result = f({args});')
             #
-            w('        get_ctx_info(next_dctx)->is_valid = false;')
-            w('        get_ctx_info(dctx)->is_valid = true;')
+            w('        _switch_back_to_original_dctx(dctx, next_dctx);')
             #
             for pname in dhpys:
                 w(f'        DHPy_close_and_check(dctx, dh_{pname});')

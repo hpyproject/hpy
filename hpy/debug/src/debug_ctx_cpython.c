@@ -71,6 +71,24 @@ static void _buffer_py2h(HPyContext *dctx, const Py_buffer *src, HPy_buffer *des
     dest->internal = src->internal;
 }
 
+static HPyContext* _switch_to_next_dctx_from_cache(HPyContext *current_dctx) {
+    HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(current_dctx);
+    if (next_dctx == NULL) {
+        HPyErr_NoMemory(current_dctx);
+        get_ctx_info(current_dctx)->is_valid = false;
+        get_ctx_info(next_dctx)->is_valid = true;
+        return NULL;
+    }
+    get_ctx_info(current_dctx)->is_valid = false;
+    get_ctx_info(next_dctx)->is_valid = true;
+    return next_dctx;
+}
+
+static void _switch_back_to_original_dctx(HPyContext *original_dctx, HPyContext *next_dctx) {
+    get_ctx_info(next_dctx)->is_valid = false;
+    get_ctx_info(original_dctx)->is_valid = true;
+}
+
 void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
                                               HPyFunc_Signature sig,
                                               void *func, void *args)
@@ -81,21 +99,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         _HPyFunc_args_NOARGS *a = (_HPyFunc_args_NOARGS*)args;
         DHPy dh_self = _py2dh(dctx, a->self);
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = NULL;
-            get_ctx_info(dctx)->is_valid = false;
-            get_ctx_info(next_dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         DHPy dh_result = f(next_dctx, dh_self);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self); 
         a->result = _dh2py(dctx, dh_result);
@@ -108,21 +120,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         DHPy dh_self = _py2dh(dctx, a->self);
         DHPy dh_arg = _py2dh(dctx, a->arg);
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = NULL;
-            get_ctx_info(dctx)->is_valid = false;
-            get_ctx_info(next_dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         DHPy dh_result = f(next_dctx, dh_self, dh_arg);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self);
         DHPy_close_and_check(dctx, dh_arg);
@@ -139,21 +145,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
             dh_args[i] = _py2dh(dctx, a->args[i]);
         }
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = NULL;
-            get_ctx_info(next_dctx)->is_valid = false;
-            get_ctx_info(dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         DHPy dh_result = f(next_dctx, dh_self, dh_args, a->nargs);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self);
         for (HPy_ssize_t i = 0; i < a->nargs; i++) {
@@ -174,21 +174,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         }
         DHPy dh_kw = _py2dh(dctx, a->kw);
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = NULL;
-            get_ctx_info(next_dctx)->is_valid = false;
-            get_ctx_info(dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         DHPy dh_result = f(next_dctx, dh_self, dh_args, nargs, dh_kw);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self);
         for (Py_ssize_t i = 0; i < nargs; i++) {
@@ -210,21 +204,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         }
         DHPy dh_kw = _py2dh(dctx, a->kw);
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = -1;
-            get_ctx_info(next_dctx)->is_valid = false;
-            get_ctx_info(dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         a->result = f(next_dctx, dh_self, dh_args, nargs, dh_kw);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self);
         for (Py_ssize_t i = 0; i < nargs; i++) {
@@ -239,21 +227,15 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         HPy_buffer hbuf;
         DHPy dh_self = _py2dh(dctx, a->self);
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = -1;
-            get_ctx_info(next_dctx)->is_valid = false;
-            get_ctx_info(dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         a->result = f(next_dctx, dh_self, &hbuf, a->flags);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self);
         if (a->result < 0) {
@@ -271,20 +253,14 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         _buffer_py2h(dctx, a->view, &hbuf);
         DHPy dh_self = _py2dh(dctx, a->self);
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
-            get_ctx_info(next_dctx)->is_valid = false;
-            get_ctx_info(dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         f(next_dctx, dh_self, &hbuf);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
 
         DHPy_close_and_check(dctx, dh_self);
         // XXX: copy back from hbuf?
@@ -295,22 +271,16 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         HPyFunc_traverseproc f = (HPyFunc_traverseproc)func;
         _HPyFunc_args_TRAVERSEPROC *a = (_HPyFunc_args_TRAVERSEPROC*)args;
 
-        HPyContext *next_dctx = hpy_debug_get_next_dctx_from_cache(dctx);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
         if (next_dctx == NULL) {
-            HPyErr_NoMemory(dctx);
             a->result = -1;
-            get_ctx_info(next_dctx)->is_valid = false;
-            get_ctx_info(dctx)->is_valid = true;
             return;
         }
-        get_ctx_info(dctx)->is_valid = false;
-        get_ctx_info(next_dctx)->is_valid = true;
 
         a->result = call_traverseproc_from_trampoline(f, a->self,
                                                       a->visit, a->arg);
 
-        get_ctx_info(next_dctx)->is_valid = false;
-        get_ctx_info(dctx)->is_valid = true;
+        _switch_back_to_original_dctx(dctx, next_dctx);
         return;
     }
     case HPyFunc_CAPSULE_DESTRUCTOR: {
