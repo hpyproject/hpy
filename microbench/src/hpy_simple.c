@@ -56,9 +56,7 @@ static HPy allocate_int_impl(HPyContext *ctx, HPy self)
 HPyDef_METH(allocate_tuple, "allocate_tuple", HPyFunc_NOARGS)
 static HPy allocate_tuple_impl(HPyContext *ctx, HPy self)
 {
-    //return Py_BuildValue("ii", 2048, 2049);
-    HPyErr_SetString(ctx, ctx->h_Exception, "HPy_BuildValue not implemented yet");
-    return HPy_NULL;
+    return HPy_BuildValue(ctx, "ii", 2048, 2049);
 }
 
 
