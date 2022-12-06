@@ -82,8 +82,6 @@ class TestModule:
                 simple.allocate_int()
 
     def test_allocate_tuple(self, api, simple, timer, N):
-        if api == 'hpy':
-            pytest.skip('Missing HPy_BuildValue')
         with timer:
             for i in range(N):
                 simple.allocate_tuple()
@@ -161,6 +159,27 @@ class TestHeapType:
 
         The type is named `simple.HTFoo` and is a heap type in all cases.
     """
+
+    def test_allocate_obj_and_survive(self, simple, timer, N):
+        import gc
+        HTFoo = simple.HTFoo
+        objs = [None] * N
+        gc.collect()
+        with timer:
+            for i in range(N):
+                objs[i] = HTFoo()
+            del objs
+            gc.collect()
+
+    def test_allocate_obj_and_die(self, simple, timer, N):
+        import gc
+        HTFoo = simple.HTFoo
+        gc.collect()
+        with timer:
+            for i in range(N):
+                obj = HTFoo()
+                obj.onearg(None)
+            gc.collect()
 
     def test_method_lookup(self, simple, timer, N):
         obj = simple.HTFoo()

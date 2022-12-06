@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 
 setup(
     name="hpy.microbench",
-    setup_requires=['hpy.devel', 'cffi'],
+    setup_requires=['cffi', 'hpy'],
     ext_modules = [
         Extension('cpy_simple',
                   ['src/cpy_simple.c'],

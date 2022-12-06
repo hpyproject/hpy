@@ -382,3 +382,31 @@ jobs:
 
       - name: Run Infer
         run: make infer
+
+  check_microbench:
+    name: Check micro benchmarks
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install / Upgrade system dependencies
+        run: sudo apt update && sudo apt install -y valgrind
+
+      - name: Install / Upgrade Python requirements
+        run: |
+          python -m pip install --upgrade pip wheel 'setuptools>=60.2'
+          python -m pip install pytest cffi
+
+      - name: Build and install HPy
+        run: python -m pip install .
+
+      - name: Run microbenchmarks
+        run: |
+          cd microbench
+          python setup.py build_ext -i
+          python -m pytest -v
