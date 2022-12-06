@@ -32,8 +32,10 @@ typedef struct {
 
 
 #if defined(__cplusplus)
+#  define HPyVERSION_FUNC extern "C" HPy_EXPORTED_SYMBOL uint32_t
 #  define HPyMODINIT_FUNC extern "C" HPy_EXPORTED_SYMBOL HPy
 #else /* __cplusplus */
+#  define HPyVERSION_FUNC HPy_EXPORTED_SYMBOL uint32_t
 #  define HPyMODINIT_FUNC HPy_EXPORTED_SYMBOL HPy
 #endif /* __cplusplus */
 
@@ -52,12 +54,14 @@ typedef struct {
 
 // module initialization in the universal and hybrid case
 #define HPy_MODINIT(modname)                                      \
-    HPy_EXPORTED_SYMBOL uint32_t                                  \
-    get_required_hpy_major_version_##modname() {                  \
+    HPyVERSION_FUNC                                               \
+    get_required_hpy_major_version_##modname()                    \
+    {                                                             \
         return HPY_ABI_VERSION;                                   \
     }                                                             \
-    HPy_EXPORTED_SYMBOL uint32_t                                  \
-    get_required_hpy_minor_version_##modname() {                  \
+    HPyVERSION_FUNC                                               \
+    get_required_hpy_minor_version_##modname()                    \
+    {                                                             \
         return HPY_ABI_VERSION_MINOR;                             \
     }                                                             \
     _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;           \
