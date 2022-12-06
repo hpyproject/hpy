@@ -316,7 +316,7 @@ jobs:
 
   check_py27_compat:
     name: Check Python 2.7 compatibility
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - uses: actions/checkout@v2
 
@@ -340,7 +340,7 @@ jobs:
 
   cpp_check:
     name: Cppcheck static analysis
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - uses: actions/checkout@v2
 
