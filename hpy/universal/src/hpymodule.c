@@ -9,6 +9,7 @@
 #include <strings.h>
 #endif
 #include <stdio.h>
+#include <inttypes.h>
 
 
 #include "api.h"
@@ -120,6 +121,36 @@ error:
     return NULL;
 }
 
+static bool validate_abi_tag(const char *shortname, const char *soname,
+                             uint32_t required_major_version, uint32_t required_minor_version) {
+    char *substr = strstr(soname, ".hpy");
+    if (substr != NULL) {
+        substr += strlen(".hpy");
+        if (*substr >= '0' && *substr <= '9') {
+            // It is a number w/o sign and whitespace, we can now parse it with atoi
+            uint32_t abi_tag = (uint32_t) atoi(substr);
+            if (abi_tag == required_major_version) {
+                return true;
+            }
+            PyErr_Format(PyExc_RuntimeError,
+                         "HPy extension module '%s' at path '%s': mismatch between the "
+                         "HPy ABI tag encoded in the filename and the major version requested "
+                         "by the HPy extension itself. Major version tag parsed from "
+                         "filename: %" PRIu32 ". Requested version: %" PRIu32 ".%" PRIu32 ".",
+                         shortname, soname, abi_tag, required_major_version, required_minor_version);
+            return false;
+        }
+    }
+    PyErr_Format(PyExc_RuntimeError,
+                 "HPy extension module '%s' at path '%s': could not find "
+                 "HPy ABI tag encoded in the filename. The extension claims to be compiled with "
+                 "HPy ABI version: %" PRIu32 ".%" PRIu32 ".",
+                 shortname, soname, required_major_version, required_minor_version);
+    return false;
+}
+
+typedef uint32_t (*version_getter)(void);
+
 static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
 {
     PyObject *name = NULL;
@@ -147,6 +178,43 @@ static PyObject *do_load(PyObject *name_unicode, PyObject *path, HPyMode mode)
         PyErr_Format(PyExc_RuntimeError,
                      "Error during loading of the HPy extension module at path "
                      "'%s'. Error message from dlopen/WinAPI: %s", soname, error);
+        goto error;
+    }
+
+    char minor_version_symbol_name[258];
+    char major_version_symbol_name[258];
+    PyOS_snprintf(minor_version_symbol_name, sizeof(init_name),
+                  "get_required_hpy_minor_version_%.200s", shortname);
+    PyOS_snprintf(major_version_symbol_name, sizeof(init_name),
+                  "get_required_hpy_major_version_%.200s", shortname);
+    void *minor_version_ptr = dlsym(mylib, minor_version_symbol_name);
+    void *major_version_ptr = dlsym(mylib, major_version_symbol_name);
+    if (minor_version_ptr == NULL || major_version_ptr == NULL) {
+        const char *error = dlerror();
+        if (error == NULL)
+            error = "no error message provided by the system";
+        PyErr_Format(PyExc_RuntimeError,
+                     "Error during loading of the HPy extension module at path "
+                     "'%s'. Cannot locate the required minimal HPy versions as symbols '%s' and `%s`. "
+                     "Error message from dlopen/WinAPI: %s",
+                     soname, minor_version_symbol_name, major_version_symbol_name, error);
+        goto error;
+    }
+    uint32_t required_minor_version = ((version_getter) minor_version_ptr)();
+    uint32_t required_major_version = ((version_getter) major_version_ptr)();
+    if (required_major_version != HPY_ABI_VERSION || required_minor_version > HPY_ABI_VERSION_MINOR) {
+        // For now, we have only one major version, but in the future at this
+        // point we would decide which HPyContext to create
+        PyErr_Format(PyExc_RuntimeError,
+                     "HPy extension module '%s' requires unsupported version of the HPy runtime. "
+                     "Requested version: %" PRIu32 ".%" PRIu32 ". Current HPy version: %" PRIu32 ".%" PRIu32 ".",
+                     shortname, required_major_version, required_minor_version,
+                     HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR);
+        goto error;
+    }
+
+    // Sanity check of the tag in the shared object filename
+    if (!validate_abi_tag(shortname, soname, required_major_version, required_minor_version)) {
         goto error;
     }
 

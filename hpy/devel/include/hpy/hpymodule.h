@@ -32,33 +32,45 @@ typedef struct {
 
 
 #if defined(__cplusplus)
+#  define HPyVERSION_FUNC extern "C" HPy_EXPORTED_SYMBOL uint32_t
 #  define HPyMODINIT_FUNC extern "C" HPy_EXPORTED_SYMBOL HPy
 #else /* __cplusplus */
+#  define HPyVERSION_FUNC HPy_EXPORTED_SYMBOL uint32_t
 #  define HPyMODINIT_FUNC HPy_EXPORTED_SYMBOL HPy
 #endif /* __cplusplus */
 
 #ifdef HPY_ABI_CPYTHON
 
 // module initialization in the CPython case
-#define HPy_MODINIT(modname)                                   \
-    static HPy init_##modname##_impl(HPyContext *ctx);         \
-    PyMODINIT_FUNC                                             \
-    PyInit_##modname(void)                                     \
-    {                                                          \
-        return _h2py(init_##modname##_impl(_HPyGetContext())); \
+#define HPy_MODINIT(modname)                                      \
+    static HPy init_##modname##_impl(HPyContext *ctx);            \
+    PyMODINIT_FUNC                                                \
+    PyInit_##modname(void)                                        \
+    {                                                             \
+        return _h2py(init_##modname##_impl(_HPyGetContext()));    \
     }
 
 #else // HPY_ABI_CPYTHON
 
 // module initialization in the universal and hybrid case
-#define HPy_MODINIT(modname)                                   \
-    _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;        \
-    static HPy init_##modname##_impl(HPyContext *ctx);         \
-    HPyMODINIT_FUNC                                            \
-    HPyInit_##modname(HPyContext *ctx)                         \
-    {                                                          \
-        _ctx_for_trampolines = ctx;                            \
-        return init_##modname##_impl(ctx);                     \
+#define HPy_MODINIT(modname)                                      \
+    HPyVERSION_FUNC                                               \
+    get_required_hpy_major_version_##modname()                    \
+    {                                                             \
+        return HPY_ABI_VERSION;                                   \
+    }                                                             \
+    HPyVERSION_FUNC                                               \
+    get_required_hpy_minor_version_##modname()                    \
+    {                                                             \
+        return HPY_ABI_VERSION_MINOR;                             \
+    }                                                             \
+    _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;           \
+    static HPy init_##modname##_impl(HPyContext *ctx);            \
+    HPyMODINIT_FUNC                                               \
+    HPyInit_##modname(HPyContext *ctx)                            \
+    {                                                             \
+        _ctx_for_trampolines = ctx;                               \
+        return init_##modname##_impl(ctx);                        \
     }
 
 #endif // HPY_ABI_CPYTHON
