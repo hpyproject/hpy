@@ -20,7 +20,9 @@ from .hpyfunc import autogen_hpyfunc_declare_h
 from .hpyfunc import autogen_hpyfunc_trampoline_h
 from .hpyfunc import autogen_ctx_call_i
 from .hpyfunc import autogen_cpython_hpyfunc_trampoline_h
-from .hpyslot import autogen_hpyslot_h
+from .hpyslot import (autogen_hpyslot_h,
+                      cpython_autogen_hpytype_checkslot_h,
+                      universal_autogen_hpytype_checkslot_h)
 from .debug import (autogen_debug_ctx_init_h,
                     autogen_debug_wrappers,
                     autogen_debug_ctx_call_i)
@@ -50,6 +52,8 @@ def main():
                 autogen_ctx_call_i,
                 autogen_cpython_hpyfunc_trampoline_h,
                 autogen_hpyslot_h,
+                cpython_autogen_hpytype_checkslot_h,
+                universal_autogen_hpytype_checkslot_h,
                 autogen_debug_ctx_init_h,
                 autogen_debug_wrappers,
                 autogen_debug_ctx_call_i,

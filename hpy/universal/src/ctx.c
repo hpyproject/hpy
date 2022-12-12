@@ -6,5 +6,6 @@
 #include "ctx_meth.h"
 #include "ctx_misc.h"
 
+#include "autogen_hpytype_checkslot.h"
 #include "autogen_ctx_impl.h"
 #include "autogen_ctx_def.h"

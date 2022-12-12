@@ -241,6 +241,7 @@ typedef struct _HPyContext_s HPyContext;
 #   include "hpy/runtime/ctx_funcs.h"
 #   include "hpy/runtime/ctx_type.h"
 #   include "hpy/cpython/misc.h"
+#   include "hpy/cpython/autogen_hpytype_checkslot.h"
 #   include "hpy/cpython/autogen_api_impl.h"
 #else
 #   include "hpy/universal/autogen_ctx.h"
