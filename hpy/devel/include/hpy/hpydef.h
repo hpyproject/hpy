@@ -252,6 +252,8 @@ typedef struct {
 #define HPyDef_SLOT(SYM, SLOT) \
     HPyDef_SLOT_IMPL(SYM, SYM##_impl, SLOT)
 
+#define HPyDef_VECTORCALL(SYM) \
+    HPyDef_SLOT(SYM, HPy_tp_vectorcall_default)
 
 // this is the actual implementation, after we determined the SIG
 #define _HPyDef_SLOT(SYM, IMPL, SLOT, SIG)                              \

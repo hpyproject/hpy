@@ -56,9 +56,9 @@ typedef HPy (*_HPyCFunction_RICHCMPFUNC)(HPyContext *, HPy, HPy, int);
         return _h2py(func(_HPyGetContext(), _py2h(self), _py2h(obj), op)); \
     }
 
-typedef HPy(*_HPyCFunction_VECTORCALLFUNC)(HPyContext *ctx, HPy callable,
+typedef HPy (*_HPyCFunction_VECTORCALLFUNC)(HPyContext *ctx, HPy callable,
             HPy const *args, HPy_ssize_t nargsf, HPy kwnames);
-#define HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                   \
+#define _HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                  \
     static cpy_PyObject *                                                      \
     SYM(cpy_PyObject *callable, cpy_PyObject *const *args, size_t nargsf,      \
             cpy_PyObject *kwnames)                                             \

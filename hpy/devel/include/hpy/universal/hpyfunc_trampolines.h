@@ -90,7 +90,7 @@ typedef struct {
         return a.result;                                                \
     }
 
-#define HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                  \
+#define _HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                 \
     static cpy_PyObject *                                                     \
     SYM(cpy_PyObject *callable, cpy_PyObject *const *args, size_t nargsf,     \
             cpy_PyObject *kwnames)                                            \

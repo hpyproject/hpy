@@ -123,6 +123,7 @@ typedef struct {
     uint16_t magic;
     HPyFunc_traverseproc tp_traverse_impl;
     HPyFunc_destroyfunc tp_destroy_impl;
+    cpy_PyCFunction tp_vectorcall_default_trampoline;
     HPyType_BuiltinShape shape;
     char name[];
 } HPyType_Extra_t;
@@ -263,6 +264,12 @@ is_destroy_slot(HPyDef *def)
     return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_destroy;
 }
 
+static inline bool
+is_vectorcall_default_slot(HPyDef *def)
+{
+    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_vectorcall_default;
+}
+
 static HPy_ssize_t
 HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
 {
@@ -270,7 +277,10 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     if (defs == NULL)
         return res;
     for(int i=0; defs[i] != NULL; i++)
-        if (defs[i]->kind == kind && !is_bf_slot(defs[i]) && !is_destroy_slot(defs[i]))
+        if (defs[i]->kind == kind
+                && !is_bf_slot(defs[i])
+                && !is_destroy_slot(defs[i])
+                && !is_vectorcall_default_slot(defs[i]))
             res++;
     return res;
 }
@@ -415,7 +425,9 @@ static int member_object_set(PyObject *self, PyObject *value, void *closure)
 #endif
 
 static PyMemberDef *
-create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t base_member_offset, PyGetSetDef **getsets)
+create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members,
+                   HPy_ssize_t base_member_offset, PyGetSetDef **getsets,
+                   size_t vectorcalloffset)
 {
     HPy_ssize_t hpymember_count = HPyDef_count(hpydefs, HPyDef_Kind_Member);
     // count the legacy members
@@ -426,14 +438,28 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
     }
     HPy_ssize_t total_count = hpymember_count + legacy_count;
 
+    // account for member '__vectorcalloffset__'
+    if (vectorcalloffset > 0)
+        total_count++;
+
     // allocate&fill the result
     PyMemberDef *result = (PyMemberDef*)PyMem_Calloc(total_count+1, sizeof(PyMemberDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    // copy the HPy members
     int dst_idx = 0;
+
+    // add vectorcalloffset if necessary
+    if (vectorcalloffset > 0) {
+        PyMemberDef *dst = &result[dst_idx++];
+        dst->name = "__vectorcalloffset__";
+        dst->type = T_PYSSIZET;
+        dst->offset = vectorcalloffset;
+        dst->flags = READONLY;
+    }
+
+    // copy the HPy members
     if (hpydefs != NULL) {
         for(int i=0; hpydefs[i] != NULL; i++) {
             HPyDef *src = hpydefs[i];
@@ -535,9 +561,10 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
 }
 
 static PyType_Slot *
-create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
-                 HPyType_Extra_t *extra)
+create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
+                 HPy_ssize_t head_size, HPy_ssize_t *basicsize)
 {
+    HPy_ssize_t base_member_offset;
     HPy_ssize_t hpyslot_count = HPyDef_count(hpyspec->defines, HPyDef_Kind_Slot);
     // add the legacy slots
     HPy_ssize_t legacy_slot_count = 0;
@@ -548,6 +575,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
     bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
+    size_t vectorcalloffset = 0;
 
     if (hpyspec->doc != NULL)
         hpyslot_count++;    // Py_tp_doc
@@ -578,6 +606,28 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
                 extra->tp_destroy_impl = (HPyFunc_destroyfunc)src->slot.impl;
                 continue;   /* we don't have a trampoline for tp_destroy */
             }
+            if (is_vectorcall_default_slot(src)) {
+                /* Slot 'HPy_tp_vectorcall_default' will add a hidden field to
+                   the type's struct. The field can only be appended which
+                   conflicts with var objects. So, we don't allow this if
+                   itemsize != 0. */
+                if (hpyspec->itemsize) {
+                    PyMem_Free(result);
+                    PyErr_SetString(PyExc_TypeError,
+                            "Cannot use vectorcall protocol with var objects.");
+                    return NULL;
+                }
+                // we only need to remember the CPython trampoline
+                extra->tp_vectorcall_default_trampoline = (cpy_PyCFunction)src->slot.cpy_trampoline;
+                /* Adding the hidden field means we increase the CPython type
+                   spec's basic by 'sizeof(vectorcallfunc)'. In case that HPy
+                   type spec's basic size was 0, we now need to adjust the
+                   base_member_offset since that will no longer be inherited
+                   automatically. */
+                vectorcalloffset = *basicsize;
+                *basicsize += sizeof(vectorcallfunc);
+                continue;   /* there is no corresponding C API slot */
+            }
             if (is_traverse_slot(src)) {
                 extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
                 /* no 'continue' here: we have a trampoline too */
@@ -587,6 +637,10 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
             dst->pfunc = (void*)src->slot.cpy_trampoline;
         }
     }
+
+    /* Since the basicsize may be modified depending on special HPy slots, we
+       defer determination of the base_member_offset to this point. */
+    base_member_offset = (*basicsize != 0) ? head_size : 0;
 
     // add a slot for the doc string if present
     if (hpyspec->doc != NULL) {
@@ -623,7 +677,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     }
 
     // prepare the "real" members, which may introduce getsetdefs in universal mode
-    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset, &pygetsets);
+    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset, &pygetsets, vectorcalloffset);
     if (pymembers == NULL) {
         PyMem_Free(pygetsets);
         PyMem_Free(pymethods);
@@ -1105,7 +1159,6 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     HPy_ssize_t basicsize;
-    HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
 
     HPy_ssize_t head_size = _HPy_GetHeaderSize(hpyspec->builtin_shape);
@@ -1118,15 +1171,13 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     /* _HPy_HEAD_SIZE(base) ensures that the custom struct is correctly
        aligned. */
     if (hpyspec->basicsize != 0) {
-        base_member_offset = head_size;
-        basicsize = hpyspec->basicsize + base_member_offset;
+        basicsize = hpyspec->basicsize + head_size;
     }
     else {
         /* If basicsize is 0, it is inherited from the parent type. In this
            case, calling *_AsStruct on an inherited type only makes sense if
            the parent type is already an HPy extension type. */
         basicsize = 0;
-        base_member_offset = 0;
     }
 
     HPyType_Extra_t *extra = _HPyType_Extra_Alloc(hpyspec->name, hpyspec->builtin_shape);
@@ -1135,14 +1186,19 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     spec->name = extra->name;
-    spec->basicsize = (int)basicsize;
-    spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec, base_member_offset, extra);
+    spec->slots = create_slot_defs(hpyspec, extra, head_size, &basicsize);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
     }
+    /* If the vectorcall protocol should be used, set the corresponding
+       CPython type flag. */
+    if (extra->tp_vectorcall_default_trampoline)
+        flags |= _Py_TPFLAGS_HAVE_VECTORCALL;
+    spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
+    spec->basicsize = (int)basicsize;
+
     PyObject *bases = build_bases_from_params(params);
     if (PyErr_Occurred()) {
         PyMem_Free(spec->slots);

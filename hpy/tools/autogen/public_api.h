@@ -1178,6 +1178,7 @@ typedef enum {
 
     /* extra HPy slots */
     HPy_tp_destroy = SLOT(1000, HPyFunc_DESTROYFUNC),
+    HPy_tp_vectorcall_default = SLOT(1001, HPyFunc_VECTORCALLFUNC),
 
     /**
      * Module create slot: the function receives loader spec and should
