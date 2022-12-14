@@ -203,6 +203,10 @@ typedef struct {
     HPyFunc_Capsule_Destructor impl;
 } HPyCapsule_Destructor;
 
+typedef struct {
+    cpy_vectorcallfunc cpy_trampoline;
+    HPyFunc_vectorcallfunc impl;
+} HPyVectorcall;
 
 // macros to automatically define HPyDefs of various kinds
 
@@ -427,6 +431,14 @@ typedef struct {
     static HPyCapsule_Destructor SYM = {                                       \
         .cpy_trampoline = SYM##_trampoline,                                    \
         .impl = SYM##_impl                                                     \
+    };
+
+#define HPyVectorcall_FUNCTION(SYM)                                           \
+    HPyFunc_DECLARE(SYM##_impl, HPyFunc_VECTORCALLFUNC);                      \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, SYM##_impl, HPyFunc_VECTORCALLFUNC); \
+    static HPyVectorcall SYM = {                                              \
+        .cpy_trampoline = SYM##_trampoline,                                   \
+        .impl = SYM##_impl                                                    \
     };
 
 #ifdef __cplusplus

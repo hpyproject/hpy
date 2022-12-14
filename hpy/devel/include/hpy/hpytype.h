@@ -287,12 +287,4 @@ _HPyType_HELPER_X(_HPyType_HELPER_FNAME(__VA_ARGS__))(HPyContext *ctx, HPy h) \
 #define HPyType_BuiltinShape_Tuple_AsStruct _HPy_AsStruct_Tuple
 #define HPyType_BuiltinShape_List_AsStruct _HPy_AsStruct_List
 
-#define HPyType_VECTORCALL(SYM)                                              \
-    _HPyFunc_DECLARE_HPyFunc_VECTORCALLFUNC(SYM##_impl);                     \
-    HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM##_trampoline, SYM##_impl); \
-    static HPyType_Vectorcall SYM = {                                        \
-        .cpy_trampoline = SYM##_trampoline,                                  \
-        .impl = SYM##_impl                                                   \
-    };
-
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */
