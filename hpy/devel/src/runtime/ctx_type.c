@@ -250,6 +250,15 @@ static void hpytype_dealloc(PyObject *self)
     Py_DECREF(tp);
 }
 
+static PyObject *
+hpyobject_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    PyTypeObject *base = type->tp_base;
+    PyObject *result = base->tp_new(type, args, kwds);
+    if (result != NULL)
+        _HPy_set_vectorcall_default(type, result);
+    return result;
+}
 
 static int
 sig2flags(HPyFunc_Signature sig)
@@ -600,6 +609,13 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                        &legacy_getset_defs);
     bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
     size_t vectorcalloffset = 0;
+    bool has_tp_new = false;
+#define ADDITIONAL_SLOTS 2
+    /* This accounts for the sentinel and maybe additional slots that HPy
+       installs automatically for some reason. For example, in case of the
+       vectorcall protocol is used, we will additionally install 'tp_call' if
+       the user did not provide it. */
+    HPy_ssize_t additional_slots = 1;
 
     if (hpyspec->doc != NULL)
         hpyslot_count++;    // Py_tp_doc
@@ -613,7 +629,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
-    PyType_Slot *result = (PyType_Slot*)PyMem_Calloc(total_slot_count+1, sizeof(PyType_Slot));
+    PyType_Slot *result = (PyType_Slot*)PyMem_Calloc(
+            total_slot_count+ADDITIONAL_SLOTS, sizeof(PyType_Slot));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -653,6 +670,9 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                 *basicsize += sizeof(vectorcallfunc);
                 continue;   /* there is no corresponding C API slot */
             }
+            if (is_tp_new_slot(src)) {
+                has_tp_new = true;
+            }
             if (is_traverse_slot(src)) {
                 extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
                 /* no 'continue' here: we have a trampoline too */
@@ -661,6 +681,18 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
             dst->slot = hpy_slot_to_cpy_slot(src->slot.slot);
             dst->pfunc = (void*)src->slot.cpy_trampoline;
         }
+    }
+
+    /* If the user did not provide the new function, we need to install a
+       special new function that will delegate to the inherited tp_new but
+       additionally sets the default vectorcall function. This is not necessary
+       if the user provides the new function because he will use 'HPy_New' to
+       allocate the object which already takes care of that. */
+    if (vectorcalloffset > 0 && !has_tp_new) {
+        additional_slots++;
+        PyType_Slot *dst = &result[dst_idx++];
+        dst->slot = Py_tp_new;
+        dst->pfunc = (void*)hpyobject_new;
     }
 
     /* Since the basicsize may be modified depending on special HPy slots, we
@@ -726,7 +758,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
-    if (dst_idx != total_slot_count + 1)
+    if (dst_idx != total_slot_count + additional_slots)
         Py_FatalError("bogus slot count in create_slot_defs");
     return result;
 }
