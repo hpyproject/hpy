@@ -9,6 +9,10 @@
 #  include "handles.h"
 #endif
 
+/* Python 3.8 had "provisional" vectorcall support which was a bit different in
+   some details. */
+#define PROVISIONAL_VECTORCALL_SUPPORT (PY_VERSION_HEX < 0x03090000)
+
 /* HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE is set automatically on HPy types created
    with HPyType_FromSpec. This is used internally within HPy to distinguish
    HPy types.
@@ -123,7 +127,7 @@ typedef struct {
     uint16_t magic;
     HPyFunc_traverseproc tp_traverse_impl;
     HPyFunc_destroyfunc tp_destroy_impl;
-    cpy_PyCFunction tp_vectorcall_default_trampoline;
+    vectorcallfunc tp_vectorcall_default_trampoline;
     HPyType_BuiltinShape shape;
     char name[];
 } HPyType_Extra_t;
@@ -145,6 +149,20 @@ static inline bool _is_pure_HPyType(PyTypeObject *tp) {
 
 static inline HPyType_BuiltinShape _HPyType_Get_Shape(PyTypeObject *tp) {
     return _is_HPyType(tp) ? _HPyType_EXTRA(tp)->shape : HPyType_BuiltinShape_Legacy;
+}
+
+static inline vectorcallfunc _HPyType_get_vectorcall_default(PyTypeObject *tp) {
+    return _is_HPyType(tp) ?
+            _HPyType_EXTRA(tp)->tp_vectorcall_default_trampoline : NULL;
+}
+
+static inline void _HPy_set_vectorcall_default(PyTypeObject *tp, PyObject *o) {
+    if (PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
+        vectorcallfunc vectorcall_default = _HPyType_get_vectorcall_default(tp);
+        Py_ssize_t offset = tp->tp_vectorcall_offset;
+        assert(offset > 0);
+        memcpy((char *) o + offset, &vectorcall_default, sizeof(vectorcall_default));
+    }
 }
 
 static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name, HPyType_BuiltinShape shape)
@@ -268,6 +286,12 @@ static inline bool
 is_vectorcall_default_slot(HPyDef *def)
 {
     return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_vectorcall_default;
+}
+
+static inline bool
+is_tp_new_slot(HPyDef *def)
+{
+    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_new;
 }
 
 static HPy_ssize_t
@@ -614,11 +638,12 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                 if (hpyspec->itemsize) {
                     PyMem_Free(result);
                     PyErr_SetString(PyExc_TypeError,
-                            "Cannot use vectorcall protocol with var objects.");
+                            "Cannot use vectorcall protocol with var objects");
                     return NULL;
                 }
                 // we only need to remember the CPython trampoline
-                extra->tp_vectorcall_default_trampoline = (cpy_PyCFunction)src->slot.cpy_trampoline;
+                extra->tp_vectorcall_default_trampoline =
+                        (vectorcallfunc)src->slot.cpy_trampoline;
                 /* Adding the hidden field means we increase the CPython type
                    spec's basic by 'sizeof(vectorcallfunc)'. In case that HPy
                    type spec's basic size was 0, we now need to adjust the
@@ -957,7 +982,7 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
 
 static inline Py_ssize_t count_members(PyType_Spec *spec, Py_ssize_t *vectorcalloffset) {
     Py_ssize_t nmembers = 0;
-#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+#if PROVISIONAL_VECTORCALL_SUPPORT
     *vectorcalloffset = 0;
 #endif /* Python 3.8.x */
     const PyType_Slot *slot;
@@ -966,7 +991,7 @@ static inline Py_ssize_t count_members(PyType_Spec *spec, Py_ssize_t *vectorcall
             nmembers = 0;
             for (const PyMemberDef *memb = (const PyMemberDef *)slot->pfunc; memb->name != NULL; memb++) {
                 nmembers++;
-#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+#if PROVISIONAL_VECTORCALL_SUPPORT
                 /* Python 3.8 already supports vectorcalls but does not
                    consider the '__vectorcalloffset__' member. So we need to do
                    it manually. */
@@ -1000,7 +1025,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
     Py_ssize_t nmembers, vectorcalloffset;
     const char *s;
 
-#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+#if PROVISIONAL_VECTORCALL_SUPPORT
     /* Python 3.8 does not support specifying the vectorcall offset via the
        type spec. Therefore, if the flag is set, 'PyType_Ready' will fail an
        assert later on. So, we clear the flag and set the flags manually after
@@ -1118,7 +1143,7 @@ fail:
         Py_DECREF(temp);
         Py_XDECREF(result);
         return NULL;
-#if PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION == 8
+#if PROVISIONAL_VECTORCALL_SUPPORT
     } else {
         tp = (PyTypeObject *) temp;
         nmembers = count_members(spec, &vectorcalloffset);
@@ -1295,6 +1320,8 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
         memset(_HPy_Payload(result, HPyType_BuiltinShape_Object), 0, payload_size);
         payload = (void *) result;
     }
+
+    _HPy_set_vectorcall_default(tp, result);
 
     // NOTE: The CPython docs explicitly ask to call GC_Track when all fields
     // are initialized, so it's important to do so AFTER zeroing the memory.
