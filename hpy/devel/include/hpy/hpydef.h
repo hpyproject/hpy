@@ -326,17 +326,6 @@ typedef struct {
         }                                           \
     };
 
-#define HPyDef_VECTORCALL_OFFSET(SYM, OFFSET) \
-    HPyDef SYM = {                            \
-        .kind = HPyDef_Kind_Member,           \
-        .member = {                           \
-            .name = "__vectorcalloffset__",   \
-            .type = HPyMember_HPYSSIZET,      \
-            .offset = OFFSET,                 \
-            .readonly=1                       \
-        }                                     \
-    };
-
 #define HPyDef_GET_IMPL(SYM, NAME, GETIMPL, ...)                                \
     HPyFunc_DECLARE(GETIMPL, HPyFunc_GETTER);                                   \
     HPyFunc_TRAMPOLINE(SYM##_get_trampoline, GETIMPL, HPyFunc_GETTER);          \
