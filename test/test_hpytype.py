@@ -1000,6 +1000,68 @@ class TestType(HPyTest):
         r = p(3, 4, 5, factor=2)
         assert r == 30
 
+    def test_vectorcall_set(self):
+        import pytest
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_vectorcall
+
+            HPyVectorcall_FUNCTION(Point_special_vectorcall)
+            static HPy
+            Point_special_vectorcall_impl(HPyContext *ctx, HPy callable,
+                                          HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            {
+                HPy tmp = Point_vectorcall_impl(ctx, callable, args, nargsf, kwnames);
+                HPy res = HPy_Negative(ctx, tmp);
+                HPy_Close(ctx, tmp);
+                return res;
+            }
+
+            HPyDef_SLOT(Point_new, HPy_tp_new)
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                long x, y;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &x, &y))
+                    return HPy_NULL;
+                PointObject *point;
+                HPy h_point = HPy_New(ctx, cls, &point);
+                if (HPy_IsNull(h_point))
+                    return HPy_NULL;
+                if (x < 0)
+                    HPyVectorcall_Set(ctx, h_point, &Point_special_vectorcall);
+                point->x = x;
+                point->y = y;
+                return h_point;
+            }
+
+            HPyDef_METH(vectorcall_set, "vectorcall_set", HPyFunc_O)
+            static HPy vectorcall_set_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                if (HPyVectorcall_Set(ctx, arg, &Point_special_vectorcall) < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_vectorcall)
+            @EXPORT(vectorcall_set)
+            @INIT
+        """)
+        # this uses 'Point_vectorcall'
+        p0 = mod.Point(1, 2)
+        assert p0(3, 4, 5, factor=2) == 30
+
+        # the negative 'x' will cause that 'Point_special_vectorcall' is used
+        p1 = mod.Point(-1, 2)
+        assert p1(3, 4, 5, factor=2) == -26
+
+        # error case: setting vectorcall function on object that does not
+        # implement the vectorcall protocol
+                # error case: setting vectorcall function on object that does not
+        # implement the vectorcall protocol
+        with pytest.raises(TypeError):
+            mod.vectorcall_set(object())
+
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
             @DEFINE_PointObject
