@@ -1026,6 +1026,35 @@ int32_t HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, H
 HPy_ID(252)
 HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
+/**
+ * Set the vectorcall function for the given object.
+ *
+ * In order to use the more efficient vectorcall API in HPy, you need to
+ * define slot ``HPy_tp_vectorcall_default``. This slot enables the vectorcall
+ * capability for the type and specifies the default vectorcall function that
+ * will be used for every instance of this HPy type. This should account for
+ * the most common case (every instance of an object uses the same vectorcall
+ * function) but to still provide the necessary flexibility, function
+ * 'HPyVectorcall_Set' allows to set different maybe specialized vectorcall
+ * functions for each instance. This may be done at any time but is most
+ * commonly used in the constructor of an object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A handle to an object implementing the vectorcall protocol, i.e., the
+ *     object's type must have slot ``HPy_tp_vectorcall_default``. Otherwise, a
+ *     ``TypeError`` will be raised.
+ * :param vectorcall:
+ *     A pointer to the vectorcall function definition to set (must not be
+ *     ``NULL``). The definition is usually created using
+ *     :c:macro:`HPyVectorcall_FUNCTION`
+ *
+ * :returns:
+ *     ``0`` in case of success and ``-1`` in case of an error.
+ */
+HPy_ID(260)
+int HPyVectorcall_Set(HPyContext *ctx, HPy h, HPyVectorcall *vectorcall);
 
 /* *******
    hpyfunc

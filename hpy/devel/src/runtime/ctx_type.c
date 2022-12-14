@@ -156,12 +156,16 @@ static inline vectorcallfunc _HPyType_get_vectorcall_default(PyTypeObject *tp) {
             _HPyType_EXTRA(tp)->tp_vectorcall_default_trampoline : NULL;
 }
 
+static inline void _HPy_set_vectorcall_func(PyTypeObject *tp, PyObject *o, vectorcallfunc f) {
+    const Py_ssize_t offset = tp->tp_vectorcall_offset;
+    assert(offset > 0);
+    memcpy((char *) o + offset, &f, sizeof(f));
+}
+
 static inline void _HPy_set_vectorcall_default(PyTypeObject *tp, PyObject *o) {
     if (PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
         vectorcallfunc vectorcall_default = _HPyType_get_vectorcall_default(tp);
-        Py_ssize_t offset = tp->tp_vectorcall_offset;
-        assert(offset > 0);
-        memcpy((char *) o + offset, &vectorcall_default, sizeof(vectorcall_default));
+        _HPy_set_vectorcall_func(tp, o, vectorcall_default);
     }
 }
 
@@ -1539,4 +1543,19 @@ _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
         // '_PyType_Name' is at least available from 3.8 to 3.12
         return _PyType_Name(tp);
     }
+}
+
+_HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
+                                   HPyVectorcall *vectorcall)
+{
+    PyObject *obj = _h2py(h);
+    PyTypeObject *tp = Py_TYPE(obj);
+    if (!PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
+        PyErr_Format(PyExc_TypeError,
+                "type '%.50s does not implement the vectorcall protocol",
+                tp->tp_name);
+        return -1;
+    }
+    _HPy_set_vectorcall_func(tp, obj, vectorcall->cpy_trampoline);
+    return 0;
 }

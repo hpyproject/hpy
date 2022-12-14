@@ -1756,3 +1756,15 @@ DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value)
     return DHPy_open(dctx, universal_result);
 }
 
+int debug_ctx_Vectorcall_Set(HPyContext *dctx, DHPy h, HPyVectorcall *vectorcall)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_h = DHPy_unwrap(dctx, h);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPyVectorcall_Set(get_info(dctx)->uctx, dh_h, vectorcall);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+

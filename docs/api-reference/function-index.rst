@@ -102,6 +102,7 @@ HPy Core API Function Index
 * :c:func:`HPyUnicode_FromWideChar`
 * :c:func:`HPyUnicode_ReadChar`
 * :c:func:`HPyUnicode_Substring`
+* :c:func:`HPyVectorcall_Set`
 * :c:func:`HPy_ASCII`
 * :c:func:`HPy_Absolute`
 * :c:func:`HPy_Add`
