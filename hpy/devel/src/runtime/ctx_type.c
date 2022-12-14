@@ -298,9 +298,9 @@ is_vectorcall_default_slot(HPyDef *def)
 }
 
 static inline bool
-is_tp_new_slot(HPyDef *def)
+is_slot(HPyDef *def, HPySlot_Slot id)
 {
-    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_new;
+    return def->kind == HPyDef_Kind_Slot && def->slot.slot == id;
 }
 
 static HPy_ssize_t
@@ -610,7 +610,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
     bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
     size_t vectorcalloffset = 0;
     bool has_tp_new = false;
-#define ADDITIONAL_SLOTS 2
+    bool has_tp_call = false;
+#define ADDITIONAL_SLOTS 3
     /* This accounts for the sentinel and maybe additional slots that HPy
        installs automatically for some reason. For example, in case of the
        vectorcall protocol is used, we will additionally install 'tp_call' if
@@ -670,10 +671,11 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                 *basicsize += sizeof(vectorcallfunc);
                 continue;   /* there is no corresponding C API slot */
             }
-            if (is_tp_new_slot(src)) {
+            if (is_slot(src, HPy_tp_new)) {
                 has_tp_new = true;
-            }
-            if (is_traverse_slot(src)) {
+            } else if (is_slot(src, HPy_tp_call)) {
+                has_tp_call = true;
+            } else if (is_traverse_slot(src)) {
                 extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
                 /* no 'continue' here: we have a trampoline too */
             }
@@ -688,11 +690,19 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
        additionally sets the default vectorcall function. This is not necessary
        if the user provides the new function because he will use 'HPy_New' to
        allocate the object which already takes care of that. */
-    if (vectorcalloffset > 0 && !has_tp_new) {
-        additional_slots++;
-        PyType_Slot *dst = &result[dst_idx++];
-        dst->slot = Py_tp_new;
-        dst->pfunc = (void*)hpyobject_new;
+    if (vectorcalloffset > 0) {
+        if (!has_tp_new) {
+            additional_slots++;
+            PyType_Slot *dst = &result[dst_idx++];
+            dst->slot = Py_tp_new;
+            dst->pfunc = (void*)hpyobject_new;
+        }
+        if (!has_tp_call) {
+            additional_slots++;
+            PyType_Slot *dst = &result[dst_idx++];
+            dst->slot = Py_tp_call;
+            dst->pfunc = (void*)PyVectorcall_Call;
+        }
     }
 
     /* Since the basicsize may be modified depending on special HPy slots, we
