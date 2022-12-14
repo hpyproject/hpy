@@ -92,6 +92,51 @@ class PointTemplate(DefaultExtensionTemplate):
             HPyDef_MEMBER(Point_y, "y", HPyMember_LONG, offsetof(PointObject, y))
         """
 
+    def DEFINE_Point_vectorcall(self):
+        return """
+            HPyDef_VECTORCALL(Point_vectorcall)
+            static HPy
+            Point_vectorcall_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            {
+                long x, sum = 0;
+                HPy_ssize_t nargs = HPyVectorcall_NARGS(nargsf);
+                for (HPy_ssize_t i = 0; i < nargs; i++) {
+                    x = HPyLong_AsLong(ctx, args[i]);
+                    if (x == -1 && HPyErr_Occurred(ctx))
+                        return HPy_NULL;
+                    sum += x;
+                }
+                if (!HPy_IsNull(kwnames)) {
+                    x = 1;
+                    HPy_ssize_t n = HPy_Length(ctx, kwnames);
+                    HPy h_factor_str = HPyUnicode_FromString(ctx, "factor");
+                    HPy kwname;
+                    for (HPy_ssize_t i=0; i < n; i++) {
+                        kwname = HPy_GetItem_i(ctx, kwnames, i);
+                        if (HPy_IsNull(kwname)) {
+                            HPy_Close(ctx, h_factor_str);
+                            return HPy_NULL;
+                        }
+                        if (HPy_RichCompareBool(ctx, h_factor_str, kwname, HPy_EQ)) {
+                            x = HPyLong_AsLong(ctx, args[nargs + i]);
+                            if (x == -1 && HPyErr_Occurred(ctx)) {
+                                HPy_Close(ctx, kwname);
+                                HPy_Close(ctx, h_factor_str);
+                                return HPy_NULL;
+                            }
+                            HPy_Close(ctx, kwname);
+                            break;
+                        }
+                        HPy_Close(ctx, kwname);
+                    }
+                    HPy_Close(ctx, h_factor_str);
+                }
+                PointObject *data = PointObject_AsStruct(ctx, callable);
+                sum += data->x + data->y;
+                return HPyLong_FromLong(ctx, sum * x);
+            }
+        """
+
     def EXPORT_POINT_TYPE(self, *defines):
         defines += ('NULL',)
         defines = ', '.join(defines)
@@ -914,110 +959,46 @@ class TestType(HPyTest):
             del foo.NONE_member
 
     def test_vectorcall(self):
-        import pytest
-        if not self.supports_vectorcall():
-            pytest.skip("vectorcall not supported")
-
         mod = self.make_module("""
-            @TYPE_STRUCT_BEGIN(VCallObject)
-                long x;
-                long y;
-                HPyType_Vectorcall vectorcall;
-            @TYPE_STRUCT_END
-
-            HPyDef_VECTORCALL_OFFSET(VCall_vectorcall_offset, offsetof(VCallObject, vectorcall))
-            
-            HPyType_VECTORCALL(VCall_vectorcall)
-            static HPy
-            VCall_vectorcall_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
-            {
-                long x, sum = 0;
-                HPy_ssize_t nargs = HPyVectorcall_NARGS(nargsf);
-                for (HPy_ssize_t i = 0; i < nargs; i++) {
-                    x = HPyLong_AsLong(ctx, args[i]);
-                    if (x == -1 && HPyErr_Occurred(ctx))
-                        return HPy_NULL;
-                    sum += x;
-                }
-                if (!HPy_IsNull(kwnames)) {
-                    x = 1;
-                    HPy_ssize_t n = HPy_Length(ctx, kwnames);
-                    HPy h_factor_str = HPyUnicode_FromString(ctx, "factor");
-                    HPy kwname;
-                    for (HPy_ssize_t i=0; i < n; i++) {
-                        kwname = HPy_GetItem_i(ctx, kwnames, i);
-                        if (HPy_IsNull(kwname)) {
-                            HPy_Close(ctx, h_factor_str);
-                            return HPy_NULL;
-                        }
-                        if (HPy_RichCompareBool(ctx, h_factor_str, kwname, HPy_EQ)) {
-                            x = HPyLong_AsLong(ctx, args[nargs + i]);
-                            if (x == -1 && HPyErr_Occurred(ctx)) {
-                                HPy_Close(ctx, kwname);
-                                HPy_Close(ctx, h_factor_str);
-                                return HPy_NULL;
-                            }
-                            HPy_Close(ctx, kwname);
-                            break;
-                        }
-                        HPy_Close(ctx, kwname);
-                    }
-                    HPy_Close(ctx, h_factor_str);
-                }
-                VCallObject *data = VCallObject_AsStruct(ctx, callable);
-                sum += data->x + data->y;
-                return HPyLong_FromLong(ctx, sum * x);
-            }
-
-            HPyDef_SLOT(VCall_new, HPy_tp_new)
-            static HPy VCall_new_impl(HPyContext *ctx, HPy cls, HPy *args,
-                                      HPy_ssize_t nargs, HPy kw)
-            {
-                int use_vectorcall;
-                long x, y;
-                VCallObject *data;
-                if (!HPyArg_Parse(ctx, NULL, args, nargs, "ill", &use_vectorcall, &x, &y))
-                    return HPy_NULL;
-                HPy h_obj = HPy_New(ctx, cls, &data);
-                if (HPy_IsNull(h_obj))
-                    return HPy_NULL;
-                if (use_vectorcall)
-                    data->vectorcall = VCall_vectorcall;
-                data->x = x;
-                data->y = y;
-                return h_obj;
-            }
-
-            HPyDef_SLOT(VCall_call, HPy_tp_call)
-            static HPy VCall_call_impl(HPyContext *ctx, HPy cls, HPy *args,
-                                      HPy_ssize_t nargs, HPy kw)
-            {
-                return HPyLong_FromLong(ctx, 0);
-            }
-
-            static HPyDef *VCall_defines[] = {
-                    &VCall_vectorcall_offset,
-                    &VCall_new,
-                    &VCall_call,
-                    NULL
-            };
-
-            static HPyType_Spec VCall_spec = {
-                .name = "mytest.VCall",
-                .basicsize = sizeof(VCallObject),
-                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_VECTORCALL,
-                .builtin_shape = SHAPE(VCallObject),
-                .defines = VCall_defines
-            };
-
-            @EXPORT_TYPE("VCall", VCall_spec)
+            @DEFINE_PointObject
+            @DEFINE_Point_vectorcall
+            @EXPORT_POINT_TYPE(&Point_vectorcall)
             @INIT
         """)
-        p = mod.VCall(True, 1, 2)
+        p = mod.Point()
         r = p(3, 4, 5, factor=2)
-        assert r == 30, "was: %r" % r
-        q = mod.VCall(False, 1, 2)
-        assert q(3, 4, 5, factor=2) == 0
+        assert r == 24
+
+    def test_vectorcall_with_tp_call(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_vectorcall
+
+            HPyDef_SLOT(Point_call, HPy_tp_call)
+            static HPy Point_call_impl(HPyContext *ctx, HPy self, HPy *args,
+                                       HPy_ssize_t nargs, HPy kw)
+            {
+                return HPyLong_FromLong(ctx, -1);
+            }
+
+            @EXPORT_POINT_TYPE(&Point_vectorcall, &Point_call)
+            @INIT
+        """)
+        p = mod.Point()
+        r = p(3, 4, 5, factor=2)
+        assert r == 24
+
+    def test_vectorcall_with_tp_new(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            @DEFINE_Point_vectorcall
+            @EXPORT_POINT_TYPE(&Point_new, &Point_vectorcall)
+            @INIT
+        """)
+        p = mod.Point(1, 2)
+        r = p(3, 4, 5, factor=2)
+        assert r == 30
 
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
