@@ -1028,8 +1028,10 @@ class TestType(HPyTest):
                 HPy h_point = HPy_New(ctx, cls, &point);
                 if (HPy_IsNull(h_point))
                     return HPy_NULL;
-                if (x < 0)
-                    HPyVectorcall_Set(ctx, h_point, &Point_special_vectorcall);
+                if (x < 0 && HPyVectorcall_Set(ctx, h_point, &Point_special_vectorcall) < 0) {
+                    HPy_Close(ctx, h_point);
+                    return HPy_NULL;
+                }
                 point->x = x;
                 point->y = y;
                 return h_point;
@@ -1047,6 +1049,7 @@ class TestType(HPyTest):
             @EXPORT(vectorcall_set)
             @INIT
         """)
+
         # this uses 'Point_vectorcall'
         p0 = mod.Point(1, 2)
         assert p0(3, 4, 5, factor=2) == 30
@@ -1056,8 +1059,6 @@ class TestType(HPyTest):
         assert p1(3, 4, 5, factor=2) == -26
 
         # error case: setting vectorcall function on object that does not
-        # implement the vectorcall protocol
-                # error case: setting vectorcall function on object that does not
         # implement the vectorcall protocol
         with pytest.raises(TypeError):
             mod.vectorcall_set(object())
@@ -1078,8 +1079,8 @@ class TestType(HPyTest):
                 .name = "mytest.Dummy",
                 .itemsize = sizeof(intptr_t),
                 .flags = HPy_TPFLAGS_DEFAULT,
-                .defines = Dummy_defines,
                 @DEFAULT_SHAPE
+                .defines = Dummy_defines,
             };
 
             HPyDef_METH(create_var_type, "create_var_type", HPyFunc_NOARGS)
@@ -1145,18 +1146,15 @@ class TestType(HPyTest):
                 .basicsize = sizeof(FooObject),
                 .itemsize = sizeof(intptr_t),
                 .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_VECTORCALL,
-                .defines = Foo_defines,
                 @DEFAULT_SHAPE
+                .defines = Foo_defines,
             };
 
             @EXPORT_TYPE("Foo", Foo_spec)
             @INIT
         """)
         foo = mod.Foo()
-        if self.supports_vectorcall():
-            assert foo() == "hello vectorcall"
-        else:
-            assert foo() == "hello legacy call"
+        assert foo() == "hello vectorcall"
 
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""

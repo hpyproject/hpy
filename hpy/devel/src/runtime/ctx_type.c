@@ -118,7 +118,6 @@ static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
 static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec);
 
-
 /* This is a hack: we need some extra space to store random data on the
    type objects created by HPyType_FromSpec().  We allocate a structure
    of type HPyType_Extra_t, which we never free for now.  We can access
@@ -127,7 +126,7 @@ typedef struct {
     uint16_t magic;
     HPyFunc_traverseproc tp_traverse_impl;
     HPyFunc_destroyfunc tp_destroy_impl;
-    vectorcallfunc tp_vectorcall_default_trampoline;
+    cpy_vectorcallfunc tp_vectorcall_default_trampoline;
     HPyType_BuiltinShape shape;
     char name[];
 } HPyType_Extra_t;
@@ -151,12 +150,12 @@ static inline HPyType_BuiltinShape _HPyType_Get_Shape(PyTypeObject *tp) {
     return _is_HPyType(tp) ? _HPyType_EXTRA(tp)->shape : HPyType_BuiltinShape_Legacy;
 }
 
-static inline vectorcallfunc _HPyType_get_vectorcall_default(PyTypeObject *tp) {
+static inline cpy_vectorcallfunc _HPyType_get_vectorcall_default(PyTypeObject *tp) {
     return _is_HPyType(tp) ?
             _HPyType_EXTRA(tp)->tp_vectorcall_default_trampoline : NULL;
 }
 
-static inline void _HPy_set_vectorcall_func(PyTypeObject *tp, PyObject *o, vectorcallfunc f) {
+static inline void _HPy_set_vectorcall_func(PyTypeObject *tp, PyObject *o, cpy_vectorcallfunc f) {
     const Py_ssize_t offset = tp->tp_vectorcall_offset;
     assert(offset > 0);
     memcpy((char *) o + offset, &f, sizeof(f));
@@ -164,7 +163,7 @@ static inline void _HPy_set_vectorcall_func(PyTypeObject *tp, PyObject *o, vecto
 
 static inline void _HPy_set_vectorcall_default(PyTypeObject *tp, PyObject *o) {
     if (PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
-        vectorcallfunc vectorcall_default = _HPyType_get_vectorcall_default(tp);
+        cpy_vectorcallfunc vectorcall_default = _HPyType_get_vectorcall_default(tp);
         _HPy_set_vectorcall_func(tp, o, vectorcall_default);
     }
 }
@@ -284,24 +283,6 @@ is_bf_slot(HPyDef *def)
 }
 
 static inline bool
-is_traverse_slot(HPyDef *def)
-{
-    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse;
-}
-
-static inline bool
-is_destroy_slot(HPyDef *def)
-{
-    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_destroy;
-}
-
-static inline bool
-is_vectorcall_default_slot(HPyDef *def)
-{
-    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_vectorcall_default;
-}
-
-static inline bool
 is_slot(HPyDef *def, HPySlot_Slot id)
 {
     return def->kind == HPyDef_Kind_Slot && def->slot.slot == id;
@@ -316,8 +297,8 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     for(int i=0; defs[i] != NULL; i++)
         if (defs[i]->kind == kind
                 && !is_bf_slot(defs[i])
-                && !is_destroy_slot(defs[i])
-                && !is_vectorcall_default_slot(defs[i]))
+                && !is_slot(defs[i], HPy_tp_destroy)
+                && !is_slot(defs[i], HPy_tp_vectorcall_default))
             res++;
     return res;
 }
@@ -655,11 +636,11 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
             HPyDef *src = hpyspec->defines[i];
             if (src->kind != HPyDef_Kind_Slot || is_bf_slot(src))
                 continue;
-            if (is_destroy_slot(src)) {
+            if (is_slot(src, HPy_tp_destroy)) {
                 extra->tp_destroy_impl = (HPyFunc_destroyfunc)src->slot.impl;
                 continue;   /* we don't have a trampoline for tp_destroy */
             }
-            if (is_vectorcall_default_slot(src)) {
+            if (is_slot(src, HPy_tp_vectorcall_default)) {
                 /* Slot 'HPy_tp_vectorcall_default' will add a hidden field to
                    the type's struct. The field can only be appended which
                    conflicts with var objects. So, we don't allow this if
@@ -672,21 +653,21 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                 }
                 // we only need to remember the CPython trampoline
                 extra->tp_vectorcall_default_trampoline =
-                        (vectorcallfunc)src->slot.cpy_trampoline;
+                        (cpy_vectorcallfunc)src->slot.cpy_trampoline;
                 /* Adding the hidden field means we increase the CPython type
                    spec's basic by 'sizeof(vectorcallfunc)'. In case that HPy
                    type spec's basic size was 0, we now need to adjust the
                    base_member_offset since that will no longer be inherited
                    automatically. */
                 vectorcalloffset = *basicsize;
-                *basicsize += sizeof(vectorcallfunc);
+                *basicsize += sizeof(cpy_vectorcallfunc);
                 continue;   /* there is no corresponding C API slot */
             }
             if (is_slot(src, HPy_tp_new)) {
                 has_tp_new = true;
             } else if (is_slot(src, HPy_tp_call)) {
                 has_tp_call = true;
-            } else if (is_traverse_slot(src)) {
+            } else if (is_slot(src, HPy_tp_traverse)) {
                 extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
                 /* no 'continue' here: we have a trampoline too */
             }
