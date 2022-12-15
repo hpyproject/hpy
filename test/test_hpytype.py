@@ -1097,6 +1097,67 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             mod.create_var_type()
 
+    def test_vectorcall_legacy(self):
+        import pytest
+        mod = self.make_module("""
+            @TYPE_STRUCT_BEGIN(FooObject)
+                void *a;
+                HPyVectorcall vectorcall;
+                void *b;
+            @TYPE_STRUCT_END
+
+            HPyDef_MEMBER(Foo_vcall_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET, offsetof(FooObject, vectorcall), .readonly=1)
+
+            HPyVectorcall_FUNCTION(Foo_vectorcall_func)
+            static HPy
+            Foo_vectorcall_func_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello vectorcall");
+            }
+
+            HPyDef_SLOT(Foo_call, HPy_tp_call)
+            static HPy Foo_call_impl(HPyContext *ctx, HPy cls, HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                return HPyUnicode_FromString(ctx, "hello legacy call");
+            }
+
+            HPyDef_SLOT(Foo_new, HPy_tp_new)
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                FooObject *data;
+                HPy h_obj = HPy_New(ctx, cls, &data);
+                if (HPy_IsNull(h_obj))
+                    return HPy_NULL;
+                data->vectorcall = Foo_vectorcall_func;
+                return h_obj;
+            }
+
+            static HPyDef *Foo_defines[] = {
+                &Foo_vcall_offset,
+                &Foo_call,
+                &Foo_new,
+                NULL
+            };
+
+            static HPyType_Spec Foo_spec = {
+                .name = "mytest.Foo",
+                .basicsize = sizeof(FooObject),
+                .itemsize = sizeof(intptr_t),
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_VECTORCALL,
+                .defines = Foo_defines,
+                @DEFAULT_SHAPE
+            };
+
+            @EXPORT_TYPE("Foo", Foo_spec)
+            @INIT
+        """)
+        foo = mod.Foo()
+        if self.supports_vectorcall():
+            assert foo() == "hello vectorcall"
+        else:
+            assert foo() == "hello legacy call"
+
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
             @DEFINE_PointObject
