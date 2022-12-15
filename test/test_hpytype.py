@@ -1062,6 +1062,41 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             mod.vectorcall_set(object())
 
+    def test_vectorcall_var_object(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_VECTORCALL(Dummy_vectorcall)
+            static HPy
+            Dummy_vectorcall_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello");
+            }
+
+            static HPyDef *Dummy_defines[] = { &Dummy_vectorcall, NULL };
+
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = sizeof(intptr_t),
+                .flags = HPy_TPFLAGS_DEFAULT,
+                .defines = Dummy_defines,
+                @DEFAULT_SHAPE
+            };
+
+            HPyDef_METH(create_var_type, "create_var_type", HPyFunc_NOARGS)
+            static HPy create_var_type_impl(HPyContext *ctx, HPy self)
+            {
+                if (!HPyHelpers_AddType(ctx, self, "Dummy", &Dummy_spec, NULL)) {
+                    return HPy_NULL;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT(create_var_type)
+            @INIT
+        """)
+        with pytest.raises(TypeError):
+            mod.create_var_type()
+
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
             @DEFINE_PointObject
