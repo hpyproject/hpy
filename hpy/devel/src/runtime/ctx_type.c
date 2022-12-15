@@ -464,7 +464,7 @@ static int member_object_set(PyObject *self, PyObject *value, void *closure)
 static PyMemberDef *
 create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members,
                    HPy_ssize_t base_member_offset, PyGetSetDef **getsets,
-                   size_t vectorcalloffset)
+                   size_t vectorcalloffset, HPy_ssize_t basicsize)
 {
     HPy_ssize_t hpymember_count = HPyDef_count(hpydefs, HPyDef_Kind_Member);
     // count the legacy members
@@ -478,6 +478,13 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members,
     // account for member '__vectorcalloffset__'
     if (vectorcalloffset > 0)
         total_count++;
+
+    // Sanity check: the type cannot have members if 'basicsize == 0'
+    if (basicsize == 0 && total_count > 0) {
+        PyErr_SetString(PyExc_TypeError,
+                "Type claims to have basicsize==0 but defines members");
+        return NULL;
+    }
 
     // allocate&fill the result
     PyMemberDef *result = (PyMemberDef*)PyMem_Calloc(total_count+1, sizeof(PyMemberDef));
@@ -748,7 +755,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
     }
 
     // prepare the "real" members, which may introduce getsetdefs in universal mode
-    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset, &pygetsets, vectorcalloffset);
+    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset, &pygetsets, vectorcalloffset, *basicsize);
     if (pymembers == NULL) {
         PyMem_Free(pygetsets);
         PyMem_Free(pymethods);
