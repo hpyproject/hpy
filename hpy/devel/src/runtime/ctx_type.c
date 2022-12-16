@@ -39,7 +39,13 @@
         double _m_double;               \
         long double _m_longdouble;      \
         void *_m_pointer;               \
-    };
+    }
+
+typedef MAX_ALIGN_T _HPy_MaxAlign_t;
+
+// Helper macro to align a given size to a multiple of sizeof(MAX_ALIGN_T).
+#define _HPy_ALIGN(SIZE) \
+        (((SIZE) + sizeof(_HPy_MaxAlign_t) - 1) & ~(sizeof(_HPy_MaxAlign_t) - 1))
 
 /* The C structs of pure HPy (i.e. non-legacy) custom types do NOT include
  * PyObject_HEAD. So, the CPython implementation of HPy_New must allocate a
@@ -52,7 +58,7 @@
  */
 typedef struct {
     PyObject_HEAD
-    MAX_ALIGN_T
+    MAX_ALIGN_T;
 } _HPy_FullyAlignedSpaceForPyObject_HEAD;
 
 /* Similar to the case above, if a pure HPy custom type inherits from a
@@ -64,7 +70,7 @@ typedef struct {
 #define FULLY_ALIGNED_SPACE(TYPE) \
     typedef struct { \
         TYPE ob_base; \
-        MAX_ALIGN_T \
+        MAX_ALIGN_T; \
     } _HPy_FullyAlignedSpaceFor##TYPE;
 
 FULLY_ALIGNED_SPACE(PyHeapTypeObject)
@@ -659,8 +665,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                    type spec's basic size was 0, we now need to adjust the
                    base_member_offset since that will no longer be inherited
                    automatically. */
-                vectorcalloffset = *basicsize;
-                *basicsize += sizeof(cpy_vectorcallfunc);
+                vectorcalloffset = _HPy_ALIGN(*basicsize);
+                *basicsize = vectorcalloffset + sizeof(cpy_vectorcallfunc);
                 continue;   /* there is no corresponding C API slot */
             }
             if (is_slot(src, HPy_tp_new)) {
