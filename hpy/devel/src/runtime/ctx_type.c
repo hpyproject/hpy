@@ -1537,7 +1537,10 @@ _HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
                                    HPyVectorcall *vectorcall)
 {
     PyObject *obj = _h2py(h);
+    assert(obj != NULL);
+
     PyTypeObject *tp = Py_TYPE(obj);
+    assert(tp != NULL);
     if (!PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
         PyErr_Format(PyExc_TypeError,
                 "type '%.50s does not implement the vectorcall protocol",
