@@ -195,11 +195,12 @@ STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES,
                  'include_dirs': get_hpy_runtime_includes(),
                  'abi': 'universal',
-                 'macros': [('HPY_UNIVERSAL_ABI', None)]}),
+                 'macros': [('HPY_ABI_HYBRID', None)]}),
                (HPY_CTX_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES + HPY_CTX_SOURCES,
                  'include_dirs': get_hpy_runtime_includes(),
-                 'abi': 'cpython'})]
+                 'abi': 'cpython',
+                 'macros': [('HPY_ABI_CPYTHON', None)]})]
 
 EXT_MODULES = [
     Extension('hpy.universal',
