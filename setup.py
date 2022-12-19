@@ -2,7 +2,6 @@ import sys
 import os.path
 from setuptools import setup, Extension
 from setuptools.command.build_clib import build_clib
-import sysconfig
 import platform
 
 # this package is supposed to be installed ONLY on CPython. Try to bail out
@@ -124,21 +123,6 @@ HPY_INCLUDE_DIRS = [
 HPY_EXTRA_LIB_NAME = "hpyextra"
 HPY_CTX_LIB_NAME = "hpyctx"
 
-
-def get_hpy_runtime_includes():
-    """ Computes a list of include directories for building the static
-        libraries. This only uses module 'sysconfig'.
-    """
-    default_include = sysconfig.get_path("include")
-    plat_include = sysconfig.get_path("platinclude")
-    config_h_dir = os.path.dirname(sysconfig.get_config_h_filename())
-    include_dirs = [default_include]
-    if default_include != plat_include:
-        include_dirs.append(plat_include)
-    if config_h_dir not in (default_include, plat_include):
-        include_dirs.append(config_h_dir)
-    return include_dirs + HPY_INCLUDE_DIRS
-
 HPY_BUILD_CLIB_ABI_ATTR = "hpy_abi"
 
 class build_clib_hpy(build_clib):
@@ -157,6 +141,9 @@ class build_clib_hpy(build_clib):
     """
     def finalize_options(self):
         super().finalize_options()
+        # we overwrite the include dirs and use the ones from 'build_ext'
+        build_ext_includes = self.get_finalized_command('build_ext').include_dirs or []
+        self.include_dirs = HPY_INCLUDE_DIRS + build_ext_includes
         self.force = 1
 
     def get_library_names(self):
@@ -194,12 +181,10 @@ class build_clib_hpy(build_clib):
 
 STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES,
-                 'include_dirs': get_hpy_runtime_includes(),
                  HPY_BUILD_CLIB_ABI_ATTR: 'universal',
                  'macros': [('HPY_ABI_HYBRID', None)]}),
                (HPY_CTX_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES + HPY_CTX_SOURCES,
-                 'include_dirs': get_hpy_runtime_includes(),
                  HPY_BUILD_CLIB_ABI_ATTR: 'cpython',
                  'macros': [('HPY_ABI_CPYTHON', None)]})]
 
