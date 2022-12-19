@@ -163,6 +163,7 @@ class build_clib_hpy(build_clib):
         else:
             lib_dir = os.path.join(build.build_lib, 'hpy', 'devel')
 
+        import pathlib
         for lib in libraries:
             lib_name, build_info = lib
             abi = build_info.get(HPY_BUILD_CLIB_ABI_ATTR)
@@ -172,6 +173,8 @@ class build_clib_hpy(build_clib):
             orig_build_clib = self.build_clib
             self.build_temp = os.path.join(orig_build_temp, 'lib', abi)
             self.build_clib = os.path.join(lib_dir, 'lib', abi)
+            # ensure that 'build_clib' directory exists
+            pathlib.Path(self.build_clib).mkdir(parents=True, exist_ok=True)
             try:
                 super().build_libraries([lib])
             finally:
