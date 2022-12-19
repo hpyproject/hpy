@@ -120,8 +120,8 @@ HPY_INCLUDE_DIRS = [
     'hpy/trace/src/include',
 ]
 
-HPY_EXTRA_LIB_NAME = "hpyextra"
-HPY_CTX_LIB_NAME = "hpyctx"
+HPY_EXTRA_LIB_NAME = "hpy-extra-universal"
+HPY_CTX_LIB_NAME = "hpy-ctx-cpython"
 
 HPY_BUILD_CLIB_ABI_ATTR = "hpy_abi"
 
