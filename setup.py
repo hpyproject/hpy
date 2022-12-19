@@ -139,6 +139,7 @@ def get_hpy_runtime_includes():
         include_dirs.append(config_h_dir)
     return include_dirs + HPY_INCLUDE_DIRS
 
+HPY_BUILD_CLIB_ABI_ATTR = "hpy_abi"
 
 class build_clib_hpy(build_clib):
     """ Special build_clib command for building HPy's static libraries defined
@@ -177,7 +178,7 @@ class build_clib_hpy(build_clib):
 
         for lib in libraries:
             lib_name, build_info = lib
-            abi = build_info.get('abi')
+            abi = build_info.get(HPY_BUILD_CLIB_ABI_ATTR)
             # Call super's build_libraries with just one library in the list
             # such that we can temporarily change the 'build_temp'.
             orig_build_temp = self.build_temp
@@ -194,12 +195,12 @@ class build_clib_hpy(build_clib):
 STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES,
                  'include_dirs': get_hpy_runtime_includes(),
-                 'abi': 'universal',
+                 HPY_BUILD_CLIB_ABI_ATTR: 'universal',
                  'macros': [('HPY_ABI_HYBRID', None)]}),
                (HPY_CTX_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES + HPY_CTX_SOURCES,
                  'include_dirs': get_hpy_runtime_includes(),
-                 'abi': 'cpython',
+                 HPY_BUILD_CLIB_ABI_ATTR: 'cpython',
                  'macros': [('HPY_ABI_CPYTHON', None)]})]
 
 EXT_MODULES = [
