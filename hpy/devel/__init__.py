@@ -178,7 +178,7 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
 
     # add a global option --hpy-abi to setup.py
     dist.__class__.hpy_abi = DEFAULT_HPY_ABI
-    dist.__class__.hpy_no_static_libs = False
+    dist.__class__.hpy_use_static_libs = False
     dist.__class__.global_options += [
         ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)' % DEFAULT_HPY_ABI),
         ('hpy-no-static-libs', None, 'Compile context and extra sources with extension (default: False)')
@@ -322,11 +322,11 @@ class build_ext_hpy_mixin:
         ext.name = HPyExtensionName(ext.name)
         ext.hpy_abi = self.distribution.hpy_abi
         ext.include_dirs += self.hpydevel.get_extra_include_dirs()
-        # If we may use static libs (default), then add all available libs (for
+        # If static libs should be used, then add all available libs (for
         # the given ABI) to the extra objects. The libs will then just be added
         # in the linking phase but nothing will be compiled in addition.
-        use_static_libs = not self.distribution.hpy_no_static_libs
-        if use_static_libs:
+        static_libs = self.distribution.hpy_use_static_libs
+        if static_libs:
             static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
         else:
             static_libs = None
