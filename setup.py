@@ -130,14 +130,15 @@ class build_clib_hpy(build_clib):
         by 'STATIC_LIBS' below. The behavior differs in following points:
         (1) Option 'force' is set such that static libs will always be renewed.
         (2) Method 'get_library_names' always returns 'None'. This is because
-            we only use this command to build static libraries for shipping
-            them. We don't need them for linking here.
-        (3) This command consumes a custom build info key 'abi' that is used
-            to create a separate build temp directories for each ABI and an
-            ABI-specific output directory. This is necessary to avoid incorrect
-            sharing of (temporary) build artifacts.
-        (4) The resulting static library is written to build_ext's output
-            directory. Currently, we use hard-coded sub-directory 'hpy/devel'.
+            we only use this command to build static libraries for testing.
+            That means, we only use them in-place. We don't need them for
+            linking here.
+        (3) This command consumes a custom build info key
+            HPY_BUILD_CLIB_ABI_ATTR that is used to create separate build
+            temp directories for each ABI. This is necessary to avoid
+            incorrect sharing of (temporary) build artifacts.
+        (4) This command will use the include directories from command
+            'build_ext'.
     """
     def finalize_options(self):
         super().finalize_options()
@@ -147,12 +148,12 @@ class build_clib_hpy(build_clib):
         self.force = 1
 
     def get_library_names(self):
-        # We only build static libraries for shipping. We don't want that our
-        # extensions (i.e. 'hpy.universal' etc) link to these libs.
+        # We only build static libraries for testing. We just use them
+        # in-place. We don't want that our extensions (i.e. 'hpy.universal'
+        # etc) link to these libs.
         return None
 
     def build_libraries(self, libraries):
-        build = self.get_finalized_command('build')
         # we just inherit the 'inplace' option from 'build_ext'
         inplace = self.get_finalized_command('build_ext').inplace
         if inplace:
@@ -161,7 +162,7 @@ class build_clib_hpy(build_clib):
             build_py = self.get_finalized_command('build_py')
             lib_dir = os.path.abspath(build_py.get_package_dir('hpy.devel'))
         else:
-            lib_dir = os.path.join(build.build_lib, 'hpy', 'devel')
+            lib_dir = self.build_clib
 
         import pathlib
         for lib in libraries:
