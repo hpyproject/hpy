@@ -188,17 +188,24 @@ jobs:
 
 
   valgrind_tests_1:
-    name: 'Valgrind tests (1/2)'
+    name: 'Valgrind tests (1/3)'
     uses: ./.github/workflows/valgrind-tests.yml
     with:
-      portion: '1/2'
+      portion: '1/3'
 
 
   valgrind_tests_2:
-    name: 'Valgrind tests (2/2)'
+    name: 'Valgrind tests (2/3)'
     uses: ./.github/workflows/valgrind-tests.yml
     with:
-      portion: '2/2'
+      portion: '2/3'
+
+
+  valgrind_tests_3:
+    name: 'Valgrind tests (3/3)'
+    uses: ./.github/workflows/valgrind-tests.yml
+    with:
+      portion: '3/3'
 
 
   docs_examples_tests:
