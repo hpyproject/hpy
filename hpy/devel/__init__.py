@@ -329,7 +329,7 @@ class build_ext_hpy_mixin:
         if static_libs:
             static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
             if static_libs is None or len(static_libs) != 1:
-                raise DistutilsError('Expected exactly one static library for'
+                raise DistutilsError('Expected exactly one static library for '
                                      'ABI "%s" but got: %r' %
                                      (ext.hpy_abi, static_libs))
 

@@ -120,7 +120,8 @@ HPY_INCLUDE_DIRS = [
     'hpy/trace/src/include',
 ]
 
-HPY_EXTRA_LIB_NAME = "hpy-extra-universal"
+HPY_EXTRA_UNIVERSAL_LIB_NAME = "hpy-extra-universal"
+HPY_EXTRA_HYBRID_LIB_NAME = "hpy-extra-hybrid"
 HPY_CTX_LIB_NAME = "hpy-ctx-cpython"
 
 HPY_BUILD_CLIB_ABI_ATTR = "hpy_abi"
@@ -183,9 +184,13 @@ class build_clib_hpy(build_clib):
                 self.build_clib = orig_build_clib
 
 
-STATIC_LIBS = [(HPY_EXTRA_LIB_NAME,
+STATIC_LIBS = [(HPY_EXTRA_UNIVERSAL_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES,
                  HPY_BUILD_CLIB_ABI_ATTR: 'universal',
+                 'macros': [('HPY_ABI_UNIVERSAL', None)]}),
+               (HPY_EXTRA_HYBRID_LIB_NAME,
+                {'sources': HPY_EXTRA_SOURCES,
+                 HPY_BUILD_CLIB_ABI_ATTR: 'hybrid',
                  'macros': [('HPY_ABI_HYBRID', None)]}),
                (HPY_CTX_LIB_NAME,
                 {'sources': HPY_EXTRA_SOURCES + HPY_CTX_SOURCES,
