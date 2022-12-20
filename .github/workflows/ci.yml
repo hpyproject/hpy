@@ -187,28 +187,19 @@ jobs:
         shell: bash
 
 
-  valgrind_tests:
-    name: Valgrind tests
-    runs-on: 'ubuntu-latest'
-    steps:
-      - uses: actions/checkout@v2
+  valgrind_tests_1:
+    name: 'Valgrind tests (1/2)'
+    uses: ./.github/workflows/valgrind-tests.yml
+    with:
+      portion: '1/2'
 
-    # - template: azure-templates/ccache.yml
-    # - template: azure-templates/python.yml
 
-      - name: Install / Upgrade system dependencies
-        run: sudo apt update && sudo apt install -y valgrind
+  valgrind_tests_2:
+    name: 'Valgrind tests (2/2)'
+    uses: ./.github/workflows/valgrind-tests.yml
+    with:
+      portion: '2/2'
 
-      - name: Install / Upgrade Python dependencies
-        run: python -m pip install --upgrade pip wheel
-
-      - name: Build
-        run: python -m pip install .
-
-      - name: Run tests
-        run: |
-          python -m pip install pytest pytest-valgrind filelock
-          make valgrind
 
   docs_examples_tests:
     name: Documentation examples tests

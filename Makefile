@@ -50,8 +50,16 @@ infer:
 	# see commit cd8cd6e for why we need to ignore debug_ctx.c
 	@infer --fail-on-issue --compilation-database compile_commands.json --report-blacklist-path-regex "hpy/debug/src/debug_ctx.c"
 
+valgrind_args = --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output
+python_args = -m pytest --valgrind --valgrind-log=/tmp/valgrind-output
+
+.PHONY: valgrind
 valgrind:
-	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python3 -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/
+ifeq ($(HPY_TEST_PORTION),)
+	PYTHONMALLOC=malloc valgrind $(valgrind_args) python3 $(python_args) test/
+else
+	PYTHONMALLOC=malloc valgrind $(valgrind_args) python3 $(python_args) --portion $(HPY_TEST_PORTION) test/
+endif
 
 porting-example-tests:
 	cd docs/porting-example/steps && python3 setup00.py build_ext -i
