@@ -2,8 +2,10 @@ on:
   workflow_call:
     inputs:
       portion:
-        required: true
+        description: 'Select portion of tests to run under Valgrind (default runs all)'
+        default: ''
         type: string
+        required: false
 
 jobs:
   valgrind_tests:
