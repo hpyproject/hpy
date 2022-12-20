@@ -26,7 +26,7 @@ jobs:
             python-version: '3.11'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/ccache.yml
       #   parameters:
@@ -64,7 +64,7 @@ jobs:
         python-version: ['3.11', '3.10', '3.9', '3.8', '3.7']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python from deadsnakes
         uses: deadsnakes/action@v2.1.1
@@ -104,7 +104,7 @@ jobs:
             python-version: '3.11'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/ccache.yml
       #   parameters:
@@ -157,7 +157,7 @@ jobs:
         python-version: ['3.9']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -210,7 +210,7 @@ jobs:
         python-version: ['3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -235,7 +235,7 @@ jobs:
     name: Build documentation
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/python.yml
 
@@ -253,7 +253,7 @@ jobs:
           python -m sphinx -T -W -E -b html -d _build/doctrees -D language=en . _build/html
 
       - name: Upload built HTML files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: hpy_html_docs
           path: docs/_build/html/*
@@ -264,7 +264,7 @@ jobs:
     name: C tests
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make -C c_test
 
 
@@ -272,7 +272,7 @@ jobs:
     name: Check autogen
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
     # - template: azure-templates/python.yml
 
@@ -309,7 +309,7 @@ jobs:
     name: Check Python 2.7 compatibility
     runs-on: 'ubuntu-20.04'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
     # - template: azure-templates/python.yml
     #   parameters:
@@ -333,7 +333,7 @@ jobs:
     name: Cppcheck static analysis
     runs-on: 'ubuntu-20.04'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -351,7 +351,7 @@ jobs:
     name: Infer static analysis
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/python.yml
 
@@ -378,7 +378,7 @@ jobs:
     name: Check micro benchmarks
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
