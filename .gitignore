@@ -14,9 +14,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+# C extensions and static libs
 *.so
 *.o
+*.a
+*.lib
 vc140.pdb
 c_test/test_debug_handles
 

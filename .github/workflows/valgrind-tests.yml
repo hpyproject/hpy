@@ -21,7 +21,9 @@ jobs:
         run: python -m pip install --upgrade pip wheel
 
       - name: Build
-        run: python -m pip install .
+        run: |
+          make
+          python -m pip install .
 
       - name: Run tests
         env:

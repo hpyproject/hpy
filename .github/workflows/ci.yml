@@ -44,7 +44,9 @@ jobs:
         run: python -m pip install --upgrade pip wheel 'setuptools>=60.2'
 
       - name: Build
-        run: python -m pip install .
+        run: |
+          make
+          python -m pip install .
 
       - if: ${{ matrix.compiler }}
         # Only set the compiler for the tests, not for the build
@@ -79,7 +81,9 @@ jobs:
         run: python -m pip install --upgrade pip wheel
 
       - name: Build
-        run: python -m pip install .
+        run: |
+          make
+          python -m pip install .
 
       - name: Run tests
         run: |
@@ -401,7 +405,9 @@ jobs:
           python -m pip install pytest cffi
 
       - name: Build and install HPy
-        run: python -m pip install .
+        run: |
+          make
+          python -m pip install .
 
       - name: Run microbenchmarks
         run: |
