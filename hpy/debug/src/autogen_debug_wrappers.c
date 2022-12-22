@@ -22,24 +22,24 @@ DHPy debug_ctx_Dup(HPyContext *dctx, DHPy h)
     return DHPy_open(dctx, HPy_Dup(get_info(dctx)->uctx, DHPy_unwrap(dctx, h)));
 }
 
-DHPy debug_ctx_Long_FromLong(HPyContext *dctx, long value)
+DHPy debug_ctx_Long_FromInt32(HPyContext *dctx, int32_t value)
 {
-    return DHPy_open(dctx, HPyLong_FromLong(get_info(dctx)->uctx, value));
+    return DHPy_open(dctx, HPyLong_FromInt32(get_info(dctx)->uctx, value));
 }
 
-DHPy debug_ctx_Long_FromUnsignedLong(HPyContext *dctx, unsigned long value)
+DHPy debug_ctx_Long_FromUInt32(HPyContext *dctx, uint32_t value)
 {
-    return DHPy_open(dctx, HPyLong_FromUnsignedLong(get_info(dctx)->uctx, value));
+    return DHPy_open(dctx, HPyLong_FromUInt32(get_info(dctx)->uctx, value));
 }
 
-DHPy debug_ctx_Long_FromLongLong(HPyContext *dctx, long long v)
+DHPy debug_ctx_Long_FromInt64(HPyContext *dctx, int64_t v)
 {
-    return DHPy_open(dctx, HPyLong_FromLongLong(get_info(dctx)->uctx, v));
+    return DHPy_open(dctx, HPyLong_FromInt64(get_info(dctx)->uctx, v));
 }
 
-DHPy debug_ctx_Long_FromUnsignedLongLong(HPyContext *dctx, unsigned long long v)
+DHPy debug_ctx_Long_FromUInt64(HPyContext *dctx, uint64_t v)
 {
-    return DHPy_open(dctx, HPyLong_FromUnsignedLongLong(get_info(dctx)->uctx, v));
+    return DHPy_open(dctx, HPyLong_FromUInt64(get_info(dctx)->uctx, v));
 }
 
 DHPy debug_ctx_Long_FromSize_t(HPyContext *dctx, size_t value)
@@ -52,34 +52,34 @@ DHPy debug_ctx_Long_FromSsize_t(HPyContext *dctx, HPy_ssize_t value)
     return DHPy_open(dctx, HPyLong_FromSsize_t(get_info(dctx)->uctx, value));
 }
 
-long debug_ctx_Long_AsLong(HPyContext *dctx, DHPy h)
+int32_t debug_ctx_Long_AsInt32(HPyContext *dctx, DHPy h)
 {
-    return HPyLong_AsLong(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return HPyLong_AsInt32(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-unsigned long debug_ctx_Long_AsUnsignedLong(HPyContext *dctx, DHPy h)
+uint32_t debug_ctx_Long_AsUInt32(HPyContext *dctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLong(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return HPyLong_AsUInt32(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-unsigned long debug_ctx_Long_AsUnsignedLongMask(HPyContext *dctx, DHPy h)
+uint32_t debug_ctx_Long_AsUInt32Mask(HPyContext *dctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLongMask(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return HPyLong_AsUInt32Mask(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-long long debug_ctx_Long_AsLongLong(HPyContext *dctx, DHPy h)
+int64_t debug_ctx_Long_AsInt64(HPyContext *dctx, DHPy h)
 {
-    return HPyLong_AsLongLong(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return HPyLong_AsInt64(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-unsigned long long debug_ctx_Long_AsUnsignedLongLong(HPyContext *dctx, DHPy h)
+uint64_t debug_ctx_Long_AsUInt64(HPyContext *dctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLongLong(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return HPyLong_AsUInt64(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-unsigned long long debug_ctx_Long_AsUnsignedLongLongMask(HPyContext *dctx, DHPy h)
+uint64_t debug_ctx_Long_AsUInt64Mask(HPyContext *dctx, DHPy h)
 {
-    return HPyLong_AsUnsignedLongLongMask(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
+    return HPyLong_AsUInt64Mask(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
 size_t debug_ctx_Long_AsSize_t(HPyContext *dctx, DHPy h)
@@ -112,7 +112,7 @@ double debug_ctx_Float_AsDouble(HPyContext *dctx, DHPy h)
     return HPyFloat_AsDouble(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-DHPy debug_ctx_Bool_FromLong(HPyContext *dctx, long v)
+DHPy debug_ctx_Bool_FromLong(HPyContext *dctx, int64_t v)
 {
     return DHPy_open(dctx, HPyBool_FromLong(get_info(dctx)->uctx, v));
 }

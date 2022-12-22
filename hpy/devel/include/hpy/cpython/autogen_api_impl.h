@@ -10,26 +10,6 @@
 
 */
 
-HPyAPI_FUNC HPy HPyLong_FromLong(HPyContext *ctx, long value)
-{
-    return _py2h(PyLong_FromLong(value));
-}
-
-HPyAPI_FUNC HPy HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long value)
-{
-    return _py2h(PyLong_FromUnsignedLong(value));
-}
-
-HPyAPI_FUNC HPy HPyLong_FromLongLong(HPyContext *ctx, long long v)
-{
-    return _py2h(PyLong_FromLongLong(v));
-}
-
-HPyAPI_FUNC HPy HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long v)
-{
-    return _py2h(PyLong_FromUnsignedLongLong(v));
-}
-
 HPyAPI_FUNC HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value)
 {
     return _py2h(PyLong_FromSize_t(value));
@@ -38,36 +18,6 @@ HPyAPI_FUNC HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value)
 HPyAPI_FUNC HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value)
 {
     return _py2h(PyLong_FromSsize_t(value));
-}
-
-HPyAPI_FUNC long HPyLong_AsLong(HPyContext *ctx, HPy h)
-{
-    return PyLong_AsLong(_h2py(h));
-}
-
-HPyAPI_FUNC unsigned long HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h)
-{
-    return PyLong_AsUnsignedLong(_h2py(h));
-}
-
-HPyAPI_FUNC unsigned long HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h)
-{
-    return PyLong_AsUnsignedLongMask(_h2py(h));
-}
-
-HPyAPI_FUNC long long HPyLong_AsLongLong(HPyContext *ctx, HPy h)
-{
-    return PyLong_AsLongLong(_h2py(h));
-}
-
-HPyAPI_FUNC unsigned long long HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h)
-{
-    return PyLong_AsUnsignedLongLong(_h2py(h));
-}
-
-HPyAPI_FUNC unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h)
-{
-    return PyLong_AsUnsignedLongLongMask(_h2py(h));
 }
 
 HPyAPI_FUNC size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h)
@@ -100,7 +50,7 @@ HPyAPI_FUNC double HPyFloat_AsDouble(HPyContext *ctx, HPy h)
     return PyFloat_AsDouble(_h2py(h));
 }
 
-HPyAPI_FUNC HPy HPyBool_FromLong(HPyContext *ctx, long v)
+HPyAPI_FUNC HPy HPyBool_FromLong(HPyContext *ctx, int64_t v)
 {
     return _py2h(PyBool_FromLong(v));
 }

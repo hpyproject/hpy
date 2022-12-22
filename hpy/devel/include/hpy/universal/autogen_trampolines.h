@@ -22,20 +22,20 @@ HPyAPI_FUNC void HPy_Close(HPyContext *ctx, HPy h) {
      ctx->ctx_Close ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromLong(HPyContext *ctx, long value) {
-     return ctx->ctx_Long_FromLong ( ctx, value ); 
+HPyAPI_FUNC HPy HPyLong_FromInt32(HPyContext *ctx, int32_t value) {
+     return ctx->ctx_Long_FromInt32 ( ctx, value ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long value) {
-     return ctx->ctx_Long_FromUnsignedLong ( ctx, value ); 
+HPyAPI_FUNC HPy HPyLong_FromUInt32(HPyContext *ctx, uint32_t value) {
+     return ctx->ctx_Long_FromUInt32 ( ctx, value ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromLongLong(HPyContext *ctx, long long v) {
-     return ctx->ctx_Long_FromLongLong ( ctx, v ); 
+HPyAPI_FUNC HPy HPyLong_FromInt64(HPyContext *ctx, int64_t v) {
+     return ctx->ctx_Long_FromInt64 ( ctx, v ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long v) {
-     return ctx->ctx_Long_FromUnsignedLongLong ( ctx, v ); 
+HPyAPI_FUNC HPy HPyLong_FromUInt64(HPyContext *ctx, uint64_t v) {
+     return ctx->ctx_Long_FromUInt64 ( ctx, v ); 
 }
 
 HPyAPI_FUNC HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value) {
@@ -46,28 +46,28 @@ HPyAPI_FUNC HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value) {
      return ctx->ctx_Long_FromSsize_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC long HPyLong_AsLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsLong ( ctx, h ); 
+HPyAPI_FUNC int32_t HPyLong_AsInt32(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsInt32 ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLong ( ctx, h ); 
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt32 ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLongMask ( ctx, h ); 
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32Mask(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt32Mask ( ctx, h ); 
 }
 
-HPyAPI_FUNC long long HPyLong_AsLongLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsLongLong ( ctx, h ); 
+HPyAPI_FUNC int64_t HPyLong_AsInt64(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsInt64 ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long long HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLongLong ( ctx, h ); 
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt64 ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLongLongMask ( ctx, h ); 
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64Mask(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt64Mask ( ctx, h ); 
 }
 
 HPyAPI_FUNC size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h) {
@@ -94,7 +94,7 @@ HPyAPI_FUNC double HPyFloat_AsDouble(HPyContext *ctx, HPy h) {
      return ctx->ctx_Float_AsDouble ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyBool_FromLong(HPyContext *ctx, long v) {
+HPyAPI_FUNC HPy HPyBool_FromLong(HPyContext *ctx, int64_t v) {
      return ctx->ctx_Bool_FromLong ( ctx, v ); 
 }
 

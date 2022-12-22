@@ -115,30 +115,30 @@ HPy_ID(79)
 void HPy_Close(HPyContext *ctx, HPy h);
 
 HPy_ID(80)
-HPy HPyLong_FromLong(HPyContext *ctx, long value);
+HPy HPyLong_FromInt32(HPyContext *ctx, int32_t value);
 HPy_ID(81)
-HPy HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long value);
+HPy HPyLong_FromUInt32(HPyContext *ctx, uint32_t value);
 HPy_ID(82)
-HPy HPyLong_FromLongLong(HPyContext *ctx, long long v);
+HPy HPyLong_FromInt64(HPyContext *ctx, int64_t v);
 HPy_ID(83)
-HPy HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long v);
+HPy HPyLong_FromUInt64(HPyContext *ctx, uint64_t v);
 HPy_ID(84)
 HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value);
 HPy_ID(85)
 HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value);
 
 HPy_ID(86)
-long HPyLong_AsLong(HPyContext *ctx, HPy h);
+int32_t HPyLong_AsInt32(HPyContext *ctx, HPy h);
 HPy_ID(87)
-unsigned long HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h);
+uint32_t HPyLong_AsUInt32(HPyContext *ctx, HPy h);
 HPy_ID(88)
-unsigned long HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h);
+uint32_t HPyLong_AsUInt32Mask(HPyContext *ctx, HPy h);
 HPy_ID(89)
-long long HPyLong_AsLongLong(HPyContext *ctx, HPy h);
+int64_t HPyLong_AsInt64(HPyContext *ctx, HPy h);
 HPy_ID(90)
-unsigned long long HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h);
+uint64_t HPyLong_AsUInt64(HPyContext *ctx, HPy h);
 HPy_ID(91)
-unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h);
+uint64_t HPyLong_AsUInt64Mask(HPyContext *ctx, HPy h);
 HPy_ID(92)
 size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h);
 HPy_ID(93)
@@ -154,7 +154,7 @@ HPy_ID(97)
 double HPyFloat_AsDouble(HPyContext *ctx, HPy h);
 
 HPy_ID(98)
-HPy HPyBool_FromLong(HPyContext *ctx, long v);
+HPy HPyBool_FromLong(HPyContext *ctx, int64_t v);
 
 
 /* abstract.h */

@@ -5,6 +5,8 @@
 # include <malloc.h>  /* for alloca() */
 #endif
 
+#include <assert.h>
+
 HPyAPI_FUNC HPy HPyErr_SetFromErrno(HPyContext *ctx, HPy h_type)
 {
     return HPyErr_SetFromErrnoWithFilenameObjects(ctx, h_type, HPy_NULL, HPy_NULL);
@@ -41,6 +43,86 @@ HPyAPI_FUNC int HPy_DelAttr(HPyContext *ctx, HPy obj, HPy name) {
 
 HPyAPI_FUNC int HPy_DelAttr_s(HPyContext *ctx, HPy obj, const char *name) {
     return HPy_SetAttr_s(ctx, obj, name, HPy_NULL);
+}
+
+HPyAPI_FUNC HPy
+HPyLong_FromLong(HPyContext *ctx, long l)
+{
+    if (sizeof(long) <= sizeof(int32_t))
+        return HPyLong_FromInt32(ctx, (int32_t)l);
+    assert(sizeof(long) <= sizeof(int64_t));
+    return HPyLong_FromInt64(ctx, (int64_t)l);
+}
+
+HPyAPI_FUNC HPy
+HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long l)
+{
+    if (sizeof(unsigned long) <= sizeof(uint32_t))
+        return HPyLong_FromUInt32(ctx, (uint32_t)l);
+    assert(sizeof(unsigned long) <= sizeof(uint64_t));
+    return HPyLong_FromUInt64(ctx, (uint64_t)l);
+}
+
+HPyAPI_FUNC HPy
+HPyLong_FromLongLong(HPyContext *ctx, long long l)
+{
+    assert(sizeof(long long) <= sizeof(int64_t));
+    return HPyLong_FromInt64(ctx, (int64_t)l);
+}
+
+HPyAPI_FUNC HPy
+HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long l)
+{
+    assert(sizeof(unsigned long long) <= sizeof(uint64_t));
+    return HPyLong_FromUInt64(ctx, (uint64_t)l);
+}
+
+HPyAPI_FUNC long
+HPyLong_AsLong(HPyContext *ctx, HPy h)
+{
+    if (sizeof(long) <= sizeof(int32_t))
+        return (long) HPyLong_AsInt32(ctx, h);
+    else if (sizeof(long) <= sizeof(int64_t))
+        return (long) HPyLong_AsInt64(ctx, h);
+}
+
+HPyAPI_FUNC unsigned long
+HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h)
+{
+    if (sizeof(unsigned long) <= sizeof(uint32_t))
+        return (unsigned long) HPyLong_AsUInt32(ctx, h);
+    else if (sizeof(unsigned long) <= sizeof(uint64_t))
+        return (unsigned long) HPyLong_AsUInt64(ctx, h);
+}
+
+HPyAPI_FUNC unsigned long
+HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h)
+{
+    if (sizeof(unsigned long) <= sizeof(uint32_t))
+        return (unsigned long) HPyLong_AsUInt32Mask(ctx, h);
+    else if (sizeof(unsigned long) <= sizeof(uint64_t))
+        return (unsigned long) HPyLong_AsUInt64Mask(ctx, h);
+}
+
+HPyAPI_FUNC long long
+HPyLong_AsLongLong(HPyContext *ctx, HPy h)
+{
+    assert(sizeof(long long) <= sizeof(int64_t));
+    return (long long) HPyLong_AsInt64(ctx, h);
+}
+
+HPyAPI_FUNC unsigned long long
+HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h)
+{
+    assert(sizeof(unsigned long long) <= sizeof(uint64_t));
+    return (unsigned long long) HPyLong_AsUInt64(ctx, h);
+}
+
+HPyAPI_FUNC unsigned long long
+HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h)
+{
+    assert(sizeof(unsigned long long) <= sizeof(uint64_t));
+    return (unsigned long long) HPyLong_AsUInt64Mask(ctx, h);
 }
 
 #endif //HPY_INLINE_HELPERS_H
