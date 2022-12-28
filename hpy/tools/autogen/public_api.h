@@ -242,7 +242,7 @@ HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
 HPy_ID(137)
 void HPy_FatalError(HPyContext *ctx, const char *message);
 HPy_ID(138)
-HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message);
+HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message);
 HPy_ID(139)
 HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 /* note: the filename will be FS decoded */
@@ -260,11 +260,11 @@ HPy HPyErr_NoMemory(HPyContext *ctx);
 HPy_ID(145)
 void HPyErr_Clear(HPyContext *ctx);
 HPy_ID(146)
-HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict);
+HPy HPyErr_NewException(HPyContext *ctx, const char *utf8_name, HPy base, HPy dict);
 HPy_ID(147)
-HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict);
+HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *utf8_name, const char *utf8_doc, HPy base, HPy dict);
 HPy_ID(148)
-int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level);
+int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *utf8_message, HPy_ssize_t stack_level);
 HPy_ID(149)
 void HPyErr_WriteUnraisable(HPyContext *ctx, HPy obj);
 
@@ -280,24 +280,24 @@ HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, 
 HPy_ID(153)
 HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy_ID(154)
-HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *name);
+HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name);
 
 HPy_ID(155)
 int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy_ID(156)
-int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *name);
+int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name);
 
 HPy_ID(157)
 int HPy_SetAttr(HPyContext *ctx, HPy obj, HPy name, HPy value);
 HPy_ID(158)
-int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *name, HPy value);
+int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name, HPy value);
 
 HPy_ID(159)
 HPy HPy_GetItem(HPyContext *ctx, HPy obj, HPy key);
 HPy_ID(160)
 HPy HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(161)
-HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *key);
+HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
 
 HPy_ID(162)
 int HPy_Contains(HPyContext *ctx, HPy container, HPy key);
@@ -307,14 +307,14 @@ int HPy_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value);
 HPy_ID(164)
 int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 HPy_ID(165)
-int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value);
+int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key, HPy value);
 
 HPy_ID(236)
 int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key);
 HPy_ID(237)
 int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(238)
-int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key);
+int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
 
 HPy_ID(166)
 HPy HPy_Type(HPyContext *ctx, HPy obj);
@@ -376,9 +376,9 @@ const char* HPyBytes_AsString(HPyContext *ctx, HPy h);
 HPy_ID(183)
 const char* HPyBytes_AS_STRING(HPyContext *ctx, HPy h);
 HPy_ID(184)
-HPy HPyBytes_FromString(HPyContext *ctx, const char *v);
+HPy HPyBytes_FromString(HPyContext *ctx, const char *bytes);
 HPy_ID(185)
-HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len);
+HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *bytes, HPy_ssize_t len);
 
 /* unicodeobject.h */
 HPy_ID(186)
@@ -396,17 +396,17 @@ const char* HPyUnicode_AsUTF8AndSize(HPyContext *ctx, HPy h, HPy_ssize_t *size);
 HPy_ID(192)
 HPy HPyUnicode_FromWideChar(HPyContext *ctx, const wchar_t *w, HPy_ssize_t size);
 HPy_ID(193)
-HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char* v);
+HPy HPyUnicode_DecodeFSDefault(HPyContext *ctx, const char *v);
 HPy_ID(194)
-HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char* v, HPy_ssize_t size);
+HPy HPyUnicode_DecodeFSDefaultAndSize(HPyContext *ctx, const char *v, HPy_ssize_t size);
 HPy_ID(195)
 HPy HPyUnicode_EncodeFSDefault(HPyContext *ctx, HPy h);
 HPy_ID(196)
 HPy_UCS4 HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t index);
 HPy_ID(197)
-HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
+HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors);
 HPy_ID(198)
-HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors);
+HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors);
 
 /* listobject.h */
 HPy_ID(199)
@@ -431,15 +431,15 @@ HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 
 /* import.h */
 HPy_ID(206)
-HPy HPyImport_ImportModule(HPyContext *ctx, const char *name);
+HPy HPyImport_ImportModule(HPyContext *ctx, const char *utf8_name);
 
 /* pycapsule.h */
 HPy_ID(245)
-HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor);
+HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *utf8_name, HPyCapsule_Destructor *destructor);
 HPy_ID(246)
-void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name);
+void* HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *utf8_name);
 HPy_ID(247)
-int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name);
+int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *utf8_name);
 HPy_ID(248)
 int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
 

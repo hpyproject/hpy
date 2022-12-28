@@ -41,8 +41,8 @@ HPyAPI_FUNC int HPy_DelAttr(HPyContext *ctx, HPy obj, HPy name) {
     return HPy_SetAttr(ctx, obj, name, HPy_NULL);
 }
 
-HPyAPI_FUNC int HPy_DelAttr_s(HPyContext *ctx, HPy obj, const char *name) {
-    return HPy_SetAttr_s(ctx, obj, name, HPy_NULL);
+HPyAPI_FUNC int HPy_DelAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name) {
+    return HPy_SetAttr_s(ctx, obj, utf8_name, HPy_NULL);
 }
 
 HPyAPI_FUNC HPy

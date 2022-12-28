@@ -312,9 +312,9 @@ void debug_ctx_FatalError(HPyContext *dctx, const char *message)
     HPy_FatalError(get_info(dctx)->uctx, message);
 }
 
-void debug_ctx_Err_SetString(HPyContext *dctx, DHPy h_type, const char *message)
+void debug_ctx_Err_SetString(HPyContext *dctx, DHPy h_type, const char *utf8_message)
 {
-    HPyErr_SetString(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type), message);
+    HPyErr_SetString(get_info(dctx)->uctx, DHPy_unwrap(dctx, h_type), utf8_message);
 }
 
 void debug_ctx_Err_SetObject(HPyContext *dctx, DHPy h_type, DHPy h_value)
@@ -352,19 +352,19 @@ void debug_ctx_Err_Clear(HPyContext *dctx)
     HPyErr_Clear(get_info(dctx)->uctx);
 }
 
-DHPy debug_ctx_Err_NewException(HPyContext *dctx, const char *name, DHPy base, DHPy dict)
+DHPy debug_ctx_Err_NewException(HPyContext *dctx, const char *utf8_name, DHPy base, DHPy dict)
 {
-    return DHPy_open(dctx, HPyErr_NewException(get_info(dctx)->uctx, name, DHPy_unwrap(dctx, base), DHPy_unwrap(dctx, dict)));
+    return DHPy_open(dctx, HPyErr_NewException(get_info(dctx)->uctx, utf8_name, DHPy_unwrap(dctx, base), DHPy_unwrap(dctx, dict)));
 }
 
-DHPy debug_ctx_Err_NewExceptionWithDoc(HPyContext *dctx, const char *name, const char *doc, DHPy base, DHPy dict)
+DHPy debug_ctx_Err_NewExceptionWithDoc(HPyContext *dctx, const char *utf8_name, const char *utf8_doc, DHPy base, DHPy dict)
 {
-    return DHPy_open(dctx, HPyErr_NewExceptionWithDoc(get_info(dctx)->uctx, name, doc, DHPy_unwrap(dctx, base), DHPy_unwrap(dctx, dict)));
+    return DHPy_open(dctx, HPyErr_NewExceptionWithDoc(get_info(dctx)->uctx, utf8_name, utf8_doc, DHPy_unwrap(dctx, base), DHPy_unwrap(dctx, dict)));
 }
 
-int debug_ctx_Err_WarnEx(HPyContext *dctx, DHPy category, const char *message, HPy_ssize_t stack_level)
+int debug_ctx_Err_WarnEx(HPyContext *dctx, DHPy category, const char *utf8_message, HPy_ssize_t stack_level)
 {
-    return HPyErr_WarnEx(get_info(dctx)->uctx, DHPy_unwrap(dctx, category), message, stack_level);
+    return HPyErr_WarnEx(get_info(dctx)->uctx, DHPy_unwrap(dctx, category), utf8_message, stack_level);
 }
 
 void debug_ctx_Err_WriteUnraisable(HPyContext *dctx, DHPy obj)
@@ -382,9 +382,9 @@ DHPy debug_ctx_GetAttr(HPyContext *dctx, DHPy obj, DHPy name)
     return DHPy_open(dctx, HPy_GetAttr(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, name)));
 }
 
-DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *name)
+DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *utf8_name)
 {
-    return DHPy_open(dctx, HPy_GetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name));
+    return DHPy_open(dctx, HPy_GetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), utf8_name));
 }
 
 int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name)
@@ -392,9 +392,9 @@ int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name)
     return HPy_HasAttr(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, name));
 }
 
-int debug_ctx_HasAttr_s(HPyContext *dctx, DHPy obj, const char *name)
+int debug_ctx_HasAttr_s(HPyContext *dctx, DHPy obj, const char *utf8_name)
 {
-    return HPy_HasAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name);
+    return HPy_HasAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), utf8_name);
 }
 
 int debug_ctx_SetAttr(HPyContext *dctx, DHPy obj, DHPy name, DHPy value)
@@ -402,9 +402,9 @@ int debug_ctx_SetAttr(HPyContext *dctx, DHPy obj, DHPy name, DHPy value)
     return HPy_SetAttr(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), DHPy_unwrap(dctx, name), DHPy_unwrap(dctx, value));
 }
 
-int debug_ctx_SetAttr_s(HPyContext *dctx, DHPy obj, const char *name, DHPy value)
+int debug_ctx_SetAttr_s(HPyContext *dctx, DHPy obj, const char *utf8_name, DHPy value)
 {
-    return HPy_SetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), name, DHPy_unwrap(dctx, value));
+    return HPy_SetAttr_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), utf8_name, DHPy_unwrap(dctx, value));
 }
 
 DHPy debug_ctx_GetItem(HPyContext *dctx, DHPy obj, DHPy key)
@@ -417,9 +417,9 @@ DHPy debug_ctx_GetItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx)
     return DHPy_open(dctx, HPy_GetItem_i(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), idx));
 }
 
-DHPy debug_ctx_GetItem_s(HPyContext *dctx, DHPy obj, const char *key)
+DHPy debug_ctx_GetItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key)
 {
-    return DHPy_open(dctx, HPy_GetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key));
+    return DHPy_open(dctx, HPy_GetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), utf8_key));
 }
 
 int debug_ctx_Contains(HPyContext *dctx, DHPy container, DHPy key)
@@ -437,9 +437,9 @@ int debug_ctx_SetItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx, DHPy value)
     return HPy_SetItem_i(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), idx, DHPy_unwrap(dctx, value));
 }
 
-int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *key, DHPy value)
+int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key, DHPy value)
 {
-    return HPy_SetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key, DHPy_unwrap(dctx, value));
+    return HPy_SetItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), utf8_key, DHPy_unwrap(dctx, value));
 }
 
 int debug_ctx_DelItem(HPyContext *dctx, DHPy obj, DHPy key)
@@ -452,9 +452,9 @@ int debug_ctx_DelItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx)
     return HPy_DelItem_i(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), idx);
 }
 
-int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *key)
+int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key)
 {
-    return HPy_DelItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), key);
+    return HPy_DelItem_s(get_info(dctx)->uctx, DHPy_unwrap(dctx, obj), utf8_key);
 }
 
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj)
@@ -532,14 +532,14 @@ HPy_ssize_t debug_ctx_Bytes_GET_SIZE(HPyContext *dctx, DHPy h)
     return HPyBytes_GET_SIZE(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-DHPy debug_ctx_Bytes_FromString(HPyContext *dctx, const char *v)
+DHPy debug_ctx_Bytes_FromString(HPyContext *dctx, const char *bytes)
 {
-    return DHPy_open(dctx, HPyBytes_FromString(get_info(dctx)->uctx, v));
+    return DHPy_open(dctx, HPyBytes_FromString(get_info(dctx)->uctx, bytes));
 }
 
-DHPy debug_ctx_Bytes_FromStringAndSize(HPyContext *dctx, const char *v, HPy_ssize_t len)
+DHPy debug_ctx_Bytes_FromStringAndSize(HPyContext *dctx, const char *bytes, HPy_ssize_t len)
 {
-    return DHPy_open(dctx, HPyBytes_FromStringAndSize(get_info(dctx)->uctx, v, len));
+    return DHPy_open(dctx, HPyBytes_FromStringAndSize(get_info(dctx)->uctx, bytes, len));
 }
 
 DHPy debug_ctx_Unicode_FromString(HPyContext *dctx, const char *utf8)
@@ -592,14 +592,14 @@ HPy_UCS4 debug_ctx_Unicode_ReadChar(HPyContext *dctx, DHPy h, HPy_ssize_t index)
     return HPyUnicode_ReadChar(get_info(dctx)->uctx, DHPy_unwrap(dctx, h), index);
 }
 
-DHPy debug_ctx_Unicode_DecodeASCII(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors)
+DHPy debug_ctx_Unicode_DecodeASCII(HPyContext *dctx, const char *ascii, HPy_ssize_t size, const char *errors)
 {
-    return DHPy_open(dctx, HPyUnicode_DecodeASCII(get_info(dctx)->uctx, s, size, errors));
+    return DHPy_open(dctx, HPyUnicode_DecodeASCII(get_info(dctx)->uctx, ascii, size, errors));
 }
 
-DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *s, HPy_ssize_t size, const char *errors)
+DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *latin1, HPy_ssize_t size, const char *errors)
 {
-    return DHPy_open(dctx, HPyUnicode_DecodeLatin1(get_info(dctx)->uctx, s, size, errors));
+    return DHPy_open(dctx, HPyUnicode_DecodeLatin1(get_info(dctx)->uctx, latin1, size, errors));
 }
 
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
@@ -632,24 +632,24 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
     return HPyTuple_Check(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *name)
+DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *utf8_name)
 {
-    return DHPy_open(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, name));
+    return DHPy_open(dctx, HPyImport_ImportModule(get_info(dctx)->uctx, utf8_name));
 }
 
-DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor)
+DHPy debug_ctx_Capsule_New(HPyContext *dctx, void *pointer, const char *utf8_name, HPyCapsule_Destructor *destructor)
 {
-    return DHPy_open(dctx, HPyCapsule_New(get_info(dctx)->uctx, pointer, name, destructor));
+    return DHPy_open(dctx, HPyCapsule_New(get_info(dctx)->uctx, pointer, utf8_name, destructor));
 }
 
-void *debug_ctx_Capsule_Get(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, const char *name)
+void *debug_ctx_Capsule_Get(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, const char *utf8_name)
 {
-    return HPyCapsule_Get(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), key, name);
+    return HPyCapsule_Get(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), key, utf8_name);
 }
 
-int debug_ctx_Capsule_IsValid(HPyContext *dctx, DHPy capsule, const char *name)
+int debug_ctx_Capsule_IsValid(HPyContext *dctx, DHPy capsule, const char *utf8_name)
 {
-    return HPyCapsule_IsValid(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), name);
+    return HPyCapsule_IsValid(get_info(dctx)->uctx, DHPy_unwrap(dctx, capsule), utf8_name);
 }
 
 int debug_ctx_Capsule_Set(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, void *value)

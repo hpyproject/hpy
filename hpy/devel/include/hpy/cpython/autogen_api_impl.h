@@ -240,9 +240,9 @@ HPyAPI_FUNC int HPyCallable_Check(HPyContext *ctx, HPy h)
     return PyCallable_Check(_h2py(h));
 }
 
-HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message)
+HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message)
 {
-    PyErr_SetString(_h2py(h_type), message);
+    PyErr_SetString(_h2py(h_type), utf8_message);
     return HPy_NULL;
 }
 
@@ -279,19 +279,19 @@ HPyAPI_FUNC void HPyErr_Clear(HPyContext *ctx)
     PyErr_Clear();
 }
 
-HPyAPI_FUNC HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict)
+HPyAPI_FUNC HPy HPyErr_NewException(HPyContext *ctx, const char *utf8_name, HPy base, HPy dict)
 {
-    return _py2h(PyErr_NewException(name, _h2py(base), _h2py(dict)));
+    return _py2h(PyErr_NewException(utf8_name, _h2py(base), _h2py(dict)));
 }
 
-HPyAPI_FUNC HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict)
+HPyAPI_FUNC HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *utf8_name, const char *utf8_doc, HPy base, HPy dict)
 {
-    return _py2h(PyErr_NewExceptionWithDoc(name, doc, _h2py(base), _h2py(dict)));
+    return _py2h(PyErr_NewExceptionWithDoc(utf8_name, utf8_doc, _h2py(base), _h2py(dict)));
 }
 
-HPyAPI_FUNC int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level)
+HPyAPI_FUNC int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *utf8_message, HPy_ssize_t stack_level)
 {
-    return PyErr_WarnEx(_h2py(category), message, stack_level);
+    return PyErr_WarnEx(_h2py(category), utf8_message, stack_level);
 }
 
 HPyAPI_FUNC void HPyErr_WriteUnraisable(HPyContext *ctx, HPy obj)
@@ -309,9 +309,9 @@ HPyAPI_FUNC HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name)
     return _py2h(PyObject_GetAttr(_h2py(obj), _h2py(name)));
 }
 
-HPyAPI_FUNC HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *name)
+HPyAPI_FUNC HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name)
 {
-    return _py2h(PyObject_GetAttrString(_h2py(obj), name));
+    return _py2h(PyObject_GetAttrString(_h2py(obj), utf8_name));
 }
 
 HPyAPI_FUNC int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name)
@@ -319,9 +319,9 @@ HPyAPI_FUNC int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name)
     return PyObject_HasAttr(_h2py(obj), _h2py(name));
 }
 
-HPyAPI_FUNC int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *name)
+HPyAPI_FUNC int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name)
 {
-    return PyObject_HasAttrString(_h2py(obj), name);
+    return PyObject_HasAttrString(_h2py(obj), utf8_name);
 }
 
 HPyAPI_FUNC int HPy_SetAttr(HPyContext *ctx, HPy obj, HPy name, HPy value)
@@ -329,9 +329,9 @@ HPyAPI_FUNC int HPy_SetAttr(HPyContext *ctx, HPy obj, HPy name, HPy value)
     return PyObject_SetAttr(_h2py(obj), _h2py(name), _h2py(value));
 }
 
-HPyAPI_FUNC int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *name, HPy value)
+HPyAPI_FUNC int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name, HPy value)
 {
-    return PyObject_SetAttrString(_h2py(obj), name, _h2py(value));
+    return PyObject_SetAttrString(_h2py(obj), utf8_name, _h2py(value));
 }
 
 HPyAPI_FUNC HPy HPy_GetItem(HPyContext *ctx, HPy obj, HPy key)
@@ -419,9 +419,9 @@ HPyAPI_FUNC const char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h)
     return PyBytes_AS_STRING(_h2py(h));
 }
 
-HPyAPI_FUNC HPy HPyBytes_FromString(HPyContext *ctx, const char *v)
+HPyAPI_FUNC HPy HPyBytes_FromString(HPyContext *ctx, const char *bytes)
 {
-    return _py2h(PyBytes_FromString(v));
+    return _py2h(PyBytes_FromString(bytes));
 }
 
 HPyAPI_FUNC HPy HPyUnicode_FromString(HPyContext *ctx, const char *utf8)
@@ -479,14 +479,14 @@ HPyAPI_FUNC HPy_UCS4 HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t ind
     return PyUnicode_ReadChar(_h2py(h), index);
 }
 
-HPyAPI_FUNC HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors)
+HPyAPI_FUNC HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors)
 {
-    return _py2h(PyUnicode_DecodeASCII(s, size, errors));
+    return _py2h(PyUnicode_DecodeASCII(ascii, size, errors));
 }
 
-HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors)
+HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors)
 {
-    return _py2h(PyUnicode_DecodeLatin1(s, size, errors));
+    return _py2h(PyUnicode_DecodeLatin1(latin1, size, errors));
 }
 
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h)
@@ -519,14 +519,14 @@ HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h)
     return PyTuple_Check(_h2py(h));
 }
 
-HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name)
+HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *utf8_name)
 {
-    return _py2h(PyImport_ImportModule(name));
+    return _py2h(PyImport_ImportModule(utf8_name));
 }
 
-HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name)
+HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *utf8_name)
 {
-    return PyCapsule_IsValid(_h2py(capsule), name);
+    return PyCapsule_IsValid(_h2py(capsule), utf8_name);
 }
 
 HPyAPI_FUNC void HPy_ReenterPythonExecution(HPyContext *ctx, HPyThreadState state)
