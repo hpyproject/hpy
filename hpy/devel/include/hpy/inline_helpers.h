@@ -49,80 +49,80 @@ HPyAPI_FUNC HPy
 HPyLong_FromLong(HPyContext *ctx, long l)
 {
     if (sizeof(long) <= sizeof(int32_t))
-        return HPyLong_FromInt32(ctx, (int32_t)l);
+        return HPyLong_FromInt32_t(ctx, (int32_t)l);
     assert(sizeof(long) <= sizeof(int64_t));
-    return HPyLong_FromInt64(ctx, (int64_t)l);
+    return HPyLong_FromInt64_t(ctx, (int64_t)l);
 }
 
 HPyAPI_FUNC HPy
 HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long l)
 {
     if (sizeof(unsigned long) <= sizeof(uint32_t))
-        return HPyLong_FromUInt32(ctx, (uint32_t)l);
+        return HPyLong_FromUInt32_t(ctx, (uint32_t)l);
     assert(sizeof(unsigned long) <= sizeof(uint64_t));
-    return HPyLong_FromUInt64(ctx, (uint64_t)l);
+    return HPyLong_FromUInt64_t(ctx, (uint64_t)l);
 }
 
 HPyAPI_FUNC HPy
 HPyLong_FromLongLong(HPyContext *ctx, long long l)
 {
     assert(sizeof(long long) <= sizeof(int64_t));
-    return HPyLong_FromInt64(ctx, (int64_t)l);
+    return HPyLong_FromInt64_t(ctx, (int64_t)l);
 }
 
 HPyAPI_FUNC HPy
 HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long l)
 {
     assert(sizeof(unsigned long long) <= sizeof(uint64_t));
-    return HPyLong_FromUInt64(ctx, (uint64_t)l);
+    return HPyLong_FromUInt64_t(ctx, (uint64_t)l);
 }
 
 HPyAPI_FUNC long
 HPyLong_AsLong(HPyContext *ctx, HPy h)
 {
     if (sizeof(long) <= sizeof(int32_t))
-        return (long) HPyLong_AsInt32(ctx, h);
+        return (long) HPyLong_AsInt32_t(ctx, h);
     else if (sizeof(long) <= sizeof(int64_t))
-        return (long) HPyLong_AsInt64(ctx, h);
+        return (long) HPyLong_AsInt64_t(ctx, h);
 }
 
 HPyAPI_FUNC unsigned long
 HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h)
 {
     if (sizeof(unsigned long) <= sizeof(uint32_t))
-        return (unsigned long) HPyLong_AsUInt32(ctx, h);
+        return (unsigned long) HPyLong_AsUInt32_t(ctx, h);
     else if (sizeof(unsigned long) <= sizeof(uint64_t))
-        return (unsigned long) HPyLong_AsUInt64(ctx, h);
+        return (unsigned long) HPyLong_AsUInt64_t(ctx, h);
 }
 
 HPyAPI_FUNC unsigned long
 HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h)
 {
     if (sizeof(unsigned long) <= sizeof(uint32_t))
-        return (unsigned long) HPyLong_AsUInt32Mask(ctx, h);
+        return (unsigned long) HPyLong_AsUInt32_tMask(ctx, h);
     else if (sizeof(unsigned long) <= sizeof(uint64_t))
-        return (unsigned long) HPyLong_AsUInt64Mask(ctx, h);
+        return (unsigned long) HPyLong_AsUInt64_tMask(ctx, h);
 }
 
 HPyAPI_FUNC long long
 HPyLong_AsLongLong(HPyContext *ctx, HPy h)
 {
     assert(sizeof(long long) <= sizeof(int64_t));
-    return (long long) HPyLong_AsInt64(ctx, h);
+    return (long long) HPyLong_AsInt64_t(ctx, h);
 }
 
 HPyAPI_FUNC unsigned long long
 HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h)
 {
     assert(sizeof(unsigned long long) <= sizeof(uint64_t));
-    return (unsigned long long) HPyLong_AsUInt64(ctx, h);
+    return (unsigned long long) HPyLong_AsUInt64_t(ctx, h);
 }
 
 HPyAPI_FUNC unsigned long long
 HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h)
 {
     assert(sizeof(unsigned long long) <= sizeof(uint64_t));
-    return (unsigned long long) HPyLong_AsUInt64Mask(ctx, h);
+    return (unsigned long long) HPyLong_AsUInt64_tMask(ctx, h);
 }
 
 #endif //HPY_INLINE_HELPERS_H

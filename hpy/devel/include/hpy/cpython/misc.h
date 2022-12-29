@@ -429,75 +429,75 @@ HPyAPI_FUNC int HPyCapsule_SetDestructor(HPyContext *ctx, HPy capsule, HPyCapsul
 #define SIZEOF_INT32 4
 #define SIZEOF_INT64 8
 
-HPyAPI_FUNC HPy HPyLong_FromInt32(HPyContext *ctx, int32_t value) {
+HPyAPI_FUNC HPy HPyLong_FromInt32_t(HPyContext *ctx, int32_t value) {
 #if SIZEOF_LONG >= SIZEOF_INT32
      return _py2h(PyLong_FromLong((long)value));
 #else
-     return ctx_Long_FromInt32 ( ctx, value );
+     return ctx_Long_FromInt32_t ( ctx, value );
 #endif
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUInt32(HPyContext *ctx, uint32_t value) {
+HPyAPI_FUNC HPy HPyLong_FromUInt32_t(HPyContext *ctx, uint32_t value) {
 #if SIZEOF_LONG >= SIZEOF_INT32
      return _py2h(PyLong_FromLong((long)value));
 #else
-     return ctx_Long_FromUInt32 ( ctx, value );
+     return ctx_Long_FromUInt32_t ( ctx, value );
 #endif
 }
 
-HPyAPI_FUNC HPy HPyLong_FromInt64(HPyContext *ctx, int64_t v) {
+HPyAPI_FUNC HPy HPyLong_FromInt64_t(HPyContext *ctx, int64_t v) {
 #if  SIZEOF_LONG_LONG >= SIZEOF_INT64
      return _py2h(PyLong_FromLongLong((long long)v));
 #else
-     return ctx_Long_FromInt64 ( ctx, v );
+     return ctx_Long_FromInt64_t ( ctx, v );
 #endif
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUInt64(HPyContext *ctx, uint64_t v) {
+HPyAPI_FUNC HPy HPyLong_FromUInt64_t(HPyContext *ctx, uint64_t v) {
 #if  SIZEOF_LONG_LONG >= SIZEOF_INT64
      return _py2h(PyLong_FromUnsignedLongLong((unsigned long long)v));
 #else
-     return ctx_Long_FromUInt64 ( ctx, v );
+     return ctx_Long_FromUInt64_t ( ctx, v );
 #endif
 }
 
-HPyAPI_FUNC int32_t HPyLong_AsInt32(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC int32_t HPyLong_AsInt32_t(HPyContext *ctx, HPy h) {
 #if SIZEOF_LONG == SIZEOF_INT32
      return (int32_t) PyLong_AsLong(_h2py(h));
 #else
-     return ctx_Long_AsInt32 ( ctx, h );
+     return ctx_Long_AsInt32_t ( ctx, h );
 #endif
 }
 
-HPyAPI_FUNC uint32_t HPyLong_AsUInt32(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32_t(HPyContext *ctx, HPy h) {
 #if SIZEOF_LONG == SIZEOF_INT32
      return (uint32_t) PyLong_AsUnsignedLong(_h2py(h));
 #else
-     return ctx_Long_AsUInt32 ( ctx, h );
+     return ctx_Long_AsUInt32_t ( ctx, h );
 #endif
 }
 
-HPyAPI_FUNC uint32_t HPyLong_AsUInt32Mask(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32_tMask(HPyContext *ctx, HPy h) {
      return (uint32_t) PyLong_AsUnsignedLongMask(_h2py(h));
 }
 
-HPyAPI_FUNC int64_t HPyLong_AsInt64(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC int64_t HPyLong_AsInt64_t(HPyContext *ctx, HPy h) {
 #if SIZEOF_LONG_LONG == SIZEOF_INT64
      return (int64_t) PyLong_AsLongLong(_h2py(h));
 #else
-     return ctx_Long_AsInt64 ( ctx, h );
+     return ctx_Long_AsInt64_t ( ctx, h );
 #endif
 }
 
-HPyAPI_FUNC uint64_t HPyLong_AsUInt64(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64_t(HPyContext *ctx, HPy h) {
 #if SIZEOF_LONG_LONG == SIZEOF_INT64
      return (uint64_t) PyLong_AsUnsignedLongLong(_h2py(h));
 #else
-     return ctx_Long_AsUInt64 ( ctx, h );
+     return ctx_Long_AsUInt64_t ( ctx, h );
 #endif
 }
 
-HPyAPI_FUNC uint64_t HPyLong_AsUInt64Mask(HPyContext *ctx, HPy h) {
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64_tMask(HPyContext *ctx, HPy h) {
      return (uint64_t) PyLong_AsUnsignedLongLongMask(_h2py(h));
 }
 

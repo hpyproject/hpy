@@ -22,20 +22,20 @@ HPyAPI_FUNC void HPy_Close(HPyContext *ctx, HPy h) {
      ctx->ctx_Close ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromInt32(HPyContext *ctx, int32_t value) {
-     return ctx->ctx_Long_FromInt32 ( ctx, value ); 
+HPyAPI_FUNC HPy HPyLong_FromInt32_t(HPyContext *ctx, int32_t value) {
+     return ctx->ctx_Long_FromInt32_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUInt32(HPyContext *ctx, uint32_t value) {
-     return ctx->ctx_Long_FromUInt32 ( ctx, value ); 
+HPyAPI_FUNC HPy HPyLong_FromUInt32_t(HPyContext *ctx, uint32_t value) {
+     return ctx->ctx_Long_FromUInt32_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromInt64(HPyContext *ctx, int64_t v) {
-     return ctx->ctx_Long_FromInt64 ( ctx, v ); 
+HPyAPI_FUNC HPy HPyLong_FromInt64_t(HPyContext *ctx, int64_t v) {
+     return ctx->ctx_Long_FromInt64_t ( ctx, v ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUInt64(HPyContext *ctx, uint64_t v) {
-     return ctx->ctx_Long_FromUInt64 ( ctx, v ); 
+HPyAPI_FUNC HPy HPyLong_FromUInt64_t(HPyContext *ctx, uint64_t v) {
+     return ctx->ctx_Long_FromUInt64_t ( ctx, v ); 
 }
 
 HPyAPI_FUNC HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value) {
@@ -46,28 +46,28 @@ HPyAPI_FUNC HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value) {
      return ctx->ctx_Long_FromSsize_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC int32_t HPyLong_AsInt32(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsInt32 ( ctx, h ); 
+HPyAPI_FUNC int32_t HPyLong_AsInt32_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsInt32_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC uint32_t HPyLong_AsUInt32(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUInt32 ( ctx, h ); 
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt32_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC uint32_t HPyLong_AsUInt32Mask(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUInt32Mask ( ctx, h ); 
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32_tMask(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt32_tMask ( ctx, h ); 
 }
 
-HPyAPI_FUNC int64_t HPyLong_AsInt64(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsInt64 ( ctx, h ); 
+HPyAPI_FUNC int64_t HPyLong_AsInt64_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsInt64_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC uint64_t HPyLong_AsUInt64(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUInt64 ( ctx, h ); 
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt64_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC uint64_t HPyLong_AsUInt64Mask(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUInt64Mask ( ctx, h ); 
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64_tMask(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt64_tMask ( ctx, h ); 
 }
 
 HPyAPI_FUNC size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h) {

@@ -76,12 +76,12 @@ class TestLong(HPyTest):
 
     def test_Long_FromFixedWidth(self):
         mod = self.make_module("""
-            @DEFINE_Long_From(int32_t, Int32, INT32_MAX)
-            @DEFINE_Long_From(int32_t, Int32, INT32_MIN)
-            @DEFINE_Long_From(uint32_t, UInt32, UINT32_MAX)
-            @DEFINE_Long_From(int64_t, Int64, INT64_MAX)
-            @DEFINE_Long_From(int64_t, Int64, INT64_MIN)
-            @DEFINE_Long_From(uint64_t, UInt64, UINT64_MAX)
+            @DEFINE_Long_From(int32_t, Int32_t, INT32_MAX)
+            @DEFINE_Long_From(int32_t, Int32_t, INT32_MIN)
+            @DEFINE_Long_From(uint32_t, UInt32_t, UINT32_MAX)
+            @DEFINE_Long_From(int64_t, Int64_t, INT64_MAX)
+            @DEFINE_Long_From(int64_t, Int64_t, INT64_MIN)
+            @DEFINE_Long_From(uint64_t, UInt64_t, UINT64_MAX)
             @INIT
         """)
         assert mod.from_int32_t_INT32_MAX() == 2147483647
@@ -107,47 +107,47 @@ class TestLong(HPyTest):
     def test_Long_AsFixedWidth(self):
         import pytest
         mod = self.make_module("""
-            @DEFINE_Long_As(int32_t, Int32)
-            @DEFINE_Long_As(uint32_t, UInt32)
-            @DEFINE_Long_As(uint32_t, UInt32Mask, UInt32)
-            @DEFINE_Long_As(int64_t, Int64)
-            @DEFINE_Long_As(uint64_t, UInt64)
-            @DEFINE_Long_As(uint64_t, UInt64Mask, UInt64)
+            @DEFINE_Long_As(int32_t, Int32_t)
+            @DEFINE_Long_As(uint32_t, UInt32_t)
+            @DEFINE_Long_As(uint32_t, UInt32_tMask, UInt32_t)
+            @DEFINE_Long_As(int64_t, Int64_t)
+            @DEFINE_Long_As(uint64_t, UInt64_t)
+            @DEFINE_Long_As(uint64_t, UInt64_tMask, UInt64_t)
             @INIT
         """)
 
-        assert mod.as_Int32(45) == 90
-        assert mod.as_Int32(-45) == -90
+        assert mod.as_Int32_t(45) == 90
+        assert mod.as_Int32_t(-45) == -90
         # doubling INT32_MAX is like a left-shift and will result in a negative value
-        assert mod.as_Int32(2147483647) < 0
+        assert mod.as_Int32_t(2147483647) < 0
         with pytest.raises(TypeError):
-            mod.as_Int32("this is not a number")
+            mod.as_Int32_t("this is not a number")
         if self.python_supports_magic_int():
-            assert mod.as_Int32(self.magic_int(2)) == 4
+            assert mod.as_Int32_t(self.magic_int(2)) == 4
         if self.python_supports_magic_index():
-            assert mod.as_Int32(self.magic_index(2)) == 4
+            assert mod.as_Int32_t(self.magic_index(2)) == 4
 
-        assert mod.as_UInt32(45) == 90
+        assert mod.as_UInt32_t(45) == 90
         with pytest.raises(OverflowError):
-            mod.as_UInt32(-45)
-        assert mod.as_UInt32(2147483647) == 4294967294
+            mod.as_UInt32_t(-45)
+        assert mod.as_UInt32_t(2147483647) == 4294967294
 
-        assert mod.as_UInt32Mask(0xffffffffffffffff) == 0xfffffffe
+        assert mod.as_UInt32_tMask(0xffffffffffffffff) == 0xfffffffe
 
-        assert mod.as_Int64(45) == 90
-        assert mod.as_Int64(-45) == -90
+        assert mod.as_Int64_t(45) == 90
+        assert mod.as_Int64_t(-45) == -90
         # doubling INT32_MAX is like a left-shift and will result in a negative value
-        assert mod.as_Int64(2147483647) == 4294967294
-        assert mod.as_Int64(9223372036854775807) < 0
+        assert mod.as_Int64_t(2147483647) == 4294967294
+        assert mod.as_Int64_t(9223372036854775807) < 0
         with pytest.raises(TypeError):
-            mod.as_Int64("this is not a number")
+            mod.as_Int64_t("this is not a number")
 
-        assert mod.as_UInt64(45) == 90
+        assert mod.as_UInt64_t(45) == 90
         with pytest.raises(OverflowError):
-            mod.as_UInt64(-45)
-        assert mod.as_UInt64(9223372036854775807) == 18446744073709551614
+            mod.as_UInt64_t(-45)
+        assert mod.as_UInt64_t(9223372036854775807) == 18446744073709551614
 
-        assert mod.as_UInt64Mask(0xffffffffffffffffff) == 0xfffffffffffffffe
+        assert mod.as_UInt64_tMask(0xffffffffffffffffff) == 0xfffffffffffffffe
 
     def test_Long_AsLong(self):
         import pytest

@@ -115,30 +115,30 @@ HPy_ID(79)
 void HPy_Close(HPyContext *ctx, HPy h);
 
 HPy_ID(80)
-HPy HPyLong_FromInt32(HPyContext *ctx, int32_t value);
+HPy HPyLong_FromInt32_t(HPyContext *ctx, int32_t value);
 HPy_ID(81)
-HPy HPyLong_FromUInt32(HPyContext *ctx, uint32_t value);
+HPy HPyLong_FromUInt32_t(HPyContext *ctx, uint32_t value);
 HPy_ID(82)
-HPy HPyLong_FromInt64(HPyContext *ctx, int64_t v);
+HPy HPyLong_FromInt64_t(HPyContext *ctx, int64_t v);
 HPy_ID(83)
-HPy HPyLong_FromUInt64(HPyContext *ctx, uint64_t v);
+HPy HPyLong_FromUInt64_t(HPyContext *ctx, uint64_t v);
 HPy_ID(84)
 HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value);
 HPy_ID(85)
 HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value);
 
 HPy_ID(86)
-int32_t HPyLong_AsInt32(HPyContext *ctx, HPy h);
+int32_t HPyLong_AsInt32_t(HPyContext *ctx, HPy h);
 HPy_ID(87)
-uint32_t HPyLong_AsUInt32(HPyContext *ctx, HPy h);
+uint32_t HPyLong_AsUInt32_t(HPyContext *ctx, HPy h);
 HPy_ID(88)
-uint32_t HPyLong_AsUInt32Mask(HPyContext *ctx, HPy h);
+uint32_t HPyLong_AsUInt32_tMask(HPyContext *ctx, HPy h);
 HPy_ID(89)
-int64_t HPyLong_AsInt64(HPyContext *ctx, HPy h);
+int64_t HPyLong_AsInt64_t(HPyContext *ctx, HPy h);
 HPy_ID(90)
-uint64_t HPyLong_AsUInt64(HPyContext *ctx, HPy h);
+uint64_t HPyLong_AsUInt64_t(HPyContext *ctx, HPy h);
 HPy_ID(91)
-uint64_t HPyLong_AsUInt64Mask(HPyContext *ctx, HPy h);
+uint64_t HPyLong_AsUInt64_tMask(HPyContext *ctx, HPy h);
 HPy_ID(92)
 size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h);
 HPy_ID(93)
