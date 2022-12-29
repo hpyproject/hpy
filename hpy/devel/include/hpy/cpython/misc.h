@@ -439,7 +439,7 @@ HPyAPI_FUNC HPy HPyLong_FromInt32_t(HPyContext *ctx, int32_t value) {
 
 HPyAPI_FUNC HPy HPyLong_FromUInt32_t(HPyContext *ctx, uint32_t value) {
 #if SIZEOF_LONG >= SIZEOF_INT32
-     return _py2h(PyLong_FromLong((long)value));
+     return _py2h(PyLong_FromUnsignedLong((unsigned long)value));
 #else
      return ctx_Long_FromUInt32_t ( ctx, value );
 #endif
