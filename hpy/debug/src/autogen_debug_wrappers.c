@@ -112,9 +112,9 @@ double debug_ctx_Float_AsDouble(HPyContext *dctx, DHPy h)
     return HPyFloat_AsDouble(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-DHPy debug_ctx_Bool_FromLong(HPyContext *dctx, int64_t v)
+DHPy debug_ctx_Bool_FromBool(HPyContext *dctx, bool v)
 {
-    return DHPy_open(dctx, HPyBool_FromLong(get_info(dctx)->uctx, v));
+    return DHPy_open(dctx, HPyBool_FromBool(get_info(dctx)->uctx, v));
 }
 
 HPy_ssize_t debug_ctx_Length(HPyContext *dctx, DHPy h)

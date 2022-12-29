@@ -241,7 +241,7 @@ HPyDef_GET(DebugHandle_is_closed, "is_closed",
 static UHPy DebugHandle_is_closed_get(HPyContext *uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
-    return HPyBool_FromLong(uctx, dh->handle->is_closed);
+    return HPyBool_FromBool(uctx, dh->handle->is_closed);
 }
 
 HPyDef_GET(DebugHandle_raw_data_size, "raw_data_size",
@@ -267,9 +267,9 @@ static UHPy DebugHandle_cmp_impl(HPyContext *uctx, UHPy self, UHPy o, HPy_RichCm
 
     switch(op) {
     case HPy_EQ:
-        return HPyBool_FromLong(uctx, dh_self->handle == dh_o->handle);
+        return HPyBool_FromBool(uctx, dh_self->handle == dh_o->handle);
     case HPy_NE:
-        return HPyBool_FromLong(uctx, dh_self->handle != dh_o->handle);
+        return HPyBool_FromBool(uctx, dh_self->handle != dh_o->handle);
     default:
         return HPy_Dup(uctx, uctx->h_NotImplemented);
     }

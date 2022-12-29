@@ -50,7 +50,7 @@ HPyAPI_IMPL double ctx_Float_AsDouble(HPyContext *ctx, HPy h)
     return PyFloat_AsDouble(_h2py(h));
 }
 
-HPyAPI_IMPL HPy ctx_Bool_FromLong(HPyContext *ctx, int64_t v)
+HPyAPI_IMPL HPy ctx_Bool_FromBool(HPyContext *ctx, bool v)
 {
     return _py2h(PyBool_FromLong(v));
 }

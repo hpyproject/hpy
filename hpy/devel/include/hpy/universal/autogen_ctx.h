@@ -112,7 +112,7 @@ struct _HPyContext_s {
     double (*ctx_Long_AsDouble)(HPyContext *ctx, HPy h);
     HPy (*ctx_Float_FromDouble)(HPyContext *ctx, double v);
     double (*ctx_Float_AsDouble)(HPyContext *ctx, HPy h);
-    HPy (*ctx_Bool_FromLong)(HPyContext *ctx, int64_t v);
+    HPy (*ctx_Bool_FromBool)(HPyContext *ctx, bool v);
     HPy_ssize_t (*ctx_Length)(HPyContext *ctx, HPy h);
     int (*ctx_Number_Check)(HPyContext *ctx, HPy h);
     HPy (*ctx_Add)(HPyContext *ctx, HPy h1, HPy h2);

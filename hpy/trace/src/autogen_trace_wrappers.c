@@ -284,14 +284,14 @@ double trace_ctx_Float_AsDouble(HPyContext *tctx, HPy h)
     return res;
 }
 
-HPy trace_ctx_Bool_FromLong(HPyContext *tctx, int64_t v)
+HPy trace_ctx_Bool_FromBool(HPyContext *tctx, bool v)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 98);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    HPy res = HPyBool_FromLong(uctx, v);
+    HPy res = HPyBool_FromBool(uctx, v);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 98, r0, r1, &_ts_start, &_ts_end);
     return res;

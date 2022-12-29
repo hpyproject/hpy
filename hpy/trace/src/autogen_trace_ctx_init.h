@@ -31,7 +31,7 @@ void *trace_ctx_Long_AsVoidPtr(HPyContext *tctx, HPy h);
 double trace_ctx_Long_AsDouble(HPyContext *tctx, HPy h);
 HPy trace_ctx_Float_FromDouble(HPyContext *tctx, double v);
 double trace_ctx_Float_AsDouble(HPyContext *tctx, HPy h);
-HPy trace_ctx_Bool_FromLong(HPyContext *tctx, int64_t v);
+HPy trace_ctx_Bool_FromBool(HPyContext *tctx, bool v);
 HPy_ssize_t trace_ctx_Length(HPyContext *tctx, HPy h);
 int trace_ctx_Number_Check(HPyContext *tctx, HPy h);
 HPy trace_ctx_Add(HPyContext *tctx, HPy h1, HPy h2);
@@ -300,7 +300,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_Long_AsDouble = &trace_ctx_Long_AsDouble;
     tctx->ctx_Float_FromDouble = &trace_ctx_Float_FromDouble;
     tctx->ctx_Float_AsDouble = &trace_ctx_Float_AsDouble;
-    tctx->ctx_Bool_FromLong = &trace_ctx_Bool_FromLong;
+    tctx->ctx_Bool_FromBool = &trace_ctx_Bool_FromBool;
     tctx->ctx_Length = &trace_ctx_Length;
     tctx->ctx_Number_Check = &trace_ctx_Number_Check;
     tctx->ctx_Add = &trace_ctx_Add;

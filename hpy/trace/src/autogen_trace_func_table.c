@@ -114,7 +114,7 @@ static const char *trace_func_table[] = {
     "ctx_Long_AsDouble",
     "ctx_Float_FromDouble",
     "ctx_Float_AsDouble",
-    "ctx_Bool_FromLong",
+    "ctx_Bool_FromBool",
     "ctx_Length",
     "ctx_Number_Check",
     "ctx_Add",

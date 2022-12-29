@@ -94,8 +94,8 @@ HPyAPI_FUNC double HPyFloat_AsDouble(HPyContext *ctx, HPy h) {
      return ctx->ctx_Float_AsDouble ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyBool_FromLong(HPyContext *ctx, int64_t v) {
-     return ctx->ctx_Bool_FromLong ( ctx, v ); 
+HPyAPI_FUNC HPy HPyBool_FromBool(HPyContext *ctx, bool v) {
+     return ctx->ctx_Bool_FromBool ( ctx, v ); 
 }
 
 HPyAPI_FUNC HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h) {

@@ -154,7 +154,7 @@ HPy_ID(97)
 double HPyFloat_AsDouble(HPyContext *ctx, HPy h);
 
 HPy_ID(98)
-HPy HPyBool_FromLong(HPyContext *ctx, int64_t v);
+HPy HPyBool_FromBool(HPyContext *ctx, bool v);
 
 
 /* abstract.h */

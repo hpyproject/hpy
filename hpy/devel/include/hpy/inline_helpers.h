@@ -125,4 +125,10 @@ HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h)
     return (unsigned long long) HPyLong_AsUInt64_tMask(ctx, h);
 }
 
+HPyAPI_FUNC HPy
+HPyBool_FromLong(HPyContext *ctx, long v)
+{
+    return HPyBool_FromBool(ctx, (v ? true : false));
+}
+
 #endif //HPY_INLINE_HELPERS_H

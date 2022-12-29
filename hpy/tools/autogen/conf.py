@@ -136,4 +136,5 @@ SPECIAL_CASES = {
     'HPyLong_AsInt64_t': None,
     'HPyLong_AsUInt64_t': None,
     'HPyLong_AsUInt64_tMask': None,
+    'HPyBool_FromBool': 'PyBool_FromLong',
 }
