@@ -271,6 +271,20 @@ void HPyErr_WriteUnraisable(HPyContext *ctx, HPy obj);
 /* object.h */
 HPy_ID(150)
 int HPy_IsTrue(HPyContext *ctx, HPy h);
+
+/**
+ * Create a type from a :c:struct:`HPyType_Spec` and an additional list of
+ * specification parameters.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param spec:
+ *     The type spec to use to create the type.
+ * :param params:
+ *     A 0-terminated list of type specification parameters or ``NULL``.
+ *
+ * :returns: a handle of the created type on success, ``HPy_NULL`` on failure.
+ */
 HPy_ID(151)
 HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec,
                      HPyType_SpecParam *params);
