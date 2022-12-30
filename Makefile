@@ -22,6 +22,7 @@ cppcheck-build-dir:
 cppcheck: cppcheck-build-dir
 	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
 	$(eval PYTHON_INC = $(shell python3 -q -c "from sysconfig import get_paths as gp; print(gp()['include'])"))
+	$(eval PYTHON_PLATINC = $(shell python3 -q -c "from sysconfig import get_paths as gp; print(gp()['platinclude'])"))
 	cppcheck --version
 	cppcheck \
 		-v \
@@ -31,9 +32,11 @@ cppcheck: cppcheck-build-dir
 		--enable=warning,performance,portability,information,missingInclude \
 		--inline-suppr \
 		--suppress=allocaCalled \
-		-I /usr/local/include \
-		-I /usr/include \
+		-I /usr/local/include/ \
+		-I /usr/include/ \
 		-I ${PYTHON_INC} \
+		-I ${PYTHON_PLATINC} \
+		-I . \
 		-I hpy/devel/include/ \
 		-I hpy/devel/include/hpy/ \
 		-I hpy/devel/include/hpy/cpython/ \
@@ -41,6 +44,9 @@ cppcheck: cppcheck-build-dir
 		-I hpy/devel/include/hpy/runtime/ \
 		-I hpy/universal/src/ \
 		-I hpy/debug/src/ \
+		-I hpy/debug/src/include \
+		-I hpy/trace/src/ \
+		-I hpy/trace/src/include \
 		--force \
 		-D NULL=0 \
 		-D HPY_ABI_CPYTHON \
