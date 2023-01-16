@@ -9,9 +9,9 @@
 
 
 _HPy_HIDDEN HPyTupleBuilder
-ctx_TupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)
+ctx_TupleBuilder_New(HPyContext *ctx, HPy_ssize_t size)
 {
-    PyObject *tup = PyTuple_New(initial_size);
+    PyObject *tup = PyTuple_New(size);
     if (tup == NULL) {
         PyErr_Clear();   /* delay the MemoryError */
         /* note: it's done this way so that the caller doesn't need to

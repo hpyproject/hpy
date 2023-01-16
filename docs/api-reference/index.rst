@@ -13,4 +13,5 @@ Some parts of the API are not included in this documentation yet.
    hpy-gil
    argument-parsing
    build-value
+   builder
    helpers

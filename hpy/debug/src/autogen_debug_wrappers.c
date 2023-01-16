@@ -667,9 +667,9 @@ cpy_PyObject *debug_ctx_AsPyObject(HPyContext *dctx, DHPy h)
     return HPy_AsPyObject(get_info(dctx)->uctx, DHPy_unwrap(dctx, h));
 }
 
-HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size)
+HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t size)
 {
-    return HPyListBuilder_New(get_info(dctx)->uctx, initial_size);
+    return HPyListBuilder_New(get_info(dctx)->uctx, size);
 }
 
 void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item)
@@ -687,9 +687,9 @@ void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder)
     HPyListBuilder_Cancel(get_info(dctx)->uctx, builder);
 }
 
-HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size)
+HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t size)
 {
-    return HPyTupleBuilder_New(get_info(dctx)->uctx, initial_size);
+    return HPyTupleBuilder_New(get_info(dctx)->uctx, size);
 }
 
 void debug_ctx_TupleBuilder_Set(HPyContext *dctx, HPyTupleBuilder builder, HPy_ssize_t index, DHPy h_item)

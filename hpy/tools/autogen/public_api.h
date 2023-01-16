@@ -472,23 +472,129 @@ void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx,
 
 /* Builders */
 
+/**
+ * Create a new list builder for ``size`` elements. The builder is then able to
+ * take at most ``size`` elements. This function does not raise any
+ * exception (even if running out of memory).
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param size:
+ *     The number of elements to hold.
+ */
 HPy_ID(210)
-HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size);
+HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t size);
+
+/**
+ * Assign an element to a certain index of the builder. Valid indices are in
+ * range ``0 <= index < size`` where ``size`` is the value passed to
+ * :c:func:`HPyListBuilder_New`. This function does not raise any exception.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param builder:
+ *     A list builder handle.
+ * :param index:
+ *     The index to assign the object to.
+ * :param h_item:
+ *     An HPy handle of the object to store or ``HPy_NULL``. Please note that
+ *     HPy **never** steals handles and so, ``h_item`` needs to be closed by
+ *     the caller.
+ */
 HPy_ID(211)
 void HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                         HPy_ssize_t index, HPy h_item);
+
+/**
+ * Builds a list from a list builder.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param builder:
+ *     A list builder handle.
+ *
+ * :returns:
+ *     An HPy handle to a list containing the values inserted with
+ *     :c:func:`HPyListBuilder_Set` or ``HPy_NULL`` in case an error occurred
+ *     during building or earlier when creating the builder or setting the
+ *     items.
+ */
 HPy_ID(212)
 HPy HPyListBuilder_Build(HPyContext *ctx, HPyListBuilder builder);
+
+/**
+ * Cancel building of a tuple and free any acquired resources.
+ * This function ignores if any error occurred previously when using the tuple
+ * builder.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param builder:
+ *     A tuple builder handle.
+ */
 HPy_ID(213)
 void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder);
 
+/**
+ * Create a new tuple builder for ``size`` elements. The builder is then able
+ * to take at most ``size`` elements. This function does not raise any
+ * exception (even if running out of memory).
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param size:
+ *     The number of elements to hold.
+ */
 HPy_ID(214)
-HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size);
+HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t size);
+
+/**
+ * Assign an element to a certain index of the builder. Valid indices are in
+ * range ``0 <= index < size`` where ``size`` is the value passed to
+ * :c:func:`HPyTupleBuilder_New`. This function does not raise * any exception.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param builder:
+ *     A tuple builder handle.
+ * :param index:
+ *     The index to assign the object to.
+ * :param h_item:
+ *     An HPy handle of the object to store or ``HPy_NULL``. Please note that
+ *     HPy **never** steals handles and so, ``h_item`` needs to be closed by
+ *     the caller.
+ */
 HPy_ID(215)
 void HPyTupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,
                          HPy_ssize_t index, HPy h_item);
+
+/**
+ * Builds a tuple from a tuple builder.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param builder:
+ *     A tuple builder handle.
+ *
+ * :returns:
+ *     An HPy handle to a tuple containing the values inserted with
+ *     :c:func:`HPyTupleBuilder_Set` or ``HPy_NULL`` in case an error occurred
+ *     during building or earlier when creating the builder or setting the
+ *     items.
+ */
 HPy_ID(216)
 HPy HPyTupleBuilder_Build(HPyContext *ctx, HPyTupleBuilder builder);
+
+/**
+ * Cancel building of a tuple and free any acquired resources.
+ * This function ignores if any error occurred previously when using the tuple
+ * builder.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param builder:
+ *     A tuple builder handle.
+ */
 HPy_ID(217)
 void HPyTupleBuilder_Cancel(HPyContext *ctx, HPyTupleBuilder builder);
 

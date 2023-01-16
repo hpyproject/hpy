@@ -155,11 +155,11 @@ int trace_ctx_Capsule_IsValid(HPyContext *tctx, HPy capsule, const char *utf8_na
 int trace_ctx_Capsule_Set(HPyContext *tctx, HPy capsule, _HPyCapsule_key key, void *value);
 HPy trace_ctx_FromPyObject(HPyContext *tctx, cpy_PyObject *obj);
 cpy_PyObject *trace_ctx_AsPyObject(HPyContext *tctx, HPy h);
-HPyListBuilder trace_ctx_ListBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size);
+HPyListBuilder trace_ctx_ListBuilder_New(HPyContext *tctx, HPy_ssize_t size);
 void trace_ctx_ListBuilder_Set(HPyContext *tctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item);
 HPy trace_ctx_ListBuilder_Build(HPyContext *tctx, HPyListBuilder builder);
 void trace_ctx_ListBuilder_Cancel(HPyContext *tctx, HPyListBuilder builder);
-HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size);
+HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t size);
 void trace_ctx_TupleBuilder_Set(HPyContext *tctx, HPyTupleBuilder builder, HPy_ssize_t index, HPy h_item);
 HPy trace_ctx_TupleBuilder_Build(HPyContext *tctx, HPyTupleBuilder builder);
 void trace_ctx_TupleBuilder_Cancel(HPyContext *tctx, HPyTupleBuilder builder);
