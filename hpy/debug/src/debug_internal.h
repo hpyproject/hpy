@@ -10,6 +10,32 @@
 
 #define HPY_DEBUG_MAGIC 0xDEB00FF
 
+/* === DHQueue === */
+
+/**
+ * This struct is meant to be embedded in the actual payload struct to avoid
+ * a separate allocation of the queue node.
+ */
+typedef struct _DHQueueNode_s {
+    struct _DHQueueNode_s *next;
+    struct _DHQueueNode_s *prev;
+    HPy_ssize_t size;
+} DHQueueNode;
+
+typedef struct {
+    DHQueueNode *head;
+    DHQueueNode *tail;
+    HPy_ssize_t size;
+} DHQueue;
+
+void DHQueue_init(DHQueue *q);
+void DHQueue_append(DHQueue *q, DHQueueNode *h);
+DHQueueNode *DHQueue_popfront(DHQueue *q);
+void DHQueue_remove(DHQueue *q, DHQueueNode *h);
+void DHQueue_sanity_check(DHQueue *q);
+
+/* === DHQueue === */
+
 /* The Debug context is a wrapper around an underlying context, which we will
    call Universal. Inside the debug mode we manipulate handles which belongs
    to both contexts, so to make things easier we create two typedefs to make
@@ -135,6 +161,7 @@ static inline void UHPy_sanity_check(UHPy uh) {
 // alternative implementation is to put special placeholders inside the list
 // to mark the creation of a new generation
 typedef struct DebugHandle {
+    DHQueueNode node;
     UHPy uh;
     long generation;
     bool is_closed:1;
@@ -145,8 +172,6 @@ typedef struct DebugHandle {
     // allocation_stacktrace information if available
     char *allocation_stacktrace;
     HPy_ssize_t associated_data_size;
-    struct DebugHandle *prev;
-    struct DebugHandle *next;
 } DebugHandle;
 
 static inline DebugHandle * as_DebugHandle(DHPy dh) {
@@ -174,20 +199,6 @@ static inline UHPy DHPy_unwrap(HPyContext *dctx, DHPy dh)
         DHPy_invalid_handle(dctx, dh);
     return handle->uh;
 }
-
-/* === DHQueue === */
-
-typedef struct {
-    DebugHandle *head;
-    DebugHandle *tail;
-    HPy_ssize_t size;
-} DHQueue;
-
-void DHQueue_init(DHQueue *q);
-void DHQueue_append(DHQueue *q, DebugHandle *h);
-DebugHandle *DHQueue_popfront(DHQueue *q);
-void DHQueue_remove(DHQueue *q, DebugHandle *h);
-void DHQueue_sanity_check(DHQueue *q);
 
 /* === HPyDebugInfo === */
 

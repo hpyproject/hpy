@@ -6,15 +6,15 @@ static void debug_handles_sanity_check(HPyDebugInfo *info)
 #ifndef NDEBUG
     DHQueue_sanity_check(&info->open_handles);
     DHQueue_sanity_check(&info->closed_handles);
-    DebugHandle *h = info->open_handles.head;
+    DebugHandle *h = (DebugHandle *)info->open_handles.head;
     while(h != NULL) {
         assert(!h->is_closed);
-        h = h->next;
+        h = (DebugHandle *)h->node.next;
     }
-    h = info->closed_handles.head;
+    h = (DebugHandle *)info->closed_handles.head;
     while(h != NULL) {
         assert(h->is_closed);
-        h = h->next;
+        h = (DebugHandle *)h->node.next;
     }
 #endif
 }
@@ -42,7 +42,7 @@ static DHPy _DHPy_open(HPyContext *dctx, UHPy uh, bool is_immortal)
     // malloc a new one
     DebugHandle *handle = NULL;
     if (info->closed_handles.size >= info->closed_handles_queue_max_size) {
-        handle = DHQueue_popfront(&info->closed_handles);
+        handle = (DebugHandle *)DHQueue_popfront(&info->closed_handles);
         DebugHandle_free_raw_data(info, handle, true);
         if (handle->allocation_stacktrace)
             free(handle->allocation_stacktrace);
@@ -65,7 +65,7 @@ static DHPy _DHPy_open(HPyContext *dctx, UHPy uh, bool is_immortal)
     handle->is_immortal = is_immortal;
     handle->associated_data = NULL;
     handle->associated_data_size = 0;
-    DHQueue_append(&info->open_handles, handle);
+    DHQueue_append(&info->open_handles, (DHQueueNode *)handle);
     debug_handles_sanity_check(info);
     return as_DHPy(handle);
 }
@@ -153,8 +153,8 @@ void DHPy_close(HPyContext *dctx, DHPy dh)
         DHPy_invalid_handle(dctx, dh);
 
     // move the handle from open_handles to closed_handles
-    DHQueue_remove(&info->open_handles, handle);
-    DHQueue_append(&info->closed_handles, handle);
+    DHQueue_remove(&info->open_handles, (DHQueueNode *)handle);
+    DHQueue_append(&info->closed_handles, (DHQueueNode *)handle);
     handle->is_closed = true;
     if (handle->associated_data) {
         // So far all implementations of raw_data_protect keep the physical
@@ -178,7 +178,7 @@ void DHPy_close(HPyContext *dctx, DHPy dh)
 
     if (info->closed_handles.size > info->closed_handles_queue_max_size) {
         // we have too many closed handles. Let's free the oldest one
-        DebugHandle *oldest = DHQueue_popfront(&info->closed_handles);
+        DebugHandle *oldest = (DebugHandle *)DHQueue_popfront(&info->closed_handles);
         DHPy_free(dctx, as_DHPy(oldest));
     }
     debug_handles_sanity_check(info);

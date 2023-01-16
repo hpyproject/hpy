@@ -38,8 +38,9 @@ static UHPy build_list_of_handles(HPyContext *uctx, UHPy u_self, DHQueue *q,
     if (HPy_IsNull(u_result))
         goto error;
 
-    DebugHandle *dh = q->head;
-    while(dh != NULL) {
+    DHQueueNode *node = q->head;
+    while(node != NULL) {
+        DebugHandle *dh = (DebugHandle *)node;
         if (dh->generation >= gen) {
             UHPy u_item = new_DebugHandleObj(uctx, u_DebugHandleType, dh);
             if (HPy_IsNull(u_item))
@@ -48,7 +49,7 @@ static UHPy build_list_of_handles(HPyContext *uctx, UHPy u_self, DHQueue *q,
                 goto error;
             HPy_Close(uctx, u_item);
         }
-        dh = dh->next;
+        node = node->next;
     }
 
     HPy_Close(uctx, u_DebugHandleType);
