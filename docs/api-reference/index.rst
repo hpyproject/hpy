@@ -24,7 +24,7 @@ Python interpreter.
    hpy-field
    hpy-global
    hpy-gil
-   argument-parsing
+   hpy-err
    builder
 
 
@@ -53,5 +53,7 @@ Inline Helper Functions
 Those functions are usually small convenience functions that everyone could
 write but in order to avoid duplicated effort, they are defined by HPy.
 
-.. autocmodule:: hpy/inline_helpers.h
-   :members:
+.. toctree::
+   :maxdepth: 2
+
+   inline-helpers

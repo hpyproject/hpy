@@ -245,9 +245,46 @@ HPy_ID(138)
 HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message);
 HPy_ID(139)
 HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
-/* note: the filename will be FS decoded */
+
+/**
+ * Similar to :c:func:`HPyErr_SetFromErrnoWithFilenameObjects` but takes just
+ * one filename (a C string) that will be decoded using
+ * :c:func:`HPyUnicode_DecodeFSDefault`.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h_type:
+ *     The exception type to raise.
+ * :param filename_fsencoded:
+ *     a filename; may be ``NULL``
+ *
+ * :return:
+ *     always returns ``HPy_NULL``
+ */
 HPy_ID(140)
 HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded);
+
+/**
+ * This is a convenience function to raise an exception when a C library
+ * function has returned an error and set the C variable ``errno``. It
+ * constructs an instance of the provided exception type ``h_type`` by calling
+ * ``h_type(errno, strerror(errno), filename1, 0, filename2)``. The exception
+ * instance is then raised.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h_type:
+ *     The exception type to raise.
+ * :param filename1:
+ *     A filename; may be ``HPy_NULL``. In the case of ``h_type`` is the
+ *     ``OSError`` exception, this is used to define the filename attribute of
+ *     the exception instance.
+ * :param filename2:
+ *     another filename argument; may be ``HPy_NULL``
+ *
+ * :return:
+ *     always returns ``HPy_NULL``
+ */
 HPy_ID(141)
 HPy HPyErr_SetFromErrnoWithFilenameObjects(HPyContext *ctx, HPy h_type, HPy filename1, HPy filename2);
 /* note: HPyErr_Occurred() returns a flag 0-or-1, instead of a 'PyObject *' */
