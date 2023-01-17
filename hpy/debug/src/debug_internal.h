@@ -130,6 +130,25 @@ void DHQueue_sanity_check(DHQueue *q);
 
 typedef HPy UHPy;
 typedef HPy DHPy;
+typedef HPyTupleBuilder UHPyTupleBuilder;
+typedef HPyTupleBuilder DHPyTupleBuilder;
+typedef HPyListBuilder UHPyListBuilder;
+typedef HPyListBuilder DHPyListBuilder;
+
+#define DHPyTupleBuilder_IsNull(h) ((h)._tup == 0)
+#define DHPyListBuilder_IsNull(h) ((h)._lst == 0)
+
+#if defined(_MSC_VER) && defined(__cplusplus) // MSVC C4576
+#  define UHPyListBuilder_NULL {0}
+#  define UHPyTupleBuilder_NULL {0}
+#  define DHPyListBuilder_NULL UHPyListBuilder_NULL
+#  define DHPyTupleBuilder_NULL UHPyTupleBuilder_NULL
+#else
+#  define UHPyListBuilder_NULL ((UHPyListBuilder){0})
+#  define UHPyTupleBuilder_NULL ((UHPyTupleBuilder){0})
+#  define DHPyListBuilder_NULL ((DHPyListBuilder){0})
+#  define DHPyTupleBuilder_NULL ((DHPyTupleBuilder){0})
+#endif
 
 /* Under CPython:
      - UHPy always end with 1 (see hpy.universal's _py2h and _h2py)
@@ -174,6 +193,20 @@ typedef struct DebugHandle {
     HPy_ssize_t associated_data_size;
 } DebugHandle;
 
+/** A debug handle for a tuple or list builder. */
+typedef struct DebugBuilderHandle {
+    DHQueueNode node;
+    union {
+        UHPyTupleBuilder tuple_builder;
+        UHPyListBuilder list_builder;
+    } uh;
+
+    /**
+     * ``true`` if the builder was consumed by the build function or cancelled.
+     */
+    bool is_closed:1;
+} DebugBuilderHandle;
+
 static inline DebugHandle * as_DebugHandle(DHPy dh) {
     DHPy_sanity_check(dh);
     return (DebugHandle *)dh._i;
@@ -183,12 +216,36 @@ static inline DHPy as_DHPy(DebugHandle *handle) {
     return (DHPy){(HPy_ssize_t)handle};
 }
 
+static inline DebugBuilderHandle * DHPyTupleBuilder_as_DebugBuilderHandle(DHPyTupleBuilder dh) {
+    if (DHPyTupleBuilder_IsNull(dh))
+        return NULL;
+    return (DebugBuilderHandle *)dh._tup;
+}
+
+static inline DHPyTupleBuilder as_DHPyTupleBuilder(DebugBuilderHandle *handle) {
+    return (DHPyTupleBuilder){(HPy_ssize_t)handle};
+}
+
+static inline DebugBuilderHandle * DHPyListBuilder_as_DebugBuilderHandle(DHPyListBuilder dh) {
+    if (DHPyListBuilder_IsNull(dh))
+        return NULL;
+    return (DebugBuilderHandle *)dh._lst;
+}
+
+static inline DHPyListBuilder as_DHPyListBuilder(DebugBuilderHandle *handle) {
+    return (DHPyListBuilder){(HPy_ssize_t)handle};
+}
+
 DHPy DHPy_open(HPyContext *dctx, UHPy uh);
 DHPy DHPy_open_immortal(HPyContext *dctx, UHPy uh);
 void DHPy_close(HPyContext *dctx, DHPy dh);
 void DHPy_close_and_check(HPyContext *dctx, DHPy dh);
 void DHPy_free(HPyContext *dctx, DHPy dh);
 void DHPy_invalid_handle(HPyContext *dctx, DHPy dh);
+DHPyTupleBuilder DHPyTupleBuilder_open(HPyContext *dctx, UHPyTupleBuilder uh);
+DHPyListBuilder DHPyListBuilder_open(HPyContext *dctx, UHPyListBuilder uh);
+void DHPy_invalid_builder_handle(HPyContext *dctx);
+void DHPy_builder_handle_close(HPyContext *dctx, DebugBuilderHandle *handle);
 
 static inline UHPy DHPy_unwrap(HPyContext *dctx, DHPy dh)
 {
@@ -199,6 +256,22 @@ static inline UHPy DHPy_unwrap(HPyContext *dctx, DHPy dh)
         DHPy_invalid_handle(dctx, dh);
     return handle->uh;
 }
+
+#define BUILDER_UNWRAP(TYPE, ACCESS) \
+    static inline U##TYPE D##TYPE##_unwrap(HPyContext *dctx, D##TYPE dh) \
+    { \
+        DebugBuilderHandle *handle = D##TYPE##_as_DebugBuilderHandle(dh); \
+        if (handle == NULL) \
+            return U##TYPE##_NULL; \
+        if (handle->is_closed) { \
+            DHPy_invalid_builder_handle(dctx); \
+            return U##TYPE##_NULL; \
+        } \
+        return handle->uh.ACCESS; \
+    }
+
+BUILDER_UNWRAP(HPyTupleBuilder, tuple_builder)
+BUILDER_UNWRAP(HPyListBuilder, list_builder)
 
 /* === HPyDebugInfo === */
 
@@ -220,6 +293,7 @@ typedef struct {
     // Alternative is to put it into a module state or to put it into HPyGlobal
     // once those features are implemented
     UHPy uh_on_invalid_handle;
+    UHPy uh_on_invalid_builder_handle;
     HPy_ssize_t closed_handles_queue_max_size; // configurable by the user
     HPy_ssize_t protected_raw_data_max_size;
     HPy_ssize_t protected_raw_data_size;
@@ -228,6 +302,7 @@ typedef struct {
     HPy_ssize_t handle_alloc_stacktrace_limit;
     DHQueue open_handles;
     DHQueue closed_handles;
+    DHQueue closed_builder;
 } HPyDebugInfo;
 
 static inline HPyDebugInfo *get_info(HPyContext *dctx)
