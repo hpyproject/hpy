@@ -489,18 +489,24 @@ class HPyDebugCapture:
     """
     def __init__(self):
         self.invalid_handles_count = 0
+        self.invalid_builders_count = 0
 
     def _capture_report(self):
         self.invalid_handles_count += 1
 
+    def _capture_builder_report(self):
+        self.invalid_builders_count += 1
+
     def __enter__(self):
         from hpy.universal import _debug
         _debug.set_on_invalid_handle(self._capture_report)
+        _debug.set_on_invalid_builder_handle(self._capture_builder_report)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         from hpy.universal import _debug
         _debug.set_on_invalid_handle(None)
+        _debug.set_on_invalid_builder_handle(None)
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
