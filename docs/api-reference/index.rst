@@ -15,11 +15,13 @@ Core API
 --------
 
 The **Core API** consists of inline functions that immediately call into the
-Python interpreter.
+Python interpreter. Those functions will be implemented by each Python
+interpreter.
 
 .. toctree::
    :maxdepth: 2
 
+   function-index
    hpy-type
    hpy-field
    hpy-global
