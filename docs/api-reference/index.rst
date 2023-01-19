@@ -1,9 +1,9 @@
 API Reference
 ============= 
 
-HPy's public API consists of three parts: 
+HPy's public API consists of three parts:
 
-1. The **Core API** as defined in file ``public_api.h`` 
+1. The **Core API** as defined in file ``public_api.h``
 2. **HPy Helper** functions 
 3. **Inline Helper** functions
 
@@ -22,6 +22,7 @@ interpreter.
    :maxdepth: 2
 
    function-index
+   hpy-ctx
    hpy-type
    hpy-field
    hpy-global
