@@ -95,4 +95,16 @@ _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
                                                           HPy h_type);
 
 
+// ctx_long.c
+_HPy_HIDDEN HPy ctx_Long_FromInt32_t(HPyContext *ctx, int32_t value);
+_HPy_HIDDEN HPy ctx_Long_FromUInt32_t(HPyContext *ctx, uint32_t value);
+_HPy_HIDDEN HPy ctx_Long_FromInt64_t(HPyContext *ctx, int64_t v);
+_HPy_HIDDEN HPy ctx_Long_FromUInt64_t(HPyContext *ctx, uint64_t v);
+_HPy_HIDDEN int32_t ctx_Long_AsInt32_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint32_t ctx_Long_AsUInt32_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint32_t ctx_Long_AsUInt32_tMask(HPyContext *ctx, HPy h);
+_HPy_HIDDEN int64_t ctx_Long_AsInt64_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint64_t ctx_Long_AsUInt64_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint64_t ctx_Long_AsUInt64_tMask(HPyContext *ctx, HPy h);
+
 #endif /* HPY_RUNTIME_CTX_FUNCS_H */

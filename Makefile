@@ -32,6 +32,7 @@ cppcheck: cppcheck-build-dir
 		--inline-suppr \
 		--suppress=allocaCalled \
 		-I /usr/local/include \
+		-I /usr/include \
 		-I ${PYTHON_INC} \
 		-I hpy/devel/include/ \
 		-I hpy/devel/include/hpy/ \

@@ -22,20 +22,20 @@ HPyAPI_FUNC void HPy_Close(HPyContext *ctx, HPy h) {
      ctx->ctx_Close ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromLong(HPyContext *ctx, long value) {
-     return ctx->ctx_Long_FromLong ( ctx, value ); 
+HPyAPI_FUNC HPy HPyLong_FromInt32_t(HPyContext *ctx, int32_t value) {
+     return ctx->ctx_Long_FromInt32_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUnsignedLong(HPyContext *ctx, unsigned long value) {
-     return ctx->ctx_Long_FromUnsignedLong ( ctx, value ); 
+HPyAPI_FUNC HPy HPyLong_FromUInt32_t(HPyContext *ctx, uint32_t value) {
+     return ctx->ctx_Long_FromUInt32_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromLongLong(HPyContext *ctx, long long v) {
-     return ctx->ctx_Long_FromLongLong ( ctx, v ); 
+HPyAPI_FUNC HPy HPyLong_FromInt64_t(HPyContext *ctx, int64_t v) {
+     return ctx->ctx_Long_FromInt64_t ( ctx, v ); 
 }
 
-HPyAPI_FUNC HPy HPyLong_FromUnsignedLongLong(HPyContext *ctx, unsigned long long v) {
-     return ctx->ctx_Long_FromUnsignedLongLong ( ctx, v ); 
+HPyAPI_FUNC HPy HPyLong_FromUInt64_t(HPyContext *ctx, uint64_t v) {
+     return ctx->ctx_Long_FromUInt64_t ( ctx, v ); 
 }
 
 HPyAPI_FUNC HPy HPyLong_FromSize_t(HPyContext *ctx, size_t value) {
@@ -46,28 +46,28 @@ HPyAPI_FUNC HPy HPyLong_FromSsize_t(HPyContext *ctx, HPy_ssize_t value) {
      return ctx->ctx_Long_FromSsize_t ( ctx, value ); 
 }
 
-HPyAPI_FUNC long HPyLong_AsLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsLong ( ctx, h ); 
+HPyAPI_FUNC int32_t HPyLong_AsInt32_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsInt32_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long HPyLong_AsUnsignedLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLong ( ctx, h ); 
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt32_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long HPyLong_AsUnsignedLongMask(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLongMask ( ctx, h ); 
+HPyAPI_FUNC uint32_t HPyLong_AsUInt32_tMask(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt32_tMask ( ctx, h ); 
 }
 
-HPyAPI_FUNC long long HPyLong_AsLongLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsLongLong ( ctx, h ); 
+HPyAPI_FUNC int64_t HPyLong_AsInt64_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsInt64_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long long HPyLong_AsUnsignedLongLong(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLongLong ( ctx, h ); 
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64_t(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt64_t ( ctx, h ); 
 }
 
-HPyAPI_FUNC unsigned long long HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h) {
-     return ctx->ctx_Long_AsUnsignedLongLongMask ( ctx, h ); 
+HPyAPI_FUNC uint64_t HPyLong_AsUInt64_tMask(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Long_AsUInt64_tMask ( ctx, h ); 
 }
 
 HPyAPI_FUNC size_t HPyLong_AsSize_t(HPyContext *ctx, HPy h) {
@@ -94,8 +94,8 @@ HPyAPI_FUNC double HPyFloat_AsDouble(HPyContext *ctx, HPy h) {
      return ctx->ctx_Float_AsDouble ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyBool_FromLong(HPyContext *ctx, long v) {
-     return ctx->ctx_Bool_FromLong ( ctx, v ); 
+HPyAPI_FUNC HPy HPyBool_FromBool(HPyContext *ctx, bool v) {
+     return ctx->ctx_Bool_FromBool ( ctx, v ); 
 }
 
 HPyAPI_FUNC HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h) {
@@ -250,8 +250,8 @@ HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy k
      return ctx->ctx_CallTupleDict ( ctx, callable, args, kw ); 
 }
 
-HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *message) {
-     ctx->ctx_Err_SetString ( ctx, h_type, message ); return HPy_NULL; 
+HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message) {
+     ctx->ctx_Err_SetString ( ctx, h_type, utf8_message ); return HPy_NULL; 
 }
 
 HPyAPI_FUNC HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value) {
@@ -282,16 +282,16 @@ HPyAPI_FUNC void HPyErr_Clear(HPyContext *ctx) {
      ctx->ctx_Err_Clear ( ctx ); 
 }
 
-HPyAPI_FUNC HPy HPyErr_NewException(HPyContext *ctx, const char *name, HPy base, HPy dict) {
-     return ctx->ctx_Err_NewException ( ctx, name, base, dict ); 
+HPyAPI_FUNC HPy HPyErr_NewException(HPyContext *ctx, const char *utf8_name, HPy base, HPy dict) {
+     return ctx->ctx_Err_NewException ( ctx, utf8_name, base, dict ); 
 }
 
-HPyAPI_FUNC HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *name, const char *doc, HPy base, HPy dict) {
-     return ctx->ctx_Err_NewExceptionWithDoc ( ctx, name, doc, base, dict ); 
+HPyAPI_FUNC HPy HPyErr_NewExceptionWithDoc(HPyContext *ctx, const char *utf8_name, const char *utf8_doc, HPy base, HPy dict) {
+     return ctx->ctx_Err_NewExceptionWithDoc ( ctx, utf8_name, utf8_doc, base, dict ); 
 }
 
-HPyAPI_FUNC int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *message, HPy_ssize_t stack_level) {
-     return ctx->ctx_Err_WarnEx ( ctx, category, message, stack_level ); 
+HPyAPI_FUNC int HPyErr_WarnEx(HPyContext *ctx, HPy category, const char *utf8_message, HPy_ssize_t stack_level) {
+     return ctx->ctx_Err_WarnEx ( ctx, category, utf8_message, stack_level ); 
 }
 
 HPyAPI_FUNC void HPyErr_WriteUnraisable(HPyContext *ctx, HPy obj) {
@@ -314,24 +314,24 @@ HPyAPI_FUNC HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name) {
      return ctx->ctx_GetAttr ( ctx, obj, name ); 
 }
 
-HPyAPI_FUNC HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
-     return ctx->ctx_GetAttr_s ( ctx, obj, name ); 
+HPyAPI_FUNC HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name) {
+     return ctx->ctx_GetAttr_s ( ctx, obj, utf8_name ); 
 }
 
 HPyAPI_FUNC int HPy_HasAttr(HPyContext *ctx, HPy obj, HPy name) {
      return ctx->ctx_HasAttr ( ctx, obj, name ); 
 }
 
-HPyAPI_FUNC int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *name) {
-     return ctx->ctx_HasAttr_s ( ctx, obj, name ); 
+HPyAPI_FUNC int HPy_HasAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name) {
+     return ctx->ctx_HasAttr_s ( ctx, obj, utf8_name ); 
 }
 
 HPyAPI_FUNC int HPy_SetAttr(HPyContext *ctx, HPy obj, HPy name, HPy value) {
      return ctx->ctx_SetAttr ( ctx, obj, name, value ); 
 }
 
-HPyAPI_FUNC int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *name, HPy value) {
-     return ctx->ctx_SetAttr_s ( ctx, obj, name, value ); 
+HPyAPI_FUNC int HPy_SetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name, HPy value) {
+     return ctx->ctx_SetAttr_s ( ctx, obj, utf8_name, value ); 
 }
 
 HPyAPI_FUNC HPy HPy_GetItem(HPyContext *ctx, HPy obj, HPy key) {
@@ -342,8 +342,8 @@ HPyAPI_FUNC HPy HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
      return ctx->ctx_GetItem_i ( ctx, obj, idx ); 
 }
 
-HPyAPI_FUNC HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *key) {
-     return ctx->ctx_GetItem_s ( ctx, obj, key ); 
+HPyAPI_FUNC HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key) {
+     return ctx->ctx_GetItem_s ( ctx, obj, utf8_key ); 
 }
 
 HPyAPI_FUNC int HPy_Contains(HPyContext *ctx, HPy container, HPy key) {
@@ -358,8 +358,8 @@ HPyAPI_FUNC int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy val
      return ctx->ctx_SetItem_i ( ctx, obj, idx, value ); 
 }
 
-HPyAPI_FUNC int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *key, HPy value) {
-     return ctx->ctx_SetItem_s ( ctx, obj, key, value ); 
+HPyAPI_FUNC int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key, HPy value) {
+     return ctx->ctx_SetItem_s ( ctx, obj, utf8_key, value ); 
 }
 
 HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key) {
@@ -370,8 +370,8 @@ HPyAPI_FUNC int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
      return ctx->ctx_DelItem_i ( ctx, obj, idx ); 
 }
 
-HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *key) {
-     return ctx->ctx_DelItem_s ( ctx, obj, key ); 
+HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key) {
+     return ctx->ctx_DelItem_s ( ctx, obj, utf8_key ); 
 }
 
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {
@@ -470,12 +470,12 @@ HPyAPI_FUNC const char *HPyBytes_AS_STRING(HPyContext *ctx, HPy h) {
      return ctx->ctx_Bytes_AS_STRING ( ctx, h ); 
 }
 
-HPyAPI_FUNC HPy HPyBytes_FromString(HPyContext *ctx, const char *v) {
-     return ctx->ctx_Bytes_FromString ( ctx, v ); 
+HPyAPI_FUNC HPy HPyBytes_FromString(HPyContext *ctx, const char *bytes) {
+     return ctx->ctx_Bytes_FromString ( ctx, bytes ); 
 }
 
-HPyAPI_FUNC HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_ssize_t len) {
-     return ctx->ctx_Bytes_FromStringAndSize ( ctx, v, len ); 
+HPyAPI_FUNC HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *bytes, HPy_ssize_t len) {
+     return ctx->ctx_Bytes_FromStringAndSize ( ctx, bytes, len ); 
 }
 
 HPyAPI_FUNC HPy HPyUnicode_FromString(HPyContext *ctx, const char *utf8) {
@@ -522,12 +522,12 @@ HPyAPI_FUNC HPy_UCS4 HPyUnicode_ReadChar(HPyContext *ctx, HPy h, HPy_ssize_t ind
      return ctx->ctx_Unicode_ReadChar ( ctx, h, index ); 
 }
 
-HPyAPI_FUNC HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors) {
-     return ctx->ctx_Unicode_DecodeASCII ( ctx, s, size, errors ); 
+HPyAPI_FUNC HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors) {
+     return ctx->ctx_Unicode_DecodeASCII ( ctx, ascii, size, errors ); 
 }
 
-HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *s, HPy_ssize_t size, const char *errors) {
-     return ctx->ctx_Unicode_DecodeLatin1 ( ctx, s, size, errors ); 
+HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors) {
+     return ctx->ctx_Unicode_DecodeLatin1 ( ctx, latin1, size, errors ); 
 }
 
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
@@ -558,20 +558,20 @@ HPyAPI_FUNC HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n) 
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }
 
-HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *name) {
-     return ctx->ctx_Import_ImportModule ( ctx, name ); 
+HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *utf8_name) {
+     return ctx->ctx_Import_ImportModule ( ctx, utf8_name ); 
 }
 
-HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor) {
-     return ctx->ctx_Capsule_New ( ctx, pointer, name, destructor ); 
+HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *utf8_name, HPyCapsule_Destructor *destructor) {
+     return ctx->ctx_Capsule_New ( ctx, pointer, utf8_name, destructor ); 
 }
 
-HPyAPI_FUNC void *HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *name) {
-     return ctx->ctx_Capsule_Get ( ctx, capsule, key, name ); 
+HPyAPI_FUNC void *HPyCapsule_Get(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *utf8_name) {
+     return ctx->ctx_Capsule_Get ( ctx, capsule, key, utf8_name ); 
 }
 
-HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *name) {
-     return ctx->ctx_Capsule_IsValid ( ctx, capsule, name ); 
+HPyAPI_FUNC int HPyCapsule_IsValid(HPyContext *ctx, HPy capsule, const char *utf8_name) {
+     return ctx->ctx_Capsule_IsValid ( ctx, capsule, utf8_name ); 
 }
 
 HPyAPI_FUNC int HPyCapsule_Set(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value) {
