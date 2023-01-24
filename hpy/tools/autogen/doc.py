@@ -1,6 +1,6 @@
-from .autogenfile import AutoGenFile
 import textwrap
 
+from .autogenfile import AutoGenFile
 from .parse import toC
 from .ctx import autogen_ctx_h
 
@@ -39,6 +39,28 @@ class autogen_function_index(AutoGenRstFile):
         for func in self.api.functions:
             if func.name[0] != '_':
                 w(f'* :c:func:`{func.name}`')
+        return '\n'.join(lines)
+
+
+class autogen_doc_api_mapping(AutoGenFile):
+    PATH = 'hpy/tools/autogen/api_mapping.txt'
+    LANGUAGE = 'txt'
+
+    def generate(self):
+        lines = []
+        w = lines.append
+        max_width = 0
+        rows = []
+        for func in self.api.functions:
+            if not func.cpython_name:
+                continue
+            col0 = f'``{func.cpython_name}``'
+            col1 = f':c:func:`{func.name}`'
+            rows.append((col0, col1))
+            max_width = max(max_width, len(col1), len(col1))
+
+        for row in rows:
+            w(f'{row[0].ljust(max_width)} {row[1]}')
         return '\n'.join(lines)
 
 
