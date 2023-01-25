@@ -14,9 +14,12 @@ HPy's public API consists of three parts:
 Core API
 --------
 
-The **Core API** consists of inline functions that immediately call into the
-Python interpreter. Those functions will be implemented by each Python
-interpreter.
+The **Core API** consists of inline functions that call into the Python
+interpreter. Those functions will be implemented by each Python interpreter. In
+:term:`CPython ABI` mode, many of these inline functions will just delegate to
+a C API functions. In :term:`HPy Universal ABI` mode, they will call a function
+pointer from the HPy context. This is the source of the performance change
+between the modes.
 
 .. toctree::
    :maxdepth: 2
