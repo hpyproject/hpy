@@ -69,19 +69,19 @@ Back to ``HPy`` vs ``HPyField`` vs ``HPyGlobal``:
     subinterpreter support will not require rebuilding of the extension (in HPy
     universal mode), nor rebuilding of CPython.
 
-.. note:: If you write a custom type having ``HPyField`` s, you **MUST** also
-    write a ``tp_traverse`` slot. Note that this is different than the old
-    ``Python.h`` API, where you need ``tp_traverse`` only under certain
-    conditions. See the next section for more details.
+.. note:: If you write a custom type using ``HPyField``, you **MUST** also write
+   a ``tp_traverse`` slot. Note that this is different than the old ``Python.h``
+   API, where you need ``tp_traverse`` only under certain conditions. See the
+   next section for more details.
 
-.. note:: The contract of ``tp_traverse`` is that it must visit all the
-    ``HPyFields`` contained within given struct, or more precisely *owned* by
-    given Python object (in the sense of the *owner* argument to
-    ``HPyField_Store``), and nothing more, nothing less. Some Python
-    implementations may choose to not call the provided ``tp_traverse`` if they
-    know how to visit all the ``HPyFields`` by other means (for example, when
-    they track them internally already). The debug mode will check this
-    contract.
+.. note:: The contract of ``tp_traverse`` is that it must visit all members of
+   type ``HPyField`` contained within given struct, or more precisely *owned* by
+   given Python object (in the sense of the *owner* argument to
+   ``HPyField_Store``), and nothing more, nothing less. Some Python
+   implementations may choose to not call the provided ``tp_traverse`` if they
+   know how to visit all members of type ``HPyField`` by other means (for
+   example, when they track them internally already). The debug mode will check
+   this contract.
 
 ``tp_traverse``, ``tp_clear``, ``Py_TPFLAGS_HAVE_GC``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -137,15 +137,17 @@ system.
 In particular, when running on top of CPython, HPy will automatically provide
 a ``tp_dealloc`` which decrefs all the fields listed by ``tp_traverse``.
 
+See also, :ref:`dealloc`.
 
-Direct C API to HPy Mappings
+
+Direct C API to HPy mappings
 ----------------------------
 
 In many cases, migrating to HPy is as easy as just replacing a certain C API
-function by the appropriate HPy API function. The table :ref:`table-mapping` a
-mapping between C API and HPy API functions. You can just apply this mapping
-without being cautious because this is a generated mapping which HPy also uses
-internally in the :term:`CPython ABI` mode.
+function by the appropriate HPy API function. Table :ref:`table-mapping` gives a
+mapping between C API and HPy API functions. This mapping is generated together
+with the code for the :term:`CPython ABI` mode, so it is correct.
+
 
 ..  _table-mapping:
 
@@ -278,11 +280,11 @@ that :c:func:`HPy_Dup` gives you a *new handle* to the same object which means
 that the two handles may be different if comparing them with ``memcmp`` but
 still reference the same object. As a consequence, you may close a handle only
 once, i.e., you cannot call :c:func:`HPy_Close` twice on the same ``HPy``
-handle. For examples, see also sections :ref:`api:handles` and :ref:`api:handles
-vs ``pyobject *```
+handle, even if returned from ``HPy_Dup``. For examples, see also sections
+:ref:`api:handles` and :ref:`api:handles vs ``pyobject *```
 
-Call Functions ``PyObject_Call`` and ``PyObject_CallObject``
-------------------------------------------------------------
+Calling functions ``PyObject_Call`` and ``PyObject_CallObject``
+---------------------------------------------------------------
 
 Both ``PyObject_Call`` and ``PyObject_CallObject`` are replaced by
 ``HPy_CallTupleDict(callable, args, kwargs)`` in which either or both of
@@ -309,7 +311,10 @@ PyModule_AddObject
 is no ``HPyModule_AddObject`` function because it has an unusual refcount
 behavior (stealing a reference but only when it returns ``0``).
 
-Deallocator Slot ``Py_tp_dealloc``
+
+.. _dealloc:
+
+Deallocator slot ``Py_tp_dealloc``
 ----------------------------------
 
 ``Py_tp_dealloc`` essentially becomes ``HPy_tp_destroy``. The name intentionally
@@ -324,24 +329,24 @@ The two major restrictions apply to the slot function of ``HPy_tp_destroy``:
 2. The function **must not** call into the interpreter.
 
 The idea is, that ``HPy_tp_destroy`` just releases native resources (e.g. by
-using C lib's ``free`` function). Therefore, it does only receive a pointer to
-the object's native data (and not a handle to the object) and it does not
-receive an ``HPyContext`` pointer argument.
+using C lib's ``free`` function). Therefore, it only receives a pointer to the
+object's native data (and not a handle to the object) and it does not receive an
+``HPyContext`` pointer argument.
 
 For the time being, HPy will support the ``HPy_tp_finalize`` slot where those
 tight restrictions do not apply at the (significant) cost of performance.
 
-Special Slots ``Py_tp_methods``, ``Py_tp_members``, and ``Py_tp_getset``
+Special slots ``Py_tp_methods``, ``Py_tp_members``, and ``Py_tp_getset``
 ------------------------------------------------------------------------
 
-There is not direct replacement for C API slots ``Py_tp_methods``,
+There is no direct replacement for C API slots ``Py_tp_methods``,
 ``Py_tp_members``, and ``Py_tp_getset`` because they are no longer needed.
 Methods, members, and get/set descriptors are specified *flatly* together with
 the other slots, using the standard mechanisms of :c:macro:`HPyDef_METH`,
 :c:macro:`HPyDef_MEMBER`, and :c:macro:`HPyDef_GETSET`. The resulting ``HPyDef``
 structures are then accumulated in :c:member:`HPyType_Spec.defines`.
 
-Creating Lists and Tuples
+Creating lists and tuples
 -------------------------
 
 The C API way of creating lists and tuples is to create an empty list or tuple
