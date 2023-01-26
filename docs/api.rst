@@ -315,10 +315,10 @@ More Examples
 -------------
 
 HPy usually has tests for each API function. This means that there is lots of
-examples available by looking at the tests. However, the test source is often
-generated and hard to read. To overcome this problem it is possible to dump the
-generated test sources. Since the HPy test are not shipped by default, you need
-to clone the HPy repository from GitHub:
+examples available by looking at the tests. However, the test source uses
+many macros and is hard to read. To overcome this we supply a utility to
+export clean C sources for the tests. Since the HPy tests are not shipped by
+default, you need to clone the HPy repository from GitHub:
 
 .. code-block:: console
 
@@ -332,7 +332,8 @@ After that, install all test requirements and dump the sources:
     > python3 -m pip install pytest filelock
     > python3 -m pytest --dump-dir=test_sources test/
 
-This will dump the generated test sources into folder ``test_sources``.
+This will dump the generated test sources into folder ``test_sources``. Note,
+that the tests won't be executed but skipped with an appropriate message.
 
 Creating types in HPy
 ---------------------
@@ -354,30 +355,28 @@ in a C-level structure. As an example, we will create a simple C structure
   :start-after: // BEGIN: PointObject
   :end-before: // END: PointObject
 
-The macro call ``HPyType_HELPERS(PointObject)`` is of particular interest. This
-macro generates useful helper facilities for working with the type. By the time
-of writing this documentation, it generates a C enum ``PointObject_SHAPE`` and a
-helper function ``PointObject_AsStruct``. The enum is meant to be used in the
-type specification. The helper function is intended to be used for efficiently
+The macro call ``HPyType_HELPERS(PointObject)`` generates useful helper
+facilities for working with the type. It generates a C enum
+``PointObject_SHAPE`` and a helper function ``PointObject_AsStruct``. The enum
+is used in the type specification. The helper function is used to efficiently
 retrieving the pointer ``PointObject *`` from an HPy handle to be able to access
-the C structure. We will use this helper function in the following to implement
-the methods, get-set descriptors, and slots.
+the C structure. We will use this helper function to implement the methods,
+get-set descriptors, and slots.
 
 It makes sense to expose fields ``PointObject.x`` and ``PointObject.y`` as
 Python-level members. To do so, we need to define members by specifying their
-name, type, and location using HPy's convenience macro ``HPyDef_MEMBER`` as the
-following example shows:
+name, type, and location using HPy's convenience macro ``HPyDef_MEMBER``:
 
 .. literalinclude:: examples/hpytype-example/simple_type.c
   :start-after: // BEGIN: members
   :end-before: // END: members
 
 The first argument of the macro is the name for the C glabal variable that will
-store the necessary information. We will need that later for registration at
-the type. The second, third, and fourth argument are the Python-level name, the
+store the necessary information. We will need that later for registration of
+the type. The second, third, and fourth arguments are the Python-level name, the
 C type of the member, and the offset in the C structure, respectively.
 
-Similarly, methods and get-set descriptors can be define. For example, method
+Similarly, methods and get-set descriptors can be defined. For example, method
 ``foo`` is an instance method that takes no arguments (the self argument is, of
 course, implicit), does some computation with fields ``x`` and ``y`` and
 returns a Python ``int``:
@@ -387,14 +386,15 @@ returns a Python ``int``:
   :end-before: // END: methods
 
 Get-set descriptors are also defined in a very similar way as methods. The
-following example defines a get-set descriptor for attribute ``z``.
+following example defines a get-set descriptor for attribute ``z`` which is
+calculated from the ``x`` and ``y`` fields of the struct.
 
 .. literalinclude:: examples/hpytype-example/simple_type.c
   :start-after: // BEGIN: getset
   :end-before: // END: getset
 
-It is also possible to just define a get-descriptor or just a set-descriptor by
-using HPy's macros ``HPyDef_GET`` and ``HPyDef_SET`` in the same way.
+It is also possible to define a get-descriptor or a set-descriptor by using
+HPy's macros ``HPyDef_GET`` and ``HPyDef_SET`` in the same way.
 
 HPy also supports type slots. In this example, we will define slot
 ``HPy_tp_new`` (which corresponds to magic method ``__new__``) to initialize
@@ -411,7 +411,7 @@ we are able to eventually register them to the type:
   :start-after: // BEGIN: defines
   :end-before: // END: defines
 
-Please note that it is strictly necessary to terminate the list with ``NULL``.
+Please note that it is required to terminate the list with ``NULL``.
 We can now create the actual type specification by appropriately filling an
 ``HPyType_Spec`` structure:
 
@@ -420,13 +420,12 @@ We can now create the actual type specification by appropriately filling an
   :end-before: // END: spec
 
 First, we need to define the name of the type by setting a C string to member
-``name``. Since this type has a C structure, we need to define the
-``basicsize`` and best practice is to just set it to ``sizeof(PointObject)``.
-Also best practice is to set ``builtin_shape`` to ``PointObject_SHAPE`` where
-``PointObject_SHAPE`` is generated by the previous usage of macro
-``HPyType_HELPERS(PointObject)``. Last but not least, we need to register the
-defines by setting field ``defines`` to the previously defined array
-``Point_defines``.
+``name``. Since this type has a C structure, we need to define the ``basicsize``
+and best practice is to set it to ``sizeof(PointObject)``. Also best practice is
+to set ``builtin_shape`` to ``PointObject_SHAPE`` where ``PointObject_SHAPE`` is
+generated by the previous usage of macro ``HPyType_HELPERS(PointObject)``. Last
+but not least, we need to register the defines by setting field ``defines`` to
+the previously defined array ``Point_defines``.
 
 The type specification for the simple type ``simple_type.Point`` represented in
 C by structure ``PointObject`` is now complete. All that remains is to create
@@ -456,8 +455,8 @@ slots, methods, members, and get/set descriptors). The idea is that you can then
 migrate one after each other while still running the tests.
 
 The major restriction when using legacy types is that you cannot build a
-universal binary (you cannot use HPy's universal ABI) of your HPy extension and
-the resulting binary will be specific to the Python interpreter used for
+universal binary of your HPy extension (i.e. you cannot use :term:`HPy Universal
+ABI`). The resulting binary will be specific to the Python interpreter used for
 building. Therefore, the goal should always be to fully migrate to HPy pure
 types.
 
@@ -477,7 +476,7 @@ is useful during incremental migration to HPy.
 Inherit from a built-in type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-HPy also supports to inherit from following built-in types:
+HPy also supports inheriting from following built-in types:
 
   * ``type``
 
@@ -535,7 +534,7 @@ type specification, we do:
   :start-after: // BEGIN: spec_Language
   :end-before: // END: spec_Language
 
-In the last step, when actually creatign the type from the specification, we
+In the last step, when actually creating the type from the specification, we
 need to define that its base class is ``str`` (aka. ``UnicodeType``):
 
 .. literalinclude:: examples/hpytype-example/builtin_type.c
