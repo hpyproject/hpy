@@ -1,10 +1,10 @@
 #####################
-Specialized protocols
+Specialized Protocols
 #####################
 
-One of the goal is to remove the abstraction overhead when possible.  For
-example, consider the case of iterating over a sequence (list, tuple,
-array.array, etc.) that happens to contain integers.
+Protocols can help remove abstraction overhead when possible. For example,
+consider the case of iterating over a sequence (list, tuple, array.array, etc.)
+that happens to contain integers.
 
 **Design goals**
 
