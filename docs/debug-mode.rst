@@ -73,14 +73,12 @@ and ``HPY`` have no effect for that extension.
 Using Debug Mode
 ----------------
 
-The default behavior in case of the debug mode detects an error is to either
-abort the process (using :c:func:`HPy_FatalError`) or raise a fatal exception.
-This may sound very strict but in general, it is not safe to continue the
-execution.
+By default, when debug mode detects an error it will either abort the process
+(using :c:func:`HPy_FatalError`) or raise a fatal exception. This may sound very
+strict but in general, it is not safe to continue the execution.
 
-This is, however, different in the case of testing and so module ``hpy.debug``
-exposes the ``LeakDetector`` class to detect leaked ``HPy`` handles. For
-example:
+When testing, aborting the process is unwanted. Module ``hpy.debug`` exposes the
+``LeakDetector`` class to detect leaked ``HPy`` handles. For example:
 
 .. literalinclude:: examples/tests.py
   :language: python
