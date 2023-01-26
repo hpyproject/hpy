@@ -152,125 +152,119 @@ internally in the :term:`CPython ABI` mode.
 .. table:: Safe API function mapping
     :widths: auto
 
-    ================================================ ================================================
-    C API function                                   HPy API function
-    ================================================ ================================================
-    ``PyLong_FromLong``                              :c:func:`HPyLong_FromLong`
-    ``PyLong_FromUnsignedLong``                      :c:func:`HPyLong_FromUnsignedLong`
-    ``PyLong_FromLongLong``                          :c:func:`HPyLong_FromLongLong`
-    ``PyLong_FromUnsignedLongLong``                  :c:func:`HPyLong_FromUnsignedLongLong`
-    ``PyLong_FromSize_t``                            :c:func:`HPyLong_FromSize_t`
-    ``PyLong_FromSsize_t``                           :c:func:`HPyLong_FromSsize_t`
-    ``PyLong_AsLong``                                :c:func:`HPyLong_AsLong`
-    ``PyLong_AsUnsignedLong``                        :c:func:`HPyLong_AsUnsignedLong`
-    ``PyLong_AsUnsignedLongMask``                    :c:func:`HPyLong_AsUnsignedLongMask`
-    ``PyLong_AsLongLong``                            :c:func:`HPyLong_AsLongLong`
-    ``PyLong_AsUnsignedLongLong``                    :c:func:`HPyLong_AsUnsignedLongLong`
-    ``PyLong_AsUnsignedLongLongMask``                :c:func:`HPyLong_AsUnsignedLongLongMask`
-    ``PyLong_AsSize_t``                              :c:func:`HPyLong_AsSize_t`
-    ``PyLong_AsSsize_t``                             :c:func:`HPyLong_AsSsize_t`
-    ``PyLong_AsVoidPtr``                             :c:func:`HPyLong_AsVoidPtr`
-    ``PyLong_AsDouble``                              :c:func:`HPyLong_AsDouble`
-    ``PyFloat_FromDouble``                           :c:func:`HPyFloat_FromDouble`
-    ``PyFloat_AsDouble``                             :c:func:`HPyFloat_AsDouble`
-    ``PyBool_FromLong``                              :c:func:`HPyBool_FromLong`
-    ``PyObject_Length``                              :c:func:`HPy_Length`
-    ``PyNumber_Check``                               :c:func:`HPyNumber_Check`
-    ``PyNumber_Add``                                 :c:func:`HPy_Add`
-    ``PyNumber_Subtract``                            :c:func:`HPy_Subtract`
-    ``PyNumber_Multiply``                            :c:func:`HPy_Multiply`
-    ``PyNumber_MatrixMultiply``                      :c:func:`HPy_MatrixMultiply`
-    ``PyNumber_FloorDivide``                         :c:func:`HPy_FloorDivide`
-    ``PyNumber_TrueDivide``                          :c:func:`HPy_TrueDivide`
-    ``PyNumber_Remainder``                           :c:func:`HPy_Remainder`
-    ``PyNumber_Divmod``                              :c:func:`HPy_Divmod`
-    ``PyNumber_Power``                               :c:func:`HPy_Power`
-    ``PyNumber_Negative``                            :c:func:`HPy_Negative`
-    ``PyNumber_Positive``                            :c:func:`HPy_Positive`
-    ``PyNumber_Absolute``                            :c:func:`HPy_Absolute`
-    ``PyNumber_Invert``                              :c:func:`HPy_Invert`
-    ``PyNumber_Lshift``                              :c:func:`HPy_Lshift`
-    ``PyNumber_Rshift``                              :c:func:`HPy_Rshift`
-    ``PyNumber_And``                                 :c:func:`HPy_And`
-    ``PyNumber_Xor``                                 :c:func:`HPy_Xor`
-    ``PyNumber_Or``                                  :c:func:`HPy_Or`
-    ``PyNumber_Index``                               :c:func:`HPy_Index`
-    ``PyNumber_Long``                                :c:func:`HPy_Long`
-    ``PyNumber_Float``                               :c:func:`HPy_Float`
-    ``PyNumber_InPlaceAdd``                          :c:func:`HPy_InPlaceAdd`
-    ``PyNumber_InPlaceSubtract``                     :c:func:`HPy_InPlaceSubtract`
-    ``PyNumber_InPlaceMultiply``                     :c:func:`HPy_InPlaceMultiply`
-    ``PyNumber_InPlaceMatrixMultiply``               :c:func:`HPy_InPlaceMatrixMultiply`
-    ``PyNumber_InPlaceFloorDivide``                  :c:func:`HPy_InPlaceFloorDivide`
-    ``PyNumber_InPlaceTrueDivide``                   :c:func:`HPy_InPlaceTrueDivide`
-    ``PyNumber_InPlaceRemainder``                    :c:func:`HPy_InPlaceRemainder`
-    ``PyNumber_InPlacePower``                        :c:func:`HPy_InPlacePower`
-    ``PyNumber_InPlaceLshift``                       :c:func:`HPy_InPlaceLshift`
-    ``PyNumber_InPlaceRshift``                       :c:func:`HPy_InPlaceRshift`
-    ``PyNumber_InPlaceAnd``                          :c:func:`HPy_InPlaceAnd`
-    ``PyNumber_InPlaceXor``                          :c:func:`HPy_InPlaceXor`
-    ``PyNumber_InPlaceOr``                           :c:func:`HPy_InPlaceOr`
-    ``PyCallable_Check``                             :c:func:`HPyCallable_Check`
-    ``PyErr_SetString``                              :c:func:`HPyErr_SetString`
-    ``PyErr_SetObject``                              :c:func:`HPyErr_SetObject`
-    ``PyErr_SetFromErrnoWithFilename``               :c:func:`HPyErr_SetFromErrnoWithFilename`
-    ``PyErr_SetFromErrnoWithFilenameObjects``        :c:func:`HPyErr_SetFromErrnoWithFilenameObjects`
-    ``PyErr_ExceptionMatches``                       :c:func:`HPyErr_ExceptionMatches`
-    ``PyErr_NoMemory``                               :c:func:`HPyErr_NoMemory`
-    ``PyErr_Clear``                                  :c:func:`HPyErr_Clear`
-    ``PyErr_NewException``                           :c:func:`HPyErr_NewException`
-    ``PyErr_NewExceptionWithDoc``                    :c:func:`HPyErr_NewExceptionWithDoc`
-    ``PyErr_WarnEx``                                 :c:func:`HPyErr_WarnEx`
-    ``PyErr_WriteUnraisable``                        :c:func:`HPyErr_WriteUnraisable`
-    ``PyObject_IsTrue``                              :c:func:`HPy_IsTrue`
-    ``PyObject_GetAttr``                             :c:func:`HPy_GetAttr`
-    ``PyObject_GetAttrString``                       :c:func:`HPy_GetAttr_s`
-    ``PyObject_HasAttr``                             :c:func:`HPy_HasAttr`
-    ``PyObject_HasAttrString``                       :c:func:`HPy_HasAttr_s`
-    ``PyObject_SetAttr``                             :c:func:`HPy_SetAttr`
-    ``PyObject_SetAttrString``                       :c:func:`HPy_SetAttr_s`
-    ``PyObject_GetItem``                             :c:func:`HPy_GetItem`
-    ``PySequence_Contains``                          :c:func:`HPy_Contains`
-    ``PyObject_SetItem``                             :c:func:`HPy_SetItem`
-    ``PyObject_DelItem``                             :c:func:`HPy_DelItem`
-    ``PyObject_Type``                                :c:func:`HPy_Type`
-    ``PyObject_Repr``                                :c:func:`HPy_Repr`
-    ``PyObject_Str``                                 :c:func:`HPy_Str`
-    ``PyObject_ASCII``                               :c:func:`HPy_ASCII`
-    ``PyObject_Bytes``                               :c:func:`HPy_Bytes`
-    ``PyObject_RichCompare``                         :c:func:`HPy_RichCompare`
-    ``PyObject_RichCompareBool``                     :c:func:`HPy_RichCompareBool`
-    ``PyObject_Hash``                                :c:func:`HPy_Hash`
-    ``PyBytes_Check``                                :c:func:`HPyBytes_Check`
-    ``PyBytes_Size``                                 :c:func:`HPyBytes_Size`
-    ``PyBytes_GET_SIZE``                             :c:func:`HPyBytes_GET_SIZE`
-    ``PyBytes_AsString``                             :c:func:`HPyBytes_AsString`
-    ``PyBytes_AS_STRING``                            :c:func:`HPyBytes_AS_STRING`
-    ``PyBytes_FromString``                           :c:func:`HPyBytes_FromString`
-    ``PyUnicode_FromString``                         :c:func:`HPyUnicode_FromString`
-    ``PyUnicode_Check``                              :c:func:`HPyUnicode_Check`
-    ``PyUnicode_AsASCIIString``                      :c:func:`HPyUnicode_AsASCIIString`
-    ``PyUnicode_AsLatin1String``                     :c:func:`HPyUnicode_AsLatin1String`
-    ``PyUnicode_AsUTF8String``                       :c:func:`HPyUnicode_AsUTF8String`
-    ``PyUnicode_AsUTF8AndSize``                      :c:func:`HPyUnicode_AsUTF8AndSize`
-    ``PyUnicode_FromWideChar``                       :c:func:`HPyUnicode_FromWideChar`
-    ``PyUnicode_DecodeFSDefault``                    :c:func:`HPyUnicode_DecodeFSDefault`
-    ``PyUnicode_DecodeFSDefaultAndSize``             :c:func:`HPyUnicode_DecodeFSDefaultAndSize`
-    ``PyUnicode_EncodeFSDefault``                    :c:func:`HPyUnicode_EncodeFSDefault`
-    ``PyUnicode_ReadChar``                           :c:func:`HPyUnicode_ReadChar`
-    ``PyUnicode_DecodeASCII``                        :c:func:`HPyUnicode_DecodeASCII`
-    ``PyUnicode_DecodeLatin1``                       :c:func:`HPyUnicode_DecodeLatin1`
-    ``PyList_Check``                                 :c:func:`HPyList_Check`
-    ``PyList_New``                                   :c:func:`HPyList_New`
-    ``PyList_Append``                                :c:func:`HPyList_Append`
-    ``PyDict_Check``                                 :c:func:`HPyDict_Check`
-    ``PyDict_New``                                   :c:func:`HPyDict_New`
-    ``PyTuple_Check``                                :c:func:`HPyTuple_Check`
-    ``PyImport_ImportModule``                        :c:func:`HPyImport_ImportModule`
-    ``PyCapsule_IsValid``                            :c:func:`HPyCapsule_IsValid`
-    ``PyEval_RestoreThread``                         :c:func:`HPy_ReenterPythonExecution`
-    ``PyEval_SaveThread``                            :c:func:`HPy_LeavePythonExecution`
-    ================================================ ================================================
+    ================================================================================================================================== ================================================
+    C API function                                                                                                                     HPY API function
+    ================================================================================================================================== ================================================
+    `PyLong_FromLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromLong>`_                                                   :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromUnsignedLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromUnsignedLong>`_                                   :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromLongLong>`_                                           :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromUnsignedLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromUnsignedLongLong>`_                           :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromSize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_FromSize_t>`_                                               :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromSsize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_FromSsize_t>`_                                             :c:func:`HPyLong_FromSsize_t`
+    `PyLong_AsSize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_AsSize_t>`_                                                   :c:func:`HPyLong_AsSize_t`
+    `PyLong_AsSsize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_AsSsize_t>`_                                                 :c:func:`HPyLong_AsSsize_t`
+    `PyLong_AsVoidPtr <https://docs.python.org/3/c-api/long.html#c.PyLong_AsVoidPtr>`_                                                 :c:func:`HPyLong_AsVoidPtr`
+    `PyLong_AsDouble <https://docs.python.org/3/c-api/long.html#c.PyLong_AsDouble>`_                                                   :c:func:`HPyLong_AsDouble`
+    `PyFloat_FromDouble <https://docs.python.org/3/c-api/float.html#c.PyFloat_FromDouble>`_                                            :c:func:`HPyFloat_FromDouble`
+    `PyFloat_AsDouble <https://docs.python.org/3/c-api/float.html#c.PyFloat_AsDouble>`_                                                :c:func:`HPyFloat_AsDouble`
+    `PyBool_FromLong <https://docs.python.org/3/c-api/bool.html#c.PyBool_FromLong>`_                                                   :c:func:`HPyBool_FromBool`
+    `PyObject_Length <https://docs.python.org/3/c-api/object.html#c.PyObject_Length>`_                                                 :c:func:`HPy_Length`
+    `PyNumber_Check <https://docs.python.org/3/c-api/number.html#c.PyNumber_Check>`_                                                   :c:func:`HPyNumber_Check`
+    `PyNumber_Add <https://docs.python.org/3/c-api/number.html#c.PyNumber_Add>`_                                                       :c:func:`HPy_Add`
+    `PyNumber_Subtract <https://docs.python.org/3/c-api/number.html#c.PyNumber_Subtract>`_                                             :c:func:`HPy_Subtract`
+    `PyNumber_Multiply <https://docs.python.org/3/c-api/number.html#c.PyNumber_Multiply>`_                                             :c:func:`HPy_Multiply`
+    `PyNumber_MatrixMultiply <https://docs.python.org/3/c-api/number.html#c.PyNumber_MatrixMultiply>`_                                 :c:func:`HPy_MatrixMultiply`
+    `PyNumber_FloorDivide <https://docs.python.org/3/c-api/number.html#c.PyNumber_FloorDivide>`_                                       :c:func:`HPy_FloorDivide`
+    `PyNumber_TrueDivide <https://docs.python.org/3/c-api/number.html#c.PyNumber_TrueDivide>`_                                         :c:func:`HPy_TrueDivide`
+    `PyNumber_Remainder <https://docs.python.org/3/c-api/number.html#c.PyNumber_Remainder>`_                                           :c:func:`HPy_Remainder`
+    `PyNumber_Divmod <https://docs.python.org/3/c-api/number.html#c.PyNumber_Divmod>`_                                                 :c:func:`HPy_Divmod`
+    `PyNumber_Power <https://docs.python.org/3/c-api/number.html#c.PyNumber_Power>`_                                                   :c:func:`HPy_Power`
+    `PyNumber_Negative <https://docs.python.org/3/c-api/number.html#c.PyNumber_Negative>`_                                             :c:func:`HPy_Negative`
+    `PyNumber_Positive <https://docs.python.org/3/c-api/number.html#c.PyNumber_Positive>`_                                             :c:func:`HPy_Positive`
+    `PyNumber_Absolute <https://docs.python.org/3/c-api/number.html#c.PyNumber_Absolute>`_                                             :c:func:`HPy_Absolute`
+    `PyNumber_Invert <https://docs.python.org/3/c-api/number.html#c.PyNumber_Invert>`_                                                 :c:func:`HPy_Invert`
+    `PyNumber_Lshift <https://docs.python.org/3/c-api/number.html#c.PyNumber_Lshift>`_                                                 :c:func:`HPy_Lshift`
+    `PyNumber_Rshift <https://docs.python.org/3/c-api/number.html#c.PyNumber_Rshift>`_                                                 :c:func:`HPy_Rshift`
+    `PyNumber_And <https://docs.python.org/3/c-api/number.html#c.PyNumber_And>`_                                                       :c:func:`HPy_And`
+    `PyNumber_Xor <https://docs.python.org/3/c-api/number.html#c.PyNumber_Xor>`_                                                       :c:func:`HPy_Xor`
+    `PyNumber_Or <https://docs.python.org/3/c-api/number.html#c.PyNumber_Or>`_                                                         :c:func:`HPy_Or`
+    `PyNumber_Index <https://docs.python.org/3/c-api/number.html#c.PyNumber_Index>`_                                                   :c:func:`HPy_Index`
+    `PyNumber_Long <https://docs.python.org/3/c-api/number.html#c.PyNumber_Long>`_                                                     :c:func:`HPy_Long`
+    `PyNumber_Float <https://docs.python.org/3/c-api/number.html#c.PyNumber_Float>`_                                                   :c:func:`HPy_Float`
+    `PyNumber_InPlaceAdd <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceAdd>`_                                         :c:func:`HPy_InPlaceAdd`
+    `PyNumber_InPlaceSubtract <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceSubtract>`_                               :c:func:`HPy_InPlaceSubtract`
+    `PyNumber_InPlaceMultiply <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceMultiply>`_                               :c:func:`HPy_InPlaceMultiply`
+    `PyNumber_InPlaceMatrixMultiply <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceMatrixMultiply>`_                   :c:func:`HPy_InPlaceMatrixMultiply`
+    `PyNumber_InPlaceFloorDivide <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceFloorDivide>`_                         :c:func:`HPy_InPlaceFloorDivide`
+    `PyNumber_InPlaceTrueDivide <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceTrueDivide>`_                           :c:func:`HPy_InPlaceTrueDivide`
+    `PyNumber_InPlaceRemainder <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceRemainder>`_                             :c:func:`HPy_InPlaceRemainder`
+    `PyNumber_InPlacePower <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlacePower>`_                                     :c:func:`HPy_InPlacePower`
+    `PyNumber_InPlaceLshift <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceLshift>`_                                   :c:func:`HPy_InPlaceLshift`
+    `PyNumber_InPlaceRshift <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceRshift>`_                                   :c:func:`HPy_InPlaceRshift`
+    `PyNumber_InPlaceAnd <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceAnd>`_                                         :c:func:`HPy_InPlaceAnd`
+    `PyNumber_InPlaceXor <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceXor>`_                                         :c:func:`HPy_InPlaceXor`
+    `PyNumber_InPlaceOr <https://docs.python.org/3/c-api/number.html#c.PyNumber_InPlaceOr>`_                                           :c:func:`HPy_InPlaceOr`
+    `PyCallable_Check <https://docs.python.org/3/c-api/callable.html#c.PyCallable_Check>`_                                             :c:func:`HPyCallable_Check`
+    `PyErr_SetString <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_SetString>`_                                             :c:func:`HPyErr_SetString`
+    `PyErr_SetObject <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_SetObject>`_                                             :c:func:`HPyErr_SetObject`
+    `PyErr_SetFromErrnoWithFilename <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_SetFromErrnoWithFilename>`_               :c:func:`HPyErr_SetFromErrnoWithFilename`
+    `PyErr_SetFromErrnoWithFilenameObjects <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_SetFromErrnoWithFilenameObjects>`_ :c:func:`HPyErr_SetFromErrnoWithFilenameObjects`
+    `PyErr_ExceptionMatches <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_ExceptionMatches>`_                               :c:func:`HPyErr_ExceptionMatches`
+    `PyErr_NoMemory <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_NoMemory>`_                                               :c:func:`HPyErr_NoMemory`
+    `PyErr_Clear <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_Clear>`_                                                     :c:func:`HPyErr_Clear`
+    `PyErr_NewException <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_NewException>`_                                       :c:func:`HPyErr_NewException`
+    `PyErr_NewExceptionWithDoc <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_NewExceptionWithDoc>`_                         :c:func:`HPyErr_NewExceptionWithDoc`
+    `PyErr_WarnEx <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_WarnEx>`_                                                   :c:func:`HPyErr_WarnEx`
+    `PyErr_WriteUnraisable <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_WriteUnraisable>`_                                 :c:func:`HPyErr_WriteUnraisable`
+    `PyObject_IsTrue <https://docs.python.org/3/c-api/object.html#c.PyObject_IsTrue>`_                                                 :c:func:`HPy_IsTrue`
+    `PyObject_GetAttr <https://docs.python.org/3/c-api/object.html#c.PyObject_GetAttr>`_                                               :c:func:`HPy_GetAttr`
+    `PyObject_GetAttrString <https://docs.python.org/3/c-api/object.html#c.PyObject_GetAttrString>`_                                   :c:func:`HPy_GetAttr_s`
+    `PyObject_HasAttr <https://docs.python.org/3/c-api/object.html#c.PyObject_HasAttr>`_                                               :c:func:`HPy_HasAttr`
+    `PyObject_HasAttrString <https://docs.python.org/3/c-api/object.html#c.PyObject_HasAttrString>`_                                   :c:func:`HPy_HasAttr_s`
+    `PyObject_SetAttr <https://docs.python.org/3/c-api/object.html#c.PyObject_SetAttr>`_                                               :c:func:`HPy_SetAttr`
+    `PyObject_SetAttrString <https://docs.python.org/3/c-api/object.html#c.PyObject_SetAttrString>`_                                   :c:func:`HPy_SetAttr_s`
+    `PyObject_GetItem <https://docs.python.org/3/c-api/object.html#c.PyObject_GetItem>`_                                               :c:func:`HPy_GetItem`
+    `PySequence_Contains <https://docs.python.org/3/c-api/sequence.html#c.PySequence_Contains>`_                                       :c:func:`HPy_Contains`
+    `PyObject_SetItem <https://docs.python.org/3/c-api/object.html#c.PyObject_SetItem>`_                                               :c:func:`HPy_SetItem`
+    `PyObject_DelItem <https://docs.python.org/3/c-api/object.html#c.PyObject_DelItem>`_                                               :c:func:`HPy_DelItem`
+    `PyObject_Type <https://docs.python.org/3/c-api/object.html#c.PyObject_Type>`_                                                     :c:func:`HPy_Type`
+    `PyObject_Repr <https://docs.python.org/3/c-api/object.html#c.PyObject_Repr>`_                                                     :c:func:`HPy_Repr`
+    `PyObject_Str <https://docs.python.org/3/c-api/object.html#c.PyObject_Str>`_                                                       :c:func:`HPy_Str`
+    `PyObject_ASCII <https://docs.python.org/3/c-api/object.html#c.PyObject_ASCII>`_                                                   :c:func:`HPy_ASCII`
+    `PyObject_Bytes <https://docs.python.org/3/c-api/object.html#c.PyObject_Bytes>`_                                                   :c:func:`HPy_Bytes`
+    `PyObject_RichCompare <https://docs.python.org/3/c-api/object.html#c.PyObject_RichCompare>`_                                       :c:func:`HPy_RichCompare`
+    `PyObject_RichCompareBool <https://docs.python.org/3/c-api/object.html#c.PyObject_RichCompareBool>`_                               :c:func:`HPy_RichCompareBool`
+    `PyObject_Hash <https://docs.python.org/3/c-api/object.html#c.PyObject_Hash>`_                                                     :c:func:`HPy_Hash`
+    `PyBytes_Check <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_Check>`_                                                      :c:func:`HPyBytes_Check`
+    `PyBytes_Size <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_Size>`_                                                        :c:func:`HPyBytes_Size`
+    `PyBytes_GET_SIZE <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_GET_SIZE>`_                                                :c:func:`HPyBytes_GET_SIZE`
+    `PyBytes_AsString <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_AsString>`_                                                :c:func:`HPyBytes_AsString`
+    `PyBytes_AS_STRING <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_AS_STRING>`_                                              :c:func:`HPyBytes_AS_STRING`
+    `PyBytes_FromString <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_FromString>`_                                            :c:func:`HPyBytes_FromString`
+    `PyUnicode_FromString <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromString>`_                                      :c:func:`HPyUnicode_FromString`
+    `PyUnicode_Check <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_Check>`_                                                :c:func:`HPyUnicode_Check`
+    `PyUnicode_AsASCIIString <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_AsASCIIString>`_                                :c:func:`HPyUnicode_AsASCIIString`
+    `PyUnicode_AsLatin1String <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_AsLatin1String>`_                              :c:func:`HPyUnicode_AsLatin1String`
+    `PyUnicode_AsUTF8String <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_AsUTF8String>`_                                  :c:func:`HPyUnicode_AsUTF8String`
+    `PyUnicode_AsUTF8AndSize <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_AsUTF8AndSize>`_                                :c:func:`HPyUnicode_AsUTF8AndSize`
+    `PyUnicode_FromWideChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromWideChar>`_                                  :c:func:`HPyUnicode_FromWideChar`
+    `PyUnicode_DecodeFSDefault <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeFSDefault>`_                            :c:func:`HPyUnicode_DecodeFSDefault`
+    `PyUnicode_DecodeFSDefaultAndSize <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeFSDefaultAndSize>`_              :c:func:`HPyUnicode_DecodeFSDefaultAndSize`
+    `PyUnicode_EncodeFSDefault <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_EncodeFSDefault>`_                            :c:func:`HPyUnicode_EncodeFSDefault`
+    `PyUnicode_ReadChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_ReadChar>`_                                          :c:func:`HPyUnicode_ReadChar`
+    `PyUnicode_DecodeASCII <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeASCII>`_                                    :c:func:`HPyUnicode_DecodeASCII`
+    `PyUnicode_DecodeLatin1 <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeLatin1>`_                                  :c:func:`HPyUnicode_DecodeLatin1`
+    `PyList_Check <https://docs.python.org/3/c-api/list.html#c.PyList_Check>`_                                                         :c:func:`HPyList_Check`
+    `PyList_New <https://docs.python.org/3/c-api/list.html#c.PyList_New>`_                                                             :c:func:`HPyList_New`
+    `PyList_Append <https://docs.python.org/3/c-api/list.html#c.PyList_Append>`_                                                       :c:func:`HPyList_Append`
+    `PyDict_Check <https://docs.python.org/3/c-api/dict.html#c.PyDict_Check>`_                                                         :c:func:`HPyDict_Check`
+    `PyDict_New <https://docs.python.org/3/c-api/dict.html#c.PyDict_New>`_                                                             :c:func:`HPyDict_New`
+    `PyTuple_Check <https://docs.python.org/3/c-api/tuple.html#c.PyTuple_Check>`_                                                      :c:func:`HPyTuple_Check`
+    `PyImport_ImportModule <https://docs.python.org/3/c-api/import.html#c.PyImport_ImportModule>`_                                     :c:func:`HPyImport_ImportModule`
+    `PyCapsule_IsValid <https://docs.python.org/3/c-api/capsule.html#c.PyCapsule_IsValid>`_                                            :c:func:`HPyCapsule_IsValid`
+    `PyEval_RestoreThread <https://docs.python.org/3/c-api/init.html#c.PyEval_RestoreThread>`_                                         :c:func:`HPy_ReenterPythonExecution`
+    `PyEval_SaveThread <https://docs.python.org/3/c-api/init.html#c.PyEval_SaveThread>`_                                               :c:func:`HPy_LeavePythonExecution`
+    ================================================================================================================================== ================================================
 
 
 .. note: There are, of course, also cases where it is not possible to map directly and safely from a C API function (or concept) to an HPy API function (or concept).

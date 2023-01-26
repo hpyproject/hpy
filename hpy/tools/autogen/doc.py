@@ -1,4 +1,5 @@
 import textwrap
+import re
 
 from .autogenfile import AutoGenFile
 from .parse import toC
@@ -42,26 +43,61 @@ class autogen_function_index(AutoGenRstFile):
         return '\n'.join(lines)
 
 
+GROUP_PATTERN = re.compile('Py(\\w+)_.*')
+
+# Some C API functions are documented in very different pages.
+SPECIAL_CASES = {
+    'PyEval_SaveThread': 'init',
+    'PyEval_RestoreThread': 'init'
+}
+
+# We assume that, e.g., prefix 'PyLong_Something' belongs to 'longobject.c' and
+# its documentation is in '.../3/c-api/long.html'. In some cases, the prefix
+# maps to a different page and this can be specified here. E.g.
+# 'PyErr_Something' is documented in page '.../3/c-api/exceptions.html'
+PREFIX_TABLE = {
+    'err': 'exceptions'
+}
+
 class autogen_doc_api_mapping(AutoGenFile):
     PATH = 'hpy/tools/autogen/api_mapping.txt'
     LANGUAGE = 'txt'
 
+    def _get_page(self, cpython_fun_name):
+        if cpython_fun_name in SPECIAL_CASES:
+            return SPECIAL_CASES[cpython_fun_name] + '.html'
+
+        first_underscore = cpython_fun_name.find('_')
+        if cpython_fun_name.startswith('Py') and first_underscore != -1:
+            prefix = cpython_fun_name[2:first_underscore].lower()
+            return PREFIX_TABLE.get(prefix, prefix) + '.html'
+        else:
+            return 'abstract.html'
+
     def generate(self):
         lines = []
         w = lines.append
-        max_width = 0
+        max_width0 = 0
+        max_width1 = 0
         rows = []
         for func in self.api.functions:
             if not func.cpython_name:
                 continue
-            col0 = f'``{func.cpython_name}``'
+            page = self._get_page(func.cpython_name)
+            col0 = f'`{func.cpython_name} <https://docs.python.org/3/c-api/{page}#c.{func.cpython_name}>`_'
             col1 = f':c:func:`{func.name}`'
             rows.append((col0, col1))
-            max_width = max(max_width, len(col1), len(col1))
+            max_width0 = max(max_width0, len(col0))
+            max_width1 = max(max_width1, len(col1))
 
+        sep = '=' * max_width0 + ' ' + '=' * max_width1
+        w(sep)
+        w('C API function'.ljust(max_width0) + ' HPY API function')
+        w(sep)
         for row in rows:
-            w(f'{row[0].ljust(max_width)} {row[1]}')
-        return '\n'.join(lines)
+            w(f'{row[0].ljust(max_width0)} {row[1]}')
+        w(sep)
+        return textwrap.indent('\n'.join(lines), ' ' * 4)
 
 
 class autogen_hpy_ctx(AutoGenRstFile):
