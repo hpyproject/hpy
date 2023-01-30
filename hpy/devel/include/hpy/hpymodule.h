@@ -15,7 +15,7 @@
 #define _HPy_CTX_MODIFIER _HPy_HIDDEN
 /**
  * Declares a module to be *embeddable* which means that it and its members can
- * be compiler/linked into a binary together with other embeddable HPy modules.
+ * be compiled/linked into a binary together with other embeddable HPy modules.
  *
  * You may declare a module to be *embeddable* if all of its member definitions
  * are in the same file.

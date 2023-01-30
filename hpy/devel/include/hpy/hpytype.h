@@ -99,8 +99,9 @@ typedef struct {
     /**
      * The internal *shape* of the type.
      *
-     * The shape gives the necessary hint for how to compute the data pointer
-     * that should be returned when calling ``MyObject_AsStruct``.
+     * The shape gives the necessary hint to compute the offset to the data
+     * pointer of the object's underlying struct that should be returned when
+     * calling ``MyObject_AsStruct``.
      *
      * **ATTENTION**:
      * It is also necessary to specify the right base class in

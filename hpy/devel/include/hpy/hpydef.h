@@ -186,7 +186,7 @@ typedef struct {
      * The kind of this definition.
      * The value of this field determines which one of the embedded members
      * ``slot``, ``meth``, ``member``, or ``getset`` is used. Since those are
-     * combined in a union, just one can be used at a time.
+     * combined in a union, only one can be used at a time.
      */
     HPyDef_Kind kind;
 

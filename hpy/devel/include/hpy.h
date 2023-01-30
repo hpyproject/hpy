@@ -138,10 +138,7 @@ extern "C" {
  */
 #define HPyAPI_FUNC   _HPy_UNUSED static inline
 
-/**
- * Just an alias for ``HPyAPI_FUNC`` such that we can handle it in the docs
- * properly.
- */
+/** An alias for ``HPyAPI_FUNC`` so we can handle it properly in the docs. */
 #define HPyAPI_INLINE_HELPER HPyAPI_FUNC
 
 /**

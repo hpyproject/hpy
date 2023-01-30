@@ -247,8 +247,8 @@ HPy_ID(139)
 HPy HPyErr_SetObject(HPyContext *ctx, HPy h_type, HPy h_value);
 
 /**
- * Similar to :c:func:`HPyErr_SetFromErrnoWithFilenameObjects` but takes just
- * one filename (a C string) that will be decoded using
+ * Similar to :c:func:`HPyErr_SetFromErrnoWithFilenameObjects` but takes one
+ * filename (a C string) that will be decoded using
  * :c:func:`HPyUnicode_DecodeFSDefault`.
  *
  * :param ctx:
@@ -265,9 +265,9 @@ HPy_ID(140)
 HPy HPyErr_SetFromErrnoWithFilename(HPyContext *ctx, HPy h_type, const char *filename_fsencoded);
 
 /**
- * This is a convenience function to raise an exception when a C library
- * function has returned an error and set the C variable ``errno``. It
- * constructs an instance of the provided exception type ``h_type`` by calling
+ * A convenience function to raise an exception when a C library function has
+ * returned an error and set the C variable ``errno``. It constructs an
+ * instance of the provided exception type ``h_type`` by calling
  * ``h_type(errno, strerror(errno), filename1, 0, filename2)``. The exception
  * instance is then raised.
  *
@@ -543,7 +543,7 @@ void HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                         HPy_ssize_t index, HPy h_item);
 
 /**
- * Builds a list from a list builder.
+ * Build a list from a list builder.
  *
  * :param ctx:
  *     The execution context.
@@ -606,7 +606,7 @@ void HPyTupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,
                          HPy_ssize_t index, HPy h_item);
 
 /**
- * Builds a tuple from a tuple builder.
+ * Build a tuple from a tuple builder.
  *
  * :param ctx:
  *     The execution context.

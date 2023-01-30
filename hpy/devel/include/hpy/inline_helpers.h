@@ -48,8 +48,8 @@ HPyErr_SetFromErrnoWithFilenameObject(HPyContext *ctx, HPy h_type, HPy filename)
 /**
  * Create a tuple from arguments.
  *
- * This is just a convenience function that will allocate a temporary array of
- * ``HPy`` elements and use :c:func:`HPyTuple_FromArray` to create a tuple.
+ * A convenience function that will allocate a temporary array of ``HPy``
+ * elements and use :c:func:`HPyTuple_FromArray` to create a tuple.
  *
  * :param ctx:
  *     The execution context.
@@ -379,7 +379,7 @@ HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h)
 }
 
 /**
- * Returns Python ``true`` or ``false`` depending on the truth value of ``v``.
+ * Returns Python ``True`` or ``False`` depending on the truth value of ``v``.
  *
  * :param ctx:
  *     The execution context.
@@ -387,7 +387,7 @@ HPyLong_AsUnsignedLongLongMask(HPyContext *ctx, HPy h)
  *     A C ``long`` value.
  *
  * :return:
- *     Python ``true`` if ``v != 0``; Python ``false`` otherwise.
+ *     Python ``True`` if ``v != 0``; Python ``False`` otherwise.
  */
 HPyAPI_INLINE_HELPER HPy
 HPyBool_FromLong(HPyContext *ctx, long v)
