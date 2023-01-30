@@ -13,7 +13,7 @@
 
 /**
  * Create a type and add it as an attribute on the given object. The type is
- * created using `HPyType_FromSpec`. The object is often a module that the type
+ * created using :c:func:`HPyType_FromSpec`. The object is often a module that the type
  * is being added to.
  *
  * :param ctx:
@@ -31,7 +31,8 @@
  *
  * Examples:
  *
- * Using `HPyHelpers_AddType` without any `HPyType_SpecParam` parameters:
+ * Using ``HPyHelpers_AddType`` without any :c:struct:`HPyType_SpecParam`
+ * parameters:
  *
  * .. code-block:: c
  *

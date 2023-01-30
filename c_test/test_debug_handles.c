@@ -8,9 +8,9 @@ static void check_DHQueue(DHQueue *q, HPy_ssize_t size, ...)
     va_start(argp, size);
     DHQueue_sanity_check(q);
     TEST_CHECK(q->size == size);
-    DebugHandle *h = q->head;
+    DHQueueNode *h = q->head;
     while(h != NULL) {
-        DebugHandle *expected = va_arg(argp, DebugHandle*);
+        DHQueueNode *expected = va_arg(argp, DHQueueNode*);
         TEST_CHECK(h == expected);
         h = h->next;
     }
@@ -30,9 +30,9 @@ void test_DHQueue_init(void)
 void test_DHQueue_append(void)
 {
     DHQueue q;
-    DebugHandle h1;
-    DebugHandle h2;
-    DebugHandle h3;
+    DHQueueNode h1;
+    DHQueueNode h2;
+    DHQueueNode h3;
     DHQueue_init(&q);
     DHQueue_append(&q, &h1);
     DHQueue_append(&q, &h2);
@@ -43,9 +43,9 @@ void test_DHQueue_append(void)
 void test_DHQueue_popfront(void)
 {
     DHQueue q;
-    DebugHandle h1;
-    DebugHandle h2;
-    DebugHandle h3;
+    DHQueueNode h1;
+    DHQueueNode h2;
+    DHQueueNode h3;
     DHQueue_init(&q);
     DHQueue_append(&q, &h1);
     DHQueue_append(&q, &h2);
@@ -65,10 +65,10 @@ void test_DHQueue_popfront(void)
 void test_DHQueue_remove(void)
 {
     DHQueue q;
-    DebugHandle h1;
-    DebugHandle h2;
-    DebugHandle h3;
-    DebugHandle h4;
+    DHQueueNode h1;
+    DHQueueNode h2;
+    DHQueueNode h3;
+    DHQueueNode h4;
     DHQueue_init(&q);
     DHQueue_append(&q, &h1);
     DHQueue_append(&q, &h2);

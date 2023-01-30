@@ -27,6 +27,9 @@ from .trace import (autogen_tracer_ctx_init_h,
                     autogen_tracer_wrappers,
                     autogen_trace_func_table_c)
 from .pypy import autogen_pypy_txt
+from .doc import (autogen_function_index,
+                  autogen_doc_api_mapping)
+
 
 def main():
     if len(sys.argv) != 2:
@@ -55,7 +58,9 @@ def main():
                 autogen_tracer_ctx_init_h,
                 autogen_tracer_wrappers,
                 autogen_trace_func_table_c,
-                autogen_pypy_txt):
+                autogen_pypy_txt,
+                autogen_function_index,
+                autogen_doc_api_mapping):
         cls(api).write(outdir)
 
 

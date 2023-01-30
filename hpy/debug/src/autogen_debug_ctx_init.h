@@ -157,11 +157,11 @@ int debug_ctx_Capsule_Set(HPyContext *dctx, DHPy capsule, _HPyCapsule_key key, v
 DHPy debug_ctx_FromPyObject(HPyContext *dctx, cpy_PyObject *obj);
 cpy_PyObject *debug_ctx_AsPyObject(HPyContext *dctx, DHPy h);
 void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx, HPyFunc_Signature sig, HPyCFunction func, void *args);
-HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);
+HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t size);
 void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder builder);
 void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder builder);
-HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t initial_size);
+HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t size);
 void debug_ctx_TupleBuilder_Set(HPyContext *dctx, HPyTupleBuilder builder, HPy_ssize_t index, DHPy h_item);
 DHPy debug_ctx_TupleBuilder_Build(HPyContext *dctx, HPyTupleBuilder builder);
 void debug_ctx_TupleBuilder_Cancel(HPyContext *dctx, HPyTupleBuilder builder);

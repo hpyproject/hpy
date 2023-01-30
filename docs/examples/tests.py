@@ -8,6 +8,8 @@ import simple
 import mixed
 import hpyvarargs
 import snippets
+import simple_type
+import builtin_type
 
 
 def test_simple_abs():
@@ -28,6 +30,27 @@ def test_snippets():
     x = 2
     assert snippets.test_foo_and_is_same_object(x, x) == 1
     assert snippets.test_foo_and_is_same_object(x, 42) == 0
+
+
+def test_simple_type():
+    p = simple_type.Point(4, 5)
+    assert p.x == 4
+    assert p.y == 5
+    assert p.foo() == 45
+    assert p.z == 1045
+    p.z = 2000
+    assert p.y == 960
+    assert p.z == 2000
+
+
+def test_builtin_type():
+    obj = builtin_type.Dummy("hello")
+    assert obj == "hello"
+
+    obj = builtin_type.Language("hello")
+    obj.lang = "en"
+    assert obj == "hello"
+    assert obj.lang == "en"
 
 
 def test_leak_detector():

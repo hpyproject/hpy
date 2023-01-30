@@ -79,7 +79,15 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyTracker_ForgetAll',
         'HPyTracker_Close',
         'HPyBytes_AsString',
-        'HPyBytes_AS_STRING'
+        'HPyBytes_AS_STRING',
+        'HPyTupleBuilder_New',
+        'HPyTupleBuilder_Set',
+        'HPyTupleBuilder_Build',
+        'HPyTupleBuilder_Cancel',
+        'HPyListBuilder_New',
+        'HPyListBuilder_Set',
+        'HPyListBuilder_Build',
+        'HPyListBuilder_Cancel'
     }
 
     def generate(self):

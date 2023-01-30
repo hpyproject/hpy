@@ -18,7 +18,7 @@ _HPy_HIDDEN int ctx_Err_Occurred(HPyContext *ctx);
 
 // ctx_listbuilder.c
 _HPy_HIDDEN HPyListBuilder ctx_ListBuilder_New(HPyContext *ctx,
-                                               HPy_ssize_t initial_size);
+                                               HPy_ssize_t size);
 _HPy_HIDDEN void ctx_ListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                                      HPy_ssize_t index, HPy h_item);
 _HPy_HIDDEN HPy ctx_ListBuilder_Build(HPyContext *ctx, HPyListBuilder builder);
@@ -46,7 +46,7 @@ _HPy_HIDDEN void ctx_Tracker_Close(HPyContext *ctx, HPyTracker ht);
 
 // ctx_tuplebuilder.c
 _HPy_HIDDEN HPyTupleBuilder ctx_TupleBuilder_New(HPyContext *ctx,
-                                                 HPy_ssize_t initial_size);
+                                                 HPy_ssize_t size);
 _HPy_HIDDEN void ctx_TupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,
                                       HPy_ssize_t index, HPy h_item);
 _HPy_HIDDEN HPy ctx_TupleBuilder_Build(HPyContext *ctx, HPyTupleBuilder builder);

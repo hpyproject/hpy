@@ -13,6 +13,13 @@
     _HPy_CTX_MODIFIER HPyContext *_ctx_for_trampolines;
 #else
 #define _HPy_CTX_MODIFIER _HPy_HIDDEN
+/**
+ * Declares a module to be *embeddable* which means that it and its members can
+ * be compiled/linked into a binary together with other embeddable HPy modules.
+ *
+ * You may declare a module to be *embeddable* if all of its member definitions
+ * are in the same file.
+ */
 #define HPY_MOD_EMBEDDABLE(modname)
 // this is defined by HPy_MODINIT
 extern HPyContext *_ctx_for_trampolines;
@@ -20,13 +27,37 @@ extern HPyContext *_ctx_for_trampolines;
 
 
 typedef struct {
+    /** The Python name of module (UTF-8 encoded) */
     const char* name;
+
+    /** Docstring of the type (UTF-8 encoded; may be ``NULL``) */
     const char* doc;
+
+    /** The size (in bytes) of the module state structure. */
     HPy_ssize_t size;
+
+    /**
+     * ``NULL``-terminated list of legacy module-level methods.
+     * In order to enable incremental migration
+     * from C API to HPy, it is possible to still add *legacy* method
+     * definitions. Those methods have a C API signature which means that they
+     * still receive ``PyObject *`` and similar arguments. If legacy methods
+     * are defined, you cannot create a *universal binary* (i.e. a binary that
+     * will run on all Python engines).
+     */
     cpy_PyMethodDef *legacy_methods;
-    HPyDef **defines;   /* points to an array of 'HPyDef *' */
-    /* array with pointers to statically allocated HPyGlobal,
-     * with NULL at the end as a sentinel. */
+
+    /**
+     * Pointer to a ``NULL``-terminated array of pointers to HPy defines (i.e.
+     * ``HPyDef *``). Note, that some kinds of HPy definitions don't make sense
+     * for a module. In particular, anything else than methods.
+     */
+    HPyDef **defines;
+
+    /**
+     * Pointer to a ``NULL``-terminated array of pointers to
+     * :c:struct:`HPyGlobal` variables. For details, see :doc:`hpy-global`.
+     */
     HPyGlobal **globals;
 } HPyModuleDef;
 
@@ -53,6 +84,34 @@ typedef struct {
 #else // HPY_ABI_CPYTHON
 
 // module initialization in the universal and hybrid case
+
+/**
+ * Convenience macro for generating the module initialization code. This will
+ * generate three functions that are used by to verify an initialize the module
+ * when loading:
+ *
+ * ``get_required_hpy_major_version_<modname>``
+ *   The HPy major version this module was built with.
+ *
+ * ``get_required_hpy_minor_version_<modname>``
+ *   The HPy minor version this module was built with.
+ *
+ * ``HPyInit_<modname>``
+ *   The init function that will be called by the interpreter.
+ *
+ * The macro expects that there is a function ``init_<modname>`` that does
+ * the actual initialization of the module.
+ *
+ * Example:
+ *
+ * .. code-block:: c
+ *
+ *   HPy_MODINIT(mymodule)
+ *   static HPy init_mymodule(HPyContext *ctx)
+ *   {
+ *     // ...
+ *   }
+ */
 #define HPy_MODINIT(modname)                                      \
     HPyVERSION_FUNC                                               \
     get_required_hpy_major_version_##modname()                    \

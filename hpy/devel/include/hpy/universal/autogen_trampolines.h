@@ -590,8 +590,8 @@ HPyAPI_FUNC void _HPy_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Si
      ctx->ctx_CallRealFunctionFromTrampoline ( ctx, sig, func, args ); 
 }
 
-HPyAPI_FUNC HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size) {
-     return ctx->ctx_ListBuilder_New ( ctx, initial_size ); 
+HPyAPI_FUNC HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t size) {
+     return ctx->ctx_ListBuilder_New ( ctx, size ); 
 }
 
 HPyAPI_FUNC void HPyListBuilder_Set(HPyContext *ctx, HPyListBuilder builder, HPy_ssize_t index, HPy h_item) {
@@ -606,8 +606,8 @@ HPyAPI_FUNC void HPyListBuilder_Cancel(HPyContext *ctx, HPyListBuilder builder) 
      ctx->ctx_ListBuilder_Cancel ( ctx, builder ); 
 }
 
-HPyAPI_FUNC HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size) {
-     return ctx->ctx_TupleBuilder_New ( ctx, initial_size ); 
+HPyAPI_FUNC HPyTupleBuilder HPyTupleBuilder_New(HPyContext *ctx, HPy_ssize_t size) {
+     return ctx->ctx_TupleBuilder_New ( ctx, size ); 
 }
 
 HPyAPI_FUNC void HPyTupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder, HPy_ssize_t index, HPy h_item) {

@@ -1890,14 +1890,14 @@ cpy_PyObject *trace_ctx_AsPyObject(HPyContext *tctx, HPy h)
     return res;
 }
 
-HPyListBuilder trace_ctx_ListBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size)
+HPyListBuilder trace_ctx_ListBuilder_New(HPyContext *tctx, HPy_ssize_t size)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 210);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    HPyListBuilder res = HPyListBuilder_New(uctx, initial_size);
+    HPyListBuilder res = HPyListBuilder_New(uctx, size);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 210, r0, r1, &_ts_start, &_ts_end);
     return res;
@@ -1940,14 +1940,14 @@ void trace_ctx_ListBuilder_Cancel(HPyContext *tctx, HPyListBuilder builder)
     hpy_trace_on_exit(info, 213, r0, r1, &_ts_start, &_ts_end);
 }
 
-HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t initial_size)
+HPyTupleBuilder trace_ctx_TupleBuilder_New(HPyContext *tctx, HPy_ssize_t size)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 214);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    HPyTupleBuilder res = HPyTupleBuilder_New(uctx, initial_size);
+    HPyTupleBuilder res = HPyTupleBuilder_New(uctx, size);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 214, r0, r1, &_ts_start, &_ts_end);
     return res;

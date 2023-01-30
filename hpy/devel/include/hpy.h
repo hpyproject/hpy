@@ -138,6 +138,9 @@ extern "C" {
  */
 #define HPyAPI_FUNC   _HPy_UNUSED static inline
 
+/** An alias for ``HPyAPI_FUNC`` so we can handle it properly in the docs. */
+#define HPyAPI_INLINE_HELPER HPyAPI_FUNC
+
 /**
  * CPython implementations for ``HPyAPI_FUNC``
  * functions. Generally speaking, they are put in ctx_*.c files and they are

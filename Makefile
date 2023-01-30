@@ -70,7 +70,8 @@ porting-example-tests:
 	python3 -m pytest docs/porting-example/steps/ ${TEST_ARGS}
 
 docs-examples-tests:
-	cd docs/examples/simple-example && python3 setup.py --hpy-abi=universal install
-	cd docs/examples/mixed-example  && python3 setup.py install
-	cd docs/examples/snippets       && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/simple-example  && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/mixed-example   && python3 setup.py install
+	cd docs/examples/snippets        && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/hpytype-example && python3 setup.py --hpy-abi=universal install
 	python3 -m pytest docs/examples/tests.py ${TEST_ARGS}

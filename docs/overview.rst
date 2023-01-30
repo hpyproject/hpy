@@ -4,12 +4,13 @@ HPy overview
 Motivation and goals
 ---------------------
 
-The superpower of the Python ecosystem is its libraries, which are
-developed by users. Over time, these libraries have grown in number,
-quality, and applicability. While it is possible to write python libraries
-entirely in python, many of them, especially in the scientific community,
-are written in C and exposed to Python using the ```Python.h`` API <https://docs.python.org/3/c-api/index.html>`_.
-The existence of these C extensions using the ``Python.h`` API leads to some issues:
+The superpower of the Python ecosystem is its libraries, which are developed by
+users. Over time, these libraries have grown in number, quality, and
+applicability. While it is possible to write python libraries entirely in
+python, many of them, especially in the scientific community, are written in C
+and exposed to Python using the `Python.h API
+<https://docs.python.org/3/c-api/index.html>`_. The existence of these C
+extensions using the ``Python.h`` API leads to some issues:
 
   1. Usually, alternative implementation of the Python programming language
      want to support C extensions. To do so, they must implement the same
@@ -26,13 +27,13 @@ into the C/API - which makes it difficult to make different design choices than
 those made by CPython. As such - the main goal of HPy is to provide a **C API
 which makes as few assumptions as possible about the design decisions of any
 implementation of Python, allowing diverse implementations to support it
-efficiently and without compromise**. In particular, **reference counting is
-not part of the API**: we want a more generic way of managing resources that
-is possible to impelement with different strategies, including the existing
-reference counting and/or with a moving *Garbage Collector* (like the ones
-used by PyPy, GraalPython or Java, for example). Moreover, each implementation
-can experiment with new memory layout of objects, add optimizations, etc.
-The following is a list of sub-goals.
+efficiently and without compromise**. In particular, **reference counting is not
+part of the API**: we want a more generic way of managing resources that is
+possible to impelement with different strategies, including the existing
+reference counting and/or with a moving *Garbage Collector* (like the ones used
+by PyPy, GraalPython or Java, for example). Moreover, each implementation can
+experiment with new memory layout of objects, add optimizations, etc. The
+following is a list of sub-goals.
 
 
 Performance on CPython
