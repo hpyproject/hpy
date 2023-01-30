@@ -8,14 +8,14 @@
 **Mailing list**: [hpy-dev@python.org](https://mail.python.org/mailman3/lists/hpy-dev.python.org/)
 
 The goal of the project is to design a better API for extending Python
-in C. The current API is specific to the current implementation of CPython: it
-exposes a lot of internal details which makes it hard:
+in C. The old C API is specific to the current implementation of CPython. It
+exposes a lot of internal details which makes it hard to:
 
-  - to implement it for other Python implementations (e.g. PyPy, GraalPython,
+  - implement it for other Python implementations (e.g. PyPy, GraalPython,
     Jython, IronPython, etc.). The implementation for CPython is in this repo,
     but other implementations sometimes have to [implement some things](https://github.com/hpyproject/hpy/issues?q=label%3A%22HPy+update+in+GraalPy%22+label%3A%22HPy+update+in+PyPy%22+) in their HPy layer.
 
-  - to experiment with new things inside CPython itself: e.g. using a GC
+  - experiment with new things inside CPython itself: e.g. using a GC
     instead of refcounting, or to remove the GIL
 
 The goal of this project is to improve the situation by designing a new API
