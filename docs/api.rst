@@ -242,9 +242,11 @@ are still written using the ``Python.h`` API.
 
 Note that the HPy module does not specify its name. HPy does not support the legacy
 single phase module initialization and the only module initialization approach is
-the multi-phase initialization (PEP 451). With multi-phase module initialization,
-the name of the module is always taken from the ``ModuleSpec``, i.e., most likely
-from the name used in the ``import {{name}}`` statement that imported your module.
+the multi-phase initialization (`PEP 489 <https://peps.python.org/pep-0489/>`_).
+With multi-phase module initialization,
+the name of the module is always taken from the ``ModuleSpec`` (`PEP 451 <https://peps.python.org/pep-0451/>`_)
+, i.e., most likely from the name used in the ``import {{name}}`` statement that
+imported your module.
 
 This is the only difference stemming from multi-phase module initialization in this
 simple example.
