@@ -1,5 +1,7 @@
-bytes/str building API
-=======================
+Design notes: bytes/str building API
+====================================
+
+`Note: these are only design notes. The API is not finalized, nor implemented yet.`
 
 We need to design an HPy API to build ``bytes`` and ``str`` objects. Before making
 any proposal, it is useful to understand:

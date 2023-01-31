@@ -157,6 +157,7 @@ Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back
 into the Python interpreter.
 
+.. _simple example:
 
 A simple example
 -----------------
@@ -321,30 +322,6 @@ table, which now becomes:
 .. literalinclude:: examples/snippets/hpyvarargs.c
   :start-after: // BEGIN: methodsdef
   :end-before: // END: methodsdef
-
-More Examples
--------------
-
-HPy usually has tests for each API function. This means that there is lots of
-examples available by looking at the tests. However, the test source uses
-many macros and is hard to read. To overcome this we supply a utility to
-export clean C sources for the tests. Since the HPy tests are not shipped by
-default, you need to clone the HPy repository from GitHub:
-
-.. code-block:: console
-
-    > git clone https://github.com/hpyproject/hpy.git
-
-After that, install all test requirements and dump the sources:
-
-.. code-block:: console
-
-    > cd hpy
-    > python3 -m pip install pytest filelock
-    > python3 -m pytest --dump-dir=test_sources test/
-
-This will dump the generated test sources into folder ``test_sources``. Note,
-that the tests won't be executed but skipped with an appropriate message.
 
 Creating types in HPy
 ---------------------
@@ -569,3 +546,40 @@ be considered in three places:
 For more information about the built-in shape and for a technical explanation
 for why it is required, see :c:member:`HPyType_Spec.builtin_shape` and
 :c:enum:`HPyType_BuiltinShape`.
+
+More Examples
+-------------
+
+The :doc:`porting-example/index` shows another complete example
+of HPy extension ported from Python/C API.
+
+The `HPy project space <https://github.com/hpyproject/>`_ on GitHub
+contains forks of some popular Python extensions ported to HPy as
+a proof of concept/feasibility studies, such as the
+`Kiwi solver <https://github.com/hpyproject/kiwi-hpy>`_.
+Note that those forks may not be up to date with their upstream projects
+or with the upstream HPy changes.
+
+HPy unit tests
+~~~~~~~~~~~~~~
+
+HPy usually has tests for each API function. This means that there is lots of
+examples available by looking at the tests. However, the test source uses
+many macros and is hard to read. To overcome this we supply a utility to
+export clean C sources for the tests. Since the HPy tests are not shipped by
+default, you need to clone the HPy repository from GitHub:
+
+.. code-block:: console
+
+    > git clone https://github.com/hpyproject/hpy.git
+
+After that, install all test requirements and dump the sources:
+
+.. code-block:: console
+
+    > cd hpy
+    > python3 -m pip install pytest filelock
+    > python3 -m pytest --dump-dir=test_sources test/
+
+This will dump the generated test sources into folder ``test_sources``. Note,
+that the tests won't be executed but skipped with an appropriate message.

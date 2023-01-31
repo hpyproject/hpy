@@ -146,7 +146,7 @@ Direct C API to HPy mappings
 In many cases, migrating to HPy is as easy as just replacing a certain C API
 function by the appropriate HPy API function. Table :ref:`table-mapping` gives a
 mapping between C API and HPy API functions. This mapping is generated together
-with the code for the :term:`CPython ABI` mode, so it is correct.
+with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correct.
 
 
 ..  _table-mapping:

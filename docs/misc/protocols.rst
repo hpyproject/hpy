@@ -1,6 +1,8 @@
-#####################
-Specialized Protocols
-#####################
+###################################
+Design notes: Specialized Protocols
+###################################
+
+`Note: these are only design notes. The API is not finalized, nor implemented yet.`
 
 Protocols can help remove abstraction overhead when possible. For example,
 consider the case of iterating over a sequence (list, tuple, array.array, etc.)

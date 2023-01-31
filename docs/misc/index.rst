@@ -2,8 +2,8 @@ Misc notes
 ==========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   str-builder-api
    embedding
+   str-builder-api
    protocols
