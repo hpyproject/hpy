@@ -15,7 +15,6 @@ struct _HPyContext_s g_universal_ctx = {
     ._private = NULL,
     .abi_version = HPY_ABI_VERSION,
     /* h_None & co. are initialized by init_universal_ctx() */
-    .ctx_Module_Create = &ctx_Module_Create,
     .ctx_Dup = &ctx_Dup,
     .ctx_Close = &ctx_Close,
     .ctx_Long_FromInt32_t = &ctx_Long_FromInt32_t,

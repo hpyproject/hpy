@@ -19,6 +19,7 @@
 
 typedef struct FORBIDDEN_cpy_PyObject cpy_PyObject;
 typedef struct FORBIDDEN_PyMethodDef cpy_PyMethodDef;
+typedef struct FORBIDDEN_PyModuleDef cpy_PyModuleDef;
 typedef struct FORBIDDEN_bufferinfo cpy_Py_buffer;
 
 // declare the following API functions as _HPY_LEGACY, which triggers an
@@ -31,6 +32,7 @@ HPyAPI_FUNC _HPY_LEGACY HPy HPy_FromPyObject(HPyContext *ctx, cpy_PyObject *obj)
 // Python.h has already been included by the main hpy.h
 typedef PyObject cpy_PyObject;
 typedef PyMethodDef cpy_PyMethodDef;
+typedef PyModuleDef cpy_PyModuleDef;
 typedef Py_buffer cpy_Py_buffer;
 
 #endif /* HPY_ABI_UNIVERSAL */

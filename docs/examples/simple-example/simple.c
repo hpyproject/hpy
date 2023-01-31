@@ -31,17 +31,13 @@ static HPyDef *SimpleMethods[] = {
 };
 
 static HPyModuleDef simple = {
-        .name = "simple",
         .doc = "HPy Example",
-        .size = -1,
+        .size = 0,
         .defines = SimpleMethods,
         .legacy_methods = NULL
 };
 // END: methodsdef
 
 // BEGIN: moduledef
-HPy_MODINIT(simple)
-HPy init_simple_impl(HPyContext *ctx) {
-    return HPyModule_Create(ctx, &simple);
-}
+HPy_MODINIT(simple, simple)
 // END: moduledef

@@ -424,3 +424,24 @@ Buffer slots for HPy types are specified using slots ``HPy_bf_getbuffer`` and
 matching PyType_Spec slots, ``Py_bf_getbuffer`` and ``Py_bf_releasebuffer``, are
 only available starting from CPython 3.9.
 
+Multi-phase Module Initialization
+---------------------------------
+
+HPy supports only multi-phase module initialization (PEP 451). This means that
+the module object is typically created by interpreter from the ``HPyModuleDef``
+specification and there is no "init" function. However, the module can define
+one or more ``HPy_mod_exec`` slots, which will be executed just after the module
+object is created. Inside the code of those slots, one can usually perform the same
+initialization as before.
+
+Example of legacy single phase module initialization that uses Python/C API:
+
+.. literalinclude:: examples/snippets/legacyinit.c
+  :start-after: // BEGIN
+  :end-before: // END
+
+The same code structure ported to HPy and multi-phase module initialization:
+
+.. literalinclude:: examples/snippets/hpyinit.c
+  :start-after: // BEGIN
+  :end-before: // END

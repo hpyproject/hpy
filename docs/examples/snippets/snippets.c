@@ -73,13 +73,9 @@ static HPyDef *Methods[] = {
 };
 
 static HPyModuleDef snippets = {
-        .name = "snippets",
         .doc = "Various HPy code snippets for the docs",
-        .size = -1,
+        .size = 0,
         .defines = Methods
 };
 
-HPy_MODINIT(snippets)
-HPy init_snippets_impl(HPyContext *ctx) {
-    return HPyModule_Create(ctx, &snippets);
-}
+HPy_MODINIT(snippets, snippets)

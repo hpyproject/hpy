@@ -91,7 +91,6 @@ struct _HPyContext_s {
     HPy h_UnicodeType;
     HPy h_TupleType;
     HPy h_ListType;
-    HPy (*ctx_Module_Create)(HPyContext *ctx, HPyModuleDef *def);
     HPy (*ctx_Dup)(HPyContext *ctx, HPy h);
     void (*ctx_Close)(HPyContext *ctx, HPy h);
     HPy (*ctx_Long_FromInt32_t)(HPyContext *ctx, int32_t value);

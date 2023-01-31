@@ -72,6 +72,7 @@ static HPyDef *point_type_defines[] = {
     &Point_repr,
     NULL
 };
+
 static HPyType_Spec point_type_spec = {
     .name = "pofcpp.Point",
     .basicsize = sizeof(PointObject),
@@ -79,17 +80,28 @@ static HPyType_Spec point_type_spec = {
     .defines = point_type_defines
 };
 
+HPyDef_SLOT(mod_exec, HPy_mod_exec)
+static int mod_exec_impl(HPyContext *ctx, HPy m)
+{
+    HPy h_point_type = HPyType_FromSpec(ctx, &point_type_spec, NULL);
+    if (HPy_IsNull(h_point_type))
+      return -1;
+    HPy_SetAttr_s(ctx, m, "Point", h_point_type);
+    HPy_Close(ctx, h_point_type);
+    return 0;
+}
+
 static HPyDef *module_defines[] = {
     &do_nothing,
     &double_obj,
     &add_ints,
     &add_ints_kw,
+    &mod_exec,
     NULL
 };
 static HPyModuleDef moduledef = {
-    .name = "pofcpp",
     .doc = "HPy c++ Proof of Concept",
-    .size = -1,
+    .size = 0,
     .defines = module_defines
 };
 
@@ -97,19 +109,7 @@ static HPyModuleDef moduledef = {
 extern "C" {
 #endif
 
-HPy_MODINIT(pofcpp)
-static HPy init_pofcpp_impl(HPyContext *ctx)
-{
-    HPy m, h_point_type;
-    m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    h_point_type = HPyType_FromSpec(ctx, &point_type_spec, NULL);
-    if (HPy_IsNull(h_point_type))
-      return HPy_NULL;
-    HPy_SetAttr_s(ctx, m, "Point", h_point_type);
-    return m;
-}
+HPy_MODINIT(pofcpp, moduledef)
 
 #ifdef __cplusplus
 }

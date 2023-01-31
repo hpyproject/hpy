@@ -4,7 +4,7 @@ from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
 
 NO_CALL = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
-           'GETBUFFERPROC', 'RELEASEBUFFERPROC', 'TRAVERSEPROC')
+           'GETBUFFERPROC', 'RELEASEBUFFERPROC', 'TRAVERSEPROC', 'MOD_CREATE')
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
 class autogen_hpyfunc_declare_h(AutoGenFile):
@@ -20,6 +20,8 @@ class autogen_hpyfunc_declare_h(AutoGenFile):
             # declare a function named 'SYM' of the appropriate type
             funcdecl = hpyfunc.node.type.type
             symdecl = deepcopy(funcdecl)
+            if isinstance(symdecl.type, c_ast.PtrDecl):
+                symdecl.type = symdecl.type.type
             symdecl.type.declname = 'SYM'
             symdecl = toC(symdecl)
             #
@@ -55,9 +57,11 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
                 continue
             #
             tramp_node = deepcopy(hpyfunc.node.type.type)
+            if isinstance(tramp_node.type, c_ast.PtrDecl):
+                tramp_node.type = tramp_node.type.type
             tramp_node.type.declname = 'SYM'
             tramp_node = hpy_to_cpy(tramp_node)
-            assert toC(tramp_node.args.params[0].type) == 'HPyContext *'
+            assert toC(tramp_node.args.params[0].type) in ['void', 'HPyContext *']
             tramp_node.args.params = [hpy_to_cpy(p)
                                       for p in tramp_node.args.params[1:]]
             for i, param in enumerate(tramp_node.args.params):
@@ -144,6 +148,8 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
                 continue
             #
             tramp_node = deepcopy(hpyfunc.node.type.type)
+            if isinstance(tramp_node.type, c_ast.PtrDecl):
+                tramp_node.type = tramp_node.type.type
             tramp_node.type.declname = 'SYM'
             tramp_node = hpy_to_cpy(tramp_node)
             tramp_node.args.params = [hpy_to_cpy(p)
