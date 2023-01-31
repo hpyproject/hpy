@@ -240,10 +240,19 @@ is also the ``.legacy_methods`` field, which allows to add methods that use the
 feature enables support for hybrid extensions in which some of the methods
 are still written using the ``Python.h`` API.
 
-.. This would be perhaps good place to add a link to the porting tutorial
-   once it's merged
+Note that the HPy module does not specify its name. HPy does not support the legacy
+single phase module initialization and the only module initialization approach is
+the multi-phase initialization (PEP 451). With multi-phase module initialization,
+the name of the module is always taken from the ``ModuleSpec``, i.e., most likely
+from the name used in the ``import {{name}}`` statement that imported your module.
 
-Finally, ``HPyModuleDef`` is basically the same as the old ``PyModuleDef``:
+This is the only difference stemming from multi-phase module initialization in this
+simple example.
+As long as there is no need for any further initialization, we can just "register"
+our module using the ``HPy_MODINIT`` convenience macro. The first argument is the
+name of the extension file and is needed for HPy, among other things, to be able
+to generate the entry point for CPython called ``PyInit_{{name}}``. The second argument
+is the ``HPyModuleDef`` we just defined.
 
 .. literalinclude:: examples/simple-example/simple.c
   :start-after: // BEGIN: moduledef

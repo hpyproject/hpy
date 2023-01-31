@@ -76,23 +76,8 @@ class DefaultExtensionTemplate(object):
 
     INIT_TEMPLATE = textwrap.dedent(
     """
-    HPyDef_SLOT(generated_init, HPy_mod_exec)
-    static int generated_init_impl(HPyContext *ctx, HPy m)
-    {
-        // Shouldn't really happen, but jut to silence the unused label warning
-        if (HPy_IsNull(m))
-            goto MODINIT_ERROR;
-    
-        %(init_types)s
-        return 0;
-
-        MODINIT_ERROR:
-        return -1;
-    }
-    
     static HPyDef *moduledefs[] = {
         %(defines)s
-        &generated_init,
         NULL
     };
     %(globals_defs)s
@@ -106,6 +91,23 @@ class DefaultExtensionTemplate(object):
 
     HPy_MODINIT(%(name)s, moduledef)
     """)
+
+    INIT_TEMPLATE_WITH_TYPES_INIT = textwrap.dedent(
+        """
+        HPyDef_SLOT(generated_init, HPy_mod_exec)
+        static int generated_init_impl(HPyContext *ctx, HPy m)
+        {
+            // Shouldn't really happen, but jut to silence the unused label warning
+            if (HPy_IsNull(m))
+                goto MODINIT_ERROR;
+
+            %(init_types)s
+            return 0;
+
+            MODINIT_ERROR:
+            return -1;
+        }
+        """ + INIT_TEMPLATE)
 
     r_marker = re.compile(r"^\s*@([A-Za-z_]+)(\(.*\))?$")
 
@@ -164,7 +166,11 @@ class DefaultExtensionTemplate(object):
                 };''') % NL_INDENT.join(self.globals_table)
             globals_field = '.globals = module_globals'
 
-        exp = self.INIT_TEMPLATE % {
+        template = self.INIT_TEMPLATE
+        if init_types:
+            template = self.INIT_TEMPLATE_WITH_TYPES_INIT
+            self.EXPORT('generated_init')
+        exp = template % {
             'legacy_methods': self.legacy_methods,
             'defines': NL_INDENT.join(self.defines_table),
             'init_types': init_types,
