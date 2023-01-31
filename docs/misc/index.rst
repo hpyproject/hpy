@@ -5,5 +5,3 @@ Misc notes
    :maxdepth: 1
 
    embedding
-   str-builder-api
-   protocols
