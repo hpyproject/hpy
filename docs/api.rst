@@ -438,7 +438,11 @@ the previously defined array ``Point_defines``.
 
 The type specification for the simple type ``simple_type.Point`` represented in
 C by structure ``PointObject`` is now complete. All that remains is to create
-the type object and add it to the module which is easily achieved by using
+the type object and add it to the module.
+
+We will define a module execute slot, which is executed by the runtime right
+after the module is created. The purpose of the execute slot is to initialize
+the newly created module object. We can then add the type by using
 :c:func:`HPyHelpers_AddType`:
 
 .. literalinclude:: examples/hpytype-example/simple_type.c
