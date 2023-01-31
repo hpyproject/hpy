@@ -41,8 +41,9 @@ Where to go next:
 
   - Show me the code:
 
-      - :ref:`Simple HPy extension example<simple example>`
-      - :doc:`Example of porting a sample Python/C API extension to HPy<porting-example/index>`
+      - :doc:`Quickstart<quickstart>`
+      - :ref:`Simple documented HPy extension example<simple example>`
+      - :doc:`Tutorial: porting Python/C API extension to HPy<porting-example/index>`
 
   - Details:
 
@@ -58,6 +59,7 @@ Full table of contents:
 .. toctree::
    :maxdepth: 2
 
+   quickstart
    overview
    api
    porting-guide

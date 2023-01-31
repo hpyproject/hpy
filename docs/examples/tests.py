@@ -43,6 +43,12 @@ def test_simple_type():
     assert p.z == 2000
 
 
+def test_quickstart():
+    import quickstart
+    assert quickstart.say_hello() == "Hello world"
+# END: test_quickstart
+
+
 def test_builtin_type():
     obj = builtin_type.Dummy("hello")
     assert obj == "hello"
