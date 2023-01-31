@@ -10,7 +10,7 @@ HPy provides a new API for extending Python in C.
 
 There are several advantages to write your C extension in HPy:
 
-  - **Speed**: it runs much faster on PyPy, GraalPython, and at native speed on CPython
+  - **Speed**: it runs much faster on PyPy, GraalPy, and at native speed on CPython
 
   - **Deployment**: it is possible to compile a single binary which runs unmodified on all
     supported Python implementations and versions -- think "stable ABI" on steroids
@@ -27,7 +27,7 @@ also informally known as ``#include <Python.h>``, is
 specific to the current implementation of CPython: it exposes a lot of
 internal details which makes it hard to:
 
-  - implement it for other Python implementations (e.g. PyPy, GraalPython,
+  - implement it for other Python implementations (e.g. PyPy, GraalPy,
     Jython, ...)
 
   - experiment with new approaches inside CPython itself, for example:

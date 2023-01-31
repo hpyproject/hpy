@@ -43,7 +43,7 @@ Back to ``HPy`` vs ``HPyField`` vs ``HPyGlobal``:
     as soon as they are no longer needed. The debug mode will report a
     long-lived ``HPy`` as a potential memory leak.
 
-  * In PyPy and GraalPython, ``HPy`` handles are implemented using an
+  * In PyPy and GraalPy, ``HPy`` handles are implemented using an
     indirection: they are indexes inside a big list of GC-managed objects: this
     big list is tracked by the GC, so when an object moves its pointer is
     correctly updated.
