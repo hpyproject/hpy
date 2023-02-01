@@ -8,7 +8,7 @@ HPy: a better API for Python
 
 HPy provides a new API for extending Python in C.
 
-There are several advantages to write your C extension in HPy:
+There are several advantages to writing C extensions in HPy:
 
   - **Speed**: it runs much faster on PyPy, GraalPy, and at native speed on CPython
 
