@@ -6,3 +6,4 @@ Misc notes
 
    str-builder-api
    embedding
+   protocols

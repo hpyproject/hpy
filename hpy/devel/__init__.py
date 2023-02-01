@@ -52,6 +52,7 @@ class HPyDevel:
         self.base_dir = Path(base_dir)
         self.include_dir = self.base_dir.joinpath('include')
         self.src_dir = self.base_dir.joinpath('src', 'runtime')
+        self._available_static_libs = None
 
     def get_extra_include_dirs(self):
         """ Extra include directories needed by extensions in both CPython and
@@ -74,6 +75,37 @@ class HPyDevel:
             self.src_dir.joinpath('helpers.c'),
             self.src_dir.joinpath('structseq.c'),
         ]))
+
+    def _scan_static_lib_dir(self):
+        """ Scan the static library directory and build a dict for all
+            available static libraries. The library directory contains
+            subdirectories for each ABI and the ABI folders then contain
+            the static libraries.
+        """
+        available_libs = {}
+        lib_dir = self.base_dir.joinpath('lib')
+        if lib_dir.exists():
+            for abi_dir in lib_dir.iterdir():
+                if abi_dir.is_dir():
+                    abi = abi_dir.name
+                    # All files in '.../lib/<abi>/' are considered to be static
+                    # libraries.
+                    available_libs[abi] = \
+                        [str(x) for x in abi_dir.iterdir() if x.is_file()]
+        return available_libs
+
+    def get_static_libs(self, hpy_abi):
+        """ The list of necessary static libraries an HPy extension needs to
+            link to or 'None' (if not available). The HPy ext needs to link to
+            all static libraries in the list otherwise some function may stay
+            unresolved. For example, there is library 'hpyextra' which contains
+            compiled HPy helper functions like 'HPyArg_Parse' and such.
+            Libraries are always specific to an ABI.
+        """
+        if not self._available_static_libs:
+            # lazily initialize the dict of available (=shipped) static libs
+            self._available_static_libs = self._scan_static_lib_dir()
+        return self._available_static_libs.get(hpy_abi, None)
 
     def get_ctx_sources(self):
         """ Extra sources needed only in the CPython ABI mode.
@@ -147,8 +179,10 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
 
     # add a global option --hpy-abi to setup.py
     dist.__class__.hpy_abi = DEFAULT_HPY_ABI
+    dist.__class__.hpy_use_static_libs = False
     dist.__class__.global_options += [
-        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)' % DEFAULT_HPY_ABI)
+        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)' % DEFAULT_HPY_ABI),
+        ('hpy-no-static-libs', None, 'Compile context and extra sources with extension (default: False)')
     ]
     hpydevel = HPyDevel()
     hpydevel.fix_distribution(dist)
@@ -289,11 +323,31 @@ class build_ext_hpy_mixin:
         ext.name = HPyExtensionName(ext.name)
         ext.hpy_abi = self.distribution.hpy_abi
         ext.include_dirs += self.hpydevel.get_extra_include_dirs()
-        ext.sources += self.hpydevel.get_extra_sources()
+        # If static libs should be used, then add all available libs (for
+        # the given ABI) to the extra objects. The libs will then just be added
+        # in the linking phase but nothing will be compiled in addition.
+        static_libs = self.distribution.hpy_use_static_libs
+        if static_libs:
+            static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
+            if static_libs is None or len(static_libs) != 1:
+                raise DistutilsError('Expected exactly one static library for '
+                                     'ABI "%s" but got: %r' %
+                                     (ext.hpy_abi, static_libs))
+
+        if static_libs:
+            ext.extra_objects += static_libs
+        else:
+            # If we should not use (pre-compiled) static libs or if they are
+            # not available, we just add the sources of the helpers to the
+            # extension. They are then compiler with the extension.
+            ext.sources += self.hpydevel.get_extra_sources()
         ext.define_macros.append(('HPY', None))
         if ext.hpy_abi == 'cpython':
+            # If the user disabled using static libs, we need to add the
+            # context sources in this case.
+            if not static_libs:
+                ext.sources += self.hpydevel.get_ctx_sources()
             ext.define_macros.append(('HPY_ABI_CPYTHON', None))
-            ext.sources += self.hpydevel.get_ctx_sources()
             ext._hpy_needs_stub = False
         elif ext.hpy_abi == 'hybrid':
             ext.define_macros.append(('HPY_ABI_HYBRID', None))

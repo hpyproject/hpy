@@ -14,6 +14,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sys
 import os
 import re
 
@@ -49,6 +50,10 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
+# -- autodoc -----------------------------------------------------------------
+
+autodoc_member_order = "bysource"
+
 # -- sphinx_c_autodoc --------------------------------------------------------
 
 c_autodoc_roots = [
@@ -59,10 +64,16 @@ c_autodoc_roots = [
 
 
 def pre_process(app, filename, contents, *args):
+    # FIXME: the missing typedef for 'HPy' causes the file formatting to fail
+    if filename.endswith('public_api.h'):
+        contents[0] = '#include "../../devel/include/hpy.h"\n' + contents[0]
+    if filename.endswith('autogen_ctx.h'):
+        contents[0] = 'typedef int HPy;' + contents[0]
+
     # remove HPyAPI_HELPER so that the sphinx-c-autodoc and clang
     # find and render the API functions
     contents[:] = [
-        re.sub(r"^(HPyAPI_HELPER|HPy_ID\(\d+\))", r"", part, flags=re.MULTILINE)
+        re.sub(r"^(HPyAPI_HELPER|HPyAPI_INLINE_HELPER|HPy_ID\(\d+\))", r"", part, flags=re.MULTILINE)
         for part in contents
     ]
 
@@ -97,6 +108,10 @@ def setup_clang():
         #       supports clang-10 and clang-11.
         cindex.Config.set_library_file(
             "/usr/lib/x86_64-linux-gnu/libclang-6.0.so.1"
+        )
+    elif sys.platform == "darwin":
+        cindex.Config.set_library_file(
+            "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib"
         )
 
 

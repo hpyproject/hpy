@@ -143,36 +143,47 @@ static HPyType_Spec Point_Type_spec = {
     .defines = point_defines,
 };
 
+// HPy supports only multiphase module initialization, so we must migrate the
+// single phase initialization by extracting the code that populates the module
+// object with attributes into a separate 'exec' slot. The module is not
+// created manually by calling API like PyModule_Create, but the runtime creates
+// the module for us from the specification in HPyModuleDef, and we can provide
+// additional slots to populate the module before its initialization is finalized
+HPyDef_SLOT(module_exec, HPy_mod_exec)
+static int module_exec_impl(HPyContext *ctx, HPy mod)
+{
+    HPy point_type = HPyType_FromSpec(ctx, &Point_Type_spec, NULL);
+    if (HPy_IsNull(point_type))
+        return -1;
+    HPy_SetAttr_s(ctx, mod, "Point", point_type);
+    return 0;
+}
+
 // Legacy module methods (the "dot" method is still a PyCFunction)
 static PyMethodDef PointModuleLegacyMethods[] = {
     {"dot", (PyCFunction)dot, METH_VARARGS, "Dot product."},
     {NULL, NULL, 0, NULL}
 };
 
-// HPy module methods (no methods have been ported yet)
+// HPy module methods: no regular methods have been ported yet,
+// but we add the module execute slot
 static HPyDef *module_defines[] = {
+    &module_exec,
     NULL
 };
 
 static HPyModuleDef moduledef = {
-    .name = "step_01_hpy_legacy",
+    // .name = "step_01_hpy_legacy",
+    // ^-- .name is not needed for multiphase module initialization,
+    // it is always taken from the ModuleSpec
     .doc = "Point module (Step 1; All legacy methods)",
-    .size = -1,
+    .size = 0,
     .legacy_methods = PointModuleLegacyMethods,
     .defines = module_defines,
 };
+// END-OF: HPyModuleDef
 
-HPy_MODINIT(step_01_hpy_legacy)
-static HPy init_step_01_hpy_legacy_impl(HPyContext *ctx)
-{
-    HPy m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-
-    HPy point_type = HPyType_FromSpec(ctx, &Point_Type_spec, NULL);
-    if (HPy_IsNull(point_type))
-      return HPy_NULL;
-    HPy_SetAttr_s(ctx, m, "Point", point_type);
-
-    return m;
-}
+// HPy_MODINIT takes the extension name, i.e., what would be XXX in PyInit_XXX,
+// and the module definition. The module will be created by the runtime and
+// passed to the HPy_mod_exec slots if any are defined
+HPy_MODINIT(step_01_hpy_legacy, moduledef)

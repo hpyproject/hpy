@@ -1,31 +1,38 @@
 Debug Mode
 ==========
 
-HPy includes a debug mode which includes useful run-time checks to ensure
-that C extensions use the API correctly. Its features include:
+HPy includes a debug mode which does useful run-time checks to ensure that C
+extensions use the API correctly. Its features include:
 
     1. No special compilation flags are required: it is enough to compile the
        extension with the Universal ABI.
-    
+
     2. Debug mode can be activated at *import time*, and it can be activated
        per-extension.
-    
-    3. You pay the overhead of debug mode only if you use it. Extensions loaded 
+
+    3. You pay the overhead of debug mode only if you use it. Extensions loaded
        without the debug mode run at full speed.
 
 This is possible because the whole of the HPy API is provided as part of the HPy
 context, so debug mode can pass in a special debugging context without affecting
 the performance of the regular context at all.
 
+.. note:: The debug mode is only available if the module (you want to use it
+    for) was built for :term:`HPy Universal ABI`.
+
 The debugging context can already check for:
 
 * Leaked handles.
 * Handles used after they are closed.
+* Tuple and list builder used after they were *closed* (i.e. cancelled or the
+  tuple/list was built).
 * Reading from a memory which is no longer guaranteed to be still valid,
-  for example, the buffer returned by ``HPyUnicode_AsUTF8AndSize`` after the
+  for example, the buffer returned by :c:func:`HPyUnicode_AsUTF8AndSize`,
+  :c:func:`HPyBytes_AsString`, and :c:func:`HPyBytes_AS_STRING`, after the
   corresponding ``HPy`` handle was closed.
 * Writing to memory which should be read-only, for example the buffer
-  returned by ``HPyUnicode_AsUTF8AndSize``.
+  returned by :c:func:`HPyUnicode_AsUTF8AndSize`, :c:func:`HPyBytes_AsString`,
+  and :c:func:`HPyBytes_AS_STRING`
 
 
 Activating Debug Mode
@@ -66,8 +73,12 @@ and ``HPY`` have no effect for that extension.
 Using Debug Mode
 ----------------
 
-HPy debug module uses the ``LeakDetector`` class to detect leaked ``HPy``
-handles. Example usage of ``LeakDetector``:
+By default, when debug mode detects an error it will either abort the process
+(using :c:func:`HPy_FatalError`) or raise a fatal exception. This may sound very
+strict but in general, it is not safe to continue the execution.
+
+When testing, aborting the process is unwanted. Module ``hpy.debug`` exposes the
+``LeakDetector`` class to detect leaked ``HPy`` handles. For example:
 
 .. literalinclude:: examples/tests.py
   :language: python
@@ -83,9 +94,9 @@ may also enable other useful debugging facilities.
   :start-at: from hpy.debug.pytest import hpy_debug
   :end-at: # Run some HPy extension code
 
-**ATTENTION**: The usage of ``LeakDetector`` or ``hpy_debug`` by itself does not
-enable HPy debug mode! If debug mode is not enabled for any extension, then
-those features have no effect.
+.. warning:: The usage of ``LeakDetector`` or ``hpy_debug`` by itself does not
+    enable HPy debug mode! If debug mode is not enabled for any extension, then
+    those features have no effect.
 
 When dealing with handle leaks, it is useful to get a stack trace of the
 allocation of the leaked handle. This feature has large memory requirements
@@ -103,10 +114,11 @@ and disabled by:
   :start-at: hpy.debug.disable_handle_stack_traces
   :end-at: hpy.debug.disable_handle_stack_traces
 
-.. Note: the following output is tested in test_leak_detector_with_traces_output
 
 Example
 -------
+
+.. note: The following output is tested in test_leak_detector_with_traces_output
 
 Following HPy function leaks a handle:
 

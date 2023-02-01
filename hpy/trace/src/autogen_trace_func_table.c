@@ -12,7 +12,7 @@
 
 #include "trace_internal.h"
 
-#define TRACE_NFUNC 182
+#define TRACE_NFUNC 181
 
 #define NO_FUNC ""
 static const char *trace_func_table[] = {
@@ -93,28 +93,27 @@ static const char *trace_func_table[] = {
     NO_FUNC,
     NO_FUNC,
     NO_FUNC,
-    "ctx_Module_Create",
     "ctx_Dup",
     "ctx_Close",
-    "ctx_Long_FromLong",
-    "ctx_Long_FromUnsignedLong",
-    "ctx_Long_FromLongLong",
-    "ctx_Long_FromUnsignedLongLong",
+    "ctx_Long_FromInt32_t",
+    "ctx_Long_FromUInt32_t",
+    "ctx_Long_FromInt64_t",
+    "ctx_Long_FromUInt64_t",
     "ctx_Long_FromSize_t",
     "ctx_Long_FromSsize_t",
-    "ctx_Long_AsLong",
-    "ctx_Long_AsUnsignedLong",
-    "ctx_Long_AsUnsignedLongMask",
-    "ctx_Long_AsLongLong",
-    "ctx_Long_AsUnsignedLongLong",
-    "ctx_Long_AsUnsignedLongLongMask",
+    "ctx_Long_AsInt32_t",
+    "ctx_Long_AsUInt32_t",
+    "ctx_Long_AsUInt32_tMask",
+    "ctx_Long_AsInt64_t",
+    "ctx_Long_AsUInt64_t",
+    "ctx_Long_AsUInt64_tMask",
     "ctx_Long_AsSize_t",
     "ctx_Long_AsSsize_t",
     "ctx_Long_AsVoidPtr",
     "ctx_Long_AsDouble",
     "ctx_Float_FromDouble",
     "ctx_Float_AsDouble",
-    "ctx_Bool_FromLong",
+    "ctx_Bool_FromBool",
     "ctx_Length",
     "ctx_Number_Check",
     "ctx_Add",
@@ -291,7 +290,7 @@ int hpy_trace_get_nfunc(void)
 
 const char * hpy_trace_get_func_name(int idx)
 {
-    if (idx >= 0 && idx < 265)
+    if (idx >= 0 && idx < 264)
         return trace_func_table[idx];
     return NULL;
 }

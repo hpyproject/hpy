@@ -82,31 +82,32 @@ class DefaultExtensionTemplate(object):
     };
     %(globals_defs)s
     static HPyModuleDef moduledef = {
-        .name = "%(name)s",
         .doc = "some test for hpy",
-        .size = -1,
+        .size = 0,
         .legacy_methods = %(legacy_methods)s,
         .defines = moduledefs,
         %(globals_field)s
     };
 
-    HPy_MODINIT(%(name)s)
-    static HPy init_%(name)s_impl(HPyContext *ctx)
-    {
-        HPy m = HPy_NULL;
-        m = HPyModule_Create(ctx, &moduledef);
-        if (HPy_IsNull(m))
-            goto MODINIT_ERROR;
-        %(init_types)s
-        return m;
-
-        MODINIT_ERROR:
-
-        if (!HPy_IsNull(m))
-            HPy_Close(ctx, m);
-        return HPy_NULL;
-    }
+    HPy_MODINIT(%(name)s, moduledef)
     """)
+
+    INIT_TEMPLATE_WITH_TYPES_INIT = textwrap.dedent(
+        """
+        HPyDef_SLOT(generated_init, HPy_mod_exec)
+        static int generated_init_impl(HPyContext *ctx, HPy m)
+        {
+            // Shouldn't really happen, but jut to silence the unused label warning
+            if (HPy_IsNull(m))
+                goto MODINIT_ERROR;
+
+            %(init_types)s
+            return 0;
+
+            MODINIT_ERROR:
+            return -1;
+        }
+        """ + INIT_TEMPLATE)
 
     r_marker = re.compile(r"^\s*@([A-Za-z_]+)(\(.*\))?$")
 
@@ -165,7 +166,11 @@ class DefaultExtensionTemplate(object):
                 };''') % NL_INDENT.join(self.globals_table)
             globals_field = '.globals = module_globals'
 
-        exp = self.INIT_TEMPLATE % {
+        template = self.INIT_TEMPLATE
+        if init_types:
+            template = self.INIT_TEMPLATE_WITH_TYPES_INIT
+            self.EXPORT('generated_init')
+        exp = template % {
             'legacy_methods': self.legacy_methods,
             'defines': NL_INDENT.join(self.defines_table),
             'init_types': init_types,
@@ -205,6 +210,9 @@ class DefaultExtensionTemplate(object):
             """
         src = reindent(src, 4)
         self.type_table.append(src.format(func=func))
+
+    def HPy_MODINIT(self, mod):
+        return "HPy_MODINIT({}, {})".format(self.name, mod)
 
 
 class Spec(object):
@@ -354,9 +362,12 @@ class ExtensionCompiler:
                                 'trace', 'hybrid+trace')
         import sys
         import hpy.universal
+        import importlib.util
         assert name not in sys.modules
-        mod = hpy.universal.load(name, so_filename, mode=mode)
+        spec = importlib.util.spec_from_file_location(name, so_filename)
+        mod = hpy.universal.load(name, so_filename, spec, mode=mode)
         mod.__file__ = so_filename
+        mod.__spec__ = spec
         return mod
 
     def load_cpython_module(self, name, so_filename):
@@ -398,7 +409,9 @@ class PythonSubprocessRunner:
             # HPy module
             load_module = "import sys;" + \
                           "import hpy.universal;" + \
-                          "mod = hpy.universal.load('{name}', '{so_filename}', debug={debug});"
+                          "import importlib.util;" + \
+                          "spec = importlib.util.spec_from_file_location('{name}', '{so_filename}');" + \
+                          "mod = hpy.universal.load('{name}', '{so_filename}', spec, debug={debug});"
             escaped_filename = mod.so_filename.replace("\\", "\\\\")  # Needed for Windows paths
             load_module = load_module.format(name=mod.name, so_filename=escaped_filename,
                                              debug=self.hpy_abi == 'debug')
@@ -489,18 +502,24 @@ class HPyDebugCapture:
     """
     def __init__(self):
         self.invalid_handles_count = 0
+        self.invalid_builders_count = 0
 
     def _capture_report(self):
         self.invalid_handles_count += 1
 
+    def _capture_builder_report(self):
+        self.invalid_builders_count += 1
+
     def __enter__(self):
         from hpy.universal import _debug
         _debug.set_on_invalid_handle(self._capture_report)
+        _debug.set_on_invalid_builder_handle(self._capture_builder_report)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         from hpy.universal import _debug
         _debug.set_on_invalid_handle(None)
+        _debug.set_on_invalid_builder_handle(None)
 
 
 # the few functions below are copied and adapted from cffi/ffiplatform.py
@@ -540,7 +559,13 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
 
     # this is the equivalent of passing --hpy-abi from setup.py's command line
     dist.hpy_abi = hpy_abi
+    # For testing, we want to use static libs to avoid repeated compilation
+    # of the same sources which slows down testing.
+    dist.hpy_use_static_libs = True
     dist.hpy_ext_modules = [ext]
+    # We need to explicitly specify which Python modules we expect because some
+    # test cases create several distributions in the same temp directory.
+    dist.py_modules = [ext.name]
     hpy_devel.fix_distribution(dist)
 
     old_level = distutils.log.set_threshold(0) or 0

@@ -3,6 +3,7 @@ from distutils import sysconfig
 
 # NOTE: these must be kept on sync with the equivalent defines in hpy.h
 HPY_ABI_VERSION = 0
+HPY_ABI_VERSION_MINOR = 0
 HPY_ABI_TAG = 'hpy%d' % HPY_ABI_VERSION
 
 def parse_ext_suffix(ext_suffix=None):

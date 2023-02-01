@@ -1,6 +1,7 @@
 #include <Python.h>
 #include "ctx_meth.h"
 #include "hpy/runtime/ctx_type.h"
+#include "hpy/runtime/ctx_module.h"
 #include "handles.h"
 
 static void _buffer_h2py(HPyContext *ctx, const HPy_buffer *src, Py_buffer *dest)
@@ -119,6 +120,13 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
         f(name, PyCapsule_GetPointer(capsule, name),
                 PyCapsule_GetContext(capsule));
         return;
+    }
+    case HPyFunc_MOD_CREATE: {
+            HPyFunc_unaryfunc f = (HPyFunc_unaryfunc)func;
+            _HPyFunc_args_UNARYFUNC *a = (_HPyFunc_args_UNARYFUNC*)args;
+            a->result = _h2py(f(ctx, _py2h(a->arg0)));
+            _HPyModule_CheckCreateSlotResult(&a->result);
+            return;
     }
 #include "autogen_ctx_call.i"
     default:

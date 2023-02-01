@@ -107,30 +107,41 @@ Similarly we replace ``PyModuleDef`` with ``HPyModuleDef``:
 .. literalinclude:: steps/step_01_hpy_legacy.c
     :lineno-match:
     :start-at: // Legacy module methods (the "dot" method is still a PyCFunction)
-    :end-before: HPy_MODINIT(step_01_hpy_legacy)
+    :end-before: // END-OF: HPyModuleDef
 
 Like the type, the list of ported methods in ``module_defines`` is initially
-empty and all the methods are still in ``PointModuleMethods`` which has
-been renamed to ``PointModuleLegacyMethods``.
+almost empty: all the regular methods are still in ``PointModuleMethods`` which has
+been renamed to ``PointModuleLegacyMethods``. However, because HPy supports only
+multiphase module initialization, we must convert our module initialization code
+to an "exec" slot on the module and add that slot to ``module_defines``.
 
 Now all that is left is to replace the module initialization function with
-one that uses ``HPy_MODINIT``:
+one that uses ``HPy_MODINIT``. The first argument is the name of the extension,
+i.e., what was ``XXX`` in ``PyInit_XXX``, and the second argument
+is the ``HPyModuleDef``.
 
 .. literalinclude:: steps/step_01_hpy_legacy.c
     :lineno-match:
-    :start-at: HPy_MODINIT(step_01_hpy_legacy)
+    :start-at: HPy_MODINIT(step_01_hpy_legacy, moduledef)
 
 And we're done!
 
-Note that the initialization function now takes an ``HPyContext *`` as an
-argument and that this ``ctx`` is passed as the first argument to calls to
-HPy API methods.
+Instead of the ``PyInit_XXX``, we now have an "exec" slot on the module.
+We implement it with a C function that that takes an ``HPyContext *ctx`` and ``HPy mod``
+as arguments. The ``ctx`` must be forwarded as the first argument to calls to
+HPy API methods. The ``mod`` argument is a handle for the module object. The runtime
+creates the module for us from the provided ``HPyModuleDef``. There is no need to
+call API like ``PyModule_Create`` explicitly.
 
-``PyModule_Create`` is replaced with ``HPyModule_Create`` and ``PyType_FromSpec``
-is replaced by ``HPyType_FromSpec``.
+Next step is to replace ``PyType_FromSpec`` by ``HPyType_FromSpec``.
 
 ``HPy_SetAttr_s`` is used to add the ``Point`` class to the module. HPy requires no
 special ``PyModule_AddObject`` method.
+
+.. literalinclude:: steps/step_01_hpy_legacy.c
+    :lineno-match:
+    :start-at: HPyDef_SLOT(module_exec, HPy_mod_exec)
+    :end-at: }
 
 
 Step 02: Transition some methods to HPy
@@ -338,7 +349,7 @@ and the module definition is simpler too:
 .. literalinclude:: steps/step_03_hpy_final.c
     :lineno-match:
     :start-at: static HPyDef *module_defines[] = {
-    :end-before: HPy_MODINIT(step_03_hpy_final)
+    :end-before: HPy_MODINIT(step_03_hpy_final, moduledef)
 
 Now that the port is complete, when we compile our extension in HPy
 universal mode, we obtain a built extension that depends only on the HPy ABI

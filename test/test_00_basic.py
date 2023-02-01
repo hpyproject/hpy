@@ -7,6 +7,8 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 "fake pytest module")
 """
 from .support import HPyTest
+from hpy.devel.abitag import HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR
+import shutil
 
 
 class TestBasic(HPyTest):
@@ -27,6 +29,57 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert type(mod) is type(sys)
+
+    def test_abi_version_check(self):
+        if self.compiler.hpy_abi != 'universal':
+            return
+        try:
+            self.make_module("""
+                // hack: we redefine the version
+                #undef HPY_ABI_VERSION
+                #define HPY_ABI_VERSION 999
+                @INIT
+            """)
+        except RuntimeError as ex:
+            assert str(ex) == "HPy extension module 'mytest' requires unsupported " \
+                              "version of the HPy runtime. Requested version: 999.0. " \
+                              "Current HPy version: {}.{}.".format(HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR)
+        else:
+            assert False, "Expected exception"
+
+    def test_abi_tag_check(self):
+        if self.compiler.hpy_abi != 'universal':
+            return
+
+        from hpy.universal import MODE_UNIVERSAL
+        def assert_load_raises(filename, message):
+            try:
+                self.compiler.load_universal_module('mytest', filename, mode=MODE_UNIVERSAL)
+            except RuntimeError as ex:
+                assert str(ex) == message
+            else:
+                assert False, "Expected exception"
+
+        module = self.compile_module("@INIT")
+        filename = module.so_filename
+        hpy_tag = ".hpy{}".format(HPY_ABI_VERSION)
+
+        filename_wrong_tag = filename.replace(hpy_tag, ".hpy999")
+        shutil.move(filename, filename_wrong_tag)
+        assert_load_raises(filename_wrong_tag,
+                           "HPy extension module 'mytest' at path '{}': mismatch "
+                           "between the HPy ABI tag encoded in the filename and "
+                           "the major version requested by the HPy extension itself. "
+                           "Major version tag parsed from filename: 999. "
+                           "Requested version: {}.{}.".format(filename_wrong_tag, HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR))
+
+        filename_no_tag = filename.replace(hpy_tag, "")
+        shutil.move(filename_wrong_tag, filename_no_tag)
+        assert_load_raises(filename_no_tag,
+                           "HPy extension module 'mytest' at path '{}': "
+                           "could not find HPy ABI tag encoded in the filename. "
+                           "The extension claims to be compiled with HPy ABI version: "
+                           "{}.{}.".format(filename_no_tag, HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR))
 
     def test_different_name(self):
         mod = self.make_module("""

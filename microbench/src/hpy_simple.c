@@ -56,16 +56,15 @@ static HPy allocate_int_impl(HPyContext *ctx, HPy self)
 HPyDef_METH(allocate_tuple, "allocate_tuple", HPyFunc_NOARGS)
 static HPy allocate_tuple_impl(HPyContext *ctx, HPy self)
 {
-    //return Py_BuildValue("ii", 2048, 2049);
-    HPyErr_SetString(ctx, ctx->h_Exception, "HPy_BuildValue not implemented yet");
-    return HPy_NULL;
+    return HPy_BuildValue(ctx, "ii", 2048, 2049);
 }
 
 
 /* Foo type */
 
 typedef struct {
-    PyObject_HEAD
+    long x;
+    long y;
 } FooObject;
 
 HPyDef_SLOT(Foo_getitem, HPy_sq_item)
@@ -104,6 +103,17 @@ static HPyType_Spec Foo_spec = {
 
 /* Module defines */
 
+HPyDef_SLOT(init_hpy_simple, HPy_mod_exec)
+static int init_hpy_simple_impl(HPyContext *ctx, HPy m)
+{
+    HPy h_Foo = HPyType_FromSpec(ctx, &Foo_spec, NULL);
+    if (HPy_IsNull(h_Foo))
+        return -1;
+    HPy_SetAttr_s(ctx, m, "Foo", h_Foo);
+    HPy_SetAttr_s(ctx, m, "HTFoo", h_Foo);
+    return 0;
+}
+
 static HPyDef *module_defines[] = {
     &noargs,
     &onearg,
@@ -112,27 +122,14 @@ static HPyDef *module_defines[] = {
     &call_with_tuple_and_dict,
     &allocate_int,
     &allocate_tuple,
+    &init_hpy_simple,
     NULL
 };
 
-
 static HPyModuleDef moduledef = {
-    .name = "hpy_simple",
     .doc = "HPy microbenchmarks",
-    .size = -1,
+    .size = 0,
     .defines = module_defines,
 };
 
-HPy_MODINIT(hpy_simple)
-static HPy init_hpy_simple_impl(HPyContext *ctx)
-{
-    HPy m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-    HPy h_Foo = HPyType_FromSpec(ctx, &Foo_spec, NULL);
-    if (HPy_IsNull(h_Foo))
-      return HPy_NULL;
-    HPy_SetAttr_s(ctx, m, "Foo", h_Foo);
-    HPy_SetAttr_s(ctx, m, "HTFoo", h_Foo);
-    return m;
-}
+HPy_MODINIT(hpy_simple, moduledef)

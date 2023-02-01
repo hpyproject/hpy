@@ -41,6 +41,8 @@ typedef enum {
     HPyFunc_DESTRUCTOR,
     HPyFunc_CAPSULE_DESTRUCTOR,
 
+    HPyFunc_MOD_CREATE,
+
 } HPyFunc_Signature;
 
 /* The typedefs corresponding to the various HPyFunc_Signature members

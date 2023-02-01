@@ -168,5 +168,20 @@ typedef struct {
                 HPyFunc_CAPSULE_DESTRUCTOR, (HPyCFunction)IMPL, capsule);      \
     }
 
+typedef struct {
+    cpy_PyObject *spec;
+    cpy_PyObject *result;
+} _HPyFunc_args_MOD_CREATE;
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_MOD_CREATE(SYM, IMPL)                      \
+    static cpy_PyObject* SYM(cpy_PyObject *spec, cpy_PyModuleDef *def)         \
+    {                                                                          \
+        (void) def; /* avoid 'unused' warning */                               \
+        _HPyFunc_args_UNARYFUNC a = { spec };                                  \
+        _HPy_CallRealFunctionFromTrampoline(                                   \
+           _ctx_for_trampolines, HPyFunc_MOD_CREATE, (HPyCFunction)IMPL, &a);  \
+        return a.result;                                                       \
+    }
+
 
 #endif // HPY_UNIVERSAL_HPYFUNC_TRAMPOLINES_H

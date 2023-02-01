@@ -3,7 +3,7 @@ all: hpy.universal
 
 .PHONY: hpy.universal
 hpy.universal:
-	python3 setup.py build_ext -if
+	python3 setup.py build_clib -f build_ext -if
 
 .PHONY: dist-info
 dist-info:
@@ -32,6 +32,7 @@ cppcheck: cppcheck-build-dir
 		--inline-suppr \
 		--suppress=allocaCalled \
 		-I /usr/local/include \
+		-I /usr/include \
 		-I ${PYTHON_INC} \
 		-I hpy/devel/include/ \
 		-I hpy/devel/include/hpy/ \
@@ -50,8 +51,16 @@ infer:
 	# see commit cd8cd6e for why we need to ignore debug_ctx.c
 	@infer --fail-on-issue --compilation-database compile_commands.json --report-blacklist-path-regex "hpy/debug/src/debug_ctx.c"
 
+valgrind_args = --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output
+python_args = -m pytest --valgrind --valgrind-log=/tmp/valgrind-output
+
+.PHONY: valgrind
 valgrind:
-	PYTHONMALLOC=malloc valgrind --suppressions=hpy/tools/valgrind/python.supp --suppressions=hpy/tools/valgrind/hpy.supp --leak-check=full --show-leak-kinds=definite,indirect --log-file=/tmp/valgrind-output python3 -m pytest --valgrind --valgrind-log=/tmp/valgrind-output test/
+ifeq ($(HPY_TEST_PORTION),)
+	PYTHONMALLOC=malloc valgrind $(valgrind_args) python3 $(python_args) test/
+else
+	PYTHONMALLOC=malloc valgrind $(valgrind_args) python3 $(python_args) --portion $(HPY_TEST_PORTION) test/
+endif
 
 porting-example-tests:
 	cd docs/porting-example/steps && python3 setup00.py build_ext -i
@@ -61,7 +70,8 @@ porting-example-tests:
 	python3 -m pytest docs/porting-example/steps/ ${TEST_ARGS}
 
 docs-examples-tests:
-	cd docs/examples/simple-example && python3 setup.py --hpy-abi=universal install
-	cd docs/examples/mixed-example  && python3 setup.py install
-	cd docs/examples/snippets       && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/simple-example  && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/mixed-example   && python3 setup.py install
+	cd docs/examples/snippets        && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/hpytype-example && python3 setup.py --hpy-abi=universal install
 	python3 -m pytest docs/examples/tests.py ${TEST_ARGS}

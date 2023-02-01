@@ -21,7 +21,7 @@ _HPy_HIDDEN int ctx_Err_Occurred(HPyContext *ctx);
 
 // ctx_listbuilder.c
 _HPy_HIDDEN HPyListBuilder ctx_ListBuilder_New(HPyContext *ctx,
-                                               HPy_ssize_t initial_size);
+                                               HPy_ssize_t size);
 _HPy_HIDDEN void ctx_ListBuilder_Set(HPyContext *ctx, HPyListBuilder builder,
                                      HPy_ssize_t index, HPy h_item);
 _HPy_HIDDEN HPy ctx_ListBuilder_Build(HPyContext *ctx, HPyListBuilder builder);
@@ -51,7 +51,7 @@ _HPy_HIDDEN void ctx_Tracker_Close(HPyContext *ctx, HPyTracker ht);
 
 // ctx_tuplebuilder.c
 _HPy_HIDDEN HPyTupleBuilder ctx_TupleBuilder_New(HPyContext *ctx,
-                                                 HPy_ssize_t initial_size);
+                                                 HPy_ssize_t size);
 _HPy_HIDDEN void ctx_TupleBuilder_Set(HPyContext *ctx, HPyTupleBuilder builder,
                                       HPy_ssize_t index, HPy h_item);
 _HPy_HIDDEN HPy ctx_TupleBuilder_Build(HPyContext *ctx, HPyTupleBuilder builder);
@@ -99,9 +99,20 @@ _HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
 _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
                                                           HPy h_type);
 
+// ctx_long.c
+_HPy_HIDDEN HPy ctx_Long_FromInt32_t(HPyContext *ctx, int32_t value);
+_HPy_HIDDEN HPy ctx_Long_FromUInt32_t(HPyContext *ctx, uint32_t value);
+_HPy_HIDDEN HPy ctx_Long_FromInt64_t(HPyContext *ctx, int64_t v);
+_HPy_HIDDEN HPy ctx_Long_FromUInt64_t(HPyContext *ctx, uint64_t v);
+_HPy_HIDDEN int32_t ctx_Long_AsInt32_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint32_t ctx_Long_AsUInt32_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint32_t ctx_Long_AsUInt32_tMask(HPyContext *ctx, HPy h);
+_HPy_HIDDEN int64_t ctx_Long_AsInt64_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint64_t ctx_Long_AsUInt64_t(HPyContext *ctx, HPy h);
+_HPy_HIDDEN uint64_t ctx_Long_AsUInt64_tMask(HPyContext *ctx, HPy h);
 
 // ctx_contextvar.c
-_HPy_HIDDEN int ctx_ContextVar_Get(HPyContext *ctx, HPy context_var, HPy defaul_value,
-                                   HPy *result);
+_HPy_HIDDEN int ctx_ContextVar_Get(HPyContext *ctx, HPy context_var,
+                                   HPy defaul_value, HPy *result);
 
 #endif /* HPY_RUNTIME_CTX_FUNCS_H */

@@ -111,4 +111,16 @@ typedef int (*_HPyCFunction_RELEASEBUFFERPROC)(HPyContext *, HPy, HPy_buffer *);
                 PyCapsule_GetContext(capsule));                                \
     }
 
+extern void
+_HPyModule_CheckCreateSlotResult(cpy_PyObject **result);
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_MOD_CREATE(SYM, IMPL)                      \
+    static cpy_PyObject* SYM(cpy_PyObject *spec, cpy_PyModuleDef *def)         \
+    {                                                                          \
+        (void) def; /* avoid 'unused' warning */                               \
+        cpy_PyObject* result = _h2py(IMPL(_HPyGetContext(), _py2h(spec)));     \
+        _HPyModule_CheckCreateSlotResult(&result);                              \
+        return result;                                                         \
+    }
+
 #endif // HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H

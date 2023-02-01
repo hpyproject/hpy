@@ -24,7 +24,9 @@
 #include <Python.h>
 #include "debug_internal.h"
 #include "hpy/runtime/ctx_type.h" // for call_traverseproc_from_trampoline
+#include "hpy/runtime/ctx_module.h"
 #include "handles.h" // for _py2h and _h2py
+
 #if defined(_MSC_VER)
 # include <malloc.h>   /* for alloca() */
 #endif
@@ -191,6 +193,17 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         const char *name = PyCapsule_GetName(capsule);
         f(name, PyCapsule_GetPointer(capsule, name),
                 PyCapsule_GetContext(capsule));
+        return;
+    }
+    case HPyFunc_MOD_CREATE: {
+        HPyFunc_unaryfunc f = (HPyFunc_unaryfunc)func;
+        _HPyFunc_args_UNARYFUNC *a = (_HPyFunc_args_UNARYFUNC*)args;
+        DHPy dh_arg0 = _py2dh(dctx, a->arg0);
+        DHPy dh_result = f(dctx, dh_arg0);
+        DHPy_close_and_check(dctx, dh_arg0);
+        a->result = _dh2py(dctx, dh_result);
+        _HPyModule_CheckCreateSlotResult(&a->result);
+        DHPy_close(dctx, dh_result);
         return;
     }
 #include "autogen_debug_ctx_call.i"

@@ -36,14 +36,10 @@ static HPyDef *SimpleMethods[] = {
 };
 // END: methodsdef
 
-static HPyModuleDef simple = {
-        .name = "hpyvarargs",
+static HPyModuleDef def = {
         .doc = "HPy Example of varargs calling convention",
-        .size = -1,
+        .size = 0,
         .defines = SimpleMethods
 };
 
-HPy_MODINIT(hpyvarargs)
-HPy init_hpyvarargs_impl(HPyContext *ctx) {
-    return HPyModule_Create(ctx, &simple);
-}
+HPy_MODINIT(hpyvarargs, def)

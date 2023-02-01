@@ -11,7 +11,7 @@ jobs:
     strategy:
       # Duplicate changes to this matrix to 'poc_tests'
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-11, windows-latest]
         python-version: ['3.9', '3.10']
         compiler: [""]
         include:
@@ -26,7 +26,7 @@ jobs:
             python-version: '3.11'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/ccache.yml
       #   parameters:
@@ -44,7 +44,9 @@ jobs:
         run: python -m pip install --upgrade pip wheel 'setuptools>=60.2'
 
       - name: Build
-        run: python -m pip install .
+        run: |
+          make
+          python -m pip install .
 
       - if: ${{ matrix.compiler }}
         # Only set the compiler for the tests, not for the build
@@ -64,7 +66,7 @@ jobs:
         python-version: ['3.11', '3.10', '3.9', '3.8', '3.7']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python from deadsnakes
         uses: deadsnakes/action@v2.1.1
@@ -79,7 +81,9 @@ jobs:
         run: python -m pip install --upgrade pip wheel
 
       - name: Build
-        run: python -m pip install .
+        run: |
+          make
+          python -m pip install .
 
       - name: Run tests
         run: |
@@ -91,7 +95,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-11, windows-latest]
         python-version: ['3.10']
         include:
           - os: ubuntu-latest
@@ -104,7 +108,7 @@ jobs:
             python-version: '3.11'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/ccache.yml
       #   parameters:
@@ -153,11 +157,11 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-11, windows-latest]
         python-version: ['3.9']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -187,39 +191,37 @@ jobs:
         shell: bash
 
 
-  valgrind_tests:
-    name: Valgrind tests
-    runs-on: 'ubuntu-latest'
-    steps:
-      - uses: actions/checkout@v2
+  valgrind_tests_1:
+    name: 'Valgrind tests (1/3)'
+    uses: ./.github/workflows/valgrind-tests.yml
+    with:
+      portion: '1/3'
 
-    # - template: azure-templates/ccache.yml
-    # - template: azure-templates/python.yml
 
-      - name: Install / Upgrade system dependencies
-        run: sudo apt update && sudo apt install -y valgrind
+  valgrind_tests_2:
+    name: 'Valgrind tests (2/3)'
+    uses: ./.github/workflows/valgrind-tests.yml
+    with:
+      portion: '2/3'
 
-      - name: Install / Upgrade Python dependencies
-        run: python -m pip install --upgrade pip wheel
 
-      - name: Build
-        run: python -m pip install .
+  valgrind_tests_3:
+    name: 'Valgrind tests (3/3)'
+    uses: ./.github/workflows/valgrind-tests.yml
+    with:
+      portion: '3/3'
 
-      - name: Run tests
-        run: |
-          python -m pip install pytest pytest-valgrind filelock
-          make valgrind
 
   docs_examples_tests:
     name: Documentation examples tests
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-11, windows-latest]
         python-version: ['3.10']
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -244,7 +246,7 @@ jobs:
     name: Build documentation
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/python.yml
 
@@ -262,7 +264,7 @@ jobs:
           python -m sphinx -T -W -E -b html -d _build/doctrees -D language=en . _build/html
 
       - name: Upload built HTML files
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: hpy_html_docs
           path: docs/_build/html/*
@@ -273,7 +275,7 @@ jobs:
     name: C tests
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make -C c_test
 
 
@@ -281,7 +283,7 @@ jobs:
     name: Check autogen
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
     # - template: azure-templates/python.yml
 
@@ -318,7 +320,7 @@ jobs:
     name: Check Python 2.7 compatibility
     runs-on: 'ubuntu-20.04'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
     # - template: azure-templates/python.yml
     #   parameters:
@@ -341,8 +343,9 @@ jobs:
   cpp_check:
     name: Cppcheck static analysis
     runs-on: 'ubuntu-20.04'
+    continue-on-error: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -360,7 +363,7 @@ jobs:
     name: Infer static analysis
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # - template: azure-templates/python.yml
 
@@ -382,3 +385,33 @@ jobs:
 
       - name: Run Infer
         run: make infer
+
+  check_microbench:
+    name: Check micro benchmarks
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install / Upgrade system dependencies
+        run: sudo apt update && sudo apt install -y valgrind
+
+      - name: Install / Upgrade Python requirements
+        run: |
+          python -m pip install --upgrade pip wheel 'setuptools>=60.2'
+          python -m pip install pytest cffi
+
+      - name: Build and install HPy
+        run: |
+          make
+          python -m pip install .
+
+      - name: Run microbenchmarks
+        run: |
+          cd microbench
+          python setup.py build_ext -i
+          python -m pytest -v

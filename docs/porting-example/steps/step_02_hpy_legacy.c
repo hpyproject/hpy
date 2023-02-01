@@ -140,30 +140,28 @@ static PyMethodDef PointModuleLegacyMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-// HPy module methods (no methods have been ported yet)
+HPyDef_SLOT(module_exec, HPy_mod_exec)
+static int module_exec_impl(HPyContext *ctx, HPy mod)
+{
+    HPy point_type = HPyType_FromSpec(ctx, &Point_Type_spec, NULL);
+    if (HPy_IsNull(point_type))
+        return -1;
+    HPy_SetAttr_s(ctx, mod, "Point", point_type);
+    return 0;
+}
+
+// HPy module methods: no regular methods have been ported yet,
+// but we add the module execute slot
 static HPyDef *module_defines[] = {
+    &module_exec,
     NULL
 };
 
 static HPyModuleDef moduledef = {
-    .name = "step_02_hpy_legacy",
     .doc = "Point module (Step 2; Porting some methods)",
-    .size = -1,
+    .size = 0,
     .legacy_methods = PointModuleLegacyMethods,
     .defines = module_defines,
 };
 
-HPy_MODINIT(step_02_hpy_legacy)
-static HPy init_step_02_hpy_legacy_impl(HPyContext *ctx)
-{
-    HPy m = HPyModule_Create(ctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-
-    HPy point_type = HPyType_FromSpec(ctx, &Point_Type_spec, NULL);
-    if (HPy_IsNull(point_type))
-      return HPy_NULL;
-    HPy_SetAttr_s(ctx, m, "Point", point_type);
-
-    return m;
-}
+HPy_MODINIT(step_02_hpy_legacy, moduledef)

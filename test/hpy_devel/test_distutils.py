@@ -154,15 +154,10 @@ class TestDistutils:
             // the simplest possible HPy module
             #include <hpy.h>
             static HPyModuleDef moduledef = {
-                .name = "hpymod",
                 .doc = "hpymod with HPy ABI: " HPY_ABI,
             };
 
-            HPy_MODINIT(hpymod)
-            static HPy init_hpymod_impl(HPyContext *ctx)
-            {
-                return HPyModule_Create(ctx, &moduledef);
-            }
+            HPy_MODINIT(hpymod, moduledef)
         """)
 
         self.writefile('hpymod_legacy.c', """
@@ -180,16 +175,11 @@ class TestDistutils:
             };
 
             static HPyModuleDef moduledef = {
-                .name = "hpymod_legacy",
                 .doc = "hpymod_legacy with HPy ABI: " HPY_ABI,
                 .legacy_methods = my_legacy_methods,
             };
 
-            HPy_MODINIT(hpymod_legacy)
-            static HPy init_hpymod_legacy_impl(HPyContext *ctx)
-            {
-                return HPyModule_Create(ctx, &moduledef);
-            }
+            HPy_MODINIT(hpymod_legacy, moduledef)
         """)
 
     def gen_setup_py(self, src):

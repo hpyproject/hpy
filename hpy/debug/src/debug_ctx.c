@@ -41,6 +41,7 @@ int hpy_debug_ctx_init(HPyContext *dctx, HPyContext *uctx)
     info->protected_raw_data_size = 0;
     DHQueue_init(&info->open_handles);
     DHQueue_init(&info->closed_handles);
+    DHQueue_init(&info->closed_builder);
     dctx->_private = info;
     debug_ctx_init_fields(dctx, uctx);
     return 0;
@@ -334,6 +335,68 @@ void debug_ctx_Tracker_Close(HPyContext *dctx, HPyTracker ht)
     // debug_ctx_Close, which is exactly what we need to properly record that
     // the handles were closed.
     ctx_Tracker_Close(dctx, ht);
+}
+
+HPyListBuilder debug_ctx_ListBuilder_New(HPyContext *dctx, HPy_ssize_t size)
+{
+    return DHPyListBuilder_open(dctx, HPyListBuilder_New(get_info(dctx)->uctx, size));
+}
+
+void debug_ctx_ListBuilder_Set(HPyContext *dctx, HPyListBuilder builder, HPy_ssize_t index, DHPy h_item)
+{
+    HPyListBuilder_Set(get_info(dctx)->uctx, DHPyListBuilder_unwrap(dctx, builder), index, DHPy_unwrap(dctx, h_item));
+}
+
+DHPy debug_ctx_ListBuilder_Build(HPyContext *dctx, HPyListBuilder dh_builder)
+{
+    DebugBuilderHandle *handle = DHPyListBuilder_as_DebugBuilderHandle(dh_builder);
+    if (handle == NULL)
+        return HPy_NULL;
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh_result = HPyListBuilder_Build(uctx, DHPyListBuilder_unwrap(dctx, dh_builder));
+    DHPy_builder_handle_close(dctx, handle);
+    return DHPy_open(dctx, uh_result);
+}
+
+void debug_ctx_ListBuilder_Cancel(HPyContext *dctx, HPyListBuilder dh_builder)
+{
+    DebugBuilderHandle *handle = DHPyListBuilder_as_DebugBuilderHandle(dh_builder);
+    if (handle == NULL)
+        return;
+    HPyContext *uctx = get_info(dctx)->uctx;
+    HPyListBuilder_Cancel(uctx, DHPyListBuilder_unwrap(dctx, dh_builder));
+    DHPy_builder_handle_close(dctx, handle);
+}
+
+HPyTupleBuilder debug_ctx_TupleBuilder_New(HPyContext *dctx, HPy_ssize_t size)
+{
+    return DHPyTupleBuilder_open(dctx, HPyTupleBuilder_New(get_info(dctx)->uctx, size));
+}
+
+void debug_ctx_TupleBuilder_Set(HPyContext *dctx, HPyTupleBuilder builder, HPy_ssize_t index, DHPy h_item)
+{
+    HPyTupleBuilder_Set(get_info(dctx)->uctx, DHPyTupleBuilder_unwrap(dctx, builder), index, DHPy_unwrap(dctx, h_item));
+}
+
+DHPy debug_ctx_TupleBuilder_Build(HPyContext *dctx, HPyTupleBuilder dh_builder)
+{
+    DebugBuilderHandle *handle = DHPyTupleBuilder_as_DebugBuilderHandle(dh_builder);
+    if (handle == NULL)
+        return HPy_NULL;
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh_result = HPyTupleBuilder_Build(uctx, DHPyTupleBuilder_unwrap(dctx, dh_builder));
+    DHPy_builder_handle_close(dctx, handle);
+    return DHPy_open(dctx, uh_result);
+}
+
+void debug_ctx_TupleBuilder_Cancel(HPyContext *dctx, HPyTupleBuilder dh_builder)
+{
+    DebugBuilderHandle *handle = DHPyTupleBuilder_as_DebugBuilderHandle(dh_builder);
+    if (handle == NULL)
+        return;
+    HPyContext *uctx = get_info(dctx)->uctx;
+    HPyTupleBuilder_Cancel(uctx, DHPyTupleBuilder_unwrap(dctx, dh_builder));
+    DHPy_builder_handle_close(dctx, handle);
 }
 
 int debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy defaul_value, DHPy *result) {

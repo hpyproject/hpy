@@ -38,8 +38,9 @@ static UHPy build_list_of_handles(HPyContext *uctx, UHPy u_self, DHQueue *q,
     if (HPy_IsNull(u_result))
         goto error;
 
-    DebugHandle *dh = q->head;
-    while(dh != NULL) {
+    DHQueueNode *node = q->head;
+    while(node != NULL) {
+        DebugHandle *dh = (DebugHandle *)node;
         if (dh->generation >= gen) {
             UHPy u_item = new_DebugHandleObj(uctx, u_DebugHandleType, dh);
             if (HPy_IsNull(u_item))
@@ -48,7 +49,7 @@ static UHPy build_list_of_handles(HPyContext *uctx, UHPy u_self, DHQueue *q,
                 goto error;
             HPy_Close(uctx, u_item);
         }
-        dh = dh->next;
+        node = node->next;
     }
 
     HPy_Close(uctx, u_DebugHandleType);
@@ -172,6 +173,25 @@ static UHPy set_on_invalid_handle_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg
     return HPy_Dup(uctx, uctx->h_None);
 }
 
+HPyDef_METH(set_on_invalid_builder_handle, "set_on_invalid_builder_handle", HPyFunc_O,
+            .doc="Set the function to call when we detect the usage of an invalid builder handle")
+static UHPy set_on_invalid_builder_handle_impl(HPyContext *uctx, UHPy u_self, UHPy u_arg)
+{
+    HPyContext *dctx = hpy_debug_get_ctx(uctx);
+    if (dctx == NULL)
+        return HPy_NULL;
+    HPyDebugInfo *info = get_info(dctx);
+    if (HPy_Is(uctx, u_arg, uctx->h_None)) {
+        info->uh_on_invalid_builder_handle = HPy_NULL;
+    } else if (!HPyCallable_Check(uctx, u_arg)) {
+        HPyErr_SetString(uctx, uctx->h_TypeError, "Expected a callable object");
+        return HPy_NULL;
+    } else {
+        info->uh_on_invalid_builder_handle = HPy_Dup(uctx, u_arg);
+    }
+    return HPy_Dup(uctx, uctx->h_None);
+}
+
 HPyDef_METH(set_handle_stack_trace_limit, "set_handle_stack_trace_limit", HPyFunc_O,
             .doc="Set the limit to captured HPy handles allocations stack traces. "
                 "None means do not capture the stack traces.")
@@ -241,7 +261,7 @@ HPyDef_GET(DebugHandle_is_closed, "is_closed",
 static UHPy DebugHandle_is_closed_get(HPyContext *uctx, UHPy self, void *closure)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);
-    return HPyBool_FromLong(uctx, dh->handle->is_closed);
+    return HPyBool_FromBool(uctx, dh->handle->is_closed);
 }
 
 HPyDef_GET(DebugHandle_raw_data_size, "raw_data_size",
@@ -267,9 +287,9 @@ static UHPy DebugHandle_cmp_impl(HPyContext *uctx, UHPy self, UHPy o, HPy_RichCm
 
     switch(op) {
     case HPy_EQ:
-        return HPyBool_FromLong(uctx, dh_self->handle == dh_o->handle);
+        return HPyBool_FromBool(uctx, dh_self->handle == dh_o->handle);
     case HPy_NE:
-        return HPyBool_FromLong(uctx, dh_self->handle != dh_o->handle);
+        return HPyBool_FromBool(uctx, dh_self->handle != dh_o->handle);
     default:
         return HPy_Dup(uctx, uctx->h_NotImplemented);
     }
@@ -377,6 +397,17 @@ static UHPy new_DebugHandleObj(HPyContext *uctx, UHPy u_DebugHandleType,
 
 /* ~~~~~~ definition of the module hpy.debug._debug ~~~~~~~ */
 
+HPyDef_SLOT(module_exec, HPy_mod_exec)
+static int module_exec_impl(HPyContext *uctx, HPy m)
+{
+    UHPy h_DebugHandleType = HPyType_FromSpec(uctx, &DebugHandleType_spec, NULL);
+    if (HPy_IsNull(h_DebugHandleType))
+        return -1;
+    HPy_SetAttr_s(uctx, m, "DebugHandle", h_DebugHandleType);
+    HPy_Close(uctx, h_DebugHandleType);
+    return 0;
+}
+
 static HPyDef *module_defines[] = {
     &new_generation,
     &get_open_handles,
@@ -386,29 +417,16 @@ static HPyDef *module_defines[] = {
     &get_protected_raw_data_max_size,
     &set_protected_raw_data_max_size,
     &set_on_invalid_handle,
+    &set_on_invalid_builder_handle,
     &set_handle_stack_trace_limit,
+    &module_exec,
     NULL
 };
 
 static HPyModuleDef moduledef = {
-    .name = "hpy.debug._debug",
     .doc = "HPy debug mode",
-    .size = -1,
+    .size = 0,
     .defines = module_defines
 };
 
-
-HPy_MODINIT(_debug)
-static UHPy init__debug_impl(HPyContext *uctx)
-{
-    UHPy m = HPyModule_Create(uctx, &moduledef);
-    if (HPy_IsNull(m))
-        return HPy_NULL;
-
-    UHPy h_DebugHandleType = HPyType_FromSpec(uctx, &DebugHandleType_spec, NULL);
-    if (HPy_IsNull(h_DebugHandleType))
-        return HPy_NULL;
-    HPy_SetAttr_s(uctx, m, "DebugHandle", h_DebugHandleType);
-    HPy_Close(uctx, h_DebugHandleType);
-    return m;
-}
+HPy_MODINIT(_debug, moduledef)

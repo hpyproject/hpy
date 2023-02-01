@@ -70,6 +70,8 @@ typedef enum {
     HPy_nb_inplace_matrix_multiply = 76,
     HPy_tp_finalize = 80,
     HPy_tp_destroy = 1000,
+    HPy_mod_create = 2000,
+    HPy_mod_exec = 2001,
 } HPySlot_Slot;
 
 #define _HPySlot_SIG__HPy_bf_getbuffer HPyFunc_GETBUFFERPROC
@@ -131,3 +133,5 @@ typedef enum {
 #define _HPySlot_SIG__HPy_nb_inplace_matrix_multiply HPyFunc_BINARYFUNC
 #define _HPySlot_SIG__HPy_tp_finalize HPyFunc_DESTRUCTOR
 #define _HPySlot_SIG__HPy_tp_destroy HPyFunc_DESTROYFUNC
+#define _HPySlot_SIG__HPy_mod_create HPyFunc_MOD_CREATE
+#define _HPySlot_SIG__HPy_mod_exec HPyFunc_INQUIRY
