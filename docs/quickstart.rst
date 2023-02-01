@@ -1,5 +1,5 @@
 HPy Quickstart
-=============
+==============
 
 This section shows how to quickly get started with HPy by creating
 a simple HPy extension from scratch.
