@@ -80,7 +80,7 @@ static HPyType_Spec Point_spec = {
 
 // BEGIN: add_type
 HPyDef_SLOT(simple_exec, HPy_mod_exec)
-int simple_exec_impl(HPyContext *ctx, HPy m) {
+static int simple_exec_impl(HPyContext *ctx, HPy m) {
     if (!HPyHelpers_AddType(ctx, m, "Point", &Point_spec, NULL)) {
         return -1;
     }

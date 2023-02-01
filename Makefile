@@ -73,5 +73,6 @@ docs-examples-tests:
 	cd docs/examples/simple-example  && python3 setup.py --hpy-abi=universal install
 	cd docs/examples/mixed-example   && python3 setup.py install
 	cd docs/examples/snippets        && python3 setup.py --hpy-abi=universal install
+	cd docs/examples/quickstart      && python3 setup.py --hpy-abi=universal install
 	cd docs/examples/hpytype-example && python3 setup.py --hpy-abi=universal install
 	python3 -m pytest docs/examples/tests.py ${TEST_ARGS}
