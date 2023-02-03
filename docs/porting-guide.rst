@@ -266,6 +266,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyCapsule_IsValid <https://docs.python.org/3/c-api/capsule.html#c.PyCapsule_IsValid>`_                                            :c:func:`HPyCapsule_IsValid`
     `PyEval_RestoreThread <https://docs.python.org/3/c-api/init.html#c.PyEval_RestoreThread>`_                                         :c:func:`HPy_ReenterPythonExecution`
     `PyEval_SaveThread <https://docs.python.org/3/c-api/init.html#c.PyEval_SaveThread>`_                                               :c:func:`HPy_LeavePythonExecution`
+    `PyEval_EvalCode <https://docs.python.org/3/c-api/veryhigh.html#c.PyEval_EvalCode>`_                                               :c:func:`HPy_EvalCode`
     ================================================================================================================================== ================================================
 
 

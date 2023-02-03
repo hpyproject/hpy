@@ -33,6 +33,7 @@ between the modes.
    hpy-gil
    hpy-err
    builder
+   hpy-eval
 
 
 HPy Helper Functions
