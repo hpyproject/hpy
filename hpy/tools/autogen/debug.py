@@ -87,7 +87,8 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyListBuilder_New',
         'HPyListBuilder_Set',
         'HPyListBuilder_Build',
-        'HPyListBuilder_Cancel'
+        'HPyListBuilder_Cancel',
+        'HPy_TypeCheck'
     }
 
     def generate(self):

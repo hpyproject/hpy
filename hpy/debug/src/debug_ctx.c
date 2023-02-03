@@ -399,3 +399,21 @@ void debug_ctx_TupleBuilder_Cancel(HPyContext *dctx, HPyTupleBuilder dh_builder)
     DHPy_builder_handle_close(dctx, handle);
 }
 
+/*
+   However, we don't want to raise an exception if you pass a non-type,
+   because the CPython version (PyObject_TypeCheck) always succeed and it
+   would be too easy to forget to check the return value. We just raise a
+   fatal error instead.
+ */
+int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh_obj = DHPy_unwrap(dctx, obj);
+    UHPy uh_type = DHPy_unwrap(dctx, type);
+    assert(!HPy_IsNull(uh_obj));
+    assert(!HPy_IsNull(uh_type));
+    if (!HPy_TypeCheck(uctx, uh_type, uctx->h_TypeType)) {
+        HPy_FatalError(uctx, "HPy_TypeCheck arg 2 must be a type");
+    }
+    return HPy_TypeCheck(uctx, uh_obj, uh_type);
+}
