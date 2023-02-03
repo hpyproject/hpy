@@ -211,6 +211,12 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 typedef struct _HPyContext_s HPyContext;
 
+typedef enum {
+    HPy_SourceKind_Expr = 0,
+    HPy_SourceKind_File = 1,
+    HPy_SourceKind_Stat = 2,
+} HPy_SourceKind;
+
 #ifdef HPY_ABI_CPYTHON
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;

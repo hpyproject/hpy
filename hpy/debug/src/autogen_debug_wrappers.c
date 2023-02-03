@@ -1658,3 +1658,28 @@ void debug_ctx_Dump(HPyContext *dctx, DHPy h)
     get_ctx_info(dctx)->is_valid = true;
 }
 
+DHPy debug_ctx_Compile_s(HPyContext *dctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPy_Compile_s(get_info(dctx)->uctx, utf8_source, utf8_filename, kind);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
+DHPy debug_ctx_EvalCode(HPyContext *dctx, DHPy code, DHPy globals, DHPy locals)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_code = DHPy_unwrap(dctx, code);
+    HPy dh_globals = DHPy_unwrap(dctx, globals);
+    HPy dh_locals = DHPy_unwrap(dctx, locals);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPy_EvalCode(get_info(dctx)->uctx, dh_code, dh_globals, dh_locals);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
