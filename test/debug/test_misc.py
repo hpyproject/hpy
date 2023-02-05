@@ -38,3 +38,24 @@ def test_use_invalid_as_struct(compiler, python_subprocess):
     assert "Invalid usage of _HPy_AsStruct_Object" in result.stderr.decode("utf-8")
 
 
+@pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
+def test_typecheck(compiler, python_subprocess):
+    mod = compiler.compile_module("""
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        {
+            if (nargs != 2) {
+                HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
+                return HPy_NULL;
+            }
+            int res = HPy_TypeCheck(ctx, args[0], args[1]);
+            return HPyBool_FromLong(ctx, res);
+        }
+        @EXPORT(f)
+        @INIT
+    """)
+    code = "assert mod.f(mod.f('hello', 2)) == 0"
+    result = python_subprocess.run(mod, code)
+    assert result.returncode != 0
+    assert "HPy_TypeCheck arg 2 must be a type" in result.stderr.decode("utf-8")
+

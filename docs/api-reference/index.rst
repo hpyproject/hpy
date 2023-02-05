@@ -26,6 +26,7 @@ between the modes.
 
    function-index
    hpy-ctx
+   hpy-object
    hpy-type
    hpy-field
    hpy-global
