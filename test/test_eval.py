@@ -18,7 +18,7 @@ class TestEval(HPyTest):
                 {
                 case 0: src_kind = HPy_SourceKind_Expr; break;
                 case 1: src_kind = HPy_SourceKind_File; break;
-                case 2: src_kind = HPy_SourceKind_Stat; break;
+                case 2: src_kind = HPy_SourceKind_Single; break;
                 default:
                     // just pass through for testing
                     src_kind = (HPy_SourceKind) src_kind_i;

@@ -226,7 +226,7 @@ typedef enum {
      * Parse a single statement. This is the mode used for the interactive
      * interpreter loop.
      */
-    HPy_SourceKind_Stat = 2,
+    HPy_SourceKind_Single = 2,
 } HPy_SourceKind;
 
 #ifdef HPY_ABI_CPYTHON

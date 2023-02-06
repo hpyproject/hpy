@@ -14,7 +14,7 @@ ctx_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_filenam
     {
     case HPy_SourceKind_Expr: start = Py_eval_input; break;
     case HPy_SourceKind_File: start = Py_file_input; break;
-    case HPy_SourceKind_Stat: start = Py_single_input; break;
+    case HPy_SourceKind_Single: start = Py_single_input; break;
     default:
         PyErr_SetString(PyExc_SystemError, "invalid source kind");
         return HPy_NULL;
