@@ -84,4 +84,4 @@ class TestEval(HPyTest):
 
         c0 = compile("raise ValueError", "hello.py", "exec")
         with pytest.raises(ValueError):
-            mod.f(c0, dict(), dict())
+            mod.f(c0, dict(__builtins__=__builtins__), dict())
