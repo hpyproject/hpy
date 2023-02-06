@@ -280,4 +280,5 @@ struct _HPyContext_s {
     int (*ctx_ContextVar_Get)(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     HPy (*ctx_SeqIter_New)(HPyContext *ctx, HPy seq);
+    int (*ctx_IsInstance)(HPyContext *ctx, HPy obj, HPy type);
 };

@@ -143,6 +143,7 @@ SPECIAL_CASES = {
     'HPy_EvalCode': 'PyEval_EvalCode',
     'HPy_MaybeGetAttr_s': None,
     'HPyDict_GetItem': None,
+    'HPy_IsInstance': 'PyObject_IsInstance',
 }
 
 # Allows to provide a simple inline implementation for the context function

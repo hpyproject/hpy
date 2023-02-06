@@ -412,6 +412,8 @@ HPy_ID(251)
 int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
 HPy_ID(252)
 const char *HPyType_GetName(HPyContext *ctx, HPy type);
+HPy_ID(266)
+int HPy_IsInstance(HPyContext *ctx, HPy obj, HPy type);
 
 HPy_ID(167)
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);

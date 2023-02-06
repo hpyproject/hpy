@@ -107,6 +107,7 @@ HPy Core API Function Index
 * :c:func:`HPy_SetType`
 * :c:func:`HPyType_IsSubtype`
 * :c:func:`HPyType_GetName`
+* :c:func:`HPy_IsInstance`
 * :c:func:`HPy_Is`
 * :c:func:`HPy_Repr`
 * :c:func:`HPy_Str`

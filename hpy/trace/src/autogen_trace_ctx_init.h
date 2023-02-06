@@ -107,6 +107,7 @@ int trace_ctx_TypeCheck(HPyContext *tctx, HPy obj, HPy type);
 int trace_ctx_SetType(HPyContext *tctx, HPy obj, HPy type);
 int trace_ctx_Type_IsSubtype(HPyContext *tctx, HPy sub, HPy type);
 const char *trace_ctx_Type_GetName(HPyContext *tctx, HPy type);
+int trace_ctx_IsInstance(HPyContext *tctx, HPy obj, HPy type);
 int trace_ctx_Is(HPyContext *tctx, HPy obj, HPy other);
 void *trace_ctx_AsStruct_Object(HPyContext *tctx, HPy h);
 void *trace_ctx_AsStruct_Legacy(HPyContext *tctx, HPy h);
@@ -196,8 +197,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(266, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(266, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(267, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(267, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -394,6 +395,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_SetType = &trace_ctx_SetType;
     tctx->ctx_Type_IsSubtype = &trace_ctx_Type_IsSubtype;
     tctx->ctx_Type_GetName = &trace_ctx_Type_GetName;
+    tctx->ctx_IsInstance = &trace_ctx_IsInstance;
     tctx->ctx_Is = &trace_ctx_Is;
     tctx->ctx_AsStruct_Object = &trace_ctx_AsStruct_Object;
     tctx->ctx_AsStruct_Legacy = &trace_ctx_AsStruct_Legacy;

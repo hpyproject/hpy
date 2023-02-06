@@ -377,6 +377,11 @@ HPyAPI_FUNC const char *HPyType_GetName(HPyContext *ctx, HPy type)
         return ((PyTypeObject*) _h2py(type))->tp_name;
 }
 
+HPyAPI_FUNC int HPy_IsInstance(HPyContext *ctx, HPy obj, HPy type)
+{
+    return PyObject_IsInstance(_h2py(obj), _h2py(type));
+}
+
 HPyAPI_FUNC HPy HPy_Repr(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Repr(_h2py(obj)));

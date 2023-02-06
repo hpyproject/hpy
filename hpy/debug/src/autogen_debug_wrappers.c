@@ -1171,6 +1171,19 @@ const char *debug_ctx_Type_GetName(HPyContext *dctx, DHPy type)
     return universal_result;
 }
 
+int debug_ctx_IsInstance(HPyContext *dctx, DHPy obj, DHPy type)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    HPy dh_type = DHPy_unwrap(dctx, type);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPy_IsInstance(get_info(dctx)->uctx, dh_obj, dh_type);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
 int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other)
 {
     if (!get_ctx_info(dctx)->is_valid) {
