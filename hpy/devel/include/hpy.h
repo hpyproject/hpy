@@ -211,6 +211,24 @@ static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 
 typedef struct _HPyContext_s HPyContext;
 
+/** An enumeration of the different kinds of source code strings. */
+typedef enum {
+    /** Parse isolated expressions (e.g. ``a + b``). */
+    HPy_SourceKind_Expr = 0,
+
+    /**
+     * Parse sequences of statements as read from a file or other source. This
+     * is the symbol to use when compiling arbitrarily long Python source code.
+     */
+    HPy_SourceKind_File = 1,
+
+    /**
+     * Parse a single statement. This is the mode used for the interactive
+     * interpreter loop.
+     */
+    HPy_SourceKind_Single = 2,
+} HPy_SourceKind;
+
 #ifdef HPY_ABI_CPYTHON
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;

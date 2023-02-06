@@ -662,3 +662,11 @@ HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h) {
      ctx->ctx_Dump ( ctx, h ); 
 }
 
+HPyAPI_FUNC HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind) {
+     return ctx->ctx_Compile_s ( ctx, utf8_source, utf8_filename, kind ); 
+}
+
+HPyAPI_FUNC HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals) {
+     return ctx->ctx_EvalCode ( ctx, code, globals, locals ); 
+}
+

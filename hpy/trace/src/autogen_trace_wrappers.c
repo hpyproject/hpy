@@ -2114,3 +2114,29 @@ void trace_ctx_Dump(HPyContext *tctx, HPy h)
     hpy_trace_on_exit(info, 227, r0, r1, &_ts_start, &_ts_end);
 }
 
+HPy trace_ctx_Compile_s(HPyContext *tctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 248);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPy_Compile_s(uctx, utf8_source, utf8_filename, kind);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 248, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_EvalCode(HPyContext *tctx, HPy code, HPy globals, HPy locals)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 249);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPy_EvalCode(uctx, code, globals, locals);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 249, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+

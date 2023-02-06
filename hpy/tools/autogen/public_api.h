@@ -802,6 +802,51 @@ HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global);
 HPy_ID(227)
 void _HPy_Dump(HPyContext *ctx, HPy h);
 
+/* Evaluating Python statements/expressions */
+
+/**
+ * Parse and compile the Python source code.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param utf8_source:
+ *     Python source code given as UTF-8 encoded C string (must not be ``NULL``).
+ * :param utf8_filename:
+ *     The filename (UTF-8 encoded C string) to use for construction of the code
+ *     object. It may appear in tracebacks or in ``SyntaxError`` exception
+ *     messages.
+ * :param kind:
+ *     The source kind which tells the parser if a single expression, statement,
+ *     or a whole file should be parsed (see enum :c:enum:`HPy_SourceKind`).
+ *
+ * :returns:
+ *     A Python code object resulting from the parsed and compiled Python source
+ *     code or ``HPy_NULL`` in case of errors.
+ */
+HPy_ID(248)
+HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind);
+
+/**
+ * Evaluate a precompiled code object.
+ *
+ * Code objects can be compiled from a string using :c:func:`HPy_Compile_s`.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param code:
+ *     The code object to evaluate.
+ * :param globals:
+ *     A Python dictionary defining the global variables for the evaluation.
+ * :param locals:
+ *     A mapping object defining the local variables for the evaluation.
+ *
+ * :returns:
+ *     The result produced by the executed code. May be ``HPy_NULL`` in case of
+ *     errors.
+ */
+HPy_ID(249)
+HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals);
+
 
 /* *******
    hpyfunc

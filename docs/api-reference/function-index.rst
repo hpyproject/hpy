@@ -162,3 +162,5 @@ HPy Core API Function Index
 * :c:func:`HPy_LeavePythonExecution`
 * :c:func:`HPyGlobal_Store`
 * :c:func:`HPyGlobal_Load`
+* :c:func:`HPy_Compile_s`
+* :c:func:`HPy_EvalCode`

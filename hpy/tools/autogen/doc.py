@@ -48,7 +48,8 @@ GROUP_PATTERN = re.compile('Py(\\w+)_.*')
 # Some C API functions are documented in very different pages.
 SPECIAL_CASES = {
     'PyEval_SaveThread': 'init',
-    'PyEval_RestoreThread': 'init'
+    'PyEval_RestoreThread': 'init',
+    'PyEval_EvalCode': 'veryhigh',
 }
 
 # We assume that, e.g., prefix 'PyLong_Something' belongs to 'longobject.c' and

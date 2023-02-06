@@ -262,4 +262,6 @@ struct _HPyContext_s {
     void *(*ctx_Capsule_Get)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, const char *utf8_name);
     int (*ctx_Capsule_IsValid)(HPyContext *ctx, HPy capsule, const char *utf8_name);
     int (*ctx_Capsule_Set)(HPyContext *ctx, HPy capsule, _HPyCapsule_key key, void *value);
+    HPy (*ctx_Compile_s)(HPyContext *ctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind);
+    HPy (*ctx_EvalCode)(HPyContext *ctx, HPy code, HPy globals, HPy locals);
 };
