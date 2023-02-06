@@ -107,6 +107,7 @@ HPY_CTX_SOURCES = [
     'hpy/devel/src/runtime/ctx_contextvar.c',
     'hpy/devel/src/runtime/ctx_dict.c',
     'hpy/devel/src/runtime/ctx_err.c',
+    'hpy/devel/src/runtime/ctx_eval.c',
     'hpy/devel/src/runtime/ctx_long.c',
     'hpy/devel/src/runtime/ctx_module.c',
     'hpy/devel/src/runtime/ctx_object.c',

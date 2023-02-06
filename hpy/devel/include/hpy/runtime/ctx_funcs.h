@@ -111,6 +111,10 @@ _HPy_HIDDEN int64_t ctx_Long_AsInt64_t(HPyContext *ctx, HPy h);
 _HPy_HIDDEN uint64_t ctx_Long_AsUInt64_t(HPyContext *ctx, HPy h);
 _HPy_HIDDEN uint64_t ctx_Long_AsUInt64_tMask(HPyContext *ctx, HPy h);
 
+// ctx_eval.c
+_HPy_HIDDEN HPy ctx_Compile_s(HPyContext *ctx, const char *utf8_source,
+                              const char *utf8_filename, HPy_SourceKind kind);
+
 // ctx_contextvar.c
 _HPy_HIDDEN int ctx_ContextVar_Get(HPyContext *ctx, HPy context_var,
                                    HPy defaul_value, HPy *result);

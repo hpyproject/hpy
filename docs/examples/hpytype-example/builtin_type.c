@@ -82,7 +82,7 @@ static void make_Language(HPyContext *ctx, HPy module)
 }
 
 HPyDef_SLOT(simple_exec, HPy_mod_exec)
-int simple_exec_impl(HPyContext *ctx, HPy m) {
+static int simple_exec_impl(HPyContext *ctx, HPy m) {
     make_Dummy(ctx, m);
     if (HPyErr_Occurred(ctx))
         return -1;

@@ -157,6 +157,7 @@ Moreover, ``HPyContext`` is used by the :term:`HPy Universal ABI` to contain a
 sort of virtual function table which is used by the C extensions to call back
 into the Python interpreter.
 
+.. _simple example:
 
 A simple example
 -----------------
@@ -242,9 +243,11 @@ are still written using the ``Python.h`` API.
 
 Note that the HPy module does not specify its name. HPy does not support the legacy
 single phase module initialization and the only module initialization approach is
-the multi-phase initialization (PEP 451). With multi-phase module initialization,
-the name of the module is always taken from the ``ModuleSpec``, i.e., most likely
-from the name used in the ``import {{name}}`` statement that imported your module.
+the multi-phase initialization (`PEP 489 <https://peps.python.org/pep-0489/>`_).
+With multi-phase module initialization,
+the name of the module is always taken from the ``ModuleSpec`` (`PEP 451 <https://peps.python.org/pep-0451/>`_)
+, i.e., most likely from the name used in the ``import {{name}}`` statement that
+imported your module.
 
 This is the only difference stemming from multi-phase module initialization in this
 simple example.
@@ -319,30 +322,6 @@ table, which now becomes:
 .. literalinclude:: examples/snippets/hpyvarargs.c
   :start-after: // BEGIN: methodsdef
   :end-before: // END: methodsdef
-
-More Examples
--------------
-
-HPy usually has tests for each API function. This means that there is lots of
-examples available by looking at the tests. However, the test source uses
-many macros and is hard to read. To overcome this we supply a utility to
-export clean C sources for the tests. Since the HPy tests are not shipped by
-default, you need to clone the HPy repository from GitHub:
-
-.. code-block:: console
-
-    > git clone https://github.com/hpyproject/hpy.git
-
-After that, install all test requirements and dump the sources:
-
-.. code-block:: console
-
-    > cd hpy
-    > python3 -m pip install pytest filelock
-    > python3 -m pytest --dump-dir=test_sources test/
-
-This will dump the generated test sources into folder ``test_sources``. Note,
-that the tests won't be executed but skipped with an appropriate message.
 
 Creating types in HPy
 ---------------------
@@ -477,7 +456,7 @@ A type with ``.legacy_slots != NULL`` is required to have
 ``HPyType_BuiltinShape_Legacy`` and to include ``PyObject_HEAD`` at the start of
 its struct. It would be easy to relax this requirement on CPython (where the
 ``PyObject_HEAD`` fields are always present) but a large burden on other
-implementations (e.g. PyPy, GraalPython) where a struct starting with
+implementations (e.g. PyPy, GraalPy) where a struct starting with
 ``PyObject_HEAD`` might not exist.
 
 Types created via the old Python C API are automatically legacy types.
@@ -567,3 +546,40 @@ be considered in three places:
 For more information about the built-in shape and for a technical explanation
 for why it is required, see :c:member:`HPyType_Spec.builtin_shape` and
 :c:enum:`HPyType_BuiltinShape`.
+
+More Examples
+-------------
+
+The :doc:`porting-example/index` shows another complete example
+of HPy extension ported from Python/C API.
+
+The `HPy project space <https://github.com/hpyproject/>`_ on GitHub
+contains forks of some popular Python extensions ported to HPy as
+a proof of concept/feasibility studies, such as the
+`Kiwi solver <https://github.com/hpyproject/kiwi-hpy>`_.
+Note that those forks may not be up to date with their upstream projects
+or with the upstream HPy changes.
+
+HPy unit tests
+~~~~~~~~~~~~~~
+
+HPy usually has tests for each API function. This means that there is lots of
+examples available by looking at the tests. However, the test source uses
+many macros and is hard to read. To overcome this we supply a utility to
+export clean C sources for the tests. Since the HPy tests are not shipped by
+default, you need to clone the HPy repository from GitHub:
+
+.. code-block:: console
+
+    > git clone https://github.com/hpyproject/hpy.git
+
+After that, install all test requirements and dump the sources:
+
+.. code-block:: console
+
+    > cd hpy
+    > python3 -m pip install pytest filelock
+    > python3 -m pytest --dump-dir=test_sources test/
+
+This will dump the generated test sources into folder ``test_sources``. Note,
+that the tests won't be executed but skipped with an appropriate message.

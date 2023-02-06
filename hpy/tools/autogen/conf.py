@@ -139,6 +139,8 @@ SPECIAL_CASES = {
     'HPyLong_AsUInt64_t': None,
     'HPyLong_AsUInt64_tMask': None,
     'HPyBool_FromBool': 'PyBool_FromLong',
+    'HPy_Compile_s': None,
+    'HPy_EvalCode': 'PyEval_EvalCode',
     'HPy_MaybeGetAttr_s': None,
     'HPyDict_GetItem': None,
 }

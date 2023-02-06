@@ -593,6 +593,11 @@ HPyAPI_IMPL HPyThreadState ctx_LeavePythonExecution(HPyContext *ctx)
     return _threads2h(PyEval_SaveThread());
 }
 
+HPyAPI_IMPL HPy ctx_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals)
+{
+    return _py2h(PyEval_EvalCode(_h2py(code), _h2py(globals), _h2py(locals)));
+}
+
 HPyAPI_IMPL int ctx_Type_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value)
 {
         return _HPyType_CheckSlot(type, value);

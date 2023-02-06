@@ -43,7 +43,7 @@ Back to ``HPy`` vs ``HPyField`` vs ``HPyGlobal``:
     as soon as they are no longer needed. The debug mode will report a
     long-lived ``HPy`` as a potential memory leak.
 
-  * In PyPy and GraalPython, ``HPy`` handles are implemented using an
+  * In PyPy and GraalPy, ``HPy`` handles are implemented using an
     indirection: they are indexes inside a big list of GC-managed objects: this
     big list is tracked by the GC, so when an object moves its pointer is
     correctly updated.
@@ -146,7 +146,7 @@ Direct C API to HPy mappings
 In many cases, migrating to HPy is as easy as just replacing a certain C API
 function by the appropriate HPy API function. Table :ref:`table-mapping` gives a
 mapping between C API and HPy API functions. This mapping is generated together
-with the code for the :term:`CPython ABI` mode, so it is correct.
+with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correct.
 
 
 ..  _table-mapping:
@@ -266,6 +266,7 @@ with the code for the :term:`CPython ABI` mode, so it is correct.
     `PyCapsule_IsValid <https://docs.python.org/3/c-api/capsule.html#c.PyCapsule_IsValid>`_                                            :c:func:`HPyCapsule_IsValid`
     `PyEval_RestoreThread <https://docs.python.org/3/c-api/init.html#c.PyEval_RestoreThread>`_                                         :c:func:`HPy_ReenterPythonExecution`
     `PyEval_SaveThread <https://docs.python.org/3/c-api/init.html#c.PyEval_SaveThread>`_                                               :c:func:`HPy_LeavePythonExecution`
+    `PyEval_EvalCode <https://docs.python.org/3/c-api/veryhigh.html#c.PyEval_EvalCode>`_                                               :c:func:`HPy_EvalCode`
     ================================================================================================================================== ================================================
 
 

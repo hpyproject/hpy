@@ -8,7 +8,8 @@
 #include "hpy.h"
 #include "hpy_debug.h"
 
-#define HPY_DEBUG_MAGIC 0xDEB00FF
+#define HPY_DEBUG_INFO_MAGIC     0xDEB00FF
+#define HPY_DEBUG_CTX_INFO_MAGIC 0xDDA003F
 
 /* === DHQueue === */
 
@@ -277,13 +278,31 @@ BUILDER_UNWRAP(HPyListBuilder, list_builder)
 
 static const HPy_ssize_t DEFAULT_CLOSED_HANDLES_QUEUE_MAX_SIZE = 1024;
 static const HPy_ssize_t DEFAULT_PROTECTED_RAW_DATA_MAX_SIZE = 1024 * 1024 * 10;
+static const HPy_ssize_t HPY_DEBUG_DEFAULT_STACKTRACE_LIMIT = 16;
+#define HPY_DEBUG_CTX_CACHE_SIZE 16 // Keep in sync with test_context_reuse.py
+
+// We intentionally create multiple HPyContext instances to check that
+// the extension is not relying on the HPyContext identity. Before bouncing
+// to HPy function in the CallRealFunctionFromTrampoline, we take next debug
+// context copy from a circular buffer and mark the current one as invalid.
+//
+// HPyDebugInfo: represents meta-data shared between all the copies of the
+// debug context.
+//
+// HPyDebugCtxInfo represents meta-data specific to each debug context
+// instance. At this point it is main flag is_valid that is checked by all
+// the context functions as the first thing.
 
 typedef struct {
     long magic_number; // used just for sanity checks
     HPyContext *uctx;
     long current_generation;
 
-    // the following should be an HPyField, but it's complicated:
+    // Array of cached debug contexts used as a circular buffer
+    HPyContext *dctx_cache[HPY_DEBUG_CTX_CACHE_SIZE];
+    size_t dctx_cache_current_index;
+
+    // the following should be an HPyField, but it's complicate:
     // HPyFields should be used only on memory which is known by the GC, which
     // happens automatically if you use e.g. HPy_New, but currently
     // HPy_DebugInfo is malloced(). We need either:
@@ -305,13 +324,30 @@ typedef struct {
     DHQueue closed_builder;
 } HPyDebugInfo;
 
-static inline HPyDebugInfo *get_info(HPyContext *dctx)
+typedef struct {
+    long magic_number; // used just for sanity checks
+    bool is_valid;
+    HPyDebugInfo *info;
+} HPyDebugCtxInfo;
+
+static inline HPyDebugCtxInfo *get_ctx_info(HPyContext *dctx)
 {
-    HPyDebugInfo *info = (HPyDebugInfo*)dctx->_private;
-    assert(info->magic_number == HPY_DEBUG_MAGIC); // sanity check
+    HPyDebugCtxInfo *info = (HPyDebugCtxInfo*)dctx->_private;
+    assert(info->magic_number == HPY_DEBUG_CTX_INFO_MAGIC); // sanity check
     return info;
 }
 
+static inline HPyDebugInfo *get_info(HPyContext *dctx)
+{
+    HPyDebugInfo *info = get_ctx_info(dctx)->info;
+    assert(info->magic_number == HPY_DEBUG_INFO_MAGIC); // sanity check
+    return info;
+}
+
+
+HPyContext* hpy_debug_get_next_dctx_from_cache(HPyContext *dctx);
+
+void report_invalid_debug_context();
 
 void *raw_data_copy(const void* data, HPy_ssize_t size, bool write_protect);
 void raw_data_protect(void* data, HPy_ssize_t size);

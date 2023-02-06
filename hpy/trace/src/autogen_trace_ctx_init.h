@@ -188,14 +188,16 @@ HPyThreadState trace_ctx_LeavePythonExecution(HPyContext *tctx);
 void trace_ctx_Global_Store(HPyContext *tctx, HPyGlobal *global, HPy h);
 HPy trace_ctx_Global_Load(HPyContext *tctx, HPyGlobal global);
 void trace_ctx_Dump(HPyContext *tctx, HPy h);
+HPy trace_ctx_Compile_s(HPyContext *tctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind);
+HPy trace_ctx_EvalCode(HPyContext *tctx, HPy code, HPy globals, HPy locals);
 int trace_ctx_Type_CheckSlot(HPyContext *tctx, HPy type, HPyDef *value);
 
 static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(264, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(264, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(266, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(266, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -474,5 +476,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_Global_Store = &trace_ctx_Global_Store;
     tctx->ctx_Global_Load = &trace_ctx_Global_Load;
     tctx->ctx_Dump = &trace_ctx_Dump;
+    tctx->ctx_Compile_s = &trace_ctx_Compile_s;
+    tctx->ctx_EvalCode = &trace_ctx_EvalCode;
     tctx->ctx_Type_CheckSlot = &trace_ctx_Type_CheckSlot;
 }

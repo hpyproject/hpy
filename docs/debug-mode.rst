@@ -43,7 +43,7 @@ Debug mode works *only* for extensions built with HPy universal ABI.
 To enable debug mode, use environment variable ``HPY``. If ``HPY=debug``, then
 all HPy modules are loaded with the trace context. Alternatively, it is also
 possible to specify the mode per module like this:
-``HPY=modA:debug,modB=debug``.
+``HPY=modA:debug,modB:debug``.
 
 In order to verify that your extension is being loaded in debug mode, use
 environment variable ``HPY_LOG``. If this variable is set, then all HPy

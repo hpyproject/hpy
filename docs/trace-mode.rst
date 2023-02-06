@@ -19,7 +19,7 @@ Similar to how the
 :ref:`debug mode is activated <debug-mode:Activating Debug Mode>`, use
 environment variable ``HPY``. If ``HPY=trace``, then all HPy modules are loaded
 with the trace context. Alternatively, it is also possible to specify the mode
-per module like this: ``HPY=modA:trace,modB=trace``.
+per module like this: ``HPY=modA:trace,modB:trace``.
 Environment variable ``HPY_LOG`` also works.
 
 

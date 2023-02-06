@@ -31,7 +31,7 @@ efficiently and without compromise**. In particular, **reference counting is not
 part of the API**: we want a more generic way of managing resources that is
 possible to impelement with different strategies, including the existing
 reference counting and/or with a moving *Garbage Collector* (like the ones used
-by PyPy, GraalPython or Java, for example). Moreover, each implementation can
+by PyPy, GraalPy or Java, for example). Moreover, each implementation can
 experiment with new memory layout of objects, add optimizations, etc. The
 following is a list of sub-goals.
 
@@ -169,7 +169,7 @@ different ABIs:
       As the name suggests, the HPy Universal ABI is designed to be loaded and
       executed by a variety of different Python implementations. Compiled
       extensions can be loaded unmodified on all the interpreters which support
-      it. PyPy and GraalPython support it natively. CPython supports it by using the
+      it. PyPy and GraalPy support it natively. CPython supports it by using the
       ``hpy.universal`` package, and there is a small speed penalty [#f1]_ compared to
       the CPython ABI.
 
@@ -223,14 +223,14 @@ The HPy project offers some benefits to the python ecosystem, both to Python
 users and to library developers.
 
   - C extensions can achieve much better speed on alternative implementions,
-    including PyPy and GraalPython: according to early :ref:`benchmarks`, an
+    including PyPy and GraalPy: according to early :ref:`benchmarks`, an
     extension written in HPy can be ~3x faster than the equivalent extension
     written using ``Python.h``.
   - Improved debugging: when you load extensions in :ref:`debug-mode:debug mode`,
     many common mistakes are checked and reported automatically.
   - Universal binaries: libraries can choose to distribute only Universal ABI
     binaries. By doing so, they can support all Python implementations and
-    version of CPython (like PyPy, GraalPython, CPython 3.10, CPython 3.11, etc)
+    version of CPython (like PyPy, GraalPy, CPython 3.10, CPython 3.11, etc)
     for which an HPy loader exists, including those that do not yet exist! This
     currently comes with a small speed penalty on CPython, but for
     non-performance critical libraries it might still be a good tradeoff.
@@ -325,7 +325,7 @@ already in place. As on April 2022, the following milestones have been reached:
   - it is possible to load HPy Universal extensions on
     PyPy (using the PyPy `hpy branch <https://foss.heptapod.net/pypy/pypy/tree/branch/hpy>`_).
 
-  - it is possible to load HPy Universal extensions on `GraalPython
+  - it is possible to load HPy Universal extensions on `GraalPy
     <https://github.com/graalvm/graalpython>`_.
 
 
@@ -405,7 +405,7 @@ code/design/discussions of HPy:
 
   - Cython
 
-  - GraalPython
+  - GraalPy
 
   - RustPython
 
@@ -424,7 +424,7 @@ compatibility layer include:
 
   - `IronPython <https://github.com/IronLanguages/ironclad>`_
 
-  - `GraalPython <https://github.com/graalvm/graalpython>`_
+  - `GraalPy <https://github.com/graalvm/graalpython>`_
 
 .. rubric:: Footnotes
 

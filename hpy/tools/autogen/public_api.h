@@ -158,7 +158,7 @@ HPy HPyBool_FromBool(HPyContext *ctx, bool v);
 /* abstract.h */
 HPy_ID(98)
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
-HPy_ID(254)
+HPy_ID(255)
 int HPySequence_Check(HPyContext *ctx, HPy h);
 
 HPy_ID(99)
@@ -333,7 +333,7 @@ HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy_ID(153)
 HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name);
 
-HPy_ID(253)
+HPy_ID(254)
 HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
 HPy_ID(154)
@@ -370,16 +370,47 @@ int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(237)
 int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
 
+/**
+ * Returns the type of the given object ``obj``.
+ *
+ * On failure, raises ``SystemError`` and returns ``HPy_NULL``. This is
+ * equivalent to the Python expression``type(obj)``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     a Python object (must not be ``HPy_NULL``)
+ *
+ * :returns:
+ *     The type of ``obj`` or ``HPy_NULL`` in case of errors.
+ */
 HPy_ID(165)
 HPy HPy_Type(HPyContext *ctx, HPy obj);
-// WARNING: HPy_TypeCheck could be tweaked/removed in the future, see issue #160
+
+/**
+ * Checks if ``ob`` is an instance of ``type`` or any subtype of ``type``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     a Python object (must not be ``HPy_NULL``)
+ * :param type:
+ *     A Python type object. This argument must not be ``HPy_NULL`` and must be
+ *     a type (i.e. it must inherit from Python ``type``). If this is not the
+ *     case, the behavior is undefined (verification of the argument is only
+ *     done in debug mode).
+ *
+ * :returns:
+ *     Non-zero if object ``obj`` is an instance of type ``type`` or an instance
+ *     of a subtype of ``type``, and ``0`` otherwise.
+ */
 HPy_ID(166)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(248)
-int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(249)
-int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
 HPy_ID(250)
+int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
+HPy_ID(251)
+int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
+HPy_ID(252)
 const char *HPyType_GetName(HPyContext *ctx, HPy type);
 
 HPy_ID(167)
@@ -424,7 +455,7 @@ int HPy_RichCompareBool(HPyContext *ctx, HPy v, HPy w, int op);
 HPy_ID(177)
 HPy_hash_t HPy_Hash(HPyContext *ctx, HPy obj);
 
-HPy_ID(251)
+HPy_ID(265)
 HPy HPySeqIter_New(HPyContext *ctx, HPy seq);
 
 /* bytesobject.h */
@@ -470,11 +501,11 @@ HPy_ID(196)
 HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors);
 HPy_ID(197)
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors);
-HPy_ID(255)
-HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
 HPy_ID(256)
-HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str);
+HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
 HPy_ID(257)
+HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str);
+HPy_ID(258)
 HPy HPyUnicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
 
 /* listobject.h */
@@ -490,7 +521,7 @@ HPy_ID(201)
 int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy_ID(202)
 HPy HPyDict_New(HPyContext *ctx);
-HPy_ID(258)
+HPy_ID(259)
 HPy HPyDict_Keys(HPyContext *ctx, HPy h);
 /* HPyDict_GetItem
 
@@ -498,7 +529,7 @@ HPy HPyDict_Keys(HPyContext *ctx, HPy h);
    if 'HPyErr_Occurred(ctx) != 0', it will still work.
    This function, of course, returns a new reference.
  */
-HPy_ID(259)
+HPy_ID(260)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 
 /* tupleobject.h */
@@ -509,15 +540,15 @@ HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
 /* slice */
-HPy_ID(260)
+HPy_ID(261)
 int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 
 /* contextvar */
-HPy_ID(261)
-HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
 HPy_ID(262)
-int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
+HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
 HPy_ID(263)
+int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
+HPy_ID(264)
 HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
 /* import.h */
@@ -813,6 +844,51 @@ HPy HPyGlobal_Load(HPyContext *ctx, HPyGlobal global);
 HPy_ID(227)
 void _HPy_Dump(HPyContext *ctx, HPy h);
 
+/* Evaluating Python statements/expressions */
+
+/**
+ * Parse and compile the Python source code.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param utf8_source:
+ *     Python source code given as UTF-8 encoded C string (must not be ``NULL``).
+ * :param utf8_filename:
+ *     The filename (UTF-8 encoded C string) to use for construction of the code
+ *     object. It may appear in tracebacks or in ``SyntaxError`` exception
+ *     messages.
+ * :param kind:
+ *     The source kind which tells the parser if a single expression, statement,
+ *     or a whole file should be parsed (see enum :c:enum:`HPy_SourceKind`).
+ *
+ * :returns:
+ *     A Python code object resulting from the parsed and compiled Python source
+ *     code or ``HPy_NULL`` in case of errors.
+ */
+HPy_ID(248)
+HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind);
+
+/**
+ * Evaluate a precompiled code object.
+ *
+ * Code objects can be compiled from a string using :c:func:`HPy_Compile_s`.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param code:
+ *     The code object to evaluate.
+ * :param globals:
+ *     A Python dictionary defining the global variables for the evaluation.
+ * :param locals:
+ *     A mapping object defining the local variables for the evaluation.
+ *
+ * :returns:
+ *     The result produced by the executed code. May be ``HPy_NULL`` in case of
+ *     errors.
+ */
+HPy_ID(249)
+HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals);
+
 
 /* *******
    hpyfunc
@@ -983,5 +1059,5 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
-HPy_ID(252)
+HPy_ID(253)
 int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);

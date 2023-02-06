@@ -26,12 +26,14 @@ between the modes.
 
    function-index
    hpy-ctx
+   hpy-object
    hpy-type
    hpy-field
    hpy-global
    hpy-gil
    hpy-err
    builder
+   hpy-eval
 
 
 HPy Helper Functions

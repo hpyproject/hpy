@@ -518,6 +518,10 @@ HPyAPI_FUNC uint64_t HPyLong_AsUInt64_tMask(HPyContext *ctx, HPy h) {
 #undef SIZEOF_INT32
 #undef SIZEOF_INT64
 
+HPyAPI_FUNC HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind) {
+    return ctx_Compile_s(ctx, utf8_source, utf8_filename, kind);
+}
+
 HPyAPI_FUNC HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {
     PyObject *pyobj = _h2py(obj);
     struct _typeobject* t = Py_TYPE(pyobj);
