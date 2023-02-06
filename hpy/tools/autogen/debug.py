@@ -115,31 +115,44 @@ class autogen_debug_wrappers(AutoGenFile):
         signature = toC(node)
         rettype = get_context_return_type(node, const_return)
         #
-        def get_params():
+        def get_params_and_decls():
             lst = []
+            decls = []
             for p in node.type.args.params:
                 if p.name == 'ctx':
                     lst.append('get_info(dctx)->uctx')
                 elif toC(p.type) == 'DHPy':
-                    lst.append('DHPy_unwrap(dctx, %s)' % p.name)
+                    decls.append('    HPy dh_%s = DHPy_unwrap(dctx, %s);' % (p.name, p.name))
+                    lst.append('dh_%s' % p.name)
                 elif toC(p.type) in ('DHPy *', 'DHPy []'):
                     assert False, ('C type %s not supported, please write the wrapper '
                                    'for %s by hand' % (toC(p.type), func.name))
                 else:
                     lst.append(p.name)
-            return ', '.join(lst)
-        params = get_params()
+            return (', '.join(lst), '\n'.join(decls))
+        (params, param_decls) = get_params_and_decls()
         #
         lines = []
         w = lines.append
         w(signature)
         w('{')
+        w('    if (!get_ctx_info(dctx)->is_valid) {')
+        w('        report_invalid_debug_context();')
+        w('    }')
+        if param_decls:
+            w(param_decls)
+        w('    get_ctx_info(dctx)->is_valid = false;')
         if rettype == 'void':
             w(f'    {func.name}({params});')
+            w('    get_ctx_info(dctx)->is_valid = true;')
         elif rettype == 'DHPy':
-            w(f'    return DHPy_open(dctx, {func.name}({params}));')
+            w(f'    HPy universal_result = {func.name}({params});')
+            w('    get_ctx_info(dctx)->is_valid = true;')
+            w('    return DHPy_open(dctx, universal_result);')
         else:
-            w(f'    return {func.name}({params});')
+            w(f'    {rettype} universal_result = {func.name}({params});')
+            w('    get_ctx_info(dctx)->is_valid = true;')
+            w('    return universal_result;')
         w('}')
         return '\n'.join(lines)
 
@@ -157,7 +170,7 @@ class autogen_debug_ctx_call_i(AutoGenFile):
                 continue
             #
             c_ret_type = toC(hpyfunc.return_type())
-            args = ['dctx']
+            args = ['next_dctx']
             dhpys = []
             for i, param in enumerate(hpyfunc.params()[1:]):
                 pname = param.name
@@ -176,12 +189,25 @@ class autogen_debug_ctx_call_i(AutoGenFile):
             for pname in dhpys:
                 w(f'        DHPy dh_{pname} = _py2dh(dctx, a->{pname});')
             #
+            w('        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);')
+            w('        if (next_dctx == NULL) {')
+            if c_ret_type == 'HPy':
+                w('            a->result = NULL;')
+            elif c_ret_type == 'int' or c_ret_type == 'HPy_ssize_t' or c_ret_type == 'HPy_hash_t':
+                w('            a->result = -1;')
+            else:
+                assert c_ret_type == 'void', c_ret_type + " not implemented"
+            w('            return;')
+            w('        }')
+            #
             if c_ret_type == 'void':
                 w(f'        f({args});')
             elif c_ret_type == 'HPy':
                 w(f'        DHPy dh_result = f({args});')
             else:
                 w(f'        a->result = f({args});')
+            #
+            w('        _switch_back_to_original_dctx(dctx, next_dctx);')
             #
             for pname in dhpys:
                 w(f'        DHPy_close_and_check(dctx, dh_{pname});')
