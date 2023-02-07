@@ -1,25 +1,6 @@
 #ifndef HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 #define HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 
-
-typedef HPy (*_HPyCFunction_NOARGS)(HPyContext*, HPy);
-#define _HPyFunc_TRAMPOLINE_HPyFunc_NOARGS(SYM, IMPL)                   \
-    static PyObject *                                                   \
-    SYM(PyObject *self, PyObject *noargs)                               \
-    {                                                                   \
-        _HPyCFunction_NOARGS func = (_HPyCFunction_NOARGS)IMPL; \
-        return _h2py(func(_HPyGetContext(), _py2h(self)));              \
-    }
-
-typedef HPy (*_HPyCFunction_O)(HPyContext*, HPy, HPy);
-#define _HPyFunc_TRAMPOLINE_HPyFunc_O(SYM, IMPL)                        \
-    static PyObject *                                                   \
-    SYM(PyObject *self, PyObject *arg)                                  \
-    {                                                                   \
-        _HPyCFunction_O func = (_HPyCFunction_O)IMPL; \
-        return _h2py(func(_HPyGetContext(), _py2h(self), _py2h(arg)));  \
-    }
-
 typedef HPy (*_HPyCFunction_VARARGS)(HPyContext*, HPy, HPy *, HPy_ssize_t);
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                  \
     static PyObject*                                                    \

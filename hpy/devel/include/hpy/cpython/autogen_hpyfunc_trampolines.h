@@ -10,6 +10,20 @@
 
 */
 
+typedef HPy (*_HPyCFunction_NOARGS)(HPyContext *, HPy);
+#define _HPyFunc_TRAMPOLINE_HPyFunc_NOARGS(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *self) \
+    { \
+        _HPyCFunction_NOARGS func = (_HPyCFunction_NOARGS)IMPL; \
+        return _h2py(func(_HPyGetContext(), _py2h(self))); \
+    }
+typedef HPy (*_HPyCFunction_O)(HPyContext *, HPy, HPy);
+#define _HPyFunc_TRAMPOLINE_HPyFunc_O(SYM, IMPL) \
+    static cpy_PyObject *SYM(cpy_PyObject *self, cpy_PyObject *arg) \
+    { \
+        _HPyCFunction_O func = (_HPyCFunction_O)IMPL; \
+        return _h2py(func(_HPyGetContext(), _py2h(self), _py2h(arg))); \
+    }
 typedef HPy (*_HPyCFunction_UNARYFUNC)(HPyContext *, HPy);
 #define _HPyFunc_TRAMPOLINE_HPyFunc_UNARYFUNC(SYM, IMPL) \
     static cpy_PyObject *SYM(cpy_PyObject *arg0) \

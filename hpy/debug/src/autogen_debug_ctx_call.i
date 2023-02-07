@@ -10,6 +10,40 @@
 
 */
 
+    case HPyFunc_NOARGS: {
+        HPyFunc_noargs f = (HPyFunc_noargs)func;
+        _HPyFunc_args_NOARGS *a = (_HPyFunc_args_NOARGS*)args;
+        DHPy dh_self = _py2dh(dctx, a->self);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            a->result = NULL;
+            return;
+        }
+        DHPy dh_result = f(next_dctx, dh_self);
+        _switch_back_to_original_dctx(dctx, next_dctx);
+        DHPy_close_and_check(dctx, dh_self);
+        a->result = _dh2py(dctx, dh_result);
+        DHPy_close(dctx, dh_result);
+        return;
+    }
+    case HPyFunc_O: {
+        HPyFunc_o f = (HPyFunc_o)func;
+        _HPyFunc_args_O *a = (_HPyFunc_args_O*)args;
+        DHPy dh_self = _py2dh(dctx, a->self);
+        DHPy dh_arg = _py2dh(dctx, a->arg);
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            a->result = NULL;
+            return;
+        }
+        DHPy dh_result = f(next_dctx, dh_self, dh_arg);
+        _switch_back_to_original_dctx(dctx, next_dctx);
+        DHPy_close_and_check(dctx, dh_self);
+        DHPy_close_and_check(dctx, dh_arg);
+        a->result = _dh2py(dctx, dh_result);
+        DHPy_close(dctx, dh_result);
+        return;
+    }
     case HPyFunc_UNARYFUNC: {
         HPyFunc_unaryfunc f = (HPyFunc_unaryfunc)func;
         _HPyFunc_args_UNARYFUNC *a = (_HPyFunc_args_UNARYFUNC*)args;
