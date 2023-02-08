@@ -1119,7 +1119,7 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
 
 #if HAVE_FROM_METACLASS
     /* On Python 3.12 an newer, we can just use 'PyType_FromMetaclass'. */
-    PyObject *result = PyType_FromMetaclass(meta, NULL, spec, bases);
+    PyObject *result = PyType_FromMetaclass(metatype, NULL, spec, bases);
 #else
     /* On Python 3.11 an older, we need to use our own
        '_PyType_FromMetaclass'. */
