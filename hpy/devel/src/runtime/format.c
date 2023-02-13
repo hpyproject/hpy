@@ -178,7 +178,6 @@ typedef struct {
 static void StrWriter_Init(StrWriter *writer, HPy_ssize_t init_size)
 {
     memset(writer, 0, sizeof(*writer));
-    init_size = init_size;
     writer->data_utf8 = malloc(init_size);
     writer->size = init_size;
 }

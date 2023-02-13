@@ -621,7 +621,8 @@ class TestUnicode(HPyTest):
         # ---
         # Generate the test code from the cases:
         def makefun(name, fmt, arg):
-            return f"""
+            cpy_arg = arg.replace("ctx->h_None", "Py_None").replace("HPy_ssize_t", "Py_ssize_t")
+            return """
                 HPyDef_METH({name}, "{name}", HPyFunc_NOARGS)
                 static HPy {name}_impl(HPyContext *ctx, HPy self)
                 {{
@@ -637,7 +638,7 @@ class TestUnicode(HPyTest):
                 static HPy {name}_cpython_impl(HPyContext *ctx, HPy self)
                 {{
                     PyObject *unicode = PyUnicode_FromString("None");
-                    PyObject *py = PyUnicode_FromFormat("{fmt}", {arg.replace("ctx->h_None", "Py_None").replace("HPy_ssize_t", "Py_ssize_t")});
+                    PyObject *py = PyUnicode_FromFormat("{fmt}", {cpy_arg});
                     HPy hpy = HPy_NULL;
                     if (py != NULL) {{
                         hpy = HPy_FromPyObject(ctx, py);
@@ -647,7 +648,7 @@ class TestUnicode(HPyTest):
                     return hpy;
                 }}
                 #endif
-            """
+            """.format(name=name, fmt=fmt, arg=arg, cpy_arg=cpy_arg)
 
         # Change False->True to also check comparison with CPython.
         # Works only for 3.12 or higher, lower versions have bugs that are
@@ -661,9 +662,9 @@ class TestUnicode(HPyTest):
         # Create functions for each case using the "makefun" template, export them
         lines = ['#define CPM_WITH_CPYTHON'] if compare_with_cpython else []
         lines += [makefun(name, fmt, arg) for (name, (fmt, _, arg)) in cases.items()]
-        lines += [f"@EXPORT({name})" for name in cases.keys()]
+        lines += ["@EXPORT({})".format(name) for name in cases.keys()]
         if compare_with_cpython:
-            lines += [f"@EXPORT({name}_cpython)" for name in cases.keys()]
+            lines += ["@EXPORT({}_cpython)".format(name) for name in cases.keys()]
         lines += ["@INIT"]
 
         mod = self.make_module("\n".join(lines))
@@ -688,7 +689,7 @@ class TestUnicode(HPyTest):
             assert getattr(mod, name)() == expected, name + ":" + repr(case)
             if compare_with_cpython and case not in cpython_incompatible_cases:
                 assert getattr(mod, name)() == getattr(mod, name + "_cpython")(), \
-                    f"CPython check: {name}:" + repr(case)
+                    "CPython check: " + name + ":" + repr(case)
 
     def test_FromFormat_PyObjs(self):
         mod = self.make_module("""
@@ -769,7 +770,7 @@ class TestUnicode(HPyTest):
         chunk_size = 1000
         chunks_count = 5
         args = ','.join([str(i) for i in range(1, chunks_count+1)])
-        mod = self.make_module(f"""
+        mod = self.make_module("""
             #include <string.h>
 
             HPyDef_METH(f, "f", HPyFunc_NOARGS)
@@ -790,12 +791,12 @@ class TestUnicode(HPyTest):
 
             @EXPORT(f)
             @INIT
-        """)
+        """.format(chunk_size=chunk_size, chunks_count=chunks_count, args=args))
         assert mod.f() == ''.join([str(i) + ("a" * (chunk_size - 1)) for i in range(1,chunks_count+1)])
 
     def test_FromFormat_Limits(self):
         import sys
-        mod = self.make_module(f"""
+        mod = self.make_module("""
                 #include <stdio.h>
 
                 HPyDef_METH(width, "width", HPyFunc_NOARGS)
@@ -817,19 +818,19 @@ class TestUnicode(HPyTest):
                 HPyDef_METH(memory_err_width, "memory_err_width", HPyFunc_NOARGS)
                 static HPy memory_err_width_impl(HPyContext *ctx, HPy self)
                 {{
-                    return HPyUnicode_FromFormat(ctx, "%{sys.maxsize + 1}d", 42);
+                    return HPyUnicode_FromFormat(ctx, "%{max_size}d", 42);
                 }}
 
                 HPyDef_METH(memory_err_precision, "memory_err_precision", HPyFunc_NOARGS)
                 static HPy memory_err_precision_impl(HPyContext *ctx, HPy self)
                 {{
-                    return HPyUnicode_FromFormat(ctx, "%.{sys.maxsize + 1}d", 42);
+                    return HPyUnicode_FromFormat(ctx, "%.{max_size}d", 42);
                 }}
 
                 @EXPORT(width)
                 @EXPORT(precision)
                 @INIT
-            """)
+            """.format(max_size = str(sys.maxsize + 1)))
         with pytest.raises(ValueError) as exc:
             mod.width()
         assert str(exc.value) == "width too big"
