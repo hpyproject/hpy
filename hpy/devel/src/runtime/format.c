@@ -178,7 +178,7 @@ typedef struct {
 static void StrWriter_Init(StrWriter *writer, HPy_ssize_t init_size)
 {
     memset(writer, 0, sizeof(*writer));
-    writer->data_utf8 = malloc(init_size);
+    writer->data_utf8 = (char*) malloc(init_size);
     writer->size = init_size;
 }
 
@@ -194,7 +194,7 @@ static bool StrWriter_EnsureSpace(StrWriter *writer, HPy_ssize_t len)
     if (writer->size < 0)
         writer->size = HPY_SSIZE_T_MAX;
     char *prev = writer->data_utf8;
-    writer->data_utf8 = realloc(writer->data_utf8, writer->size);
+    writer->data_utf8 = (char*) realloc(writer->data_utf8, writer->size);
     if (!writer->data_utf8) {
         free(prev);
         writer->memory_error = true;
