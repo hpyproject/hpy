@@ -782,6 +782,7 @@ class TestUnicode(HPyTest):
     def test_FromFormat_LongFormat(self):
         chunk_size = 1000
         chunks_count = 5
+        total_c_size = (chunk_size + 1) * chunks_count + 1
         args = ','.join([str(i) for i in range(1, chunks_count+1)])
         mod = self.make_module("""
             #include <string.h>
@@ -790,9 +791,8 @@ class TestUnicode(HPyTest):
             static HPy f_impl(HPyContext *ctx, HPy self)
             {{
                 const size_t chunk_size = {chunk_size} + 1; // for the '%d'
-                const size_t total_size =
-                    chunk_size * {chunks_count} + 1; // for terminating null
-                char fmt[total_size];
+                const size_t total_size = {total_size};
+                char fmt[{total_size}];
                 memset(fmt, 'a', total_size);
                 fmt[total_size - 1] = '\\0';
                 for (size_t i = 0; i < {chunks_count}; i++) {{
@@ -804,7 +804,7 @@ class TestUnicode(HPyTest):
 
             @EXPORT(f)
             @INIT
-        """.format(chunk_size=chunk_size, chunks_count=chunks_count, args=args))
+        """.format(chunk_size=chunk_size, chunks_count=chunks_count, total_size=total_c_size, args=args))
         assert mod.f() == ''.join([str(i) + ("a" * (chunk_size - 1)) for i in range(1,chunks_count+1)])
 
     def test_FromFormat_Limits(self):
