@@ -574,7 +574,6 @@ class TestUnicode(HPyTest):
             ("%1.5V",  "None", '   NULL,    "None"'),
 
             # Additional HPy tests:
-            ("%p", "0xbeef", "(void*)(0xbeef)"),
             ("%c", (OverflowError, re.escape("character argument not in range(0x110000)")), "0x10ffff + 2"),
 
             ("check if %5d %s %6.3d is %5S or %6.3S",
@@ -690,6 +689,20 @@ class TestUnicode(HPyTest):
             if compare_with_cpython and case not in cpython_incompatible_cases:
                 assert getattr(mod, name)() == getattr(mod, name + "_cpython")(), \
                     "CPython check: " + name + ":" + repr(case)
+
+    def test_FromFormat_Ptr(self):
+        # '%p' is platform dependent to some extent, so we need to use regex
+        mod = self.make_module("""
+            HPyDef_METH(p, "p", HPyFunc_NOARGS)
+            static HPy p_impl(HPyContext *ctx, HPy self)
+            {
+                return HPyUnicode_FromFormat(ctx, "prefix-%p-suffix", (void*) 0xbeef);
+            }
+
+            @EXPORT(p)
+            @INIT
+        """)
+        assert re.match(r'prefix-0x[0]{,60}[bB][eE][eE][fF]-suffix', mod.p())
 
     def test_FromFormat_PyObjs(self):
         mod = self.make_module("""
@@ -811,7 +824,7 @@ class TestUnicode(HPyTest):
                 static HPy precision_impl(HPyContext *ctx, HPy self)
                 {{
                     char fmt[512];
-                    sprintf(fmt, "%%.%llud", (unsigned long long) HPY_SSIZE_T_MAX + 1ull);
+                    sprintf(fmt, "%%.%llud", ((unsigned long long) HPY_SSIZE_T_MAX) + 1ull);
                     return HPyUnicode_FromFormat(ctx, fmt, 42);
                 }}
 

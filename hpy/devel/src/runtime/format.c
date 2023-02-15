@@ -47,7 +47,12 @@
  * ``%s [const char*]``
  *
  * ``%p [const void*]``
- *      Guaranteed to start with the literal 0x regardless of what the platform’s printf yields.
+ *      Guaranteed to start with the literal '0x' regardless of what the
+ *      platform’s printf yields. However, there is no guarantee for
+ *      zero-padding after the '0x' prefix. Some systems pad the pointer
+ *      to 32 or 64 digits depending on the architecture, some do not
+ *      zero pad at all. Moreover, there is no guarantee whether the letters
+ *      will be capitalized or not.
  *
  * Python specific:
  * ~~~~~~~~~~~~~~~~
