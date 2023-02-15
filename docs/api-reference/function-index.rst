@@ -147,6 +147,7 @@ HPy Core API Function Index
 * :c:func:`HPyDict_New`
 * :c:func:`HPyDict_Keys`
 * :c:func:`HPyDict_GetItem`
+* :c:func:`HPyDict_Copy`
 * :c:func:`HPyTuple_Check`
 * :c:func:`HPyTuple_FromArray`
 * :c:func:`HPySlice_Unpack`

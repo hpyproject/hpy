@@ -1916,6 +1916,19 @@ HPy trace_ctx_Dict_GetItem(HPyContext *tctx, HPy op, HPy key)
     return res;
 }
 
+HPy trace_ctx_Dict_Copy(HPyContext *tctx, HPy h)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 267);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyDict_Copy(uctx, h);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 267, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 int trace_ctx_Tuple_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 203);

@@ -533,6 +533,8 @@ HPy HPyDict_Keys(HPyContext *ctx, HPy h);
  */
 HPy_ID(260)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
+HPy_ID(267)
+HPy HPyDict_Copy(HPyContext *ctx, HPy h);
 
 /* tupleobject.h */
 HPy_ID(203)

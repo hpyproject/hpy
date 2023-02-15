@@ -281,4 +281,5 @@ struct _HPyContext_s {
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     HPy (*ctx_SeqIter_New)(HPyContext *ctx, HPy seq);
     int (*ctx_IsInstance)(HPyContext *ctx, HPy obj, HPy type);
+    HPy (*ctx_Dict_Copy)(HPyContext *ctx, HPy h);
 };

@@ -558,6 +558,11 @@ HPyAPI_IMPL HPy ctx_Dict_Keys(HPyContext *ctx, HPy h)
     return _py2h(PyDict_Keys(_h2py(h)));
 }
 
+HPyAPI_IMPL HPy ctx_Dict_Copy(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyDict_Copy(_h2py(h)));
+}
+
 HPyAPI_IMPL int ctx_Tuple_Check(HPyContext *ctx, HPy h)
 {
     return PyTuple_Check(_h2py(h));

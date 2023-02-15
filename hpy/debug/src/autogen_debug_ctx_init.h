@@ -158,6 +158,7 @@ int debug_ctx_Dict_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Dict_New(HPyContext *dctx);
 DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Dict_GetItem(HPyContext *dctx, DHPy op, DHPy key);
+DHPy debug_ctx_Dict_Copy(HPyContext *dctx, DHPy h);
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy items[], HPy_ssize_t n);
 int debug_ctx_Slice_Unpack(HPyContext *dctx, DHPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
@@ -428,6 +429,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Dict_New = &debug_ctx_Dict_New;
     dctx->ctx_Dict_Keys = &debug_ctx_Dict_Keys;
     dctx->ctx_Dict_GetItem = &debug_ctx_Dict_GetItem;
+    dctx->ctx_Dict_Copy = &debug_ctx_Dict_Copy;
     dctx->ctx_Tuple_Check = &debug_ctx_Tuple_Check;
     dctx->ctx_Tuple_FromArray = &debug_ctx_Tuple_FromArray;
     dctx->ctx_Slice_Unpack = &debug_ctx_Slice_Unpack;
