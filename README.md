@@ -16,10 +16,8 @@ It exposes a lot of internal details which makes it hard to:
 
   - implement it for other Python implementations (e.g. PyPy, GraalPython,
     Jython, IronPython, etc.).
-
   - experiment with new things inside CPython itself: e.g. using a GC
     instead of refcounting, or to remove the GIL
-
   - guarantee binary stability
 
 HPy is a specification of a new API and ABI for extending Python that is
@@ -27,18 +25,14 @@ Python implementation agnostic and designed to hide and abstract internal
 details such that it:
 
   - can stay binary compatible even if the underlying Python internals change significantly
-
   - does not hinder internal progress of CPython and other Pythons
 
 Please read the [documentation](https://docs.hpyproject.org/en/latest/overview.html)
 for more details on HPy motivation, goals, and features, for example:
 
   - debug mode for better developer experience
-
   - support for incremental porting from CPython API to HPy
-
   - CPython ABI for raw peformance on CPython
-
   - and others
 
 Do you want to see how HPy API looks in code? Check out
