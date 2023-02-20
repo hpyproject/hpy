@@ -4,7 +4,7 @@
 [![Documentation](https://readthedocs.org/projects/hpy/badge/)](https://hpy.readthedocs.io/)
 [![Join the discord server at https://discord.gg/xSzxUbPkTQ](https://img.shields.io/discord/1077164940906995813.svg?color=7389D8&labelColor=6A7EC2&logo=discord&logoColor=ffffff&style=flat-square)](https://discord.gg/xSzxUbPkTQ)
 
-**Documentation**: [hpy.readthedocs.io](https://hpy.readthedocs.io/) \
+**Website**: [hpyproject.org](https://hpyproject.org/) \
 **Community**: [HPy Discord server](https://discord.gg/xSzxUbPkTQ) \
 **Mailing list**: [hpy-dev@python.org](https://mail.python.org/mailman3/lists/hpy-dev.python.org/)
 
