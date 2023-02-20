@@ -2,73 +2,45 @@
 
 [![Build](https://github.com/hpyproject/hpy/actions/workflows/ci.yml/badge.svg)](https://github.com/hpyproject/hpy/actions/workflows/ci.yml)
 [![Documentation](https://readthedocs.org/projects/hpy/badge/)](https://hpy.readthedocs.io/)
+[![Join the discord server at https://discord.gg/xSzxUbPkTQ](https://img.shields.io/discord/1077164940906995813.svg?color=7389D8&labelColor=6A7EC2&logo=discord&logoColor=ffffff&style=flat-square)](https://discord.gg/xSzxUbPkTQ)
 
-**IRC channel** : #hpy on [libera.chat](https://libera.chat)
-
+**Website**: [hpyproject.org](https://hpyproject.org/) \
+**Community**: [HPy Discord server](https://discord.gg/xSzxUbPkTQ) \
 **Mailing list**: [hpy-dev@python.org](https://mail.python.org/mailman3/lists/hpy-dev.python.org/)
 
-The goal of the project is to design a better API for extending Python
-in C. The old C API is specific to the current implementation of CPython. It
-exposes a lot of internal details which makes it hard to:
+## Summary
+
+HPy is a better API for extending Python
+in C. The old C API is specific to the current implementation of CPython.
+It exposes a lot of internal details which makes it hard to:
 
   - implement it for other Python implementations (e.g. PyPy, GraalPython,
-    Jython, IronPython, etc.). The implementation for CPython is in this repo,
-    but other implementations sometimes have to [implement some things](https://github.com/hpyproject/hpy/issues?q=label%3A%22HPy+update+in+GraalPy%22+label%3A%22HPy+update+in+PyPy%22+) in their HPy layer.
-
+    Jython, IronPython, etc.).
   - experiment with new things inside CPython itself: e.g. using a GC
     instead of refcounting, or to remove the GIL
+  - guarantee binary stability
 
-The goal of this project is to improve the situation by designing a new API
-which solves some of the current problems.
+HPy is a specification of a new API and ABI for extending Python that is
+Python implementation agnostic and designed to hide and abstract internal
+details such that it:
 
-More specifically, the goals include (but are not necessarily limited to):
+  - can stay binary compatible even if the underlying Python internals change significantly
+  - does not hinder internal progress of CPython and other Pythons
 
-  - to be usable on CPython *right now* with no (or almost no) performance
-    impact
+Please read the [documentation](https://docs.hpyproject.org/en/latest/overview.html)
+for more details on HPy motivation, goals, and features, for example:
 
-  - to make the adoption **incremental**: it should be possible to migrate
-    existing C extensions piece by piece and to use the old and the new API
-    side-by-side during the transition
+  - debug mode for better developer experience
+  - support for incremental porting from CPython API to HPy
+  - CPython ABI for raw peformance on CPython
+  - and others
 
-  - to provide better debugging experience: in debug mode, you could get
-    precise notification about which handles are kept open for too long
-    or used after being closed.
+Do you want to see how HPy API looks in code? Check out
+our [quickstart example](https://docs.hpyproject.org/en/latest/quickstart.html).
 
-  - to be more friendly for other implementations: in particular, we do not
-    want reference counting to be part of the API: we want a more generic way
-    of managing resources which is possible to implement with different
-    strategies, including the existing reference counting and/or with a moving
-    GC (like the ones used by PyPy or Java, for example)
-
-  - to be smaller and easier to study/use/manage than the existing one
-
-  - to avoid to expose internal details of a specific implementation, so that
-    each implementation can experiment with new memory layout of objects, add
-    optimizations, etc.
-
-  - to be written in a way which could make it possible in the future to have
-    a single binary which is ABI-compatible across multiple Python versions
-    and/or multiple implementations
-
-  - internal details might still be available, but in a opt-in way: for
-    example, if Cython wants to iterate over a list of integers, it can ask if
-    the implementation provides a direct low-level access to the content
-    (e.g. in the form of a `int64_t[]` array) and use that. But at the same
-    time, be ready to handle the generic fallback case.
-
-
-## More concrete goals
-
-  - we will write a small C library which implements the new API on top of the
-    existing one: no changes to CPython needed
-
-  - PyPy will implement this natively: extensions using this API will be
-    orders of magnitude faster than the ones using the existing old API (see
-    [this blog post](https://www.pypy.org/posts/2018/09/inside-cpyext-why-emulating-cpython-c-8083064623681286567.html)
-    for details)
-
-  - Cython will adopt this from day one: existing Cython programs will benefit
-    from this automatically
+This repository contains the API and ABI specification and implementation
+for the CPython interpreter. Other interpreters that support HPy natively: GraalPy
+and PyPy, provide their own builtin HPy implementations.
 
 
 ## Why should I care about this stuff?
