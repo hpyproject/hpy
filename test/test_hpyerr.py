@@ -692,3 +692,17 @@ class TestErr(HPyTest):
         result = python_subprocess.run(mod, "mod.f()")
         assert result.returncode == 0
 
+
+    def test_HPyErr_Format(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                return HPyErr_Format(ctx, ctx->h_ValueError, "Formatted '%S' and %d", arg, 42);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        with pytest.raises(ValueError, match="Formatted 'error message' and 42"):
+            mod.f("error message")
