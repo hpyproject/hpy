@@ -13,22 +13,22 @@ class TestHPyContextVar(HPyTest):
 
     def test_basics(self):
         mod = self.make_module("""
-            HPyDef_METH(new, "new", HPyFunc_NOARGS)
-            static HPy new_impl(HPyContext *ctx, HPy self)
+            HPyDef_METH(new_ctxv, "new_ctxv", HPyFunc_NOARGS)
+            static HPy new_ctxv_impl(HPyContext *ctx, HPy self)
             {
                 return HPyContextVar_New(ctx, "test_contextvar", HPy_NULL);
             }
 
-            HPyDef_METH(set, "set", HPyFunc_VARARGS)
-            static HPy set_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(set_ctxv, "set_ctxv", HPyFunc_VARARGS)
+            static HPy set_ctxv_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy obj, val;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &obj, &val))
                     return HPy_NULL;
                 return HPyContextVar_Set(ctx, obj, val);
             }
-            HPyDef_METH(get, "get", HPyFunc_VARARGS)
-            static HPy get_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            HPyDef_METH(get_ctxv, "get_ctxv", HPyFunc_VARARGS)
+            static HPy get_ctxv_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
             {
                 HPy obj, def=HPy_NULL, val;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|O", &obj, &def))
@@ -40,13 +40,13 @@ class TestHPyContextVar(HPyTest):
             }
 
 
-            @EXPORT(new)
-            @EXPORT(get)
-            @EXPORT(set)
+            @EXPORT(new_ctxv)
+            @EXPORT(get_ctxv)
+            @EXPORT(set_ctxv)
             @INIT
         """)
-        var = mod.new()
-        tok = mod.set(var, 4)
+        var = mod.new_ctxv()
+        tok = mod.set_ctxv(var, 4)
         assert tok.var is var
-        four = mod.get(var)
+        four = mod.get_ctxv(var)
         assert four == 4
