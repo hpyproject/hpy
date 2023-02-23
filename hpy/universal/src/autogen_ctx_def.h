@@ -182,4 +182,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Dump = &ctx_Dump,
     .ctx_Compile_s = &ctx_Compile_s,
     .ctx_EvalCode = &ctx_EvalCode,
+    .ctx_ContextVar_New = &ctx_ContextVar_New,
+    .ctx_ContextVar_Get = &ctx_ContextVar_Get,
+    .ctx_ContextVar_Set = &ctx_ContextVar_Set,
 };

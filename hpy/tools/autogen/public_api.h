@@ -846,6 +846,12 @@ HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_fil
  */
 HPy_ID(249)
 HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals);
+HPy_ID(250)
+HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
+HPy_ID(251)
+int32_t HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
+HPy_ID(252)
+HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
 
 /* *******

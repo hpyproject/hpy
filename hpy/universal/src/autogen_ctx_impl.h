@@ -540,3 +540,13 @@ HPyAPI_IMPL HPy ctx_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals)
     return _py2h(PyEval_EvalCode(_h2py(code), _h2py(globals), _h2py(locals)));
 }
 
+HPyAPI_IMPL HPy ctx_ContextVar_New(HPyContext *ctx, const char *name, HPy default_value)
+{
+    return _py2h(PyContextVar_New(name, _h2py(default_value)));
+}
+
+HPyAPI_IMPL HPy ctx_ContextVar_Set(HPyContext *ctx, HPy context_var, HPy value)
+{
+    return _py2h(PyContextVar_Set(_h2py(context_var), _h2py(value)));
+}
+

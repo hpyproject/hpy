@@ -164,3 +164,6 @@ HPy Core API Function Index
 * :c:func:`HPyGlobal_Load`
 * :c:func:`HPy_Compile_s`
 * :c:func:`HPy_EvalCode`
+* :c:func:`HPyContextVar_New`
+* :c:func:`HPyContextVar_Get`
+* :c:func:`HPyContextVar_Set`

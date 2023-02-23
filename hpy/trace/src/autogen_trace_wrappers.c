@@ -2140,3 +2140,42 @@ HPy trace_ctx_EvalCode(HPyContext *tctx, HPy code, HPy globals, HPy locals)
     return res;
 }
 
+HPy trace_ctx_ContextVar_New(HPyContext *tctx, const char *name, HPy default_value)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 250);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyContextVar_New(uctx, name, default_value);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 250, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+int32_t trace_ctx_ContextVar_Get(HPyContext *tctx, HPy context_var, HPy default_value, HPy *result)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 251);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    int32_t res = HPyContextVar_Get(uctx, context_var, default_value, result);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 251, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_ContextVar_Set(HPyContext *tctx, HPy context_var, HPy value)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 252);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyContextVar_Set(uctx, context_var, value);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 252, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+

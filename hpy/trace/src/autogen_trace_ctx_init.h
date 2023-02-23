@@ -175,13 +175,16 @@ HPy trace_ctx_Global_Load(HPyContext *tctx, HPyGlobal global);
 void trace_ctx_Dump(HPyContext *tctx, HPy h);
 HPy trace_ctx_Compile_s(HPyContext *tctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind);
 HPy trace_ctx_EvalCode(HPyContext *tctx, HPy code, HPy globals, HPy locals);
+HPy trace_ctx_ContextVar_New(HPyContext *tctx, const char *name, HPy default_value);
+int32_t trace_ctx_ContextVar_Get(HPyContext *tctx, HPy context_var, HPy default_value, HPy *result);
+HPy trace_ctx_ContextVar_Set(HPyContext *tctx, HPy context_var, HPy value);
 
 static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(250, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(250, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(253, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(253, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -447,4 +450,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_Dump = &trace_ctx_Dump;
     tctx->ctx_Compile_s = &trace_ctx_Compile_s;
     tctx->ctx_EvalCode = &trace_ctx_EvalCode;
+    tctx->ctx_ContextVar_New = &trace_ctx_ContextVar_New;
+    tctx->ctx_ContextVar_Get = &trace_ctx_ContextVar_Get;
+    tctx->ctx_ContextVar_Set = &trace_ctx_ContextVar_Set;
 }
