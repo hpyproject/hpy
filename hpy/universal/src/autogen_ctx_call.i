@@ -10,6 +10,18 @@
 
 */
 
+    case HPyFunc_NOARGS: {
+        HPyFunc_noargs f = (HPyFunc_noargs)func;
+        _HPyFunc_args_NOARGS *a = (_HPyFunc_args_NOARGS*)args;
+        a->result = _h2py(f(ctx, _py2h(a->self)));
+        return;
+    }
+    case HPyFunc_O: {
+        HPyFunc_o f = (HPyFunc_o)func;
+        _HPyFunc_args_O *a = (_HPyFunc_args_O*)args;
+        a->result = _h2py(f(ctx, _py2h(a->self), _py2h(a->arg)));
+        return;
+    }
     case HPyFunc_UNARYFUNC: {
         HPyFunc_unaryfunc f = (HPyFunc_unaryfunc)func;
         _HPyFunc_args_UNARYFUNC *a = (_HPyFunc_args_UNARYFUNC*)args;

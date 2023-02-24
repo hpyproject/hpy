@@ -5,17 +5,6 @@
 
 typedef struct {
     cpy_PyObject *self;
-    cpy_PyObject *result;
-} _HPyFunc_args_NOARGS;
-
-typedef struct {
-    cpy_PyObject *self;
-    cpy_PyObject *arg;
-    cpy_PyObject *result;
-} _HPyFunc_args_O;
-
-typedef struct {
-    cpy_PyObject *self;
     cpy_PyObject *const *args;
     HPy_ssize_t nargs;
     cpy_PyObject *result;
@@ -41,27 +30,6 @@ typedef struct {
     HPy_RichCmpOp arg2;
     cpy_PyObject * result;
 } _HPyFunc_args_RICHCMPFUNC;
-
-
-#define _HPyFunc_TRAMPOLINE_HPyFunc_NOARGS(SYM, IMPL)                   \
-    static cpy_PyObject *                                               \
-    SYM(cpy_PyObject *self, cpy_PyObject *noargs)                       \
-    {                                                                   \
-        _HPyFunc_args_NOARGS a = { self };                              \
-        _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_NOARGS, (HPyCFunction)IMPL, &a);            \
-        return a.result;                                                \
-    }
-
-#define _HPyFunc_TRAMPOLINE_HPyFunc_O(SYM, IMPL)                        \
-    static cpy_PyObject *                                               \
-    SYM(cpy_PyObject *self, cpy_PyObject *arg)                          \
-    {                                                                   \
-        _HPyFunc_args_O a = { self, arg };                              \
-        _HPy_CallRealFunctionFromTrampoline(                            \
-            _ctx_for_trampolines, HPyFunc_O, (HPyCFunction)IMPL, &a);                 \
-        return a.result;                                                \
-    }
 
 
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                  \

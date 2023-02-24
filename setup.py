@@ -96,6 +96,7 @@ def get_scm_config():
 HPY_EXTRA_SOURCES = [
     'hpy/devel/src/runtime/argparse.c',
     'hpy/devel/src/runtime/buildvalue.c',
+    'hpy/devel/src/runtime/format.c',
     'hpy/devel/src/runtime/helpers.c',
 ]
 

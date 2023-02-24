@@ -150,7 +150,7 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
                     }
                     par_type = top_level_par;
                 }
-                snprintf(msg, MESSAGE_BUF_SIZE, "unmatched '%c' in the format string passed to HPy_BuildValue", par_type);
+                snprintf(msg, sizeof(msg), "unmatched '%c' in the format string passed to HPy_BuildValue", par_type);
                 HPyErr_SetString(ctx, ctx->h_SystemError, msg);
                 return -1;
             }
@@ -260,7 +260,7 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
 
         default: {
             char message[MESSAGE_BUF_SIZE];
-            snprintf(message, MESSAGE_BUF_SIZE, "bad format char '%c' in the format string passed to HPy_BuildValue", format_char);
+            snprintf(message, sizeof(message), "bad format char '%c' in the format string passed to HPy_BuildValue", format_char);
             HPyErr_SetString(ctx, ctx->h_SystemError, message);
             return HPy_NULL;
         }

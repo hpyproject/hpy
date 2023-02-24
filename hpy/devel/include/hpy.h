@@ -236,10 +236,17 @@ typedef enum {
     typedef Py_ssize_t HPy_ssize_t;
     typedef Py_hash_t HPy_hash_t;
     typedef Py_UCS4 HPy_UCS4;
+
+#   define HPY_SSIZE_T_MAX PY_SSIZE_T_MAX
+#   define HPY_SSIZE_T_MIN PY_SSIZE_T_MIN
+
 #else
     typedef intptr_t HPy_ssize_t;
     typedef intptr_t HPy_hash_t;
     typedef uint32_t HPy_UCS4;
+
+#   define HPY_SSIZE_T_MAX INTPTR_MAX
+#   define HPY_SSIZE_T_MIN (-HPY_SSIZE_T_MAX-1)
 
     /* HPyCapsule field keys */
     typedef enum {
@@ -262,6 +269,7 @@ typedef enum {
 #include "hpy/hpymodule.h"
 #include "hpy/runtime/argparse.h"
 #include "hpy/runtime/buildvalue.h"
+#include "hpy/runtime/format.h"
 #include "hpy/runtime/helpers.h"
 #include "hpy/runtime/structseq.h"
 

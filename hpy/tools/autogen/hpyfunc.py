@@ -3,7 +3,7 @@ from pycparser import c_ast
 from .autogenfile import AutoGenFile
 from .parse import toC, find_typedecl
 
-NO_CALL = ('NOARGS', 'O', 'VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
+NO_CALL = ('VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
            'GETBUFFERPROC', 'RELEASEBUFFERPROC', 'TRAVERSEPROC', 'MOD_CREATE')
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
