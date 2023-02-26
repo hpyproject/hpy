@@ -139,7 +139,7 @@ SPECIAL_CASES = {
     'HPyBool_FromBool': 'PyBool_FromLong',
     'HPy_Compile_s': None,
     'HPy_EvalCode': 'PyEval_EvalCode',
-    'HPyContextVar_New': 'PyContextVar_New',
+    'HPyContextVar_New': None,
     'HPyContextVar_Get': None,
-    'HPyContextVar_Set': 'PyContextVar_Set',
+    'HPyContextVar_Set': None,
 }

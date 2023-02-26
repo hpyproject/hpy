@@ -532,7 +532,10 @@ int32_t debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy defaul
     UHPy uh_result;
     assert(!HPy_IsNull(uh_context_var));
     int32_t ret = HPyContextVar_Get(uctx, uh_context_var, uh_default_value, &uh_result);
-    if (ret < 0) return ret;
+    if (ret < 0) {
+        *result = HPy_NULL;
+        return ret;
+    }
     *result = DHPy_open(dctx, uh_result);
     return ret;
 }
