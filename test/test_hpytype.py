@@ -1239,6 +1239,34 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             mod.create_type("mytest.DummyIntMeta", int)
 
+    def test_get_name(self):
+        import array
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @DEFAULT_SHAPE
+            };
+
+            HPyDef_METH(get_name, "get_name", HPyFunc_O)
+            static HPy get_name_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                const char *name = HPyType_GetName(ctx, arg);
+                if (name == NULL)
+                    return HPy_NULL;
+                return HPyUnicode_FromString(ctx, name);
+            }
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @EXPORT(get_name)
+            @INIT
+        """)
+        assert mod.Dummy.__name__ == "Dummy"
+        assert mod.get_name(mod.Dummy) == "Dummy"
+        assert mod.get_name(str) == "str"
+        assert mod.get_name(array.array) == "array"
+
 
 class TestPureHPyType(HPyTest):
 
