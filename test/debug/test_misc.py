@@ -117,3 +117,27 @@ def test_type_getname(compiler, python_subprocess):
 
     result = python_subprocess.run(mod, "mod.f(1, str)")
     assert result.returncode != 0
+
+
+@pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
+def test_type_issubtype(compiler, python_subprocess):
+    mod = compiler.compile_module("""
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        {
+            if (nargs != 2) {
+                HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
+                return HPy_NULL;
+            }
+            return HPyLong_FromLong(ctx, HPyType_IsSubtype(ctx, args[0], args[1]));
+        }
+        @EXPORT(f)
+        @INIT
+    """)
+    result = python_subprocess.run(mod, "mod.f(bool, 'hello')")
+    assert result.returncode != 0
+    assert "HPyType_IsSubtype arg 2 must be a type" in result.stderr.decode("utf-8")
+
+    result = python_subprocess.run(mod, "mod.f('hello', str)")
+    assert result.returncode != 0
+    assert "HPyType_IsSubtype arg 1 must be a type" in result.stderr.decode("utf-8")
