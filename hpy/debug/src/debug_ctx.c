@@ -523,3 +523,19 @@ int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type)
     }
     return HPy_TypeCheck(uctx, uh_obj, uh_type);
 }
+
+int32_t debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy default_value, DHPy *result)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh_context_var = DHPy_unwrap(dctx, context_var);
+    UHPy uh_default_value = DHPy_unwrap(dctx, default_value);
+    UHPy uh_result;
+    assert(!HPy_IsNull(uh_context_var));
+    int32_t ret = HPyContextVar_Get(uctx, uh_context_var, uh_default_value, &uh_result);
+    if (ret < 0) {
+        *result = HPy_NULL;
+        return ret;
+    }
+    *result = DHPy_open(dctx, uh_result);
+    return ret;
+}

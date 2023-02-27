@@ -670,3 +670,15 @@ HPyAPI_FUNC HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals)
      return ctx->ctx_EvalCode ( ctx, code, globals, locals ); 
 }
 
+HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value) {
+     return ctx->ctx_ContextVar_New ( ctx, name, default_value ); 
+}
+
+HPyAPI_FUNC int32_t HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result) {
+     return ctx->ctx_ContextVar_Get ( ctx, context_var, default_value, result ); 
+}
+
+HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value) {
+     return ctx->ctx_ContextVar_Set ( ctx, context_var, value ); 
+}
+

@@ -508,4 +508,9 @@ HPyAPI_FUNC HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const ch
     return ctx_Compile_s(ctx, utf8_source, utf8_filename, kind);
 }
 
+HPyAPI_FUNC int32_t
+HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result) {
+    return ctx_ContextVar_Get(ctx, context_var, default_value, result);
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */

@@ -114,6 +114,7 @@ HPY_CTX_SOURCES = [
     'hpy/devel/src/runtime/ctx_listbuilder.c',
     'hpy/devel/src/runtime/ctx_tuple.c',
     'hpy/devel/src/runtime/ctx_tuplebuilder.c',
+    'hpy/devel/src/runtime/ctx_contextvar.c',
 ]
 
 HPY_INCLUDE_DIRS = [

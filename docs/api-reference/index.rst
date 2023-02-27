@@ -66,3 +66,5 @@ write but in order to avoid duplicated effort, they are defined by HPy.
    :maxdepth: 2
 
    inline-helpers
+
+

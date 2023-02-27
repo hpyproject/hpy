@@ -177,6 +177,9 @@ DHPy debug_ctx_Global_Load(HPyContext *dctx, HPyGlobal global);
 void debug_ctx_Dump(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Compile_s(HPyContext *dctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind);
 DHPy debug_ctx_EvalCode(HPyContext *dctx, DHPy code, DHPy globals, DHPy locals);
+DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy default_value);
+int32_t debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy default_value, DHPy *result);
+DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
 {
@@ -430,4 +433,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Dump = &debug_ctx_Dump;
     dctx->ctx_Compile_s = &debug_ctx_Compile_s;
     dctx->ctx_EvalCode = &debug_ctx_EvalCode;
+    dctx->ctx_ContextVar_New = &debug_ctx_ContextVar_New;
+    dctx->ctx_ContextVar_Get = &debug_ctx_ContextVar_Get;
+    dctx->ctx_ContextVar_Set = &debug_ctx_ContextVar_Set;
 }
