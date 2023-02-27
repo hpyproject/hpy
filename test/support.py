@@ -22,6 +22,7 @@ IS_PYTHON_DEBUG_BUILD = hasattr(sys, 'gettotalrefcount')
 # pytest marker to run tests only on linux
 ONLY_LINUX = pytest.mark.skipif(sys.platform!='linux', reason='linux only')
 
+SUPPORTS_MEM_PROTECTION = '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ
 
 def reindent(s, indent):
     s = textwrap.dedent(s)
