@@ -93,6 +93,7 @@ _HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
                                     HPy_ssize_t nargs, HPy kw);
 _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
                                                           HPy h_type);
+_HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type);
 
 
 // ctx_long.c

@@ -102,6 +102,7 @@ int trace_ctx_DelItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx);
 int trace_ctx_DelItem_s(HPyContext *tctx, HPy obj, const char *utf8_key);
 HPy trace_ctx_Type(HPyContext *tctx, HPy obj);
 int trace_ctx_TypeCheck(HPyContext *tctx, HPy obj, HPy type);
+const char *trace_ctx_Type_GetName(HPyContext *tctx, HPy type);
 int trace_ctx_Is(HPyContext *tctx, HPy obj, HPy other);
 void *trace_ctx_AsStruct_Object(HPyContext *tctx, HPy h);
 void *trace_ctx_AsStruct_Legacy(HPyContext *tctx, HPy h);
@@ -183,8 +184,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(253, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(253, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(254, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(254, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -376,6 +377,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_DelItem_s = &trace_ctx_DelItem_s;
     tctx->ctx_Type = &trace_ctx_Type;
     tctx->ctx_TypeCheck = &trace_ctx_TypeCheck;
+    tctx->ctx_Type_GetName = &trace_ctx_Type_GetName;
     tctx->ctx_Is = &trace_ctx_Is;
     tctx->ctx_AsStruct_Object = &trace_ctx_AsStruct_Object;
     tctx->ctx_AsStruct_Legacy = &trace_ctx_AsStruct_Legacy;

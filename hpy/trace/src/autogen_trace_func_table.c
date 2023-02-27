@@ -12,7 +12,7 @@
 
 #include "trace_internal.h"
 
-#define TRACE_NFUNC 170
+#define TRACE_NFUNC 171
 
 #define NO_FUNC ""
 static const char *trace_func_table[] = {
@@ -269,6 +269,7 @@ static const char *trace_func_table[] = {
     "ctx_ContextVar_New",
     "ctx_ContextVar_Get",
     "ctx_ContextVar_Set",
+    "ctx_Type_GetName",
     NULL /* sentinel */
 };
 
@@ -279,7 +280,7 @@ int hpy_trace_get_nfunc(void)
 
 const char * hpy_trace_get_func_name(int idx)
 {
-    if (idx >= 0 && idx < 253)
+    if (idx >= 0 && idx < 254)
         return trace_func_table[idx];
     return NULL;
 }

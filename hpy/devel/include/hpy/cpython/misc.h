@@ -513,4 +513,10 @@ HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *resu
     return ctx_ContextVar_Get(ctx, context_var, default_value, result);
 }
 
+HPyAPI_FUNC const char *
+HPyType_GetName(HPyContext *ctx, HPy type)
+{
+    return ctx_Type_GetName(ctx, type);
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */

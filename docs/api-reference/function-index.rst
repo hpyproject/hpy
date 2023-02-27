@@ -102,6 +102,7 @@ HPy Core API Function Index
 * :c:func:`HPy_DelItem_s`
 * :c:func:`HPy_Type`
 * :c:func:`HPy_TypeCheck`
+* :c:func:`HPyType_GetName`
 * :c:func:`HPy_Is`
 * :c:func:`HPy_Repr`
 * :c:func:`HPy_Str`
