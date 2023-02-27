@@ -425,6 +425,31 @@ int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
 HPy_ID(253)
 const char *HPyType_GetName(HPyContext *ctx, HPy type);
 
+/**
+ * Checks if ``sub`` is a subtype of ``type``.
+ *
+ * This function only checks for actual subtypes, which means that
+ * ``__subclasscheck__()`` is not called on ``type``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param sub:
+ *     A Python type object. This argument must not be ``HPy_NULL`` and must be
+ *     a type (i.e. it must inherit from Python ``type``). If this is not the
+ *     case, the behavior is undefined (verification of the argument is only
+ *     done in debug mode).
+ * :param type:
+ *     A Python type object. This argument must not be ``HPy_NULL`` and must be
+ *     a type (i.e. it must inherit from Python ``type``). If this is not the
+ *     case, the behavior is undefined (verification of the argument is only
+ *     done in debug mode).
+ *
+ * :returns:
+ *     Non-zero if ``sub`` is a subtype of ``type``.
+ */
+HPy_ID(254)
+int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
+
 HPy_ID(167)
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
 

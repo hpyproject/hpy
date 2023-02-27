@@ -91,6 +91,7 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPy_TypeCheck',
         'HPyContextVar_Get',
         'HPyType_GetName',
+        'HPyType_IsSubtype',
     }
 
     def generate(self):

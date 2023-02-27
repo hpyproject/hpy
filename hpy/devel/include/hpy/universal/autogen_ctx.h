@@ -268,4 +268,5 @@ struct _HPyContext_s {
     int32_t (*ctx_ContextVar_Get)(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     const char *(*ctx_Type_GetName)(HPyContext *ctx, HPy type);
+    int (*ctx_Type_IsSubtype)(HPyContext *ctx, HPy sub, HPy type);
 };

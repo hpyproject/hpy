@@ -562,3 +562,30 @@ const char *debug_ctx_Type_GetName(HPyContext *dctx, DHPy type)
     n_name = strlen(name);
     return (const char *)protect_and_associate_data_ptr(type, (void *)name, n_name);
 }
+
+int debug_ctx_Type_IsSubtype(HPyContext *dctx, DHPy sub, DHPy type)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+    int res;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+
+    UHPy uh_sub = DHPy_unwrap(dctx, sub);
+    uctx = ctx_info->info->uctx;
+    if (!HPy_TypeCheck(uctx, uh_sub, uctx->h_TypeType)) {
+        HPy_FatalError(uctx, "HPyType_IsSubtype arg 1 must be a type");
+    }
+    UHPy uh_type = DHPy_unwrap(dctx, type);
+    if (!HPy_TypeCheck(uctx, uh_type, uctx->h_TypeType)) {
+        HPy_FatalError(uctx, "HPyType_IsSubtype arg 2 must be a type");
+    }
+
+    ctx_info->is_valid = false;
+    res = HPyType_IsSubtype(uctx, uh_sub, uh_type);
+    ctx_info->is_valid = true;
+    return res;
+}

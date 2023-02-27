@@ -109,6 +109,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Type = &ctx_Type,
     .ctx_TypeCheck = &ctx_TypeCheck,
     .ctx_Type_GetName = &ctx_Type_GetName,
+    .ctx_Type_IsSubtype = &ctx_Type_IsSubtype,
     .ctx_Is = &ctx_Is,
     .ctx_AsStruct_Object = &ctx_AsStruct_Object,
     .ctx_AsStruct_Legacy = &ctx_AsStruct_Legacy,

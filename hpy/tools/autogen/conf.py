@@ -141,4 +141,5 @@ SPECIAL_CASES = {
     'HPy_EvalCode': 'PyEval_EvalCode',
     'HPyContextVar_Get': None,
     'HPyType_GetName': None,
+    'HPyType_IsSubtype': None,
 }
