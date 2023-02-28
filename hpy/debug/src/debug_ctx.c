@@ -589,3 +589,24 @@ int debug_ctx_Type_IsSubtype(HPyContext *dctx, DHPy sub, DHPy type)
     ctx_info->is_valid = true;
     return res;
 }
+
+DHPy debug_ctx_Unicode_Substring(HPyContext *dctx, DHPy str, HPy_ssize_t start, HPy_ssize_t end)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+
+    HPy uh_str = DHPy_unwrap(dctx, str);
+    uctx = ctx_info->info->uctx;
+    if (!HPy_TypeCheck(uctx, uh_str, uctx->h_UnicodeType)) {
+        HPy_FatalError(uctx, "HPyUnicode_Substring arg 1 must be a Unicode object");
+    }
+    ctx_info->is_valid = false;
+    HPy universal_result = HPyUnicode_Substring(uctx, uh_str, start, end);
+    ctx_info->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
