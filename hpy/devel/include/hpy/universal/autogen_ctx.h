@@ -269,4 +269,5 @@ struct _HPyContext_s {
     HPy (*ctx_ContextVar_Set)(HPyContext *ctx, HPy context_var, HPy value);
     const char *(*ctx_Type_GetName)(HPyContext *ctx, HPy type);
     int (*ctx_Type_IsSubtype)(HPyContext *ctx, HPy sub, HPy type);
+    HPy (*ctx_Unicode_FromEncodedObject)(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
 };
