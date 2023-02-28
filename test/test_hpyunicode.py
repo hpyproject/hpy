@@ -850,3 +850,68 @@ class TestUnicode(HPyTest):
         with pytest.raises(ValueError) as exc:
             mod.precision()
         assert str(exc.value) == "precision too big"
+
+    def test_FromEncodedObject(self):
+        import pytest
+        mod = self.make_module("""
+            static const char *as_string(HPyContext *ctx, HPy h)
+            {
+                const char *res = HPyUnicode_AsUTF8AndSize(ctx, h, NULL);
+                if (res == NULL)
+                    HPyErr_Clear(ctx);
+                return res;
+            }
+
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                HPy h_obj;
+                const char *encoding, *errors;
+                if (nargs != 3) {
+                    HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 3 arguments");
+                    return HPy_NULL;
+                }
+                h_obj = HPy_Is(ctx, args[0], ctx->h_None) ? HPy_NULL : args[0];
+                encoding = as_string(ctx, args[1]);
+                errors = as_string(ctx, args[2]);
+                return HPyUnicode_FromEncodedObject(ctx, h_obj, encoding, errors);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        # "hellö" as UTF-8 encoded bytes
+        utf8_bytes = b"hell\xc3\xb6"
+        # "hellö" as UTF-16 encoded bytes
+        utf16_bytes = b'\xff\xfeh\x00e\x00l\x00l\x00\xf6\x00'
+        ascii_codepoints = bytes(range(1, 128))
+
+        # note: None (if passed to arguments 'encoding' or 'errors') will be
+        # translated to a NULL pointer
+
+        for errors in (None, "strict", "ignore", "replace"):
+            assert mod.f(b"hello", "ascii", errors) == "hello"
+            assert mod.f(utf8_bytes, "utf8", errors) == "hellö"
+            assert mod.f(utf16_bytes, "utf16", errors) == "hellö"
+            assert len(mod.f(ascii_codepoints, "ascii", errors)) == 127
+            assert len(mod.f(ascii_codepoints, "utf8", errors)) == 127
+
+        # None will be translated to NULL and then defaults to UTF-8 encoding
+        for encoding in (None, "utf8"):
+            assert mod.f(utf8_bytes, encoding, None) == "hellö"
+
+            with pytest.raises(UnicodeDecodeError):
+                mod.f(utf16_bytes, encoding, None)
+
+            assert mod.f(utf16_bytes, encoding, "replace") == '��h\x00e\x00l\x00l\x00�\x00'
+            assert mod.f(utf16_bytes, encoding, "ignore") == 'h\x00e\x00l\x00l\x00\x00'
+
+        # test unknown encoding
+        with pytest.raises(LookupError):
+            mod.f(b"", "qwertyasdf13", None)
+
+        with pytest.raises(SystemError):
+            mod.f(None, None, None)
+        with pytest.raises(TypeError):
+            mod.f("hello", None, None)
+        with pytest.raises(TypeError):
+            mod.f(123, None, None)

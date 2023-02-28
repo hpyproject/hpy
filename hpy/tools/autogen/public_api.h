@@ -406,7 +406,7 @@ int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
  * Return the type's name.
  *
  * Equivalent to getting the type's ``__name__`` attribute. If you want to
- * retrieve the type's name as Python Unicode object, then just use
+ * retrieve the type's name as a handle that refers to a ``str``, then just use
  * ``HPy_GetAttr_s(ctx, type, "__name__")``.
  *
  * :param ctx:
@@ -560,8 +560,8 @@ HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t siz
  *     ``NULL`` in which case it will default to ``"strict"``.
  *
  * :returns:
- *     Unicode object created from the decoded bytes or ``HPy_NULL`` in case of
- *     errors.
+ *     A handle to a ``str`` object created from the decoded bytes or
+ *     ``HPy_NULL`` in case of errors.
  */
 HPy_ID(255)
 HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
