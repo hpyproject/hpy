@@ -273,6 +273,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyUnicode_FromString <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromString>`_                                      :c:func:`HPyUnicode_FromString`
     `PyUnicode_FromWideChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromWideChar>`_                                  :c:func:`HPyUnicode_FromWideChar`
     `PyUnicode_ReadChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_ReadChar>`_                                          :c:func:`HPyUnicode_ReadChar`
+    `PyUnicode_Substring <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_Substring>`_                                        :c:func:`HPyUnicode_Substring`
     ================================================================================================================================== ================================================
 
 

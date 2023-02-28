@@ -538,6 +538,10 @@ HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const cha
      return ctx->ctx_Unicode_FromEncodedObject ( ctx, obj, encoding, errors ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end) {
+     return ctx->ctx_Unicode_Substring ( ctx, str, start, end ); 
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_List_Check ( ctx, h ); 
 }

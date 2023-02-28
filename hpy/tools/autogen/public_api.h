@@ -566,6 +566,32 @@ HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t siz
 HPy_ID(255)
 HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
 
+/**
+ * Return a substring of ``str``, from character index ``start`` (included) to
+ * character index ``end`` (excluded).
+ *
+ * Indices ``start`` and ``end`` must not be negative, otherwise an
+ * ``IndexError`` will be raised. If ``start >= len(str)`` or if
+ * ``end < start``, an empty string will be returned. If ``end > len(str)`` then
+ * ``end == len(str)`` will be assumed.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param str:
+ *     A Python Unicode object (must not be ``HPy_NULL``). Otherwise, the
+ *     behavior is undefined (verification of the argument is only done in
+ *     debug mode).
+ * :param start:
+ *     The non-negative start index (inclusive).
+ * :param end:
+ *    The non-negative end index (exclusive).
+ *
+ * :returns:
+ *     The requested substring or ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(256)
+HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
+
 /* listobject.h */
 HPy_ID(198)
 int HPyList_Check(HPyContext *ctx, HPy h);
