@@ -141,3 +141,33 @@ def test_type_issubtype(compiler, python_subprocess):
     result = python_subprocess.run(mod, "mod.f('hello', str)")
     assert result.returncode != 0
     assert "HPyType_IsSubtype arg 1 must be a type" in result.stderr.decode("utf-8")
+
+
+@pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
+def test_unicode_substring(compiler, python_subprocess):
+    mod = compiler.compile_module("""
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        {
+            HPy_ssize_t start, end;
+            if (nargs != 3) {
+                HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 3 arguments");
+                return HPy_NULL;
+            }
+
+            start = HPyLong_AsSsize_t(ctx, args[1]);
+            if (start == -1 && HPyErr_Occurred(ctx))
+                return HPy_NULL;
+
+            end = HPyLong_AsSsize_t(ctx, args[2]);
+            if (end == -1 && HPyErr_Occurred(ctx))
+                return HPy_NULL;
+
+            return HPyUnicode_Substring(ctx, args[0], start, end);
+        }
+        @EXPORT(f)
+        @INIT
+    """)
+    result = python_subprocess.run(mod, "mod.f(b'hello', 2, 3)")
+    assert result.returncode != 0
+    assert "HPyUnicode_Substring arg 1 must be a Unicode object" in result.stderr.decode("utf-8")
