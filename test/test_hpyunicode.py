@@ -915,3 +915,61 @@ class TestUnicode(HPyTest):
             mod.f("hello", None, None)
         with pytest.raises(TypeError):
             mod.f(123, None, None)
+
+    def test_Substring(self):
+        import pytest
+        import string
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                HPy_ssize_t start, end;
+                if (nargs != 3) {
+                    HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 3 arguments");
+                    return HPy_NULL;
+                }
+
+                start = HPyLong_AsSsize_t(ctx, args[1]);
+                if (start == -1 && HPyErr_Occurred(ctx))
+                    return HPy_NULL;
+
+                end = HPyLong_AsSsize_t(ctx, args[2]);
+                if (end == -1 && HPyErr_Occurred(ctx))
+                    return HPy_NULL;
+
+                return HPyUnicode_Substring(ctx, args[0], start, end);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        # start == end
+        assert mod.f("hello", 0, 0) == ""
+        assert mod.f("hello", 4, 4) == ""
+        assert mod.f("hello", 5, 0) == ""
+        # start < end
+        assert mod.f("hello", 0, 5) == "hello"
+        assert mod.f("hello", 0, 100) == "hello"
+        assert mod.f('hello', 0, 1) == 'h'
+        assert mod.f("hello", 0, 2) == "he"
+        assert mod.f("hello", 2, 5) == "llo"
+        assert mod.f("hello", 2, 4) == "ll"
+        assert mod.f("hello", 100, 105) == ""
+        # start > end
+        assert mod.f("hello", 2000, 1000) == ""
+        assert mod.f("hello", 2, 1) == ""
+
+        with pytest.raises(IndexError):
+            mod.f("hello", -2, 5)
+        with pytest.raises(IndexError):
+            mod.f("hello", 2, -1)
+
+        # The following block is a variation of CPython's
+        # 'string_tests.py: test_extended_getslice'. This compares substrings
+        # with list slicing.
+        s = string.ascii_letters + string.digits
+        n = len(s)
+        indices = (0, 1, 3, 41, 1000, n-1, n-2, n-37)
+        for start in indices:
+            for stop in indices:
+                L = list(s)[start:stop]
+                assert mod.f(s, start, stop) == "".join(L)
