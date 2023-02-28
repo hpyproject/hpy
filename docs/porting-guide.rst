@@ -269,6 +269,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyUnicode_DecodeFSDefaultAndSize <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeFSDefaultAndSize>`_              :c:func:`HPyUnicode_DecodeFSDefaultAndSize`
     `PyUnicode_DecodeLatin1 <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeLatin1>`_                                  :c:func:`HPyUnicode_DecodeLatin1`
     `PyUnicode_EncodeFSDefault <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_EncodeFSDefault>`_                            :c:func:`HPyUnicode_EncodeFSDefault`
+    `PyUnicode_FromEncodedObject <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromEncodedObject>`_                        :c:func:`HPyUnicode_FromEncodedObject`
     `PyUnicode_FromString <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromString>`_                                      :c:func:`HPyUnicode_FromString`
     `PyUnicode_FromWideChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromWideChar>`_                                  :c:func:`HPyUnicode_FromWideChar`
     `PyUnicode_ReadChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_ReadChar>`_                                          :c:func:`HPyUnicode_ReadChar`

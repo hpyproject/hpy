@@ -406,7 +406,7 @@ int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
  * Return the type's name.
  *
  * Equivalent to getting the type's ``__name__`` attribute. If you want to
- * retrieve the type's name as Python unicode object, then just use
+ * retrieve the type's name as Python Unicode object, then just use
  * ``HPy_GetAttr_s(ctx, type, "__name__")``.
  *
  * :param ctx:
@@ -535,6 +535,36 @@ HPy_ID(196)
 HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors);
 HPy_ID(197)
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors);
+
+/**
+ * Decode a bytes-like object to a Unicode object.
+ *
+ * The bytes of the bytes-like object are decoded according to the given
+ * encoding and using the error handling defined by ``errors``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A bytes-like object. This can be, for example, Python *bytes*,
+ *     *bytearray*, *memoryview*, *array.array* and objects that support the
+ *     Buffer protocol. If this argument is `HPy_NULL``, a ``SystemError`` will
+ *     be raised. If the argument is not a bytes-like object, a ``TypeError``
+ *     will be raised.
+ * :param encoding:
+ *     The name (UTF-8 encoded C string) of the encoding to use. If the encoding
+ *     does not exist, a ``LookupError`` will be raised. If this argument is
+ *     ``NULL``, the default encoding ``UTF-8`` will be used.
+ * :param errors:
+ *     The error handling (UTF-8 encoded C string) to use when decoding. The
+ *     possible values depend on the used encoding. This argument may be
+ *     ``NULL`` in which case it will default to ``"strict"``.
+ *
+ * :returns:
+ *     Unicode object created from the decoded bytes or ``HPy_NULL`` in case of
+ *     errors.
+ */
+HPy_ID(255)
+HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
 
 /* listobject.h */
 HPy_ID(198)
