@@ -150,6 +150,7 @@ DHPy debug_ctx_List_New(HPyContext *dctx, HPy_ssize_t len);
 int debug_ctx_List_Append(HPyContext *dctx, DHPy h_list, DHPy h_item);
 int debug_ctx_Dict_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Dict_New(HPyContext *dctx);
+DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h);
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy items[], HPy_ssize_t n);
 DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *utf8_name);
@@ -410,6 +411,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_List_Append = &debug_ctx_List_Append;
     dctx->ctx_Dict_Check = &debug_ctx_Dict_Check;
     dctx->ctx_Dict_New = &debug_ctx_Dict_New;
+    dctx->ctx_Dict_Keys = &debug_ctx_Dict_Keys;
     dctx->ctx_Tuple_Check = &debug_ctx_Tuple_Check;
     dctx->ctx_Tuple_FromArray = &debug_ctx_Tuple_FromArray;
     dctx->ctx_Import_ImportModule = &debug_ctx_Import_ImportModule;
