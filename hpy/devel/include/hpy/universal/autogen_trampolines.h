@@ -566,6 +566,10 @@ HPyAPI_FUNC HPy HPyDict_Keys(HPyContext *ctx, HPy h) {
      return ctx->ctx_Dict_Keys ( ctx, h ); 
 }
 
+HPyAPI_FUNC HPy HPyDict_Copy(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Dict_Copy ( ctx, h ); 
+}
+
 HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_Tuple_Check ( ctx, h ); 
 }

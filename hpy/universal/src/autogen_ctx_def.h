@@ -156,6 +156,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Dict_Check = &ctx_Dict_Check,
     .ctx_Dict_New = &ctx_Dict_New,
     .ctx_Dict_Keys = &ctx_Dict_Keys,
+    .ctx_Dict_Copy = &ctx_Dict_Copy,
     .ctx_Tuple_Check = &ctx_Tuple_Check,
     .ctx_Tuple_FromArray = &ctx_Tuple_FromArray,
     .ctx_Import_ImportModule = &ctx_Import_ImportModule,
