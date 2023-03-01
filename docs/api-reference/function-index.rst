@@ -26,6 +26,7 @@ HPy Core API Function Index
 * :c:func:`HPyContextVar_New`
 * :c:func:`HPyContextVar_Set`
 * :c:func:`HPyDict_Check`
+* :c:func:`HPyDict_Keys`
 * :c:func:`HPyDict_New`
 * :c:func:`HPyErr_Clear`
 * :c:func:`HPyErr_ExceptionMatches`

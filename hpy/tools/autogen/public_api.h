@@ -606,6 +606,25 @@ int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy_ID(202)
 HPy HPyDict_New(HPyContext *ctx);
 
+/**
+ * Returns a list of all keys from the dictionary.
+ *
+ * Note: This function will directly access the storage of the dict object and
+ * therefore ignores if method ``keys`` was overwritten.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A Python dict object. If this argument is ``HPy_NULL`` or not an
+ *     instance of a Python dict, a ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     A Python list object containing all keys of the given dictionary or
+ *     ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(257)
+HPy HPyDict_Keys(HPyContext *ctx, HPy h);
+
 /* tupleobject.h */
 HPy_ID(203)
 int HPyTuple_Check(HPyContext *ctx, HPy h);

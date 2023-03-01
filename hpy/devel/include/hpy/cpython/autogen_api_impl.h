@@ -524,6 +524,11 @@ HPyAPI_FUNC HPy HPyDict_New(HPyContext *ctx)
     return _py2h(PyDict_New());
 }
 
+HPyAPI_FUNC HPy HPyDict_Keys(HPyContext *ctx, HPy h)
+{
+    return _py2h(PyDict_Keys(_h2py(h)));
+}
+
 HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h)
 {
     return PyTuple_Check(_h2py(h));

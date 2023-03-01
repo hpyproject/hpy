@@ -271,4 +271,5 @@ struct _HPyContext_s {
     int (*ctx_Type_IsSubtype)(HPyContext *ctx, HPy sub, HPy type);
     HPy (*ctx_Unicode_FromEncodedObject)(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
     HPy (*ctx_Unicode_Substring)(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
+    HPy (*ctx_Dict_Keys)(HPyContext *ctx, HPy h);
 };

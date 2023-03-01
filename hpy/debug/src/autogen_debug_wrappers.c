@@ -1499,6 +1499,18 @@ DHPy debug_ctx_Dict_New(HPyContext *dctx)
     return DHPy_open(dctx, universal_result);
 }
 
+DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_h = DHPy_unwrap(dctx, h);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPyDict_Keys(get_info(dctx)->uctx, dh_h);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
 int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
 {
     if (!get_ctx_info(dctx)->is_valid) {
