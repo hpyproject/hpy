@@ -170,6 +170,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyContextVar_New <https://docs.python.org/3/c-api/contextvars.html#c.PyContextVar_New>`_                                          :c:func:`HPyContextVar_New`
     `PyContextVar_Set <https://docs.python.org/3/c-api/contextvars.html#c.PyContextVar_Set>`_                                          :c:func:`HPyContextVar_Set`
     `PyDict_Check <https://docs.python.org/3/c-api/dict.html#c.PyDict_Check>`_                                                         :c:func:`HPyDict_Check`
+    `PyDict_Copy <https://docs.python.org/3/c-api/dict.html#c.PyDict_Copy>`_                                                           :c:func:`HPyDict_Copy`
     `PyDict_Keys <https://docs.python.org/3/c-api/dict.html#c.PyDict_Keys>`_                                                           :c:func:`HPyDict_Keys`
     `PyDict_New <https://docs.python.org/3/c-api/dict.html#c.PyDict_New>`_                                                             :c:func:`HPyDict_New`
     `PyErr_Clear <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_Clear>`_                                                     :c:func:`HPyErr_Clear`

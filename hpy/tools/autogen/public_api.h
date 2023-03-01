@@ -625,6 +625,22 @@ HPy HPyDict_New(HPyContext *ctx);
 HPy_ID(257)
 HPy HPyDict_Keys(HPyContext *ctx, HPy h);
 
+/**
+ * Creates a copy of the provided Python dict object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A Python dict object. If this argument is ``HPy_NULL`` or not an
+ *     instance of a Python dict, a ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     Return a new dictionary that contains the same key-value pairs as ``h``
+ *     or ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(258)
+HPy HPyDict_Copy(HPyContext *ctx, HPy h);
+
 /* tupleobject.h */
 HPy_ID(203)
 int HPyTuple_Check(HPyContext *ctx, HPy h);
