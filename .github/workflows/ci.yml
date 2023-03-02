@@ -344,6 +344,8 @@ jobs:
     name: Cppcheck static analysis
     runs-on: 'ubuntu-20.04'
     continue-on-error: true
+    # Skip it, see issue gh-188
+    if: false
     steps:
       - uses: actions/checkout@v3
 
