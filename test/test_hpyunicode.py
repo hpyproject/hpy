@@ -907,7 +907,7 @@ class TestUnicode(HPyTest):
 
         # test unknown encoding
         with pytest.raises(LookupError):
-            mod.f(b"", "qwertyasdf13", None)
+            mod.f(b"hello", "qwertyasdf13", None)
 
         with pytest.raises(SystemError):
             mod.f(None, None, None)
