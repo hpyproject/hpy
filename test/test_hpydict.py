@@ -97,3 +97,25 @@ class TestDict(HPyTest):
             mod.f(None)
         with pytest.raises(SystemError):
             mod.f(42)
+
+    def test_copy(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy h_dict = HPy_Is(ctx, arg, ctx->h_None) ? HPy_NULL : arg;
+                return HPyDict_Copy(ctx, h_dict);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        dicts = ({}, {'hello': 1})
+        for d in dicts:
+            d_copy = mod.f(d)
+            assert d_copy == d
+            assert d_copy is not d
+        with pytest.raises(SystemError):
+            mod.f(None)
+        with pytest.raises(SystemError):
+            mod.f(42)
