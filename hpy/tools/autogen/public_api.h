@@ -406,7 +406,7 @@ int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
  * Return the type's name.
  *
  * Equivalent to getting the type's ``__name__`` attribute. If you want to
- * retrieve the type's name as Python unicode object, then just use
+ * retrieve the type's name as a handle that refers to a ``str``, then just use
  * ``HPy_GetAttr_s(ctx, type, "__name__")``.
  *
  * :param ctx:
@@ -536,6 +536,62 @@ HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size,
 HPy_ID(197)
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors);
 
+/**
+ * Decode a bytes-like object to a Unicode object.
+ *
+ * The bytes of the bytes-like object are decoded according to the given
+ * encoding and using the error handling defined by ``errors``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A bytes-like object. This can be, for example, Python *bytes*,
+ *     *bytearray*, *memoryview*, *array.array* and objects that support the
+ *     Buffer protocol. If this argument is `HPy_NULL``, a ``SystemError`` will
+ *     be raised. If the argument is not a bytes-like object, a ``TypeError``
+ *     will be raised.
+ * :param encoding:
+ *     The name (UTF-8 encoded C string) of the encoding to use. If the encoding
+ *     does not exist, a ``LookupError`` will be raised. If this argument is
+ *     ``NULL``, the default encoding ``UTF-8`` will be used.
+ * :param errors:
+ *     The error handling (UTF-8 encoded C string) to use when decoding. The
+ *     possible values depend on the used encoding. This argument may be
+ *     ``NULL`` in which case it will default to ``"strict"``.
+ *
+ * :returns:
+ *     A handle to a ``str`` object created from the decoded bytes or
+ *     ``HPy_NULL`` in case of errors.
+ */
+HPy_ID(255)
+HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
+
+/**
+ * Return a substring of ``str``, from character index ``start`` (included) to
+ * character index ``end`` (excluded).
+ *
+ * Indices ``start`` and ``end`` must not be negative, otherwise an
+ * ``IndexError`` will be raised. If ``start >= len(str)`` or if
+ * ``end < start``, an empty string will be returned. If ``end > len(str)`` then
+ * ``end == len(str)`` will be assumed.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param str:
+ *     A Python Unicode object (must not be ``HPy_NULL``). Otherwise, the
+ *     behavior is undefined (verification of the argument is only done in
+ *     debug mode).
+ * :param start:
+ *     The non-negative start index (inclusive).
+ * :param end:
+ *    The non-negative end index (exclusive).
+ *
+ * :returns:
+ *     The requested substring or ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(256)
+HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
+
 /* listobject.h */
 HPy_ID(198)
 int HPyList_Check(HPyContext *ctx, HPy h);
@@ -549,6 +605,41 @@ HPy_ID(201)
 int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy_ID(202)
 HPy HPyDict_New(HPyContext *ctx);
+
+/**
+ * Returns a list of all keys from the dictionary.
+ *
+ * Note: This function will directly access the storage of the dict object and
+ * therefore ignores if method ``keys`` was overwritten.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A Python dict object. If this argument is ``HPy_NULL`` or not an
+ *     instance of a Python dict, a ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     A Python list object containing all keys of the given dictionary or
+ *     ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(257)
+HPy HPyDict_Keys(HPyContext *ctx, HPy h);
+
+/**
+ * Creates a copy of the provided Python dict object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A Python dict object. If this argument is ``HPy_NULL`` or not an
+ *     instance of a Python dict, a ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     Return a new dictionary that contains the same key-value pairs as ``h``
+ *     or ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(258)
+HPy HPyDict_Copy(HPyContext *ctx, HPy h);
 
 /* tupleobject.h */
 HPy_ID(203)

@@ -1721,6 +1721,32 @@ HPy trace_ctx_Unicode_DecodeLatin1(HPyContext *tctx, const char *latin1, HPy_ssi
     return res;
 }
 
+HPy trace_ctx_Unicode_FromEncodedObject(HPyContext *tctx, HPy obj, const char *encoding, const char *errors)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 255);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyUnicode_FromEncodedObject(uctx, obj, encoding, errors);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 255, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_Unicode_Substring(HPyContext *tctx, HPy str, HPy_ssize_t start, HPy_ssize_t end)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 256);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyUnicode_Substring(uctx, str, start, end);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 256, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 int trace_ctx_List_Check(HPyContext *tctx, HPy h)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 198);
@@ -1783,6 +1809,32 @@ HPy trace_ctx_Dict_New(HPyContext *tctx)
     HPy res = HPyDict_New(uctx);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 202, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_Dict_Keys(HPyContext *tctx, HPy h)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 257);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyDict_Keys(uctx, h);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 257, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_Dict_Copy(HPyContext *tctx, HPy h)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 258);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyDict_Copy(uctx, h);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 258, r0, r1, &_ts_start, &_ts_end);
     return res;
 }
 

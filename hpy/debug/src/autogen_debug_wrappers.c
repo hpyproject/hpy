@@ -1428,6 +1428,18 @@ DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *latin1, HPy_ss
     return DHPy_open(dctx, universal_result);
 }
 
+DHPy debug_ctx_Unicode_FromEncodedObject(HPyContext *dctx, DHPy obj, const char *encoding, const char *errors)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPyUnicode_FromEncodedObject(get_info(dctx)->uctx, dh_obj, encoding, errors);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
 int debug_ctx_List_Check(HPyContext *dctx, DHPy h)
 {
     if (!get_ctx_info(dctx)->is_valid) {
@@ -1483,6 +1495,30 @@ DHPy debug_ctx_Dict_New(HPyContext *dctx)
     }
     get_ctx_info(dctx)->is_valid = false;
     HPy universal_result = HPyDict_New(get_info(dctx)->uctx);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
+DHPy debug_ctx_Dict_Keys(HPyContext *dctx, DHPy h)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_h = DHPy_unwrap(dctx, h);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPyDict_Keys(get_info(dctx)->uctx, dh_h);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
+DHPy debug_ctx_Dict_Copy(HPyContext *dctx, DHPy h)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_h = DHPy_unwrap(dctx, h);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPyDict_Copy(get_info(dctx)->uctx, dh_h);
     get_ctx_info(dctx)->is_valid = true;
     return DHPy_open(dctx, universal_result);
 }

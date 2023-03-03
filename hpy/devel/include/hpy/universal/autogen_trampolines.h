@@ -534,6 +534,14 @@ HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy
      return ctx->ctx_Unicode_DecodeLatin1 ( ctx, latin1, size, errors ); 
 }
 
+HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors) {
+     return ctx->ctx_Unicode_FromEncodedObject ( ctx, obj, encoding, errors ); 
+}
+
+HPyAPI_FUNC HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end) {
+     return ctx->ctx_Unicode_Substring ( ctx, str, start, end ); 
+}
+
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_List_Check ( ctx, h ); 
 }
@@ -552,6 +560,14 @@ HPyAPI_FUNC int HPyDict_Check(HPyContext *ctx, HPy h) {
 
 HPyAPI_FUNC HPy HPyDict_New(HPyContext *ctx) {
      return ctx->ctx_Dict_New ( ctx ); 
+}
+
+HPyAPI_FUNC HPy HPyDict_Keys(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Dict_Keys ( ctx, h ); 
+}
+
+HPyAPI_FUNC HPy HPyDict_Copy(HPyContext *ctx, HPy h) {
+     return ctx->ctx_Dict_Copy ( ctx, h ); 
 }
 
 HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h) {

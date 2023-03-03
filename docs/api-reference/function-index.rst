@@ -26,6 +26,8 @@ HPy Core API Function Index
 * :c:func:`HPyContextVar_New`
 * :c:func:`HPyContextVar_Set`
 * :c:func:`HPyDict_Check`
+* :c:func:`HPyDict_Copy`
+* :c:func:`HPyDict_Keys`
 * :c:func:`HPyDict_New`
 * :c:func:`HPyErr_Clear`
 * :c:func:`HPyErr_ExceptionMatches`
@@ -94,9 +96,11 @@ HPy Core API Function Index
 * :c:func:`HPyUnicode_DecodeFSDefaultAndSize`
 * :c:func:`HPyUnicode_DecodeLatin1`
 * :c:func:`HPyUnicode_EncodeFSDefault`
+* :c:func:`HPyUnicode_FromEncodedObject`
 * :c:func:`HPyUnicode_FromString`
 * :c:func:`HPyUnicode_FromWideChar`
 * :c:func:`HPyUnicode_ReadChar`
+* :c:func:`HPyUnicode_Substring`
 * :c:func:`HPy_ASCII`
 * :c:func:`HPy_Absolute`
 * :c:func:`HPy_Add`

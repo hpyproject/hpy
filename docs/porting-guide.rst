@@ -170,6 +170,8 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyContextVar_New <https://docs.python.org/3/c-api/contextvars.html#c.PyContextVar_New>`_                                          :c:func:`HPyContextVar_New`
     `PyContextVar_Set <https://docs.python.org/3/c-api/contextvars.html#c.PyContextVar_Set>`_                                          :c:func:`HPyContextVar_Set`
     `PyDict_Check <https://docs.python.org/3/c-api/dict.html#c.PyDict_Check>`_                                                         :c:func:`HPyDict_Check`
+    `PyDict_Copy <https://docs.python.org/3/c-api/dict.html#c.PyDict_Copy>`_                                                           :c:func:`HPyDict_Copy`
+    `PyDict_Keys <https://docs.python.org/3/c-api/dict.html#c.PyDict_Keys>`_                                                           :c:func:`HPyDict_Keys`
     `PyDict_New <https://docs.python.org/3/c-api/dict.html#c.PyDict_New>`_                                                             :c:func:`HPyDict_New`
     `PyErr_Clear <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_Clear>`_                                                     :c:func:`HPyErr_Clear`
     `PyErr_ExceptionMatches <https://docs.python.org/3/c-api/exceptions.html#c.PyErr_ExceptionMatches>`_                               :c:func:`HPyErr_ExceptionMatches`
@@ -269,9 +271,11 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyUnicode_DecodeFSDefaultAndSize <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeFSDefaultAndSize>`_              :c:func:`HPyUnicode_DecodeFSDefaultAndSize`
     `PyUnicode_DecodeLatin1 <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_DecodeLatin1>`_                                  :c:func:`HPyUnicode_DecodeLatin1`
     `PyUnicode_EncodeFSDefault <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_EncodeFSDefault>`_                            :c:func:`HPyUnicode_EncodeFSDefault`
+    `PyUnicode_FromEncodedObject <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromEncodedObject>`_                        :c:func:`HPyUnicode_FromEncodedObject`
     `PyUnicode_FromString <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromString>`_                                      :c:func:`HPyUnicode_FromString`
     `PyUnicode_FromWideChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromWideChar>`_                                  :c:func:`HPyUnicode_FromWideChar`
     `PyUnicode_ReadChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_ReadChar>`_                                          :c:func:`HPyUnicode_ReadChar`
+    `PyUnicode_Substring <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_Substring>`_                                        :c:func:`HPyUnicode_Substring`
     ================================================================================================================================== ================================================
 
 
