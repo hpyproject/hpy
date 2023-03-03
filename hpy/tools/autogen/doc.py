@@ -37,7 +37,10 @@ class autogen_function_index(AutoGenRstFile):
         w('HPy Core API Function Index')
         w('###########################')
         w('')
-        for func in self.api.functions:
+        functions = list(self.api.functions)
+        # sort the list of functions by 'func.name'
+        functions.sort(key=lambda x: x.name)
+        for func in functions:
             if func.name[0] != '_':
                 w(f'* :c:func:`{func.name}`')
         return '\n'.join(lines)
@@ -57,7 +60,8 @@ SPECIAL_CASES = {
 # maps to a different page and this can be specified here. E.g.
 # 'PyErr_Something' is documented in page '.../3/c-api/exceptions.html'
 PREFIX_TABLE = {
-    'err': 'exceptions'
+    'err': 'exceptions',
+    'contextvar': 'contextvars'
 }
 
 class autogen_doc_api_mapping(AutoGenFile):
@@ -81,9 +85,11 @@ class autogen_doc_api_mapping(AutoGenFile):
         max_width0 = 0
         max_width1 = 0
         rows = []
-        for func in self.api.functions:
-            if not func.cpython_name:
-                continue
+        functions = [x for x in self.api.functions if x.cpython_name]
+        # sort the list of functions by 'func.cpython_name'
+        functions.sort(key=lambda x: x.cpython_name)
+        for func in functions:
+            assert func.cpython_name
             page = self._get_page(func.cpython_name)
             col0 = f'`{func.cpython_name} <https://docs.python.org/3/c-api/{page}#c.{func.cpython_name}>`_'
             col1 = f':c:func:`{func.name}`'

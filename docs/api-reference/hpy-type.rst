@@ -17,11 +17,11 @@ Definition
 .. autocmodule:: hpy/hpytype.h
    :members: HPyType_Spec,HPyType_BuiltinShape,HPyType_SpecParam,HPyType_SpecParam_Kind,HPyType_HELPERS,HPyType_LEGACY_HELPERS,HPy_TPFLAGS_DEFAULT,HPy_TPFLAGS_BASETYPE,HPy_TPFLAGS_HAVE_GC
 
-Construction
-~~~~~~~~~~~~
+Construction and More
+~~~~~~~~~~~~~~~~~~~~~
 
 .. autocmodule:: autogen/public_api.h
-   :members: HPyType_FromSpec
+   :members: HPyType_FromSpec, HPyType_GetName, HPyType_IsSubtype
 
 HPy Module
 ----------

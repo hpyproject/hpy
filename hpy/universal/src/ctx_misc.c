@@ -74,3 +74,10 @@ ctx_FatalError(HPyContext *ctx, const char *message)
 {
     Py_FatalError(message);
 }
+
+HPyAPI_IMPL int
+ctx_Type_IsSubtype(HPyContext *ctx, HPy sub, HPy type)
+{
+    return PyType_IsSubtype((PyTypeObject *)_h2py(sub),
+            (PyTypeObject *)_h2py(type));
+}

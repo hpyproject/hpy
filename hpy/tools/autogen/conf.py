@@ -140,4 +140,6 @@ SPECIAL_CASES = {
     'HPy_Compile_s': None,
     'HPy_EvalCode': 'PyEval_EvalCode',
     'HPyContextVar_Get': None,
+    'HPyType_GetName': None,
+    'HPyType_IsSubtype': None,
 }

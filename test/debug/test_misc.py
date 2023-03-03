@@ -1,5 +1,5 @@
 import pytest
-from test.support import SUPPORTS_SYS_EXECUTABLE
+from test.support import SUPPORTS_SYS_EXECUTABLE, SUPPORTS_MEM_PROTECTION
 
 @pytest.fixture
 def hpy_abi():
@@ -59,3 +59,85 @@ def test_typecheck(compiler, python_subprocess):
     assert result.returncode != 0
     assert "HPy_TypeCheck arg 2 must be a type" in result.stderr.decode("utf-8")
 
+
+@pytest.mark.skipif(not SUPPORTS_MEM_PROTECTION, reason=
+                    "Could be implemented by checking the contents on close.")
+@pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
+def test_type_getname(compiler, python_subprocess):
+    mod = compiler.compile_module("""
+        #define MODE_READ_ONLY 0
+        #define MODE_USE_AFTER_FREE 1
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        {
+            HPy type;
+            int mode;
+            const char *name;
+            char *buffer;
+
+            // parse arguments
+            if (nargs != 2) {
+                HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
+                return HPy_NULL;
+            }
+            mode = HPyLong_AsLong(ctx, args[0]);
+            if (mode < 0) {
+                HPyErr_Clear(ctx);
+                HPyErr_SetString(ctx, ctx->h_ValueError, "invalid test mode");
+                return HPy_NULL;
+            }
+            type = mode == 1 ? HPy_Dup(ctx, args[1]) : args[1];
+
+            name = HPyType_GetName(ctx, type);
+            if (name == NULL)
+                return HPy_NULL;
+
+            switch (mode) {
+            case MODE_READ_ONLY:
+                // write to read-only memory
+                buffer = (char *)name;
+                buffer[0] = 'h';
+                break;
+            case MODE_USE_AFTER_FREE:
+                // will cause use after handle was closed
+                HPy_Close(ctx, type);
+                break;
+            }
+            return HPyUnicode_FromString(ctx, name);
+        }
+        @EXPORT(f)
+        @INIT
+    """)
+    result = python_subprocess.run(mod, "mod.f(0, 'hello')")
+    assert result.returncode != 0
+    assert "HPyType_GetName arg must be a type" in result.stderr.decode("utf-8")
+
+    result = python_subprocess.run(mod, "mod.f(0, str)")
+    assert result.returncode != 0
+
+    result = python_subprocess.run(mod, "mod.f(1, str)")
+    assert result.returncode != 0
+
+
+@pytest.mark.skipif(not SUPPORTS_SYS_EXECUTABLE, reason="needs subprocess")
+def test_type_issubtype(compiler, python_subprocess):
+    mod = compiler.compile_module("""
+        HPyDef_METH(f, "f", HPyFunc_VARARGS)
+        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        {
+            if (nargs != 2) {
+                HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
+                return HPy_NULL;
+            }
+            return HPyLong_FromLong(ctx, HPyType_IsSubtype(ctx, args[0], args[1]));
+        }
+        @EXPORT(f)
+        @INIT
+    """)
+    result = python_subprocess.run(mod, "mod.f(bool, 'hello')")
+    assert result.returncode != 0
+    assert "HPyType_IsSubtype arg 2 must be a type" in result.stderr.decode("utf-8")
+
+    result = python_subprocess.run(mod, "mod.f('hello', str)")
+    assert result.returncode != 0
+    assert "HPyType_IsSubtype arg 1 must be a type" in result.stderr.decode("utf-8")

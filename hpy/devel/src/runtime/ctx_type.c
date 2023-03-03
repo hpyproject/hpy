@@ -1378,3 +1378,17 @@ _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx, HPy h
     }
     return _HPyType_Get_Shape((PyTypeObject *)tp);
 }
+
+_HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
+{
+    PyTypeObject *tp = (PyTypeObject*) _h2py(type);
+    assert(tp != NULL);
+    if (tp->tp_flags & Py_TPFLAGS_HEAPTYPE) {
+        PyHeapTypeObject* et = (PyHeapTypeObject*)tp;
+        return PyUnicode_AsUTF8(et->ht_name);
+    }
+    else {
+        // '_PyType_Name' is at least available from 3.7 to 3.12
+        return _PyType_Name(tp);
+    }
+}

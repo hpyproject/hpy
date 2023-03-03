@@ -513,4 +513,16 @@ HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *resu
     return ctx_ContextVar_Get(ctx, context_var, default_value, result);
 }
 
+HPyAPI_FUNC const char *
+HPyType_GetName(HPyContext *ctx, HPy type)
+{
+    return ctx_Type_GetName(ctx, type);
+}
+
+HPyAPI_FUNC int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type)
+{
+    return PyType_IsSubtype((PyTypeObject *)_h2py(sub),
+            (PyTypeObject *)_h2py(type));
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */

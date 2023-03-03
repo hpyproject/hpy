@@ -1239,6 +1239,110 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             mod.create_type("mytest.DummyIntMeta", int)
 
+    def test_get_name(self):
+        import array
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = 0,
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @DEFAULT_SHAPE
+            };
+
+            HPyDef_METH(get_name, "get_name", HPyFunc_O)
+            static HPy get_name_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                const char *name = HPyType_GetName(ctx, arg);
+                if (name == NULL)
+                    return HPy_NULL;
+                return HPyUnicode_FromString(ctx, name);
+            }
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @EXPORT(get_name)
+            @INIT
+        """)
+        assert mod.Dummy.__name__ == "Dummy"
+        assert mod.get_name(mod.Dummy) == "Dummy"
+        assert mod.get_name(str) == "str"
+        assert mod.get_name(array.array) == "array"
+
+    def test_issubtype(self):
+        mod = self.make_module("""
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE,
+                @DEFAULT_SHAPE
+            };
+
+            static HPyType_Spec Single_spec = {
+                .name = "mytest.Single",
+                @DEFAULT_SHAPE
+            };
+
+            static HPyType_Spec Dual_spec = {
+                .name = "mytest.Dual",
+                @DEFAULT_SHAPE
+            };
+
+            static void make_types(HPyContext *ctx, HPy module)
+            {
+                HPy h_dummy = HPyType_FromSpec(ctx, &Dummy_spec, NULL);
+                HPy_SetAttr_s(ctx, module, "Dummy", h_dummy);
+                HPyType_SpecParam single_param[] = {
+                    { HPyType_SpecParam_Base, ctx->h_LongType },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+                HPy h_single = HPyType_FromSpec(ctx, &Single_spec, single_param);
+                if (HPy_IsNull(h_single))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Single", h_single);
+                HPy_Close(ctx, h_single);
+
+                HPyType_SpecParam dual_param[] = {
+                    { HPyType_SpecParam_Base, ctx->h_LongType },
+                    { HPyType_SpecParam_Base, h_dummy },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+                HPy h_dual = HPyType_FromSpec(ctx, &Dual_spec, dual_param);
+                HPy_Close(ctx, h_dummy);
+                if (HPy_IsNull(h_dual))
+                    return;
+                HPy_SetAttr_s(ctx, module, "Dual", h_dual);
+                HPy_Close(ctx, h_dual);
+            }
+
+            HPyDef_METH(issubtype, "issubtype", HPyFunc_VARARGS)
+            static HPy issubtype_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            {
+                if (nargs != 2) {
+                    HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
+                    return HPy_NULL;
+                }
+                int res = HPyType_IsSubtype(ctx, args[0], args[1]);
+                return HPyLong_FromLong(ctx, res);
+            }
+
+            @EXPORT(issubtype)
+            @EXTRA_INIT_FUNC(make_types)
+            @INIT
+        """)
+
+        class EveryMeta(type):
+            def __subclasscheck__(self, subclass):
+                return subclass is not None
+        Every = EveryMeta('Every', (), {})
+        assert mod.issubtype(mod.Single, int)
+        assert mod.issubtype(mod.Dual, int)
+        assert mod.issubtype(mod.Dual, mod.Dummy)
+        assert not mod.issubtype(mod.Single, mod.Dummy)
+        assert not mod.issubtype(mod.Single, mod.Dual)
+        assert not mod.issubtype(mod.Dual, mod.Single)
+        assert issubclass(mod.Single, Every)
+        assert issubclass(mod.Dual, Every)
+        assert not mod.issubtype(mod.Single, Every)
+        assert not mod.issubtype(mod.Dual, Every)
+
 
 class TestPureHPyType(HPyTest):
 

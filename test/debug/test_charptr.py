@@ -1,12 +1,10 @@
-from test.support import SUPPORTS_SYS_EXECUTABLE
 import os
 import pytest
+from test.support import SUPPORTS_SYS_EXECUTABLE, SUPPORTS_MEM_PROTECTION
 
 # Tests detection of usage of char pointers associated with invalid already
 # closed handles. For now, the debug mode does not provide any hook for this
 # error, so we have to run the tests from subprocess and check the return code.
-
-SUPPORTS_MEM_PROTECTION = '_HPY_DEBUG_FORCE_DEFAULT_MEM_PROTECT' not in os.environ
 
 @pytest.fixture
 def hpy_abi():
