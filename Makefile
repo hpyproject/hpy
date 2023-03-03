@@ -28,10 +28,9 @@ cppcheck: cppcheck-build-dir
 		-v \
 		--error-exitcode=1 \
 		--cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) \
-		--output-file=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt \
 		--enable=warning,performance,portability,information,missingInclude \
 		--inline-suppr \
-		--suppress=allocaCalled \
+		--suppress=syntaxError \
 		-I /usr/local/include/ \
 		-I /usr/include/ \
 		-I ${PYTHON_INC} \
@@ -50,7 +49,10 @@ cppcheck: cppcheck-build-dir
 		--force \
 		-D NULL=0 \
 		-D HPY_ABI_CPYTHON \
-		. || (cat $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt && false)
+		-D __linux__=1 \
+		-D __x86_64__=1 \
+		-D __LP64__=1 \
+		.
 
 infer:
 	python3 setup.py build_ext -if -U NDEBUG | compiledb
