@@ -22,18 +22,20 @@ cppcheck-build-dir:
 cppcheck: cppcheck-build-dir
 	# azure pipelines doesn't show stderr, so we write the errors to a file and cat it later :(
 	$(eval PYTHON_INC = $(shell python3 -q -c "from sysconfig import get_paths as gp; print(gp()['include'])"))
+	$(eval PYTHON_PLATINC = $(shell python3 -q -c "from sysconfig import get_paths as gp; print(gp()['platinclude'])"))
 	cppcheck --version
 	cppcheck \
 		-v \
 		--error-exitcode=1 \
 		--cppcheck-build-dir=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck) \
-		--output-file=$(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt \
 		--enable=warning,performance,portability,information,missingInclude \
 		--inline-suppr \
-		--suppress=allocaCalled \
-		-I /usr/local/include \
-		-I /usr/include \
+		--suppress=syntaxError \
+		-I /usr/local/include/ \
+		-I /usr/include/ \
 		-I ${PYTHON_INC} \
+		-I ${PYTHON_PLATINC} \
+		-I . \
 		-I hpy/devel/include/ \
 		-I hpy/devel/include/hpy/ \
 		-I hpy/devel/include/hpy/cpython/ \
@@ -41,10 +43,16 @@ cppcheck: cppcheck-build-dir
 		-I hpy/devel/include/hpy/runtime/ \
 		-I hpy/universal/src/ \
 		-I hpy/debug/src/ \
+		-I hpy/debug/src/include \
+		-I hpy/trace/src/ \
+		-I hpy/trace/src/include \
 		--force \
 		-D NULL=0 \
 		-D HPY_ABI_CPYTHON \
-		. || (cat $(or ${CPPCHECK_BUILD_DIR}, .cppcheck)/output.txt && false)
+		-D __linux__=1 \
+		-D __x86_64__=1 \
+		-D __LP64__=1 \
+		.
 
 infer:
 	python3 setup.py build_ext -if -U NDEBUG | compiledb

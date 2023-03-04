@@ -342,10 +342,8 @@ jobs:
 
   cpp_check:
     name: Cppcheck static analysis
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     continue-on-error: true
-    # Skip it, see issue gh-188
-    if: false
     steps:
       - uses: actions/checkout@v3
 
@@ -355,7 +353,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install Cppcheck
-        run: sudo apt-get -qq -y install cppcheck
+        run: sudo apt-get -qq -y install cppcheck=2.7-1
 
       - name: Run Cppcheck
         run: make cppcheck
