@@ -52,6 +52,7 @@ problems due to different compilers.
    argument-parsing
    build-value
    formatting
+   structseq
    helpers
 
 

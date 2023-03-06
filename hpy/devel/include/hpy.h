@@ -268,6 +268,7 @@ typedef enum {
 #include "hpy/runtime/buildvalue.h"
 #include "hpy/runtime/format.h"
 #include "hpy/runtime/helpers.h"
+#include "hpy/runtime/structseq.h"
 
 #ifdef HPY_ABI_CPYTHON
 #   include "hpy/cpython/autogen_ctx.h"
