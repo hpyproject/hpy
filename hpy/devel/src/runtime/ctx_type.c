@@ -1148,17 +1148,6 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     ht->ht_type.tp_name = (const char *)extra->name;
 #endif
 
-#if PY_VERSION_HEX < 0x03080000
-    /*
-    py3.7 compatibility
-    Before 3.8, the tp_finalize slot is only considered if the type has
-    Py_TPFLAGS_HAVE_FINALIZE. That flag is ignored in 3.8+ (see bpo-32388).
-    */
-    if (((PyTypeObject*)result)->tp_finalize != NULL) {
-        ((PyTypeObject*)result)->tp_flags |= Py_TPFLAGS_HAVE_FINALIZE;
-    }
-#endif
-
     PyBufferProcs* buffer_procs = create_buffer_procs(hpyspec);
     if (buffer_procs) {
         ((PyTypeObject*)result)->tp_as_buffer = buffer_procs;
@@ -1219,11 +1208,6 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
 
     if (!result)
         return HPy_NULL;
-#if PY_VERSION_HEX < 0x03080000
-    // Workaround for Python issue 35810; no longer necessary in Python 3.8
-    // TODO: Remove this workaround once we no longer support Python versions older than 3.8
-    Py_INCREF(tp);
-#endif
 
     *data = payload;
 
@@ -1388,7 +1372,7 @@ _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
         return PyUnicode_AsUTF8(et->ht_name);
     }
     else {
-        // '_PyType_Name' is at least available from 3.7 to 3.12
+        // '_PyType_Name' is at least available from 3.8 to 3.12
         return _PyType_Name(tp);
     }
 }
