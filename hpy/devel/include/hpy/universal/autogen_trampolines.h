@@ -578,6 +578,10 @@ HPyAPI_FUNC HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n) 
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }
 
+HPyAPI_FUNC int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step) {
+     return ctx->ctx_Slice_Unpack ( ctx, slice, start, stop, step ); 
+}
+
 HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *utf8_name) {
      return ctx->ctx_Import_ImportModule ( ctx, utf8_name ); 
 }

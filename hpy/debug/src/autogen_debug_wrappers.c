@@ -1535,6 +1535,18 @@ int debug_ctx_Tuple_Check(HPyContext *dctx, DHPy h)
     return universal_result;
 }
 
+int debug_ctx_Slice_Unpack(HPyContext *dctx, DHPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_slice = DHPy_unwrap(dctx, slice);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPySlice_Unpack(get_info(dctx)->uctx, dh_slice, start, stop, step);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
 DHPy debug_ctx_Import_ImportModule(HPyContext *dctx, const char *utf8_name)
 {
     if (!get_ctx_info(dctx)->is_valid) {
