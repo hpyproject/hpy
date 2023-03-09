@@ -60,16 +60,6 @@ typedef struct {
  */
 extern const char * const HPyStructSequence_UnnamedField;
 
-typedef HPyTupleBuilder HPyStructSequenceBuilder;
-
-/**
- * Use this macro to check if a struct sequence builder is the ``NULL`` builder.
- *
- * :param x:
- *     The struct sequence builder to test.
- */
-#define HPyStructSequenceBuilder_IsNull(x) ((x)._tup == 0)
-
 /**
  * Create a new struct sequence type from a descriptor. Instances of the
  * resulting type can be created with :c:func:`HPyStructSequence_New`.
@@ -88,11 +78,11 @@ HPyAPI_HELPER HPy
 HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc);
 
 /**
- * Creates a new builder instance for instances of ``type``.
+ * Creates a new instance of ``type`` initializing it with the given arguments.
  *
- * Since struct sequences are immutable objects, they can only be created using
- * a builder. This function will create a fresh builder for creating instances
- * of the provided struct sequence type. The type must have been created with
+ * Since struct sequences are immutable objects, they need to be initialized at
+ * instantiation. This function will create a fresh instance of the provided
+ * struct sequence type. The type must have been created with
  * :c:func:`HPyStructSequence_NewType`.
  *
  * :param ctx:
@@ -101,90 +91,51 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc);
  *     A struct sequence type (must not be ``HPy_NULL``). If the passed object
  *     is not a type, the behavior is undefined. If the given type is not
  *     appropriate, a ``TypeError`` will be raised.
+ * :param nargs:
+ *     The number of arguments in ``args``. If this argument is not exactly the
+ *     number of fields of the struct sequence, a ``TypeError`` will be raised.
+ * :param args:
+ *     An array of HPy handles to Python objects to be used for initializing
+ *     the struct sequence. If ``nargs > 0`` then this argument must not be
+ *     ``NULL``.
  *
  * :returns:
- *     A new builder for creating a new instance of ``type``. Use macro
- *     :c:macro:`HPyStructSequenceBuilder_IsNull` to test if an error occurred.
- */
-HPyAPI_HELPER HPyStructSequenceBuilder
-HPyStructSequenceBuilder_New(HPyContext *ctx, HPy type);
-
-/**
- * Sets the field at index ``idx`` of the struct sequence builder.
- *
- * Use this to collect all elements that will be used to fill the new instance
- * of the struct sequence as soon as :c:func:`HPyStructSequenceBuilder_Build` is
- * called.
- *
- * :param ctx:
- *     The execution context.
- * :param builder:
- *     A struct sequence type (must not be ``HPy_NULL``). If the given type is
- *     not appropriate, a ``TypeError`` will be raised.
- * :param idx:
- *     The index of the field to set. No bounds checking will be done. If the
- *     index is out of bounds, behavior is undefined.
- * :param value:
- *     An arbitrary object to set as value at the given index (must not be
- *     ``HPy_NULL``).
- */
-HPyAPI_HELPER void
-HPyStructSequenceBuilder_Set(HPyContext *ctx, HPyStructSequenceBuilder builder, HPy_ssize_t idx, HPy value);
-
-/**
- * Sets the field at index ``idx`` of the struct sequence builder.
- *
- * Use this to collect all elements that will be used to fill the new instance
- * of the struct sequence as soon as :c:func:`HPyStructSequenceBuilder_Build` is
- * called.
- *
- * :param ctx:
- *     The execution context.
- * :param builder:
- *     A struct sequence type (must not be ``HPy_NULL``). If the given type is
- *     not appropriate, a ``TypeError`` will be raised.
- * :param idx:
- *     The index of the field to set. No bounds checking will be done. If the
- *     index is out of bounds, behavior is undefined.
- * :param value:
- *     A C long to set as value at the given index. The long will be converted
- *     to a Python ``int``.
- */
-HPyAPI_HELPER void
-HPyStructSequenceBuilder_Set_i(HPyContext *ctx, HPyStructSequenceBuilder builder, HPy_ssize_t idx, long value);
-
-/**
- * Build a struct sequence from a builder.
- *
- * :param ctx:
- *     The execution context.
- * :param builder:
- *     A struct sequence type (must not be ``HPy_NULL``). If the given type is
- *     not appropriate, a ``TypeError`` will be raised.
- *
- * :returns:
- *     An HPy handle to a struct sequence containing the values inserted with
- *     :c:func:`HPyStructSequenceBuilder_Set` or
- *     :c:func:`HPyStructSequenceBuilder_Set_i`. The result will be ``HPy_NULL``
- *     in case an error occurred during building or earlier when creating the
- *     builder or setting the items.
+ *     A new instance of ``type`` or ``HPy_NULL`` if an error occurred.
  */
 HPyAPI_HELPER HPy
-HPyStructSequenceBuilder_Build(HPyContext *ctx, HPyStructSequenceBuilder builder, HPy type);
+HPyStructSequence_New(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args);
 
 /**
- * Cancel building of a struct sequence and free any acquired resources.
+ * Create a new instance of the struct sequence type ``type`` and initialize it
+ * with the given format and arguments.
  *
- * This function ignores if any error occurred previously when using the tuple
- * builder.
+ * This function is similar to :c:func:`HPyStructSequence_New` but it is more
+ * convenient since it allows to pass C values that will be converted according
+ * to the specified format.
+ *
+ * Supported format specifiers are
+ * :ref:`api-reference/build-value:supported formatting strings` except of
+ * :ref:`api-reference/build-value:collections`.
  *
  * :param ctx:
  *     The execution context.
- * :param builder:
- *     A struct sequence type (must not be ``HPy_NULL``). If the given type is
- *     not appropriate, a ``TypeError`` will be raised.
+ * :param type:
+ *     A struct sequence type (must not be ``HPy_NULL``). If the passed object
+ *     is not a type, the behavior is undefined. If the given type is not
+ *     appropriate, a ``TypeError`` will be raised.
+ * :param fmt:
+ *     A format string specifying the number and type of arguments passed. The
+ *     values will be converted according to the format and inserted (in given
+ *     order) into the struct sequence. If the number of variable arguments is
+ *     not exactly the number of fields of the struct sequence, a ``TypeError``
+ *     will be raised.
+ * :param ...:
+ *     Variable arguments of values according to the format ``fmt``.
+ *
+ * :returns:
+ *     A new instance of ``type`` or ``HPy_NULL`` if an error occurred.
  */
-HPyAPI_HELPER void
-HPyStructSequenceBuilder_Cancel(HPyContext *ctx, HPyStructSequenceBuilder builder);
+HPyAPI_HELPER HPy
+HPyStructSequence_NewFromFormat(HPyContext *ctx, HPy type, const char *fmt, ...);
 
 #endif /* HPY_COMMON_RUNTIME_STRUCTSEQ_H */

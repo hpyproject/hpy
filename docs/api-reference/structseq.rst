@@ -12,4 +12,4 @@ created.
    :c:func:`HPy_GetItem`, :c:func:`HPy_GetItem_i`, or :c:func:`HPy_GetItem_s`.
 
 .. autocmodule:: hpy/runtime/structseq.h
-   :members: HPyStructSequence_Field,HPyStructSequence_Desc,HPyStructSequence_UnnamedField,HPyStructSequenceBuilder,HPyStructSequenceBuilder_IsNull,HPyStructSequence_NewType,HPyStructSequenceBuilder_New,HPyStructSequenceBuilder_Set,HPyStructSequenceBuilder_Set_i,HPyStructSequenceBuilder_Build,HPyStructSequenceBuilder_Cancel
+   :members: HPyStructSequence_Field,HPyStructSequence_Desc,HPyStructSequence_UnnamedField,HPyStructSequence_NewType,HPyStructSequence_New,HPyStructSequence_NewFromFormat

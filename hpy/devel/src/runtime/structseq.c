@@ -7,10 +7,16 @@
  */
 
 #include "hpy.h"
+#include "buildvalue_internal.h"
 
 #include <string.h>
+#include <stdio.h>
 
 const char * const HPyStructSequence_UnnamedField = "_";
+
+static HPy_ssize_t count_single_items(HPyContext *ctx, const char *fmt);
+static HPy build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ssize_t size);
+static void close_array(HPyContext *ctx, HPy_ssize_t n, HPy *arr);
 
 HPyAPI_HELPER HPy
 HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
@@ -188,106 +194,166 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
 #endif
 }
 
-HPyAPI_HELPER HPyStructSequenceBuilder
-HPyStructSequenceBuilder_New(HPyContext *ctx, HPy type)
+static HPy
+structseq_new(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args, bool args_owned)
 {
+    static const char *s_n_fields = "n_fields";
 #ifndef HPY_ABI_CPYTHON
-    HPy n_fields = HPy_GetAttr_s(ctx, type, "n_fields");
-    if (HPy_IsNull(n_fields)) {
-        goto error;
+    if (!HPy_HasAttr_s(ctx, type, s_n_fields)) {
+        if (args_owned)
+            close_array(ctx, nargs, args);
+        HPyErr_Clear(ctx);
+        HPyErr_Format(ctx, ctx->h_TypeError,
+                "object '%R' does not look like a struct sequence type ", type);
+        return HPy_NULL;
     }
-    HPy_ssize_t n = HPyLong_AsSsize_t(ctx, n_fields);
-    HPy_Close(ctx, n_fields);
-    if (n < 0) {
-        goto error;
+    HPy tuple = HPyTuple_FromArray(ctx, args, nargs);
+    if (args_owned)
+        close_array(ctx, nargs, args);
+    if (HPy_IsNull(tuple)) {
+        return HPy_NULL;
     }
-    HPyStructSequenceBuilder res = HPyTupleBuilder_New(ctx, n);
-    /* This function does not defer errors to 'HPyStructSequenceBuilder_Build',
-       hence we need to check for NULL here and raise an exception. */
-    if (HPyStructSequenceBuilder_IsNull(res)) {
-        goto error;
-    }
-    return res;
-
-error:
-    HPyErr_Clear(ctx);
-    HPyErr_Format(ctx, ctx->h_TypeError,
-            "object '%R' does not look like a struct sequence type ", type);
-    return (HPyTupleBuilder){(HPy_ssize_t)0};
+    HPy result = HPy_CallTupleDict(ctx, type, tuple, HPy_NULL);
+    HPy_Close(ctx, tuple);
+    return result;
 #else
     PyTypeObject *tp = (PyTypeObject *)_h2py(type);
+    // CPython also accesses the dict directly
+    PyObject *name = PyUnicode_FromStringAndSize(s_n_fields, sizeof(s_n_fields));
+    PyObject *v = PyDict_GetItemWithError(tp->tp_dict, name);
+    Py_DECREF(name);
+    if (v == NULL && !PyErr_Occurred()) {
+        goto error;
+    }
+    Py_ssize_t n_fields = PyLong_AsSsize_t(v);
     PyObject *seq = PyStructSequence_New(tp);
     if (seq == NULL) {
-        /* The error behavior seems not to be consistent. If anything goes
-           wrong, we will convert it to a TypeError here. */
-        PyErr_Clear();
+        goto error;
+    }
+    if (n_fields != nargs) {
         PyErr_Format(PyExc_TypeError,
-                     "type '%s' does not look like a struct sequence type ",
-                     tp->tp_name);
+                     "expected exactly %d arguments but got %d",
+                     n_fields, nargs);
+        return HPy_NULL;
     }
-    return (HPyStructSequenceBuilder){(HPy_ssize_t)seq};
-#endif
-}
 
-HPyAPI_HELPER void
-HPyStructSequenceBuilder_Set(HPyContext *ctx, HPyStructSequenceBuilder self, HPy_ssize_t i, HPy value)
-{
-#ifndef HPY_ABI_CPYTHON
-    HPyTupleBuilder_Set(ctx, self, i, value);
-#else
-    PyObject *t = (PyObject *)self._tup;
-    if (t) {
-        PyObject *v = _h2py(value);
-        Py_INCREF(v);
-        PyStructSequence_SetItem(t, i, v);
+    PyObject *item;
+    for (Py_ssize_t i = 0; i < nargs; i++) {
+        item = _h2py(args[i]);
+        if (!args_owned)
+            Py_INCREF(item);
+        PyStructSequence_SetItem(seq, i, item);
     }
-#endif
-}
+    return _py2h(seq);
 
-HPyAPI_HELPER void
-HPyStructSequenceBuilder_Set_i(HPyContext *ctx, HPyStructSequenceBuilder self, HPy_ssize_t i, long value)
-{
-#ifndef HPY_ABI_CPYTHON
-    HPy v = HPyLong_FromLong(ctx, value);
-    HPyTupleBuilder_Set(ctx, self, i, v);
-    HPy_Close(ctx, v);
-#else
-    PyObject *t = (PyObject *)self._tup;
-    if (t) {
-        PyStructSequence_SetItem(t, i, PyLong_FromLong(value));
-    }
+error:
+    /* The error behavior seems not to be consistent. If anything goes
+       wrong, we will convert it to a TypeError here. */
+    PyErr_Clear();
+    PyErr_Format(PyExc_TypeError,
+                 "type '%s' does not look like a struct sequence type",
+                 tp->tp_name);
+    return HPy_NULL;
 #endif
 }
 
 HPyAPI_HELPER HPy
-HPyStructSequenceBuilder_Build(HPyContext *ctx, HPyStructSequenceBuilder self, HPy type)
+HPyStructSequence_New(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args)
 {
-#ifndef HPY_ABI_CPYTHON
-    HPy tuple = HPyTupleBuilder_Build(ctx, self);
-    if (HPy_IsNull(tuple)) {
-        return HPy_NULL;
-    }
-    HPy kw = HPyDict_New(ctx);
-    if (HPy_IsNull(kw)) {
-        HPy_Close(ctx, tuple);
-        return HPy_NULL;
-    }
-    HPy result = HPy_CallTupleDict(ctx, type, tuple, kw);
-    HPy_Close(ctx, kw);
-    HPy_Close(ctx, tuple);
-    return result;
-#else
-    return _py2h((PyObject *)self._tup);
-#endif
+    return structseq_new(ctx, type, nargs, args, false);
 }
 
-HPyAPI_HELPER void
-HPyStructSequenceBuilder_Cancel(HPyContext *ctx, HPyStructSequenceBuilder self)
+HPyAPI_HELPER HPy
+HPyStructSequence_NewFromFormat(HPyContext *ctx, HPy type, const char *fmt, ...)
 {
-#ifndef HPY_ABI_CPYTHON
-    HPyTupleBuilder_Cancel(ctx, self);
-#else
-    Py_DECREF((PyObject *)self._tup);
-    self._tup = 0;
-#endif
+    va_list values;
+    HPy result;
+    va_start(values, fmt);
+    HPy_ssize_t size = count_single_items(ctx, fmt);
+    if (size < 0) {
+        result = HPy_NULL;
+    } else if (size == 0) {
+        result = HPyStructSequence_New(ctx, type, 0, NULL);
+    } else if (size == 1) {
+        int owned;
+        result = buildvalue_single(ctx, &fmt, &values, &owned);
+        if (!owned) {
+            result = HPy_Dup(ctx, result);
+        }
+    } else {
+        result = build_array(ctx, type, &fmt, &values, size);
+    }
+    va_end(values);
+    return result;
+
+}
+
+static const char ERROR_FMT[] = "bad format char '%c' in the format string passed to HPyStructSequence_NewFromFormat";
+
+static HPy_ssize_t
+count_single_items(HPyContext *ctx, const char *fmt)
+{
+    HPy_ssize_t i;
+    char c;
+    for (i = 0; (c = fmt[i]) != '\0'; i++) {
+        switch (c) {
+        case 'i':
+        case 'I':
+        case 'k':
+        case 'l':
+        case 'L':
+        case 'K':
+        case 's':
+        case 'O':
+        case 'S':
+        case 'N':
+        case 'f':
+        case 'd':
+            break;
+
+        default: {
+            /* the size of ERROR_FMT will be enough since we are just inserting
+               a single char */
+            char msg[sizeof(ERROR_FMT)];
+            snprintf(msg, sizeof(msg), ERROR_FMT, c);
+            HPyErr_SetString(ctx, ctx->h_SystemError, msg);
+            return -1;
+        }
+        }
+    }
+    return i;
+}
+
+static void
+close_array(HPyContext *ctx, HPy_ssize_t n, HPy *arr)
+{
+    for (HPy_ssize_t i=0; i < n; i++) {
+        HPy_Close(ctx, arr[i]);
+    }
+}
+
+static HPy
+build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ssize_t size)
+{
+    HPy arr[size];
+    for (HPy_ssize_t i = 0; i < size; ++i) {
+        int owned;
+        HPy item = buildvalue_single(ctx, fmt, values, &owned);
+        if (HPy_IsNull(arr[i])) {
+            // in case of error, close all previously created items
+            close_array(ctx, i, arr);
+            return HPy_NULL;
+        }
+        arr[i] = owned ? item : HPy_Dup(ctx, item);
+    }
+    /* Sanity check: after we have consumed 'size' items, we expect the end of
+       of the format string. Otherwise, function 'count_single_items' is
+       not counting correctly. */
+    if (**fmt != '\0') {
+        close_array(ctx, size, arr);
+        HPyErr_SetString(ctx, ctx->h_SystemError,
+                "internal error in HPyStructSequence_NewFromFormat");
+        return HPy_NULL;
+    }
+    return structseq_new(ctx, type, size, arr, true);
 }
