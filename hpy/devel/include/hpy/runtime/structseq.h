@@ -4,9 +4,9 @@
 #include "hpy.h"
 
 /*
- * Struct sequences are relatively simple subclasses of tuple, so we provide the
- * simplified API to create them here. This maps closely to the CPython limited
- * API for creating struct sequences. However, in universal mode we use the
+ * Struct sequences are subclasses of tuple, so we provide a simplified API to
+ * create them here. This maps closely to the CPython limited API for creating
+ * struct sequences. However, in universal mode we use the
  * collections.namedtuple type to implement this, which behaves a bit
  * differently w.r.t. hidden elements. Thus, the n_in_sequence field available
  * in CPython's PyStructSequence_Desc is not available. Also, we use a builder
@@ -33,9 +33,9 @@ typedef struct {
 
 /**
  * Contains the meta information of a struct sequence type to create.
- * Struct sequences are subclasses of tuple. All fields are Python objects. The
- * index in the :c:member:`fields` array of the descriptor determines which
- * field of the struct sequence is described.
+ * Struct sequences are subclasses of tuple. The index in the :c:member:`fields`
+ * array of the descriptor determines which field of the struct sequence is
+ * described.
  */
 typedef struct {
     /**
