@@ -96,13 +96,14 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "buildvalue_internal.h"
+
 #define MESSAGE_BUF_SIZE 128
 
-static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end);
-static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end);
-static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size);
-static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values);
-static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int *needs_close);
+static HPy_ssize_t buildvalue_count_items(HPyContext *ctx, const char *fmt, char end);
+static HPy buildvalue_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end);
+static HPy buildvalue_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size);
+static HPy buildvalue_dict(HPyContext *ctx, const char **fmt, va_list *values);
 
 /**
  * Creates a new value based on a format string from the values passed in
@@ -125,25 +126,26 @@ HPy HPy_BuildValue(HPyContext *ctx, const char *fmt, ...)
     va_list values;
     HPy result;
     va_start(values, fmt);
-    HPy_ssize_t size = count_items(ctx, fmt, '\0');
+    HPy_ssize_t size = buildvalue_count_items(ctx, fmt, '\0');
     if (size < 0) {
         result = HPy_NULL;
     } else if (size == 0) {
         result = HPy_Dup(ctx, ctx->h_None);
     } else if (size == 1) {
         int needs_close;
-        result = build_single(ctx, &fmt, &values, &needs_close);
+        result = buildvalue_single(ctx, &fmt, &values, &needs_close);
         if (!needs_close) {
             result = HPy_Dup(ctx, result);
         }
     } else {
-        result = build_tuple(ctx, &fmt, &values, size, '\0');
+        result = buildvalue_tuple(ctx, &fmt, &values, size, '\0');
     }
     va_end(values);
     return result;
 }
 
-static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
+HPyAPI_HELPER
+HPy_ssize_t buildvalue_count_items(HPyContext *ctx, const char *fmt, char end)
 {
     HPy_ssize_t level = 0, result = 0;
     char top_level_par = 'X';
@@ -202,29 +204,30 @@ static HPy_ssize_t count_items(HPyContext *ctx, const char *fmt, char end)
     return result;
 }
 
-static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int *needs_close)
+HPyAPI_HELPER
+HPy buildvalue_single(HPyContext *ctx, const char **fmt, va_list *values, int *needs_close)
 {
     char format_char = *(*fmt)++;
     *needs_close = 1;
     switch (format_char) {
         case '(': {
-            HPy_ssize_t size = count_items(ctx, *fmt, ')');
+            HPy_ssize_t size = buildvalue_count_items(ctx, *fmt, ')');
             if (size < 0) {
                 return HPy_NULL;
             }
-            return build_tuple(ctx, fmt, values, size, ')');
+            return buildvalue_tuple(ctx, fmt, values, size, ')');
         }
 
         case '[': {
-            HPy_ssize_t size = count_items(ctx, *fmt, ']');
+            HPy_ssize_t size = buildvalue_count_items(ctx, *fmt, ']');
             if (size < 0) {
                 return HPy_NULL;
             }
-            return build_list(ctx, fmt, values, size);
+            return buildvalue_list(ctx, fmt, values, size);
         }
 
         case '{': {
-            return build_dict(ctx, fmt, values);
+            return buildvalue_dict(ctx, fmt, values);
         }
 
         case 'i':
@@ -288,7 +291,7 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
     } // switch
 }
 
-static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values)
+static HPy buildvalue_dict(HPyContext *ctx, const char **fmt, va_list *values)
 {
     HPy dict = HPyDict_New(ctx);
     int expect_comma = 0;
@@ -316,7 +319,7 @@ static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values)
             }
         }
         int needs_key_close, needs_value_close;
-        HPy key = build_single(ctx, fmt, values, &needs_key_close);
+        HPy key = buildvalue_single(ctx, fmt, values, &needs_key_close);
         if (HPy_IsNull(key)) {
             HPy_Close(ctx, dict);
             return HPy_NULL;
@@ -332,7 +335,7 @@ static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values)
         } else {
             (*fmt)++;
         }
-        HPy value = build_single(ctx, fmt, values, &needs_value_close);
+        HPy value = buildvalue_single(ctx, fmt, values, &needs_value_close);
         if (HPy_IsNull(value)) {
             if (needs_key_close) {
                 HPy_Close(ctx, key);
@@ -355,7 +358,7 @@ static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values)
         expect_comma = 1;
     }
     if (**fmt != '}') {
-        // count_items does not check the type of the matching paren, that's what we do here
+        // buildvalue_count_items does not check the type of the matching paren, that's what we do here
         HPy_Close(ctx, dict);
         HPyErr_SetString(ctx, ctx->h_SystemError,
                          "unmatched '{' in the format string passed to HPy_BuildValue");
@@ -365,12 +368,12 @@ static HPy build_dict(HPyContext *ctx, const char **fmt, va_list *values)
     return dict;
 }
 
-static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size)
+static HPy buildvalue_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size)
 {
     HPyListBuilder builder = HPyListBuilder_New(ctx, size);
     for (HPy_ssize_t i = 0; i < size; ++i) {
         int needs_close;
-        HPy item = build_single(ctx, fmt, values, &needs_close);
+        HPy item = buildvalue_single(ctx, fmt, values, &needs_close);
         if (HPy_IsNull(item)) {
             HPyListBuilder_Cancel(ctx, builder);
             return HPy_NULL;
@@ -384,7 +387,7 @@ static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ss
         }
     }
     if (**fmt != ']') {
-        // count_items does not check the type of the matching paren, that's what we do here
+        // buildvalue_count_items does not check the type of the matching paren, that's what we do here
         HPyListBuilder_Cancel(ctx, builder);
         HPyErr_SetString(ctx, ctx->h_SystemError,
                          "unmatched '[' in the format string passed to HPy_BuildValue");
@@ -394,12 +397,12 @@ static HPy build_list(HPyContext *ctx, const char **fmt, va_list *values, HPy_ss
     return HPyListBuilder_Build(ctx, builder);
 }
 
-static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end)
+static HPy buildvalue_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_ssize_t size, char expected_end)
 {
     HPyTupleBuilder builder = HPyTupleBuilder_New(ctx, size);
     for (HPy_ssize_t i = 0; i < size; ++i) {
         int needs_close;
-        HPy item = build_single(ctx, fmt, values, &needs_close);
+        HPy item = buildvalue_single(ctx, fmt, values, &needs_close);
         if (HPy_IsNull(item)) {
             HPyTupleBuilder_Cancel(ctx, builder);
             return HPy_NULL;
@@ -413,8 +416,8 @@ static HPy build_tuple(HPyContext *ctx, const char **fmt, va_list *values, HPy_s
         }
     }
     if (**fmt != expected_end) {
-        // count_items does not check the type of the matching paren, that's what we do here
-        // if expected_end == '\0', then there would have to be a bug in count_items
+        // buildvalue_count_items does not check the type of the matching paren, that's what we do here
+        // if expected_end == '\0', then there would have to be a bug in buildvalue_count_items
         HPyTupleBuilder_Cancel(ctx, builder);
         if (expected_end == '\0') {
             HPyErr_SetString(ctx, ctx->h_SystemError, "internal error in HPy_BuildValue");
