@@ -236,18 +236,19 @@ structseq_new(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args, bool args
     PyObject *v = PyDict_GetItemWithError(tp->tp_dict, name);
     Py_DECREF(name);
     if (v == NULL && !PyErr_Occurred()) {
-        goto error;
+        goto type_error;
     }
     Py_ssize_t n_fields = PyLong_AsSsize_t(v);
     PyObject *seq = PyStructSequence_New(tp);
     if (seq == NULL) {
-        goto error;
+        goto type_error;
     }
     if (n_fields != nargs) {
         PyErr_Format(PyExc_TypeError,
                      "expected exactly %d arguments but got %d",
                      n_fields, nargs);
-        return HPy_NULL;
+        Py_DECREF(seq);
+        goto error;
     }
 
     PyObject *item;
@@ -257,15 +258,21 @@ structseq_new(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args, bool args
             Py_INCREF(item);
         PyStructSequence_SetItem(seq, i, item);
     }
+    /* no need to call 'close_array' if 'args_owned' because items are stolen
+       from 'args' by 'PyStructSequence_SetItem' */
     return _py2h(seq);
 
-error:
+type_error:
     /* The error behavior seems not to be consistent. If anything goes
        wrong, we will convert it to a TypeError here. */
     PyErr_Clear();
     PyErr_Format(PyExc_TypeError,
                  "type '%s' does not look like a struct sequence type",
                  tp->tp_name);
+
+error:
+    if (args_owned)
+        close_array(ctx, nargs, args);
     return HPy_NULL;
 #endif
 }
