@@ -102,7 +102,7 @@ In general it is possible to compile the same source into multiple compiled
 libraries, each one targeting a different ABI. :pep:`3149` states that the
 filename of the compiled extension should contain the *ABI tag* to specify
 what the target ABI is. For example, if you compile an extension called
-``simple.c`` on CPython 3.7, you get a DLL called
+``simple.c`` on CPython 3.8, you get a DLL called
 ``simple.cpython-38-x86_64-linux-gnu.so``:
 
   - ``cpython-38`` is the ABI tag, in this case CPython 3.8
