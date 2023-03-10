@@ -194,7 +194,12 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
 #else
     PyStructSequence_Desc d = {
         .name = desc->name,
+#if PY_VERSION_HEX < 0x03090000
+        // In Python 3.8.x or earlier, the docstring MUST NOT be NULL
+        .doc = (desc->doc != NULL ? desc->doc : ""),
+#else
         .doc = desc->doc,
+#endif
         .fields = (PyStructSequence_Field *)desc->fields,
         .n_in_sequence = i
     };

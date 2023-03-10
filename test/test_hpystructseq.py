@@ -105,7 +105,10 @@ class TestHPyStructSequence(HPyTest):
         assert mod.WithFields.__doc__ == "some doc"
         assert mod.WithFields.__module__ == "mytest"
         assert mod.NoFields.__name__ == "NoFields"
-        assert mod.NoFields.__doc__ is None
+        # In Python 3.8 or earlier, we cannot pass a NULL pointer as docstring,
+        # so we pass the empty string. Therefore, we are testing for None or
+        # empty docstring.
+        assert not mod.NoFields.__doc__
         assert mod.NoFields.__module__ == "mytest"
 
         assert mod.WithFields.n_fields == 3
