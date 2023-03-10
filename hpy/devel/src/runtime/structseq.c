@@ -339,7 +339,7 @@ build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ss
     for (HPy_ssize_t i = 0; i < size; ++i) {
         int owned;
         HPy item = buildvalue_single(ctx, fmt, values, &owned);
-        if (HPy_IsNull(arr[i])) {
+        if (HPy_IsNull(item)) {
             // in case of error, close all previously created items
             close_array(ctx, i, arr);
             return HPy_NULL;
