@@ -9,8 +9,12 @@
 #include "hpy.h"
 #include "buildvalue_internal.h"
 
-#include <string.h>
+#include <string.h> // for strncpy/strncpy_s
 #include <stdio.h>
+
+#ifdef _WIN32
+#include <malloc.h> // required for _malloca
+#endif
 
 const char * const HPyStructSequence_UnnamedField = "_";
 
@@ -147,7 +151,11 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
            once available. */
         const size_t n_modname = s - desc->name;
         modname = (char *)malloc((n_modname + 1) * sizeof(char));
+#ifdef _WIN32
+        strncpy_s(modname, n_modname + 1, desc->name, n_modname);
+#else
         strncpy(modname, desc->name, n_modname);
+#endif
         modname[n_modname] = '\0';
 
         // now, advance by one to skip '.'
@@ -335,13 +343,21 @@ close_array(HPyContext *ctx, HPy_ssize_t n, HPy *arr)
 static HPy
 build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ssize_t size)
 {
+#ifdef _WIN32
+    HPy *arr = _malloca(size);
+    HPy result;
+#else
     HPy arr[size];
+#endif
     for (HPy_ssize_t i = 0; i < size; ++i) {
         int owned;
         HPy item = buildvalue_single(ctx, fmt, values, &owned);
         if (HPy_IsNull(item)) {
             // in case of error, close all previously created items
             close_array(ctx, i, arr);
+#ifdef _WIN32
+            _freea(arr);
+#endif
             return HPy_NULL;
         }
         arr[i] = owned ? item : HPy_Dup(ctx, item);
@@ -351,9 +367,18 @@ build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ss
        not counting correctly. */
     if (**fmt != '\0') {
         close_array(ctx, size, arr);
+#ifdef _WIN32
+        _freea(arr);
+#endif
         HPyErr_SetString(ctx, ctx->h_SystemError,
                 "internal error in HPyStructSequence_NewFromFormat");
         return HPy_NULL;
     }
+#ifdef _WIN32
+    result = structseq_new(ctx, type, size, arr, true);
+    _freea(arr);
+    return result;
+#else
     return structseq_new(ctx, type, size, arr, true);
+#endif
 }
