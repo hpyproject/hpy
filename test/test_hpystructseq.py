@@ -20,7 +20,7 @@ class TestHPyStructSequence(HPyTest):
                 { NULL, NULL },
                 { NULL, NULL },
             };
-            
+
             static HPyStructSequence_Field structseq_empty_fields[] = {
                 { NULL, NULL },
             };
@@ -35,33 +35,45 @@ class TestHPyStructSequence(HPyTest):
                 .name = "mytest.NoFields",
                 .fields = structseq_empty_fields
             };
-            
+
+            #define N 3
+
             HPyDef_METH(build, "build", HPyFunc_O)
             static HPy build_impl(HPyContext *ctx, HPy self, HPy type)
             {
-                HPyStructSequenceBuilder builder = HPyStructSequenceBuilder_New(ctx, type);
-                if (HPyStructSequenceBuilder_IsNull(builder))
+                int i;
+                HPy elements[N];
+                elements[0] = HPyLong_FromLong(ctx, 1);
+                elements[1] = HPyFloat_FromDouble(ctx, 2.0);
+                elements[2] = HPyUnicode_FromString(ctx, "3");
+                HPy structseq = HPyStructSequence_New(ctx, type, N, elements);
+                for (i = 0; i < N; i++)
+                    HPy_Close(ctx, elements[i]);
+                if (HPy_IsNull(structseq))
                     return HPy_NULL;
-                HPy tmp = HPyLong_FromLong(ctx, 1);
-                HPyStructSequenceBuilder_Set(ctx, builder, 0, tmp);
-                HPy_Close(ctx, tmp);
-                HPyStructSequenceBuilder_Set_i(ctx, builder, 1, 2);
-                HPyStructSequenceBuilder_Set_i(ctx, builder, 2, 3);
-                return HPyStructSequenceBuilder_Build(ctx, builder, type);
+                return structseq;
             }
 
-            HPyDef_METH(cancel, "cancel", HPyFunc_O)
-            static HPy cancel_impl(HPyContext *ctx, HPy self, HPy type)
+            HPyDef_METH(build_from_format, "build_from_format", HPyFunc_O)
+            static HPy build_from_format_impl(HPyContext *ctx, HPy self, HPy type)
             {
-                HPyStructSequenceBuilder builder = HPyStructSequenceBuilder_New(ctx, type);
-                if (HPyStructSequenceBuilder_IsNull(builder))
+                HPy three = HPyUnicode_FromString(ctx, "3");
+                HPy structseq = HPyStructSequence_NewFromFormat(ctx, type, "idO", 1, 2.0, three);
+                HPy_Close(ctx, three);
+                if (HPy_IsNull(structseq))
                     return HPy_NULL;
-                HPy tmp = HPyLong_FromLong(ctx, 1);
-                HPyStructSequenceBuilder_Set(ctx, builder, 0, tmp);
-                HPy_Close(ctx, tmp);
-                HPyStructSequenceBuilder_Set_i(ctx, builder, 1, 2);
-                HPyStructSequenceBuilder_Set_i(ctx, builder, 2, 3);
-                return HPyStructSequenceBuilder_Build(ctx, builder, type);
+                return structseq;
+            }
+
+            HPyDef_METH(bad_format, "bad_format", HPyFunc_O)
+            static HPy bad_format_impl(HPyContext *ctx, HPy self, HPy type)
+            {
+                HPy three = HPyUnicode_FromString(ctx, "3");
+                HPy structseq = HPyStructSequence_NewFromFormat(ctx, type, "i(dO)i", 1, 2.0, three, 3);
+                HPy_Close(ctx, three);
+                if (HPy_IsNull(structseq))
+                    return HPy_NULL;
+                return structseq;
             }
 
             static void make_types(HPyContext *ctx, HPy module)
@@ -84,6 +96,8 @@ class TestHPyStructSequence(HPyTest):
             }
 
             @EXPORT(build)
+            @EXPORT(build_from_format)
+            @EXPORT(bad_format)
             @EXTRA_INIT_FUNC(make_types)
             @INIT
         """)
@@ -97,17 +111,21 @@ class TestHPyStructSequence(HPyTest):
         assert mod.WithFields.n_fields == 3
         assert mod.NoFields.n_fields == 0
 
-        s0 = mod.build(mod.WithFields)
-        assert s0.field0 == 1, s0.field0
-        assert s0.field1 == 2, s0.field1
-        assert s0[2] == 3, s0[2]
+        for s0 in (mod.build(mod.WithFields), mod.build_from_format(mod.WithFields)):
+            assert s0.field0 == 1, s0.field0
+            assert s0.field1 == 2.0, s0.field1
+            assert s0[2] == "3", s0[2]
+
+        with pytest.raises(TypeError):
+            mod.build_from_format(mod.NoFields)
+        with pytest.raises(TypeError):
+            mod.build(mod.NoFields)
+
+        with pytest.raises(SystemError):
+            mod.bad_format(mod.WithFields)
 
         with pytest.raises(TypeError):
             mod.build(str)
-
-        dummy_type = type("DummyType", (), dict(n_fields=3))
-        with pytest.raises(TypeError):
-            mod.build(dummy_type)
 
 
     def test_invalid_descriptor(self):
