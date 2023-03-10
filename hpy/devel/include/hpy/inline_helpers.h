@@ -395,4 +395,67 @@ HPyBool_FromLong(HPyContext *ctx, long v)
     return HPyBool_FromBool(ctx, (v ? true : false));
 }
 
+/**
+ * Adjust start/end slice indices assuming a sequence of the specified length.
+ *
+ * Out of bounds indices are clipped in a manner consistent with the handling of
+ * normal slices. This function cannot fail and does not call interpreter
+ * routines.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param length:
+ *     The length of the sequence that should be assumed for adjusting the
+ *     indices.
+ * :param start:
+ *     Pointer to the start value (must not be ``NULL``).
+ * :param stop:
+ *     Pointer to the stop value (must not be ``NULL``).
+ * :param step:
+ *     The step value of the slice (must not be ``0``)
+ *
+ * :return:
+ *     Return the length of the slice. Always successful. Doesn’t call Python code.
+ */
+HPyAPI_INLINE_HELPER HPy_ssize_t
+HPySlice_AdjustIndices(HPyContext *ctx, HPy_ssize_t length, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t step)
+{
+    /* Taken from CPython: Written by Jim Hugunin and Chris Chase. */
+    /* this is harder to get right than you might think */
+    assert(step != 0);
+    assert(step >= -HPY_SSIZE_T_MAX);
+
+    if (*start < 0) {
+        *start += length;
+        if (*start < 0) {
+            *start = (step < 0) ? -1 : 0;
+        }
+    }
+    else if (*start >= length) {
+        *start = (step < 0) ? length - 1 : length;
+    }
+
+    if (*stop < 0) {
+        *stop += length;
+        if (*stop < 0) {
+            *stop = (step < 0) ? -1 : 0;
+        }
+    }
+    else if (*stop >= length) {
+        *stop = (step < 0) ? length - 1 : length;
+    }
+
+    if (step < 0) {
+        if (*stop < *start) {
+            return (*start - *stop - 1) / (-step) + 1;
+        }
+    }
+    else {
+        if (*start < *stop) {
+            return (*stop - *start - 1) / step + 1;
+        }
+    }
+    return 0;
+}
+
 #endif //HPY_INLINE_HELPERS_H
