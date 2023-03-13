@@ -153,7 +153,6 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_Unicode_ReadChar = &ctx_Unicode_ReadChar,
     .ctx_Unicode_DecodeASCII = &ctx_Unicode_DecodeASCII,
     .ctx_Unicode_DecodeLatin1 = &ctx_Unicode_DecodeLatin1,
-    .ctx_Unicode_InternFromString = &ctx_Unicode_InternFromString,
     .ctx_Unicode_FromEncodedObject = &ctx_Unicode_FromEncodedObject,
     .ctx_Unicode_Substring = &ctx_Unicode_Substring,
     .ctx_List_Check = &ctx_List_Check,

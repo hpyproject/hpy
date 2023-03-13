@@ -147,7 +147,6 @@ HPy trace_ctx_Unicode_EncodeFSDefault(HPyContext *tctx, HPy h);
 HPy_UCS4 trace_ctx_Unicode_ReadChar(HPyContext *tctx, HPy h, HPy_ssize_t index);
 HPy trace_ctx_Unicode_DecodeASCII(HPyContext *tctx, const char *ascii, HPy_ssize_t size, const char *errors);
 HPy trace_ctx_Unicode_DecodeLatin1(HPyContext *tctx, const char *latin1, HPy_ssize_t size, const char *errors);
-HPy trace_ctx_Unicode_InternFromString(HPyContext *tctx, const char *str);
 HPy trace_ctx_Unicode_FromEncodedObject(HPyContext *tctx, HPy obj, const char *encoding, const char *errors);
 HPy trace_ctx_Unicode_Substring(HPyContext *tctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
 int trace_ctx_List_Check(HPyContext *tctx, HPy h);
@@ -198,8 +197,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(268, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(268, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(267, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(267, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -436,7 +435,6 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_Unicode_ReadChar = &trace_ctx_Unicode_ReadChar;
     tctx->ctx_Unicode_DecodeASCII = &trace_ctx_Unicode_DecodeASCII;
     tctx->ctx_Unicode_DecodeLatin1 = &trace_ctx_Unicode_DecodeLatin1;
-    tctx->ctx_Unicode_InternFromString = &trace_ctx_Unicode_InternFromString;
     tctx->ctx_Unicode_FromEncodedObject = &trace_ctx_Unicode_FromEncodedObject;
     tctx->ctx_Unicode_Substring = &trace_ctx_Unicode_Substring;
     tctx->ctx_List_Check = &trace_ctx_List_Check;

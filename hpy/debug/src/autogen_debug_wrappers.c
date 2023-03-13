@@ -1490,17 +1490,6 @@ DHPy debug_ctx_Unicode_DecodeLatin1(HPyContext *dctx, const char *latin1, HPy_ss
     return DHPy_open(dctx, universal_result);
 }
 
-DHPy debug_ctx_Unicode_InternFromString(HPyContext *dctx, const char *str)
-{
-    if (!get_ctx_info(dctx)->is_valid) {
-        report_invalid_debug_context();
-    }
-    get_ctx_info(dctx)->is_valid = false;
-    HPy universal_result = HPyUnicode_InternFromString(get_info(dctx)->uctx, str);
-    get_ctx_info(dctx)->is_valid = true;
-    return DHPy_open(dctx, universal_result);
-}
-
 DHPy debug_ctx_Unicode_FromEncodedObject(HPyContext *dctx, DHPy obj, const char *encoding, const char *errors)
 {
     if (!get_ctx_info(dctx)->is_valid) {

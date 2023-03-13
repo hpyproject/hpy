@@ -104,7 +104,6 @@ HPy Core API Function Index
 * :c:func:`HPyUnicode_FromEncodedObject`
 * :c:func:`HPyUnicode_FromString`
 * :c:func:`HPyUnicode_FromWideChar`
-* :c:func:`HPyUnicode_InternFromString`
 * :c:func:`HPyUnicode_ReadChar`
 * :c:func:`HPyUnicode_Substring`
 * :c:func:`HPy_ASCII`

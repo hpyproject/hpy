@@ -554,10 +554,6 @@ HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy
      return ctx->ctx_Unicode_DecodeLatin1 ( ctx, latin1, size, errors ); 
 }
 
-HPyAPI_FUNC HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str) {
-     return ctx->ctx_Unicode_InternFromString ( ctx, str ); 
-}
-
 HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors) {
      return ctx->ctx_Unicode_FromEncodedObject ( ctx, obj, encoding, errors ); 
 }

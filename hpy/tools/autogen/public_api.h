@@ -158,7 +158,7 @@ HPy HPyBool_FromBool(HPyContext *ctx, bool v);
 /* abstract.h */
 HPy_ID(98)
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
-HPy_ID(267)
+HPy_ID(266)
 int HPySequence_Check(HPyContext *ctx, HPy h);
 
 HPy_ID(99)
@@ -333,7 +333,7 @@ HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy_ID(153)
 HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name);
 
-HPy_ID(264)
+HPy_ID(263)
 HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
 HPy_ID(154)
@@ -406,9 +406,9 @@ HPy HPy_Type(HPyContext *ctx, HPy obj);
  */
 HPy_ID(166)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(262)
+HPy_ID(261)
 int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(266)
+HPy_ID(265)
 int HPy_IsInstance(HPyContext *ctx, HPy obj, HPy type);
 
 /**
@@ -501,7 +501,7 @@ int HPy_RichCompareBool(HPyContext *ctx, HPy v, HPy w, int op);
 HPy_ID(177)
 HPy_hash_t HPy_Hash(HPyContext *ctx, HPy obj);
 
-HPy_ID(265)
+HPy_ID(264)
 HPy HPySeqIter_New(HPyContext *ctx, HPy seq);
 
 /* bytesobject.h */
@@ -547,8 +547,6 @@ HPy_ID(196)
 HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors);
 HPy_ID(197)
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors);
-HPy_ID(259)
-HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str);
 
 /**
  * Decode a bytes-like object to a Unicode object.
@@ -626,7 +624,7 @@ HPy HPyDict_New(HPyContext *ctx);
    if 'HPyErr_Occurred(ctx) != 0', it will still work.
    This function, of course, returns a new reference.
  */
-HPy_ID(260)
+HPy_ID(259)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 
 /**
@@ -672,7 +670,7 @@ HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
 /* slice */
-HPy_ID(261)
+HPy_ID(260)
 int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 
 /* import.h */
@@ -1189,5 +1187,5 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
-HPy_ID(263)
+HPy_ID(262)
 int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);
