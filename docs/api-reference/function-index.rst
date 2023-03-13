@@ -150,7 +150,6 @@ HPy Core API Function Index
 * :c:func:`HPy_Index`
 * :c:func:`HPy_Invert`
 * :c:func:`HPy_Is`
-* :c:func:`HPy_IsInstance`
 * :c:func:`HPy_IsTrue`
 * :c:func:`HPy_LeavePythonExecution`
 * :c:func:`HPy_Length`

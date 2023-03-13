@@ -158,7 +158,7 @@ HPy HPyBool_FromBool(HPyContext *ctx, bool v);
 /* abstract.h */
 HPy_ID(98)
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
-HPy_ID(266)
+HPy_ID(265)
 int HPySequence_Check(HPyContext *ctx, HPy h);
 
 HPy_ID(99)
@@ -408,8 +408,6 @@ HPy_ID(166)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
 HPy_ID(261)
 int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(265)
-int HPy_IsInstance(HPyContext *ctx, HPy obj, HPy type);
 
 /**
  * Return the type's name.

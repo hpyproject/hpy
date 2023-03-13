@@ -279,6 +279,5 @@ struct _HPyContext_s {
     int (*ctx_Type_CheckSlot)(HPyContext *ctx, HPy type, HPyDef *value);
     HPy (*ctx_MaybeGetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
     HPy (*ctx_SeqIter_New)(HPyContext *ctx, HPy seq);
-    int (*ctx_IsInstance)(HPyContext *ctx, HPy obj, HPy type);
     int (*ctx_Sequence_Check)(HPyContext *ctx, HPy h);
 };

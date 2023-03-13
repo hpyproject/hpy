@@ -106,7 +106,6 @@ int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key);
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj);
 int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type);
 int debug_ctx_SetType(HPyContext *dctx, DHPy obj, DHPy type);
-int debug_ctx_IsInstance(HPyContext *dctx, DHPy obj, DHPy type);
 const char *debug_ctx_Type_GetName(HPyContext *dctx, DHPy type);
 int debug_ctx_Type_IsSubtype(HPyContext *dctx, DHPy sub, DHPy type);
 int debug_ctx_Is(HPyContext *dctx, DHPy obj, DHPy other);
@@ -376,7 +375,6 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_Type = &debug_ctx_Type;
     dctx->ctx_TypeCheck = &debug_ctx_TypeCheck;
     dctx->ctx_SetType = &debug_ctx_SetType;
-    dctx->ctx_IsInstance = &debug_ctx_IsInstance;
     dctx->ctx_Type_GetName = &debug_ctx_Type_GetName;
     dctx->ctx_Type_IsSubtype = &debug_ctx_Type_IsSubtype;
     dctx->ctx_Is = &debug_ctx_Is;
