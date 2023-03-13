@@ -48,6 +48,9 @@
  * ``K (int) [unsigned long long]``
  *     Convert a C unsigned long long to a Python integer object.
  *
+ * ``n (int) [HPy_ssize_t]``
+ *     Convert a C HPy_ssize_t to a Python integer object.
+ *
  * ``f (float) [float]``
  *     Convert a C float to a Python floating point number.
  *
@@ -226,6 +229,9 @@ static HPy build_single(HPyContext *ctx, const char **fmt, va_list *values, int 
 
         case 'K':
             return HPyLong_FromUnsignedLongLong(ctx, va_arg(*values, unsigned long long));
+
+        case 'n':
+            return HPyLong_FromSsize_t(ctx, va_arg(*values, HPy_ssize_t));
 
         case 's':
             return HPyUnicode_FromString(ctx, va_arg(*values, const char*));
