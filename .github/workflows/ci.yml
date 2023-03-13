@@ -16,8 +16,6 @@ jobs:
         compiler: [""]
         include:
           - os: ubuntu-latest
-            python-version: '3.7'
-          - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
             python-version: '3.10'
@@ -63,7 +61,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.11', '3.10', '3.9', '3.8', '3.7']
+        python-version: ['3.11', '3.10', '3.9', '3.8']
 
     steps:
       - uses: actions/checkout@v3
@@ -98,8 +96,6 @@ jobs:
         os: [ubuntu-latest, macos-11, windows-latest]
         python-version: ['3.10']
         include:
-          - os: ubuntu-latest
-            python-version: '3.7'
           - os: ubuntu-latest
             python-version: '3.8'
           - os: ubuntu-latest
@@ -342,7 +338,7 @@ jobs:
 
   cpp_check:
     name: Cppcheck static analysis
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     continue-on-error: true
     steps:
       - uses: actions/checkout@v3
@@ -353,7 +349,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install Cppcheck
-        run: sudo apt-get -qq -y install cppcheck
+        run: sudo apt-get -qq -y install cppcheck=2.7-1
 
       - name: Run Cppcheck
         run: make cppcheck

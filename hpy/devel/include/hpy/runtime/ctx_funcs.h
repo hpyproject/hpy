@@ -98,6 +98,7 @@ _HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
                                     HPy_ssize_t nargs, HPy kw);
 _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
                                                           HPy h_type);
+_HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type);
 
 // ctx_long.c
 _HPy_HIDDEN HPy ctx_Long_FromInt32_t(HPyContext *ctx, int32_t value);
@@ -116,7 +117,6 @@ _HPy_HIDDEN HPy ctx_Compile_s(HPyContext *ctx, const char *utf8_source,
                               const char *utf8_filename, HPy_SourceKind kind);
 
 // ctx_contextvar.c
-_HPy_HIDDEN int ctx_ContextVar_Get(HPyContext *ctx, HPy context_var,
-                                   HPy defaul_value, HPy *result);
-
+_HPy_HIDDEN int32_t ctx_ContextVar_Get(HPyContext *ctx, HPy context_var,
+                                       HPy default_value, HPy *result);
 #endif /* HPY_RUNTIME_CTX_FUNCS_H */

@@ -371,12 +371,6 @@ HPyAPI_FUNC int HPy_SetType(HPyContext *ctx, HPy obj, HPy type)
         return 0;
 }
 
-HPyAPI_FUNC const char *HPyType_GetName(HPyContext *ctx, HPy type)
-{
-        assert(PyType_Check(_h2py(type)));
-        return ((PyTypeObject*) _h2py(type))->tp_name;
-}
-
 HPyAPI_FUNC int HPy_IsInstance(HPyContext *ctx, HPy obj, HPy type)
 {
     return PyObject_IsInstance(_h2py(obj), _h2py(type));
@@ -517,19 +511,19 @@ HPyAPI_FUNC HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy
     return _py2h(PyUnicode_DecodeLatin1(latin1, size, errors));
 }
 
-HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors)
-{
-    return _py2h(PyUnicode_FromEncodedObject(_h2py(obj), encoding, errors));
-}
-
 HPyAPI_FUNC HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str)
 {
     return _py2h(PyUnicode_InternFromString(str));
 }
 
-HPyAPI_FUNC HPy HPyUnicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end)
+HPyAPI_FUNC HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors)
 {
-    return _py2h(PyUnicode_Substring(_h2py(obj), start, end));
+    return _py2h(PyUnicode_FromEncodedObject(_h2py(obj), encoding, errors));
+}
+
+HPyAPI_FUNC HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end)
+{
+    return _py2h(PyUnicode_Substring(_h2py(str), start, end));
 }
 
 HPyAPI_FUNC int HPyList_Check(HPyContext *ctx, HPy h)
@@ -577,16 +571,6 @@ HPyAPI_FUNC int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, 
     return PySlice_Unpack(_h2py(slice), start, stop, step);
 }
 
-HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value)
-{
-    return _py2h(PyContextVar_New(name, _h2py(default_value)));
-}
-
-HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value)
-{
-    return _py2h(PyContextVar_Set(_h2py(context_var), _h2py(value)));
-}
-
 HPyAPI_FUNC HPy HPyImport_ImportModule(HPyContext *ctx, const char *utf8_name)
 {
     return _py2h(PyImport_ImportModule(utf8_name));
@@ -610,6 +594,16 @@ HPyAPI_FUNC HPyThreadState HPy_LeavePythonExecution(HPyContext *ctx)
 HPyAPI_FUNC HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals)
 {
     return _py2h(PyEval_EvalCode(_h2py(code), _h2py(globals), _h2py(locals)));
+}
+
+HPyAPI_FUNC HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value)
+{
+    return _py2h(PyContextVar_New(name, _h2py(default_value)));
+}
+
+HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value)
+{
+    return _py2h(PyContextVar_Set(_h2py(context_var), _h2py(value)));
 }
 
 HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value)

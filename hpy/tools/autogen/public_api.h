@@ -158,7 +158,7 @@ HPy HPyBool_FromBool(HPyContext *ctx, bool v);
 /* abstract.h */
 HPy_ID(98)
 HPy_ssize_t HPy_Length(HPyContext *ctx, HPy h);
-HPy_ID(255)
+HPy_ID(267)
 int HPySequence_Check(HPyContext *ctx, HPy h);
 
 HPy_ID(99)
@@ -333,7 +333,7 @@ HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
 HPy_ID(153)
 HPy HPy_GetAttr_s(HPyContext *ctx, HPy obj, const char *utf8_name);
 
-HPy_ID(254)
+HPy_ID(264)
 HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name);
 
 HPy_ID(154)
@@ -406,14 +406,58 @@ HPy HPy_Type(HPyContext *ctx, HPy obj);
  */
 HPy_ID(166)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(250)
+HPy_ID(262)
 int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
-HPy_ID(251)
-int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
-HPy_ID(252)
-const char *HPyType_GetName(HPyContext *ctx, HPy type);
 HPy_ID(266)
 int HPy_IsInstance(HPyContext *ctx, HPy obj, HPy type);
+
+/**
+ * Return the type's name.
+ *
+ * Equivalent to getting the type's ``__name__`` attribute. If you want to
+ * retrieve the type's name as a handle that refers to a ``str``, then just use
+ * ``HPy_GetAttr_s(ctx, type, "__name__")``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param type:
+ *     A Python type object. This argument must not be ``HPy_NULL`` and must be
+ *     a type (i.e. it must inherit from Python ``type``). If this is not the
+ *     case, the behavior is undefined (verification of the argument is only
+ *     done in debug mode).
+ *
+ * :returns:
+ *     The name of the type as C string (UTF-8 encoded) or ``NULL`` in case of
+ *     an error. The returned pointer is read-only and guaranteed to be valid as
+ *     long as the handle ``type`` is valid.
+ */
+HPy_ID(253)
+const char *HPyType_GetName(HPyContext *ctx, HPy type);
+
+/**
+ * Checks if ``sub`` is a subtype of ``type``.
+ *
+ * This function only checks for actual subtypes, which means that
+ * ``__subclasscheck__()`` is not called on ``type``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param sub:
+ *     A Python type object. This argument must not be ``HPy_NULL`` and must be
+ *     a type (i.e. it must inherit from Python ``type``). If this is not the
+ *     case, the behavior is undefined (verification of the argument is only
+ *     done in debug mode).
+ * :param type:
+ *     A Python type object. This argument must not be ``HPy_NULL`` and must be
+ *     a type (i.e. it must inherit from Python ``type``). If this is not the
+ *     case, the behavior is undefined (verification of the argument is only
+ *     done in debug mode).
+ *
+ * :returns:
+ *     Non-zero if ``sub`` is a subtype of ``type``.
+ */
+HPy_ID(254)
+int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
 
 HPy_ID(167)
 int HPy_Is(HPyContext *ctx, HPy obj, HPy other);
@@ -503,12 +547,64 @@ HPy_ID(196)
 HPy HPyUnicode_DecodeASCII(HPyContext *ctx, const char *ascii, HPy_ssize_t size, const char *errors);
 HPy_ID(197)
 HPy HPyUnicode_DecodeLatin1(HPyContext *ctx, const char *latin1, HPy_ssize_t size, const char *errors);
-HPy_ID(256)
-HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
-HPy_ID(257)
+HPy_ID(259)
 HPy HPyUnicode_InternFromString(HPyContext *ctx, const char *str);
-HPy_ID(258)
-HPy HPyUnicode_Substring(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
+
+/**
+ * Decode a bytes-like object to a Unicode object.
+ *
+ * The bytes of the bytes-like object are decoded according to the given
+ * encoding and using the error handling defined by ``errors``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A bytes-like object. This can be, for example, Python *bytes*,
+ *     *bytearray*, *memoryview*, *array.array* and objects that support the
+ *     Buffer protocol. If this argument is `HPy_NULL``, a ``SystemError`` will
+ *     be raised. If the argument is not a bytes-like object, a ``TypeError``
+ *     will be raised.
+ * :param encoding:
+ *     The name (UTF-8 encoded C string) of the encoding to use. If the encoding
+ *     does not exist, a ``LookupError`` will be raised. If this argument is
+ *     ``NULL``, the default encoding ``UTF-8`` will be used.
+ * :param errors:
+ *     The error handling (UTF-8 encoded C string) to use when decoding. The
+ *     possible values depend on the used encoding. This argument may be
+ *     ``NULL`` in which case it will default to ``"strict"``.
+ *
+ * :returns:
+ *     A handle to a ``str`` object created from the decoded bytes or
+ *     ``HPy_NULL`` in case of errors.
+ */
+HPy_ID(255)
+HPy HPyUnicode_FromEncodedObject(HPyContext *ctx, HPy obj, const char *encoding, const char *errors);
+
+/**
+ * Return a substring of ``str``, from character index ``start`` (included) to
+ * character index ``end`` (excluded).
+ *
+ * Indices ``start`` and ``end`` must not be negative, otherwise an
+ * ``IndexError`` will be raised. If ``start >= len(str)`` or if
+ * ``end < start``, an empty string will be returned. If ``end > len(str)`` then
+ * ``end == len(str)`` will be assumed.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param str:
+ *     A Python Unicode object (must not be ``HPy_NULL``). Otherwise, the
+ *     behavior is undefined (verification of the argument is only done in
+ *     debug mode).
+ * :param start:
+ *     The non-negative start index (inclusive).
+ * :param end:
+ *    The non-negative end index (exclusive).
+ *
+ * :returns:
+ *     The requested substring or ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(256)
+HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
 
 /* listobject.h */
 HPy_ID(198)
@@ -523,8 +619,7 @@ HPy_ID(201)
 int HPyDict_Check(HPyContext *ctx, HPy h);
 HPy_ID(202)
 HPy HPyDict_New(HPyContext *ctx);
-HPy_ID(259)
-HPy HPyDict_Keys(HPyContext *ctx, HPy h);
+
 /* HPyDict_GetItem
 
    In contrast to HPy_GetItem, this function ignores the error context. I.e.
@@ -533,7 +628,40 @@ HPy HPyDict_Keys(HPyContext *ctx, HPy h);
  */
 HPy_ID(260)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
-HPy_ID(267)
+
+/**
+ * Returns a list of all keys from the dictionary.
+ *
+ * Note: This function will directly access the storage of the dict object and
+ * therefore ignores if method ``keys`` was overwritten.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A Python dict object. If this argument is ``HPy_NULL`` or not an
+ *     instance of a Python dict, a ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     A Python list object containing all keys of the given dictionary or
+ *     ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(257)
+HPy HPyDict_Keys(HPyContext *ctx, HPy h);
+
+/**
+ * Creates a copy of the provided Python dict object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A Python dict object. If this argument is ``HPy_NULL`` or not an
+ *     instance of a Python dict, a ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     Return a new dictionary that contains the same key-value pairs as ``h``
+ *     or ``HPy_NULL`` in case of an error.
+ */
+HPy_ID(258)
 HPy HPyDict_Copy(HPyContext *ctx, HPy h);
 
 /* tupleobject.h */
@@ -546,14 +674,6 @@ HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 /* slice */
 HPy_ID(261)
 int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
-
-/* contextvar */
-HPy_ID(262)
-HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
-HPy_ID(263)
-int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
-HPy_ID(264)
-HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
 /* import.h */
 HPy_ID(205)
@@ -892,6 +1012,12 @@ HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_fil
  */
 HPy_ID(249)
 HPy HPy_EvalCode(HPyContext *ctx, HPy code, HPy globals, HPy locals);
+HPy_ID(250)
+HPy HPyContextVar_New(HPyContext *ctx, const char *name, HPy default_value);
+HPy_ID(251)
+int32_t HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result);
+HPy_ID(252)
+HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
 
 /* *******
@@ -1063,5 +1189,5 @@ typedef enum {
 } HPySlot_Slot;
 
 // TODO: custom enum to allow only some slots?
-HPy_ID(253)
+HPy_ID(263)
 int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value);

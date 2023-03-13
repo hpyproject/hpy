@@ -524,16 +524,89 @@ int debug_ctx_TypeCheck(HPyContext *dctx, DHPy obj, DHPy type)
     return HPy_TypeCheck(uctx, uh_obj, uh_type);
 }
 
-int debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy defaul_value, DHPy *result) {
-    HPy uresult;
-    int ret = HPyContextVar_Get(get_info(dctx)->uctx,
-                      DHPy_unwrap(dctx, context_var),
-                      DHPy_unwrap(dctx, defaul_value),
-                      &uresult);
-    if (HPy_IsNull(uresult)) {
+int32_t debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy default_value, DHPy *result)
+{
+    HPyContext *uctx = get_info(dctx)->uctx;
+    UHPy uh_context_var = DHPy_unwrap(dctx, context_var);
+    UHPy uh_default_value = DHPy_unwrap(dctx, default_value);
+    UHPy uh_result;
+    assert(!HPy_IsNull(uh_context_var));
+    int32_t ret = HPyContextVar_Get(uctx, uh_context_var, uh_default_value, &uh_result);
+    if (ret < 0) {
         *result = HPy_NULL;
-    } else {
-        *result = DHPy_open(dctx, uresult);
+        return ret;
     }
+    *result = DHPy_open(dctx, uh_result);
     return ret;
+}
+
+const char *debug_ctx_Type_GetName(HPyContext *dctx, DHPy type)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+    UHPy uh_type;
+    HPy_ssize_t n_name;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+    uh_type = DHPy_unwrap(dctx, type);
+    uctx = ctx_info->info->uctx;
+    if (!HPy_TypeCheck(uctx, uh_type, uctx->h_TypeType)) {
+        HPy_FatalError(uctx, "HPyType_GetName arg must be a type");
+    }
+    ctx_info->is_valid = false;
+    const char *name = HPyType_GetName(uctx, uh_type);
+    ctx_info->is_valid = true;
+    n_name = strlen(name);
+    return (const char *)protect_and_associate_data_ptr(type, (void *)name, n_name);
+}
+
+int debug_ctx_Type_IsSubtype(HPyContext *dctx, DHPy sub, DHPy type)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+    int res;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+
+    UHPy uh_sub = DHPy_unwrap(dctx, sub);
+    uctx = ctx_info->info->uctx;
+    if (!HPy_TypeCheck(uctx, uh_sub, uctx->h_TypeType)) {
+        HPy_FatalError(uctx, "HPyType_IsSubtype arg 1 must be a type");
+    }
+    UHPy uh_type = DHPy_unwrap(dctx, type);
+    if (!HPy_TypeCheck(uctx, uh_type, uctx->h_TypeType)) {
+        HPy_FatalError(uctx, "HPyType_IsSubtype arg 2 must be a type");
+    }
+
+    ctx_info->is_valid = false;
+    res = HPyType_IsSubtype(uctx, uh_sub, uh_type);
+    ctx_info->is_valid = true;
+    return res;
+}
+
+DHPy debug_ctx_Unicode_Substring(HPyContext *dctx, DHPy str, HPy_ssize_t start, HPy_ssize_t end)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+
+    HPy uh_str = DHPy_unwrap(dctx, str);
+    uctx = ctx_info->info->uctx;
+    if (!HPy_TypeCheck(uctx, uh_str, uctx->h_UnicodeType)) {
+        HPy_FatalError(uctx, "HPyUnicode_Substring arg 1 must be a Unicode object");
+    }
+    ctx_info->is_valid = false;
+    HPy universal_result = HPyUnicode_Substring(uctx, uh_str, start, end);
+    ctx_info->is_valid = true;
+    return DHPy_open(dctx, universal_result);
 }

@@ -67,6 +67,7 @@ Full table of contents:
    debug-mode
    trace-mode
    api-reference/index
+   contributing/index
    misc/index
    changelog
 

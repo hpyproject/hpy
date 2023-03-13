@@ -283,11 +283,6 @@ HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
     return ctx_TypeCheck(ctx, h_obj, h_type);
 }
 
-HPyAPI_FUNC int HPyType_IsSubtype(HPyContext *ctx, HPy h_sub, HPy h_type)
-{
-    return ctx_Type_IsSubtype(ctx, h_sub, h_type);
-}
-
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
 {
     return ctx_Is(ctx, h_obj, h_other);
@@ -390,13 +385,6 @@ HPyAPI_FUNC HPy HPyBytes_FromStringAndSize(HPyContext *ctx, const char *v, HPy_s
 
 HPyAPI_FUNC int HPyErr_Occurred(HPyContext *ctx) {
     return ctx_Err_Occurred(ctx);
-}
-
-HPyAPI_FUNC int HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result) {
-    PyObject *py_result;
-    int ret = PyContextVar_Get(_h2py(context_var), _h2py(default_value), &py_result);
-    *result = _py2h(py_result);
-    return ret;
 }
 
 HPyAPI_FUNC HPy HPyCapsule_New(HPyContext *ctx, void *pointer, const char *name, HPyCapsule_Destructor *destructor)
@@ -520,6 +508,23 @@ HPyAPI_FUNC uint64_t HPyLong_AsUInt64_tMask(HPyContext *ctx, HPy h) {
 
 HPyAPI_FUNC HPy HPy_Compile_s(HPyContext *ctx, const char *utf8_source, const char *utf8_filename, HPy_SourceKind kind) {
     return ctx_Compile_s(ctx, utf8_source, utf8_filename, kind);
+}
+
+HPyAPI_FUNC int32_t
+HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, HPy *result) {
+    return ctx_ContextVar_Get(ctx, context_var, default_value, result);
+}
+
+HPyAPI_FUNC const char *
+HPyType_GetName(HPyContext *ctx, HPy type)
+{
+    return ctx_Type_GetName(ctx, type);
+}
+
+HPyAPI_FUNC int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type)
+{
+    return PyType_IsSubtype((PyTypeObject *)_h2py(sub),
+            (PyTypeObject *)_h2py(type));
 }
 
 HPyAPI_FUNC HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {

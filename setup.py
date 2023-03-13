@@ -105,7 +105,6 @@ HPY_CTX_SOURCES = [
     'hpy/devel/src/runtime/ctx_bytes.c',
     'hpy/devel/src/runtime/ctx_call.c',
     'hpy/devel/src/runtime/ctx_capsule.c',
-    'hpy/devel/src/runtime/ctx_contextvar.c',
     'hpy/devel/src/runtime/ctx_dict.c',
     'hpy/devel/src/runtime/ctx_err.c',
     'hpy/devel/src/runtime/ctx_eval.c',
@@ -117,6 +116,7 @@ HPY_CTX_SOURCES = [
     'hpy/devel/src/runtime/ctx_listbuilder.c',
     'hpy/devel/src/runtime/ctx_tuple.c',
     'hpy/devel/src/runtime/ctx_tuplebuilder.c',
+    'hpy/devel/src/runtime/ctx_contextvar.c',
 ]
 
 HPY_INCLUDE_DIRS = [
@@ -265,5 +265,5 @@ setup(
     use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
     install_requires=['setuptools>=64.0'],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
 )
