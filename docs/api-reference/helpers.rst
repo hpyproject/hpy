@@ -1,5 +1,5 @@
-Runtime Helpers
-===============
+Misc Helpers
+============
 
 .. autocmodule:: runtime/helpers.c
    :members:
