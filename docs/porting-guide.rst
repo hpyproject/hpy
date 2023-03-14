@@ -259,6 +259,8 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyObject_Type <https://docs.python.org/3/c-api/object.html#c.PyObject_Type>`_                                                     :c:func:`HPy_Type`
     `PyObject_TypeCheck <https://docs.python.org/3/c-api/object.html#c.PyObject_TypeCheck>`_                                           :c:func:`HPy_TypeCheck`
     `PySequence_Contains <https://docs.python.org/3/c-api/sequence.html#c.PySequence_Contains>`_                                       :c:func:`HPy_Contains`
+    `PySlice_AdjustIndices <https://docs.python.org/3/c-api/slice.html#c.PySlice_AdjustIndices>`_                                      :c:func:`HPySlice_AdjustIndices`
+    `PySlice_Unpack <https://docs.python.org/3/c-api/slice.html#c.PySlice_Unpack>`_                                                    :c:func:`HPySlice_Unpack`
     `PyTuple_Check <https://docs.python.org/3/c-api/tuple.html#c.PyTuple_Check>`_                                                      :c:func:`HPyTuple_Check`
     `PyType_IsSubtype <https://docs.python.org/3/c-api/type.html#c.PyType_IsSubtype>`_                                                 :c:func:`HPyType_IsSubtype`
     `PyUnicode_AsASCIIString <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_AsASCIIString>`_                                :c:func:`HPyUnicode_AsASCIIString`

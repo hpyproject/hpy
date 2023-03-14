@@ -113,6 +113,6 @@ _HPy_HIDDEN HPy ctx_Compile_s(HPyContext *ctx, const char *utf8_source,
                               const char *utf8_filename, HPy_SourceKind kind);
 
 // ctx_contextvar.c
-_HPy_HIDDEN int ctx_ContextVar_Get(HPyContext *ctx, HPy context_var,
-                                   HPy default_value, HPy *result);
+_HPy_HIDDEN int32_t ctx_ContextVar_Get(HPyContext *ctx, HPy context_var,
+                                       HPy default_value, HPy *result);
 #endif /* HPY_RUNTIME_CTX_FUNCS_H */

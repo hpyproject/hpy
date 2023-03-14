@@ -1,11 +1,14 @@
+Contributing
+============
+
 Getting Started
-===============
+---------------
 
 TBD
 
 
 Adding New API
-==============
+--------------
 
 1. Add the function to ``hpy/tools/autogen/public_api.h``. If the CPython
    equivalent function name is not the same (after removing the leading ``H``,

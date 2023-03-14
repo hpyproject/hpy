@@ -877,6 +877,12 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
                         return NULL;
                     }
                     res = (struct _typeobject*) _h2py(p->object);
+                    if (!PyType_Check(res)) {
+                        PyErr_Format(PyExc_TypeError,
+                                "Metaclass '%R' is not a subclass of 'type'.",
+                                res);
+                        return NULL;
+                    }
                     break;
                 default:
                     // other values are intentionally ignored
@@ -890,6 +896,10 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
        nothing was specified. */
     return res;
 }
+
+#define HAVE_FROM_METACLASS (PY_VERSION_HEX >= 0x030C0000)
+
+#if !HAVE_FROM_METACLASS
 
 static inline Py_ssize_t count_members(PyType_Spec *spec) {
     Py_ssize_t nmembers = 0;
@@ -905,10 +915,6 @@ static inline Py_ssize_t count_members(PyType_Spec *spec) {
     }
     return nmembers;
 }
-
-#define HAVE_FROM_METACLASS (PY_VERSION_HEX >= 0x030C0000)
-
-#if !HAVE_FROM_METACLASS
 
 /* On older Python versions (before 3.12), we need to workaround the missing
    support for metaclasses. We create a temporary heap type using
@@ -935,12 +941,8 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
        expensive and slow. */
     if (meta) {
         result = NULL;
-        if (!PyType_Check(meta)) {
-            PyErr_Format(PyExc_TypeError,
-                    "Metaclass '%R' is not a subclass of 'type'.",
-                    meta);
-            goto fail;
-        }
+        /* We previously tested at this point if 'meta' is a type. That check
+           was moved to function 'get_metatype'. */
         if (meta->tp_new != PyType_Type.tp_new) {
             PyErr_SetString(PyExc_TypeError,
                     "Metaclasses with custom tp_new are not supported.");
