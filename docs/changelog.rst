@@ -8,11 +8,11 @@ New Features/API:
 
   - HPy headers are C++ compliant
   - Python 3.10 support
-  - `HPyField <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L323>`_: 
+  - `HPyField <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L323>`_:
     References to Python objects that can be stored in raw native memory owned by Python objects.
 
     - New API functions: ``HPyField_Load``, ``HPyField_Store``
-  - `HPyGlobal <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L383>`_: 
+  - `HPyGlobal <https://github.com/hpyproject/hpy/blob/master/hpy/tools/autogen/public_api.h#L383>`_:
     References to Python objects that can be stored into a C global variable.
 
     - New API functions: ``HPyGlobal_Load``, ``HPyGlobal_Store``
@@ -58,10 +58,10 @@ Misc Changes:
 Version 0.0.3 (September 22nd, 2021)
 ------------------------------------
 
-This release adds various new API functions (see below) and extends the debug 
+This release adds various new API functions (see below) and extends the debug
 mode with the ability to track closed handles.
 The default ABI mode now is 'universal' for non-CPython implementations.
-Also, the type definition of `HPyContext` was changed and it's no longer a
+Also, the type definition of ``HPyContext`` was changed and it's no longer a
 pointer type.
 The name of the HPy dev package was changed to 'hpy' (formerly: 'hpy.devel').
 Macro HPy_CAST was replaced by HPy_AsStruct.

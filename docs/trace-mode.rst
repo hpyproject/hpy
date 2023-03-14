@@ -2,9 +2,9 @@ Trace Mode
 ==========
 
 HPy's trace mode allows you to analyze the usage of the HPy API. The two
-fundamental metrics are `call count` and `duration`. As the name already
-suggests, `call count` tells you how often a certain HPy API function was called
-and `duration` uses a monotonic clock to measure how much (accumulated) time was
+fundamental metrics are ``call count`` and ``duration``. As the name already
+suggests, ``call count`` tells you how often a certain HPy API function was called
+and ``duration`` uses a monotonic clock to measure how much (accumulated) time was
 spent in a certain HPy API function. It is further possible to register custom
 *on-enter* and *on-exit* Python functions.
 
@@ -61,4 +61,4 @@ When this script is executed in trace mode:
 .. literalinclude:: examples/trace-example.py
   :language: python
 
-The output is ``get_call_counts()["ctx_Add"] == 1``. 
+The output is ``get_call_counts()["ctx_Add"] == 1``.

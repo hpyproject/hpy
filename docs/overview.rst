@@ -295,13 +295,13 @@ already in place. As on April 2022, the following milestones have been reached:
     the various kinds of calling conventions.
 
   - there is support for argument parsing (i.e., the equivalents of
-    `PyArg_ParseTuple` and `PyArg_ParseTupleAndKeywords`), and a
-    convenient complex value building (i.e., the equivalent `Py_BuildValue`).
+    ``PyArg_ParseTuple`` and ``PyArg_ParseTupleAndKeywords``), and a
+    convenient complex value building (i.e., the equivalent ``Py_BuildValue``).
 
   - one can implement custom types, whose struct may contain references to other
-    Python objects using `HPyField`.
+    Python objects using ``HPyField``.
 
-  - there is a support for globally accessible Python object handles: `HPyGlobal`,
+  - there is a support for globally accessible Python object handles: ``HPyGlobal``,
     which can still provide isolation for subinterpreters if needed.
 
   - there is support for raising and catching exceptions.
@@ -310,8 +310,8 @@ already in place. As on April 2022, the following milestones have been reached:
     recompiling. It can detect leaked handles or handles used after
     being closed.
 
-  - wheels can be build for HPy extensions with `python setup.py bdist_wheel`
-    and can be installed with `pip install`.
+  - wheels can be build for HPy extensions with ``python setup.py bdist_wheel``
+    and can be installed with ``pip install``.
 
   - it is possible to choose between the :term:`CPython ABI` and the
     :term:`HPy Universal ABI` when compiling an extension module.
