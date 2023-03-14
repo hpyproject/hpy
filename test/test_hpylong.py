@@ -418,8 +418,8 @@ class TestLong(HPyTest):
             @EXPORT(f)
             @INIT
         """)
-        assert mod.is_null(0) == True
-        assert mod.is_null(10) == False
+        assert mod.is_null(0) is True
+        assert mod.is_null(10) is False
 
     def test_Long_AsDouble(self):
         import pytest

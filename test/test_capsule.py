@@ -350,7 +350,7 @@ class TestHPyCapsule(HPyTest):
             assert mod.capsule_setpointer(p, 456, "lorem ipsum", True) is None
             assert mod.capsule_getpointer(p) == (456, "lorem ipsum")
 
-            assert mod.capsule_getcontext(p) == None
+            assert mod.capsule_getcontext(p) is None
             assert mod.capsule_setcontext(p, 123, "hello") is None
             assert mod.capsule_getcontext(p) == (123, "hello")
 

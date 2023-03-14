@@ -61,7 +61,7 @@ def test_builtin_type():
 
 def test_leak_detector():
     from hpy.debug.pytest import LeakDetector
-    with LeakDetector() as ld:
+    with LeakDetector():
         # add_ints is an HPy C function. If it forgets to close a handle,
         # LeakDetector will complain
         assert mixed.add_ints(40, 2) == 42

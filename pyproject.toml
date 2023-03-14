@@ -1,3 +1,23 @@
 [build-system]
 requires = [ "setuptools>=64.0", "setuptools-scm[toml]>=6.0", "wheel>=0.34.2",]
 build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+ignore = [
+    "F401",  # imported but unused
+    "F541",  # f-string without any placeholders
+]
+line-length = 107
+show-source = true
+target-version = "py37"
+
+[tool.ruff.per-file-ignores]
+"docs/*" = [
+    "E402",  # module level import not at top of file
+    "F811",  # redefinition of unused variable
+]
+"test/*" = [
+    "E",     # pycodestyle errors
+    "F811",  # redefinition of unused variable
+    "F841",  # local variable is assigned to but unused
+]
