@@ -1,26 +1,16 @@
-/**
+/*
  * Helper functions to create struct sequences.
  *
  * These are not part of the HPy context or ABI, but instead are just helpers
  * that delegate to the relevant HPy/CPython APIs.
- *
  */
 
 #include "hpy.h"
-#include "buildvalue_internal.h"
 
 #include <string.h> // for strncpy/strncpy_s
 #include <stdio.h>
 
-#ifdef _WIN32
-#include <malloc.h> // required for _malloca
-#endif
-
 const char * const HPyStructSequence_UnnamedField = "_";
-
-static HPy_ssize_t count_single_items(HPyContext *ctx, const char *fmt);
-static HPy build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ssize_t size);
-static void close_array(HPyContext *ctx, HPy_ssize_t n, HPy *arr);
 
 HPyAPI_HELPER HPy
 HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
@@ -207,22 +197,18 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc)
 #endif
 }
 
-static HPy
-structseq_new(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args, bool args_owned)
+HPyAPI_HELPER HPy
+HPyStructSequence_New(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args)
 {
     static const char *s_n_fields = "n_fields";
 #ifndef HPY_ABI_CPYTHON
     if (!HPy_HasAttr_s(ctx, type, s_n_fields)) {
-        if (args_owned)
-            close_array(ctx, nargs, args);
         HPyErr_Clear(ctx);
         HPyErr_Format(ctx, ctx->h_TypeError,
                 "object '%R' does not look like a struct sequence type ", type);
         return HPy_NULL;
     }
     HPy tuple = HPyTuple_FromArray(ctx, args, nargs);
-    if (args_owned)
-        close_array(ctx, nargs, args);
     if (HPy_IsNull(tuple)) {
         return HPy_NULL;
     }
@@ -254,12 +240,9 @@ structseq_new(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args, bool args
     PyObject *item;
     for (Py_ssize_t i = 0; i < nargs; i++) {
         item = _h2py(args[i]);
-        if (!args_owned)
-            Py_INCREF(item);
+        Py_INCREF(item);
         PyStructSequence_SetItem(seq, i, item);
     }
-    /* no need to call 'close_array' if 'args_owned' because items are stolen
-       from 'args' by 'PyStructSequence_SetItem' */
     return _py2h(seq);
 
 type_error:
@@ -271,126 +254,6 @@ type_error:
                  tp->tp_name);
 
 error:
-    if (args_owned)
-        close_array(ctx, nargs, args);
     return HPy_NULL;
-#endif
-}
-
-HPyAPI_HELPER HPy
-HPyStructSequence_New(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args)
-{
-    return structseq_new(ctx, type, nargs, args, false);
-}
-
-HPyAPI_HELPER HPy
-HPyStructSequence_NewFromFormat(HPyContext *ctx, HPy type, const char *fmt, ...)
-{
-    va_list values;
-    HPy result;
-    va_start(values, fmt);
-    HPy_ssize_t size = count_single_items(ctx, fmt);
-    if (size < 0) {
-        result = HPy_NULL;
-    } else if (size == 0) {
-        result = HPyStructSequence_New(ctx, type, 0, NULL);
-    } else if (size == 1) {
-        int owned;
-        result = buildvalue_single(ctx, &fmt, &values, &owned);
-        if (!owned) {
-            result = HPy_Dup(ctx, result);
-        }
-    } else {
-        result = build_array(ctx, type, &fmt, &values, size);
-    }
-    va_end(values);
-    return result;
-
-}
-
-static const char ERROR_FMT[] = "bad format char '%c' in the format string passed to HPyStructSequence_NewFromFormat";
-
-static HPy_ssize_t
-count_single_items(HPyContext *ctx, const char *fmt)
-{
-    HPy_ssize_t i;
-    char c;
-    for (i = 0; (c = fmt[i]) != '\0'; i++) {
-        switch (c) {
-        case 'i':
-        case 'I':
-        case 'k':
-        case 'l':
-        case 'L':
-        case 'K':
-        case 's':
-        case 'O':
-        case 'S':
-        case 'N':
-        case 'f':
-        case 'd':
-            break;
-
-        default: {
-            /* the size of ERROR_FMT will be enough since we are just inserting
-               a single char */
-            char msg[sizeof(ERROR_FMT)];
-            snprintf(msg, sizeof(msg), ERROR_FMT, c);
-            HPyErr_SetString(ctx, ctx->h_SystemError, msg);
-            return -1;
-        }
-        }
-    }
-    return i;
-}
-
-static void
-close_array(HPyContext *ctx, HPy_ssize_t n, HPy *arr)
-{
-    for (HPy_ssize_t i=0; i < n; i++) {
-        HPy_Close(ctx, arr[i]);
-    }
-}
-
-static HPy
-build_array(HPyContext *ctx, HPy type, const char **fmt, va_list *values, HPy_ssize_t size)
-{
-#ifdef _WIN32
-    HPy *arr = _malloca(size);
-    HPy result;
-#else
-    HPy arr[size];
-#endif
-    for (HPy_ssize_t i = 0; i < size; ++i) {
-        int owned;
-        HPy item = buildvalue_single(ctx, fmt, values, &owned);
-        if (HPy_IsNull(item)) {
-            // in case of error, close all previously created items
-            close_array(ctx, i, arr);
-#ifdef _WIN32
-            _freea(arr);
-#endif
-            return HPy_NULL;
-        }
-        arr[i] = owned ? item : HPy_Dup(ctx, item);
-    }
-    /* Sanity check: after we have consumed 'size' items, we expect the end of
-       of the format string. Otherwise, function 'count_single_items' is
-       not counting correctly. */
-    if (**fmt != '\0') {
-        close_array(ctx, size, arr);
-#ifdef _WIN32
-        _freea(arr);
-#endif
-        HPyErr_SetString(ctx, ctx->h_SystemError,
-                "internal error in HPyStructSequence_NewFromFormat");
-        return HPy_NULL;
-    }
-#ifdef _WIN32
-    result = structseq_new(ctx, type, size, arr, true);
-    _freea(arr);
-    return result;
-#else
-    return structseq_new(ctx, type, size, arr, true);
 #endif
 }

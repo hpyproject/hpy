@@ -12,7 +12,6 @@ from .support import HPyTest
 class TestHPyStructSequence(HPyTest):
     def test_structseq(self):
         import pytest
-        import sys
         mod = self.make_module("""
             static HPyStructSequence_Field structseq_fields[] = {
                 { "field0", "doc0" },
@@ -54,28 +53,6 @@ class TestHPyStructSequence(HPyTest):
                 return structseq;
             }
 
-            HPyDef_METH(build_from_format, "build_from_format", HPyFunc_O)
-            static HPy build_from_format_impl(HPyContext *ctx, HPy self, HPy type)
-            {
-                HPy three = HPyUnicode_FromString(ctx, "3");
-                HPy structseq = HPyStructSequence_NewFromFormat(ctx, type, "idO", 1, 2.0, three);
-                HPy_Close(ctx, three);
-                if (HPy_IsNull(structseq))
-                    return HPy_NULL;
-                return structseq;
-            }
-
-            HPyDef_METH(bad_format, "bad_format", HPyFunc_O)
-            static HPy bad_format_impl(HPyContext *ctx, HPy self, HPy type)
-            {
-                HPy three = HPyUnicode_FromString(ctx, "3");
-                HPy structseq = HPyStructSequence_NewFromFormat(ctx, type, "i(dO)i", 1, 2.0, three, 3);
-                HPy_Close(ctx, three);
-                if (HPy_IsNull(structseq))
-                    return HPy_NULL;
-                return structseq;
-            }
-
             static void make_types(HPyContext *ctx, HPy module)
             {
                 // cannot be done in the static initializer
@@ -96,8 +73,6 @@ class TestHPyStructSequence(HPyTest):
             }
 
             @EXPORT(build)
-            @EXPORT(build_from_format)
-            @EXPORT(bad_format)
             @EXTRA_INIT_FUNC(make_types)
             @INIT
         """)
@@ -114,18 +89,13 @@ class TestHPyStructSequence(HPyTest):
         assert mod.WithFields.n_fields == 3
         assert mod.NoFields.n_fields == 0
 
-        for s0 in (mod.build(mod.WithFields), mod.build_from_format(mod.WithFields)):
-            assert s0.field0 == 1, s0.field0
-            assert s0.field1 == 2.0, s0.field1
-            assert s0[2] == "3", s0[2]
+        s0 = mod.build(mod.WithFields)
+        assert s0.field0 == 1, s0.field0
+        assert s0.field1 == 2.0, s0.field1
+        assert s0[2] == "3", s0[2]
 
-        with pytest.raises(TypeError):
-            mod.build_from_format(mod.NoFields)
         with pytest.raises(TypeError):
             mod.build(mod.NoFields)
-
-        with pytest.raises(SystemError):
-            mod.bad_format(mod.WithFields)
 
         with pytest.raises(TypeError):
             mod.build(str)

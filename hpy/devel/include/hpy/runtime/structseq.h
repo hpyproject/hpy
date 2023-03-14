@@ -105,37 +105,4 @@ HPyStructSequence_NewType(HPyContext *ctx, HPyStructSequence_Desc *desc);
 HPyAPI_HELPER HPy
 HPyStructSequence_New(HPyContext *ctx, HPy type, HPy_ssize_t nargs, HPy *args);
 
-/**
- * Create a new instance of the struct sequence type ``type`` and initialize it
- * with the given format and arguments.
- *
- * This function is similar to :c:func:`HPyStructSequence_New` but it is more
- * convenient since it allows to pass C values that will be converted according
- * to the specified format.
- *
- * Supported format specifiers are
- * :ref:`api-reference/build-value:supported formatting strings` except of
- * :ref:`api-reference/build-value:collections`.
- *
- * :param ctx:
- *     The execution context.
- * :param type:
- *     A struct sequence type (must not be ``HPy_NULL``). If the passed object
- *     is not a type, the behavior is undefined. If the given type is not
- *     appropriate, a ``TypeError`` will be raised.
- * :param fmt:
- *     A format string specifying the number and type of arguments passed. The
- *     values will be converted according to the format and inserted (in given
- *     order) into the struct sequence. If the number of variable arguments is
- *     not exactly the number of fields of the struct sequence, a ``TypeError``
- *     will be raised.
- * :param ...:
- *     Variable arguments of values according to the format ``fmt``.
- *
- * :returns:
- *     A new instance of ``type`` or ``HPy_NULL`` if an error occurred.
- */
-HPyAPI_HELPER HPy
-HPyStructSequence_NewFromFormat(HPyContext *ctx, HPy type, const char *fmt, ...);
-
 #endif /* HPY_COMMON_RUNTIME_STRUCTSEQ_H */
