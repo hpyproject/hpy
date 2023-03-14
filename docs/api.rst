@@ -28,7 +28,7 @@ The HPy API strictly follows these rules:
 
 These rules makes the code simpler to reason about. Moreover, no reference
 borrowing enables the Python implementations to use whatever internal
-representation they wish. For example, the object returned by `HPy_GetItem_i`
+representation they wish. For example, the object returned by ``HPy_GetItem_i``
 may be created on demand from some compact internal representation, which does
 not need to convert itself to full blown representation in order to hold onto
 the borrowed object.
@@ -53,7 +53,7 @@ point to the same object, and a python object's identity is completely given
 by its address in memory, and two pointers with the same address can
 be passed to ``Python.h`` API functions interchangeably. As a result, ``Py_INCREF``
 and ``Py_DECREF`` can be called with any reference to an object as long as the
-total number of calls of `incref` is equal to the number of calls of `decref`
+total number of calls of ``incref`` is equal to the number of calls of ``decref``
 at the end of the object lifetime.
 
 Whereas using HPy API, each handle must be closed independently.
