@@ -36,6 +36,7 @@ class TestBuildValue(HPyTest):
             ('return HPy_BuildValue(ctx, "I", 33);', 33),
             ('return HPy_BuildValue(ctx, "k", 1);', 1),
             ('return HPy_BuildValue(ctx, "K", 6543);', 6543),
+            ('return HPy_BuildValue(ctx, "n", 9876);', 9876),
             ('return HPy_BuildValue(ctx, "l", 345L);', 345),
             ('return HPy_BuildValue(ctx, "l", -876L);', -876),
             ('return HPy_BuildValue(ctx, "L", 545LL);', 545),
@@ -208,6 +209,7 @@ class TestBuildValue(HPyTest):
             ('return HPy_BuildValue(ctx, "(iI)", -1, UINT_MAX);',),
             ('return HPy_BuildValue(ctx, "(ik)", -1, ULONG_MAX);',),
             ('return HPy_BuildValue(ctx, "(iK)", -1, ULLONG_MAX);',),
+            ('return HPy_BuildValue(ctx, "(nn)", HPY_SSIZE_T_MIN, HPY_SSIZE_T_MAX);',),
         ]
         mod = self.make_tests_module(test_cases)
         for i, (test,) in enumerate(test_cases):

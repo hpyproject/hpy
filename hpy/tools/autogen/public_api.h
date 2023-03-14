@@ -622,7 +622,7 @@ HPy HPyDict_New(HPyContext *ctx);
    if 'HPyErr_Occurred(ctx) != 0', it will still work.
    This function, of course, returns a new reference.
  */
-HPy_ID(259)
+HPy_ID(260)
 HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key);
 
 /**
@@ -667,8 +667,38 @@ HPy_ID(204)
 HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
-/* slice */
-HPy_ID(260)
+/* sliceobject.h */
+
+/**
+ * Extract the start, stop and step data members from a slice object as C
+ * integers.
+ *
+ * The slice members may be arbitrary int-like objects. If they are not Python
+ * int objects, they will be coerced to int objects by calling their
+ * ``__index__`` method.
+ *
+ * If a slice member value is out of bounds, it will be set to the maximum value
+ * of ``HPy_ssize_t`` if the member was a positive number, or to the minimum
+ * value of ``HPy_ssize_t`` if it was a negative number.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param slice:
+ *     A handle to a Python slice object. This argument must be a slice object
+ *     and must not be ``HPy_NULL``. Otherwise, behavior is undefined.
+ * :param start:
+ *     A pointer to a variable where to write the unpacked slice start. Must not
+ *     be ``NULL``.
+ * :param end:
+ *     A pointer to a variable where to write the unpacked slice end. Must not
+ * :param step:
+ *     A pointer to a variable where to write the unpacked slice step. Must not
+ *     be ``NULL``.
+ *
+ * :returns:
+ *     ``-1`` on error, ``0`` on success
+ */
+HPy_ID(259)
 int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 
 /* import.h */

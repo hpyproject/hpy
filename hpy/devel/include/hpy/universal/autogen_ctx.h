@@ -273,8 +273,8 @@ struct _HPyContext_s {
     HPy (*ctx_Unicode_Substring)(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
     HPy (*ctx_Dict_Keys)(HPyContext *ctx, HPy h);
     HPy (*ctx_Dict_Copy)(HPyContext *ctx, HPy h);
-    HPy (*ctx_Dict_GetItem)(HPyContext *ctx, HPy op, HPy key);
     int (*ctx_Slice_Unpack)(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
+    HPy (*ctx_Dict_GetItem)(HPyContext *ctx, HPy op, HPy key);
     int (*ctx_SetType)(HPyContext *ctx, HPy obj, HPy type);
     int (*ctx_Type_CheckSlot)(HPyContext *ctx, HPy type, HPyDef *value);
     HPy (*ctx_MaybeGetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
