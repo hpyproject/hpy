@@ -274,7 +274,7 @@ sig2flags(HPyFunc_Signature sig)
 {
     switch(sig) {
         case HPyFunc_VARARGS:  return METH_FASTCALL;
-        case HPyFunc_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
+        case HPyFunc_KEYWORDS: return METH_FASTCALL | METH_KEYWORDS;
         case HPyFunc_NOARGS:   return METH_NOARGS;
         case HPyFunc_O:        return METH_O;
         default:               return -1;

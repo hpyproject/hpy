@@ -148,8 +148,8 @@ static int check_and_set_func(HPyContext *uctx, HPy arg, HPy *out)
 
 HPyDef_METH(set_trace_functions, "set_trace_functions", HPyFunc_KEYWORDS,
         .doc="Set the functions to call if an HPy API is entered/exited.")
-static HPy set_trace_functions_impl(HPyContext *uctx, HPy self, HPy *args,
-        HPy_ssize_t nargs, HPy kw)
+static HPy set_trace_functions_impl(HPyContext *uctx, HPy self, const HPy *args,
+        size_t nargs, HPy kwnames)
 {
     HPy h_on_enter = HPy_NULL;
     HPy h_on_exit = HPy_NULL;
@@ -158,7 +158,7 @@ static HPy set_trace_functions_impl(HPyContext *uctx, HPy self, HPy *args,
     HPyTracker ht;
 
     static const char *kwlist[] = { "on_enter", "on_exit", NULL };
-    if (!HPyArg_ParseKeywords(uctx, &ht, args, nargs, kw, "|OO", kwlist,
+    if (!HPyArg_ParseKeywords(uctx, &ht, args, nargs, kwnames, "|OO", kwlist,
             &h_on_enter, &h_on_exit)) {
         return HPy_NULL;
     }

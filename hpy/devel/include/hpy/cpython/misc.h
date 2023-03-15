@@ -45,6 +45,11 @@ static inline PyObject * _hg2py(HPyGlobal hf)
     return _h2py(h);
 }
 
+static inline const HPy *_arr_py2h(PyObject *const *py_arr) {
+    assert(sizeof(HPy) == sizeof(PyObject *));
+    return (const HPy *)py_arr;
+}
+
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx;
 

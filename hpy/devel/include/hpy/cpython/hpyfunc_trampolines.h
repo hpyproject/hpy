@@ -1,28 +1,26 @@
 #ifndef HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 #define HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 
-typedef HPy (*_HPyCFunction_VARARGS)(HPyContext*, HPy, HPy *, HPy_ssize_t);
+typedef HPy (*_HPyCFunction_VARARGS)(HPyContext*, HPy, const HPy *, HPy_ssize_t);
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                  \
     static PyObject*                                                    \
     SYM(PyObject *self, PyObject *const *args, Py_ssize_t nargs)        \
     {                                                                   \
-        _HPyCFunction_VARARGS func = (_HPyCFunction_VARARGS)IMPL; \
+        _HPyCFunction_VARARGS func = (_HPyCFunction_VARARGS)IMPL;       \
         return _h2py(func(_HPyGetContext(),                             \
-                                 _py2h(self), (HPy *)args, nargs));     \
+                              _py2h(self), _arr_py2h(args), nargs));    \
     }
 
-typedef HPy (*_HPyCFunction_KEYWORDS)(HPyContext*, HPy, HPy *, HPy_ssize_t, HPy);
-#define _HPyFunc_TRAMPOLINE_HPyFunc_KEYWORDS(SYM, IMPL)                 \
-    static PyObject *                                                   \
-    SYM(PyObject *self, PyObject *args, PyObject *kw)                   \
-    {                                                                   \
-        /* get the tuple elements as an array of "PyObject *", which */ \
-        /* is equivalent to an array of "HPy" with enough casting... */ \
-        HPy *items = (HPy *)&PyTuple_GET_ITEM(args, 0);                 \
-        Py_ssize_t nargs = PyTuple_GET_SIZE(args);                      \
-        _HPyCFunction_KEYWORDS func = (_HPyCFunction_KEYWORDS)IMPL; \
-        return _h2py(func(_HPyGetContext(), _py2h(self),                \
-                                 items, nargs, _py2h(kw)));             \
+typedef HPy (*_HPyCFunction_KEYWORDS)(HPyContext*, HPy, const HPy *, size_t, HPy);
+#define _HPyFunc_TRAMPOLINE_HPyFunc_KEYWORDS(SYM, IMPL)                   \
+    static PyObject *                                                     \
+    SYM(PyObject *self, PyObject *const *args, Py_ssize_t nargs,          \
+            PyObject *kwnames)                                            \
+    {                                                                     \
+        _HPyCFunction_KEYWORDS func = (_HPyCFunction_KEYWORDS)IMPL;       \
+        assert(nargs >= 0);                                               \
+        return _h2py(func(_HPyGetContext(), _py2h(self), _arr_py2h(args), \
+                          (size_t)nargs, _py2h(kwnames)));                \
     }
 
 typedef int (*_HPyCFunction_INITPROC)(HPyContext*, HPy, HPy *, HPy_ssize_t, HPy);
