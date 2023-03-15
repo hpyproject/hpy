@@ -324,12 +324,12 @@ class TestBasic(HPyTest):
                 return HPyLong_FromLong(ctx, 10*a + b);
             }
             HPyDef_METH(i, "i", HPyFunc_KEYWORDS)
-            static HPy i_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs,
-                              HPy kw)
+            static HPy i_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs,
+                              HPy kwnames)
             {
                 long a, b;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "ll", kwlist, &a, &b))
+                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kwnames, "ll", kwlist, &a, &b))
                     return HPy_NULL;
                 return HPyLong_FromLong(ctx, 10*a + b);
             }

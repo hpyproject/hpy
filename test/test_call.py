@@ -22,8 +22,8 @@ class TestCall(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(call, "call", HPyFunc_KEYWORDS)
-            static HPy call_impl(HPyContext *ctx, HPy self,
-                                 HPy *args, HPy_ssize_t nargs, HPy kw)
+            static HPy call_impl(HPyContext *ctx, HPy self, const HPy *args,
+                                 size_t nargs, HPy kwnames)
             {
 
                 HPy f, result;
@@ -31,8 +31,8 @@ class TestCall(HPyTest):
                 HPy f_kw = HPy_NULL;
                 HPyTracker ht;
                 static const char *kwlist[] = { "f", "args", "kw", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|OO",
-                                          kwlist, &f, &f_args, &f_kw)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames,
+                                          "O|OO", kwlist, &f, &f_args, &f_kw)) {
                     return HPy_NULL;
                 }
                 result = HPy_CallTupleDict(ctx, f, f_args, f_kw);

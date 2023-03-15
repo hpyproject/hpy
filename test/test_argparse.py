@@ -434,13 +434,13 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {{
                 HPy a, b, result;
                 HPyTracker ht;
                 static const char *kwlist[] = {{ "a", "b", NULL }};
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "{fmt}",
-                                          kwlist, &a, &b)) {{
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames,
+                                          "{fmt}", kwlist, &a, &b)) {{
                     return HPy_NULL;
                 }}
                 result = HPy_Add(ctx, a, b);
@@ -460,12 +460,13 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 HPy a, b, result;
                 HPyTracker ht;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "OO", kwlist, &a, &b)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames, "OO",
+                                          kwlist, &a, &b)) {
                     return HPy_NULL;
                 }
                 result = HPy_Add(ctx, a, b);
@@ -481,14 +482,15 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 HPy a;
                 HPy b = HPy_NULL;
                 HPyTracker ht;
                 HPy res;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|O", kwlist, &a, &b)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames, "O|O",
+                                          kwlist, &a, &b)) {
                     return HPy_NULL;
                 }
                 if (HPy_IsNull(b)) {
@@ -540,12 +542,12 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 long a, b, c;
                 static const char *kwlist[] = { "", "b", "", NULL };
-                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "lll", kwlist,
-                                          &a, &b, &c))
+                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kwnames,
+                                          "lll", kwlist, &a, &b, &c))
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
@@ -561,14 +563,15 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 HPy a;
                 HPy b = HPy_NULL;
                 HPyTracker ht;
                 HPy res;
                 static const char *kwlist[] = { "", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|O", kwlist, &a, &b)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames,
+                                          "O|O", kwlist, &a, &b)) {
                     return HPy_NULL;
                 }
                 if (HPy_IsNull(b)) {
