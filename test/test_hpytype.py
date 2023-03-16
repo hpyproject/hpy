@@ -975,8 +975,9 @@ class TestType(HPyTest):
             @DEFINE_Point_vectorcall
 
             HPyDef_SLOT(Point_call, HPy_tp_call)
-            static HPy Point_call_impl(HPyContext *ctx, HPy self, HPy *args,
-                                       HPy_ssize_t nargs, HPy kw)
+            static HPy Point_call_impl(HPyContext *ctx, HPy self,
+                                       const HPy *args, HPy_ssize_t nargs,
+                                       HPy kwnames)
             {
                 return HPyLong_FromLong(ctx, -1);
             }
@@ -1117,8 +1118,8 @@ class TestType(HPyTest):
             }
 
             HPyDef_SLOT(Foo_call, HPy_tp_call)
-            static HPy Foo_call_impl(HPyContext *ctx, HPy cls, HPy *args,
-                                      HPy_ssize_t nargs, HPy kw)
+            static HPy Foo_call_impl(HPyContext *ctx, HPy cls, const HPy *args,
+                                      HPy_ssize_t nargs, HPy kwnames)
             {
                 return HPyUnicode_FromString(ctx, "hello legacy call");
             }
