@@ -8,6 +8,11 @@ NO_CALL = ('VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
            'VECTORCALLFUNC')
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
+# This is a list of type that can automatically be converted from Python to HPy
+# and vice versa.
+AUTO_CONVERSION_TYPES = ('HPy', 'HPy_ssize_t', 'void *', 'int', 'char *',
+                         'HPy_hash_t', 'HPy_RichCmpOp', 'void')
+
 class autogen_hpyfunc_declare_h(AutoGenFile):
     PATH = 'hpy/devel/include/hpy/autogen_hpyfunc_declare.h'
 
@@ -98,6 +103,22 @@ class autogen_hpyfunc_trampoline_h(AutoGenFile):
         return '\n'.join(lines)
 
 
+def _py2h(type):
+    if type == 'HPy':
+        return '_py2h'
+    elif type in AUTO_CONVERSION_TYPES:
+        return ''
+    raise TypeError(f'cannot generate automatic conversion for type \'{type}\'')
+
+
+def _h2py(type):
+    if type == 'HPy':
+        return '_h2py'
+    elif type in AUTO_CONVERSION_TYPES:
+        return ''
+    raise TypeError(f'cannot generate automatic conversion for type \'{type}\'')
+
+
 class autogen_ctx_call_i(AutoGenFile):
     PATH = 'hpy/universal/src/autogen_ctx_call.i'
 
@@ -116,10 +137,7 @@ class autogen_ctx_call_i(AutoGenFile):
                 pname = param.name
                 if pname is None:
                     pname = 'arg%d' % i
-                if toC(param.type) == 'HPy':
-                    args.append(f'_py2h(a->{pname})')
-                else:
-                    args.append(f'a->{pname}')
+                args.append(f'{_py2h(toC(param.type))}(a->{pname})')
             args = ', '.join(args)
             #
             w(f'    case HPyFunc_{NAME}: {{')
@@ -127,10 +145,8 @@ class autogen_ctx_call_i(AutoGenFile):
             w(f'        _HPyFunc_args_{NAME} *a = (_HPyFunc_args_{NAME}*)args;')
             if c_ret_type == 'void':
                 w(f'        f({args});')
-            elif c_ret_type == 'HPy':
-                w(f'        a->result = _h2py(f({args}));')
             else:
-                w(f'        a->result = f({args});')
+                w(f'        a->result = {_h2py(c_ret_type)}(f({args}));')
             w(f'        return;')
             w(f'    }}')
         return '\n'.join(lines)
@@ -161,10 +177,7 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
                     param.name = 'arg%d' % i
                     typedecl.declname = 'arg%d' % i
 
-            if toC(hpyfunc.return_type()) == 'HPy':
-                result = '_h2py'
-            else:
-                result = ''
+            result = _h2py(toC(hpyfunc.return_type()))
             args = ['_HPyGetContext()']
             func_ptr_ret_type = toC(hpyfunc.return_type())
             func_ptr_sig = ['HPyContext *']
@@ -173,10 +186,7 @@ class autogen_cpython_hpyfunc_trampoline_h(AutoGenFile):
                 if pname is None:
                     pname = 'arg%d' % i
                 func_ptr_sig.append(toC(param.type))
-                if toC(param.type) == 'HPy':
-                    args.append(f'_py2h({pname})')
-                else:
-                    args.append(f'{pname}')
+                args.append(f'{_py2h(toC(param.type))}({pname})')
             args = ', '.join(args)
             func_ptr_sig = ', '.join(func_ptr_sig)
             #
