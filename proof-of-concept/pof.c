@@ -23,12 +23,13 @@ static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs
 }
 
 HPyDef_METH(add_ints_kw, "add_ints_kw", HPyFunc_KEYWORDS)
-static HPy add_ints_kw_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs,
-                            HPy kw)
+static HPy add_ints_kw_impl(HPyContext *ctx, HPy self, const HPy *args,
+                           size_t nargs, HPy kwnames)
 {
     long a, b;
     const char* kwlist[] = {"a", "b", NULL};
-    if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "ll", kwlist, &a, &b))
+    if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kwnames, "ll",
+                              kwlist, &a, &b))
         return HPy_NULL;
     return HPyLong_FromLong(ctx, a+b);
 }
@@ -41,8 +42,8 @@ typedef struct {
 HPyType_HELPERS(PointObject)
 
 HPyDef_SLOT(Point_new, HPy_tp_new)
-static HPy Point_new_impl (HPyContext *ctx, HPy cls, HPy *args,
-                           HPy_ssize_t nargs, HPy Kw)
+static HPy Point_new_impl (HPyContext *ctx, HPy cls, const HPy *args,
+                           HPy_ssize_t nargs, HPy kwnames)
 {
     double x, y;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "dd", &x, &y))
