@@ -1377,7 +1377,8 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
 }
 
 _HPy_HIDDEN HPy
-ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HPy kw)
+ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, const HPy *args,
+                    HPy_ssize_t nargs, HPy kw)
 {
     PyObject *tp = _h2py(h_type);
     assert(tp != NULL);

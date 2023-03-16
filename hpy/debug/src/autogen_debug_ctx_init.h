@@ -84,7 +84,7 @@ int debug_ctx_Err_WarnEx(HPyContext *dctx, DHPy category, const char *utf8_messa
 void debug_ctx_Err_WriteUnraisable(HPyContext *dctx, DHPy obj);
 int debug_ctx_IsTrue(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecParam *params);
-DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw);
+DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, const DHPy *args, HPy_ssize_t nargs, DHPy kw);
 DHPy debug_ctx_GetAttr(HPyContext *dctx, DHPy obj, DHPy name);
 DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *utf8_name);
 int debug_ctx_HasAttr(HPyContext *dctx, DHPy obj, DHPy name);

@@ -70,7 +70,7 @@ class PointTemplate(DefaultExtensionTemplate):
     def DEFINE_Point_new(self):
         return """
             HPyDef_SLOT(Point_new, HPy_tp_new)
-            static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 long x, y;
@@ -582,7 +582,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -643,7 +643,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -699,7 +699,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -851,7 +851,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -1019,7 +1019,7 @@ class TestType(HPyTest):
             }
 
             HPyDef_SLOT(Point_new, HPy_tp_new)
-            static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 long x, y;
@@ -1100,7 +1100,6 @@ class TestType(HPyTest):
             mod.create_var_type()
 
     def test_vectorcall_legacy(self):
-        import pytest
         mod = self.make_module("""
             @TYPE_STRUCT_BEGIN(FooObject)
                 void *a;
@@ -1125,7 +1124,8 @@ class TestType(HPyTest):
             }
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args, HPy_ssize_t nargs, HPy kw)
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
+                                    HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *data;
                 HPy h_obj = HPy_New(ctx, cls, &data);

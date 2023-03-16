@@ -37,6 +37,20 @@ typedef int (*_HPyCFunction_INITPROC)(HPyContext*, HPy, HPy *, HPy_ssize_t, HPy)
                     items, nargs, _py2h(kw));                           \
     }
 
+typedef HPy (*_HPyCFunction_NEWFUNC)(HPyContext*, HPy, const HPy *, HPy_ssize_t, HPy);
+#define _HPyFunc_TRAMPOLINE_HPyFunc_NEWFUNC(SYM, IMPL)                  \
+    static PyObject *                                                   \
+    SYM(PyObject *self, PyObject *args, PyObject *kw)                   \
+    {                                                                   \
+        /* get the tuple elements as an array of "PyObject *", which */ \
+        /* is equivalent to an array of "HPy" with enough casting... */ \
+        PyObject *const *items = &PyTuple_GET_ITEM(args, 0);            \
+        Py_ssize_t nargs = PyTuple_GET_SIZE(args);                      \
+        _HPyCFunction_NEWFUNC func = (_HPyCFunction_NEWFUNC)IMPL;       \
+        return _h2py(func(_HPyGetContext(), _py2h(self),                \
+                         _arr_py2h(items), nargs, _py2h(kw)));          \
+    }
+
 /* special case: the HPy_tp_destroy slot doesn't map to any CPython slot.
    Instead, it is called from our own tp_dealloc: see also
    hpytype_dealloc(). */
@@ -50,7 +64,7 @@ typedef HPy (*_HPyCFunction_RICHCMPFUNC)(HPyContext *, HPy, HPy, int);
     static cpy_PyObject *                                                  \
     SYM(PyObject *self, PyObject *obj, int op)                             \
     {                                                                      \
-        _HPyCFunction_RICHCMPFUNC func = (_HPyCFunction_RICHCMPFUNC)IMPL; \
+        _HPyCFunction_RICHCMPFUNC func = (_HPyCFunction_RICHCMPFUNC)IMPL;  \
         return _h2py(func(_HPyGetContext(), _py2h(self), _py2h(obj), op)); \
     }
 
@@ -73,7 +87,7 @@ typedef int (*_HPyCFunction_GETBUFFERPROC)(HPyContext *, HPy, HPy_buffer *, int)
 #define _HPyFunc_TRAMPOLINE_HPyFunc_GETBUFFERPROC(SYM, IMPL) \
     static int SYM(PyObject *arg0, Py_buffer *arg1, int arg2) \
     { \
-        _HPyCFunction_GETBUFFERPROC func = (_HPyCFunction_GETBUFFERPROC)IMPL; \
+        _HPyCFunction_GETBUFFERPROC func = (_HPyCFunction_GETBUFFERPROC)IMPL;  \
         return (func(_HPyGetContext(), _py2h(arg0), (HPy_buffer*)arg1, arg2)); \
     }
 
@@ -110,7 +124,7 @@ _HPyModule_CheckCreateSlotResult(cpy_PyObject **result);
     {                                                                          \
         (void) def; /* avoid 'unused' warning */                               \
         cpy_PyObject* result = _h2py(IMPL(_HPyGetContext(), _py2h(spec)));     \
-        _HPyModule_CheckCreateSlotResult(&result);                              \
+        _HPyModule_CheckCreateSlotResult(&result);                             \
         return result;                                                         \
     }
 

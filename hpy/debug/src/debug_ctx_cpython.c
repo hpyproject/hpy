@@ -180,6 +180,36 @@ void debug_ctx_CallRealFunctionFromTrampoline(HPyContext *dctx,
         DHPy_close_and_check(dctx, dh_kw);
         return;
     }
+    case HPyFunc_NEWFUNC: {
+        HPyFunc_newfunc f = (HPyFunc_newfunc)func;
+        _HPyFunc_args_NEWFUNC *a = (_HPyFunc_args_NEWFUNC*)args;
+        DHPy dh_self = _py2dh(dctx, a->self);
+        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
+        DHPy *dh_args = (DHPy *)alloca(nargs * sizeof(DHPy));
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            dh_args[i] = _py2dh(dctx, PyTuple_GET_ITEM(a->args, i));
+        }
+        DHPy dh_kw = _py2dh(dctx, a->kw);
+
+        HPyContext *next_dctx = _switch_to_next_dctx_from_cache(dctx);
+        if (next_dctx == NULL) {
+            a->result = NULL;
+            return;
+        }
+
+        DHPy dh_result = f(next_dctx, dh_self, dh_args, nargs, dh_kw);
+
+        _switch_back_to_original_dctx(dctx, next_dctx);
+
+        DHPy_close_and_check(dctx, dh_self);
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            DHPy_close_and_check(dctx, dh_args[i]);
+        }
+        DHPy_close_and_check(dctx, dh_kw);
+        a->result = _dh2py(dctx, dh_result);
+        DHPy_close(dctx, dh_result);
+        return;
+    }
     case HPyFunc_GETBUFFERPROC: {
         HPyFunc_getbufferproc f = (HPyFunc_getbufferproc)func;
         _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;

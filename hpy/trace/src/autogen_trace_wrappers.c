@@ -954,7 +954,7 @@ HPy trace_ctx_Type_FromSpec(HPyContext *tctx, HPyType_Spec *spec, HPyType_SpecPa
     return res;
 }
 
-HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
+HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 151);
     HPyContext *uctx = info->uctx;

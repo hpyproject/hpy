@@ -5,7 +5,7 @@ from .parse import toC, find_typedecl
 
 NO_CALL = ('VARARGS', 'KEYWORDS', 'INITPROC', 'DESTROYFUNC',
            'GETBUFFERPROC', 'RELEASEBUFFERPROC', 'TRAVERSEPROC', 'MOD_CREATE',
-           'VECTORCALLFUNC')
+           'VECTORCALLFUNC', 'NEWFUNC')
 NO_TRAMPOLINE = NO_CALL + ('RICHCMPFUNC',)
 
 # This is a list of type that can automatically be converted from Python to HPy

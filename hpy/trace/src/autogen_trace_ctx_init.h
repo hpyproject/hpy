@@ -83,7 +83,7 @@ int trace_ctx_Err_WarnEx(HPyContext *tctx, HPy category, const char *utf8_messag
 void trace_ctx_Err_WriteUnraisable(HPyContext *tctx, HPy obj);
 int trace_ctx_IsTrue(HPyContext *tctx, HPy h);
 HPy trace_ctx_Type_FromSpec(HPyContext *tctx, HPyType_Spec *spec, HPyType_SpecParam *params);
-HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
+HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw);
 HPy trace_ctx_GetAttr(HPyContext *tctx, HPy obj, HPy name);
 HPy trace_ctx_GetAttr_s(HPyContext *tctx, HPy obj, const char *utf8_name);
 int trace_ctx_HasAttr(HPyContext *tctx, HPy obj, HPy name);

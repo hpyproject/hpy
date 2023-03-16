@@ -24,7 +24,7 @@ class PairTemplate(DefaultExtensionTemplate):
     def DEFINE_Pair_new(self):
         return """
             HPyDef_SLOT(Pair_new, HPy_tp_new)
-            static HPy Pair_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Pair_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 HPy a;

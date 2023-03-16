@@ -324,7 +324,7 @@ HPy_ID(150)
 HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec,
                      HPyType_SpecParam *params);
 HPy_ID(151)
-HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
+HPy HPyType_GenericNew(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw);
 
 HPy_ID(152)
 HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
@@ -1093,6 +1093,8 @@ typedef HPy (*HPyFunc_descrgetfunc)(HPyContext *ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_descrsetfunc)(HPyContext *ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_initproc)(HPyContext *ctx, HPy self,
                                 HPy *args, HPy_ssize_t nargs, HPy kw);
+typedef HPy (*HPyFunc_newfunc)(HPyContext *ctx, HPy type, const HPy *args,
+                               HPy_ssize_t nargs, HPy kw);
 typedef HPy (*HPyFunc_getter)(HPyContext *ctx, HPy, void *);
 typedef int (*HPyFunc_setter)(HPyContext *ctx, HPy, HPy, void *);
 typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
@@ -1188,7 +1190,7 @@ typedef enum {
     //HPy_tp_iter = SLOT(62, HPyFunc_X),
     //HPy_tp_iternext = SLOT(63, HPyFunc_X),
     //HPy_tp_methods = SLOT(64, HPyFunc_X),    NOT SUPPORTED
-    HPy_tp_new = SLOT(65, HPyFunc_KEYWORDS),
+    HPy_tp_new = SLOT(65, HPyFunc_NEWFUNC),
     HPy_tp_repr = SLOT(66, HPyFunc_REPRFUNC),
     HPy_tp_richcompare = SLOT(67, HPyFunc_RICHCMPFUNC),
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),

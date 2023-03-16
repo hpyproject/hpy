@@ -226,7 +226,7 @@ HPyAPI_FUNC _HPy_NO_RETURN void HPy_FatalError(HPyContext *ctx, const char *mess
     Py_FatalError(message);
 }
 
-HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
+HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     return ctx_Type_GenericNew(ctx, type, args, nargs, kw);
 }

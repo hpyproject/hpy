@@ -72,6 +72,17 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
         a->result = f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw));
         return;
     }
+    case HPyFunc_NEWFUNC: {
+        HPyFunc_newfunc f = (HPyFunc_newfunc)func;
+        _HPyFunc_args_NEWFUNC *a = (_HPyFunc_args_NEWFUNC*)args;
+        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
+        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
+        }
+        a->result = _h2py(f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw)));
+        return;
+    }
     case HPyFunc_GETBUFFERPROC: {
         HPyFunc_getbufferproc f = (HPyFunc_getbufferproc)func;
         _HPyFunc_args_GETBUFFERPROC *a = (_HPyFunc_args_GETBUFFERPROC*)args;

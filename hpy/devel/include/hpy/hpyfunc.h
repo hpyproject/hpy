@@ -34,6 +34,7 @@ typedef enum {
     HPyFunc_DESCRGETFUNC,
     HPyFunc_DESCRSETFUNC,
     HPyFunc_INITPROC,
+    HPyFunc_NEWFUNC,
     HPyFunc_GETTER,
     HPyFunc_SETTER,
     HPyFunc_OBJOBJPROC,

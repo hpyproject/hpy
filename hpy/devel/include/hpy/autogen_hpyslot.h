@@ -123,7 +123,7 @@ typedef enum {
 #define _HPySlot_SIG__HPy_tp_call HPyFunc_KEYWORDS
 #define _HPySlot_SIG__HPy_tp_hash HPyFunc_HASHFUNC
 #define _HPySlot_SIG__HPy_tp_init HPyFunc_INITPROC
-#define _HPySlot_SIG__HPy_tp_new HPyFunc_KEYWORDS
+#define _HPySlot_SIG__HPy_tp_new HPyFunc_NEWFUNC
 #define _HPySlot_SIG__HPy_tp_repr HPyFunc_REPRFUNC
 #define _HPySlot_SIG__HPy_tp_richcompare HPyFunc_RICHCMPFUNC
 #define _HPySlot_SIG__HPy_tp_str HPyFunc_REPRFUNC

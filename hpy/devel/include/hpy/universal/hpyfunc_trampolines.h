@@ -26,6 +26,13 @@ typedef struct {
 } _HPyFunc_args_INITPROC;
 
 typedef struct {
+    cpy_PyObject *self;
+    cpy_PyObject *args;
+    cpy_PyObject *kw;
+    cpy_PyObject *result;
+} _HPyFunc_args_NEWFUNC;
+
+typedef struct {
     cpy_PyObject *arg0;
     cpy_PyObject *arg1;
     HPy_RichCmpOp arg2;
@@ -69,6 +76,16 @@ typedef struct {
         _HPyFunc_args_INITPROC a = { self, args, kw };                       \
         _HPy_CallRealFunctionFromTrampoline(                                 \
             _ctx_for_trampolines, HPyFunc_INITPROC, (HPyCFunction)IMPL, &a); \
+        return a.result;                                                     \
+    }
+
+#define _HPyFunc_TRAMPOLINE_HPyFunc_NEWFUNC(SYM, IMPL)                       \
+    static cpy_PyObject *                                                    \
+    SYM(cpy_PyObject *self, cpy_PyObject *args, cpy_PyObject *kw)            \
+    {                                                                        \
+        _HPyFunc_args_NEWFUNC a = { self, args, kw };                        \
+        _HPy_CallRealFunctionFromTrampoline(                                 \
+            _ctx_for_trampolines, HPyFunc_NEWFUNC, (HPyCFunction)IMPL, &a);  \
         return a.result;                                                     \
     }
 

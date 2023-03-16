@@ -89,8 +89,8 @@ _HPy_HIDDEN void* ctx_AsStruct_Slow(HPyContext *ctx, HPy h);
 _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                                   HPyType_SpecParam *params);
 _HPy_HIDDEN HPy ctx_New(HPyContext *ctx, HPy h_type, void **data);
-_HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args,
-                                    HPy_ssize_t nargs, HPy kw);
+_HPy_HIDDEN HPy ctx_Type_GenericNew(HPyContext *ctx, HPy h_type,
+                                    const HPy *args, HPy_ssize_t nargs, HPy kw);
 _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
                                                           HPy h_type);
 _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type);

@@ -118,7 +118,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
             } PointObject;
 
             HPyDef_SLOT(Point_new, HPy_tp_new)
-            static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 PointObject *point;
@@ -182,7 +182,7 @@ class TestCustomLegacySlotsFeatures(HPyTest):
             } PointObject;
 
             HPyDef_SLOT(Point_new, HPy_tp_new)
-            static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 PointObject *point;

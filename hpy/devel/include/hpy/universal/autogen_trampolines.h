@@ -302,7 +302,7 @@ HPyAPI_FUNC HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec, HPyType_Sp
      return ctx->ctx_Type_FromSpec ( ctx, spec, params ); 
 }
 
-HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw) {
+HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw) {
      return ctx->ctx_Type_GenericNew ( ctx, type, args, nargs, kw ); 
 }
 
