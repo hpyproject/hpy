@@ -622,3 +622,57 @@ class TestArgParseKeywords(HPyTest):
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "my-error-message"
+
+    def test_keywords_dict(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              const HPy *args, size_t nargs, HPy kwnames)
+            {
+                HPy args_tuple, kwdict;
+                HPy a, b = HPy_NULL, res;
+                HPyTracker ht;
+                HPy_ssize_t n_args_tuple, i;
+                HPy *args_arr;
+                int status;
+                static const char *kwlist[] = { "a", "b", NULL };
+
+                if (nargs != 2) {
+                    HPyErr_SetString(ctx, ctx->h_SystemError,
+                                     "expected exactly two args");
+                    return HPy_NULL;
+                }
+                args_tuple = args[0];
+                kwdict = args[1];
+                n_args_tuple = HPy_Length(ctx, args_tuple);
+                args_arr = (HPy *)malloc(n_args_tuple * sizeof(HPy));
+                for (i=0; i < n_args_tuple; i++)
+                    args_arr[i] = HPy_GetItem_i(ctx, args_tuple, i);
+
+                status = HPyArg_ParseKeywordsDict(ctx, &ht, args_arr,
+                             n_args_tuple, kwdict, "O|O", kwlist, &a, &b);
+
+                for (i=0; i < n_args_tuple; i++)
+                    HPy_Close(ctx, args_arr[i]);
+                free(args_arr);
+                if (!status) {
+                    return HPy_NULL;
+                }
+                if (HPy_IsNull(b)) {
+                    b = HPyLong_FromLong(ctx, 5);
+                    HPyTracker_Add(ctx, ht, b);
+                }
+                res = HPy_Add(ctx, a, b);
+                HPyTracker_Close(ctx, ht);
+                return res;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(tuple(), dict(a=3, b=2)) == 5
+        assert mod.f((3, 2), {}) == 5
+        assert mod.f(tuple(), dict(a=3)) == 8
+        assert mod.f((3,), {}) == 8
+        with pytest.raises(TypeError):
+            mod.f(tuple(), {})
