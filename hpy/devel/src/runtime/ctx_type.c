@@ -28,20 +28,17 @@
 
 // these fields are never accessed: they are present just to ensure
 // the correct alignment of payload
-#define MAX_ALIGN_T \
-    union {                             \
-        unsigned char payload[1];       \
-        unsigned short _m_short;        \
-        unsigned int _m_int;            \
-        unsigned long _m_long;          \
-        unsigned long long _m_longlong; \
-        float _m_float;                 \
-        double _m_double;               \
-        long double _m_longdouble;      \
-        void *_m_pointer;               \
-    }
-
-typedef MAX_ALIGN_T _HPy_MaxAlign_t;
+typedef union {
+    unsigned char _m_char[1];
+    unsigned short _m_short;
+    unsigned int _m_int;
+    unsigned long _m_long;
+    unsigned long long _m_longlong;
+    float _m_float;
+    double _m_double;
+    long double _m_longdouble;
+    void *_m_pointer;
+} _HPy_MaxAlign_t;
 
 // Helper macro to align a given size to a multiple of sizeof(MAX_ALIGN_T).
 #define _HPy_ALIGN(SIZE) \
@@ -58,7 +55,7 @@ typedef MAX_ALIGN_T _HPy_MaxAlign_t;
  */
 typedef struct {
     PyObject_HEAD
-    MAX_ALIGN_T;
+    _HPy_MaxAlign_t payload;
 } _HPy_FullyAlignedSpaceForPyObject_HEAD;
 
 /* Similar to the case above, if a pure HPy custom type inherits from a
@@ -70,7 +67,7 @@ typedef struct {
 #define FULLY_ALIGNED_SPACE(TYPE) \
     typedef struct { \
         TYPE ob_base; \
-        MAX_ALIGN_T; \
+        _HPy_MaxAlign_t payload; \
     } _HPy_FullyAlignedSpaceFor##TYPE;
 
 FULLY_ALIGNED_SPACE(PyHeapTypeObject)
