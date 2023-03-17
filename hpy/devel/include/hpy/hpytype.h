@@ -77,7 +77,7 @@ typedef enum {
 
 typedef struct {
     cpy_vectorcallfunc cpy_trampoline;
-    HPyFunc_vectorcallfunc impl;
+    HPyCallFunction impl;
 } HPyType_Vectorcall;
 
 typedef struct {

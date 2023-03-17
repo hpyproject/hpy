@@ -304,7 +304,7 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
         if (defs[i]->kind == kind
                 && !is_bf_slot(defs[i])
                 && !is_slot(defs[i], HPy_tp_destroy)
-                && !is_slot(defs[i], HPy_tp_vectorcall_default))
+                && !is_slot(defs[i], HPy_tp_call))
             res++;
     return res;
 }
@@ -608,7 +608,6 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
     bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
     size_t vectorcalloffset = 0;
     bool has_tp_new = false;
-    bool has_tp_call = false;
 #define ADDITIONAL_SLOTS 3
     /* This accounts for the sentinel and maybe additional slots that HPy
        installs automatically for some reason. For example, in case of the
@@ -646,15 +645,15 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                 extra->tp_destroy_impl = (HPyFunc_destroyfunc)src->slot.impl;
                 continue;   /* we don't have a trampoline for tp_destroy */
             }
-            if (is_slot(src, HPy_tp_vectorcall_default)) {
-                /* Slot 'HPy_tp_vectorcall_default' will add a hidden field to
+            if (is_slot(src, HPy_tp_call)) {
+                /* Slot 'HPy_tp_call' will add a hidden field to
                    the type's struct. The field can only be appended which
                    conflicts with var objects. So, we don't allow this if
                    itemsize != 0. */
                 if (hpyspec->itemsize) {
                     PyMem_Free(result);
                     PyErr_SetString(PyExc_TypeError,
-                            "Cannot use vectorcall protocol with var objects");
+                            "Cannot use HPy call protocol with var objects");
                     return NULL;
                 }
                 // we only need to remember the CPython trampoline
@@ -667,12 +666,12 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                    automatically. */
                 vectorcalloffset = _HPy_ALIGN(*basicsize);
                 *basicsize = vectorcalloffset + sizeof(cpy_vectorcallfunc);
-                continue;   /* there is no corresponding C API slot */
+                /* Although there is a corresponding C API slot, we actually
+                   implement HPy_tp_call using CPython's vectorcall protocol. */
+                continue;
             }
             if (is_slot(src, HPy_tp_new)) {
                 has_tp_new = true;
-            } else if (is_slot(src, HPy_tp_call)) {
-                has_tp_call = true;
             } else if (is_slot(src, HPy_tp_traverse)) {
                 extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
                 /* no 'continue' here: we have a trampoline too */
@@ -683,23 +682,25 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
         }
     }
 
-    /* If the user did not provide the new function, we need to install a
-       special new function that will delegate to the inherited tp_new but
-       additionally sets the default vectorcall function. This is not necessary
-       if the user provides the new function because he will use 'HPy_New' to
-       allocate the object which already takes care of that. */
+    // if we have seen HPy_tp_call
     if (vectorcalloffset > 0) {
+        /* Since there is no way to set Py_tp_call directly from HPy, we also
+           always need to specify it if HPy_tp_call is there. */
+        additional_slots++;
+        PyType_Slot *dst = &result[dst_idx++];
+        dst->slot = Py_tp_call;
+        dst->pfunc = (void*)PyVectorcall_Call;
+
+        /* If the user did not provide the new function, we need to install a
+           special new function that will delegate to the inherited tp_new but
+           additionally sets the default call function. This is not necessary if
+           the user provides the new function because he will use 'HPy_New' to
+           allocate the object which already takes care of that. */
         if (!has_tp_new) {
             additional_slots++;
             PyType_Slot *dst = &result[dst_idx++];
             dst->slot = Py_tp_new;
             dst->pfunc = (void*)hpyobject_new;
-        }
-        if (!has_tp_call) {
-            additional_slots++;
-            PyType_Slot *dst = &result[dst_idx++];
-            dst->slot = Py_tp_call;
-            dst->pfunc = (void*)PyVectorcall_Call;
         }
     }
 
@@ -1541,7 +1542,7 @@ _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
 }
 
 _HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
-                                   HPyVectorcall *vectorcall)
+                                   HPyCallFunction *func)
 {
     PyObject *obj = _h2py(h);
     assert(obj != NULL);
@@ -1550,10 +1551,10 @@ _HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
     assert(tp != NULL);
     if (!PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
         PyErr_Format(PyExc_TypeError,
-                "type '%.50s does not implement the vectorcall protocol",
+                "type '%.50s does not implement the call protocol",
                 tp->tp_name);
         return -1;
     }
-    _HPy_set_vectorcall_func(tp, obj, vectorcall->cpy_trampoline);
+    _HPy_set_vectorcall_func(tp, obj, func->cpy_trampoline);
     return 0;
 }

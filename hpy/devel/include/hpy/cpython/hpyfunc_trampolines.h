@@ -14,13 +14,14 @@ typedef HPy (*_HPyCFunction_VARARGS)(HPyContext*, HPy, const HPy *, HPy_ssize_t)
 typedef HPy (*_HPyCFunction_KEYWORDS)(HPyContext*, HPy, const HPy *, size_t, HPy);
 #define _HPyFunc_TRAMPOLINE_HPyFunc_KEYWORDS(SYM, IMPL)                   \
     static PyObject *                                                     \
-    SYM(PyObject *self, PyObject *const *args, Py_ssize_t nargs,          \
+    SYM(PyObject *self, PyObject *const *args, size_t nargsf,             \
             PyObject *kwnames)                                            \
     {                                                                     \
         _HPyCFunction_KEYWORDS func = (_HPyCFunction_KEYWORDS)IMPL;       \
-        assert(nargs >= 0);                                               \
+        /* We also use HPyFunc_KEYWORDS for HPy_tp_call which is */       \
+        /* called via vectorcall and so nargsf may have the flag set */   \
         return _h2py(func(_HPyGetContext(), _py2h(self), _arr_py2h(args), \
-                          (size_t)nargs, _py2h(kwnames)));                \
+                          PyVectorcall_NARGS(nargsf), _py2h(kwnames)));   \
     }
 
 typedef int (*_HPyCFunction_INITPROC)(HPyContext*, HPy, const HPy *, HPy_ssize_t, HPy);
@@ -66,18 +67,6 @@ typedef HPy (*_HPyCFunction_RICHCMPFUNC)(HPyContext *, HPy, HPy, int);
     {                                                                      \
         _HPyCFunction_RICHCMPFUNC func = (_HPyCFunction_RICHCMPFUNC)IMPL;  \
         return _h2py(func(_HPyGetContext(), _py2h(self), _py2h(obj), op)); \
-    }
-
-typedef HPy (*_HPyCFunction_VECTORCALLFUNC)(HPyContext *ctx, HPy callable,
-            HPy const *args, HPy_ssize_t nargsf, HPy kwnames);
-#define _HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                  \
-    static cpy_PyObject *                                                      \
-    SYM(cpy_PyObject *callable, cpy_PyObject *const *args, size_t nargsf,      \
-            cpy_PyObject *kwnames)                                             \
-    {                                                                          \
-        _HPyCFunction_VECTORCALLFUNC f = (_HPyCFunction_VECTORCALLFUNC)IMPL;   \
-        return _h2py(f(_HPyGetContext(), _py2h(callable),                      \
-                          (HPy *)args, nargsf, _py2h(kwnames)));               \
     }
 
 /* With the cpython ABI, Py_buffer and HPy_buffer are ABI-compatible.

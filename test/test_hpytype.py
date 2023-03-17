@@ -92,15 +92,14 @@ class PointTemplate(DefaultExtensionTemplate):
             HPyDef_MEMBER(Point_y, "y", HPyMember_LONG, offsetof(PointObject, y))
         """
 
-    def DEFINE_Point_vectorcall(self):
+    def DEFINE_Point_call(self):
         return """
-            HPyDef_VECTORCALL(Point_vectorcall)
+            HPyDef_SLOT(Point_call, HPy_tp_call)
             static HPy
-            Point_vectorcall_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            Point_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
             {
                 long x, sum = 0;
-                HPy_ssize_t nargs = HPyVectorcall_NARGS(nargsf);
-                for (HPy_ssize_t i = 0; i < nargs; i++) {
+                for (size_t i = 0; i < nargs; i++) {
                     x = HPyLong_AsLong(ctx, args[i]);
                     if (x == -1 && HPyErr_Occurred(ctx))
                         return HPy_NULL;
@@ -958,61 +957,41 @@ class TestType(HPyTest):
         with pytest.raises(AttributeError):
             del foo.NONE_member
 
-    def test_vectorcall(self):
+    def test_call(self):
         mod = self.make_module("""
             @DEFINE_PointObject
-            @DEFINE_Point_vectorcall
-            @EXPORT_POINT_TYPE(&Point_vectorcall)
+            @DEFINE_Point_call
+            @EXPORT_POINT_TYPE(&Point_call)
             @INIT
         """)
         p = mod.Point()
         r = p(3, 4, 5, factor=2)
         assert r == 24
 
-    def test_vectorcall_with_tp_call(self):
-        mod = self.make_module("""
-            @DEFINE_PointObject
-            @DEFINE_Point_vectorcall
-
-            HPyDef_SLOT(Point_call, HPy_tp_call)
-            static HPy Point_call_impl(HPyContext *ctx, HPy self,
-                                       const HPy *args, HPy_ssize_t nargs,
-                                       HPy kwnames)
-            {
-                return HPyLong_FromLong(ctx, -1);
-            }
-
-            @EXPORT_POINT_TYPE(&Point_vectorcall, &Point_call)
-            @INIT
-        """)
-        p = mod.Point()
-        r = p(3, 4, 5, factor=2)
-        assert r == 24
-
-    def test_vectorcall_with_tp_new(self):
+    def test_call_with_tp_new(self):
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_new
-            @DEFINE_Point_vectorcall
-            @EXPORT_POINT_TYPE(&Point_new, &Point_vectorcall)
+            @DEFINE_Point_call
+            @EXPORT_POINT_TYPE(&Point_new, &Point_call)
             @INIT
         """)
         p = mod.Point(1, 2)
         r = p(3, 4, 5, factor=2)
         assert r == 30
 
-    def test_vectorcall_set(self):
+    def test_call_set(self):
         import pytest
         mod = self.make_module("""
             @DEFINE_PointObject
-            @DEFINE_Point_vectorcall
+            @DEFINE_Point_call
 
-            HPyVectorcall_FUNCTION(Point_special_vectorcall)
+            HPyDef_CALL_FUNCTION(Point_special_call)
             static HPy
-            Point_special_vectorcall_impl(HPyContext *ctx, HPy callable,
-                                          HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            Point_special_call_impl(HPyContext *ctx, HPy callable,
+                                    const HPy *args, size_t nargs, HPy kwnames)
             {
-                HPy tmp = Point_vectorcall_impl(ctx, callable, args, nargsf, kwnames);
+                HPy tmp = Point_call_impl(ctx, callable, args, nargs, kwnames);
                 HPy res = HPy_Negative(ctx, tmp);
                 HPy_Close(ctx, tmp);
                 return res;
@@ -1029,7 +1008,7 @@ class TestType(HPyTest):
                 HPy h_point = HPy_New(ctx, cls, &point);
                 if (HPy_IsNull(h_point))
                     return HPy_NULL;
-                if (x < 0 && HPyVectorcall_Set(ctx, h_point, &Point_special_vectorcall) < 0) {
+                if (x < 0 && HPyVectorcall_Set(ctx, h_point, &Point_special_call) < 0) {
                     HPy_Close(ctx, h_point);
                     return HPy_NULL;
                 }
@@ -1038,43 +1017,43 @@ class TestType(HPyTest):
                 return h_point;
             }
 
-            HPyDef_METH(vectorcall_set, "vectorcall_set", HPyFunc_O)
-            static HPy vectorcall_set_impl(HPyContext *ctx, HPy self, HPy arg)
+            HPyDef_METH(call_set, "call_set", HPyFunc_O)
+            static HPy call_set_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                if (HPyVectorcall_Set(ctx, arg, &Point_special_vectorcall) < 0)
+                if (HPyVectorcall_Set(ctx, arg, &Point_special_call) < 0)
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
-            @EXPORT_POINT_TYPE(&Point_new, &Point_vectorcall)
-            @EXPORT(vectorcall_set)
+            @EXPORT_POINT_TYPE(&Point_new, &Point_call)
+            @EXPORT(call_set)
             @INIT
         """)
 
-        # this uses 'Point_vectorcall'
+        # this uses 'Point_call'
         p0 = mod.Point(1, 2)
         assert p0(3, 4, 5, factor=2) == 30
 
-        # the negative 'x' will cause that 'Point_special_vectorcall' is used
+        # the negative 'x' will cause that 'Point_special_call' is used
         p1 = mod.Point(-1, 2)
         assert p1(3, 4, 5, factor=2) == -26
 
-        # error case: setting vectorcall function on object that does not
-        # implement the vectorcall protocol
+        # error case: setting call function on object that does not implement
+        # the HPy call protocol
         with pytest.raises(TypeError):
-            mod.vectorcall_set(object())
+            mod.call_set(object())
 
-    def test_vectorcall_var_object(self):
+    def test_call_var_object(self):
         import pytest
         mod = self.make_module("""
-            HPyDef_VECTORCALL(Dummy_vectorcall)
+            HPyDef_SLOT(Dummy_call, HPy_tp_call)
             static HPy
-            Dummy_vectorcall_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
             {
                 return HPyUnicode_FromString(ctx, "hello");
             }
 
-            static HPyDef *Dummy_defines[] = { &Dummy_vectorcall, NULL };
+            static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
 
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
@@ -1099,28 +1078,28 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             mod.create_var_type()
 
-    def test_vectorcall_legacy(self):
+    def test_call_explicit_offset(self):
         mod = self.make_module("""
             @TYPE_STRUCT_BEGIN(FooObject)
                 void *a;
-                HPyVectorcall vectorcall;
+                HPyCallFunction call_func;
                 void *b;
             @TYPE_STRUCT_END
 
-            HPyDef_MEMBER(Foo_vcall_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET, offsetof(FooObject, vectorcall), .readonly=1)
+            HPyDef_MEMBER(Foo_vcall_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET, offsetof(FooObject, call_func), .readonly=1)
 
-            HPyVectorcall_FUNCTION(Foo_vectorcall_func)
+            HPyDef_CALL_FUNCTION(Foo_manual_call_func)
             static HPy
-            Foo_vectorcall_func_impl(HPyContext *ctx, HPy callable, HPy *args, HPy_ssize_t nargsf, HPy kwnames)
+            Foo_manual_call_func_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
             {
-                return HPyUnicode_FromString(ctx, "hello vectorcall");
+                return HPyUnicode_FromString(ctx, "hello manually initialized call function");
             }
 
             HPyDef_SLOT(Foo_call, HPy_tp_call)
-            static HPy Foo_call_impl(HPyContext *ctx, HPy cls, const HPy *args,
-                                      HPy_ssize_t nargs, HPy kwnames)
+            static HPy
+            Foo_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
             {
-                return HPyUnicode_FromString(ctx, "hello legacy call");
+                return HPyUnicode_FromString(ctx, "hello call");
             }
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
@@ -1131,7 +1110,7 @@ class TestType(HPyTest):
                 HPy h_obj = HPy_New(ctx, cls, &data);
                 if (HPy_IsNull(h_obj))
                     return HPy_NULL;
-                data->vectorcall = Foo_vectorcall_func;
+                data->call_func = Foo_manual_call_func;
                 return h_obj;
             }
 

@@ -205,8 +205,8 @@ typedef struct {
 
 typedef struct {
     cpy_vectorcallfunc cpy_trampoline;
-    HPyFunc_vectorcallfunc impl;
-} HPyVectorcall;
+    HPyFunc_keywords impl;
+} HPyCallFunction;
 
 // macros to automatically define HPyDefs of various kinds
 
@@ -251,9 +251,6 @@ typedef struct {
  */
 #define HPyDef_SLOT(SYM, SLOT) \
     HPyDef_SLOT_IMPL(SYM, SYM##_impl, SLOT)
-
-#define HPyDef_VECTORCALL(SYM) \
-    HPyDef_SLOT(SYM, HPy_tp_vectorcall_default)
 
 // this is the actual implementation, after we determined the SIG
 #define _HPyDef_SLOT(SYM, IMPL, SLOT, SIG)                              \
@@ -435,10 +432,10 @@ typedef struct {
         .impl = SYM##_impl                                                     \
     };
 
-#define HPyVectorcall_FUNCTION(SYM)                                           \
-    HPyFunc_DECLARE(SYM##_impl, HPyFunc_VECTORCALLFUNC);                      \
-    HPyFunc_TRAMPOLINE(SYM##_trampoline, SYM##_impl, HPyFunc_VECTORCALLFUNC); \
-    static HPyVectorcall SYM = {                                              \
+#define HPyDef_CALL_FUNCTION(SYM)                                             \
+    HPyFunc_DECLARE(SYM##_impl, HPyFunc_KEYWORDS);                            \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, SYM##_impl, HPyFunc_KEYWORDS);       \
+    static HPyCallFunction SYM = {                                            \
         .cpy_trampoline = SYM##_trampoline,                                   \
         .impl = SYM##_impl                                                    \
     };

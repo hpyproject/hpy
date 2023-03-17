@@ -710,7 +710,7 @@ HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value) {
      return ctx->ctx_ContextVar_Set ( ctx, context_var, value ); 
 }
 
-HPyAPI_FUNC int HPyVectorcall_Set(HPyContext *ctx, HPy h, HPyVectorcall *vectorcall) {
-     return ctx->ctx_Vectorcall_Set ( ctx, h, vectorcall ); 
+HPyAPI_FUNC int HPyVectorcall_Set(HPyContext *ctx, HPy h, HPyCallFunction *func) {
+     return ctx->ctx_Vectorcall_Set ( ctx, h, func ); 
 }
 

@@ -13,7 +13,10 @@ typedef struct {
 typedef struct {
     cpy_PyObject *self;
     cpy_PyObject *const *args;
-    size_t nargs;
+    /* We also use HPyFunc_KEYWORDS for HPy_tp_call which will be called as
+       vectorcall function from CPython. Therefore, 'nargsf' may also have bit
+       'PY_VECTORCALL_ARGUMENTS_OFFSET' set. */
+    size_t nargsf;
     cpy_PyObject *kwnames;
     cpy_PyObject *result;
 } _HPyFunc_args_KEYWORDS;
@@ -38,15 +41,6 @@ typedef struct {
     HPy_RichCmpOp arg2;
     cpy_PyObject * result;
 } _HPyFunc_args_RICHCMPFUNC;
-
-typedef struct {
-    cpy_PyObject *callable;
-    cpy_PyObject *const *args;
-    size_t nargsf;
-    cpy_PyObject *kwnames;
-    cpy_PyObject *result;
-} _HPyFunc_args_VECTORCALLFUNC;
-
 
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                      \
     static cpy_PyObject *                                                   \
@@ -106,18 +100,6 @@ typedef struct {
         _HPy_CallRealFunctionFromTrampoline(                                   \
            _ctx_for_trampolines, HPyFunc_RICHCMPFUNC, (HPyCFunction)IMPL, &a); \
         return a.result;                                                       \
-    }
-
-#define _HPyFunc_TRAMPOLINE_HPyFunc_VECTORCALLFUNC(SYM, IMPL)                 \
-    static cpy_PyObject *                                                     \
-    SYM(cpy_PyObject *callable, cpy_PyObject *const *args, size_t nargsf,     \
-            cpy_PyObject *kwnames)                                            \
-    {                                                                         \
-        _HPyFunc_args_VECTORCALLFUNC a = { callable, args, nargsf, kwnames }; \
-        _HPy_CallRealFunctionFromTrampoline(                                  \
-            _ctx_for_trampolines, HPyFunc_VECTORCALLFUNC, (HPyCFunction)IMPL, \
-            &a);                                                              \
-        return a.result;                                                      \
     }
 
 typedef struct {

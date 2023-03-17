@@ -95,7 +95,7 @@ _HPy_HIDDEN HPyType_BuiltinShape ctx_Type_GetBuiltinShape(HPyContext *ctx,
                                                           HPy h_type);
 _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type);
 _HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
-                                   HPyVectorcall *vectorcall);
+                                   HPyCallFunction *func);
 
 
 // ctx_long.c
