@@ -43,7 +43,8 @@ int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, HPy_tp_init)
-int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
+int Point_init_impl(HPyContext *ctx, HPy self, const HPy *args,
+        HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", "obj", NULL};
     PointObject *p = PointObject_AsStruct(ctx, self);

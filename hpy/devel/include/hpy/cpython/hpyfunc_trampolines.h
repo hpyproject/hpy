@@ -23,18 +23,18 @@ typedef HPy (*_HPyCFunction_KEYWORDS)(HPyContext*, HPy, const HPy *, size_t, HPy
                           (size_t)nargs, _py2h(kwnames)));                \
     }
 
-typedef int (*_HPyCFunction_INITPROC)(HPyContext*, HPy, HPy *, HPy_ssize_t, HPy);
+typedef int (*_HPyCFunction_INITPROC)(HPyContext*, HPy, const HPy *, HPy_ssize_t, HPy);
 #define _HPyFunc_TRAMPOLINE_HPyFunc_INITPROC(SYM, IMPL)                 \
     static int                                                          \
     SYM(PyObject *self, PyObject *args, PyObject *kw)                   \
     {                                                                   \
         /* get the tuple elements as an array of "PyObject *", which */ \
         /* is equivalent to an array of "HPy" with enough casting... */ \
-        HPy *items = (HPy *)&PyTuple_GET_ITEM(args, 0);                 \
+        PyObject *const *items = &PyTuple_GET_ITEM(args, 0);            \
         Py_ssize_t nargs = PyTuple_GET_SIZE(args);                      \
         _HPyCFunction_INITPROC func = (_HPyCFunction_INITPROC)IMPL; \
         return func(_HPyGetContext(), _py2h(self),                      \
-                    items, nargs, _py2h(kw));                           \
+                    _arr_py2h(items), nargs, _py2h(kw));                \
     }
 
 typedef HPy (*_HPyCFunction_NEWFUNC)(HPyContext*, HPy, const HPy *, HPy_ssize_t, HPy);
