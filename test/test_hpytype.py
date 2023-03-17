@@ -961,12 +961,33 @@ class TestType(HPyTest):
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_call
+
+            HPyDef_SLOT(Dummy_call, HPy_tp_call)
+            static HPy
+            Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args,
+                            size_t nargs, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello");
+            }
+
+            static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                @DEFAULT_SHAPE
+                .defines = Dummy_defines,
+            };
+
             @EXPORT_POINT_TYPE(&Point_call)
+            @EXPORT_TYPE("Dummy", Dummy_spec)
             @INIT
         """)
         p = mod.Point()
-        r = p(3, 4, 5, factor=2)
-        assert r == 24
+        assert p(3, 4, 5, factor=2) == 24
+
+        # type 'Dummy' has basicsize == 0; this test ensures that installation
+        # of the hidden call function field is done correctly
+        q = mod.Dummy()
+        assert q() == 'hello'
 
     def test_call_with_tp_new(self):
         mod = self.make_module("""
@@ -977,8 +998,7 @@ class TestType(HPyTest):
             @INIT
         """)
         p = mod.Point(1, 2)
-        r = p(3, 4, 5, factor=2)
-        assert r == 30
+        assert p(3, 4, 5, factor=2) == 30
 
     def test_call_set(self):
         import pytest
@@ -1043,7 +1063,7 @@ class TestType(HPyTest):
         with pytest.raises(TypeError):
             mod.call_set(object())
 
-    def test_call_var_object(self):
+    def test_call_invalid_specs(self):
         import pytest
         mod = self.make_module("""
             HPyDef_SLOT(Dummy_call, HPy_tp_call)
@@ -1053,7 +1073,10 @@ class TestType(HPyTest):
                 return HPyUnicode_FromString(ctx, "hello");
             }
 
+            HPyDef_MEMBER(Dummy_vcall_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET, 4*sizeof(void*), .readonly=1)
+
             static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
+            static HPyDef *Dummy_vcall_defines[] = { &Dummy_call, &Dummy_vcall_offset, NULL };
 
             static HPyType_Spec Dummy_spec = {
                 .name = "mytest.Dummy",
@@ -1061,6 +1084,13 @@ class TestType(HPyTest):
                 .flags = HPy_TPFLAGS_DEFAULT,
                 @DEFAULT_SHAPE
                 .defines = Dummy_defines,
+            };
+
+            static HPyType_Spec Dummy_vcall_spec = {
+                .name = "mytest.DummyVCall",
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_VECTORCALL,
+                @DEFAULT_SHAPE
+                .defines = Dummy_vcall_defines,
             };
 
             HPyDef_METH(create_var_type, "create_var_type", HPyFunc_NOARGS)
@@ -1072,11 +1102,23 @@ class TestType(HPyTest):
                 return HPy_Dup(ctx, ctx->h_None);
             }
 
+            HPyDef_METH(create_vcall, "create_call_and_vectorcalloffset_type", HPyFunc_NOARGS)
+            static HPy create_vcall_impl(HPyContext *ctx, HPy self)
+            {
+                if (!HPyHelpers_AddType(ctx, self, "DummyVCall", &Dummy_vcall_spec, NULL)) {
+                    return HPy_NULL;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
             @EXPORT(create_var_type)
+            @EXPORT(create_vcall)
             @INIT
         """)
         with pytest.raises(TypeError):
             mod.create_var_type()
+        with pytest.raises(TypeError):
+            mod.create_call_and_vectorcalloffset_type()
 
     def test_call_explicit_offset(self):
         mod = self.make_module("""
@@ -1095,13 +1137,6 @@ class TestType(HPyTest):
                 return HPyUnicode_FromString(ctx, "hello manually initialized call function");
             }
 
-            HPyDef_SLOT(Foo_call, HPy_tp_call)
-            static HPy
-            Foo_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
-            {
-                return HPyUnicode_FromString(ctx, "hello call");
-            }
-
             HPyDef_SLOT(Foo_new, HPy_tp_new)
             static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                     HPy_ssize_t nargs, HPy kw)
@@ -1116,7 +1151,6 @@ class TestType(HPyTest):
 
             static HPyDef *Foo_defines[] = {
                 &Foo_vcall_offset,
-                &Foo_call,
                 &Foo_new,
                 NULL
             };
@@ -1134,7 +1168,7 @@ class TestType(HPyTest):
             @INIT
         """)
         foo = mod.Foo()
-        assert foo() == "hello vectorcall"
+        assert foo() == 'hello manually initialized call function'
 
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
