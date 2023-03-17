@@ -68,10 +68,3 @@ typedef enum {
 #define HPy_END_LEAVE_PYTHON(context)   \
     HPy_ReenterPythonExecution(context, _token); \
     }
-
-// Macro to use C++ static_cast<>
-#ifdef __cplusplus
-#  define _HPy_STATIC_CAST(type, expr) static_cast<type>(expr)
-#else
-#  define _HPy_STATIC_CAST(type, expr) ((type)(expr))
-#endif

@@ -201,9 +201,6 @@ typedef struct {
     GC-based alternative implementations. */
 #define HPy_TPFLAGS_HAVE_GC (1UL << 14)
 
-#define HPy_VECTORCALL_ARGUMENTS_OFFSET \
-    (_HPy_STATIC_CAST(size_t, 1) << (8 * sizeof(size_t) - 1))
-
 /** Convenience macro which is equivalent to:
     ``HPyType_HELPERS(TYPE, HPyType_BuiltinShape_Legacy)`` */
 #define HPyType_LEGACY_HELPERS(TYPE) \
