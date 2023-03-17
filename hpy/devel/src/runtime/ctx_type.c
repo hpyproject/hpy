@@ -164,7 +164,12 @@ static inline void _HPy_set_vectorcall_func(PyTypeObject *tp, PyObject *o, cpy_v
     memcpy((char *) o + offset, &f, sizeof(f));
 }
 
-static inline void _HPy_set_vectorcall_default(PyTypeObject *tp, PyObject *o) {
+/*
+ * If type 'tp' supports the vectorcall protocol, then retrieve the default
+ * vectorcall function from the 'HPyType_Extra_t' struct and write it to the
+ * appropriate offset of 'o'.
+ */
+static inline void _HPy_vectorcall_init(PyTypeObject *tp, PyObject *o) {
     if (PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
         cpy_vectorcallfunc vectorcall_default = _HPyType_get_vectorcall_default(tp);
         _HPy_set_vectorcall_func(tp, o, vectorcall_default);
@@ -256,13 +261,17 @@ static void hpytype_dealloc(PyObject *self)
     Py_DECREF(tp);
 }
 
+/*
+ * A thin decorator around the type base's 'tp_new' function, that will
+ * initialize the vectorcall member (if appropriate).
+ */
 static PyObject *
 hpyobject_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyTypeObject *base = type->tp_base;
     PyObject *result = base->tp_new(type, args, kwds);
     if (result != NULL)
-        _HPy_set_vectorcall_default(type, result);
+        _HPy_vectorcall_init(type, result);
     return result;
 }
 
@@ -1359,7 +1368,7 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
         payload = (void *) result;
     }
 
-    _HPy_set_vectorcall_default(tp, result);
+    _HPy_vectorcall_init(tp, result);
 
     // NOTE: The CPython docs explicitly ask to call GC_Track when all fields
     // are initialized, so it's important to do so AFTER zeroing the memory.
