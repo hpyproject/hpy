@@ -102,7 +102,6 @@ HPy Core API Function Index
 * :c:func:`HPyUnicode_FromWideChar`
 * :c:func:`HPyUnicode_ReadChar`
 * :c:func:`HPyUnicode_Substring`
-* :c:func:`HPyVectorcall_Set`
 * :c:func:`HPy_ASCII`
 * :c:func:`HPy_Absolute`
 * :c:func:`HPy_Add`
@@ -166,6 +165,7 @@ HPy Core API Function Index
 * :c:func:`HPy_Rshift`
 * :c:func:`HPy_SetAttr`
 * :c:func:`HPy_SetAttr_s`
+* :c:func:`HPy_SetCallFunction`
 * :c:func:`HPy_SetItem`
 * :c:func:`HPy_SetItem_i`
 * :c:func:`HPy_SetItem_s`

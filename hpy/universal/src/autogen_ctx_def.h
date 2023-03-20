@@ -192,5 +192,5 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_ContextVar_New = &ctx_ContextVar_New,
     .ctx_ContextVar_Get = &ctx_ContextVar_Get,
     .ctx_ContextVar_Set = &ctx_ContextVar_Set,
-    .ctx_Vectorcall_Set = &ctx_Vectorcall_Set,
+    .ctx_SetCallFunction = &ctx_SetCallFunction,
 };

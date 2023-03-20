@@ -276,7 +276,7 @@ static const char *trace_func_table[] = {
     "ctx_Dict_Keys",
     "ctx_Dict_Copy",
     "ctx_Slice_Unpack",
-    "ctx_Vectorcall_Set",
+    "ctx_SetCallFunction",
     NULL /* sentinel */
 };
 

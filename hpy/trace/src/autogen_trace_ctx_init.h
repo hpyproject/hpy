@@ -185,7 +185,7 @@ HPy trace_ctx_EvalCode(HPyContext *tctx, HPy code, HPy globals, HPy locals);
 HPy trace_ctx_ContextVar_New(HPyContext *tctx, const char *name, HPy default_value);
 int32_t trace_ctx_ContextVar_Get(HPyContext *tctx, HPy context_var, HPy default_value, HPy *result);
 HPy trace_ctx_ContextVar_Set(HPyContext *tctx, HPy context_var, HPy value);
-int trace_ctx_Vectorcall_Set(HPyContext *tctx, HPy h, HPyCallFunction *func);
+int trace_ctx_SetCallFunction(HPyContext *tctx, HPy h, HPyCallFunction *func);
 
 static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
@@ -468,5 +468,5 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_ContextVar_New = &trace_ctx_ContextVar_New;
     tctx->ctx_ContextVar_Get = &trace_ctx_ContextVar_Get;
     tctx->ctx_ContextVar_Set = &trace_ctx_ContextVar_Set;
-    tctx->ctx_Vectorcall_Set = &trace_ctx_Vectorcall_Set;
+    tctx->ctx_SetCallFunction = &trace_ctx_SetCallFunction;
 }

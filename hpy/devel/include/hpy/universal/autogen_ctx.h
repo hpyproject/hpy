@@ -274,5 +274,5 @@ struct _HPyContext_s {
     HPy (*ctx_Dict_Keys)(HPyContext *ctx, HPy h);
     HPy (*ctx_Dict_Copy)(HPyContext *ctx, HPy h);
     int (*ctx_Slice_Unpack)(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
-    int (*ctx_Vectorcall_Set)(HPyContext *ctx, HPy h, HPyCallFunction *func);
+    int (*ctx_SetCallFunction)(HPyContext *ctx, HPy h, HPyCallFunction *func);
 };

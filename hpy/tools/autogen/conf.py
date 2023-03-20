@@ -142,5 +142,5 @@ SPECIAL_CASES = {
     'HPyContextVar_Get': None,
     'HPyType_GetName': None,
     'HPyType_IsSubtype': None,
-    'HPyVectorcall_Set': None,
+    'HPy_SetCallFunction': None,
 }

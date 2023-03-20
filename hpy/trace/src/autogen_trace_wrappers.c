@@ -2270,14 +2270,14 @@ HPy trace_ctx_ContextVar_Set(HPyContext *tctx, HPy context_var, HPy value)
     return res;
 }
 
-int trace_ctx_Vectorcall_Set(HPyContext *tctx, HPy h, HPyCallFunction *func)
+int trace_ctx_SetCallFunction(HPyContext *tctx, HPy h, HPyCallFunction *func)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 260);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    int res = HPyVectorcall_Set(uctx, h, func);
+    int res = HPy_SetCallFunction(uctx, h, func);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 260, r0, r1, &_ts_start, &_ts_end);
     return res;

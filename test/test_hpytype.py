@@ -1015,7 +1015,7 @@ class TestType(HPyTest):
                 HPy h_point = HPy_New(ctx, cls, &point);
                 if (HPy_IsNull(h_point))
                     return HPy_NULL;
-                if (x < 0 && HPyVectorcall_Set(ctx, h_point, &Point_special_call) < 0) {
+                if (x < 0 && HPy_SetCallFunction(ctx, h_point, &Point_special_call) < 0) {
                     HPy_Close(ctx, h_point);
                     return HPy_NULL;
                 }
@@ -1027,7 +1027,7 @@ class TestType(HPyTest):
             HPyDef_METH(call_set, "call_set", HPyFunc_O)
             static HPy call_set_impl(HPyContext *ctx, HPy self, HPy arg)
             {
-                if (HPyVectorcall_Set(ctx, arg, &Point_special_call) < 0)
+                if (HPy_SetCallFunction(ctx, arg, &Point_special_call) < 0)
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }

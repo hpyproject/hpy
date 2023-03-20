@@ -530,9 +530,9 @@ HPyAPI_FUNC int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type)
             (PyTypeObject *)_h2py(type));
 }
 
-HPyAPI_FUNC int HPyVectorcall_Set(HPyContext *ctx, HPy h, HPyCallFunction *func)
+HPyAPI_FUNC int HPy_SetCallFunction(HPyContext *ctx, HPy h, HPyCallFunction *func)
 {
-    return ctx_Vectorcall_Set(ctx, h, func);
+    return ctx_SetCallFunction(ctx, h, func);
 }
 
 #endif /* !HPY_CPYTHON_MISC_H */

@@ -1605,8 +1605,8 @@ _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
     }
 }
 
-_HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
-                                   HPyCallFunction *func)
+_HPy_HIDDEN int ctx_SetCallFunction(HPyContext *ctx, HPy h,
+                                    HPyCallFunction *func)
 {
     PyObject *obj = _h2py(h);
     assert(obj != NULL);
@@ -1615,7 +1615,7 @@ _HPy_HIDDEN int ctx_Vectorcall_Set(HPyContext *ctx, HPy h,
     assert(tp != NULL);
     if (!PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
         PyErr_Format(PyExc_TypeError,
-                "type '%.50s does not implement the call protocol",
+                "type '%.50s does not implement the HPy call protocol",
                 tp->tp_name);
         return -1;
     }
