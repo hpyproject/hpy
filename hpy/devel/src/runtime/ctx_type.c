@@ -708,7 +708,22 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
                    base_member_offset since that will no longer be inherited
                    automatically. */
                 vectorcalloffset = _HPy_ALIGN(*basicsize == 0 ? head_size : *basicsize);
-                *basicsize = vectorcalloffset + sizeof(cpy_vectorcallfunc);
+                if (vectorcalloffset > 0) {
+                    *basicsize = vectorcalloffset + sizeof(cpy_vectorcallfunc);
+                } else {
+                    /* We cannot safely add the hidden field in case of a legacy
+                       type that inherits the basicsize since we don't know it.
+                       In this case, we reject to use HPy_tp_call but since it
+                       is a legacy type, legacy slot Py_tp_call can be used. */
+                    assert(hpyspec->builtin_shape == HPyType_BuiltinShape_Legacy);
+                    assert(hpyspec->basicsize == 0);
+                    PyMem_Free(result);
+                    PyErr_SetString(PyExc_TypeError,
+                            "Cannot use HPy call protocol with legacy types that"
+                            " inherit the struct. Either set the basicsize to a"
+                            "non-zero value or use legacy slot 'Py_tp_call'.");
+                    return NULL;
+                }
                 /* Although there is a corresponding C API slot, we actually
                    implement HPy_tp_call using CPython's vectorcall protocol. */
                 continue;

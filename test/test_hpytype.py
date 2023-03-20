@@ -970,24 +970,11 @@ class TestType(HPyTest):
                 return HPyUnicode_FromString(ctx, "hello");
             }
 
-            static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
-            static HPyType_Spec Dummy_spec = {
-                .name = "mytest.Dummy",
-                @DEFAULT_SHAPE
-                .defines = Dummy_defines,
-            };
-
             @EXPORT_POINT_TYPE(&Point_call)
-            @EXPORT_TYPE("Dummy", Dummy_spec)
             @INIT
         """)
         p = mod.Point()
         assert p(3, 4, 5, factor=2) == 24
-
-        # type 'Dummy' has basicsize == 0; this test ensures that installation
-        # of the hidden call function field is done correctly
-        q = mod.Dummy()
-        assert q() == 'hello'
 
     def test_call_with_tp_new(self):
         mod = self.make_module("""
@@ -1666,3 +1653,28 @@ class TestPureHPyType(HPyTest):
                 @EXPORT_TYPE("Dummy", Dummy_spec)
                 @INIT
             """)
+
+    def test_call_zero_basicsize(self):
+        mod = self.make_module("""
+            HPyDef_SLOT(Dummy_call, HPy_tp_call)
+            static HPy
+            Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args,
+                            size_t nargs, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello");
+            }
+
+            static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                @DEFAULT_SHAPE
+                .defines = Dummy_defines,
+            };
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @INIT
+        """)
+        # type 'Dummy' has basicsize == 0; this test ensures that installation
+        # of the hidden call function field is done correctly
+        q = mod.Dummy()
+        assert q() == 'hello'
