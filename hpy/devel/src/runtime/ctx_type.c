@@ -635,7 +635,8 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
 
 static PyType_Slot *
 create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
-                 HPy_ssize_t head_size, HPy_ssize_t *basicsize)
+                 HPy_ssize_t head_size, HPy_ssize_t *basicsize,
+                 unsigned long *flags)
 {
     HPy_ssize_t base_member_offset;
     HPy_ssize_t hpyslot_count = HPyDef_count(hpyspec->defines, HPyDef_Kind_Slot);
@@ -792,6 +793,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
             dst->slot = Py_tp_new;
             dst->pfunc = (void*)hpyobject_new;
         }
+
+        *flags |= _Py_TPFLAGS_HAVE_VECTORCALL;
     }
 
     // add both members and getsets
@@ -1267,6 +1270,9 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         PyErr_NoMemory();
         return HPy_NULL;
     }
+    /* Create local copies of 'basicsize' and 'flags' because they might be
+       modified and we must not write into 'hpyspec' since it is not owned by
+       this function and it could be read-only memory. */
     HPy_ssize_t basicsize;
     unsigned long flags = hpyspec->flags;
 
@@ -1296,15 +1302,15 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     }
     spec->name = extra->name;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec, extra, head_size, &basicsize);
+    spec->slots = create_slot_defs(hpyspec, extra, head_size, &basicsize, &flags);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
     }
     /* If the vectorcall protocol should be used, set the corresponding
        CPython type flag. */
-    if (extra->tp_vectorcall_default_trampoline)
-        flags |= _Py_TPFLAGS_HAVE_VECTORCALL;
+    assert(extra->tp_vectorcall_default_trampoline == NULL ||
+            (flags & _Py_TPFLAGS_HAVE_VECTORCALL));
     spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
     spec->basicsize = (int)basicsize;
 
