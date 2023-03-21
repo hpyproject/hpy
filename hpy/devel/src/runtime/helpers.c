@@ -67,35 +67,10 @@ HPyHelpers_AddType(HPyContext *ctx, HPy obj, const char *name,
  * convention is similar to CPython's fastcall/vectorcall calling convention
  * where positional and keyword arguments are passed as a C array, the number of
  * positional arguments is explicitly given by an argument and the names of the
- * keyword arguments are provided in a tuple. For example:
+ * keyword arguments are provided in a tuple.
  *
- * .. code-block:: c
- *
- *     // function using legacy 'tp_call' calling convention
- *     static HPy
- *     legacy_call_function(HPyContext *ctx, HPy args, HPy kwd)
- *     {
- *         // 'args' is a tuple
- *         // 'kwd' is a dict
- *         // ...
- *     }
- *
- *     // function using HPy calling convention
- *     static HPy
- *     hpy_call_function(HPyContext *ctx, const HPy *args, size_t nargs,
- *                       HPy kwnames)
- *     {
- *         HPy pos_args, kwd, result;
- *         if (!HPyHelpers_PackArgsAndKeywords(ctx, args, nargs, kwnames,
- *                                             &pos_args, &kwd)) {
- *             return HPy_NULL;
- *         }
- *         result = legacy_call_function(ctx, pos_args, kwd);
- *         HPy_Close(ctx, pos_args);
- *         HPy_Close(ctx, kwd);
- *         return ersult;
- *
- *     }
+ * For an example on how to use this function, see section
+ * :ref:`call-migration`.
  *
  * :param ctx:
  *     The execution context.

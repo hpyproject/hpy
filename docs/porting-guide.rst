@@ -315,6 +315,96 @@ dictionary, ``HPy_CallTupleDict`` will return ``HPy_NULL`` and raise a
 ``TypeError``. This is different to ``PyObject_Call`` and
 ``PyObject_CallObject`` which may segfault instead.
 
+Calling Protocol
+----------------
+
+Both, the *tp_call* and *vectorcall* calling protocols are replaced by HPy's
+calling protocol. This is done by defining slot ``HPy_tp_call``. HPy uses only
+one calling convention which is similar to the vectorcall calling convention.
+In the following example, we implement a call function for a simple Euclidean
+vector type. The function computes the dot product of two vectors.
+
+.. literalinclude:: examples/snippets/hpycall.c
+  :start-after: // BEGIN EuclideanVectorObject
+  :end-before: // END EuclideanVectorObject
+
+.. literalinclude:: examples/snippets/hpycall.c
+  :start-after: // BEGIN HPy_tp_call
+  :end-before: // END HPy_tp_call
+
+Positional and keyword arguments are passed as C array ``args``. Argument
+``nargs`` specifies the number of positional arguments. Argument ``kwnames`` is
+a tuple containing the names of the keyword arguments. The keyword argument
+values are appended to positional arguments and start at ``args[nargs]`` (if
+there are any).
+
+In the above example, function ``call_impl`` will be used by default to call all
+instances of the corresponding type. It is also possible to install (maybe
+specialized) call function implementations per instances by using function
+:c:func:`HPy_SetCallFunction`. This needs to be done in the constructor of an
+object. For example:
+
+.. literalinclude:: examples/snippets/hpycall.c
+  :start-after: // BEGIN HPy_SetCallFunction
+  :end-before: // END HPy_SetCallFunction
+
+Limitations
+~~~~~~~~~~~
+
+  1. It is not possible to use slot ``HPy_tp_call`` for a *var object* (i.e. if
+     :c:member:`HPyType_Spec.itemsize` is greater ``0``). Reason: HPy installs
+     a hidden field in the object's data to store the call function pointer
+     which is appended to everything else. In case of ``EuclideanVectorObject``,
+     a field is implicitly appended after member ``y``. This is not possible for
+     var objects because the variable part will also start after the fixed
+     members.
+
+  2. It is also not possible to use slot ``HPy_tp_call`` with a legacy type that
+     inherits the basicsize (i.e. if :c:member:`HPyType_Spec.basicsize` is
+     ``0``) for the same reason as above.
+
+To overcome these limitations, it is still possible to manually embed a field
+for the call function pointer in a type's C struct and tell HPy where this field
+is. In this case, it is always necessary to set the call function pointer using
+:c:func:`HPy_SetCallFunction` in the object's constructor. This procedure is
+less convenient than just using slot ``HPy_tp_cal`` but still not hard to use.
+Consider following example. We define a struct ``FooObject`` and declare field
+``HPyCallFunction call_func`` which will be used to store the call function's
+pointer. We need to register the offset of that field with member
+``__vectorcalloffset__`` and in the constructor ``Foo_new``, we assign the call
+function ``Foo_call_func``.
+
+.. literalinclude:: examples/snippets/hpycall.c
+  :start-after: // BEGIN FooObject
+  :end-before: // END FooObject
+
+.. literalinclude:: examples/snippets/hpycall.c
+  :start-after: // BEGIN vectorcalloffset
+  :end-before: // END vectorcalloffset
+
+.. note::
+
+    In contrast to CPython's vectorcall protocol, ``nargs`` will never have flag
+    ``PY_VECTORCALL_ARGUMENTS_OFFSET`` set. It will **only** be the positional
+    argument count.
+
+.. _call-migration:
+
+Incremental Migration to HPy's Calling Protocol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to support incremental migration, HPy provides helper function
+:c:func:`HPyHelpers_PackArgsAndKeywords` that converts from HPy's calling
+convention to CPython's *tp_call*  calling convention. Consider following
+example:
+
+.. literalinclude:: examples/snippets/hpycall.c
+  :start-after: // BEGIN pack_args
+  :end-before: // END pack_args
+
+In this example, ``args``, ``nargs``, and ``kwnames`` are used to create a tuple
+of positional arguments ``args_tuple`` and a keyword arguments dictionary
+``kwd``.
 
 PyModule_AddObject
 ------------------
