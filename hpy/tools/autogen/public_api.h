@@ -1034,8 +1034,11 @@ HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
  * every instance. This should account for the most common case (every instance
  * of an object uses the same call function) but to still provide the necessary
  * flexibility, function ``HPy_SetCallFunction`` allows to set different (maybe
- * specialized) call functions for each instance. This may be done at any time
- * but is most commonly used in the constructor of an object.
+ * specialized) call functions for each instance. This must be done in the
+ * constructor of an object.
+ *
+ * A more detailed description on how to use that function can be found in
+ * section :ref:`porting-guide:calling protocol`.
  *
  * :param ctx:
  *     The execution context.
