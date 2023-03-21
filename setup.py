@@ -98,6 +98,7 @@ HPY_EXTRA_SOURCES = [
     'hpy/devel/src/runtime/buildvalue.c',
     'hpy/devel/src/runtime/format.c',
     'hpy/devel/src/runtime/helpers.c',
+    'hpy/devel/src/runtime/structseq.c',
 ]
 
 HPY_CTX_SOURCES = [

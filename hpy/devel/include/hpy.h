@@ -74,6 +74,7 @@ extern "C" {
 #   define _HPy_HIDDEN
 #   define _HPy_UNUSED
 #endif /* __GNUC__ */
+#define _HPy_UNUSED_ARG(x) (__HPy_UNUSED_TAGGED ## x) _HPy_UNUSED
 
 #if defined(__clang__) || \
     (defined(__GNUC__) && \

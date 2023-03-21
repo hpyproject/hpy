@@ -1,5 +1,5 @@
-Building complex Python objects
+Building Complex Python Objects
 ===============================
 
 .. autocmodule:: runtime/buildvalue.c
-   :no-members:
+   :members:

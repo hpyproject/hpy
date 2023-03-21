@@ -69,10 +69,10 @@
  *      is ``HPy_NULL``).
  *
  * ``%S [HPy]``
- *      The result of calling ``HPyObject_Str``.
+ *      The result of calling ``HPy_Str``.
  *
  * ``%R [HPy]``
- *      The result of calling ``PyObject_Repr``.
+ *      The result of calling ``HPy_Repr``.
  *
  * Additional flags:
  * ~~~~~~~~~~~~~~~~~

@@ -419,7 +419,8 @@ HPyBool_FromLong(HPyContext *ctx, long v)
  *     Return the length of the slice. Always successful. Doesn’t call Python code.
  */
 HPyAPI_INLINE_HELPER HPy_ssize_t
-HPySlice_AdjustIndices(HPyContext *ctx, HPy_ssize_t length, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t step)
+HPySlice_AdjustIndices(HPyContext *_HPy_UNUSED_ARG(ctx), HPy_ssize_t length,
+        HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t step)
 {
     /* Taken from CPython: Written by Jim Hugunin and Chris Chase. */
     /* this is harder to get right than you might think */
