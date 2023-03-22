@@ -18,6 +18,23 @@ class TestCall(HPyTest):
             if not args and not kw:
                 yield {}
 
+    def argument_combinations_tuple(self, **items):
+        """ Same as 'argument_combinations' but returns a tuple where
+            the first element is the argument tuple and the second is
+            a dict that may contain the keywords dict.
+        """
+        items = list(items.items())
+        for i in range(len(items) + 1):
+            args = tuple(item[1] for item in items[:i])
+            kw = dict(items[i:])
+            yield args, {"kw": kw}
+            if not args:
+                yield tuple(), {"kw": kw}
+            if not kw:
+                yield args, {}
+            if not args and not kw:
+                yield tuple(), {}
+
     def test_hpy_calltupledict(self):
         import pytest
         mod = self.make_module("""
@@ -153,6 +170,192 @@ class TestCall(HPyTest):
 
         with pytest.raises(TypeError):
             mod.call(receiver="Hello, World", name="find", args=("1", ) * 100)
+
+    def test_hpy_callvectordict(self):
+        import pytest
+        mod = self.make_module("""
+            #define ARGS_OFFSET 1
+
+            HPyDef_METH(call, "call", call_impl, HPyFunc_KEYWORDS)
+            static HPy call_impl(HPyContext *ctx, HPy self,
+                                 HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPyTracker ht;
+                HPy result;
+                HPy m_kw = HPy_NULL;
+                HPy_ssize_t m_nargs = nargs - ARGS_OFFSET;
+                HPy *m_args = NULL;
+
+                if (nargs < ARGS_OFFSET) {
+                    HPyErr_SetString(ctx, ctx->h_TypeError, "HPy_CallVectorDict requires a receiver");
+                    return HPy_NULL;
+                }
+                m_args = args + ARGS_OFFSET;
+
+                static const char *kwlist[] = { "kw", NULL };
+                if (!HPyArg_ParseKeywords(ctx, &ht, NULL, 0, kw, "|O", kwlist, &m_kw)) {
+                    return HPy_NULL;
+                }
+                result = HPy_CallVectorDict(ctx, args[0], m_args, m_nargs, m_kw);
+                HPyTracker_Close(ctx, ht);
+                return result;
+            }
+            @EXPORT(call)
+            @INIT
+        """)
+
+        def foo():
+            raise ValueError
+
+        def listify(*args):
+            return args
+
+        def f(a, b):
+            return a + b
+
+        def g():
+            return "this is g"
+
+        class KwDict(dict):
+            def __getitem__(self, key):
+                return "key=" + str(key);
+
+        test_args = (
+            # (receiver, method, args_tuple)
+            (dict, (dict(a=0, b=1), ), {}),
+            (dict, tuple(), dict(a=0, b=1)),
+        )
+        for receiver, args_tuple, kw in test_args:
+            assert mod.call(receiver, *args_tuple, kw=kw) == receiver(*args_tuple, **kw)
+
+        # NULL dict for keywords
+        mod.call(dict)
+
+        # dict subclass for keywords
+        kwdict = KwDict(x=11, y=12, z=13)
+        assert mod.call(dict, kw=kwdict) == dict(kwdict)
+
+        with pytest.raises(TypeError):
+            mod.call(dict, *args_tuple, kw=None)
+        with pytest.raises(ValueError):
+            mod.call(foo)
+        with pytest.raises(TypeError):
+            mod.call()
+
+        # large amount of args
+        r = range(1000)
+        assert mod.call(listify, *r) == listify(*r)
+
+        # test passing arguments with handles of the correct type --
+        # i.e. args is a tuple or a null handle, kw is a dict or a null handle.
+        for args, kwd in self.argument_combinations_tuple(a=1, b=2):
+            assert mod.call(f, *args, **kwd) == 3
+        for args, kwd in self.argument_combinations_tuple(a=1):
+            with pytest.raises(TypeError):
+                mod.call(f, *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple():
+            with pytest.raises(TypeError):
+                mod.call(f, *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple():
+            assert mod.call(g, *args, **kwd) == "this is g"
+        for args, kwd in self.argument_combinations_tuple(object=2):
+            assert mod.call(str, *args, **kwd) == "2"
+        for args, kwd in self.argument_combinations_tuple():
+            with pytest.raises(TypeError):
+                mod.call("not callable", *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple(unknown=2):
+            with pytest.raises(TypeError):
+                mod.call("not callable", *args, **kwd)
+
+        # test passing handles of the incorrect type as keywords
+        with pytest.raises(TypeError):
+            mod.call(f, kw=[1, 2])
+        with pytest.raises(TypeError):
+            mod.call(f, kw="string")
+        with pytest.raises(TypeError):
+            mod.call(f, kw=1)
+        with pytest.raises(TypeError):
+            mod.call(f, kw=None)
+
+
+    def test_hpy_callmethodvectordict(self):
+        import pytest
+        mod = self.make_module("""
+            #define ARGS_OFFSET 2
+
+            HPyDef_METH(call, "call", call_impl, HPyFunc_KEYWORDS)
+            static HPy call_impl(HPyContext *ctx, HPy self,
+                                 HPy *args, HPy_ssize_t nargs, HPy kw)
+            {
+                HPyTracker ht;
+                HPy result;
+                HPy m_kw = HPy_NULL;
+                HPy_ssize_t m_nargs = nargs - ARGS_OFFSET;
+                HPy *m_args = NULL;
+
+                if (nargs < ARGS_OFFSET) {
+                    HPyErr_SetString(ctx, ctx->h_TypeError, "HPy_CallMethodVectorDict requires a receiver and a method name");
+                    return HPy_NULL;
+                }
+                m_args = args + ARGS_OFFSET;
+
+                static const char *kwlist[] = { "kw", NULL };
+                if (!HPyArg_ParseKeywords(ctx, &ht, NULL, 0, kw, "|O", kwlist, &m_kw)) {
+                    return HPy_NULL;
+                }
+                result = HPy_CallMethodVectorDict(ctx, args[0], args[1], m_args, m_nargs, m_kw);
+                HPyTracker_Close(ctx, ht);
+                return result;
+            }
+            @EXPORT(call)
+            @INIT
+        """)
+
+        class Dummy:
+            not_callable = 123
+
+            def f(self, a, b):
+                return a + b
+
+            def g(self):
+                return "this is g"
+
+        test_obj = Dummy()
+
+        # test passing arguments with handles of the correct type --
+        # i.e. args is a tuple or a null handle, kw is a dict or a null handle.
+        for args, kwd in self.argument_combinations_tuple(a=1, b=2):
+            assert mod.call(test_obj, "f", *args, **kwd) == 3
+        for args, kwd in self.argument_combinations_tuple(a=1):
+            with pytest.raises(TypeError):
+                mod.call(test_obj, "f", *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple(a=1, b=2, c=3):
+            with pytest.raises(TypeError):
+                mod.call(test_obj, "f", *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple():
+            with pytest.raises(TypeError):
+                mod.call(test_obj, "f", *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple():
+            assert mod.call(test_obj, "g", *args, **kwd) == "this is g"
+        for args, kwd in self.argument_combinations_tuple():
+            with pytest.raises(TypeError):
+                mod.call(test_obj, "not_callable", *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple(unknown=2):
+            with pytest.raises(TypeError):
+                mod.call(test_obj, "not_callable", *args, **kwd)
+        for args, kwd in self.argument_combinations_tuple():
+            with pytest.raises(AttributeError):
+                mod.call(test_obj, "embedded null byte", *args, **kwd)
+
+        # test passing handles of the incorrect type as keywords
+        with pytest.raises(TypeError):
+            mod.call(test_obj, "f", kw=[1, 2])
+        with pytest.raises(TypeError):
+            mod.call(test_obj, "f", kw="string")
+        with pytest.raises(TypeError):
+            mod.call(test_obj, "f", kw=1)
+        with pytest.raises(TypeError):
+            mod.call(test_obj, "f", kw=None)
 
     def test_hpycallable_check(self):
         mod = self.make_module("""
