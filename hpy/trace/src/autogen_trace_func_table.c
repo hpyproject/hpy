@@ -277,8 +277,8 @@ static const char *trace_func_table[] = {
     "ctx_Dict_Copy",
     "ctx_Slice_Unpack",
     "ctx_SetCallFunction",
-    "ctx_CallVectorDict",
-    "ctx_CallMethodVectorDict",
+    "ctx_Call",
+    "ctx_CallMethod",
     NULL /* sentinel */
 };
 

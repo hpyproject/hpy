@@ -40,105 +40,64 @@ ctx_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
     return _py2h(obj);
 }
 
-_HPy_UNUSED static inline void
-_harr2pyarr(PyObject *dest[], const HPy_ssize_t dest_offset, HPy src[], HPy_ssize_t n)
-{
-    HPy_ssize_t i;
-    for (i = 0; i < n; i++) {
-        dest[i + dest_offset] = _h2py(src[i]);
-    }
-}
-
 _HPy_HIDDEN HPy
-ctx_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw)
+ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h_kwnames)
 {
-    PyObject *result;
+    PyObject *result, *kwnames;
+    size_t n_all_args;
 
-    if (!HPy_IsNull(kw) && !HPyDict_Check(ctx, kw)) {
-       HPyErr_SetString(ctx, ctx->h_TypeError,
-           "HPy_CallVectorDict requires kw to be a dict or null handle");
-       return HPy_NULL;
-    }
-
-#if PY_VERSION_HEX >= 0x03080000
-    PyObject **py_args = (PyObject **) alloca(nargs * sizeof(PyObject *));
-    _harr2pyarr(py_args, 0, args, nargs);
-#endif
-
-#if PY_VERSION_HEX >= 0x03090000
-    result = PyObject_VectorcallDict(_h2py(callable), py_args, nargs, _h2py(kw));
-#elif PY_VERSION_HEX >= 0x03080000 
-    result = _PyObject_FastCallDict(_h2py(callable), py_args, nargs, _h2py(kw));
-#else
-    /* Before Python 3.8, we need to convert to a tuple and use 'PyObject_Call'. */
-    HPy args_tuple = HPyTuple_FromArray(ctx, args, nargs);
-    if (HPy_IsNull(kw)) {
-        result = PyObject_CallObject(_h2py(callable), _h2py(args_tuple));
+    if (HPy_IsNull(h_kwnames)) {
+        kwnames = NULL;
+        n_all_args = nargs;
     } else {
-        result = PyObject_Call(_h2py(callable), _h2py(args_tuple), _h2py(kw));
+        kwnames = _h2py(h_kwnames);
+        assert(PyTuple_Check(kwnames));
+        n_all_args = nargs + PyTuple_GET_SIZE(kwnames);
+        assert(n_all_args >= nargs);
     }
-    HPy_Close(ctx, args_tuple);
+
+    PyObject **args = (PyObject **) alloca(n_all_args * sizeof(PyObject *));
+    for (size_t i = 0; i < n_all_args; i++) {
+        args[i] = _h2py(h_args[i]);
+    }
+
+#if PY_VERSION_HEX < 0x03090000
+    result = _PyObject_Vectorcall(_h2py(callable), args, nargs, kwnames);
+#else
+    result = PyObject_Vectorcall(_h2py(h_callable), args, nargs, kwnames);
 #endif
     return _py2h(result);
 }
 
 _HPy_HIDDEN HPy
-ctx_CallMethodVectorDict(HPyContext *ctx, HPy receiver, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw)
+ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs, HPy h_kwnames)
 {
-    PyObject *result;
+    PyObject *result, *kwnames;
+    size_t n_all_args;
 
-    if (!HPy_IsNull(kw) && !HPyDict_Check(ctx, kw)) {
-       HPyErr_SetString(ctx, ctx->h_TypeError,
-           "HPy_CallMethodVectorDict requires kw to be a dict or null handle");
-       return HPy_NULL;
-    }
-
-#if PY_VERSION_HEX >= 0x03090000
-    PyObject **py_args;
-    if (HPy_IsNull(kw)) {
-        /* If we don't have keywords, we can use PyObject_VectorcallMethod */
-        py_args = (PyObject **) alloca((nargs + 1) * sizeof(PyObject *));
-        py_args[0] = _h2py(receiver);
-        _harr2pyarr(py_args, 1, args, nargs);
-        result = PyObject_VectorcallMethod(_h2py(name), py_args, nargs + 1, NULL);
+    if (HPy_IsNull(h_kwnames)) {
+        kwnames = NULL;
+        n_all_args = nargs;
     } else {
-        /* If we have keywords, we use PyObject_VectorcallDict and lookup the method manually */
-        HPy callable = HPy_GetAttr(ctx, receiver, name);
-        if (HPy_IsNull(callable)) {
-            return HPy_NULL;
-        }
-        py_args = (PyObject **) alloca(nargs * sizeof(PyObject *));
-        _harr2pyarr(py_args, 0, args, nargs);
-        result = PyObject_VectorcallDict(_h2py(callable), py_args, nargs, _h2py(kw));
-        HPy_Close(ctx, callable);
+        kwnames = _h2py(h_kwnames);
+        assert(PyTuple_Check(kwnames));
+        n_all_args = nargs + PyTuple_GET_SIZE(kwnames);
+        assert(n_all_args >= nargs);
     }
-#elif PY_VERSION_HEX >= 0x03080000 /* >= 3.8 */
-    HPy callable = HPy_GetAttr(ctx, receiver, name);
-    if (HPy_IsNull(callable)) {
+
+    PyObject **args = (PyObject **) alloca(n_all_args * sizeof(PyObject *));
+    for (size_t i = 0; i < n_all_args; i++) {
+        args[i] = _h2py(h_args[i]);
+    }
+
+#if PY_VERSION_HEX < 0x03090000
+    PyObject *method = PyObject_GetAttr(args[0], _h2py(h_name));
+    if (method == NULL)
         return HPy_NULL;
-    }
-    PyObject **py_args = (PyObject **) alloca(nargs * sizeof(PyObject *));
-    _harr2pyarr(py_args, 0, args, nargs);
-    if (HPy_IsNull(kw)) {
-        result = _PyObject_Vectorcall(_h2py(callable), py_args, nargs, NULL);
-    } else {
-        result = _PyObject_FastCallDict(_h2py(callable), py_args, nargs, _h2py(kw));
-    }
-    HPy_Close(ctx, callable);
+    result = _PyObject_Vectorcall(method, args, nargs, NULL);
+    Py_DECREF(method);
 #else
-    /* Before Python 3.8, we need to convert to a tuple and use 'PyObject_Call'. */
-    HPy callable = HPy_GetAttr(ctx, receiver, name);
-    if (HPy_IsNull(callable)) {
-        return HPy_NULL;
-    }
-    HPy args_tuple = HPyTuple_FromArray(ctx, args, nargs);
-    if (HPy_IsNull(kw)) {
-        result = PyObject_CallObject(_h2py(callable), _h2py(args_tuple));
-    } else {
-        result = PyObject_Call(_h2py(callable), _h2py(args_tuple), _h2py(kw));
-    }
-    HPy_Close(ctx, args_tuple);
-    HPy_Close(ctx, callable);
-#endif /* >= 3.9 */
+    result = PyObject_VectorcallMethod(_h2py(h_name), args, nargs, kwnames);
+#endif
     return _py2h(result);
 }

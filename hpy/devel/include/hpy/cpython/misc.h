@@ -276,14 +276,22 @@ HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy k
     return ctx_CallTupleDict(ctx, callable, args, kw);
 }
 
-HPyAPI_FUNC HPy HPy_CallVectorDict(HPyContext *ctx, HPy callable, HPy args[], HPy_ssize_t nargs, HPy kw)
+HPyAPI_FUNC HPy HPy_Call(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
 {
-    return ctx_CallVectorDict(ctx, callable, args, nargs, kw);
+    if (sizeof(HPy) == sizeof(PyObject *)) {
+        return _py2h(PyObject_Vectorcall(_h2py(callable), (PyObject *const *)args, nargs, _h2py(kwnames)));
+    }
+    return ctx_Call(ctx, callable, args, nargs, kwnames);
 }
 
-HPyAPI_FUNC HPy HPy_CallMethodVectorDict(HPyContext *ctx, HPy callable, HPy name, HPy args[], HPy_ssize_t nargs, HPy kw)
+HPyAPI_FUNC HPy HPy_CallMethod(HPyContext *ctx, HPy name, const HPy *args, size_t nargs, HPy kwnames)
 {
-    return ctx_CallMethodVectorDict(ctx, callable, name, args, nargs, kw);
+#if PY_VERSION_HEX >= 0x03090000
+    if (sizeof(HPy) == sizeof(PyObject *)) {
+        return _py2h(PyObject_VectorcallMethod(_h2py(name), (PyObject *const *)args, nargs, _h2py(kwnames)));
+    }
+#endif
+    return ctx_CallMethod(ctx, name, args, nargs, kwnames);
 }
 
 HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h)
