@@ -89,8 +89,8 @@ class TestBytes(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args,
-                              HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args,
+                              size_t nargs)
             {
                 HPy src;
                 long len;
@@ -103,8 +103,8 @@ class TestBytes(HPyTest):
             }
 
             HPyDef_METH(f_null, "f_null", HPyFunc_VARARGS)
-            static HPy f_null_impl(HPyContext *ctx, HPy self, HPy *args,
-                                   HPy_ssize_t nargs)
+            static HPy f_null_impl(HPyContext *ctx, HPy self, const HPy *args,
+                                   size_t nargs)
             {
                 long len;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "l", &len)) {

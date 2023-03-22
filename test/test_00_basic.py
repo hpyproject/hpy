@@ -220,7 +220,7 @@ class TestBasic(HPyTest):
     def test_varargs(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 long a, b;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))
@@ -316,7 +316,7 @@ class TestBasic(HPyTest):
                 return HPy_Dup(ctx, arg);
             }
             HPyDef_METH(h, "h", HPyFunc_VARARGS)
-            static HPy h_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy h_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 long a, b;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))

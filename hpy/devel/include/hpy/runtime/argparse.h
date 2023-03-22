@@ -8,7 +8,7 @@ extern "C" {
 
 HPyAPI_HELPER int
 HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, const HPy *args,
-             HPy_ssize_t nargs, const char *fmt, ...);
+             size_t nargs, const char *fmt, ...);
 
 HPyAPI_HELPER int
 HPyArg_ParseKeywords(HPyContext *ctx, HPyTracker *ht, const HPy *args,

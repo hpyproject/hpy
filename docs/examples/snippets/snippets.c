@@ -31,7 +31,7 @@ int is_same_object(HPyContext *ctx, HPy x, HPy y)
 // dummy entry point so that we can test the snippets:
 HPyDef_METH(test_foo_and_is_same_object, "test_foo_and_is_same_object", HPyFunc_VARARGS)
 static HPy test_foo_and_is_same_object_impl(HPyContext *ctx, HPy self,
-                                            HPy *args, HPy_ssize_t nargs)
+                                            const HPy *args, size_t nargs)
 {
     foo(ctx);   // not much we can test here
     return HPyLong_FromLong(ctx, is_same_object(ctx, args[0], args[1]));
@@ -52,7 +52,7 @@ static HPy test_leak_stacktrace_impl(HPyContext *ctx, HPy self)
 
 // BEGIN: add
 HPyDef_METH(add, "add", HPyFunc_VARARGS)
-static HPy add_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+static HPy add_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     if (nargs != 2) {
         HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly two args");

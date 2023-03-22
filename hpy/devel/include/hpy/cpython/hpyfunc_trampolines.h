@@ -1,7 +1,7 @@
 #ifndef HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 #define HPY_CPYTHON_HPYFUNC_TRAMPOLINES_H
 
-typedef HPy (*_HPyCFunction_VARARGS)(HPyContext*, HPy, const HPy *, HPy_ssize_t);
+typedef HPy (*_HPyCFunction_VARARGS)(HPyContext*, HPy, const HPy *, size_t);
 #define _HPyFunc_TRAMPOLINE_HPyFunc_VARARGS(SYM, IMPL)                  \
     static PyObject*                                                    \
     SYM(PyObject *self, PyObject *const *args, Py_ssize_t nargs)        \

@@ -463,14 +463,14 @@ parse_item(HPyContext *ctx, HPyTracker *ht, HPy current_arg, int current_arg_tmp
  *    future format string codes (e.g. for character strings).
  */
 HPyAPI_HELPER int
-HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, const HPy *args, HPy_ssize_t nargs, const char *fmt, ...)
+HPyArg_Parse(HPyContext *ctx, HPyTracker *ht, const HPy *args, size_t nargs, const char *fmt, ...)
 {
     const char *fmt1 = fmt;
     const char *err_fmt = NULL;
     const char *fmt_end = NULL;
 
     int optional = 0;
-    HPy_ssize_t i = 0;
+    size_t i = 0;
     HPy current_arg;
 
     fmt_end = parse_err_fmt(fmt, &err_fmt);

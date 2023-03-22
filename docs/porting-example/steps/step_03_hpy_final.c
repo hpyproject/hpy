@@ -84,7 +84,7 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
 
 // this is an HPy function that uses Point
 HPyDef_METH(dot, "dot", HPyFunc_VARARGS, .doc="Dot product.")
-HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+HPy dot_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     HPy point1, point2;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &point1, &point2))

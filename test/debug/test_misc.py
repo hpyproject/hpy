@@ -42,7 +42,7 @@ def test_use_invalid_as_struct(compiler, python_subprocess):
 def test_typecheck(compiler, python_subprocess):
     mod = compiler.compile_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             if (nargs != 2) {
                 HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
@@ -68,7 +68,7 @@ def test_type_getname(compiler, python_subprocess):
         #define MODE_READ_ONLY 0
         #define MODE_USE_AFTER_FREE 1
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             HPy type;
             int mode;
@@ -123,7 +123,7 @@ def test_type_getname(compiler, python_subprocess):
 def test_type_issubtype(compiler, python_subprocess):
     mod = compiler.compile_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             if (nargs != 2) {
                 HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
@@ -147,7 +147,7 @@ def test_type_issubtype(compiler, python_subprocess):
 def test_unicode_substring(compiler, python_subprocess):
     mod = compiler.compile_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             HPy_ssize_t start, end;
             if (nargs != 3) {

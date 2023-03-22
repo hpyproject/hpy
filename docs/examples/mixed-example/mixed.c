@@ -7,7 +7,7 @@
 
 /* a HPy style function */
 HPyDef_METH(add_ints, "add_ints", HPyFunc_VARARGS)
-static HPy add_ints_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+static HPy add_ints_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     long a, b;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &a, &b))

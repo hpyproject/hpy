@@ -1422,7 +1422,7 @@ class TestType(HPyTest):
 
             HPyDef_METH(create_type, "create_type", HPyFunc_VARARGS)
             static HPy create_type_impl(HPyContext *ctx, HPy module,
-                                            HPy *args, HPy_ssize_t nargs)
+                                            const HPy *args, size_t nargs)
             {
                 HPy metaclass;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "sO",
@@ -1556,7 +1556,7 @@ class TestType(HPyTest):
             }
 
             HPyDef_METH(issubtype, "issubtype", HPyFunc_VARARGS)
-            static HPy issubtype_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy issubtype_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 if (nargs != 2) {
                     HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");

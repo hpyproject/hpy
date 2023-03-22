@@ -59,7 +59,7 @@ class TestSlice(HPyTest):
     def test_adjust_indices(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy_ssize_t length, start, stop, step;
 

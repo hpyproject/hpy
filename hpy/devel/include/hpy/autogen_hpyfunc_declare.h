@@ -12,7 +12,7 @@
 
 #define _HPyFunc_DECLARE_HPyFunc_NOARGS(SYM) static HPy SYM(HPyContext *ctx, HPy self)
 #define _HPyFunc_DECLARE_HPyFunc_O(SYM) static HPy SYM(HPyContext *ctx, HPy self, HPy arg)
-#define _HPyFunc_DECLARE_HPyFunc_VARARGS(SYM) static HPy SYM(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+#define _HPyFunc_DECLARE_HPyFunc_VARARGS(SYM) static HPy SYM(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 #define _HPyFunc_DECLARE_HPyFunc_KEYWORDS(SYM) static HPy SYM(HPyContext *ctx, HPy self, const HPy *args, size_t nargs, HPy kwnames)
 #define _HPyFunc_DECLARE_HPyFunc_UNARYFUNC(SYM) static HPy SYM(HPyContext *ctx, HPy)
 #define _HPyFunc_DECLARE_HPyFunc_BINARYFUNC(SYM) static HPy SYM(HPyContext *ctx, HPy, HPy)
@@ -50,7 +50,7 @@
 
 typedef HPy (*HPyFunc_noargs)(HPyContext *ctx, HPy self);
 typedef HPy (*HPyFunc_o)(HPyContext *ctx, HPy self, HPy arg);
-typedef HPy (*HPyFunc_varargs)(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs);
+typedef HPy (*HPyFunc_varargs)(HPyContext *ctx, HPy self, const HPy *args, size_t nargs);
 typedef HPy (*HPyFunc_keywords)(HPyContext *ctx, HPy self, const HPy *args, size_t nargs, HPy kwnames);
 typedef HPy (*HPyFunc_unaryfunc)(HPyContext *ctx, HPy);
 typedef HPy (*HPyFunc_binaryfunc)(HPyContext *ctx, HPy, HPy);

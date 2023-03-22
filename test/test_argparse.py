@@ -31,7 +31,7 @@ class TestParseItem(HPyTest):
 
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {{
                 {type} a;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "{fmt}", &a))
@@ -300,7 +300,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {{
                 HPy a;
                 HPy b = HPy_NULL;
@@ -325,7 +325,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 long a, b, c, d, e;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "lllll",
@@ -343,7 +343,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
@@ -359,7 +359,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b, result;
                 HPyTracker ht;

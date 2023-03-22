@@ -1066,7 +1066,7 @@ int HPy_SetCallFunction(HPyContext *ctx, HPy h, HPyCallFunction *func);
 */
 typedef HPy (*HPyFunc_noargs)(HPyContext *ctx, HPy self);
 typedef HPy (*HPyFunc_o)(HPyContext *ctx, HPy self, HPy arg);
-typedef HPy (*HPyFunc_varargs)(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs);
+typedef HPy (*HPyFunc_varargs)(HPyContext *ctx, HPy self, const HPy *args, size_t nargs);
 typedef HPy (*HPyFunc_keywords)(HPyContext *ctx, HPy self, const HPy *args,
                                 size_t nargs, HPy kwnames);
 

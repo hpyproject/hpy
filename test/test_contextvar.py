@@ -20,7 +20,7 @@ class TestHPyContextVar(HPyTest):
             }
 
             HPyDef_METH(set_ctxv, "set_ctxv", HPyFunc_VARARGS)
-            static HPy set_ctxv_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy set_ctxv_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy obj, val;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &obj, &val))
@@ -28,7 +28,7 @@ class TestHPyContextVar(HPyTest):
                 return HPyContextVar_Set(ctx, obj, val);
             }
             HPyDef_METH(get_ctxv, "get_ctxv", HPyFunc_VARARGS)
-            static HPy get_ctxv_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy get_ctxv_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy obj, def=HPy_NULL, val;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "O|O", &obj, &def))
