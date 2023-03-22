@@ -93,8 +93,8 @@ class autogen_debug_wrappers(AutoGenFile):
         'HPyType_GetName',
         'HPyType_IsSubtype',
         'HPyUnicode_Substring',
-        'HPy_CallVectorDict',
-        'HPy_CallMethodVectorDict',
+        'HPy_Call',
+        'HPy_CallMethod',
     }
 
     def generate(self):

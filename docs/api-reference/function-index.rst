@@ -112,9 +112,9 @@ HPy Core API Function Index
 * :c:func:`HPy_And`
 * :c:func:`HPy_AsPyObject`
 * :c:func:`HPy_Bytes`
-* :c:func:`HPy_CallMethodVectorDict`
+* :c:func:`HPy_Call`
+* :c:func:`HPy_CallMethod`
 * :c:func:`HPy_CallTupleDict`
-* :c:func:`HPy_CallVectorDict`
 * :c:func:`HPy_Close`
 * :c:func:`HPy_Compile_s`
 * :c:func:`HPy_Contains`
