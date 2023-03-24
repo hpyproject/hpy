@@ -27,7 +27,7 @@ typedef enum {
      * ``HPyType_BuiltinShape_Legacy`` and to include ``PyObject_HEAD`` at the
      * start of its struct. It would be easy to relax this requirement on
      * CPython (where the ``PyObject_HEAD`` fields are always present) but a
-     * large burden on other implementations (e.g. PyPy, GraalPython) where a
+     * large burden on other implementations (e.g. PyPy, GraalPy) where a
      * struct starting with ``PyObject_HEAD`` might not exist.
      *
      * Types created via the old Python C API are automatically legacy types.
@@ -133,7 +133,7 @@ typedef struct {
      * ``HPyType_BuiltinShape_Legacy`` and to include ``PyObject_HEAD`` at the
      * start of its struct. It would be easy to relax this requirement on
      * CPython (where the ``PyObject_HEAD`` fields are always present) but a
-     * large burden on other implementations (e.g. PyPy, GraalPython) where a
+     * large burden on other implementations (e.g. PyPy, GraalPy) where a
      * struct starting with ``PyObject_HEAD`` might not exist.
      */
     void *legacy_slots;

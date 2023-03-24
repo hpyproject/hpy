@@ -23,7 +23,7 @@
 #  error "Cannot build hpy.universal on top of PyPy. PyPy comes with its own version of it"
 #endif
 #ifdef GRAALVM_PYTHON
-#  error "Cannot build hpy.universal on top of GraalPython. GraalPython comes with its own version of it"
+#  error "Cannot build hpy.universal on top of GraalPy. GraalPy comes with its own version of it"
 #endif
 
 static const char *hpy_mode_names[] = {
