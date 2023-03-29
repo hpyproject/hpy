@@ -240,7 +240,8 @@ HPyAPI_FUNC void* _HPy_AsStruct_Object(HPyContext *ctx, HPy h)
 
 HPyAPI_FUNC void* _HPy_AsStruct_Legacy(HPyContext *ctx, HPy h)
 {
-    return ctx_AsStruct_Legacy(ctx, h);
+    //return ctx_AsStruct_Legacy(ctx, h);
+    return (void *)_h2py(h);
 }
 
 HPyAPI_FUNC void* _HPy_AsStruct_Type(HPyContext *ctx, HPy h)
