@@ -592,4 +592,11 @@ HPyAPI_FUNC HPy HPyDict_GetItem(HPyContext *ctx, HPy op, HPy key) {
     return ctx_Dict_GetItem(ctx, op, key);
 }
 
+HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj)
+{
+    PyObject *v = (PyObject *)Py_TYPE(_h2py(obj));
+    Py_INCREF(v);
+    return _py2h(v);
+}
+
 #endif /* !HPY_CPYTHON_MISC_H */

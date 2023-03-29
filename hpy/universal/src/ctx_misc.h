@@ -16,5 +16,6 @@ HPyAPI_IMPL void ctx_Global_Store(HPyContext *ctx, HPyGlobal *global, HPy h);
 HPyAPI_IMPL HPy ctx_Global_Load(HPyContext *ctx, HPyGlobal global);
 HPyAPI_IMPL void ctx_FatalError(HPyContext *ctx, const char *message);
 HPyAPI_IMPL int ctx_Type_IsSubtype(HPyContext *ctx, HPy sub, HPy type);
+HPyAPI_IMPL HPy ctx_Type(HPyContext *ctx, HPy obj);
 
 #endif /* HPY_CTX_MISC_H */

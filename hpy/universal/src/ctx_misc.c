@@ -81,3 +81,11 @@ ctx_Type_IsSubtype(HPyContext *ctx, HPy sub, HPy type)
     return PyType_IsSubtype((PyTypeObject *)_h2py(sub),
             (PyTypeObject *)_h2py(type));
 }
+
+HPyAPI_IMPL HPy
+ctx_Type(HPyContext *ctx, HPy obj)
+{
+    PyObject *v = (PyObject *)Py_TYPE(_h2py(obj));
+    Py_INCREF(v);
+    return _py2h(v);
+}

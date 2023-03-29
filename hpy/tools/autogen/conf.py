@@ -117,7 +117,7 @@ SPECIAL_CASES = {
     'HPyTracker_ForgetAll': None,
     'HPyTracker_Close': None,
     '_HPy_Dump': None,
-    'HPy_Type': 'PyObject_Type',
+    'HPy_Type': None,
     'HPy_TypeCheck': None,
     'HPy_TypeCheck_g': None,
     'HPy_Is': None,

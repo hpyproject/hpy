@@ -359,11 +359,6 @@ HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key)
     return PyObject_DelItem(_h2py(obj), _h2py(key));
 }
 
-HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj)
-{
-    return _py2h(PyObject_Type(_h2py(obj)));
-}
-
 HPyAPI_FUNC int HPy_SetType(HPyContext *ctx, HPy obj, HPy type)
 {
         assert(PyType_Check(_h2py(type)));
