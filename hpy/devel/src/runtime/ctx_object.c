@@ -23,7 +23,25 @@ ctx_Dump(HPyContext *ctx, HPy h)
 _HPy_HIDDEN int
 ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 {
-    return PyObject_TypeCheck(_h2py(h_obj), (PyTypeObject*)_h2py(h_type));
+    PyTypeObject *tp = (PyTypeObject*)_h2py(h_type);
+    PyObject *obj = _h2py(h_obj);
+    if (tp == &PyLong_Type)
+        return PyLong_Check(obj);
+    else if (tp == &PyType_Type)
+        return PyType_Check(obj);
+    return PyObject_TypeCheck(obj, tp);
+}
+
+_HPy_HIDDEN int
+ctx_TypeCheck_g(HPyContext *ctx, HPy h_obj, HPyGlobal hg_type)
+{
+    PyTypeObject *tp = (PyTypeObject*)_hg2py(hg_type);
+    PyObject *obj = _h2py(h_obj);
+    if (tp == &PyLong_Type)
+        return PyLong_Check(obj);
+    else if (tp == &PyType_Type)
+        return PyType_Check(obj);
+    return PyObject_TypeCheck(obj, tp);
 }
 
 _HPy_HIDDEN int

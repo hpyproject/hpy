@@ -410,6 +410,8 @@ HPy HPy_Type(HPyContext *ctx, HPy obj);
  */
 HPy_ID(166)
 int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type);
+HPy_ID(269)
+int HPy_TypeCheck_g(HPyContext *ctx, HPy obj, HPyGlobal type);
 HPy_ID(264)
 int HPy_SetType(HPyContext *ctx, HPy obj, HPy type);
 

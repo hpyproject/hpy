@@ -283,4 +283,5 @@ struct _HPyContext_s {
     HPy (*ctx_MaybeGetAttr_s)(HPyContext *ctx, HPy obj, const char *name);
     HPy (*ctx_SeqIter_New)(HPyContext *ctx, HPy seq);
     int (*ctx_Sequence_Check)(HPyContext *ctx, HPy h);
+    int (*ctx_TypeCheck_g)(HPyContext *ctx, HPy obj, HPyGlobal type);
 };

@@ -182,4 +182,5 @@ HPy Core API Function Index
 * :c:func:`HPy_TrueDivide`
 * :c:func:`HPy_Type`
 * :c:func:`HPy_TypeCheck`
+* :c:func:`HPy_TypeCheck_g`
 * :c:func:`HPy_Xor`

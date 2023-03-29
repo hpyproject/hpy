@@ -35,6 +35,7 @@ _HPy_HIDDEN HPy ctx_Module_Create(HPyContext *ctx, HPyModuleDef *hpydef);
 // ctx_object.c
 _HPy_HIDDEN void ctx_Dump(HPyContext *ctx, HPy h);
 _HPy_HIDDEN int ctx_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type);
+_HPy_HIDDEN int ctx_TypeCheck_g(HPyContext *ctx, HPy h_obj, HPyGlobal hg_type);
 _HPy_HIDDEN int ctx_Type_IsSubtype(HPyContext *ctx, HPy h_sub, HPy h_type);
 _HPy_HIDDEN int ctx_Is(HPyContext *ctx, HPy h_obj, HPy h_other);
 _HPy_HIDDEN HPy ctx_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);

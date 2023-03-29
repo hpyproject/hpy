@@ -1133,6 +1133,18 @@ DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj)
     return DHPy_open(dctx, universal_result);
 }
 
+int debug_ctx_TypeCheck_g(HPyContext *dctx, DHPy obj, HPyGlobal type)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPy_TypeCheck_g(get_info(dctx)->uctx, dh_obj, type);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
 int debug_ctx_SetType(HPyContext *dctx, DHPy obj, DHPy type)
 {
     if (!get_ctx_info(dctx)->is_valid) {

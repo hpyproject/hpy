@@ -303,7 +303,25 @@ HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h)
 
 HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 {
-    return ctx_TypeCheck(ctx, h_obj, h_type);
+    PyTypeObject *tp = (PyTypeObject*)_h2py(h_type);
+    PyObject *obj = _h2py(h_obj);
+    // dict, list, long, tuple, type, base exc, unicode, bytes
+    if (tp == &PyLong_Type)
+        return PyLong_Check(obj);
+    else if (tp == &PyType_Type)
+        return PyType_Check(obj);
+    return PyObject_TypeCheck(obj, tp);
+}
+
+HPyAPI_FUNC int HPy_TypeCheck_g(HPyContext *ctx, HPy h_obj, HPyGlobal hg_type)
+{
+    PyTypeObject *tp = (PyTypeObject*)_hg2py(hg_type);
+    PyObject *obj = _h2py(h_obj);
+    if (tp == &PyLong_Type)
+        return PyLong_Check(obj);
+    else if (tp == &PyType_Type)
+        return PyType_Check(obj);
+    return PyObject_TypeCheck(obj, tp);
 }
 
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)

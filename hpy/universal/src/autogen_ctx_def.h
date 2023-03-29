@@ -112,6 +112,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_DelItem_s = &ctx_DelItem_s,
     .ctx_Type = &ctx_Type,
     .ctx_TypeCheck = &ctx_TypeCheck,
+    .ctx_TypeCheck_g = &ctx_TypeCheck_g,
     .ctx_SetType = &ctx_SetType,
     .ctx_Type_GetName = &ctx_Type_GetName,
     .ctx_Type_IsSubtype = &ctx_Type_IsSubtype,

@@ -394,6 +394,10 @@ HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy obj, HPy type) {
      return ctx->ctx_TypeCheck ( ctx, obj, type ); 
 }
 
+HPyAPI_FUNC int HPy_TypeCheck_g(HPyContext *ctx, HPy obj, HPyGlobal type) {
+     return ctx->ctx_TypeCheck_g ( ctx, obj, type ); 
+}
+
 HPyAPI_FUNC int HPy_SetType(HPyContext *ctx, HPy obj, HPy type) {
      return ctx->ctx_SetType ( ctx, obj, type ); 
 }

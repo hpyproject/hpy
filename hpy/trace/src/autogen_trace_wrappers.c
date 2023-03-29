@@ -1253,6 +1253,19 @@ int trace_ctx_TypeCheck(HPyContext *tctx, HPy obj, HPy type)
     return res;
 }
 
+int trace_ctx_TypeCheck_g(HPyContext *tctx, HPy obj, HPyGlobal type)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 269);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    int res = HPy_TypeCheck_g(uctx, obj, type);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 269, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 int trace_ctx_SetType(HPyContext *tctx, HPy obj, HPy type)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 264);
