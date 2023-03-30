@@ -9,7 +9,7 @@ class TestCPythonCompatibility(HPyTest):
     # check e.g. after an HPy_Dup the refcnt is += 1. However, on PyPy they
     # are implemented in a completely different way which is unrelated to the
     # refcnt (this is the whole point of HPy, after all :)). So in many of the
-    # following ttests, checking the actual result of the function doesn't
+    # following tests, checking the actual result of the function doesn't
     # really make sens on PyPy. We still run the functions to ensure they do
     # not crash, though.
 

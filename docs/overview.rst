@@ -29,7 +29,7 @@ which makes as few assumptions as possible about the design decisions of any
 implementation of Python, allowing diverse implementations to support it
 efficiently and without compromise**. In particular, **reference counting is not
 part of the API**: we want a more generic way of managing resources that is
-possible to impelement with different strategies, including the existing
+possible to implement with different strategies, including the existing
 reference counting and/or with a moving *Garbage Collector* (like the ones used
 by PyPy, GraalPy or Java, for example). Moreover, each implementation can
 experiment with new memory layout of objects, add optimizations, etc. The

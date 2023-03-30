@@ -32,7 +32,7 @@ for more details on HPy motivation, goals, and features, for example:
 
   - debug mode for better developer experience
   - support for incremental porting from CPython API to HPy
-  - CPython ABI for raw peformance on CPython
+  - CPython ABI for raw performance on CPython
   - and others
 
 Do you want to see how HPy API looks in code? Check out

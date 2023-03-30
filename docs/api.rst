@@ -95,7 +95,7 @@ close a handle twice and that you don't forget to close any.
   identify the precise code locations which created and closed it. This is
   possible because handles are associated with a single call to a C/API
   function. As a result, given a handle that is leaked or used after freeing,
-  it is possible to identify exactly the C/API function that producted it.
+  it is possible to identify exactly the C/API function that produced it.
 
 
 Remember that ``Python.h`` guarantees that multiple references to the same
@@ -182,7 +182,7 @@ There are a couple of points which are worth noting:
     module.
 
   * The actual C function which implements ``myabs`` is called ``myabs_impl``
-    and is infered by the macro. The macro takes the name and adds ``_impl``
+    and is inferred by the macro. The macro takes the name and adds ``_impl``
     to the end of it.
 
   * It uses the ``HPyFunc_O`` calling convention. Like ``METH_O`` in ``Python.h``,

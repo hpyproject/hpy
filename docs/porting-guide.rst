@@ -368,7 +368,7 @@ fill the empty object using ``PyList_SetItem / PyList_SET_ITEM`` or
 
 This is in particular problematic for tuples because they are actually
 immutable. HPy goes a different way and provides a dedicated *builder* API to
-avoid the (temporary) inconsitent state during object initialization.
+avoid the (temporary) inconsistent state during object initialization.
 
 Long story short, doing the same in HPy with builders is still very simple and
 straight forward. Following an example for creating a list:

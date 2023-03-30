@@ -28,7 +28,7 @@ if sys.implementation.name != 'cpython':
         # this seems to be a python which does not support hpy
         msg += 'This python implementation does not seem to support hpy:\n'
         msg += '(built-in module _hpy_universal not found).\n'
-        msg += 'Please contact your vendor for more informations.'
+        msg += 'Please contact your vendor for more information.'
     sys.exit(msg)
 
 
