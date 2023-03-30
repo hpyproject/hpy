@@ -7,7 +7,7 @@ import sys
 import pytest
 from .support import HPyTest, make_hpy_abi_fixture, ONLY_LINUX
 
-# this is not strictly correct, we should check whether the actualy compiler
+# this is not strictly correct, we should check whether the actual compiler
 # is GCC. But for the CI and most cases, it's enough to assume that if we are
 # on linux we are using GCC.
 #

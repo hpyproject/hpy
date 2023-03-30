@@ -355,7 +355,7 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
 
 
 HPyDef_METH(DebugHandle__force_close, "_force_close",
-            HPyFunc_NOARGS, .doc="Close the underyling handle. FOR TESTS ONLY.")
+            HPyFunc_NOARGS, .doc="Close the underlying handle. FOR TESTS ONLY.")
 static UHPy DebugHandle__force_close_impl(HPyContext *uctx, UHPy self)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);

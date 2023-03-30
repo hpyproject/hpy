@@ -13,7 +13,7 @@
    for HPy, so uctx contains the logic to call HPy functions from CPython, by
    using _HPy_CallRealFunctionFromTrampoline.
 
-   uctx->ctx_CallRealFunctionFromTrampoline convers PyObject* into UHPy. So
+   uctx->ctx_CallRealFunctionFromTrampoline converts PyObject* into UHPy. So
    for the debug mode we need to:
 
        1. convert the PyObject* args into UHPys.
