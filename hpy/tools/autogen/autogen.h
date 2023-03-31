@@ -35,5 +35,6 @@ typedef int int64_t;
 typedef int uint64_t;
 typedef int bool;
 typedef int HPy_SourceKind;
+typedef int HPyCallFunction;
 
 #include "public_api.h"

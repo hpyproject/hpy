@@ -76,6 +76,11 @@ typedef enum {
 } HPyType_BuiltinShape;
 
 typedef struct {
+    cpy_vectorcallfunc cpy_trampoline;
+    HPyCallFunction impl;
+} HPyType_Vectorcall;
+
+typedef struct {
     /** The Python name of type (UTF-8 encoded) */
     const char* name;
 
@@ -182,6 +187,12 @@ typedef struct {
 
 /** Default type flags for HPy types. */
 #define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
+
+/** Set if the type implements the vectorcall protocol (PEP 590) */
+#define HPy_TPFLAGS_HAVE_VECTORCALL (1UL << 11)
+
+/** Set if the type allows subclassing */
+#define HPy_TPFLAGS_BASETYPE (1UL << 10)
 
 /** Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)

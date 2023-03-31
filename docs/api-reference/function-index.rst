@@ -165,6 +165,7 @@ HPy Core API Function Index
 * :c:func:`HPy_Rshift`
 * :c:func:`HPy_SetAttr`
 * :c:func:`HPy_SetAttr_s`
+* :c:func:`HPy_SetCallFunction`
 * :c:func:`HPy_SetItem`
 * :c:func:`HPy_SetItem_i`
 * :c:func:`HPy_SetItem_s`

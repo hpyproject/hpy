@@ -231,6 +231,32 @@ class TestLegacyType(_TestType):
         mod.set_member(d)
         assert d.member == 123614
 
+    def test_call_zero_basicsize(self):
+        import pytest
+        # type 'Dummy' has basicsize == 0; we cannot use the HPy call protocol
+        # with legacy types that inherit their struct since we then don't know
+        # how to safely allocate the hidden field
+        with pytest.raises(TypeError):
+            self.make_module("""
+                HPyDef_SLOT(Dummy_call, HPy_tp_call)
+                static HPy
+                Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args,
+                                size_t nargs, HPy kwnames)
+                {
+                    return HPyUnicode_FromString(ctx, "hello");
+                }
+
+                static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
+                static HPyType_Spec Dummy_spec = {
+                    .name = "mytest.Dummy",
+                    @DEFAULT_SHAPE
+                    .defines = Dummy_defines,
+                };
+
+                @EXPORT_TYPE("Dummy", Dummy_spec)
+                @INIT
+            """)
+
 class TestCustomLegacyFeatures(HPyTest):
 
     def test_legacy_methods(self):

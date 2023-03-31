@@ -324,7 +324,7 @@ HPy_ID(150)
 HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec,
                      HPyType_SpecParam *params);
 HPy_ID(151)
-HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
+HPy HPyType_GenericNew(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw);
 
 HPy_ID(152)
 HPy HPy_GetAttr(HPyContext *ctx, HPy obj, HPy name);
@@ -1026,6 +1026,36 @@ int32_t HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy default_value, H
 HPy_ID(252)
 HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 
+/**
+ * Set the call function for the given object.
+ *
+ * By defining slot ``HPy_tp_call`` for some type, instances of this type will
+ * be callable objects. The specified call function will be used by default for
+ * every instance. This should account for the most common case (every instance
+ * of an object uses the same call function) but to still provide the necessary
+ * flexibility, function ``HPy_SetCallFunction`` allows to set different (maybe
+ * specialized) call functions for each instance. This must be done in the
+ * constructor of an object.
+ *
+ * A more detailed description on how to use that function can be found in
+ * section :ref:`porting-guide:calling protocol`.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A handle to an object implementing the call protocol, i.e., the object's
+ *     type must have slot ``HPy_tp_call``. Otherwise, a ``TypeError`` will be
+ *     raised. This argument must not be ``HPy_NULL``.
+ * :param def:
+ *     A pointer to the call function definition to set (must not be
+ *     ``NULL``). The definition is usually created using
+ *     :c:macro:`HPyDef_CALL_FUNCTION`
+ *
+ * :returns:
+ *     ``0`` in case of success and ``-1`` in case of an error.
+ */
+HPy_ID(260)
+int HPy_SetCallFunction(HPyContext *ctx, HPy h, HPyCallFunction *func);
 
 /* *******
    hpyfunc
@@ -1036,9 +1066,9 @@ HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value);
 */
 typedef HPy (*HPyFunc_noargs)(HPyContext *ctx, HPy self);
 typedef HPy (*HPyFunc_o)(HPyContext *ctx, HPy self, HPy arg);
-typedef HPy (*HPyFunc_varargs)(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs);
-typedef HPy (*HPyFunc_keywords)(HPyContext *ctx, HPy self,
-                                HPy *args, HPy_ssize_t nargs, HPy kw);
+typedef HPy (*HPyFunc_varargs)(HPyContext *ctx, HPy self, const HPy *args, size_t nargs);
+typedef HPy (*HPyFunc_keywords)(HPyContext *ctx, HPy self, const HPy *args,
+                                size_t nargs, HPy kwnames);
 
 typedef HPy (*HPyFunc_unaryfunc)(HPyContext *ctx, HPy);
 typedef HPy (*HPyFunc_binaryfunc)(HPyContext *ctx, HPy, HPy);
@@ -1063,7 +1093,9 @@ typedef HPy (*HPyFunc_iternextfunc)(HPyContext *ctx, HPy);
 typedef HPy (*HPyFunc_descrgetfunc)(HPyContext *ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_descrsetfunc)(HPyContext *ctx, HPy, HPy, HPy);
 typedef int (*HPyFunc_initproc)(HPyContext *ctx, HPy self,
-                                HPy *args, HPy_ssize_t nargs, HPy kw);
+                                const HPy *args, HPy_ssize_t nargs, HPy kw);
+typedef HPy (*HPyFunc_newfunc)(HPyContext *ctx, HPy type, const HPy *args,
+                               HPy_ssize_t nargs, HPy kw);
 typedef HPy (*HPyFunc_getter)(HPyContext *ctx, HPy, void *);
 typedef int (*HPyFunc_setter)(HPyContext *ctx, HPy, HPy, void *);
 typedef int (*HPyFunc_objobjproc)(HPyContext *ctx, HPy, HPy);
@@ -1142,7 +1174,7 @@ typedef enum {
     //HPy_tp_alloc = SLOT(47, HPyFunc_X),      NOT SUPPORTED
     //HPy_tp_base = SLOT(48, HPyFunc_X),
     //HPy_tp_bases = SLOT(49, HPyFunc_X),
-    //HPy_tp_call = SLOT(50, HPyFunc_X),
+    HPy_tp_call = SLOT(50, HPyFunc_KEYWORDS),
     //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
@@ -1157,7 +1189,7 @@ typedef enum {
     //HPy_tp_iter = SLOT(62, HPyFunc_X),
     //HPy_tp_iternext = SLOT(63, HPyFunc_X),
     //HPy_tp_methods = SLOT(64, HPyFunc_X),    NOT SUPPORTED
-    HPy_tp_new = SLOT(65, HPyFunc_KEYWORDS),
+    HPy_tp_new = SLOT(65, HPyFunc_NEWFUNC),
     HPy_tp_repr = SLOT(66, HPyFunc_REPRFUNC),
     HPy_tp_richcompare = SLOT(67, HPyFunc_RICHCMPFUNC),
     //HPy_tp_setattr = SLOT(68, HPyFunc_X),

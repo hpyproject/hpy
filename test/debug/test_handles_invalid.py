@@ -75,7 +75,7 @@ def test_cant_use_closed_handle(compiler, hpy_debug_capture):
         }
 
         HPyDef_METH(f_varargs, "f_varargs", HPyFunc_VARARGS, .doc="returns arg w/o dupping it")
-        static HPy f_varargs_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_varargs_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             // should be: return HPy_Dup(ctx, args[0]);
             return args[0];

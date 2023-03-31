@@ -14,7 +14,7 @@ class TestHPyTracker(HPyTest):
         return self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {{
                 HPyTracker ht;
                 HPy result = HPy_NULL;
@@ -64,7 +64,7 @@ class TestHPyTracker(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(squares, "squares", HPyFunc_VARARGS)
             static HPy squares_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 long i, n;
                 long n_err = -1; // simulate an error at the given index

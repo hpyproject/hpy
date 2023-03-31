@@ -14,7 +14,7 @@ class TestSlots(HPyTest):
             HPyDef_SLOT_IMPL(Point_new, HPyType_GenericNew, HPy_tp_new)
 
             HPyDef_SLOT(Point_init, HPy_tp_init)
-            static int Point_init_impl(HPyContext *ctx, HPy self, HPy *args,
+            static int Point_init_impl(HPyContext *ctx, HPy self, const HPy *args,
                                        HPy_ssize_t nargs, HPy kw)
             {
                 long x, y;

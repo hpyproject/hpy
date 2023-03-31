@@ -325,7 +325,7 @@ that implements the dot product between two points:
 
 The changes are similar to those used in porting the ``norm`` method, except:
 
-- We use ``HPyArg_Parse`` instead of ``HPyArg_ParseKeywords``.
+- We use ``HPyArg_Parse`` instead of ``HPyArg_ParseKeywordsDict``.
 
 - We opted not to use an ``HPyTracker`` by passing ``NULL`` as the pointer to the
   tracker when calling ``HPyArg_Parse``. There is no reason not to use a

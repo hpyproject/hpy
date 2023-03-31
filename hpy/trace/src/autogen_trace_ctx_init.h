@@ -83,7 +83,7 @@ int trace_ctx_Err_WarnEx(HPyContext *tctx, HPy category, const char *utf8_messag
 void trace_ctx_Err_WriteUnraisable(HPyContext *tctx, HPy obj);
 int trace_ctx_IsTrue(HPyContext *tctx, HPy h);
 HPy trace_ctx_Type_FromSpec(HPyContext *tctx, HPyType_Spec *spec, HPyType_SpecParam *params);
-HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw);
+HPy trace_ctx_Type_GenericNew(HPyContext *tctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw);
 HPy trace_ctx_GetAttr(HPyContext *tctx, HPy obj, HPy name);
 HPy trace_ctx_GetAttr_s(HPyContext *tctx, HPy obj, const char *utf8_name);
 int trace_ctx_HasAttr(HPyContext *tctx, HPy obj, HPy name);
@@ -185,13 +185,14 @@ HPy trace_ctx_EvalCode(HPyContext *tctx, HPy code, HPy globals, HPy locals);
 HPy trace_ctx_ContextVar_New(HPyContext *tctx, const char *name, HPy default_value);
 int32_t trace_ctx_ContextVar_Get(HPyContext *tctx, HPy context_var, HPy default_value, HPy *result);
 HPy trace_ctx_ContextVar_Set(HPyContext *tctx, HPy context_var, HPy value);
+int trace_ctx_SetCallFunction(HPyContext *tctx, HPy h, HPyCallFunction *func);
 
 static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(260, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(260, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(261, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(261, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -467,4 +468,5 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_ContextVar_New = &trace_ctx_ContextVar_New;
     tctx->ctx_ContextVar_Get = &trace_ctx_ContextVar_Get;
     tctx->ctx_ContextVar_Set = &trace_ctx_ContextVar_Set;
+    tctx->ctx_SetCallFunction = &trace_ctx_SetCallFunction;
 }
