@@ -11,7 +11,7 @@ HPyType_HELPERS(EuclideanVectorObject)
 // BEGIN HPy_tp_call
 HPyDef_SLOT(call, HPy_tp_call)
 static HPy
-call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
+call_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs,
           HPy kwnames)
 {
     static const char *keywords[] = { "x1", "y1", NULL };
@@ -21,7 +21,7 @@ call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
                 &x1, &y1)) {
         return HPy_NULL;
     }
-    EuclideanVectorObject *data = EuclideanVectorObject_AsStruct(ctx, callable);
+    EuclideanVectorObject *data = EuclideanVectorObject_AsStruct(ctx, self);
     return HPyLong_FromLong(ctx, data->x * x1 + data->y * y1);
 }
 // END HPy_tp_call
@@ -29,10 +29,10 @@ call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
 // BEGIN HPy_SetCallFunction
 HPyDef_CALL_FUNCTION(special_call)
 static HPy
-special_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
+special_call_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs,
                   HPy kwnames)
 {
-    HPy tmp = call_impl(ctx, callable, args, nargs, kwnames);
+    HPy tmp = call_impl(ctx, self, args, nargs, kwnames);
     HPy res = HPy_Negative(ctx, tmp);
     HPy_Close(ctx, tmp);
     return res;
@@ -84,7 +84,7 @@ HPyDef_MEMBER(Foo_call_func_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET,
 
 HPyDef_CALL_FUNCTION(Foo_call_func)
 static HPy
-Foo_call_func_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
+Foo_call_func_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs,
                    HPy kwnames)
 {
     return HPyUnicode_FromString(ctx,
@@ -107,7 +107,7 @@ static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
 // BEGIN pack_args
 // function using legacy 'tp_call' calling convention
 static HPy
-Pack_call_legacy(HPyContext *ctx, HPy callable, HPy args, HPy kwd)
+Pack_call_legacy(HPyContext *ctx, HPy self, HPy args, HPy kwd)
 {
     // use 'args' and 'kwd'
     return HPy_Dup(ctx, ctx->h_None);
@@ -116,7 +116,7 @@ Pack_call_legacy(HPyContext *ctx, HPy callable, HPy args, HPy kwd)
 // function using HPy calling convention
 HPyDef_SLOT(Pack_call, HPy_tp_call)
 static HPy
-Pack_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
+Pack_call_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs,
           HPy kwnames)
 {
     HPy args_tuple, kwd;
@@ -125,7 +125,7 @@ Pack_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs,
              &args_tuple, &kwd)) {
         return HPy_NULL;
     }
-    result = Pack_call_legacy(ctx, callable, args_tuple, kwd);
+    result = Pack_call_legacy(ctx, self, args_tuple, kwd);
     HPy_Close(ctx, args_tuple);
     HPy_Close(ctx, kwd);
     return result;
