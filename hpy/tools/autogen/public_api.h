@@ -233,10 +233,76 @@ HPy HPy_InPlaceOr(HPyContext *ctx, HPy h1, HPy h2);
 
 HPy_ID(134)
 int HPyCallable_Check(HPyContext *ctx, HPy h);
+
+/**
+ * Call a Python object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param callable:
+ *     A handle to the Python object to call (must not be ``HPy_NULL``).
+ * :param args:
+ *     A handle to a tuple containing the positional arguments (must not be
+ *     ``HPy_NULL`` but can, of course, be empty).
+ * :param kw:
+ *     A handle to a Python dictionary containing the keyword arguments (may be
+ *     ``HPy_NULL``).
+ *
+ * :returns:
+ *     The result of the call on success, or ``HPy_NULL`` in case of an error.
+ */
 HPy_ID(135)
 HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw);
+
+/**
+ * Call a Python object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param callable:
+ *     A handle to the Python object to call (must not be ``HPy_NULL``).
+ * :param args:
+ *     A pointer to an array of positional and keyword arguments. This argument
+ *     must not be ``NULL`` if ``nargs > 0`` or
+ *     ``HPy_Length(ctx, kwnames) > 0``.
+ * :param nargs:
+ *     The number of positional arguments in ``args``.
+ * :param kwnames:
+ *     A handle to the tuple of keyword argument names (may be ``HPy_NULL``).
+ *     The values of the keyword arguments are also passed in ``args`` appended
+ *     to the positional arguments. Argument ``nargs`` does not include the
+ *     keyword argument count.
+ *
+ * :returns:
+ *     The result of the call on success, or ``HPy_NULL`` in case of an error.
+ */
 HPy_ID(261)
 HPy HPy_Call(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames);
+
+/**
+ * Call a method of a Python object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param name:
+ *     A handle to the name (a Unicode object) of the method. Must not be
+ *     ``HPy_NULL``.
+ * :param args:
+ *     A pointer to an array of the arguments. The receiver is ``args[0]``, and
+ *     the positional and keyword arguments are starting at ``args[1]``. This
+ *     argument must not be ``NULL`` since a receiver is always required.
+ * :param nargs:
+ *     The number of positional arguments in ``args`` including the receiver at
+ *     ``args[0]`` (therefore, ``nargs`` must be at least ``1``).
+ * :param kwnames:
+ *     A handle to the tuple of keyword argument names (may be ``HPy_NULL``).
+ *     The values of the keyword arguments are also passed in ``args`` appended
+ *     to the positional arguments. Argument ``nargs`` does not include the
+ *     keyword argument count.
+ *
+ * :returns:
+ *     The result of the call on success, or ``HPy_NULL`` in case of an error.
+ */
 HPy_ID(262)
 HPy HPy_CallMethod(HPyContext *ctx, HPy name, const HPy *args, size_t nargs, HPy kwnames);
 

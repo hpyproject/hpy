@@ -28,6 +28,7 @@ between the modes.
    hpy-ctx
    hpy-object
    hpy-type
+   hpy-call
    hpy-field
    hpy-global
    hpy-gil
