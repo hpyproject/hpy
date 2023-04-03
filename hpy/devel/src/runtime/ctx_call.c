@@ -51,6 +51,7 @@ ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h
         n_all_args = nargs;
     } else {
         kwnames = _h2py(h_kwnames);
+        assert(kwnames != NULL);
         assert(PyTuple_Check(kwnames));
         n_all_args = nargs + PyTuple_GET_SIZE(kwnames);
         assert(n_all_args >= nargs);
@@ -80,6 +81,7 @@ ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs, HPy
         n_all_args = nargs;
     } else {
         kwnames = _h2py(h_kwnames);
+        assert(kwnames != NULL);
         assert(PyTuple_Check(kwnames));
         n_all_args = nargs + PyTuple_GET_SIZE(kwnames);
         assert(n_all_args >= nargs);
