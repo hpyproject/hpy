@@ -99,7 +99,7 @@ ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs, HPy
     PyObject *method = PyObject_GetAttr(args[0], _h2py(h_name));
     if (method == NULL)
         return HPy_NULL;
-    result = _PyObject_Vectorcall(method, args, nargs, NULL);
+    result = _PyObject_Vectorcall(method, &args[1], nargs-1, kwnames);
     Py_DECREF(method);
 #else
     result = PyObject_VectorcallMethod(_h2py(h_name), args, nargs, kwnames);
