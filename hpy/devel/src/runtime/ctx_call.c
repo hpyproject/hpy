@@ -40,10 +40,14 @@ ctx_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
     return _py2h(obj);
 }
 
+#if PY_VERSION_HEX < 0x03090000
+#define PyObject_Vectorcall _PyObject_Vectorcall
+#endif
+
 _HPy_HIDDEN HPy
 ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h_kwnames)
 {
-    PyObject *result, *kwnames;
+    PyObject *kwnames;
     size_t n_all_args;
 
     if (HPy_IsNull(h_kwnames)) {
@@ -62,13 +66,12 @@ ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h
         args[i] = _h2py(h_args[i]);
     }
 
-#if PY_VERSION_HEX < 0x03090000
-    result = _PyObject_Vectorcall(_h2py(callable), args, nargs, kwnames);
-#else
-    result = PyObject_Vectorcall(_h2py(h_callable), args, nargs, kwnames);
-#endif
-    return _py2h(result);
+    return _py2h(PyObject_Vectorcall(_h2py(h_callable), args, nargs, kwnames));
 }
+
+#if PY_VERSION_HEX < 0x03090000
+#undef PyObject_Vectorcall
+#endif
 
 _HPy_HIDDEN HPy
 ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs, HPy h_kwnames)

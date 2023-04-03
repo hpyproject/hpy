@@ -276,6 +276,10 @@ HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy k
     return ctx_CallTupleDict(ctx, callable, args, kw);
 }
 
+#if PY_VERSION_HEX < 0x03090000
+#define PyObject_Vectorcall _PyObject_Vectorcall
+#endif
+
 HPyAPI_FUNC HPy HPy_Call(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
 {
     if (sizeof(HPy) == sizeof(PyObject *)) {
@@ -283,6 +287,10 @@ HPyAPI_FUNC HPy HPy_Call(HPyContext *ctx, HPy callable, const HPy *args, size_t 
     }
     return ctx_Call(ctx, callable, args, nargs, kwnames);
 }
+
+#if PY_VERSION_HEX < 0x03090000
+#undef PyObject_Vectorcall
+#endif
 
 HPyAPI_FUNC HPy HPy_CallMethod(HPyContext *ctx, HPy name, const HPy *args, size_t nargs, HPy kwnames)
 {
