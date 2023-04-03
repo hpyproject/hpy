@@ -61,12 +61,16 @@ ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h
         assert(n_all_args >= nargs);
     }
 
-    PyObject **args = (PyObject **) alloca(n_all_args * sizeof(PyObject *));
+    /* Since we already allocate a fresh args array, we make it one element
+       larger and set PY_VECTORCALL_ARGUMENTS_OFFSET to avoid further
+       allocations from CPython. */
+    PyObject **args = (PyObject **) alloca((n_all_args + 1) * sizeof(PyObject *));
     for (size_t i = 0; i < n_all_args; i++) {
-        args[i] = _h2py(h_args[i]);
+        args[i+1] = _h2py(h_args[i]);
     }
 
-    return _py2h(PyObject_Vectorcall(_h2py(h_callable), args, nargs, kwnames));
+    return _py2h(PyObject_Vectorcall(_h2py(h_callable), args+1,
+            nargs | PY_VECTORCALL_ARGUMENTS_OFFSET, kwnames));
 }
 
 #if PY_VERSION_HEX < 0x03090000
@@ -74,7 +78,8 @@ ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h
 #endif
 
 _HPy_HIDDEN HPy
-ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs, HPy h_kwnames)
+ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs,
+               HPy h_kwnames)
 {
     PyObject *result, *kwnames;
     size_t n_all_args;
@@ -90,19 +95,25 @@ ctx_CallMethod(HPyContext *ctx, HPy h_name, const HPy *h_args, size_t nargs, HPy
         assert(n_all_args >= nargs);
     }
 
-    PyObject **args = (PyObject **) alloca(n_all_args * sizeof(PyObject *));
+    /* Since we already allocate a fresh args array, we make it one element
+       larger and set PY_VECTORCALL_ARGUMENTS_OFFSET to avoid further
+       allocations from CPython. */
+    PyObject **args = (PyObject **) alloca(
+                          (n_all_args + 1) * sizeof(PyObject *));
     for (size_t i = 0; i < n_all_args; i++) {
-        args[i] = _h2py(h_args[i]);
+        args[i+1] = _h2py(h_args[i]);
     }
 
 #if PY_VERSION_HEX < 0x03090000
-    PyObject *method = PyObject_GetAttr(args[0], _h2py(h_name));
+    PyObject *method = PyObject_GetAttr(args[1], _h2py(h_name));
     if (method == NULL)
         return HPy_NULL;
-    result = _PyObject_Vectorcall(method, &args[1], nargs-1, kwnames);
+    result = _PyObject_Vectorcall(method, &args[2],
+                 (nargs-1) | PY_VECTORCALL_ARGUMENTS_OFFSET, kwnames);
     Py_DECREF(method);
 #else
-    result = PyObject_VectorcallMethod(_h2py(h_name), args, nargs, kwnames);
+    result = PyObject_VectorcallMethod(_h2py(h_name), args+1,
+                 nargs | PY_VECTORCALL_ARGUMENTS_OFFSET, kwnames);
 #endif
     return _py2h(result);
 }
