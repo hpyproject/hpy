@@ -151,6 +151,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
 
 ..  _table-mapping:
 
+.. mark: BEGIN API MAPPING
 .. table:: Safe API function mapping
     :widths: auto
 
@@ -282,6 +283,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyUnicode_ReadChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_ReadChar>`_                                          :c:func:`HPyUnicode_ReadChar`
     `PyUnicode_Substring <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_Substring>`_                                        :c:func:`HPyUnicode_Substring`
     ================================================================================================================================== ================================================
+.. mark: END API MAPPING
 
 
 .. note: There are, of course, also cases where it is not possible to map directly and safely from a C API function (or concept) to an HPy API function (or concept).
