@@ -149,16 +149,15 @@ mapping between C API and HPy API functions. This mapping is generated together
 with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correct.
 
 
-..  _table-mapping:
-
 .. mark: BEGIN API MAPPING
+.. _table-mapping:
 .. table:: Safe API function mapping
     :widths: auto
 
     ================================================================================================================================== ================================================
     C API function                                                                                                                     HPY API function
     ================================================================================================================================== ================================================
-    `PyBool_FromLong <https://docs.python.org/3/c-api/bool.html#c.PyBool_FromLong>`_                                                   :c:func:`HPyBool_FromBool`
+    `PyBool_FromLong <https://docs.python.org/3/c-api/bool.html#c.PyBool_FromLong>`_                                                   :c:func:`HPyBool_FromLong`
     `PyBytes_AS_STRING <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_AS_STRING>`_                                              :c:func:`HPyBytes_AS_STRING`
     `PyBytes_AsString <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_AsString>`_                                                :c:func:`HPyBytes_AsString`
     `PyBytes_Check <https://docs.python.org/3/c-api/bytes.html#c.PyBytes_Check>`_                                                      :c:func:`HPyBytes_Check`
@@ -195,15 +194,21 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyList_Check <https://docs.python.org/3/c-api/list.html#c.PyList_Check>`_                                                         :c:func:`HPyList_Check`
     `PyList_New <https://docs.python.org/3/c-api/list.html#c.PyList_New>`_                                                             :c:func:`HPyList_New`
     `PyLong_AsDouble <https://docs.python.org/3/c-api/long.html#c.PyLong_AsDouble>`_                                                   :c:func:`HPyLong_AsDouble`
+    `PyLong_AsLong <https://docs.python.org/3/c-api/long.html#c.PyLong_AsLong>`_                                                       :c:func:`HPyLong_AsLong`
+    `PyLong_AsLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_AsLongLong>`_                                               :c:func:`HPyLong_AsLongLong`
     `PyLong_AsSize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_AsSize_t>`_                                                   :c:func:`HPyLong_AsSize_t`
     `PyLong_AsSsize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_AsSsize_t>`_                                                 :c:func:`HPyLong_AsSsize_t`
+    `PyLong_AsUnsignedLong <https://docs.python.org/3/c-api/long.html#c.PyLong_AsUnsignedLong>`_                                       :c:func:`HPyLong_AsUnsignedLong`
+    `PyLong_AsUnsignedLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_AsUnsignedLongLong>`_                               :c:func:`HPyLong_AsUnsignedLongLong`
+    `PyLong_AsUnsignedLongLongMask <https://docs.python.org/3/c-api/long.html#c.PyLong_AsUnsignedLongLongMask>`_                       :c:func:`HPyLong_AsUnsignedLongLongMask`
+    `PyLong_AsUnsignedLongMask <https://docs.python.org/3/c-api/long.html#c.PyLong_AsUnsignedLongMask>`_                               :c:func:`HPyLong_AsUnsignedLongMask`
     `PyLong_AsVoidPtr <https://docs.python.org/3/c-api/long.html#c.PyLong_AsVoidPtr>`_                                                 :c:func:`HPyLong_AsVoidPtr`
-    `PyLong_FromLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromLong>`_                                                   :c:func:`HPyLong_FromSize_t`
-    `PyLong_FromLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromLongLong>`_                                           :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromLong>`_                                                   :c:func:`HPyLong_FromLong`
+    `PyLong_FromLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromLongLong>`_                                           :c:func:`HPyLong_FromLongLong`
     `PyLong_FromSize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_FromSize_t>`_                                               :c:func:`HPyLong_FromSize_t`
     `PyLong_FromSsize_t <https://docs.python.org/3/c-api/long.html#c.PyLong_FromSsize_t>`_                                             :c:func:`HPyLong_FromSsize_t`
-    `PyLong_FromUnsignedLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromUnsignedLong>`_                                   :c:func:`HPyLong_FromSize_t`
-    `PyLong_FromUnsignedLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromUnsignedLongLong>`_                           :c:func:`HPyLong_FromSize_t`
+    `PyLong_FromUnsignedLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromUnsignedLong>`_                                   :c:func:`HPyLong_FromUnsignedLong`
+    `PyLong_FromUnsignedLongLong <https://docs.python.org/3/c-api/long.html#c.PyLong_FromUnsignedLongLong>`_                           :c:func:`HPyLong_FromUnsignedLongLong`
     `PyNumber_Absolute <https://docs.python.org/3/c-api/number.html#c.PyNumber_Absolute>`_                                             :c:func:`HPy_Absolute`
     `PyNumber_Add <https://docs.python.org/3/c-api/number.html#c.PyNumber_Add>`_                                                       :c:func:`HPy_Add`
     `PyNumber_And <https://docs.python.org/3/c-api/number.html#c.PyNumber_And>`_                                                       :c:func:`HPy_And`
@@ -282,6 +287,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyUnicode_FromWideChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_FromWideChar>`_                                  :c:func:`HPyUnicode_FromWideChar`
     `PyUnicode_ReadChar <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_ReadChar>`_                                          :c:func:`HPyUnicode_ReadChar`
     `PyUnicode_Substring <https://docs.python.org/3/c-api/unicode.html#c.PyUnicode_Substring>`_                                        :c:func:`HPyUnicode_Substring`
+    `Py_FatalError <https://docs.python.org/3/c-api/sys.html#c.Py_FatalError>`_                                                        :c:func:`HPy_FatalError`
     ================================================================================================================================== ================================================
 .. mark: END API MAPPING
 
