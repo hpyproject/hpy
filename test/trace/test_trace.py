@@ -23,7 +23,7 @@ def test_get_call_counts(compiler):
     import pytest
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             if (nargs != 2) {
                 HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly two args");
@@ -81,7 +81,7 @@ def test_trace_funcs(compiler):
     import pytest
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
         {
             if (nargs != 2) {
                 HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly two args");

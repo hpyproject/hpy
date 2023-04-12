@@ -85,7 +85,7 @@ int debug_ctx_Err_WarnEx(HPyContext *dctx, DHPy category, const char *utf8_messa
 void debug_ctx_Err_WriteUnraisable(HPyContext *dctx, DHPy obj);
 int debug_ctx_IsTrue(HPyContext *dctx, DHPy h);
 DHPy debug_ctx_Type_FromSpec(HPyContext *dctx, HPyType_Spec *spec, HPyType_SpecParam *params);
-DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, DHPy *args, HPy_ssize_t nargs, DHPy kw);
+DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy type, const DHPy *args, HPy_ssize_t nargs, DHPy kw);
 DHPy debug_ctx_GetAttr(HPyContext *dctx, DHPy obj, DHPy name);
 DHPy debug_ctx_GetAttr_s(HPyContext *dctx, DHPy obj, const char *utf8_name);
 DHPy debug_ctx_MaybeGetAttr_s(HPyContext *dctx, DHPy obj, const char *name);
@@ -192,6 +192,7 @@ DHPy debug_ctx_EvalCode(HPyContext *dctx, DHPy code, DHPy globals, DHPy locals);
 DHPy debug_ctx_ContextVar_New(HPyContext *dctx, const char *name, DHPy default_value);
 int32_t debug_ctx_ContextVar_Get(HPyContext *dctx, DHPy context_var, DHPy default_value, DHPy *result);
 DHPy debug_ctx_ContextVar_Set(HPyContext *dctx, DHPy context_var, DHPy value);
+int debug_ctx_SetCallFunction(HPyContext *dctx, DHPy h, HPyCallFunction *func);
 int debug_ctx_Type_CheckSlot(HPyContext *dctx, DHPy type, HPyDef *value);
 
 static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
@@ -461,5 +462,6 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_ContextVar_New = &debug_ctx_ContextVar_New;
     dctx->ctx_ContextVar_Get = &debug_ctx_ContextVar_Get;
     dctx->ctx_ContextVar_Set = &debug_ctx_ContextVar_Set;
+    dctx->ctx_SetCallFunction = &debug_ctx_SetCallFunction;
     dctx->ctx_Type_CheckSlot = &debug_ctx_Type_CheckSlot;
 }

@@ -142,6 +142,7 @@ SPECIAL_CASES = {
     'HPyContextVar_Get': None,
     'HPyType_GetName': None,
     'HPyType_IsSubtype': None,
+    'HPy_SetCallFunction': None,
     'HPy_MaybeGetAttr_s': None,
     'HPyDict_GetItem': None,
     'HPy_IsInstance': 'PyObject_IsInstance',

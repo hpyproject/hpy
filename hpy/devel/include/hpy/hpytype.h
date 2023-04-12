@@ -27,7 +27,7 @@ typedef enum {
      * ``HPyType_BuiltinShape_Legacy`` and to include ``PyObject_HEAD`` at the
      * start of its struct. It would be easy to relax this requirement on
      * CPython (where the ``PyObject_HEAD`` fields are always present) but a
-     * large burden on other implementations (e.g. PyPy, GraalPython) where a
+     * large burden on other implementations (e.g. PyPy, GraalPy) where a
      * struct starting with ``PyObject_HEAD`` might not exist.
      *
      * Types created via the old Python C API are automatically legacy types.
@@ -74,6 +74,11 @@ typedef enum {
      */
     HPyType_BuiltinShape_List = 6,
 } HPyType_BuiltinShape;
+
+typedef struct {
+    cpy_vectorcallfunc cpy_trampoline;
+    HPyCallFunction impl;
+} HPyType_Vectorcall;
 
 typedef struct {
     /** The Python name of type (UTF-8 encoded) */
@@ -133,7 +138,7 @@ typedef struct {
      * ``HPyType_BuiltinShape_Legacy`` and to include ``PyObject_HEAD`` at the
      * start of its struct. It would be easy to relax this requirement on
      * CPython (where the ``PyObject_HEAD`` fields are always present) but a
-     * large burden on other implementations (e.g. PyPy, GraalPython) where a
+     * large burden on other implementations (e.g. PyPy, GraalPy) where a
      * struct starting with ``PyObject_HEAD`` might not exist.
      */
     void *legacy_slots;
@@ -182,6 +187,12 @@ typedef struct {
 
 /** Default type flags for HPy types. */
 #define HPy_TPFLAGS_DEFAULT (_Py_TPFLAGS_HEAPTYPE | _Py_TPFLAGS_HAVE_VERSION_TAG)
+
+/** Set if the type implements the vectorcall protocol (PEP 590) */
+#define HPy_TPFLAGS_HAVE_VECTORCALL (1UL << 11)
+
+/** Set if the type allows subclassing */
+#define HPy_TPFLAGS_BASETYPE (1UL << 10)
 
 /** Set if the type allows subclassing */
 #define HPy_TPFLAGS_BASETYPE (1UL << 10)

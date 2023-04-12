@@ -268,7 +268,7 @@ DHPy debug_ctx_Tuple_FromArray(HPyContext *dctx, DHPy dh_items[], HPy_ssize_t n)
     return DHPy_open(dctx, HPyTuple_FromArray(get_info(dctx)->uctx, uh_items, n));
 }
 
-DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, DHPy *dh_args,
+DHPy debug_ctx_Type_GenericNew(HPyContext *dctx, DHPy dh_type, const DHPy *dh_args,
                                HPy_ssize_t nargs, DHPy dh_kw)
 {
     if (!get_ctx_info(dctx)->is_valid) {

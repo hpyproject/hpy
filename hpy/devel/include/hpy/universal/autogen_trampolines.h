@@ -306,7 +306,7 @@ HPyAPI_FUNC HPy HPyType_FromSpec(HPyContext *ctx, HPyType_Spec *spec, HPyType_Sp
      return ctx->ctx_Type_FromSpec ( ctx, spec, params ); 
 }
 
-HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw) {
+HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw) {
      return ctx->ctx_Type_GenericNew ( ctx, type, args, nargs, kw ); 
 }
 
@@ -728,6 +728,10 @@ HPyAPI_FUNC int32_t HPyContextVar_Get(HPyContext *ctx, HPy context_var, HPy defa
 
 HPyAPI_FUNC HPy HPyContextVar_Set(HPyContext *ctx, HPy context_var, HPy value) {
      return ctx->ctx_ContextVar_Set ( ctx, context_var, value ); 
+}
+
+HPyAPI_FUNC int HPy_SetCallFunction(HPyContext *ctx, HPy h, HPyCallFunction *func) {
+     return ctx->ctx_SetCallFunction ( ctx, h, func ); 
 }
 
 HPyAPI_FUNC int HPyType_CheckSlot(HPyContext *ctx, HPy type, HPyDef *value) {

@@ -15,13 +15,13 @@ static HPy onearg_impl(HPyContext *ctx, HPy self, HPy arg)
 }
 
 HPyDef_METH(varargs, "varargs", HPyFunc_VARARGS)
-static HPy varargs_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+static HPy varargs_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     return HPy_Dup(ctx, ctx->h_None);
 }
 
 HPyDef_METH(call_with_tuple, "call_with_tuple", HPyFunc_VARARGS)
-static HPy call_with_tuple_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+static HPy call_with_tuple_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     HPy f, f_args;
     if (nargs != 2) {
@@ -34,7 +34,7 @@ static HPy call_with_tuple_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_
 }
 
 HPyDef_METH(call_with_tuple_and_dict, "call_with_tuple_and_dict", HPyFunc_VARARGS)
-static HPy call_with_tuple_and_dict_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+static HPy call_with_tuple_and_dict_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     HPy f, f_args, f_kw;
     if (nargs != 3) {

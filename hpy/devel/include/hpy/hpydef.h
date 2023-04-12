@@ -203,6 +203,10 @@ typedef struct {
     HPyFunc_Capsule_Destructor impl;
 } HPyCapsule_Destructor;
 
+typedef struct {
+    cpy_vectorcallfunc cpy_trampoline;
+    HPyFunc_keywords impl;
+} HPyCallFunction;
 
 // macros to automatically define HPyDefs of various kinds
 
@@ -247,7 +251,6 @@ typedef struct {
  */
 #define HPyDef_SLOT(SYM, SLOT) \
     HPyDef_SLOT_IMPL(SYM, SYM##_impl, SLOT)
-
 
 // this is the actual implementation, after we determined the SIG
 #define _HPyDef_SLOT(SYM, IMPL, SLOT, SIG)                              \
@@ -427,6 +430,29 @@ typedef struct {
     static HPyCapsule_Destructor SYM = {                                       \
         .cpy_trampoline = SYM##_trampoline,                                    \
         .impl = SYM##_impl                                                     \
+    };
+
+/**
+ * A convenience macro and the recommended way to create a call function
+ * definition.
+ *
+ * The macro generates a C global variable with name ``SYM``. It will fill an
+ * :c:struct:`HPyCallFunction` structure appropriately and store it in the
+ * global variable.
+ *
+ * This macro expects a C function ``SYM_impl`` that will be used as the
+ * implementing C function.
+ *
+ * :param SYM: A C symbol name of the resulting global variable that will
+ *             contain the generated call function definition. The variable is
+ *             defined as ``static``.
+ */
+#define HPyDef_CALL_FUNCTION(SYM)                                             \
+    HPyFunc_DECLARE(SYM##_impl, HPyFunc_KEYWORDS);                            \
+    HPyFunc_TRAMPOLINE(SYM##_trampoline, SYM##_impl, HPyFunc_KEYWORDS);       \
+    static HPyCallFunction SYM = {                                            \
+        .cpy_trampoline = SYM##_trampoline,                                   \
+        .impl = SYM##_impl                                                    \
     };
 
 #ifdef __cplusplus

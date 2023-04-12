@@ -19,7 +19,7 @@ def test_charptr_use_after_implicit_arg_handle_close(compiler, python_subprocess
         const char *keep;
 
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t n)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t n)
         {
             if (n != 2) {
                 HPyErr_SetString(ctx, ctx->h_ValueError, "expected exactly two arguments");
@@ -74,7 +74,7 @@ def test_charptr_use_after_implicit_arg_handle_close(compiler, python_subprocess
 def test_charptr_use_after_handle_close(compiler, python_subprocess):
     mod = compiler.compile_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t n)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t n)
         {
             if (n != 2) {
                 HPyErr_SetString(ctx, ctx->h_ValueError, "expected exactly two arguments");
@@ -127,7 +127,7 @@ def test_charptr_use_after_handle_close(compiler, python_subprocess):
 def test_charptr_write_ptr(compiler, python_subprocess):
     mod = compiler.compile_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t n)
+        static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t n)
         {
             if (n != 2) {
                 HPyErr_SetString(ctx, ctx->h_ValueError, "expected exactly two arguments");

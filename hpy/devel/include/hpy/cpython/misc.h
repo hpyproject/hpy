@@ -45,6 +45,11 @@ static inline PyObject * _hg2py(HPyGlobal hf)
     return _h2py(h);
 }
 
+static inline const HPy *_arr_py2h(PyObject *const *py_arr) {
+    assert(sizeof(HPy) == sizeof(PyObject *));
+    return (const HPy *)py_arr;
+}
+
 /* XXX! should be defined only once, not once for every .c! */
 static struct _HPyContext_s _global_ctx;
 
@@ -223,7 +228,7 @@ HPyAPI_FUNC _HPy_NO_RETURN void HPy_FatalError(HPyContext *ctx, const char *mess
     Py_FatalError(message);
 }
 
-HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, HPy *args, HPy_ssize_t nargs, HPy kw)
+HPyAPI_FUNC HPy HPyType_GenericNew(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kw)
 {
     return ctx_Type_GenericNew(ctx, type, args, nargs, kw);
 }
@@ -525,6 +530,11 @@ HPyAPI_FUNC int HPyType_IsSubtype(HPyContext *ctx, HPy sub, HPy type)
 {
     return PyType_IsSubtype((PyTypeObject *)_h2py(sub),
             (PyTypeObject *)_h2py(type));
+}
+
+HPyAPI_FUNC int HPy_SetCallFunction(HPyContext *ctx, HPy h, HPyCallFunction *func)
+{
+    return ctx_SetCallFunction(ctx, h, func);
 }
 
 HPyAPI_FUNC HPy HPy_MaybeGetAttr_s(HPyContext *ctx, HPy obj, const char *name) {

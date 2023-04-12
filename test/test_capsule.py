@@ -59,7 +59,7 @@ class CapsuleTemplate(DefaultExtensionTemplate):
             #define CAPSULE_NAME _capsule_name
 
             HPyDef_METH(Capsule_New, "capsule_new", HPyFunc_VARARGS)
-            static HPy Capsule_New_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy Capsule_New_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy res;
                 int value;
@@ -189,7 +189,7 @@ class TestHPyCapsule(HPyTest):
             @DEFINE_Payload_Free
 
             HPyDef_METH(Capsule_SetPointer, "capsule_setpointer", HPyFunc_VARARGS)
-            static HPy Capsule_SetPointer_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy Capsule_SetPointer_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy capsule;
                 int value;
@@ -236,7 +236,7 @@ class TestHPyCapsule(HPyTest):
             }
 
             HPyDef_METH(Capsule_SetContext, "capsule_setcontext", HPyFunc_VARARGS)
-            static HPy Capsule_SetContext_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy Capsule_SetContext_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy capsule;
                 int value;
@@ -264,7 +264,7 @@ class TestHPyCapsule(HPyTest):
             }
 
             HPyDef_METH(Capsule_SetName, "capsule_setname", HPyFunc_VARARGS)
-            static HPy Capsule_SetName_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy Capsule_SetName_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy capsule;
                 const char *name;
@@ -296,7 +296,7 @@ class TestHPyCapsule(HPyTest):
             static HPyCapsule_Destructor invalid_dtor = { NULL, NULL };
 
             HPyDef_METH(Capsule_SetDestructor, "capsule_set_destructor", HPyFunc_VARARGS)
-            static HPy Capsule_SetDestructor_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy Capsule_SetDestructor_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy capsule;
                 HPy null_dtor;
@@ -392,7 +392,7 @@ class TestHPyCapsule(HPyTest):
             @DEFINE_Payload_Free
 
             HPyDef_METH(Capsule_isvalid, "capsule_isvalid", HPyFunc_VARARGS)
-            static HPy Capsule_isvalid_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy Capsule_isvalid_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy capsule;
                 const char *name;

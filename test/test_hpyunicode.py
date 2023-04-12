@@ -863,7 +863,7 @@ class TestUnicode(HPyTest):
             }
 
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy h_obj;
                 const char *encoding, *errors;
@@ -921,7 +921,7 @@ class TestUnicode(HPyTest):
         import string
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy_ssize_t start, end;
                 if (nargs != 3) {

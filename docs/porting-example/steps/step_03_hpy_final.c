@@ -43,7 +43,8 @@ int Point_traverse_impl(void *self, HPyFunc_visitproc visit, void *arg)
 
 // this is a method for creating a Point
 HPyDef_SLOT(Point_init, HPy_tp_init)
-int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy kw)
+int Point_init_impl(HPyContext *ctx, HPy self, const HPy *args,
+        HPy_ssize_t nargs, HPy kw)
 {
     static const char *kwlist[] = {"x", "y", "obj", NULL};
     PointObject *p = PointObject_AsStruct(ctx, self);
@@ -51,12 +52,13 @@ int Point_init_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs, HPy
     p->y = 0.0;
     HPy obj = HPy_NULL;
     HPyTracker ht;
-    if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "|ddO", kwlist,
+    if (!HPyArg_ParseKeywordsDict(ctx, &ht, args, nargs, kw, "|ddO", kwlist,
                               &p->x, &p->y, &obj))
         return -1;
     if (HPy_IsNull(obj))
         obj = ctx->h_None;
-    // INCREF not needed because HPyArg_ParseKeywords does not steal a reference
+    /* INCREF not needed because HPyArg_ParseKeywordsDict does not steal a
+       reference */
     HPyField_Store(ctx, self, &p->obj, obj);
     HPyTracker_Close(ctx, ht);
     return 0;
@@ -82,7 +84,7 @@ HPy Point_norm_impl(HPyContext *ctx, HPy self)
 
 // this is an HPy function that uses Point
 HPyDef_METH(dot, "dot", HPyFunc_VARARGS, .doc="Dot product.")
-HPy dot_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+HPy dot_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
 {
     HPy point1, point2;
     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &point1, &point2))

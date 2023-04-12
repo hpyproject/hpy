@@ -293,7 +293,7 @@ class ExtensionCompiler:
             compile_args = [
                 '/Od',
                 '/WX',               # turn warnings into errors (all, for now)
-                # '/Wall',           # this is too aggresive, makes windows itself fail
+                # '/Wall',           # this is too aggressive, makes windows itself fail
                 '/Zi',
                 '-D_CRT_SECURE_NO_WARNINGS', # something about _snprintf and _snprintf_s
                 '/FS',               # Since the tests run in parallel
@@ -479,7 +479,7 @@ class HPyTest:
         """ Returns True if the underlying Python implementation supports
             reference counts.
 
-            By default returns True on CPython and False on other
+            By default, returns True on CPython and False on other
             implementations.
         """
         return sys.implementation.name == "cpython"
@@ -488,12 +488,21 @@ class HPyTest:
         """ Returns True if `.make_module(...)` loads modules using a
             standard Python import mechanism (e.g. `importlib.import_module`).
 
-            By default returns True because the base implementation of
+            By default, returns True because the base implementation of
             `.make_module(...)` uses an ordinary import. Sub-classes that
             override `.make_module(...)` may also want to override this
             method.
         """
         return True
+
+    def supports_refcounts(self):
+        """ Returns True if the underlying Python implementation supports
+            the vectorcall protocol.
+
+            By default, this returns True for Python version 3.8+ on all
+            implementations.
+        """
+        return sys.version_info >= (3, 8)
 
 
 class HPyDebugCapture:

@@ -11,11 +11,11 @@ def test_correct_usage(compiler, hpy_debug_capture):
     # Basic sanity check that valid code does not trigger any error reports
     mod = compiler.make_module("""
         HPyDef_METH(build, "build", HPyFunc_VARARGS)
-        static HPy build_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy build_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyTupleBuilder tbuilder = HPyTupleBuilder_New(ctx, nargs);
             HPyListBuilder lbuilder = HPyListBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++) {
+            for (size_t i=0; i < nargs; i++) {
                 HPyTupleBuilder_Set(ctx, tbuilder, i, args[i]);
                 HPyListBuilder_Set(ctx, lbuilder, i, args[i]);
             }
@@ -28,11 +28,11 @@ def test_correct_usage(compiler, hpy_debug_capture):
         }
         
         HPyDef_METH(cancel, "cancel", HPyFunc_VARARGS)
-        static HPy cancel_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy cancel_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyTupleBuilder tbuilder = HPyTupleBuilder_New(ctx, nargs);
             HPyListBuilder lbuilder = HPyListBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++) {
+            for (size_t i=0; i < nargs; i++) {
                 HPyTupleBuilder_Set(ctx, tbuilder, i, args[i]);
                 HPyListBuilder_Set(ctx, lbuilder, i, args[i]);
             }
@@ -52,20 +52,20 @@ def test_correct_usage(compiler, hpy_debug_capture):
 def test_build_twice(compiler, hpy_debug_capture):
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyTupleBuilder builder = HPyTupleBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++)
+            for (size_t i=0; i < nargs; i++)
                 HPyTupleBuilder_Set(ctx, builder, i, args[i]);
             HPy h_result = HPyTupleBuilder_Build(ctx, builder);
             HPy_Close(ctx, h_result);
             return HPyTupleBuilder_Build(ctx, builder);
         }
         HPyDef_METH(g, "g", HPyFunc_VARARGS)
-        static HPy g_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy g_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyListBuilder builder = HPyListBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++)
+            for (size_t i=0; i < nargs; i++)
                 HPyListBuilder_Set(ctx, builder, i, args[i]);
             HPy h_result = HPyListBuilder_Build(ctx, builder);
             HPy_Close(ctx, h_result);
@@ -86,19 +86,19 @@ def test_build_twice(compiler, hpy_debug_capture):
 def test_build_after_cancel(compiler, hpy_debug_capture):
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyTupleBuilder builder = HPyTupleBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++)
+            for (size_t i=0; i < nargs; i++)
                 HPyTupleBuilder_Set(ctx, builder, i, args[i]);
             HPyTupleBuilder_Cancel(ctx, builder);
             return HPyTupleBuilder_Build(ctx, builder);
         }
         HPyDef_METH(g, "g", HPyFunc_VARARGS)
-        static HPy g_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy g_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyListBuilder builder = HPyListBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++)
+            for (size_t i=0; i < nargs; i++)
                 HPyListBuilder_Set(ctx, builder, i, args[i]);
             HPyListBuilder_Cancel(ctx, builder);
             return HPyListBuilder_Build(ctx, builder);
@@ -118,10 +118,10 @@ def test_build_after_cancel(compiler, hpy_debug_capture):
 def test_build_cancel_after_build(compiler, hpy_debug_capture):
     mod = compiler.make_module("""
         HPyDef_METH(f, "f", HPyFunc_VARARGS)
-        static HPy f_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy f_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyTupleBuilder builder = HPyTupleBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++)
+            for (size_t i=0; i < nargs; i++)
                 HPyTupleBuilder_Set(ctx, builder, i, args[i]);
             HPy h_result = HPyTupleBuilder_Build(ctx, builder);
             HPyTupleBuilder_Cancel(ctx, builder);
@@ -129,10 +129,10 @@ def test_build_cancel_after_build(compiler, hpy_debug_capture):
             return HPy_Dup(ctx, ctx->h_None);
         }
         HPyDef_METH(g, "g", HPyFunc_VARARGS)
-        static HPy g_impl(HPyContext *ctx, HPy h_self, HPy *args, HPy_ssize_t nargs)
+        static HPy g_impl(HPyContext *ctx, HPy h_self, const HPy *args, size_t nargs)
         {
             HPyListBuilder builder = HPyListBuilder_New(ctx, nargs);
-            for (int i=0; i < nargs; i++)
+            for (size_t i=0; i < nargs; i++)
                 HPyListBuilder_Set(ctx, builder, i, args[i]);
             HPy h_result = HPyListBuilder_Build(ctx, builder);
             HPyListBuilder_Cancel(ctx, builder);

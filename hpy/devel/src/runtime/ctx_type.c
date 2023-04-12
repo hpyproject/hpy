@@ -9,6 +9,10 @@
 #  include "handles.h"
 #endif
 
+/* Python 3.8 had "provisional" vectorcall support which was a bit different in
+   some details. */
+#define PROVISIONAL_VECTORCALL_SUPPORT (PY_VERSION_HEX < 0x03090000)
+
 /* HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE is set automatically on HPy types created
    with HPyType_FromSpec. This is used internally within HPy to distinguish
    HPy types.
@@ -24,18 +28,21 @@
 
 // these fields are never accessed: they are present just to ensure
 // the correct alignment of payload
-#define MAX_ALIGN_T \
-    union {                             \
-        unsigned char payload[1];       \
-        unsigned short _m_short;        \
-        unsigned int _m_int;            \
-        unsigned long _m_long;          \
-        unsigned long long _m_longlong; \
-        float _m_float;                 \
-        double _m_double;               \
-        long double _m_longdouble;      \
-        void *_m_pointer;               \
-    };
+typedef union {
+    unsigned char _m_char[1];
+    unsigned short _m_short;
+    unsigned int _m_int;
+    unsigned long _m_long;
+    unsigned long long _m_longlong;
+    float _m_float;
+    double _m_double;
+    long double _m_longdouble;
+    void *_m_pointer;
+} _HPy_MaxAlign_t;
+
+// Helper macro to align a given size to a multiple of sizeof(MAX_ALIGN_T).
+#define _HPy_ALIGN(SIZE) \
+        (((SIZE) + sizeof(_HPy_MaxAlign_t) - 1) & ~(sizeof(_HPy_MaxAlign_t) - 1))
 
 /* The C structs of pure HPy (i.e. non-legacy) custom types do NOT include
  * PyObject_HEAD. So, the CPython implementation of HPy_New must allocate a
@@ -48,7 +55,7 @@
  */
 typedef struct {
     PyObject_HEAD
-    MAX_ALIGN_T
+    _HPy_MaxAlign_t payload;
 } _HPy_FullyAlignedSpaceForPyObject_HEAD;
 
 /* Similar to the case above, if a pure HPy custom type inherits from a
@@ -60,7 +67,7 @@ typedef struct {
 #define FULLY_ALIGNED_SPACE(TYPE) \
     typedef struct { \
         TYPE ob_base; \
-        MAX_ALIGN_T \
+        _HPy_MaxAlign_t payload; \
     } _HPy_FullyAlignedSpaceFor##TYPE;
 
 FULLY_ALIGNED_SPACE(PyHeapTypeObject)
@@ -114,7 +121,6 @@ static inline void* _HPy_Payload(PyObject *obj, const HPyType_BuiltinShape shape
 static bool has_tp_traverse(HPyType_Spec *hpyspec);
 static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec);
 
-
 /* This is a hack: we need some extra space to store random data on the
    type objects created by HPyType_FromSpec().  We allocate a structure
    of type HPyType_Extra_t, which we never free for now.  We can access
@@ -123,6 +129,7 @@ typedef struct {
     uint16_t magic;
     HPyFunc_traverseproc tp_traverse_impl;
     HPyFunc_destroyfunc tp_destroy_impl;
+    cpy_vectorcallfunc tp_vectorcall_default_trampoline;
     HPyType_BuiltinShape shape;
     char name[];
 } HPyType_Extra_t;
@@ -144,6 +151,29 @@ static inline bool _is_pure_HPyType(PyTypeObject *tp) {
 
 static inline HPyType_BuiltinShape _HPyType_Get_Shape(PyTypeObject *tp) {
     return _is_HPyType(tp) ? _HPyType_EXTRA(tp)->shape : HPyType_BuiltinShape_Legacy;
+}
+
+static inline cpy_vectorcallfunc _HPyType_get_vectorcall_default(PyTypeObject *tp) {
+    return _is_HPyType(tp) ?
+            _HPyType_EXTRA(tp)->tp_vectorcall_default_trampoline : NULL;
+}
+
+static inline void _HPy_set_vectorcall_func(PyTypeObject *tp, PyObject *o, cpy_vectorcallfunc f) {
+    const Py_ssize_t offset = tp->tp_vectorcall_offset;
+    assert(offset > 0);
+    memcpy((char *) o + offset, &f, sizeof(f));
+}
+
+/*
+ * If type 'tp' supports the vectorcall protocol, then retrieve the default
+ * vectorcall function from the 'HPyType_Extra_t' struct and write it to the
+ * appropriate offset of 'o'.
+ */
+static inline void _HPy_vectorcall_init(PyTypeObject *tp, PyObject *o) {
+    if (PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
+        cpy_vectorcallfunc vectorcall_default = _HPyType_get_vectorcall_default(tp);
+        _HPy_set_vectorcall_func(tp, o, vectorcall_default);
+    }
 }
 
 static HPyType_Extra_t *_HPyType_Extra_Alloc(const char *name, HPyType_BuiltinShape shape)
@@ -231,13 +261,26 @@ static void hpytype_dealloc(PyObject *self)
     Py_DECREF(tp);
 }
 
+/*
+ * A thin decorator around the type base's 'tp_new' function, that will
+ * initialize the vectorcall member (if appropriate).
+ */
+static PyObject *
+hpyobject_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    PyTypeObject *base = type->tp_base;
+    PyObject *result = base->tp_new(type, args, kwds);
+    if (result != NULL)
+        _HPy_vectorcall_init(type, result);
+    return result;
+}
 
 static int
 sig2flags(HPyFunc_Signature sig)
 {
     switch(sig) {
         case HPyFunc_VARARGS:  return METH_FASTCALL;
-        case HPyFunc_KEYWORDS: return METH_VARARGS | METH_KEYWORDS;
+        case HPyFunc_KEYWORDS: return METH_FASTCALL | METH_KEYWORDS;
         case HPyFunc_NOARGS:   return METH_NOARGS;
         case HPyFunc_O:        return METH_O;
         default:               return -1;
@@ -252,15 +295,16 @@ is_bf_slot(HPyDef *def)
 }
 
 static inline bool
-is_traverse_slot(HPyDef *def)
+is_slot(HPyDef *def, HPySlot_Slot id)
 {
-    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_traverse;
+    return def->kind == HPyDef_Kind_Slot && def->slot.slot == id;
 }
 
 static inline bool
-is_destroy_slot(HPyDef *def)
+is_vectorcalloffset_member(const char *name)
 {
-    return def->kind == HPyDef_Kind_Slot && def->slot.slot == HPy_tp_destroy;
+    return name[0] == '_' && name[1] == '_' &&
+            strcmp(name, "__vectorcalloffset__") == 0;
 }
 
 static HPy_ssize_t
@@ -270,7 +314,10 @@ HPyDef_count(HPyDef *defs[], HPyDef_Kind kind)
     if (defs == NULL)
         return res;
     for(int i=0; defs[i] != NULL; i++)
-        if (defs[i]->kind == kind && !is_bf_slot(defs[i]) && !is_destroy_slot(defs[i]))
+        if (defs[i]->kind == kind
+                && !is_bf_slot(defs[i])
+                && !is_slot(defs[i], HPy_tp_destroy)
+                && !is_slot(defs[i], HPy_tp_call))
             res++;
     return res;
 }
@@ -415,9 +462,18 @@ static int member_object_set(PyObject *self, PyObject *value, void *closure)
 #endif
 
 static PyMemberDef *
-create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t base_member_offset, PyGetSetDef **getsets)
+create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members,
+                   HPy_ssize_t base_member_offset, PyGetSetDef **getsets,
+                   size_t *vectorcalloffset, HPy_ssize_t basicsize)
 {
+    /* Will be set to true if '__vectorcalloffset__' was explicitly specified as
+       HPy or legacy member. */
+    bool explicit_vectorcalloffset = false;
+    /* Will be true if HPy_tp_call was specified and we therefore have an
+       implicit vectorcall offset. */
+    bool implicit_vectorcalloffset = *vectorcalloffset > 0;
     HPy_ssize_t hpymember_count = HPyDef_count(hpydefs, HPyDef_Kind_Member);
+
     // count the legacy members
     HPy_ssize_t legacy_count = 0;
     if (legacy_members != NULL) {
@@ -426,14 +482,35 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
     }
     HPy_ssize_t total_count = hpymember_count + legacy_count;
 
+    // account for member '__vectorcalloffset__'
+    if (implicit_vectorcalloffset)
+        total_count++;
+
+    // Sanity check: the type cannot have members if 'basicsize == 0'
+    if (basicsize == 0 && total_count > 0) {
+        PyErr_SetString(PyExc_TypeError,
+                "Type claims to have basicsize==0 but defines members");
+        return NULL;
+    }
+
     // allocate&fill the result
     PyMemberDef *result = (PyMemberDef*)PyMem_Calloc(total_count+1, sizeof(PyMemberDef));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
     }
-    // copy the HPy members
     int dst_idx = 0;
+
+    // add vectorcalloffset if 'HPy_tp_call' was specified
+    if (implicit_vectorcalloffset) {
+        PyMemberDef *dst = &result[dst_idx++];
+        dst->name = "__vectorcalloffset__";
+        dst->type = T_PYSSIZET;
+        dst->offset = *vectorcalloffset;
+        dst->flags = READONLY;
+    }
+
+    // copy the HPy members
     if (hpydefs != NULL) {
         for(int i=0; hpydefs[i] != NULL; i++) {
             HPyDef *src = hpydefs[i];
@@ -481,11 +558,33 @@ create_member_defs(HPyDef *hpydefs[], PyMemberDef *legacy_members, HPy_ssize_t b
                 dst->flags = READONLY;
             else
                 dst->flags = 0; // read-write
+            // test if this HPy member was '__vectorcalloffset__'
+            if (is_vectorcalloffset_member(src->member.name)) {
+                explicit_vectorcalloffset = true;
+                *vectorcalloffset = dst->offset;
+            }
         }
     }
     // copy the legacy members
-    for(int i=0; i<legacy_count; i++)
+    for(int i=0; i<legacy_count; i++) {
         result[dst_idx++] = legacy_members[i];
+        // test if this legacy member was '__vectorcalloffset__'
+        if (is_vectorcalloffset_member(legacy_members[i].name)) {
+            explicit_vectorcalloffset = true;
+            assert(legacy_members[i].offset > 0);
+            *vectorcalloffset = legacy_members[i].offset;
+        }
+    }
+
+    /* Enforce constraint that we cannot have slot 'HPy_tp_call' and an explicit
+       member '__vectorcalloffset__'. */
+    if (implicit_vectorcalloffset && explicit_vectorcalloffset) {
+        PyErr_SetString(PyExc_TypeError,
+                "Cannot have HPy_tp_call and explicit member"
+                "'__vectorcalloffset__'. Specify just one of them.");
+        return NULL;
+    }
+
     result[dst_idx++] = (PyMemberDef){NULL};
     if (dst_idx != total_count + 1)
         Py_FatalError("bogus count in create_member_defs");
@@ -535,9 +634,11 @@ create_getset_defs(HPyDef *hpydefs[], PyGetSetDef *legacy_getsets)
 }
 
 static PyType_Slot *
-create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
-                 HPyType_Extra_t *extra)
+create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
+                 HPy_ssize_t head_size, HPy_ssize_t *basicsize,
+                 unsigned long *flags)
 {
+    HPy_ssize_t base_member_offset;
     HPy_ssize_t hpyslot_count = HPyDef_count(hpyspec->defines, HPyDef_Kind_Slot);
     // add the legacy slots
     HPy_ssize_t legacy_slot_count = 0;
@@ -548,6 +649,14 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
                        &legacy_method_defs, &legacy_member_defs,
                        &legacy_getset_defs);
     bool needs_dealloc = needs_hpytype_dealloc(hpyspec);
+    size_t vectorcalloffset = 0;
+    bool has_tp_new = false;
+#define ADDITIONAL_SLOTS 3
+    /* This accounts for the sentinel and maybe additional slots that HPy
+       installs automatically for some reason. For example, in case of the
+       vectorcall protocol is used, we will additionally install 'tp_call' if
+       the user did not provide it. */
+    HPy_ssize_t additional_slots = 1;
 
     if (hpyspec->doc != NULL)
         hpyslot_count++;    // Py_tp_doc
@@ -561,7 +670,8 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
-    PyType_Slot *result = (PyType_Slot*)PyMem_Calloc(total_slot_count+1, sizeof(PyType_Slot));
+    PyType_Slot *result = (PyType_Slot*)PyMem_Calloc(
+            total_slot_count+ADDITIONAL_SLOTS, sizeof(PyType_Slot));
     if (result == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -574,11 +684,53 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
             HPyDef *src = hpyspec->defines[i];
             if (src->kind != HPyDef_Kind_Slot || is_bf_slot(src))
                 continue;
-            if (is_destroy_slot(src)) {
+            if (is_slot(src, HPy_tp_destroy)) {
                 extra->tp_destroy_impl = (HPyFunc_destroyfunc)src->slot.impl;
                 continue;   /* we don't have a trampoline for tp_destroy */
             }
-            if (is_traverse_slot(src)) {
+            if (is_slot(src, HPy_tp_call)) {
+                /* Slot 'HPy_tp_call' will add a hidden field to
+                   the type's struct. The field can only be appended which
+                   conflicts with var objects. So, we don't allow this if
+                   itemsize != 0. */
+                if (hpyspec->itemsize) {
+                    PyMem_Free(result);
+                    PyErr_SetString(PyExc_TypeError,
+                            "Cannot use HPy call protocol with var objects");
+                    return NULL;
+                }
+                // we only need to remember the CPython trampoline
+                extra->tp_vectorcall_default_trampoline =
+                        (cpy_vectorcallfunc)src->slot.cpy_trampoline;
+                /* Adding the hidden field means we increase the CPython type
+                   spec's basic by 'sizeof(vectorcallfunc)'. In case that HPy
+                   type spec's basic size was 0, we now need to adjust the
+                   base_member_offset since that will no longer be inherited
+                   automatically. */
+                vectorcalloffset = _HPy_ALIGN(*basicsize == 0 ? head_size : *basicsize);
+                if (vectorcalloffset > 0) {
+                    *basicsize = vectorcalloffset + sizeof(cpy_vectorcallfunc);
+                } else {
+                    /* We cannot safely add the hidden field in case of a legacy
+                       type that inherits the basicsize since we don't know it.
+                       In this case, we reject to use HPy_tp_call but since it
+                       is a legacy type, legacy slot Py_tp_call can be used. */
+                    assert(hpyspec->builtin_shape == HPyType_BuiltinShape_Legacy);
+                    assert(hpyspec->basicsize == 0);
+                    PyMem_Free(result);
+                    PyErr_SetString(PyExc_TypeError,
+                            "Cannot use HPy call protocol with legacy types that"
+                            " inherit the struct. Either set the basicsize to a"
+                            "non-zero value or use legacy slot 'Py_tp_call'.");
+                    return NULL;
+                }
+                /* Although there is a corresponding C API slot, we actually
+                   implement HPy_tp_call using CPython's vectorcall protocol. */
+                continue;
+            }
+            if (is_slot(src, HPy_tp_new)) {
+                has_tp_new = true;
+            } else if (is_slot(src, HPy_tp_traverse)) {
                 extra->tp_traverse_impl = (HPyFunc_traverseproc)src->slot.impl;
                 /* no 'continue' here: we have a trampoline too */
             }
@@ -587,6 +739,10 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
             dst->pfunc = (void*)src->slot.cpy_trampoline;
         }
     }
+
+    /* Since the basicsize may be modified depending on special HPy slots, we
+       defer determination of the base_member_offset to this point. */
+    base_member_offset = (*basicsize != 0) ? head_size : 0;
 
     // add a slot for the doc string if present
     if (hpyspec->doc != NULL) {
@@ -623,12 +779,37 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
     }
 
     // prepare the "real" members, which may introduce getsetdefs in universal mode
-    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset, &pygetsets);
+    PyMemberDef *pymembers = create_member_defs(hpyspec->defines, legacy_member_defs, base_member_offset, &pygetsets, &vectorcalloffset, *basicsize);
     if (pymembers == NULL) {
         PyMem_Free(pygetsets);
         PyMem_Free(pymethods);
         PyMem_Free(result);
         return NULL;
+    }
+
+    // if we have seen HPy_tp_call or an explicit member '__vectorcalloffset__'
+    if (vectorcalloffset > 0) {
+        /* Since there is no way to set Py_tp_call directly from HPy, we also
+           always need to specify it if HPy_tp_call is there or a
+           '__vectorcalloffset__' was specified. */
+        additional_slots++;
+        PyType_Slot *dst = &result[dst_idx++];
+        dst->slot = Py_tp_call;
+        dst->pfunc = (void*)PyVectorcall_Call;
+
+        /* If the user did not provide the new function, we need to install a
+           special new function that will delegate to the inherited tp_new but
+           additionally sets the default call function. This is not necessary if
+           the user provides the new function because he will use 'HPy_New' to
+           allocate the object which already takes care of that. */
+        if (!has_tp_new) {
+            additional_slots++;
+            PyType_Slot *dst = &result[dst_idx++];
+            dst->slot = Py_tp_new;
+            dst->pfunc = (void*)hpyobject_new;
+        }
+
+        *flags |= _Py_TPFLAGS_HAVE_VECTORCALL;
     }
 
     // add both members and getsets
@@ -647,7 +828,7 @@ create_slot_defs(HPyType_Spec *hpyspec, HPy_ssize_t base_member_offset,
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
-    if (dst_idx != total_slot_count + 1)
+    if (dst_idx != total_slot_count + additional_slots)
         Py_FatalError("bogus slot count in create_slot_defs");
     return result;
 }
@@ -901,15 +1082,28 @@ _HPy_HIDDEN struct _typeobject *get_metatype(HPyType_SpecParam *params) {
 
 #if !HAVE_FROM_METACLASS
 
-static inline Py_ssize_t count_members(PyType_Spec *spec) {
+static inline Py_ssize_t count_members(PyType_Spec *spec, Py_ssize_t *vectorcalloffset) {
     Py_ssize_t nmembers = 0;
-    PyType_Slot *slot;
-    PyMemberDef *memb;
+#if PROVISIONAL_VECTORCALL_SUPPORT
+    *vectorcalloffset = 0;
+#endif /* Python 3.8.x */
+    const PyType_Slot *slot;
     for (slot = spec->slots; slot->slot; slot++) {
         if (slot->slot == Py_tp_members) {
             nmembers = 0;
-            for (memb = (PyMemberDef *) slot->pfunc; memb->name != NULL; memb++) {
+            for (const PyMemberDef *memb = (const PyMemberDef *)slot->pfunc; memb->name != NULL; memb++) {
                 nmembers++;
+#if PROVISIONAL_VECTORCALL_SUPPORT
+                /* Python 3.8 already supports vectorcalls but does not
+                   consider the '__vectorcalloffset__' member. So we need to do
+                   it manually. */
+                if (strcmp(memb->name, "__vectorcalloffset__") == 0) {
+                    // The PyMemberDef must be a Py_ssize_t and readonly
+                    assert(memb->type == T_PYSSIZET);
+                    assert(memb->flags == READONLY);
+                    *vectorcalloffset = memb->offset;
+                }
+#endif /* Python 3.8.x */
             }
         }
     }
@@ -930,8 +1124,17 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
     PyObject *temp, *result;
     PyHeapTypeObject *temp_ht, *ht;
     PyTypeObject *temp_tp, *tp;
-    Py_ssize_t nmembers;
+    Py_ssize_t nmembers, vectorcalloffset;
     const char *s;
+
+#if PROVISIONAL_VECTORCALL_SUPPORT
+    /* Python 3.8 does not support specifying the vectorcall offset via the
+       type spec. Therefore, if the flag is set, 'PyType_Ready' will fail an
+       assert later on. So, we clear the flag and set the flags manually after
+       'PyType_Ready' when 'tp_vectorcall_offset' is also set. */
+    unsigned int restore_vectorcall_flag = spec->flags & _Py_TPFLAGS_HAVE_VECTORCALL;
+    spec->flags &= ~_Py_TPFLAGS_HAVE_VECTORCALL;
+#endif /* Python 3.8.x */
 
     temp = PyType_FromSpecWithBases(spec, bases);
     if (!temp)
@@ -958,7 +1161,7 @@ _PyType_FromMetaclass(PyType_Spec *spec, PyObject *bases,
 
         /* Count the members as 'PyType_FromSpecWithBases' does such that we
            can properly allocate the size later when allocating the type. */
-        nmembers = count_members(spec);
+        nmembers = count_members(spec, &vectorcalloffset);
 
         result = meta->tp_alloc(meta, nmembers);
         if (!result)
@@ -1042,6 +1245,21 @@ fail:
         Py_DECREF(temp);
         Py_XDECREF(result);
         return NULL;
+#if PROVISIONAL_VECTORCALL_SUPPORT
+    } else {
+        tp = (PyTypeObject *) temp;
+        nmembers = count_members(spec, &vectorcalloffset);
+    }
+
+    if (vectorcalloffset) {
+        tp->tp_vectorcall_offset = vectorcalloffset;
+    }
+
+    if (restore_vectorcall_flag) {
+        tp->tp_flags |= _Py_TPFLAGS_HAVE_VECTORCALL;
+        _PyObject_ASSERT((PyObject *)tp, tp->tp_vectorcall_offset > 0);
+        _PyObject_ASSERT((PyObject *)tp, tp->tp_call != NULL);
+#endif /* Python 3.8.x */
     }
     return temp;
 }
@@ -1067,8 +1285,10 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         PyErr_NoMemory();
         return HPy_NULL;
     }
+    /* Create local copies of 'basicsize' and 'flags' because they might be
+       modified and we must not write into 'hpyspec' since it is not owned by
+       this function and it could be read-only memory. */
     HPy_ssize_t basicsize;
-    HPy_ssize_t base_member_offset;
     unsigned long flags = hpyspec->flags;
 
     HPy_ssize_t head_size = _HPy_GetHeaderSize(hpyspec->builtin_shape);
@@ -1081,15 +1301,13 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
     /* _HPy_HEAD_SIZE(base) ensures that the custom struct is correctly
        aligned. */
     if (hpyspec->basicsize != 0) {
-        base_member_offset = head_size;
-        basicsize = hpyspec->basicsize + base_member_offset;
+        basicsize = hpyspec->basicsize + head_size;
     }
     else {
         /* If basicsize is 0, it is inherited from the parent type. In this
            case, calling *_AsStruct on an inherited type only makes sense if
            the parent type is already an HPy extension type. */
         basicsize = 0;
-        base_member_offset = 0;
     }
 
     HPyType_Extra_t *extra = _HPyType_Extra_Alloc(hpyspec->name, hpyspec->builtin_shape);
@@ -1098,14 +1316,19 @@ ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
         return HPy_NULL;
     }
     spec->name = extra->name;
-    spec->basicsize = (int)basicsize;
-    spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
     spec->itemsize = hpyspec->itemsize;
-    spec->slots = create_slot_defs(hpyspec, base_member_offset, extra);
+    spec->slots = create_slot_defs(hpyspec, extra, head_size, &basicsize, &flags);
     if (spec->slots == NULL) {
         PyMem_Free(spec);
         return HPy_NULL;
     }
+    /* If the vectorcall protocol should be used, set the corresponding
+       CPython type flag. */
+    assert(extra->tp_vectorcall_default_trampoline == NULL ||
+            (flags & _Py_TPFLAGS_HAVE_VECTORCALL));
+    spec->flags = flags | HPy_TPFLAGS_INTERNAL_IS_HPY_TYPE;
+    spec->basicsize = (int)basicsize;
+
     PyObject *bases = build_bases_from_params(params);
     if (PyErr_Occurred()) {
         PyMem_Free(spec->slots);
@@ -1203,6 +1426,8 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
         payload = (void *) result;
     }
 
+    _HPy_vectorcall_init(tp, result);
+
     // NOTE: The CPython docs explicitly ask to call GC_Track when all fields
     // are initialized, so it's important to do so AFTER zeroing the memory.
     if (PyType_IS_GC(tp))
@@ -1217,7 +1442,8 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
 }
 
 _HPy_HIDDEN HPy
-ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, HPy *args, HPy_ssize_t nargs, HPy kw)
+ctx_Type_GenericNew(HPyContext *ctx, HPy h_type, const HPy *args,
+                    HPy_ssize_t nargs, HPy kw)
 {
     PyObject *tp = _h2py(h_type);
     assert(tp != NULL);
@@ -1377,4 +1603,22 @@ _HPy_HIDDEN const char *ctx_Type_GetName(HPyContext *ctx, HPy type)
         // '_PyType_Name' is at least available from 3.8 to 3.12
         return _PyType_Name(tp);
     }
+}
+
+_HPy_HIDDEN int ctx_SetCallFunction(HPyContext *ctx, HPy h,
+                                    HPyCallFunction *func)
+{
+    PyObject *obj = _h2py(h);
+    assert(obj != NULL);
+
+    PyTypeObject *tp = Py_TYPE(obj);
+    assert(tp != NULL);
+    if (!PyType_HasFeature(tp, _Py_TPFLAGS_HAVE_VECTORCALL)) {
+        PyErr_Format(PyExc_TypeError,
+                "type '%.50s does not implement the HPy call protocol",
+                tp->tp_name);
+        return -1;
+    }
+    _HPy_set_vectorcall_func(tp, obj, func->cpy_trampoline);
+    return 0;
 }

@@ -82,7 +82,7 @@ static UHPy get_open_handles_impl(HPyContext *uctx, UHPy u_self, UHPy u_gen)
 
 HPyDef_METH(get_closed_handles, "get_closed_handles", HPyFunc_VARARGS,
             .doc="Return a list of all the closed handle in the cache")
-static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self, HPy *args, HPy_ssize_t nargs)
+static UHPy get_closed_handles_impl(HPyContext *uctx, UHPy u_self, const HPy *args, size_t nargs)
 {
     HPyContext *dctx = hpy_debug_get_ctx(uctx);
     if (dctx == NULL)
@@ -355,7 +355,7 @@ static UHPy DebugHandle_repr_impl(HPyContext *uctx, UHPy self)
 
 
 HPyDef_METH(DebugHandle__force_close, "_force_close",
-            HPyFunc_NOARGS, .doc="Close the underyling handle. FOR TESTS ONLY.")
+            HPyFunc_NOARGS, .doc="Close the underlying handle. FOR TESTS ONLY.")
 static UHPy DebugHandle__force_close_impl(HPyContext *uctx, UHPy self)
 {
     DebugHandleObject *dh = DebugHandleObject_AsStruct(uctx, self);

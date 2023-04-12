@@ -179,7 +179,8 @@ extern "C" {
 
        - PyPy: ._i is an index into a list
 
-       - GraalPython: ???
+       - GraalPy: ._i is a tagged value, either an index into a list,
+         or an immediate integer or double value
 
        - Debug mode: _i is a pointer to a DebugHandle, which contains a
          another HPy among other stuff
@@ -206,7 +207,7 @@ typedef struct { intptr_t _i; } HPyThreadState;
 
 /* Convenience functions to cast between HPy and void*.  We need to decide
    whether these are part of the official API or not, and maybe introduce a
-   better naming convetion. For now, they are needed for ujson. */
+   better naming convention. For now, they are needed for ujson. */
 static inline HPy HPy_FromVoidP(void *p) { return _hconv((intptr_t)p); }
 static inline void* HPy_AsVoidP(HPy h) { return (void*)h._i; }
 

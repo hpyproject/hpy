@@ -89,7 +89,7 @@ class TestNumber(HPyTest):
             mod = self.make_module("""
                 HPyDef_METH(f, "f", HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext *ctx, HPy self,
-                                  HPy *args, HPy_ssize_t nargs)
+                                  const HPy *args, size_t nargs)
                 {
                     HPy a, b;
                     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
@@ -106,7 +106,7 @@ class TestNumber(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b, c;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOO", &a, &b, &c))
@@ -128,7 +128,7 @@ class TestNumber(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
@@ -158,7 +158,7 @@ class TestNumber(HPyTest):
             mod = self.make_module("""
                 HPyDef_METH(f, "f", HPyFunc_VARARGS)
                 static HPy f_impl(HPyContext *ctx, HPy self,
-                                  HPy *args, HPy_ssize_t nargs)
+                                  const HPy *args, size_t nargs)
                 {
                     HPy a, b;
                     if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
@@ -178,7 +178,7 @@ class TestNumber(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b, c;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOO", &a, &b, &c))
@@ -207,7 +207,7 @@ class TestNumber(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))

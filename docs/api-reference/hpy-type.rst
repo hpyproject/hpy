@@ -47,4 +47,4 @@ Defining slots, methods, members, and get-set descriptors for types and modules
 is done with HPy definition (represented by C struct :c:struct:`HPyDef`).
 
 .. autocmodule:: hpy/hpydef.h
-   :members: HPyDef,HPyDef_Kind,HPySlot,HPyMeth,HPyMember_FieldType,HPyMember,HPyGetSet,HPyDef_SLOT,HPyDef_METH,HPyDef_MEMBER,HPyDef_GET,HPyDef_SET,HPyDef_GETSET
+   :members: HPyDef,HPyDef_Kind,HPySlot,HPyMeth,HPyMember_FieldType,HPyMember,HPyGetSet,HPyDef_SLOT,HPyDef_METH,HPyDef_MEMBER,HPyDef_GET,HPyDef_SET,HPyDef_GETSET,HPyDef_CALL_FUNCTION

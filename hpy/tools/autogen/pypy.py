@@ -4,7 +4,7 @@ from .parse import toC
 # this class should probably be moved somewhere in the PyPy repo
 class autogen_pypy_txt(AutoGenFile):
     PATH = 'hpy/tools/autogen/autogen_pypy.txt'
-    LANGUAGE = 'txt' # to avoid insering the disclaimer
+    LANGUAGE = 'txt' # to avoid inserting the disclaimer
 
     def generate(self):
         lines = []

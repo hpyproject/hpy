@@ -31,7 +31,7 @@ class TestParseItem(HPyTest):
 
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {{
                 {type} a;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "{fmt}", &a))
@@ -300,7 +300,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {{
                 HPy a;
                 HPy b = HPy_NULL;
@@ -325,7 +325,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 long a, b, c, d, e;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "lllll",
@@ -343,7 +343,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &a, &b))
@@ -359,7 +359,7 @@ class TestArgParse(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy a, b, result;
                 HPyTracker ht;
@@ -434,13 +434,13 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {{
                 HPy a, b, result;
                 HPyTracker ht;
                 static const char *kwlist[] = {{ "a", "b", NULL }};
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "{fmt}",
-                                          kwlist, &a, &b)) {{
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames,
+                                          "{fmt}", kwlist, &a, &b)) {{
                     return HPy_NULL;
                 }}
                 result = HPy_Add(ctx, a, b);
@@ -460,12 +460,13 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 HPy a, b, result;
                 HPyTracker ht;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "OO", kwlist, &a, &b)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames, "OO",
+                                          kwlist, &a, &b)) {
                     return HPy_NULL;
                 }
                 result = HPy_Add(ctx, a, b);
@@ -481,14 +482,15 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 HPy a;
                 HPy b = HPy_NULL;
                 HPyTracker ht;
                 HPy res;
                 static const char *kwlist[] = { "a", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|O", kwlist, &a, &b)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames, "O|O",
+                                          kwlist, &a, &b)) {
                     return HPy_NULL;
                 }
                 if (HPy_IsNull(b)) {
@@ -540,12 +542,12 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 long a, b, c;
                 static const char *kwlist[] = { "", "b", "", NULL };
-                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kw, "lll", kwlist,
-                                          &a, &b, &c))
+                if (!HPyArg_ParseKeywords(ctx, NULL, args, nargs, kwnames,
+                                          "lll", kwlist, &a, &b, &c))
                     return HPy_NULL;
                 return HPy_Dup(ctx, ctx->h_None);
             }
@@ -561,14 +563,15 @@ class TestArgParseKeywords(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs, HPy kw)
+                              const HPy *args, size_t nargs, HPy kwnames)
             {
                 HPy a;
                 HPy b = HPy_NULL;
                 HPyTracker ht;
                 HPy res;
                 static const char *kwlist[] = { "", "b", NULL };
-                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kw, "O|O", kwlist, &a, &b)) {
+                if (!HPyArg_ParseKeywords(ctx, &ht, args, nargs, kwnames,
+                                          "O|O", kwlist, &a, &b)) {
                     return HPy_NULL;
                 }
                 if (HPy_IsNull(b)) {
@@ -619,3 +622,57 @@ class TestArgParseKeywords(HPyTest):
         with pytest.raises(TypeError) as exc:
             mod.f(1, 2)
         assert str(exc.value) == "my-error-message"
+
+    def test_keywords_dict(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_KEYWORDS)
+            static HPy f_impl(HPyContext *ctx, HPy self,
+                              const HPy *args, size_t nargs, HPy kwnames)
+            {
+                HPy args_tuple, kwdict;
+                HPy a, b = HPy_NULL, res;
+                HPyTracker ht;
+                HPy_ssize_t n_args_tuple, i;
+                HPy *args_arr;
+                int status;
+                static const char *kwlist[] = { "a", "b", NULL };
+
+                if (nargs != 2) {
+                    HPyErr_SetString(ctx, ctx->h_SystemError,
+                                     "expected exactly two args");
+                    return HPy_NULL;
+                }
+                args_tuple = args[0];
+                kwdict = args[1];
+                n_args_tuple = HPy_Length(ctx, args_tuple);
+                args_arr = (HPy *)malloc(n_args_tuple * sizeof(HPy));
+                for (i=0; i < n_args_tuple; i++)
+                    args_arr[i] = HPy_GetItem_i(ctx, args_tuple, i);
+
+                status = HPyArg_ParseKeywordsDict(ctx, &ht, args_arr,
+                             n_args_tuple, kwdict, "O|O", kwlist, &a, &b);
+
+                for (i=0; i < n_args_tuple; i++)
+                    HPy_Close(ctx, args_arr[i]);
+                free(args_arr);
+                if (!status) {
+                    return HPy_NULL;
+                }
+                if (HPy_IsNull(b)) {
+                    b = HPyLong_FromLong(ctx, 5);
+                    HPyTracker_Add(ctx, ht, b);
+                }
+                res = HPy_Add(ctx, a, b);
+                HPyTracker_Close(ctx, ht);
+                return res;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f(tuple(), dict(a=3, b=2)) == 5
+        assert mod.f((3, 2), {}) == 5
+        assert mod.f(tuple(), dict(a=3)) == 8
+        assert mod.f((3,), {}) == 8
+        with pytest.raises(TypeError):
+            mod.f(tuple(), {})

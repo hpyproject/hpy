@@ -154,7 +154,7 @@ class TestErr(HPyTest):
 
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {{
                 HPy type, file1, file2;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OOO", &type, &file1, &file2))
@@ -337,7 +337,7 @@ class TestErr(HPyTest):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
             static HPy f_impl(HPyContext *ctx, HPy self,
-                              HPy *args, HPy_ssize_t nargs)
+                              const HPy *args, size_t nargs)
             {
                 HPy h_key, h_args, h_kw;
                 HPy h_dict, h_err, h_err_value;
@@ -478,7 +478,7 @@ class TestErr(HPyTest):
     def test_errorval_returned_by_api_functions_hpy(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy a = HPy_NULL;
                 HPy b = HPy_NULL;
@@ -523,7 +523,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 // MSVC doesn't allow "static HPy h_FooErr = HPy_NULL"
                 // so we do an initialization dance instead.
@@ -603,7 +603,7 @@ class TestErr(HPyTest):
         import pytest
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPyTracker ht;
                 HPy fun, fun_args;

@@ -14,7 +14,7 @@ HPy is a better API for extending Python
 in C. The old C API is specific to the current implementation of CPython.
 It exposes a lot of internal details which makes it hard to:
 
-  - implement it for other Python implementations (e.g. PyPy, GraalPython,
+  - implement it for other Python implementations (e.g. PyPy, GraalPy,
     Jython, IronPython, etc.).
   - experiment with new things inside CPython itself: e.g. using a GC
     instead of refcounting, or to remove the GIL
@@ -32,7 +32,7 @@ for more details on HPy motivation, goals, and features, for example:
 
   - debug mode for better developer experience
   - support for incremental porting from CPython API to HPy
-  - CPython ABI for raw peformance on CPython
+  - CPython ABI for raw performance on CPython
   - and others
 
 Do you want to see how HPy API looks in code? Check out

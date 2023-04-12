@@ -85,7 +85,7 @@ static void print_error(HPyContext *uctx, const char *message)
     // we just print the exception to stderr and clear it
     // XXX: we should use HPySys_WriteStderr when we have it
     fprintf(stderr, "%s\n", message);
-    //HPyErr_PrintEx(0); // uncommment when we have it
+    //HPyErr_PrintEx(0); // uncomment when we have it
 }
 
 static inline void

@@ -52,12 +52,14 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
     case HPyFunc_KEYWORDS: {
         HPyFunc_keywords f = (HPyFunc_keywords)func;
         _HPyFunc_args_KEYWORDS *a = (_HPyFunc_args_KEYWORDS*)args;
-        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
-        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
-        for (Py_ssize_t i = 0; i < nargs; i++) {
-            h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
+        size_t n_kwnames = a->kwnames != NULL ? PyTuple_GET_SIZE(a->kwnames) : 0;
+        size_t nargs = PyVectorcall_NARGS(a->nargsf);
+        size_t nargs_with_kw = nargs + n_kwnames;
+        HPy *h_args = (HPy *)alloca(nargs_with_kw * sizeof(HPy));
+        for (size_t i = 0; i < nargs_with_kw; i++) {
+            h_args[i] = _py2h(a->args[i]);
         }
-        a->result = _h2py(f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw)));
+        a->result = _h2py(f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kwnames)));
         return;
     }
     case HPyFunc_INITPROC: {
@@ -69,6 +71,17 @@ ctx_CallRealFunctionFromTrampoline(HPyContext *ctx, HPyFunc_Signature sig,
             h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
         }
         a->result = f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw));
+        return;
+    }
+    case HPyFunc_NEWFUNC: {
+        HPyFunc_newfunc f = (HPyFunc_newfunc)func;
+        _HPyFunc_args_NEWFUNC *a = (_HPyFunc_args_NEWFUNC*)args;
+        Py_ssize_t nargs = PyTuple_GET_SIZE(a->args);
+        HPy *h_args = (HPy *)alloca(nargs * sizeof(HPy));
+        for (Py_ssize_t i = 0; i < nargs; i++) {
+            h_args[i] = _py2h(PyTuple_GET_ITEM(a->args, i));
+        }
+        a->result = _h2py(f(ctx, _py2h(a->self), h_args, nargs, _py2h(a->kw)));
         return;
     }
     case HPyFunc_GETBUFFERPROC: {

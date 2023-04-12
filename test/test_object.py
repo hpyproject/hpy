@@ -715,7 +715,7 @@ class TestObject(HPyTest):
     def test_contains(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 int result = HPy_Contains(ctx, args[0], args[1]);
                 if (result == -1) {
@@ -794,7 +794,7 @@ class TestObject(HPyTest):
     def test_typecheck_and_subtype(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy a, b;
                 int c, res;
@@ -822,7 +822,7 @@ class TestObject(HPyTest):
     def test_is(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_VARARGS)
-            static HPy f_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 HPy obj, other;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "OO", &obj, &other))

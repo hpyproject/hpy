@@ -43,7 +43,7 @@ HPy Helper Functions
 together with the HPy extension's sources. The appropriate source files are
 automatically added to the extension sources. The helper functions will, of
 course, use the core API to interact with the interpreter. The main reason for
-having the helper functions in the HPy extension is to avoid compatiblilty
+having the helper functions in the HPy extension is to avoid compatibility
 problems due to different compilers.
 
 .. toctree::

@@ -70,7 +70,7 @@ class PointTemplate(DefaultExtensionTemplate):
     def DEFINE_Point_new(self):
         return """
             HPyDef_SLOT(Point_new, HPy_tp_new)
-            static HPy Point_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 long x, y;
@@ -90,6 +90,50 @@ class PointTemplate(DefaultExtensionTemplate):
         return """
             HPyDef_MEMBER(Point_x, "x", HPyMember_LONG, offsetof(PointObject, x))
             HPyDef_MEMBER(Point_y, "y", HPyMember_LONG, offsetof(PointObject, y))
+        """
+
+    def DEFINE_Point_call(self):
+        return """
+            HPyDef_SLOT(Point_call, HPy_tp_call)
+            static HPy
+            Point_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
+            {
+                long x, sum = 0;
+                for (size_t i = 0; i < nargs; i++) {
+                    x = HPyLong_AsLong(ctx, args[i]);
+                    if (x == -1 && HPyErr_Occurred(ctx))
+                        return HPy_NULL;
+                    sum += x;
+                }
+                if (!HPy_IsNull(kwnames)) {
+                    x = 1;
+                    HPy_ssize_t n = HPy_Length(ctx, kwnames);
+                    HPy h_factor_str = HPyUnicode_FromString(ctx, "factor");
+                    HPy kwname;
+                    for (HPy_ssize_t i=0; i < n; i++) {
+                        kwname = HPy_GetItem_i(ctx, kwnames, i);
+                        if (HPy_IsNull(kwname)) {
+                            HPy_Close(ctx, h_factor_str);
+                            return HPy_NULL;
+                        }
+                        if (HPy_RichCompareBool(ctx, h_factor_str, kwname, HPy_EQ)) {
+                            x = HPyLong_AsLong(ctx, args[nargs + i]);
+                            if (x == -1 && HPyErr_Occurred(ctx)) {
+                                HPy_Close(ctx, kwname);
+                                HPy_Close(ctx, h_factor_str);
+                                return HPy_NULL;
+                            }
+                            HPy_Close(ctx, kwname);
+                            break;
+                        }
+                        HPy_Close(ctx, kwname);
+                    }
+                    HPy_Close(ctx, h_factor_str);
+                }
+                PointObject *data = PointObject_AsStruct(ctx, callable);
+                sum += data->x + data->y;
+                return HPyLong_FromLong(ctx, sum * x);
+            }
         """
 
     def EXPORT_POINT_TYPE(self, *defines):
@@ -583,7 +627,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -644,7 +688,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -700,7 +744,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -852,7 +896,7 @@ class TestType(HPyTest):
             @TYPE_STRUCT_END
 
             HPyDef_SLOT(Foo_new, HPy_tp_new)
-            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, HPy *args,
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
                                       HPy_ssize_t nargs, HPy kw)
             {
                 FooObject *foo;
@@ -959,6 +1003,205 @@ class TestType(HPyTest):
         with pytest.raises(AttributeError):
             del foo.NONE_member
 
+    def test_call(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_call
+
+            HPyDef_SLOT(Dummy_call, HPy_tp_call)
+            static HPy
+            Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args,
+                            size_t nargs, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello");
+            }
+
+            @EXPORT_POINT_TYPE(&Point_call)
+            @INIT
+        """)
+        p = mod.Point()
+        assert p(3, 4, 5, factor=2) == 24
+
+    def test_call_with_tp_new(self):
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_new
+            @DEFINE_Point_call
+            @EXPORT_POINT_TYPE(&Point_new, &Point_call)
+            @INIT
+        """)
+        p = mod.Point(1, 2)
+        assert p(3, 4, 5, factor=2) == 30
+
+    def test_call_set(self):
+        import pytest
+        mod = self.make_module("""
+            @DEFINE_PointObject
+            @DEFINE_Point_call
+
+            HPyDef_CALL_FUNCTION(Point_special_call)
+            static HPy
+            Point_special_call_impl(HPyContext *ctx, HPy callable,
+                                    const HPy *args, size_t nargs, HPy kwnames)
+            {
+                HPy tmp = Point_call_impl(ctx, callable, args, nargs, kwnames);
+                HPy res = HPy_Negative(ctx, tmp);
+                HPy_Close(ctx, tmp);
+                return res;
+            }
+
+            HPyDef_SLOT(Point_new, HPy_tp_new)
+            static HPy Point_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
+                                      HPy_ssize_t nargs, HPy kw)
+            {
+                long x, y;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "ll", &x, &y))
+                    return HPy_NULL;
+                PointObject *point;
+                HPy h_point = HPy_New(ctx, cls, &point);
+                if (HPy_IsNull(h_point))
+                    return HPy_NULL;
+                if (x < 0 && HPy_SetCallFunction(ctx, h_point, &Point_special_call) < 0) {
+                    HPy_Close(ctx, h_point);
+                    return HPy_NULL;
+                }
+                point->x = x;
+                point->y = y;
+                return h_point;
+            }
+
+            HPyDef_METH(call_set, "call_set", HPyFunc_O)
+            static HPy call_set_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                if (HPy_SetCallFunction(ctx, arg, &Point_special_call) < 0)
+                    return HPy_NULL;
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT_POINT_TYPE(&Point_new, &Point_call)
+            @EXPORT(call_set)
+            @INIT
+        """)
+
+        # this uses 'Point_call'
+        p0 = mod.Point(1, 2)
+        assert p0(3, 4, 5, factor=2) == 30
+
+        # the negative 'x' will cause that 'Point_special_call' is used
+        p1 = mod.Point(-1, 2)
+        assert p1(3, 4, 5, factor=2) == -26
+
+        # error case: setting call function on object that does not implement
+        # the HPy call protocol
+        with pytest.raises(TypeError):
+            mod.call_set(object())
+
+    def test_call_invalid_specs(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_SLOT(Dummy_call, HPy_tp_call)
+            static HPy
+            Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello");
+            }
+
+            HPyDef_MEMBER(Dummy_vcall_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET, 4*sizeof(void*), .readonly=1)
+
+            static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
+            static HPyDef *Dummy_vcall_defines[] = { &Dummy_call, &Dummy_vcall_offset, NULL };
+
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                .itemsize = sizeof(intptr_t),
+                .flags = HPy_TPFLAGS_DEFAULT,
+                @DEFAULT_SHAPE
+                .defines = Dummy_defines,
+            };
+
+            static HPyType_Spec Dummy_vcall_spec = {
+                .name = "mytest.DummyVCall",
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_VECTORCALL,
+                @DEFAULT_SHAPE
+                .defines = Dummy_vcall_defines,
+            };
+
+            HPyDef_METH(create_var_type, "create_var_type", HPyFunc_NOARGS)
+            static HPy create_var_type_impl(HPyContext *ctx, HPy self)
+            {
+                if (!HPyHelpers_AddType(ctx, self, "Dummy", &Dummy_spec, NULL)) {
+                    return HPy_NULL;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            HPyDef_METH(create_vcall, "create_call_and_vectorcalloffset_type", HPyFunc_NOARGS)
+            static HPy create_vcall_impl(HPyContext *ctx, HPy self)
+            {
+                if (!HPyHelpers_AddType(ctx, self, "DummyVCall", &Dummy_vcall_spec, NULL)) {
+                    return HPy_NULL;
+                }
+                return HPy_Dup(ctx, ctx->h_None);
+            }
+
+            @EXPORT(create_var_type)
+            @EXPORT(create_vcall)
+            @INIT
+        """)
+        with pytest.raises(TypeError):
+            mod.create_var_type()
+        with pytest.raises(TypeError):
+            mod.create_call_and_vectorcalloffset_type()
+
+    def test_call_explicit_offset(self):
+        mod = self.make_module("""
+            @TYPE_STRUCT_BEGIN(FooObject)
+                void *a;
+                HPyCallFunction call_func;
+                void *b;
+            @TYPE_STRUCT_END
+
+            HPyDef_MEMBER(Foo_vcall_offset, "__vectorcalloffset__", HPyMember_HPYSSIZET, offsetof(FooObject, call_func), .readonly=1)
+
+            HPyDef_CALL_FUNCTION(Foo_manual_call_func)
+            static HPy
+            Foo_manual_call_func_impl(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello manually initialized call function");
+            }
+
+            HPyDef_SLOT(Foo_new, HPy_tp_new)
+            static HPy Foo_new_impl(HPyContext *ctx, HPy cls, const HPy *args,
+                                    HPy_ssize_t nargs, HPy kw)
+            {
+                FooObject *data;
+                HPy h_obj = HPy_New(ctx, cls, &data);
+                if (HPy_IsNull(h_obj))
+                    return HPy_NULL;
+                data->call_func = Foo_manual_call_func;
+                return h_obj;
+            }
+
+            static HPyDef *Foo_defines[] = {
+                &Foo_vcall_offset,
+                &Foo_new,
+                NULL
+            };
+
+            static HPyType_Spec Foo_spec = {
+                .name = "mytest.Foo",
+                .basicsize = sizeof(FooObject),
+                .itemsize = sizeof(intptr_t),
+                .flags = HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_HAVE_VECTORCALL,
+                @DEFAULT_SHAPE
+                .defines = Foo_defines,
+            };
+
+            @EXPORT_TYPE("Foo", Foo_spec)
+            @INIT
+        """)
+        foo = mod.Foo()
+        assert foo() == 'hello manually initialized call function'
 
     def test_HPyType_GenericNew(self):
         mod = self.make_module("""
@@ -1225,7 +1468,7 @@ class TestType(HPyTest):
 
             HPyDef_METH(create_type, "create_type", HPyFunc_VARARGS)
             static HPy create_type_impl(HPyContext *ctx, HPy module,
-                                            HPy *args, HPy_ssize_t nargs)
+                                            const HPy *args, size_t nargs)
             {
                 HPy metaclass;
                 if (!HPyArg_Parse(ctx, NULL, args, nargs, "sO",
@@ -1359,7 +1602,7 @@ class TestType(HPyTest):
             }
 
             HPyDef_METH(issubtype, "issubtype", HPyFunc_VARARGS)
-            static HPy issubtype_impl(HPyContext *ctx, HPy self, HPy *args, HPy_ssize_t nargs)
+            static HPy issubtype_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
             {
                 if (nargs != 2) {
                     HPyErr_SetString(ctx, ctx->h_TypeError, "expected exactly 2 arguments");
@@ -1456,3 +1699,28 @@ class TestPureHPyType(HPyTest):
                 @EXPORT_TYPE("Dummy", Dummy_spec)
                 @INIT
             """)
+
+    def test_call_zero_basicsize(self):
+        mod = self.make_module("""
+            HPyDef_SLOT(Dummy_call, HPy_tp_call)
+            static HPy
+            Dummy_call_impl(HPyContext *ctx, HPy callable, const HPy *args,
+                            size_t nargs, HPy kwnames)
+            {
+                return HPyUnicode_FromString(ctx, "hello");
+            }
+
+            static HPyDef *Dummy_defines[] = { &Dummy_call, NULL };
+            static HPyType_Spec Dummy_spec = {
+                .name = "mytest.Dummy",
+                @DEFAULT_SHAPE
+                .defines = Dummy_defines,
+            };
+
+            @EXPORT_TYPE("Dummy", Dummy_spec)
+            @INIT
+        """)
+        # type 'Dummy' has basicsize == 0; this test ensures that installation
+        # of the hidden call function field is done correctly
+        q = mod.Dummy()
+        assert q() == 'hello'

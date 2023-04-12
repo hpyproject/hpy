@@ -10,6 +10,7 @@ import hpyvarargs
 import snippets
 import simple_type
 import builtin_type
+import hpycall
 
 
 def test_simple_abs():
@@ -111,3 +112,13 @@ def test_trace_mode_output():
     # Rudimentary check that the output contains what we have in the documentation
     out = result.stdout.decode('latin-1')
     assert 'get_call_counts()["ctx_Add"] == 1' in out
+
+def test_call_dot_product():
+    vec = hpycall.EuclideanVector(4, 5)
+    assert vec(6, 7) == 4 * 6 + 5 * 7
+    vec = hpycall.EuclideanVector(4, 5, use_special_call=True)
+    assert vec(6, 7) == -(4 * 6 + 5 * 7)
+    foo = hpycall.Foo()
+    assert foo() == 'hello manually initialized call function'
+    pack = hpycall.Pack()
+    assert pack() is None

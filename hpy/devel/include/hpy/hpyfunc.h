@@ -2,8 +2,8 @@
 #define HPY_UNIVERSAL_HPYFUNC_H
 
 typedef enum {
-    HPyFunc_VARARGS  = 1,  // METH_VARARGS
-    HPyFunc_KEYWORDS = 2,  // METH_VARARGS | METH_KEYWORDS
+    HPyFunc_VARARGS  = 1,  // METH_FASTCALL
+    HPyFunc_KEYWORDS = 2,  // METH_FASTCALL | METH_KEYWORDS
     HPyFunc_NOARGS   = 3,  // METH_NOARGS
     HPyFunc_O        = 4,  // METH_O
 
@@ -34,12 +34,14 @@ typedef enum {
     HPyFunc_DESCRGETFUNC,
     HPyFunc_DESCRSETFUNC,
     HPyFunc_INITPROC,
+    HPyFunc_NEWFUNC,
     HPyFunc_GETTER,
     HPyFunc_SETTER,
     HPyFunc_OBJOBJPROC,
     HPyFunc_TRAVERSEPROC,
     HPyFunc_DESTRUCTOR,
     HPyFunc_CAPSULE_DESTRUCTOR,
+    HPyFunc_VECTORCALLFUNC,
 
     HPyFunc_MOD_CREATE,
 
