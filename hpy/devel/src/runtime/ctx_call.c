@@ -41,7 +41,7 @@ ctx_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)
 }
 
 #if PY_VERSION_HEX < 0x03090000
-#define PyObject_Vectorcall _PyObject_Vectorcall
+#    define PyObject_Vectorcall _PyObject_Vectorcall
 #endif
 
 _HPy_HIDDEN HPy
@@ -74,7 +74,7 @@ ctx_Call(HPyContext *ctx, HPy h_callable, const HPy *h_args, size_t nargs, HPy h
 }
 
 #if PY_VERSION_HEX < 0x03090000
-#undef PyObject_Vectorcall
+#    undef PyObject_Vectorcall
 #endif
 
 _HPy_HIDDEN HPy
