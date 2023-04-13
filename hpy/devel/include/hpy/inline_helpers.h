@@ -459,10 +459,34 @@ HPySlice_AdjustIndices(HPyContext *_HPy_UNUSED_ARG(ctx), HPy_ssize_t length,
     return 0;
 }
 
+/**
+ * Call a method of a Python object.
+ *
+ * This is a convenience function for calling a method. It uses
+ * :c:func:`HPy_GetAttr_s` and :c:func:`HPy_CallTupleDict` to perform the method
+ * call.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param utf8_name:
+ *     The name (UTF-8 encoded C string) of the method. Must not be ``NULL``.
+ * :param receiver:
+ *     A handle to the receiver of the call (i.e. the ``self``). Must not be
+ *     ``HPy_NULL``.
+ * :param args:
+ *     A handle to a tuple containing the positional arguments (must not be
+ *     ``HPy_NULL`` but can, of course, be empty).
+ * :param kw:
+ *     A handle to a Python dictionary containing the keyword arguments (may be
+ *     ``HPy_NULL``).
+ *
+ * :returns:
+ *     The result of the call on success, or ``HPy_NULL`` in case of an error.
+ */
 HPyAPI_INLINE_HELPER HPy
-HPy_CallMethodTupleDict_s(HPyContext *ctx, const char *name, HPy receiver, HPy args, HPy kw)
+HPy_CallMethodTupleDict_s(HPyContext *ctx, const char *utf8_name, HPy receiver, HPy args, HPy kw)
 {
-    HPy method = HPy_GetAttr_s(ctx, receiver, name);
+    HPy method = HPy_GetAttr_s(ctx, receiver, utf8_name);
     if (HPy_IsNull(method)) {
         return HPy_NULL;
     }
@@ -472,6 +496,31 @@ HPy_CallMethodTupleDict_s(HPyContext *ctx, const char *name, HPy receiver, HPy a
     return result;
 }
 
+/**
+ * Call a method of a Python object.
+ *
+ * This is a convenience function for calling a method. It uses
+ * :c:func:`HPy_GetAttr` and :c:func:`HPy_CallTupleDict` to perform the method
+ * call.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param name:
+ *     A handle to the name (a Unicode object) of the method. Must not be
+ *     ``HPy_NULL``.
+ * :param receiver:
+ *     A handle to the receiver of the call (i.e. the ``self``). Must not be
+ *     ``HPy_NULL``.
+ * :param args:
+ *     A handle to a tuple containing the positional arguments (must not be
+ *     ``HPy_NULL`` but can, of course, be empty).
+ * :param kw:
+ *     A handle to a Python dictionary containing the keyword arguments (may be
+ *     ``HPy_NULL``).
+ *
+ * :returns:
+ *     The result of the call on success, or ``HPy_NULL`` in case of an error.
+ */
 HPyAPI_INLINE_HELPER HPy
 HPy_CallMethodTupleDict(HPyContext *ctx, HPy name, HPy receiver, HPy args, HPy kw)
 {
