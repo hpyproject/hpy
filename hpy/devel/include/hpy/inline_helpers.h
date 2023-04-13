@@ -460,7 +460,7 @@ HPySlice_AdjustIndices(HPyContext *_HPy_UNUSED_ARG(ctx), HPy_ssize_t length,
 }
 
 HPyAPI_INLINE_HELPER HPy
-HPy_CallMethodTupleDict_s(HPyContext *ctx, HPy receiver, const char *name, HPy args, HPy kw)
+HPy_CallMethodTupleDict_s(HPyContext *ctx, const char *name, HPy receiver, HPy args, HPy kw)
 {
     HPy method = HPy_GetAttr_s(ctx, receiver, name);
     if (HPy_IsNull(method)) {
@@ -473,7 +473,7 @@ HPy_CallMethodTupleDict_s(HPyContext *ctx, HPy receiver, const char *name, HPy a
 }
 
 HPyAPI_INLINE_HELPER HPy
-HPy_CallMethodTupleDict(HPyContext *ctx, HPy receiver, HPy name, HPy args, HPy kw)
+HPy_CallMethodTupleDict(HPyContext *ctx, HPy name, HPy receiver, HPy args, HPy kw)
 {
     HPy method = HPy_GetAttr(ctx, receiver, name);
     if (HPy_IsNull(method)) {

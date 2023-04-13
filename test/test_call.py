@@ -129,13 +129,13 @@ class TestCall(HPyTest):
                     return HPy_NULL;
                 }
 
-                result_0 = HPy_CallMethodTupleDict(ctx, receiver, h_name, m_args, HPy_NULL);
+                result_0 = HPy_CallMethodTupleDict(ctx, h_name, receiver, m_args, HPy_NULL);
                 if (HPy_IsNull(result_0)) {
                     HPyTracker_Close(ctx, ht);
                     return HPy_NULL;
                 }
 
-                result_1 = HPy_CallMethodTupleDict_s(ctx, receiver, s_name, m_args, HPy_NULL);
+                result_1 = HPy_CallMethodTupleDict_s(ctx, s_name, receiver, m_args, HPy_NULL);
                 if (HPy_IsNull(result_1)) {
                     HPyTracker_Close(ctx, ht);
                     HPy_Close(ctx, result_0);
