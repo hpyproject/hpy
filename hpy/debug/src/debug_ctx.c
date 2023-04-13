@@ -624,9 +624,17 @@ DHPy debug_ctx_Call(HPyContext *dctx, DHPy dh_callable, const DHPy *dh_args, siz
     UHPy uh_callable = DHPy_unwrap(dctx, dh_callable);
     UHPy uh_kwnames = DHPy_unwrap(dctx, dh_kwnames);
     uctx = ctx_info->info->uctx;
-    HPy_ssize_t nkw = HPy_IsNull(uh_kwnames) ? 0 : HPy_Length(uctx, uh_kwnames);
-    if (nkw < 0) {
-        return HPy_NULL;
+    HPy_ssize_t nkw;
+    if (!HPy_IsNull(uh_kwnames)) {
+        if (!HPyTuple_Check(uctx, uh_kwnames)) {
+            HPy_FatalError(uctx, "HPy_Call arg 'kwnames' must be a tuple object or HPy_NULL");
+        }
+        nkw = HPy_Length(uctx, uh_kwnames);
+        if (nkw < 0) {
+            return HPy_NULL;
+        }
+    } else {
+        nkw = 0;
     }
     const size_t n_all_args = nargs + nkw;
     UHPy *uh_args = (UHPy *)alloca(n_all_args * sizeof(UHPy));
@@ -652,9 +660,17 @@ DHPy debug_ctx_CallMethod(HPyContext *dctx,  DHPy dh_name, const DHPy *dh_args, 
     UHPy uh_name = DHPy_unwrap(dctx, dh_name);
     UHPy uh_kwnames = DHPy_unwrap(dctx, dh_kwnames);
     uctx = ctx_info->info->uctx;
-    HPy_ssize_t nkw = HPy_IsNull(uh_kwnames) ? 0 : HPy_Length(uctx, uh_kwnames);
-    if (nkw < 0) {
-        return HPy_NULL;
+    HPy_ssize_t nkw;
+    if (!HPy_IsNull(uh_kwnames)) {
+        if (!HPyTuple_Check(uctx, uh_kwnames)) {
+            HPy_FatalError(uctx, "HPy_CallMethod arg 'kwnames' must be a tuple object or HPy_NULL");
+        }
+        nkw = HPy_Length(uctx, uh_kwnames);
+        if (nkw < 0) {
+            return HPy_NULL;
+        }
+    } else {
+        nkw = 0;
     }
     const size_t n_all_args = nargs + nkw;
     UHPy *uh_args = (UHPy *)alloca(n_all_args * sizeof(UHPy));
