@@ -240,6 +240,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyNumber_Xor <https://docs.python.org/3/c-api/number.html#c.PyNumber_Xor>`_                                                       :c:func:`HPy_Xor`
     `PyObject_ASCII <https://docs.python.org/3/c-api/object.html#c.PyObject_ASCII>`_                                                   :c:func:`HPy_ASCII`
     `PyObject_Bytes <https://docs.python.org/3/c-api/object.html#c.PyObject_Bytes>`_                                                   :c:func:`HPy_Bytes`
+    `PyObject_Call <https://docs.python.org/3/c-api/call.html#c.PyObject_Call>`_                                                       :c:func:`HPy_CallTupleDict`
     `PyObject_DelItem <https://docs.python.org/3/c-api/object.html#c.PyObject_DelItem>`_                                               :c:func:`HPy_DelItem`
     `PyObject_GetAttr <https://docs.python.org/3/c-api/object.html#c.PyObject_GetAttr>`_                                               :c:func:`HPy_GetAttr`
     `PyObject_GetAttrString <https://docs.python.org/3/c-api/object.html#c.PyObject_GetAttrString>`_                                   :c:func:`HPy_GetAttr_s`
@@ -258,6 +259,8 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyObject_Str <https://docs.python.org/3/c-api/object.html#c.PyObject_Str>`_                                                       :c:func:`HPy_Str`
     `PyObject_Type <https://docs.python.org/3/c-api/object.html#c.PyObject_Type>`_                                                     :c:func:`HPy_Type`
     `PyObject_TypeCheck <https://docs.python.org/3/c-api/object.html#c.PyObject_TypeCheck>`_                                           :c:func:`HPy_TypeCheck`
+    `PyObject_Vectorcall <https://docs.python.org/3/c-api/call.html#c.PyObject_Vectorcall>`_                                           :c:func:`HPy_Call`
+    `PyObject_VectorcallMethod <https://docs.python.org/3/c-api/call.html#c.PyObject_VectorcallMethod>`_                               :c:func:`HPy_CallMethod`
     `PySequence_Contains <https://docs.python.org/3/c-api/sequence.html#c.PySequence_Contains>`_                                       :c:func:`HPy_Contains`
     `PySlice_AdjustIndices <https://docs.python.org/3/c-api/slice.html#c.PySlice_AdjustIndices>`_                                      :c:func:`HPySlice_AdjustIndices`
     `PySlice_Unpack <https://docs.python.org/3/c-api/slice.html#c.PySlice_Unpack>`_                                                    :c:func:`HPySlice_Unpack`

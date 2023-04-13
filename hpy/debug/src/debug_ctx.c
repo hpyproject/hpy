@@ -610,3 +610,75 @@ DHPy debug_ctx_Unicode_Substring(HPyContext *dctx, DHPy str, HPy_ssize_t start, 
     ctx_info->is_valid = true;
     return DHPy_open(dctx, universal_result);
 }
+
+DHPy debug_ctx_Call(HPyContext *dctx, DHPy dh_callable, const DHPy *dh_args, size_t nargs, DHPy dh_kwnames)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+
+    UHPy uh_callable = DHPy_unwrap(dctx, dh_callable);
+    UHPy uh_kwnames = DHPy_unwrap(dctx, dh_kwnames);
+    uctx = ctx_info->info->uctx;
+    HPy_ssize_t nkw;
+    if (!HPy_IsNull(uh_kwnames)) {
+        if (!HPyTuple_Check(uctx, uh_kwnames)) {
+            HPy_FatalError(uctx, "HPy_Call arg 'kwnames' must be a tuple object or HPy_NULL");
+        }
+        nkw = HPy_Length(uctx, uh_kwnames);
+        if (nkw < 0) {
+            return HPy_NULL;
+        }
+    } else {
+        nkw = 0;
+    }
+    const size_t n_all_args = nargs + nkw;
+    UHPy *uh_args = (UHPy *)alloca(n_all_args * sizeof(UHPy));
+    for(size_t i=0; i < n_all_args; i++) {
+        uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
+    }
+    ctx_info->is_valid = false;
+    DHPy dh_result = DHPy_open(dctx, HPy_Call(uctx, uh_callable, uh_args, nargs, uh_kwnames));
+    ctx_info->is_valid = true;
+    return dh_result;
+}
+
+DHPy debug_ctx_CallMethod(HPyContext *dctx,  DHPy dh_name, const DHPy *dh_args, size_t nargs, DHPy dh_kwnames)
+{
+    HPyDebugCtxInfo *ctx_info;
+    HPyContext *uctx;
+
+    ctx_info = get_ctx_info(dctx);
+    if (!ctx_info->is_valid) {
+        report_invalid_debug_context();
+    }
+
+    UHPy uh_name = DHPy_unwrap(dctx, dh_name);
+    UHPy uh_kwnames = DHPy_unwrap(dctx, dh_kwnames);
+    uctx = ctx_info->info->uctx;
+    HPy_ssize_t nkw;
+    if (!HPy_IsNull(uh_kwnames)) {
+        if (!HPyTuple_Check(uctx, uh_kwnames)) {
+            HPy_FatalError(uctx, "HPy_CallMethod arg 'kwnames' must be a tuple object or HPy_NULL");
+        }
+        nkw = HPy_Length(uctx, uh_kwnames);
+        if (nkw < 0) {
+            return HPy_NULL;
+        }
+    } else {
+        nkw = 0;
+    }
+    const size_t n_all_args = nargs + nkw;
+    UHPy *uh_args = (UHPy *)alloca(n_all_args * sizeof(UHPy));
+    for(size_t i=0; i < n_all_args; i++) {
+        uh_args[i] = DHPy_unwrap(dctx, dh_args[i]);
+    }
+    ctx_info->is_valid = false;
+    DHPy dh_result = DHPy_open(dctx, HPy_CallMethod(uctx, uh_name, uh_args, nargs, uh_kwnames));
+    ctx_info->is_valid = true;
+    return dh_result;
+}
