@@ -1,5 +1,5 @@
-HPy overview
-=============
+HPy Overview
+============
 
 Motivation and goals
 ---------------------
@@ -285,11 +285,12 @@ You have two choices:
 Current status and roadmap
 --------------------------
 
-HPy is still in the early stages of development, but many big pieces are
-already in place. As on April 2022, the following milestones have been reached:
+HPy left the early stages of development and already provides a noticeable set
+of features. As on April 2023, the following milestones have been reached:
 
-  - some real-world Python packages have been ported to HPy API.
-    The ports will be published soon.
+  - some prominent real-world Python packages have been ported to HPy API. There
+    is a list of HPy-compatible packages we know about on the HPy website
+    `hpyproject.org <https://hpyproject.org/>`_.
 
   - one can write extensions which expose module-level functions, with all
     the various kinds of calling conventions.
@@ -310,7 +311,10 @@ already in place. As on April 2022, the following milestones have been reached:
     recompiling. It can detect leaked handles or handles used after
     being closed.
 
-  - wheels can be build for HPy extensions with ``python setup.py bdist_wheel``
+  - trace mode has been implemented and can be activated just like the debug
+    mode. It helps analyzing the API usage (in particular wrt. performance).
+
+  - wheels can be built for HPy extensions with ``python setup.py bdist_wheel``
     and can be installed with ``pip install``.
 
   - it is possible to choose between the :term:`CPython ABI` and the
@@ -327,6 +331,10 @@ already in place. As on April 2022, the following milestones have been reached:
 
   - it is possible to load HPy Universal extensions on `GraalPy
     <https://github.com/graalvm/graalpython>`_.
+
+  - there is support for multi-phase module initialization.
+
+  - support for metaclasses has been added.
 
 
 However, there is still a long road before HPy is usable for the general

@@ -3,13 +3,9 @@ API Reference
 
 HPy's public API consists of three parts:
 
-1. The **Core API** as defined in file ``public_api.h``
-2. **HPy Helper** functions 
+1. The **Core API** as defined in the :doc:`public-api`
+2. **HPy Helper** functions
 3. **Inline Helper** functions
-
-.. warning:: Generated API reference documentation is work in progress. Some
-    parts of the API are not included in this documentation yet.
-
 
 Core API
 --------
@@ -35,6 +31,7 @@ between the modes.
    hpy-err
    builder
    hpy-eval
+   public-api
 
 
 HPy Helper Functions

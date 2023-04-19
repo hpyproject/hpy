@@ -4,6 +4,10 @@ import re
 from .autogenfile import AutoGenFile
 from .parse import toC
 from .ctx import autogen_ctx_h
+from .conf import (DOC_C_API_PAGES_SPECIAL_CASES,
+                   DOC_MANUAL_API_MAPPING,
+                   DOC_PREFIX_TABLE)
+
 
 CTX_NAME = '_HPyContext_s'
 
@@ -26,7 +30,6 @@ class AutoGenRstFile(AutoGenFile):
             self.DISCLAIMER = RST_DISCLAIMER
         self.api = api
 
-
 class autogen_function_index(AutoGenRstFile):
     PATH = 'docs/api-reference/function-index.rst'
     LANGUAGE = 'rst'
@@ -46,53 +49,75 @@ class autogen_function_index(AutoGenRstFile):
         return '\n'.join(lines)
 
 
+class AutoGenFilePart:
+    PATH = None
+    BEGIN_MARKER = None
+    END_MARKER = None
+
+    def __init__(self, api):
+        self.api = api
+
+    def generate(self, old):
+        raise NotImplementedError
+
+    def write(self, root):
+        if not self.BEGIN_MARKER or not self.END_MARKER:
+            raise RuntimeError("missing BEGIN_MARKER or END_MARKER")
+        n_begin = len(self.BEGIN_MARKER)
+        with root.join(self.PATH).open('r') as f:
+            content = f.read()
+        start = content.find(self.BEGIN_MARKER)
+        if start < 0:
+            raise RuntimeError(f'begin marker "{self.BEGIN_MARKER}" not found'
+                               f'in file {self.PATH}')
+        end = content.find(self.END_MARKER, start + n_begin)
+        if end < 0:
+            raise RuntimeError(f'end marker "{self.END_MARKER}" not found in'
+                               f'file {self.PATH}')
+        new_content = self.generate(content[(start+n_begin):end])
+        with root.join(self.PATH).open('w') as f:
+            f.write(content[:start + n_begin] + new_content + content[end:])
+
+
 GROUP_PATTERN = re.compile('Py(\\w+)_.*')
 
-# Some C API functions are documented in very different pages.
-SPECIAL_CASES = {
-    'PyEval_SaveThread': 'init',
-    'PyEval_RestoreThread': 'init',
-    'PyEval_EvalCode': 'veryhigh',
-}
-
-# We assume that, e.g., prefix 'PyLong_Something' belongs to 'longobject.c' and
-# its documentation is in '.../3/c-api/long.html'. In some cases, the prefix
-# maps to a different page and this can be specified here. E.g.
-# 'PyErr_Something' is documented in page '.../3/c-api/exceptions.html'
-PREFIX_TABLE = {
-    'err': 'exceptions',
-    'contextvar': 'contextvars'
-}
-
-class autogen_doc_api_mapping(AutoGenFile):
-    PATH = 'hpy/tools/autogen/api_mapping.txt'
-    LANGUAGE = 'txt'
+class autogen_doc_api_mapping(AutoGenFilePart):
+    PATH = 'docs/porting-guide.rst'
+    BEGIN_MARKER = '.. mark: BEGIN API MAPPING\n'
+    END_MARKER = '.. mark: END API MAPPING\n'
 
     def _get_page(self, cpython_fun_name):
-        if cpython_fun_name in SPECIAL_CASES:
-            return SPECIAL_CASES[cpython_fun_name] + '.html'
+        if cpython_fun_name in DOC_C_API_PAGES_SPECIAL_CASES:
+            return DOC_C_API_PAGES_SPECIAL_CASES[cpython_fun_name] + '.html'
 
         first_underscore = cpython_fun_name.find('_')
         if cpython_fun_name.startswith('Py') and first_underscore != -1:
             prefix = cpython_fun_name[2:first_underscore].lower()
-            return PREFIX_TABLE.get(prefix, prefix) + '.html'
+            return DOC_PREFIX_TABLE.get(prefix, prefix) + '.html'
         else:
             return 'abstract.html'
 
-    def generate(self):
+    def generate(self, old_content):
+        table_directive = '.. _table-mapping:\n.. table:: Safe API function mapping\n'
+        assert old_content.strip().startswith(table_directive)
+
         lines = []
         w = lines.append
+        w(':widths: auto')
+        w('')
+        mapping = {x.cpython_name: x.name for x in self.api.functions if x.cpython_name}
+        mapping.update(DOC_MANUAL_API_MAPPING)
         max_width0 = 0
         max_width1 = 0
         rows = []
-        functions = [x for x in self.api.functions if x.cpython_name]
-        # sort the list of functions by 'func.cpython_name'
-        functions.sort(key=lambda x: x.cpython_name)
-        for func in functions:
-            assert func.cpython_name
-            page = self._get_page(func.cpython_name)
-            col0 = f'`{func.cpython_name} <https://docs.python.org/3/c-api/{page}#c.{func.cpython_name}>`_'
-            col1 = f':c:func:`{func.name}`'
+        cpy_functions = list(mapping.keys())
+        # sort the list of functions by 'cpython_name'
+        cpy_functions.sort()
+        for cpy_func in cpy_functions:
+            assert cpy_func
+            page = self._get_page(cpy_func)
+            col0 = f'`{cpy_func} <https://docs.python.org/3/c-api/{page}#c.{cpy_func}>`_'
+            col1 = f':c:func:`{mapping[cpy_func]}`'
             rows.append((col0, col1))
             max_width0 = max(max_width0, len(col0))
             max_width1 = max(max_width1, len(col1))
@@ -104,7 +129,8 @@ class autogen_doc_api_mapping(AutoGenFile):
         for row in rows:
             w(f'{row[0].ljust(max_width0)} {row[1]}')
         w(sep)
-        return textwrap.indent('\n'.join(lines), ' ' * 4)
+        w('')
+        return table_directive + textwrap.indent('\n'.join(lines), ' ' * 4)
 
 
 class autogen_hpy_ctx(AutoGenRstFile):

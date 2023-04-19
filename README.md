@@ -38,6 +38,9 @@ for more details on HPy motivation, goals, and features, for example:
 Do you want to see how HPy API looks in code? Check out
 our [quickstart example](https://docs.hpyproject.org/en/latest/quickstart.html).
 
+You may also be interested in HPy's
+[API reference](https://docs.hpyproject.org/en/latest/api-reference/index.html).
+
 This repository contains the API and ABI specification and implementation
 for the CPython interpreter. Other interpreters that support HPy natively: GraalPy
 and PyPy, provide their own builtin HPy implementations.

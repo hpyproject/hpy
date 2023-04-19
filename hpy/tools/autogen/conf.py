@@ -146,3 +146,58 @@ SPECIAL_CASES = {
     'HPyType_IsSubtype': None,
     'HPy_SetCallFunction': None,
 }
+
+################################################################################
+#                    Configuration for auto-generating docs                    #
+################################################################################
+
+# A manual mapping of between CPython C API functions and HPy API functions.
+# Most of the mapping will be generated automatically from 'public_api.h' if an
+# HPy API function is not a special case (see 'conf.py'). However, in some
+# cases, it might be that we have inline helper functions or something similar
+# that map to a CPython C API function which cannot be determined automatically.
+# In those cases, the mapping can be manually specified here. Also, manual
+# mapping will always take precedence over automatically derived mappings.
+DOC_MANUAL_API_MAPPING = {
+    # key = C API function name
+    # value = HPy API function name
+    'Py_FatalError': 'HPy_FatalError',
+    'PyContextVar_Get': 'HPyContextVar_Get',
+    'PyLong_FromLong': 'HPyLong_FromLong',
+    'PyLong_FromLongLong': 'HPyLong_FromLongLong',
+    'PyLong_FromUnsignedLong': 'HPyLong_FromUnsignedLong',
+    'PyLong_FromUnsignedLongLong': 'HPyLong_FromUnsignedLongLong',
+    'PyLong_AsLong': 'HPyLong_AsLong',
+    'PyLong_AsLongLong': 'HPyLong_AsLongLong',
+    'PyLong_AsUnsignedLong': 'HPyLong_AsUnsignedLong',
+    'PyLong_AsUnsignedLongMask': 'HPyLong_AsUnsignedLongMask',
+    'PyLong_AsUnsignedLongLong': 'HPyLong_AsUnsignedLongLong',
+    'PyLong_AsUnsignedLongLongMask': 'HPyLong_AsUnsignedLongLongMask',
+    'PyBool_FromLong': 'HPyBool_FromLong',
+    'PyObject_TypeCheck': 'HPy_TypeCheck',
+    'PySlice_AdjustIndices': 'HPySlice_AdjustIndices',
+    'PyType_IsSubtype': 'HPyType_IsSubtype',
+    'PyObject_Call': 'HPy_CallTupleDict',
+    'PyObject_Vectorcall': 'HPy_Call',
+    'PyObject_VectorcallMethod': 'HPy_CallMethod',
+}
+
+# Some C API functions are documented in very different pages.
+DOC_C_API_PAGES_SPECIAL_CASES = {
+    'Py_FatalError': 'sys',
+    'PyEval_SaveThread': 'init',
+    'PyEval_RestoreThread': 'init',
+    'PyEval_EvalCode': 'veryhigh',
+    'PyObject_Call': 'call',
+    'PyObject_Vectorcall': 'call',
+    'PyObject_VectorcallMethod': 'call',
+}
+
+# We assume that, e.g., prefix 'PyLong_Something' belongs to 'longobject.c' and
+# its documentation is in '.../3/c-api/long.html'. In some cases, the prefix
+# maps to a different page and this can be specified here. E.g.
+# 'PyErr_Something' is documented in page '.../3/c-api/exceptions.html'
+DOC_PREFIX_TABLE = {
+    'err': 'exceptions',
+    'contextvar': 'contextvars'
+}
