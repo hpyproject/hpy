@@ -7,10 +7,6 @@ HPy's public API consists of three parts:
 2. **HPy Helper** functions
 3. **Inline Helper** functions
 
-.. warning:: Generated API reference documentation is work in progress. Some
-    parts of the API are not included in this documentation yet.
-
-
 Core API
 --------
 

@@ -1,10 +1,6 @@
 HPy API introduction
 ====================
 
-.. warning::
-   HPy is still in the early stages of development and the API may change.
-
-
 Handles
 -------
 
