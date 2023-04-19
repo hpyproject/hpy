@@ -17,11 +17,12 @@
 import sys
 import os
 import re
+import datetime
 
 # -- Project information -----------------------------------------------------
 
 project = "HPy"
-copyright = "2019-2020, HPy Collective"
+copyright = "2019-{}, HPy Collective".format(datetime.date.today().year)
 author = "HPy Collective"
 
 # The full version, including alpha/beta/rc tags
