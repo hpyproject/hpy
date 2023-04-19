@@ -1,4 +1,4 @@
-Misc notes
+Misc Notes
 ==========
 
 .. toctree::

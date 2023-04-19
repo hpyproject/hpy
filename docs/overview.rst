@@ -1,5 +1,5 @@
-HPy overview
-=============
+HPy Overview
+============
 
 Motivation and goals
 ---------------------

@@ -1,4 +1,4 @@
-HPy API introduction
+HPy API Introduction
 ====================
 
 Handles
