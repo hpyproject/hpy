@@ -26,7 +26,7 @@ copyright = "2019-{}, HPy Collective".format(datetime.date.today().year)
 author = "HPy Collective"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.4"
+release = "0.9"
 
 
 # -- General configuration ---------------------------------------------------
