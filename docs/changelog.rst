@@ -1,6 +1,61 @@
 Changelog
 =========
 
+Version 0.9 (April 21st, 2023)
+------------------------------
+
+New Features/API
+
+* Python 3.11 support
+* Preliminary Python 3.12 support
+* Dropped Python 3.6 support (since EOL)
+* Dropped Python 3.7 support (since EOL by June 2023)
+* Ensure deterministic auto-generation
+* Ensure ABI backwards compatibility
+
+  * Explicitly define slot within HPyContext of function pointers and handles
+  * Compile HPy ABI version into binary and verify at load time
+* Added support for backtrace on MacOS
+* Added proper support for object members ``HPyMember_OBJECT``
+* Support subclasses of built-in types
+* Support for metaclasses
+* Simplified ``HPyDef_*`` macros
+* Introduced **Hybrid ABI**
+* Introduced **Trace Mode**
+* Changed ``HPyBytes_(AsString/AS_STRING)`` to return ``const char *``
+* Use fixed-width integers in context functions
+* Support multi-phase module initialization
+* HPy call protocol
+
+  * Enabled slot ``HPy_tp_call``
+  * Added ``HPy_SetCallFunction`` to allow setting per-object call function
+  * Slightly changed signature of ``HPyFunc_(VARARGS/KEYWORDS)``
+* Other added API functions
+
+  * Deleting attributes and items ``HPy_DelAttr(_s)``, ``HPy_DelItem(_i/_s)``
+  * Capsule API ``HPyCapsule_(New/Get*/IsValid/Set*)``
+  * Eval API ``HPy_Compile_s`` and ``HPy_EvalCode``
+  * Formatting helpers ``HPyUnicode_FromFormat`` and ``HPyErr_Format``
+  * Contextvar API ``HPyContextVar_(New/Get/Set)``
+  * Unicode API ``HPyUnicode_FromEncodedObject`` and ``HPyUnicode_Substring``
+  * Dict API ``HPyDict_Keys`` and ``HPyDict_Copy``
+  * Type API ``HPyType_GetName`` and ``HPyType_IsSubtype``
+  * Slice API ``HPySlice_Unpack`` and ``HPySlice_AdjustIndices``
+  * Structseq API ``HPyStructSequence_New(Type)``
+  * Call API ``HPy_Call(Method)`` and ``HPy_CallMethodTupleDict(_s)``
+
+* Documentation
+  * Added incremental porting example
+  * Added quickstart guide
+  * Extended API reference a lot
+  * Added API function index
+  * Added possiblity to generate examples from tests with argument ``--dump-dir``
+* Debug mode
+  * Detect closing and returning (without dup) of context handles
+  * Detect invalid usage of stored HPyContext pointer
+
+
+
 Version 0.0.4 (May 25th, 2022)
 ------------------------------
 
