@@ -671,8 +671,32 @@ HPy_ID(200)
 int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 
 /* dictobject.h */
+
+/**
+ * Tests if an object is an instance of a Python dict.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A handle to an arbitrary object (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     Non-zero if object ``h`` is an instance of type ``dict`` or an instance
+ *     of a subtype of ``dict``, and ``0`` otherwise.
+ */
 HPy_ID(201)
 int HPyDict_Check(HPyContext *ctx, HPy h);
+
+/**
+ * Creates a new empty Python dictionary.
+ *
+ * :param ctx:
+ *     The execution context.
+ *
+ * :returns:
+ *     A handle to the new and empty Python dictionary or ``HPy_NULL`` in case
+ *     of an error.
+ */
 HPy_ID(202)
 HPy HPyDict_New(HPyContext *ctx);
 

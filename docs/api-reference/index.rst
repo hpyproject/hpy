@@ -27,6 +27,7 @@ between the modes.
    hpy-call
    hpy-field
    hpy-global
+   hpy-dict
    hpy-gil
    hpy-err
    builder
