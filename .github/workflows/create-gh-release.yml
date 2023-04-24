@@ -28,3 +28,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*
+          # consider tags in form '*.*.*rc*' to indicate a draft release
+          draft: ${{ contains(github.ref, 'rc') }}

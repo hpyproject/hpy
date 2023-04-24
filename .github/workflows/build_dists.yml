@@ -62,8 +62,9 @@ jobs:
         CIBW_BUILD: 'cp*'  # no PyPy builds
         CIBW_ARCHS_LINUX: "x86_64" # only Intel 64-bit
         CIBW_ARCHS_MACOS: "x86_64" # only Intel 64-bit
-        # CIBW_TEST_REQUIRES: pytest pytest-xdist filelock 'setuptools>=60.2'
-        # CIBW_TEST_COMMAND: pytest --basetemp=.tmpdir -n auto {project}/test/
+        CIBW_TEST_REQUIRES: pytest pytest-xdist filelock setuptools>=60.2
+        # only copy test dir to current working dir
+        CIBW_TEST_COMMAND: cp -R {project}/test ./ && pytest --basetemp=.tmpdir --ignore=test/hpy_devel -n auto ./test/
 
     - uses: actions/upload-artifact@v3
       with:
