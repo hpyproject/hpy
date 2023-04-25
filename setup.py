@@ -161,14 +161,15 @@ class build_clib_hpy(build_clib):
 
     def build_libraries(self, libraries):
         # we just inherit the 'inplace' option from 'build_ext'
-        inplace = self.get_finalized_command('build_ext').inplace
+        build_ext = self.get_finalized_command('build_ext')
+        inplace = build_ext.inplace
         if inplace:
             # the inplace option requires to find the package directory
             # using the build_py command for that
             build_py = self.get_finalized_command('build_py')
             lib_dir = os.path.abspath(build_py.get_package_dir('hpy.devel'))
         else:
-            lib_dir = self.build_clib
+            lib_dir = os.path.join(build_ext.build_lib, 'hpy', 'devel')
 
         import pathlib
         for lib in libraries:
