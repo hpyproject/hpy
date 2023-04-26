@@ -177,6 +177,12 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
     """
     assert attr == 'hpy_ext_modules'
 
+    # It can happen that this hook will be called multiple times depending on
+    # which command was used. So, skip patching if we already patched the
+    # distribution.
+    if getattr(dist, 'hpydevel', None):
+        return
+
     # add a global option --hpy-abi to setup.py
     dist.__class__.hpy_abi = DEFAULT_HPY_ABI
     dist.__class__.hpy_use_static_libs = False
