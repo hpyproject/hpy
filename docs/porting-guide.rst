@@ -329,7 +329,7 @@ dictionary, ``HPy_CallTupleDict`` will return ``HPy_NULL`` and raise a
 Calling Protocol
 ----------------
 
-Both, the *tp_call* and *vectorcall* calling protocols are replaced by HPy's
+Both the *tp_call* and *vectorcall* calling protocols are replaced by HPy's
 calling protocol. This is done by defining slot ``HPy_tp_call``. HPy uses only
 one calling convention which is similar to the vectorcall calling convention.
 In the following example, we implement a call function for a simple Euclidean
