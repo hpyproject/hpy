@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'The Git tag to create the release for'
+        description: 'The Git tag to create or test a release for. Official releases should always be made from an existing tag.'
         required: true
         type: string
       official:
-        description: 'Publish to official PyPI'
+        description: 'If true, publish to official PyPI and create GitHub release. Otherwise publish only to test PyPI.'
         default: false
         type: boolean
 
