@@ -91,7 +91,7 @@ jobs:
     needs: [build_sdist, build_bdist]
     runs-on: ubuntu-latest
     # don't do this action on forks by default
-    if: github.event_name == 'push' && github.repository == 'hpyproject/hpy'
+    if: github.repository == 'hpyproject/hpy'
     steps:
     - uses: actions/download-artifact@v3
       with:
@@ -119,7 +119,7 @@ jobs:
     needs: [upload_pypi]
     runs-on: ubuntu-latest
     # don't do this action on forks by default
-    if: github.event_name == 'push' && github.repository == 'hpyproject/hpy'
+    if: github.repository == 'hpyproject/hpy'
     steps:
     - uses: actions/download-artifact@v3
       with:
