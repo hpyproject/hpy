@@ -188,8 +188,11 @@ def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
     dist.__class__.hpy_abi = DEFAULT_HPY_ABI
     dist.__class__.hpy_use_static_libs = False
     dist.__class__.global_options += [
-        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)' % DEFAULT_HPY_ABI),
-        ('hpy-no-static-libs', None, 'Compile context and extra sources with extension (default: False)')
+        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)'
+                           % DEFAULT_HPY_ABI),
+        ('hpy-use-static-libs', None, 'Use static library containing context '
+                                      'and helper functions for building '
+                                      'extensions (default: False)')
     ]
     hpydevel = HPyDevel()
     hpydevel.fix_distribution(dist)
