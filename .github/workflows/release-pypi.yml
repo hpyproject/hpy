@@ -126,16 +126,11 @@ jobs:
         name: artifact
         path: dist
 
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ inputs.tag }}
-
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         files: dist/*
         # consider tags in form '*.*.*rc*' to indicate a pre-release
-        prerelease: ${{ contains(github.ref, 'rc') }}
+        prerelease: ${{ contains(inputs.tag, 'rc') }}
         draft: ${{ !inputs.official }}
         tag_name: ${{ inputs.tag }}
