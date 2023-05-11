@@ -74,6 +74,7 @@ class HPyDevel:
             self.src_dir.joinpath('buildvalue.c'),
             self.src_dir.joinpath('format.c'),
             self.src_dir.joinpath('helpers.c'),
+            self.src_dir.joinpath('structseq.c'),
         ]))
 
     def _scan_static_lib_dir(self):
