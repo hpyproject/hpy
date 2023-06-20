@@ -27,7 +27,7 @@ class AutoGenFile:
     def write(self, root):
         cls = self.__class__
         clsname = '%s.%s' % (cls.__module__, cls.__name__)
-        with root.join(self.PATH).open('w') as f:
+        with root.join(self.PATH).open('w', encoding='utf-8') as f:
             if self.DISCLAIMER is not None:
                 f.write(self.DISCLAIMER.format(clsname=clsname))
                 f.write('\n')

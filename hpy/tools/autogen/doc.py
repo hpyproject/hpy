@@ -64,7 +64,7 @@ class AutoGenFilePart:
         if not self.BEGIN_MARKER or not self.END_MARKER:
             raise RuntimeError("missing BEGIN_MARKER or END_MARKER")
         n_begin = len(self.BEGIN_MARKER)
-        with root.join(self.PATH).open('r') as f:
+        with root.join(self.PATH).open('r', encoding='utf-8') as f:
             content = f.read()
         start = content.find(self.BEGIN_MARKER)
         if start < 0:
@@ -75,7 +75,7 @@ class AutoGenFilePart:
             raise RuntimeError(f'end marker "{self.END_MARKER}" not found in'
                                f'file {self.PATH}')
         new_content = self.generate(content[(start+n_begin):end])
-        with root.join(self.PATH).open('w') as f:
+        with root.join(self.PATH).open('w', encoding='utf-8') as f:
             f.write(content[:start + n_begin] + new_content + content[end:])
 
 
