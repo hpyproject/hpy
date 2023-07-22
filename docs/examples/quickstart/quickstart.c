@@ -35,5 +35,5 @@ static HPyModuleDef quickstart_def = {
 
 // The Python interpreter will create the module for us from the
 // HPyModuleDef specification. Additional initialization can be
-// done in the HPy_mod_execute slot
+// done in the HPy_mod_exec slot
 HPy_MODINIT(quickstart, quickstart_def)
