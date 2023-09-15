@@ -4,14 +4,17 @@ HPy Quickstart
 This section shows how to quickly get started with HPy by creating
 a simple HPy extension from scratch.
 
-Install HPy:
-
-..
-    This should be updated to pip install hpy once this version is released
+Install latest HPy release:
 
 .. code-block:: console
 
-    python3 -m pip install git+https://github.com/hpyproject/hpy.git#egg=hpy.universal
+    python3 -m pip install hpy
+
+Alternatively, you can also install HPy from the development repository:
+
+.. code-block:: console
+
+    python3 -m pip install git+https://github.com/hpyproject/hpy.git#egg=hpy
 
 Create a new directory for the new HPy extension. Location and name of the directory
 do not matter. Add the following two files:
