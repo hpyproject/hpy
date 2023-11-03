@@ -50,9 +50,15 @@ def make_hpy_abi_fixture(ABIs, class_fixture=False):
         hpy_abi = make_hpy_abi_fixture('with hybrid', class_fixture=True)
     """
     if ABIs == 'default':
-        ABIs = ['cpython', 'universal', 'debug']
+        if sys.implementation.name == 'cpython':
+            ABIs = ['cpython', 'universal', 'debug']
+        else:
+            ABIs = ['universal', 'debug']
     elif ABIs == 'with hybrid':
-        ABIs = ['cpython', 'hybrid', 'hybrid+debug']
+        if sys.implementation.name == 'cpython':
+            ABIs = ['cpython', 'hybrid', 'hybrid+debug']
+        else:
+            ABIs = ['hybrid', 'hybrid+debug']
     elif isinstance(ABIs, list):
         pass
     else:
@@ -495,15 +501,6 @@ class HPyTest:
         """
         return True
 
-    def supports_refcounts(self):
-        """ Returns True if the underlying Python implementation supports
-            the vectorcall protocol.
-
-            By default, this returns True for Python version 3.8+ on all
-            implementations.
-        """
-        return sys.version_info >= (3, 8)
-
 
 class HPyDebugCapture:
     """
@@ -572,7 +569,7 @@ def _build(tmpdir, ext, hpy_devel, hpy_abi, compiler_verbose=0, debug=None):
     dist.hpy_abi = hpy_abi
     # For testing, we want to use static libs to avoid repeated compilation
     # of the same sources which slows down testing.
-    dist.hpy_use_static_libs = True
+    dist.hpy_use_static_libs = False
     dist.hpy_ext_modules = [ext]
     # We need to explicitly specify which Python modules we expect because some
     # test cases create several distributions in the same temp directory.
