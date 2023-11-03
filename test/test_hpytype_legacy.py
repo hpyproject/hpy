@@ -1,6 +1,7 @@
 """ HPyType tests on legacy types. """
 
 import pytest
+import sys
 from .support import HPyTest, make_hpy_abi_fixture
 from .test_hpytype import PointTemplate, TestType as _TestType
 
@@ -257,6 +258,7 @@ class TestLegacyType(_TestType):
                 @INIT
             """)
 
+    @pytest.mark.skipif(sys.version_info < (3, 9), reason="not for python<3.9") 
     def test_legacy_class_method(self):
         mod = self.make_module("""
             @DEFINE_PointObject
