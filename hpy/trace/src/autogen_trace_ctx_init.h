@@ -154,7 +154,7 @@ HPy trace_ctx_Dict_New(HPyContext *tctx);
 HPy trace_ctx_Dict_Keys(HPyContext *tctx, HPy h);
 HPy trace_ctx_Dict_Copy(HPyContext *tctx, HPy h);
 int trace_ctx_Tuple_Check(HPyContext *tctx, HPy h);
-HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, HPy items[], HPy_ssize_t n);
+HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, const HPy items[], HPy_ssize_t n);
 int trace_ctx_Slice_Unpack(HPyContext *tctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 HPy trace_ctx_Import_ImportModule(HPyContext *tctx, const char *utf8_name);
 HPy trace_ctx_Capsule_New(HPyContext *tctx, void *pointer, const char *utf8_name, HPyCapsule_Destructor *destructor);
