@@ -419,7 +419,7 @@ class TestSlots(HPyTest):
                 assert sys.getrefcount(arr) == init_refcount + 1
             for i in range(12):
                 assert mv[i] == i
-        del mv
+        # make sure mv is collected to release the reference to arr
         import gc
         for i in range(3):
             gc.collect()
