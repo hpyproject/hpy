@@ -1299,7 +1299,7 @@ typedef enum {
     //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
-    //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
+    HPy_tp_descr_get = SLOT(54, HPyFunc_TERNARYFUNC),
     //HPy_tp_descr_set = SLOT(55, HPyFunc_X),
     //HPy_tp_doc = SLOT(56, HPyFunc_X),
     //HPy_tp_getattr = SLOT(57, HPyFunc_X),
