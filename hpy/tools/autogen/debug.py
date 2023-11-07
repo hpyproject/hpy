@@ -74,6 +74,7 @@ class autogen_debug_wrappers(AutoGenFile):
         '_HPy_AsStruct_Unicode',
         '_HPy_AsStruct_Tuple',
         '_HPy_AsStruct_List',
+        '_HPy_AsStruct_Dict',
         'HPyTracker_New',
         'HPyTracker_Add',
         'HPyTracker_ForgetAll',

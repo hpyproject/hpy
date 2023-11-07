@@ -73,6 +73,12 @@ typedef enum {
      * need to specify base class ``ctx->h_ListType``.
      */
     HPyType_BuiltinShape_List = 6,
+
+    /**
+     * The type inherits from built-in type ``dict``. If using this shape, you
+     * need to specify base class ``ctx->h_DictType``.
+     */
+    HPyType_BuiltinShape_Dict = 7,
 } HPyType_BuiltinShape;
 
 typedef struct {
@@ -283,5 +289,6 @@ _HPyType_HELPER_X(_HPyType_HELPER_FNAME(__VA_ARGS__))(HPyContext *ctx, HPy h) \
 #define HPyType_BuiltinShape_Unicode_AsStruct _HPy_AsStruct_Unicode
 #define HPyType_BuiltinShape_Tuple_AsStruct _HPy_AsStruct_Tuple
 #define HPyType_BuiltinShape_List_AsStruct _HPy_AsStruct_List
+#define HPyType_BuiltinShape_Dict_AsStruct _HPy_AsStruct_Dict
 
 #endif /* HPY_UNIVERSAL_HPYTYPE_H */

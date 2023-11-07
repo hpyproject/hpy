@@ -430,6 +430,10 @@ HPyAPI_FUNC void *_HPy_AsStruct_List(HPyContext *ctx, HPy h) {
      return ctx->ctx_AsStruct_List ( ctx, h ); 
 }
 
+HPyAPI_FUNC void *_HPy_AsStruct_Dict(HPyContext *ctx, HPy h) {
+     return ctx->ctx_AsStruct_Dict ( ctx, h ); 
+}
+
 HPyAPI_FUNC HPyType_BuiltinShape _HPyType_GetBuiltinShape(HPyContext *ctx, HPy h_type) {
      return ctx->ctx_Type_GetBuiltinShape ( ctx, h_type ); 
 }

@@ -139,6 +139,7 @@ HPyAPI_FUNC HPyContext * _HPyGetContext(void) {
         ctx->h_UnicodeType = _py2h((PyObject *)&PyUnicode_Type);
         ctx->h_TupleType = _py2h((PyObject *)&PyTuple_Type);
         ctx->h_ListType = _py2h((PyObject *)&PyList_Type);
+        ctx->h_DictType = _py2h((PyObject *)&PyDict_Type);
         ctx->h_ComplexType = _py2h((PyObject *)&PyComplex_Type);
         ctx->h_BytesType = _py2h((PyObject *)&PyBytes_Type);
         ctx->h_MemoryViewType = _py2h((PyObject *)&PyMemoryView_Type);
@@ -269,6 +270,11 @@ HPyAPI_FUNC void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h)
 HPyAPI_FUNC void* _HPy_AsStruct_List(HPyContext *ctx, HPy h)
 {
     return ctx_AsStruct_List(ctx, h);
+}
+
+HPyAPI_FUNC void* _HPy_AsStruct_Dict(HPyContext *ctx, HPy h)
+{
+    return ctx_AsStruct_Dict(ctx, h);
 }
 
 HPyAPI_FUNC HPy HPy_CallTupleDict(HPyContext *ctx, HPy callable, HPy args, HPy kw)

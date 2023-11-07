@@ -96,6 +96,7 @@ HPy_ID(73) HPy h_FloatType;        /* built-in 'float' */
 HPy_ID(74) HPy h_UnicodeType;      /* built-in 'str' */
 HPy_ID(75) HPy h_TupleType;        /* built-in 'tuple' */
 HPy_ID(76) HPy h_ListType;         /* built-in 'list' */
+HPy_ID(263) HPy h_DictType;         /* built-in 'dict' */
 HPy_ID(238) HPy h_ComplexType;     /* built-in 'complex' */
 HPy_ID(239) HPy h_BytesType;       /* built-in 'bytes' */
 HPy_ID(240) HPy h_MemoryViewType;  /* built-in 'memoryview' */
@@ -539,6 +540,8 @@ HPy_ID(232)
 void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h);
 HPy_ID(233)
 void* _HPy_AsStruct_List(HPyContext *ctx, HPy h);
+HPy_ID(264)
+void* _HPy_AsStruct_Dict(HPyContext *ctx, HPy h);
 HPy_ID(234)
 HPyType_BuiltinShape _HPyType_GetBuiltinShape(HPyContext *ctx, HPy h_type);
 
