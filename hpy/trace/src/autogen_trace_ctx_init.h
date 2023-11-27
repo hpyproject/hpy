@@ -288,12 +288,12 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->h_UnicodeType = uctx->h_UnicodeType;
     tctx->h_TupleType = uctx->h_TupleType;
     tctx->h_ListType = uctx->h_ListType;
-    tctx->h_DictType = uctx->h_DictType;
     tctx->h_ComplexType = uctx->h_ComplexType;
     tctx->h_BytesType = uctx->h_BytesType;
     tctx->h_MemoryViewType = uctx->h_MemoryViewType;
     tctx->h_CapsuleType = uctx->h_CapsuleType;
     tctx->h_SliceType = uctx->h_SliceType;
+    tctx->h_DictType = uctx->h_DictType;
     tctx->h_Builtins = uctx->h_Builtins;
     tctx->ctx_Dup = &trace_ctx_Dup;
     tctx->ctx_Close = &trace_ctx_Close;
