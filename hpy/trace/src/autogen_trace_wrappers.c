@@ -1877,7 +1877,7 @@ int trace_ctx_Tuple_Check(HPyContext *tctx, HPy h)
     return res;
 }
 
-HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, HPy items[], HPy_ssize_t n)
+HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, const HPy items[], HPy_ssize_t n)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 204);
     HPyContext *uctx = info->uctx;

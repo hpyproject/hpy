@@ -739,7 +739,7 @@ HPy HPyDict_Copy(HPyContext *ctx, HPy h);
 HPy_ID(203)
 int HPyTuple_Check(HPyContext *ctx, HPy h);
 HPy_ID(204)
-HPy HPyTuple_FromArray(HPyContext *ctx, HPy items[], HPy_ssize_t n);
+HPy HPyTuple_FromArray(HPyContext *ctx, const HPy items[], HPy_ssize_t n);
 // note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
 /* sliceobject.h */

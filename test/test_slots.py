@@ -462,6 +462,7 @@ class TestSlots(HPyTest):
         assert repr(p) == 'repr(Point(1, 2))'
 
     def test_tp_hash(self):
+        import pytest
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_new
@@ -771,7 +772,6 @@ class TestSqSlots(HPyTest):
             'hello' in p
 
     def test_tp_richcompare(self):
-        import pytest
         mod = self.make_module("""
             @DEFINE_PointObject
             @DEFINE_Point_new

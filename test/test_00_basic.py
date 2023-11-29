@@ -8,7 +8,6 @@ to be able to use e.g. pytest.raises (which on PyPy will be implemented by a
 """
 from .support import HPyTest
 from hpy.devel.abitag import HPY_ABI_VERSION, HPY_ABI_VERSION_MINOR
-import shutil
 
 
 class TestBasic(HPyTest):
@@ -48,6 +47,7 @@ class TestBasic(HPyTest):
             assert False, "Expected exception"
 
     def test_abi_tag_check(self):
+        import shutil
         if self.compiler.hpy_abi != 'universal':
             return
 
@@ -560,3 +560,20 @@ class TestBasic(HPyTest):
             @INIT
         """)
         assert mod.f("abraka") == 3
+
+    def test_dup_null(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_NOARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self)
+            {
+                HPy h = HPy_Dup(ctx, HPy_NULL);
+                if (HPy_IsNull(h)) {
+                    return HPyLong_FromSize_t(ctx, 0);
+                }
+                HPy_Close(ctx, h);
+                return HPyLong_FromSize_t(ctx, -1);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        assert mod.f() == 0
