@@ -6,7 +6,7 @@ import py
 import pycparser
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
-from distutils.sysconfig import get_config_var
+from sysconfig import get_config_var
 from .conf import SPECIAL_CASES, RETURN_CONSTANT
 
 PUBLIC_API_H = py.path.local(__file__).dirpath('public_api.h')
