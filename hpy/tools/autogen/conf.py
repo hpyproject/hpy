@@ -52,6 +52,7 @@ SPECIAL_CASES = {
     '_HPy_AsStruct_Unicode': None,
     '_HPy_AsStruct_Tuple': None,
     '_HPy_AsStruct_List': None,
+    '_HPy_AsStruct_Dict': None,
     '_HPy_AsStruct_Legacy': None,
     '_HPyType_GetBuiltinShape': None,
     '_HPy_CallRealFunctionFromTrampoline': None,

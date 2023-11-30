@@ -121,6 +121,7 @@ struct _HPyContext_s g_universal_ctx = {
     .ctx_AsStruct_Unicode = &ctx_AsStruct_Unicode,
     .ctx_AsStruct_Tuple = &ctx_AsStruct_Tuple,
     .ctx_AsStruct_List = &ctx_AsStruct_List,
+    .ctx_AsStruct_Dict = &ctx_AsStruct_Dict,
     .ctx_Type_GetBuiltinShape = &ctx_Type_GetBuiltinShape,
     .ctx_New = &ctx_New,
     .ctx_Repr = &ctx_Repr,

@@ -87,6 +87,7 @@ _HPy_HIDDEN void* ctx_AsStruct_Float(HPyContext *ctx, HPy h);
 _HPy_HIDDEN void* ctx_AsStruct_Unicode(HPyContext *ctx, HPy h);
 _HPy_HIDDEN void* ctx_AsStruct_Tuple(HPyContext *ctx, HPy h);
 _HPy_HIDDEN void* ctx_AsStruct_List(HPyContext *ctx, HPy h);
+_HPy_HIDDEN void* ctx_AsStruct_Dict(HPyContext *ctx, HPy h);
 _HPy_HIDDEN void* ctx_AsStruct_Slow(HPyContext *ctx, HPy h);
 _HPy_HIDDEN HPy ctx_Type_FromSpec(HPyContext *ctx, HPyType_Spec *hpyspec,
                                   HPyType_SpecParam *params);

@@ -1370,6 +1370,19 @@ void *trace_ctx_AsStruct_List(HPyContext *tctx, HPy h)
     return res;
 }
 
+void *trace_ctx_AsStruct_Dict(HPyContext *tctx, HPy h)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 264);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    void * res = _HPy_AsStruct_Dict(uctx, h);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 264, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 HPyType_BuiltinShape trace_ctx_Type_GetBuiltinShape(HPyContext *tctx, HPy h_type)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 234);

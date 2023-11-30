@@ -115,6 +115,7 @@ void *trace_ctx_AsStruct_Float(HPyContext *tctx, HPy h);
 void *trace_ctx_AsStruct_Unicode(HPyContext *tctx, HPy h);
 void *trace_ctx_AsStruct_Tuple(HPyContext *tctx, HPy h);
 void *trace_ctx_AsStruct_List(HPyContext *tctx, HPy h);
+void *trace_ctx_AsStruct_Dict(HPyContext *tctx, HPy h);
 HPyType_BuiltinShape trace_ctx_Type_GetBuiltinShape(HPyContext *tctx, HPy h_type);
 HPy trace_ctx_New(HPyContext *tctx, HPy h_type, void **data);
 HPy trace_ctx_Repr(HPyContext *tctx, HPy obj);
@@ -193,8 +194,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(263, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(263, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(265, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(265, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -292,6 +293,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->h_MemoryViewType = uctx->h_MemoryViewType;
     tctx->h_CapsuleType = uctx->h_CapsuleType;
     tctx->h_SliceType = uctx->h_SliceType;
+    tctx->h_DictType = uctx->h_DictType;
     tctx->h_Builtins = uctx->h_Builtins;
     tctx->ctx_Dup = &trace_ctx_Dup;
     tctx->ctx_Close = &trace_ctx_Close;
@@ -399,6 +401,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_AsStruct_Unicode = &trace_ctx_AsStruct_Unicode;
     tctx->ctx_AsStruct_Tuple = &trace_ctx_AsStruct_Tuple;
     tctx->ctx_AsStruct_List = &trace_ctx_AsStruct_List;
+    tctx->ctx_AsStruct_Dict = &trace_ctx_AsStruct_Dict;
     tctx->ctx_Type_GetBuiltinShape = &trace_ctx_Type_GetBuiltinShape;
     tctx->ctx_New = &trace_ctx_New;
     tctx->ctx_Repr = &trace_ctx_Repr;

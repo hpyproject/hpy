@@ -676,6 +676,7 @@ static void init_universal_ctx(HPyContext *ctx)
     ctx->h_MemoryViewType = _py2h((PyObject *)&PyMemoryView_Type);
     ctx->h_CapsuleType = _py2h((PyObject *)&PyCapsule_Type);
     ctx->h_SliceType = _py2h((PyObject *)&PySlice_Type);
+    ctx->h_DictType = _py2h((PyObject *)&PyDict_Type);
     /* Reflection */
     ctx->h_Builtins = _py2h(PyEval_GetBuiltins());
 }

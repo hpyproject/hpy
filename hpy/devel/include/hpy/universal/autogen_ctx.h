@@ -277,4 +277,6 @@ struct _HPyContext_s {
     int (*ctx_SetCallFunction)(HPyContext *ctx, HPy h, HPyCallFunction *func);
     HPy (*ctx_Call)(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames);
     HPy (*ctx_CallMethod)(HPyContext *ctx, HPy name, const HPy *args, size_t nargs, HPy kwnames);
+    HPy h_DictType;
+    void *(*ctx_AsStruct_Dict)(HPyContext *ctx, HPy h);
 };

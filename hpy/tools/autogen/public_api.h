@@ -101,6 +101,7 @@ HPy_ID(239) HPy h_BytesType;       /* built-in 'bytes' */
 HPy_ID(240) HPy h_MemoryViewType;  /* built-in 'memoryview' */
 HPy_ID(241) HPy h_CapsuleType;     /* built-in 'capsule' */
 HPy_ID(242) HPy h_SliceType;       /* built-in 'slice' */
+HPy_ID(263) HPy h_DictType;         /* built-in 'dict' */
 
 /* Reflection */
 HPy_ID(243) HPy h_Builtins;        /* dict of builtins */
@@ -539,6 +540,8 @@ HPy_ID(232)
 void* _HPy_AsStruct_Tuple(HPyContext *ctx, HPy h);
 HPy_ID(233)
 void* _HPy_AsStruct_List(HPyContext *ctx, HPy h);
+HPy_ID(264)
+void* _HPy_AsStruct_Dict(HPyContext *ctx, HPy h);
 HPy_ID(234)
 HPyType_BuiltinShape _HPyType_GetBuiltinShape(HPyContext *ctx, HPy h_type);
 

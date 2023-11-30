@@ -116,6 +116,7 @@ void *debug_ctx_AsStruct_Float(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStruct_Unicode(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStruct_Tuple(HPyContext *dctx, DHPy h);
 void *debug_ctx_AsStruct_List(HPyContext *dctx, DHPy h);
+void *debug_ctx_AsStruct_Dict(HPyContext *dctx, DHPy h);
 HPyType_BuiltinShape debug_ctx_Type_GetBuiltinShape(HPyContext *dctx, DHPy h_type);
 DHPy debug_ctx_New(HPyContext *dctx, DHPy h_type, void **data);
 DHPy debug_ctx_Repr(HPyContext *dctx, DHPy obj);
@@ -275,6 +276,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->h_MemoryViewType = DHPy_open_immortal(dctx, uctx->h_MemoryViewType);
     dctx->h_CapsuleType = DHPy_open_immortal(dctx, uctx->h_CapsuleType);
     dctx->h_SliceType = DHPy_open_immortal(dctx, uctx->h_SliceType);
+    dctx->h_DictType = DHPy_open_immortal(dctx, uctx->h_DictType);
     dctx->h_Builtins = DHPy_open_immortal(dctx, uctx->h_Builtins);
     dctx->ctx_Dup = &debug_ctx_Dup;
     dctx->ctx_Close = &debug_ctx_Close;
@@ -382,6 +384,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_AsStruct_Unicode = &debug_ctx_AsStruct_Unicode;
     dctx->ctx_AsStruct_Tuple = &debug_ctx_AsStruct_Tuple;
     dctx->ctx_AsStruct_List = &debug_ctx_AsStruct_List;
+    dctx->ctx_AsStruct_Dict = &debug_ctx_AsStruct_Dict;
     dctx->ctx_Type_GetBuiltinShape = &debug_ctx_Type_GetBuiltinShape;
     dctx->ctx_New = &debug_ctx_New;
     dctx->ctx_Repr = &debug_ctx_Repr;
