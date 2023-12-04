@@ -258,7 +258,7 @@ class TestLegacyType(_TestType):
                 @INIT
             """)
 
-    @pytest.mark.skipif(sys.version_info < (3, 9), reason="not for python<3.9") 
+    @pytest.mark.skipif(sys.version_info < (3, 9), reason="not for python<3.9")
     def test_legacy_class_method(self):
         mod = self.make_module("""
             @DEFINE_PointObject
@@ -397,3 +397,165 @@ class TestCustomLegacyFeatures(HPyTest):
         assert str(err.value) == (
             "A legacy type should not inherit its memory layout from a"
             " pure type")
+
+
+class TestInheritBaseLegacy(HPyTest):
+
+    def test_float64(self):
+        # Recreate the numpy float64 scalar type
+        mod = self.make_module("""
+            #include <Python.h>
+            #define HPY_BASEFLAGS HPy_TPFLAGS_DEFAULT | HPy_TPFLAGS_BASETYPE
+
+            typedef struct {
+                    PyObject_HEAD
+                    double obval;
+            } PyDoubleScalarObject;
+
+            HPyGlobal float64global;
+
+            HPyType_LEGACY_HELPERS(PyDoubleScalarObject);
+
+            HPyDef_SLOT(double_arrtype_new, HPy_tp_new)
+            static HPy
+            double_arrtype_new_impl(HPyContext *ctx, HPy type, const HPy *args, HPy_ssize_t nargs, HPy kwds)
+            {
+                /* allow base-class (if any) to do conversion */
+                HPy targs = HPyTuple_FromArray(ctx, (HPy*)args, nargs);
+
+                HPy from_superclass = HPy_CallTupleDict(ctx, ctx->h_FloatType, targs, kwds);
+
+                HPy_Close(ctx, targs);
+                if (HPy_IsNull(from_superclass)) {
+                    /* NumPy clears the error and does lots of other conversions
+                       For this test, give up instead
+                    */
+                    return HPy_NULL;
+                }
+                else {
+                    return from_superclass;
+                }
+            }
+
+            static PyType_Slot PyGenericArrType_Type_slots_legacy[] = {
+                {0},
+            };
+
+            static HPyDef *PyGenericArrType_Type_hpy_slots[] = {
+                0
+            };
+
+            static PyType_Slot PyFloatingArrType_Type_slots_legacy[] = {
+                {0},
+            };
+
+            static PyType_Slot PyDoubleArrType_Type_slots_legacy[] = {
+                {0},
+            };
+
+            static HPyDef *PyDoubleArrType_Type_hpy_defines[] = {
+                &double_arrtype_new,
+                0
+            };
+
+            static HPyType_Spec PyGenericArrType_Type_spec = {
+                .name = "numpy.generic",
+                .flags = HPY_BASEFLAGS,
+                .builtin_shape = HPyType_BuiltinShape_Legacy,
+                .legacy_slots = &PyGenericArrType_Type_slots_legacy,
+                .defines = PyGenericArrType_Type_hpy_slots,
+                .basicsize = sizeof(PyObject),
+            };
+
+            HPyDef_METH(new_float64, "new_float64", HPyFunc_O)
+            static HPy new_float64_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                double a = HPyFloat_AsDouble(ctx, arg);
+                HPy h_PyType = HPyGlobal_Load(ctx, float64global);
+                if (HPy_IsNull(h_PyType))
+                    return HPy_NULL;
+                PyTypeObject *pytype = (PyTypeObject *)HPy_AsPyObject(ctx, h_PyType);
+                PyObject *val=pytype->tp_alloc(pytype, 0);
+                HPy_Close(ctx, h_PyType);
+                /* XXX This value is not the one seen in the interpreter */
+                ((PyDoubleScalarObject *)val)->obval = a;
+                return HPy_FromPyObject(ctx, val);
+            }
+
+            HPyDef_METH(getvalue, "getvalue", HPyFunc_O)
+            static HPy getvalue_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                PyDoubleScalarObject * pobj = PyDoubleScalarObject_AsStruct(ctx, arg);
+                if (pobj == NULL)
+                    return HPy_NULL;
+                return HPyLong_FromLong(ctx, pobj->obval);
+            }
+
+            void make_Float64(HPyContext *ctx, HPy module)
+            {
+
+                HPy h_PyGenericArrType_Type =
+                    HPyType_FromSpec(ctx, &PyGenericArrType_Type_spec, NULL);
+                if (HPy_IsNull(h_PyGenericArrType_Type))
+                    return;
+
+                HPyType_SpecParam Floating_params[] = {
+                    { HPyType_SpecParam_Base, h_PyGenericArrType_Type },
+                    { 0 }, };
+
+                HPyType_Spec PyFloatingArrType_Type_spec = {
+                    .name = "numpy.floating",
+                    .builtin_shape = HPyType_BuiltinShape_Legacy,
+                    .legacy_slots = PyFloatingArrType_Type_slots_legacy,
+                    .flags = HPY_BASEFLAGS,
+                    .basicsize = sizeof(PyObject),
+                };
+
+                HPy h_PyFloatingArrType_Type =
+                    HPyType_FromSpec(ctx, &PyFloatingArrType_Type_spec, Floating_params);
+                HPy_Close(ctx, h_PyGenericArrType_Type);
+                if (HPy_IsNull(h_PyFloatingArrType_Type)) {
+                    return;
+                }
+
+                HPyType_Spec PyDoubleArrType_Type_spec = {
+                    .name = "numpy.float64",
+                    .basicsize = sizeof(PyDoubleScalarObject),
+                    .builtin_shape = HPyType_BuiltinShape_Legacy,
+                    .legacy_slots = PyDoubleArrType_Type_slots_legacy,
+                    .flags = HPY_BASEFLAGS,
+                    .defines = PyDoubleArrType_Type_hpy_defines,
+                };
+
+                HPyType_SpecParam Double_params[] = {
+                    { HPyType_SpecParam_Base, h_PyFloatingArrType_Type },
+                    { HPyType_SpecParam_Base, ctx->h_FloatType },
+                    { (HPyType_SpecParam_Kind)0 }
+                };
+
+                HPy h_PyDoubleArrType_Type =
+                   HPyType_FromSpec(ctx, &PyDoubleArrType_Type_spec, Double_params);
+                HPy_Close(ctx, h_PyFloatingArrType_Type);
+                if (HPy_IsNull(h_PyDoubleArrType_Type))
+                    return;
+                HPy_SetAttr_s(ctx, module, "float64", h_PyDoubleArrType_Type);
+                HPyGlobal_Store(ctx, &float64global, h_PyDoubleArrType_Type);
+                HPy_Close(ctx, h_PyDoubleArrType_Type);
+            };
+            @EXTRA_INIT_FUNC(make_Float64)
+            @EXPORT(new_float64)
+            @EXPORT(getvalue)
+            @EXPORT_GLOBAL(float64global)
+            @INIT
+        """)
+        assert isinstance(mod.float64, type)
+        h0 = mod.new_float64(0.0)
+        print(type(h0).mro())
+        assert 'numpy.float64' in str(type(h0).mro())
+        assert h0 == 0.0
+        assert mod.float64() == 0.0
+        h42 = mod.float64(42)
+        print(type(h42).mro())
+        assert 'numpy.float64' in str(type(h42).mro())
+        assert mod.getvalue(h42) == 42.0
+        # assert h42[()] == 42.0
