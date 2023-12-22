@@ -318,7 +318,7 @@ HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
 {
-    return ctx_Is(ctx, h_obj, h_other);
+    return _h2py(h_obj) == _h2py(h_other);
 }
 
 HPyAPI_FUNC HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)
