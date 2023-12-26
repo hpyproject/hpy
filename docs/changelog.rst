@@ -4,7 +4,7 @@ Changelog
 Version 0.9 (April 25th, 2023)
 ------------------------------
 
-This release adds numerous major features and indicates the end of HPy's *alhpa*
+This release adds numerous major features and indicates the end of HPy's *alpha*
 phase. We've migrated several key packages to HPy (for a list, see our website
 https://hpyproject.org) and we are now confident that HPy is mature enough for
 being used as serious extension API. We also plan that the next major release
@@ -56,7 +56,7 @@ HPy :ref:`porting-guide:calling protocol`
   convention. This is: the arguments are passed in a C array and the keyword
   argument names are provided as a Python tuple. Before this release, the only
   way to create a callable type was to set the special method ``__call__``.
-  However, this has several disadvantages. In particlar, poor performance on
+  However, this has several disadvantages. In particular, poor performance on
   CPython (and maybe other implementations) and it was not possible to have
   specialized call function implementations per object (see
   :c:func:`HPy_SetCallFunction`)
@@ -117,7 +117,7 @@ Documentation
 * Added :doc:`quickstart` guide
 * Extended :doc:`api-reference/index`
 * Added :doc:`api-reference/function-index`
-* Added possiblity to generate examples from tests with argument ``--dump-dir``
+* Added possibility to generate examples from tests with argument ``--dump-dir``
   (see :ref:`api:hpy unit tests`)
 * Added initial :doc:`contributing/index` docs
 
@@ -206,7 +206,7 @@ Debug mode:
 Misc Changes:
 
   - Removed unnecessary prefix ``"m_"`` from fields of ``HPyModuleDef`` (incompatible change)
-  - For HPy implementors: new pytest mark for HPy tests assuming synchronous GC
+  - For HPy implementers: new pytest mark for HPy tests assuming synchronous GC
 
 Version 0.0.3 (September 22nd, 2021)
 ------------------------------------

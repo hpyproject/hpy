@@ -188,7 +188,7 @@ def test_charptr_correct_usage(compiler):
         @EXPORT(f)
         @INIT
     """)
-    assert mod.f('I wont be leaked!') == 'I wont be leaked!';
+    assert mod.f('I will not be leaked!') == 'I will not be leaked!';
 
 
 def test_charptr_limit_stress_test(compiler):

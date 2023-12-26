@@ -222,7 +222,7 @@ Benefits for the Python ecosystem
 The HPy project offers some benefits to the python ecosystem, both to Python
 users and to library developers.
 
-  - C extensions can achieve much better speed on alternative implementions,
+  - C extensions can achieve much better speed on alternative implementations,
     including PyPy and GraalPy: according to early :ref:`benchmarks`, an
     extension written in HPy can be ~3x faster than the equivalent extension
     written using ``Python.h``.
