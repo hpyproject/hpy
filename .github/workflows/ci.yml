@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python from deadsnakes
-        uses: deadsnakes/action@v3.1.0
+        uses: deadsnakes/action@v2.1.1  # Upgrading will cause test failures.
         with:
           python-version: ${{ matrix.python-version }}
           debug: true
