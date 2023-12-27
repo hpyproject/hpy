@@ -7,12 +7,14 @@ files in this directory, which all inherit from HPyTest and test the API
 itself.
 """
 
-import sys
 import os
-import textwrap
-import subprocess
+import platform
 import shutil
+import subprocess
+import sys
+import textwrap
 import venv
+
 import py
 import pytest
 
@@ -23,6 +25,14 @@ from ..support import atomic_run, HPY_ROOT
 #
 # The env is created once in /tmp/venv-for-hpytest and reused among tests and
 # sessions. If you want to recreate it, simply rm -r /tmp/venv-for-hpytest
+
+
+def macos_version():  # -> tuple[int]:
+    macos_version_release = platform.mac_ver()[0]
+    if macos_version_release:
+        return tuple(int(x) for x in macos_version_release.split(".")[:3])
+    return (0, 0, 0)
+
 
 def print_CalledProcessError(p):
     """
@@ -197,6 +207,7 @@ class TestDistutils:
         cmd = f'import {modname}; print({modname}.__doc__)'
         return self.python('-c', cmd, capture=True)
 
+    @pytest.mark.xfail(macos_version() > (12, ), reason="setup.py xxx is deprecated")
     def test_cpymod_setup_install(self):
         # CPython-only project, no hpy at all. This is a baseline to check
         # that everything works even without hpy.
@@ -209,6 +220,7 @@ class TestDistutils:
         doc = self.get_docstring('cpymod')
         assert doc == 'cpymod docstring'
 
+    @pytest.mark.xfail(macos_version() > (12, ), reason="setup.py xxx is deprecated")
     def test_cpymod_with_empty_hpy_ext_modules_setup_install(self):
         # if we have hpy_ext_modules=[] we trigger the hpy.devel monkey
         # patch. This checks that we don't ext_modules still works after that.
@@ -265,6 +277,7 @@ class TestDistutils:
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
+    @pytest.mark.xfail(macos_version() > (12, ), reason="setup.py xxx is deprecated")
     def test_hpymod_setup_install(self, hpy_abi):
         # check that we can install hpy modules with setup.py install
         self.gen_setup_py("""
@@ -290,6 +303,7 @@ class TestDistutils:
         doc = self.get_docstring('hpymod')
         assert doc == f'hpymod with HPy ABI: {hpy_abi}'
 
+    @pytest.mark.xfail(macos_version() > (12, ), reason="setup.py xxx is deprecated")
     def test_dont_mix_cpython_and_universal_abis(self):
         """
         See issue #322
@@ -325,6 +339,7 @@ class TestDistutils:
         doc = self.get_docstring('hpymod')
         assert doc == 'hpymod with HPy ABI: universal'
 
+    @pytest.mark.xfail(macos_version() > (12, ), reason="setup.py xxx is deprecated")
     def test_hpymod_legacy(self, hpy_abi):
         if hpy_abi == 'universal':
             pytest.skip('only for cpython and hybrid ABIs')
