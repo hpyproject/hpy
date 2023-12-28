@@ -15,6 +15,14 @@ ctx_Dump(HPyContext *ctx, HPy h)
     _PyObject_Dump(_h2py(h));
 }
 
+_HPy_HIDDEN HPy
+ctx_Type(HPyContext *ctx, HPy obj)
+{
+    PyTypeObject *tp = Py_TYPE(_h2py(obj));
+    Py_INCREF(tp);
+    return _py2h((PyObject *)tp);
+}
+
 /* NOTE: In contrast to CPython, HPy has to check that 'h_type' is a type. This
    is not necessary on CPython because it requires C type 'PyTypeObject *' but
    here we can only receive an HPy handle. Appropriate checking of the argument
