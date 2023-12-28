@@ -42,10 +42,14 @@ ctx_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
 
 _HPy_HIDDEN HPy
 ctx_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
+    PyObject *py_obj = _h2py(obj);
+    if (PySequence_Check(py_obj)) {
+        return _py2h(PySequence_GetItem(py_obj, idx));
+    }
     PyObject* key = PyLong_FromSsize_t(idx);
     if (key == NULL)
         return HPy_NULL;
-    HPy result = _py2h(PyObject_GetItem(_h2py(obj), key));
+    HPy result = _py2h(PyObject_GetItem(py_obj, key));
     Py_DECREF(key);
     return result;
 }
