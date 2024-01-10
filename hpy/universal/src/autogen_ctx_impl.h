@@ -510,6 +510,11 @@ HPyAPI_IMPL int ctx_List_Append(HPyContext *ctx, HPy h_list, HPy h_item)
     return PyList_Append(_h2py(h_list), _h2py(h_item));
 }
 
+HPyAPI_IMPL int ctx_List_Insert(HPyContext *ctx, HPy h_list, HPy_ssize_t index, HPy h_item)
+{
+    return PyList_Insert(_h2py(h_list), index, _h2py(h_item));
+}
+
 HPyAPI_IMPL int ctx_Dict_Check(HPyContext *ctx, HPy h)
 {
     return PyDict_Check(_h2py(h));

@@ -54,6 +54,7 @@ HPy Core API Function Index
 * :c:func:`HPyListBuilder_Set`
 * :c:func:`HPyList_Append`
 * :c:func:`HPyList_Check`
+* :c:func:`HPyList_Insert`
 * :c:func:`HPyList_New`
 * :c:func:`HPyLong_AsDouble`
 * :c:func:`HPyLong_AsInt32_t`
