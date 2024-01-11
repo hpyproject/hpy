@@ -350,6 +350,10 @@ HPyAPI_FUNC HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key) {
      return ctx->ctx_GetItem_s ( ctx, obj, utf8_key ); 
 }
 
+HPyAPI_FUNC HPy HPy_GetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2) {
+     return ctx->ctx_GetSlice ( ctx, obj, i1, i2 ); 
+}
+
 HPyAPI_FUNC int HPy_Contains(HPyContext *ctx, HPy container, HPy key) {
      return ctx->ctx_Contains ( ctx, container, key ); 
 }

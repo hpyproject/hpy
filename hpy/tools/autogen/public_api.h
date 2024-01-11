@@ -419,6 +419,27 @@ HPy HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(160)
 HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
 
+/**
+ * Return the slice of sequence object ``obj`` between ``i1`` and ``i2``.
+ * This is the equivalent of the Python expression ``obj[i1:i2]``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A sliceable Python object (must not be ``HPy_NULL`` otherwise a
+ *     ``SystemError`` will be raised). If the object is not sliceable, a
+ *     ``TypeError`` will be raised.
+ * :param i1:
+ *     The start index.
+ * :param i2:
+ *     The end index.
+ *
+ * :returns:
+ *     The requested slice or ``HPy_NULL`` on failure.
+ */
+HPy_ID(266)
+HPy HPy_GetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2);
+
 HPy_ID(161)
 int HPy_Contains(HPyContext *ctx, HPy container, HPy key);
 

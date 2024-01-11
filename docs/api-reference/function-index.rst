@@ -130,6 +130,7 @@ HPy Core API Function Index
 * :c:func:`HPy_GetItem`
 * :c:func:`HPy_GetItem_i`
 * :c:func:`HPy_GetItem_s`
+* :c:func:`HPy_GetSlice`
 * :c:func:`HPy_HasAttr`
 * :c:func:`HPy_HasAttr_s`
 * :c:func:`HPy_Hash`

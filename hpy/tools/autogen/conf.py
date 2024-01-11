@@ -32,6 +32,7 @@ SPECIAL_CASES = {
     'HPy_GetItem': 'PyObject_GetItem',
     'HPy_GetItem_i': None,
     'HPy_GetItem_s': None,
+    'HPy_GetSlice': 'PySequence_GetSlice',
     'HPy_SetItem': 'PyObject_SetItem',
     'HPy_SetItem_i': None,
     'HPy_SetItem_s': None,

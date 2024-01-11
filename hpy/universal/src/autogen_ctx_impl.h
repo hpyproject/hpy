@@ -335,6 +335,11 @@ HPyAPI_IMPL HPy ctx_GetItem(HPyContext *ctx, HPy obj, HPy key)
     return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
 }
 
+HPyAPI_IMPL HPy ctx_GetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2)
+{
+    return _py2h(PySequence_GetSlice(_h2py(obj), i1, i2));
+}
+
 HPyAPI_IMPL int ctx_Contains(HPyContext *ctx, HPy container, HPy key)
 {
     return PySequence_Contains(_h2py(container), _h2py(key));

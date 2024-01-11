@@ -96,6 +96,7 @@ int debug_ctx_SetAttr_s(HPyContext *dctx, DHPy obj, const char *utf8_name, DHPy 
 DHPy debug_ctx_GetItem(HPyContext *dctx, DHPy obj, DHPy key);
 DHPy debug_ctx_GetItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx);
 DHPy debug_ctx_GetItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key);
+DHPy debug_ctx_GetSlice(HPyContext *dctx, DHPy obj, HPy_ssize_t i1, HPy_ssize_t i2);
 int debug_ctx_Contains(HPyContext *dctx, DHPy container, DHPy key);
 int debug_ctx_SetItem(HPyContext *dctx, DHPy obj, DHPy key, DHPy value);
 int debug_ctx_SetItem_i(HPyContext *dctx, DHPy obj, HPy_ssize_t idx, DHPy value);
@@ -365,6 +366,7 @@ static inline void debug_ctx_init_fields(HPyContext *dctx, HPyContext *uctx)
     dctx->ctx_GetItem = &debug_ctx_GetItem;
     dctx->ctx_GetItem_i = &debug_ctx_GetItem_i;
     dctx->ctx_GetItem_s = &debug_ctx_GetItem_s;
+    dctx->ctx_GetSlice = &debug_ctx_GetSlice;
     dctx->ctx_Contains = &debug_ctx_Contains;
     dctx->ctx_SetItem = &debug_ctx_SetItem;
     dctx->ctx_SetItem_i = &debug_ctx_SetItem_i;

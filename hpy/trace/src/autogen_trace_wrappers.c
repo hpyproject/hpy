@@ -1110,6 +1110,19 @@ HPy trace_ctx_GetItem_s(HPyContext *tctx, HPy obj, const char *utf8_key)
     return res;
 }
 
+HPy trace_ctx_GetSlice(HPyContext *tctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 266);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPy_GetSlice(uctx, obj, i1, i2);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 266, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 int trace_ctx_Contains(HPyContext *tctx, HPy container, HPy key)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 161);

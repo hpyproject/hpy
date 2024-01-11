@@ -1007,6 +1007,18 @@ DHPy debug_ctx_GetItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key)
     return DHPy_open(dctx, universal_result);
 }
 
+DHPy debug_ctx_GetSlice(HPyContext *dctx, DHPy obj, HPy_ssize_t i1, HPy_ssize_t i2)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPy_GetSlice(get_info(dctx)->uctx, dh_obj, i1, i2);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
 int debug_ctx_Contains(HPyContext *dctx, DHPy container, DHPy key)
 {
     if (!get_ctx_info(dctx)->is_valid) {
