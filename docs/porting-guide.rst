@@ -269,7 +269,9 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyObject_Vectorcall <https://docs.python.org/3/c-api/call.html#c.PyObject_Vectorcall>`_                                           :c:func:`HPy_Call`
     `PyObject_VectorcallMethod <https://docs.python.org/3/c-api/call.html#c.PyObject_VectorcallMethod>`_                               :c:func:`HPy_CallMethod`
     `PySequence_Contains <https://docs.python.org/3/c-api/sequence.html#c.PySequence_Contains>`_                                       :c:func:`HPy_Contains`
+    `PySequence_DelSlice <https://docs.python.org/3/c-api/sequence.html#c.PySequence_DelSlice>`_                                       :c:func:`HPy_DelSlice`
     `PySequence_GetSlice <https://docs.python.org/3/c-api/sequence.html#c.PySequence_GetSlice>`_                                       :c:func:`HPy_GetSlice`
+    `PySequence_SetSlice <https://docs.python.org/3/c-api/sequence.html#c.PySequence_SetSlice>`_                                       :c:func:`HPy_SetSlice`
     `PySlice_AdjustIndices <https://docs.python.org/3/c-api/slice.html#c.PySlice_AdjustIndices>`_                                      :c:func:`HPySlice_AdjustIndices`
     `PySlice_Unpack <https://docs.python.org/3/c-api/slice.html#c.PySlice_Unpack>`_                                                    :c:func:`HPySlice_Unpack`
     `PyTuple_Check <https://docs.python.org/3/c-api/tuple.html#c.PyTuple_Check>`_                                                      :c:func:`HPyTuple_Check`

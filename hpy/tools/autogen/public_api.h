@@ -450,12 +450,57 @@ int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 HPy_ID(164)
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key, HPy value);
 
+/**
+ * Assign the sequence object ``value`` to the slice in sequence object ``obj``
+ * from ``i1`` to ``i2``. This is the equivalent of the Python statement
+ * ``obj[i1:i2] = value``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A sliceable Python object (must not be ``HPy_NULL`` otherwise a
+ *     ``SystemError`` will be raised). If the object is not sliceable, a
+ *     ``TypeError`` will be raised.
+ * :param i1:
+ *     The start index.
+ * :param i2:
+ *     The end index.
+ * :param value:
+ *     The sequence object to assign (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     ``0`` on success; ``-1`` on failure
+ */
+HPy_ID(267)
+int HPy_SetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2, HPy value);
+
 HPy_ID(235)
 int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key);
 HPy_ID(236)
 int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(237)
 int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
+
+/**
+ * Delete the slice of sequence object ``obj`` between ``i1`` and ``i2``.
+ * This is the equivalent of the Python statement ``del obj[i1:i2]``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A sliceable Python object (must not be ``HPy_NULL`` otherwise a
+ *     ``SystemError`` will be raised). If the object is not sliceable, a
+ *     ``TypeError`` will be raised.
+ * :param i1:
+ *     The start index.
+ * :param i2:
+ *     The end index.
+ *
+ * :returns:
+ *     ``0`` on success; ``-1`` on failure
+ */
+HPy_ID(268)
+int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2);
 
 /**
  * Returns the type of the given object ``obj``.

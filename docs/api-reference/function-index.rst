@@ -118,6 +118,7 @@ HPy Core API Function Index
 * :c:func:`HPy_DelItem`
 * :c:func:`HPy_DelItem_i`
 * :c:func:`HPy_DelItem_s`
+* :c:func:`HPy_DelSlice`
 * :c:func:`HPy_Divmod`
 * :c:func:`HPy_Dup`
 * :c:func:`HPy_EvalCode`
@@ -173,6 +174,7 @@ HPy Core API Function Index
 * :c:func:`HPy_SetItem`
 * :c:func:`HPy_SetItem_i`
 * :c:func:`HPy_SetItem_s`
+* :c:func:`HPy_SetSlice`
 * :c:func:`HPy_Str`
 * :c:func:`HPy_Subtract`
 * :c:func:`HPy_TrueDivide`

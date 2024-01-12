@@ -100,9 +100,11 @@ int trace_ctx_Contains(HPyContext *tctx, HPy container, HPy key);
 int trace_ctx_SetItem(HPyContext *tctx, HPy obj, HPy key, HPy value);
 int trace_ctx_SetItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx, HPy value);
 int trace_ctx_SetItem_s(HPyContext *tctx, HPy obj, const char *utf8_key, HPy value);
+int trace_ctx_SetSlice(HPyContext *tctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2, HPy value);
 int trace_ctx_DelItem(HPyContext *tctx, HPy obj, HPy key);
 int trace_ctx_DelItem_i(HPyContext *tctx, HPy obj, HPy_ssize_t idx);
 int trace_ctx_DelItem_s(HPyContext *tctx, HPy obj, const char *utf8_key);
+int trace_ctx_DelSlice(HPyContext *tctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2);
 HPy trace_ctx_Type(HPyContext *tctx, HPy obj);
 int trace_ctx_TypeCheck(HPyContext *tctx, HPy obj, HPy type);
 const char *trace_ctx_Type_GetName(HPyContext *tctx, HPy type);
@@ -196,8 +198,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(267, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(267, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(269, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(269, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -388,9 +390,11 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_SetItem = &trace_ctx_SetItem;
     tctx->ctx_SetItem_i = &trace_ctx_SetItem_i;
     tctx->ctx_SetItem_s = &trace_ctx_SetItem_s;
+    tctx->ctx_SetSlice = &trace_ctx_SetSlice;
     tctx->ctx_DelItem = &trace_ctx_DelItem;
     tctx->ctx_DelItem_i = &trace_ctx_DelItem_i;
     tctx->ctx_DelItem_s = &trace_ctx_DelItem_s;
+    tctx->ctx_DelSlice = &trace_ctx_DelSlice;
     tctx->ctx_Type = &trace_ctx_Type;
     tctx->ctx_TypeCheck = &trace_ctx_TypeCheck;
     tctx->ctx_Type_GetName = &trace_ctx_Type_GetName;

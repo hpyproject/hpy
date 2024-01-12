@@ -1072,6 +1072,19 @@ int debug_ctx_SetItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key, DHPy v
     return universal_result;
 }
 
+int debug_ctx_SetSlice(HPyContext *dctx, DHPy obj, HPy_ssize_t i1, HPy_ssize_t i2, DHPy value)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    HPy dh_value = DHPy_unwrap(dctx, value);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPy_SetSlice(get_info(dctx)->uctx, dh_obj, i1, i2, dh_value);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
 int debug_ctx_DelItem(HPyContext *dctx, DHPy obj, DHPy key)
 {
     if (!get_ctx_info(dctx)->is_valid) {
@@ -1105,6 +1118,18 @@ int debug_ctx_DelItem_s(HPyContext *dctx, DHPy obj, const char *utf8_key)
     HPy dh_obj = DHPy_unwrap(dctx, obj);
     get_ctx_info(dctx)->is_valid = false;
     int universal_result = HPy_DelItem_s(get_info(dctx)->uctx, dh_obj, utf8_key);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
+int debug_ctx_DelSlice(HPyContext *dctx, DHPy obj, HPy_ssize_t i1, HPy_ssize_t i2)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPy_DelSlice(get_info(dctx)->uctx, dh_obj, i1, i2);
     get_ctx_info(dctx)->is_valid = true;
     return universal_result;
 }
