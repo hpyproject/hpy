@@ -530,6 +530,54 @@ class TestObject(HPyTest):
         with pytest.raises(TypeError):
             mod.f([])
 
+    def test_getslice(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
+            {
+                HPy seq;
+                HPy_ssize_t i1, i2;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Onn", &seq, &i1, &i2)) {
+                    return HPy_NULL;
+                }
+                if (HPy_Is(ctx, seq, ctx->h_None)) {
+                    seq = HPy_NULL;
+                }
+                return HPy_GetSlice(ctx, seq, i1, i2);
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        l = [1,2,3,4,5]
+        assert mod.f(l, 0, 5) == l
+        assert mod.f(l, 2, 3) == [3]
+        assert mod.f(l, 1, 3) == [2, 3]
+
+        s = "hello"
+        assert mod.f(s, 0, 5) == "hello"
+        assert mod.f(s, 1, 3) == "el"
+
+        class Sliceable:
+            def __getitem__(self, key):
+                # assume 'key' is a slice
+                if key.start < 0:
+                    raise ValueError
+                return key.start + key.stop
+
+        o = Sliceable()
+        assert mod.f(o, 5, 13) == 18
+
+        # test that errors are propagated
+        with pytest.raises(ValueError):
+            mod.f(o, -1, 1)
+
+        # 'None' will be mapped to 'HPy_NULL' by the C function
+        with pytest.raises(SystemError):
+            mod.f(None, 0, 1)
+        with pytest.raises(TypeError):
+            mod.f({1: "hello"}, 0, 1)
+
     def test_setitem(self):
         import pytest
         mod = self.make_module("""
