@@ -784,6 +784,62 @@ class TestObject(HPyTest):
         with pytest.raises(TypeError):
             mod.delitem_s3([1, 2, 3, 4])
 
+    def test_delslice(self):
+        import pytest
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_VARARGS)
+            static HPy f_impl(HPyContext *ctx, HPy self, const HPy *args, size_t nargs)
+            {
+                int res;
+                HPy seq;
+                HPy_ssize_t i1, i2;
+                if (!HPyArg_Parse(ctx, NULL, args, nargs, "Onn", &seq, &i1, &i2)) {
+                    return HPy_NULL;
+                }
+                if (HPy_Is(ctx, seq, ctx->h_None)) {
+                    seq = HPy_NULL;
+                }
+                res = HPy_DelSlice(ctx, seq, i1, i2);
+                if (res == 0) {
+                    return HPy_Dup(ctx, seq);
+                } else if (res == -1) {
+                    return HPy_NULL;
+                }
+                HPyErr_SetString(ctx, ctx->h_SystemError,
+                    "HPy_DelSlice returned an invalid result code");
+                return HPy_NULL;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+        l = [1,2,3,4,5]
+        x = mod.f(l, 0, 5)
+        assert x is l
+        assert l == []
+
+        l = [1,2,3,4,5]
+        assert mod.f(l, 1, 3) == [1, 4, 5]
+
+        class Sliceable:
+            def __delitem__(self, key):
+                # assume 'key' is a slice
+                if key.start < 0:
+                    raise ValueError
+                self.value = key.start + key.stop
+
+        o = Sliceable()
+        assert mod.f(o, 5, 13).value == 18
+
+        # test that errors are propagated
+        with pytest.raises(ValueError):
+            mod.f(o, -1, 1)
+
+        # 'None' will be mapped to 'HPy_NULL' by the C function
+        with pytest.raises(SystemError):
+            mod.f(None, 0, 1)
+        with pytest.raises(TypeError):
+            mod.f({1: "hello"}, 0, 1)
+
     def test_length(self):
         mod = self.make_module("""
             HPyDef_METH(f, "f", HPyFunc_O)
