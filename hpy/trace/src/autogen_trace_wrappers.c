@@ -1110,14 +1110,14 @@ HPy trace_ctx_GetItem_s(HPyContext *tctx, HPy obj, const char *utf8_key)
     return res;
 }
 
-HPy trace_ctx_GetSlice(HPyContext *tctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2)
+HPy trace_ctx_GetSlice(HPyContext *tctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 266);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    HPy res = HPy_GetSlice(uctx, obj, i1, i2);
+    HPy res = HPy_GetSlice(uctx, obj, start, end);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 266, r0, r1, &_ts_start, &_ts_end);
     return res;
@@ -1175,14 +1175,14 @@ int trace_ctx_SetItem_s(HPyContext *tctx, HPy obj, const char *utf8_key, HPy val
     return res;
 }
 
-int trace_ctx_SetSlice(HPyContext *tctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2, HPy value)
+int trace_ctx_SetSlice(HPyContext *tctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end, HPy value)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 267);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    int res = HPy_SetSlice(uctx, obj, i1, i2, value);
+    int res = HPy_SetSlice(uctx, obj, start, end, value);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 267, r0, r1, &_ts_start, &_ts_end);
     return res;
@@ -1227,14 +1227,14 @@ int trace_ctx_DelItem_s(HPyContext *tctx, HPy obj, const char *utf8_key)
     return res;
 }
 
-int trace_ctx_DelSlice(HPyContext *tctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2)
+int trace_ctx_DelSlice(HPyContext *tctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 268);
     HPyContext *uctx = info->uctx;
     _HPyTime_t _ts_start, _ts_end;
     _HPyClockStatus_t r0, r1;
     r0 = get_monotonic_clock(&_ts_start);
-    int res = HPy_DelSlice(uctx, obj, i1, i2);
+    int res = HPy_DelSlice(uctx, obj, start, end);
     r1 = get_monotonic_clock(&_ts_end);
     hpy_trace_on_exit(info, 268, r0, r1, &_ts_start, &_ts_end);
     return res;

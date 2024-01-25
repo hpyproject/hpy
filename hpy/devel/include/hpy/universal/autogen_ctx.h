@@ -280,7 +280,7 @@ struct _HPyContext_s {
     HPy h_DictType;
     void *(*ctx_AsStruct_Dict)(HPyContext *ctx, HPy h);
     int (*ctx_List_Insert)(HPyContext *ctx, HPy h_list, HPy_ssize_t index, HPy h_item);
-    HPy (*ctx_GetSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2);
-    int (*ctx_SetSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2, HPy value);
-    int (*ctx_DelSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t i1, HPy_ssize_t i2);
+    HPy (*ctx_GetSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
+    int (*ctx_SetSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end, HPy value);
+    int (*ctx_DelSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
 };
