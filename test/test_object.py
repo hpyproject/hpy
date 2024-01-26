@@ -576,7 +576,7 @@ class TestObject(HPyTest):
         with pytest.raises(SystemError):
             mod.f(None, 0, 1)
         with pytest.raises(TypeError):
-            mod.f({1: "hello"}, 0, 1)
+            mod.f(123, 0, 1)
 
     def test_setitem(self):
         import pytest
@@ -710,7 +710,7 @@ class TestObject(HPyTest):
         with pytest.raises(SystemError):
             mod.f(None, 0, 1, [])
         with pytest.raises(TypeError):
-            mod.f({1: "hello"}, 0, 1, [])
+            mod.f(123, 0, 1, [])
 
     def test_delitem(self):
         import pytest
@@ -838,7 +838,7 @@ class TestObject(HPyTest):
         with pytest.raises(SystemError):
             mod.f(None, 0, 1)
         with pytest.raises(TypeError):
-            mod.f({1: "hello"}, 0, 1)
+            mod.f(123, 0, 1)
 
     def test_length(self):
         mod = self.make_module("""
