@@ -509,7 +509,8 @@ If an error occurs during building the list or tuple, it is necessary to call
 :c:func:`HPyListBuilder_Cancel` or :c:func:`HPyTupleBuilder_Cancel`,
 respectively, to avoid memory leaks.
 
-For details, see the API reference documentation :doc:`api-reference/builder`.
+For details, see the API reference documentation
+:doc:`api-reference/hpy-sequence`.
 
 Buffers
 -------
