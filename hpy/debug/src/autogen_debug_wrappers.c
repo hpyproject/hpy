@@ -1476,6 +1476,19 @@ int debug_ctx_List_Append(HPyContext *dctx, DHPy h_list, DHPy h_item)
     return universal_result;
 }
 
+int debug_ctx_List_Insert(HPyContext *dctx, DHPy h_list, HPy_ssize_t index, DHPy h_item)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_h_list = DHPy_unwrap(dctx, h_list);
+    HPy dh_h_item = DHPy_unwrap(dctx, h_item);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPyList_Insert(get_info(dctx)->uctx, dh_h_list, index, dh_h_item);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
 int debug_ctx_Dict_Check(HPyContext *dctx, DHPy h)
 {
     if (!get_ctx_info(dctx)->is_valid) {

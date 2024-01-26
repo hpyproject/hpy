@@ -673,6 +673,30 @@ HPy HPyList_New(HPyContext *ctx, HPy_ssize_t len);
 HPy_ID(200)
 int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 
+/**
+ * Insert the item ``h_item`` into list ``h_list`` in front of index ``index``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h_list:
+ *     A Python list object (must not be ``HPy_NULL``). Otherwise, a
+ *     ``SystemError`` will be raised.
+ * :param index:
+ *     The index where the element should be inserted before. A negative index
+ *     is allowed and is then interpreted to be relative to the end of sequence.
+ *     E.g. ``index == -1`` is the last element.
+ *     If ``index < -n`` (where ``n`` is the length of the list), it will be
+ *     replaced by ``0``. If ``index > n``, it will be replaced by ``n``.
+ * :param h_item:
+ *    The item to insert (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     Return ``0`` if successful; return ``-1`` and set an exception if
+ *     unsuccessful.
+ */
+HPy_ID(265)
+int HPyList_Insert(HPyContext *ctx, HPy h_list, HPy_ssize_t index, HPy h_item);
+
 /* dictobject.h */
 
 /**

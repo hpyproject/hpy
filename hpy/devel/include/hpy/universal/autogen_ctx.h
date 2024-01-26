@@ -279,4 +279,5 @@ struct _HPyContext_s {
     HPy (*ctx_CallMethod)(HPyContext *ctx, HPy name, const HPy *args, size_t nargs, HPy kwnames);
     HPy h_DictType;
     void *(*ctx_AsStruct_Dict)(HPyContext *ctx, HPy h);
+    int (*ctx_List_Insert)(HPyContext *ctx, HPy h_list, HPy_ssize_t index, HPy h_item);
 };

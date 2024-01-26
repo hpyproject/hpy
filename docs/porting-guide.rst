@@ -192,6 +192,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyImport_ImportModule <https://docs.python.org/3/c-api/import.html#c.PyImport_ImportModule>`_                                     :c:func:`HPyImport_ImportModule`
     `PyList_Append <https://docs.python.org/3/c-api/list.html#c.PyList_Append>`_                                                       :c:func:`HPyList_Append`
     `PyList_Check <https://docs.python.org/3/c-api/list.html#c.PyList_Check>`_                                                         :c:func:`HPyList_Check`
+    `PyList_Insert <https://docs.python.org/3/c-api/list.html#c.PyList_Insert>`_                                                       :c:func:`HPyList_Insert`
     `PyList_New <https://docs.python.org/3/c-api/list.html#c.PyList_New>`_                                                             :c:func:`HPyList_New`
     `PyLong_AsDouble <https://docs.python.org/3/c-api/long.html#c.PyLong_AsDouble>`_                                                   :c:func:`HPyLong_AsDouble`
     `PyLong_AsLong <https://docs.python.org/3/c-api/long.html#c.PyLong_AsLong>`_                                                       :c:func:`HPyLong_AsLong`

@@ -566,6 +566,10 @@ HPyAPI_FUNC int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item) {
      return ctx->ctx_List_Append ( ctx, h_list, h_item ); 
 }
 
+HPyAPI_FUNC int HPyList_Insert(HPyContext *ctx, HPy h_list, HPy_ssize_t index, HPy h_item) {
+     return ctx->ctx_List_Insert ( ctx, h_list, index, h_item ); 
+}
+
 HPyAPI_FUNC int HPyDict_Check(HPyContext *ctx, HPy h) {
      return ctx->ctx_Dict_Check ( ctx, h ); 
 }
