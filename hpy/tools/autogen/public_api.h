@@ -419,6 +419,27 @@ HPy HPy_GetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(160)
 HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
 
+/**
+ * Return the slice of sequence object ``obj`` between ``start`` and ``end``.
+ * This is the equivalent of the Python expression ``obj[start:end]``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A sliceable Python object (must not be ``HPy_NULL`` otherwise a
+ *     ``SystemError`` will be raised). If the object is not sliceable, a
+ *     ``TypeError`` will be raised.
+ * :param start:
+ *     The start index (inclusive).
+ * :param end:
+ *     The end index (exclusive).
+ *
+ * :returns:
+ *     The requested slice or ``HPy_NULL`` on failure.
+ */
+HPy_ID(266)
+HPy HPy_GetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
+
 HPy_ID(161)
 int HPy_Contains(HPyContext *ctx, HPy container, HPy key);
 
@@ -429,12 +450,57 @@ int HPy_SetItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx, HPy value);
 HPy_ID(164)
 int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key, HPy value);
 
+/**
+ * Assign the sequence object ``value`` to the slice in sequence object ``obj``
+ * from ``start`` to ``end``. This is the equivalent of the Python statement
+ * ``obj[start:end] = value``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A sliceable Python object (must not be ``HPy_NULL`` otherwise a
+ *     ``SystemError`` will be raised). If the object is not sliceable, a
+ *     ``TypeError`` will be raised.
+ * :param start:
+ *     The start index (inclusive).
+ * :param end:
+ *     The end index (exclusive).
+ * :param value:
+ *     The sequence object to assign (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     ``0`` on success; ``-1`` on failure
+ */
+HPy_ID(267)
+int HPy_SetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end, HPy value);
+
 HPy_ID(235)
 int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key);
 HPy_ID(236)
 int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx);
 HPy_ID(237)
 int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
+
+/**
+ * Delete the slice of sequence object ``obj`` between ``start`` and ``end``.
+ * This is the equivalent of the Python statement ``del obj[start:end]``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A sliceable Python object (must not be ``HPy_NULL`` otherwise a
+ *     ``SystemError`` will be raised). If the object is not sliceable, a
+ *     ``TypeError`` will be raised.
+ * :param start:
+ *     The start index (inclusive).
+ * :param end:
+ *     The end index (exclusive).
+ *
+ * :returns:
+ *     ``0`` on success; ``-1`` on failure
+ */
+HPy_ID(268)
+int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
 
 /**
  * Returns the type of the given object ``obj``.

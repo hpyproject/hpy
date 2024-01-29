@@ -350,6 +350,10 @@ HPyAPI_FUNC HPy HPy_GetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key) {
      return ctx->ctx_GetItem_s ( ctx, obj, utf8_key ); 
 }
 
+HPyAPI_FUNC HPy HPy_GetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end) {
+     return ctx->ctx_GetSlice ( ctx, obj, start, end ); 
+}
+
 HPyAPI_FUNC int HPy_Contains(HPyContext *ctx, HPy container, HPy key) {
      return ctx->ctx_Contains ( ctx, container, key ); 
 }
@@ -366,6 +370,10 @@ HPyAPI_FUNC int HPy_SetItem_s(HPyContext *ctx, HPy obj, const char *utf8_key, HP
      return ctx->ctx_SetItem_s ( ctx, obj, utf8_key, value ); 
 }
 
+HPyAPI_FUNC int HPy_SetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end, HPy value) {
+     return ctx->ctx_SetSlice ( ctx, obj, start, end, value ); 
+}
+
 HPyAPI_FUNC int HPy_DelItem(HPyContext *ctx, HPy obj, HPy key) {
      return ctx->ctx_DelItem ( ctx, obj, key ); 
 }
@@ -376,6 +384,10 @@ HPyAPI_FUNC int HPy_DelItem_i(HPyContext *ctx, HPy obj, HPy_ssize_t idx) {
 
 HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key) {
      return ctx->ctx_DelItem_s ( ctx, obj, utf8_key ); 
+}
+
+HPyAPI_FUNC int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end) {
+     return ctx->ctx_DelSlice ( ctx, obj, start, end ); 
 }
 
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {

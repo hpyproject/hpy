@@ -335,6 +335,11 @@ HPyAPI_IMPL HPy ctx_GetItem(HPyContext *ctx, HPy obj, HPy key)
     return _py2h(PyObject_GetItem(_h2py(obj), _h2py(key)));
 }
 
+HPyAPI_IMPL HPy ctx_GetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end)
+{
+    return _py2h(PySequence_GetSlice(_h2py(obj), start, end));
+}
+
 HPyAPI_IMPL int ctx_Contains(HPyContext *ctx, HPy container, HPy key)
 {
     return PySequence_Contains(_h2py(container), _h2py(key));
@@ -345,9 +350,19 @@ HPyAPI_IMPL int ctx_SetItem(HPyContext *ctx, HPy obj, HPy key, HPy value)
     return PyObject_SetItem(_h2py(obj), _h2py(key), _h2py(value));
 }
 
+HPyAPI_IMPL int ctx_SetSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end, HPy value)
+{
+    return PySequence_SetSlice(_h2py(obj), start, end, _h2py(value));
+}
+
 HPyAPI_IMPL int ctx_DelItem(HPyContext *ctx, HPy obj, HPy key)
 {
     return PyObject_DelItem(_h2py(obj), _h2py(key));
+}
+
+HPyAPI_IMPL int ctx_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end)
+{
+    return PySequence_DelSlice(_h2py(obj), start, end);
 }
 
 HPyAPI_IMPL HPy ctx_Type(HPyContext *ctx, HPy obj)
