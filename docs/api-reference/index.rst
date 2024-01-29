@@ -28,9 +28,9 @@ between the modes.
    hpy-field
    hpy-global
    hpy-dict
+   hpy-sequence
    hpy-gil
    hpy-err
-   builder
    hpy-eval
    public-api
 

@@ -666,10 +666,52 @@ HPy_ID(256)
 HPy HPyUnicode_Substring(HPyContext *ctx, HPy str, HPy_ssize_t start, HPy_ssize_t end);
 
 /* listobject.h */
+
+/**
+ * Tests if an object is an instance of a Python list.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A handle to an arbitrary object (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     Non-zero if object ``h`` is an instance of type ``list`` or an instance
+ *     of a subtype of ``list``, and ``0`` otherwise.
+ */
 HPy_ID(198)
 int HPyList_Check(HPyContext *ctx, HPy h);
+
+/**
+ * Creates a new list instance with length ``len``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param len:
+ *     A Python list object (must not be ``HPy_NULL``). Otherwise, a
+ *     ``SystemError`` will be raised.
+ *
+ * :returns:
+ *     The new list instance on success, or ``HPy_NULL`` on failure.
+ */
 HPy_ID(199)
 HPy HPyList_New(HPyContext *ctx, HPy_ssize_t len);
+
+/**
+ * Append item ``h_item`` to list ``h_list``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h_list:
+ *     A Python list object (must not be ``HPy_NULL``). Otherwise, a
+ *     ``SystemError`` will be raised.
+ * :param h_item:
+ *    The item to append (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     Return ``0`` if successful; return ``-1`` and set an exception if
+ *     unsuccessful.
+ */
 HPy_ID(200)
 int HPyList_Append(HPyContext *ctx, HPy h_list, HPy h_item);
 
@@ -763,11 +805,41 @@ HPy_ID(258)
 HPy HPyDict_Copy(HPyContext *ctx, HPy h);
 
 /* tupleobject.h */
+
+/**
+ * Tests if an object is an instance of a Python tuple.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param h:
+ *     A handle to an arbitrary object (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     Non-zero if object ``h`` is an instance of type ``tuple`` or an instance
+ *     of a subtype of ``tuple``, and ``0`` otherwise.
+ */
 HPy_ID(203)
 int HPyTuple_Check(HPyContext *ctx, HPy h);
+
+/**
+ * Create a tuple from an array.
+ *
+ * Note: Consider to use the convenience function :c:func:`HPyTuple_Pack` to
+ * create a tuple.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param items:
+ *     An array of items to use for initialization of the tuple.
+ * :param n:
+ *     The number of elements in array ``items``.
+ *
+ * :return:
+ *     A new tuple with ``n`` elements or ``HPy_NULL`` in case of an error
+ *     occurred.
+ */
 HPy_ID(204)
 HPy HPyTuple_FromArray(HPyContext *ctx, const HPy items[], HPy_ssize_t n);
-// note: HPyTuple_Pack is implemented as a macro in common/macros.h
 
 /* sliceobject.h */
 
@@ -1299,7 +1371,7 @@ typedef enum {
     //HPy_tp_clear = SLOT(51, HPyFunc_X),      NOT SUPPORTED, use tp_traverse
     //HPy_tp_dealloc = SLOT(52, HPyFunc_X),    NOT SUPPORTED
     //HPy_tp_del = SLOT(53, HPyFunc_X),
-    //HPy_tp_descr_get = SLOT(54, HPyFunc_X),
+    HPy_tp_descr_get = SLOT(54, HPyFunc_TERNARYFUNC),
     //HPy_tp_descr_set = SLOT(55, HPyFunc_X),
     //HPy_tp_doc = SLOT(56, HPyFunc_X),
     //HPy_tp_getattr = SLOT(57, HPyFunc_X),
