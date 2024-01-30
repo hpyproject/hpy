@@ -365,11 +365,6 @@ HPyAPI_IMPL int ctx_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ss
     return PySequence_DelSlice(_h2py(obj), start, end);
 }
 
-HPyAPI_IMPL HPy ctx_Type(HPyContext *ctx, HPy obj)
-{
-    return _py2h(PyObject_Type(_h2py(obj)));
-}
-
 HPyAPI_IMPL HPy ctx_Repr(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Repr(_h2py(obj)));

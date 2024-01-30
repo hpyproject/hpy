@@ -311,6 +311,13 @@ HPyAPI_FUNC void _HPy_Dump(HPyContext *ctx, HPy h)
     ctx_Dump(ctx, h);
 }
 
+HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy h_obj)
+{
+    PyTypeObject *tp = Py_TYPE(_h2py(h_obj));
+    Py_INCREF(tp);
+    return _py2h((PyObject *)tp);
+}
+
 HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 {
     return ctx_TypeCheck(ctx, h_obj, h_type);
@@ -318,7 +325,7 @@ HPyAPI_FUNC int HPy_TypeCheck(HPyContext *ctx, HPy h_obj, HPy h_type)
 
 HPyAPI_FUNC int HPy_Is(HPyContext *ctx, HPy h_obj, HPy h_other)
 {
-    return ctx_Is(ctx, h_obj, h_other);
+    return _h2py(h_obj) == _h2py(h_other);
 }
 
 HPyAPI_FUNC HPyListBuilder HPyListBuilder_New(HPyContext *ctx, HPy_ssize_t initial_size)

@@ -121,7 +121,7 @@ SPECIAL_CASES = {
     'HPyTracker_ForgetAll': None,
     'HPyTracker_Close': None,
     '_HPy_Dump': None,
-    'HPy_Type': 'PyObject_Type',
+    'HPy_Type': None,
     'HPy_TypeCheck': None,
     'HPy_Is': None,
     'HPyBytes_FromStringAndSize': None,
@@ -182,6 +182,7 @@ DOC_MANUAL_API_MAPPING = {
     'PySlice_AdjustIndices': 'HPySlice_AdjustIndices',
     'PyType_IsSubtype': 'HPyType_IsSubtype',
     'PyObject_Call': 'HPy_CallTupleDict',
+    'PyObject_Type': 'HPy_Type',
     'PyObject_Vectorcall': 'HPy_Call',
     'PyObject_VectorcallMethod': 'HPy_CallMethod',
 }
