@@ -236,7 +236,8 @@ class TestDistutils:
             )
         """)
         # self.python('setup.py', '--hpy-abi=universal', 'build')
-        self.python('-m', 'build', hpy_abi='universal')        self.python('-m', 'pip', 'install', '.')
+        self.python('-m', 'build', hpy_abi='universal')
+        self.python('-m', 'pip', 'install', '.')
         build = self.hpy_test_project.join('build')
         lib = build.listdir('lib*')[0]
         hpymod_py = lib.join('hpymod.py')
