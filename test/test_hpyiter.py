@@ -69,9 +69,22 @@ class TestIter(HPyTest):
             @INIT
         """)
 
-        import pytest
+        class CustomIterator:
+            def __init__(self):
+                self._iter = iter(["a", "b", "c"])
 
+            def __iter__(self):
+                return self._iter
+
+            def __next__(self):
+                return next(self._iter)
+            
+        assert mod.f(iter([3, 2, 1])) == 3
+        assert mod.f((i for i in range(1, 10))) == 1
+        assert mod.f(CustomIterator()) == "a"
+
+        import pytest
         with pytest.raises(StopIteration):
             assert mod.f(iter([]))
 
-        assert mod.f((i for i in range(1, 10))) == 1
+        

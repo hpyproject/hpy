@@ -254,6 +254,18 @@ HPyAPI_FUNC HPy HPy_CallMethod(HPyContext *ctx, HPy name, const HPy *args, size_
      return ctx->ctx_CallMethod ( ctx, name, args, nargs, kwnames ); 
 }
 
+HPyAPI_FUNC HPy HPy_GetIter(HPyContext *ctx, HPy obj) {
+     return ctx->ctx_GetIter ( ctx, obj ); 
+}
+
+HPyAPI_FUNC HPy HPyIter_Next(HPyContext *ctx, HPy obj) {
+     return ctx->ctx_Iter_Next ( ctx, obj ); 
+}
+
+HPyAPI_FUNC int HPyIter_Check(HPyContext *ctx, HPy obj) {
+     return ctx->ctx_Iter_Check ( ctx, obj ); 
+}
+
 HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message) {
      ctx->ctx_Err_SetString ( ctx, h_type, utf8_message ); return HPy_NULL; 
 }
@@ -388,18 +400,6 @@ HPyAPI_FUNC int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key) {
 
 HPyAPI_FUNC int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end) {
      return ctx->ctx_DelSlice ( ctx, obj, start, end ); 
-}
-
-HPyAPI_FUNC HPy HPy_GetIter(HPyContext *ctx, HPy obj) {
-     return ctx->ctx_GetIter ( ctx, obj ); 
-}
-
-HPyAPI_FUNC HPy HPyIter_Next(HPyContext *ctx, HPy obj) {
-     return ctx->ctx_Iter_Next ( ctx, obj ); 
-}
-
-HPyAPI_FUNC int HPyIter_Check(HPyContext *ctx, HPy obj) {
-     return ctx->ctx_Iter_Check ( ctx, obj ); 
 }
 
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {

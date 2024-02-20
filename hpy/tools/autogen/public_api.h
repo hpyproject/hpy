@@ -307,6 +307,56 @@ HPy HPy_Call(HPyContext *ctx, HPy callable, const HPy *args, size_t nargs, HPy k
 HPy_ID(262)
 HPy HPy_CallMethod(HPyContext *ctx, HPy name, const HPy *args, size_t nargs, HPy kwnames);
 
+/**
+ * Return a new iterator for iterable object ``obj``. This is the equivalent
+ * of the Python expression ``iter(obj)``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     An iterable Python object (must not be ``HPy_NULL``). If the object is
+ *     not iterable, a ``TypeError`` will be raised.
+ *
+ * :returns:
+ *     The new iterator, ``obj`` itself if it is already an iterator, or
+ *     ``HPy_NULL`` on failure.
+ */
+HPy_ID(269)
+HPy HPy_GetIter(HPyContext *ctx, HPy obj);
+
+/**
+ * Return the next value from iterator ``obj``.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     An iterator Python object (must not be ``HPy_NULL``). This can be 
+ *     verified with ``HPy_IterCheck``. Otherwise, the behavior is undefined
+ *     (verification of the argument is only done in debug mode).
+ *
+ * :returns:
+ *     The new value in iterator ``obj``, or ``HPy_NULL`` on failure. If the
+ *     iterator was exhausted normally, an exception will not be set. In
+ *     case of some other error, one will be set.
+ */
+HPy_ID(270)
+HPy HPyIter_Next(HPyContext *ctx, HPy obj);
+
+/**
+ * Tests if an object is an instance of a Python iterator.
+ *
+ * :param ctx:
+ *     The execution context.
+ * :param obj:
+ *     A handle to an arbitrary object (must not be ``HPy_NULL``).
+ *
+ * :returns:
+ *     Non-zero if object ``h`` provides the ``Iterator`` protocol, and ``0``
+ *     otherwise.
+ */
+HPy_ID(271)
+int HPyIter_Check(HPyContext *ctx, HPy obj);
+
 /* pyerrors.h */
 HPy_ID(136)
 void HPy_FatalError(HPyContext *ctx, const char *message);
@@ -501,15 +551,6 @@ int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
  */
 HPy_ID(268)
 int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
-
-HPy_ID(269)
-HPy HPy_GetIter(HPyContext *ctx, HPy obj);
-
-HPy_ID(270)
-HPy HPyIter_Next(HPyContext *ctx, HPy obj);
-
-HPy_ID(271)
-int HPyIter_Check(HPyContext *ctx, HPy obj);
 
 /**
  * Returns the type of the given object ``obj``.
