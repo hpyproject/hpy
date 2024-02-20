@@ -190,6 +190,8 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyFloat_AsDouble <https://docs.python.org/3/c-api/float.html#c.PyFloat_AsDouble>`_                                                :c:func:`HPyFloat_AsDouble`
     `PyFloat_FromDouble <https://docs.python.org/3/c-api/float.html#c.PyFloat_FromDouble>`_                                            :c:func:`HPyFloat_FromDouble`
     `PyImport_ImportModule <https://docs.python.org/3/c-api/import.html#c.PyImport_ImportModule>`_                                     :c:func:`HPyImport_ImportModule`
+    `PyIter_Check <https://docs.python.org/3/c-api/iter.html#c.PyIter_Check>`_                                                         :c:func:`HPyIter_Check`
+    `PyIter_Next <https://docs.python.org/3/c-api/iter.html#c.PyIter_Next>`_                                                           :c:func:`HPyIter_Next`
     `PyList_Append <https://docs.python.org/3/c-api/list.html#c.PyList_Append>`_                                                       :c:func:`HPyList_Append`
     `PyList_Check <https://docs.python.org/3/c-api/list.html#c.PyList_Check>`_                                                         :c:func:`HPyList_Check`
     `PyList_Insert <https://docs.python.org/3/c-api/list.html#c.PyList_Insert>`_                                                       :c:func:`HPyList_Insert`
@@ -252,6 +254,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PyObject_GetAttr <https://docs.python.org/3/c-api/object.html#c.PyObject_GetAttr>`_                                               :c:func:`HPy_GetAttr`
     `PyObject_GetAttrString <https://docs.python.org/3/c-api/object.html#c.PyObject_GetAttrString>`_                                   :c:func:`HPy_GetAttr_s`
     `PyObject_GetItem <https://docs.python.org/3/c-api/object.html#c.PyObject_GetItem>`_                                               :c:func:`HPy_GetItem`
+    `PyObject_GetIter <https://docs.python.org/3/c-api/object.html#c.PyObject_GetIter>`_                                               :c:func:`HPy_GetIter`
     `PyObject_HasAttr <https://docs.python.org/3/c-api/object.html#c.PyObject_HasAttr>`_                                               :c:func:`HPy_HasAttr`
     `PyObject_HasAttrString <https://docs.python.org/3/c-api/object.html#c.PyObject_HasAttrString>`_                                   :c:func:`HPy_HasAttr_s`
     `PyObject_Hash <https://docs.python.org/3/c-api/object.html#c.PyObject_Hash>`_                                                     :c:func:`HPy_Hash`

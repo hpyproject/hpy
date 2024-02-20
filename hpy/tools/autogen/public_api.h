@@ -502,6 +502,15 @@ int HPy_DelItem_s(HPyContext *ctx, HPy obj, const char *utf8_key);
 HPy_ID(268)
 int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
 
+HPy_ID(269)
+HPy HPy_GetIter(HPyContext *ctx, HPy obj);
+
+HPy_ID(270)
+HPy HPyIter_Next(HPyContext *ctx, HPy obj);
+
+HPy_ID(271)
+int HPyIter_Check(HPyContext *ctx, HPy obj);
+
 /**
  * Returns the type of the given object ``obj``.
  *

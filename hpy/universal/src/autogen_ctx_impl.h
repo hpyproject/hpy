@@ -365,6 +365,21 @@ HPyAPI_IMPL int ctx_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ss
     return PySequence_DelSlice(_h2py(obj), start, end);
 }
 
+HPyAPI_IMPL HPy ctx_GetIter(HPyContext *ctx, HPy obj)
+{
+    return _py2h(PyObject_GetIter(_h2py(obj)));
+}
+
+HPyAPI_IMPL HPy ctx_Iter_Next(HPyContext *ctx, HPy obj)
+{
+    return _py2h(PyIter_Next(_h2py(obj)));
+}
+
+HPyAPI_IMPL int ctx_Iter_Check(HPyContext *ctx, HPy obj)
+{
+    return PyIter_Check(_h2py(obj));
+}
+
 HPyAPI_IMPL HPy ctx_Repr(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Repr(_h2py(obj)));

@@ -48,6 +48,8 @@ HPy Core API Function Index
 * :c:func:`HPyGlobal_Load`
 * :c:func:`HPyGlobal_Store`
 * :c:func:`HPyImport_ImportModule`
+* :c:func:`HPyIter_Check`
+* :c:func:`HPyIter_Next`
 * :c:func:`HPyListBuilder_Build`
 * :c:func:`HPyListBuilder_Cancel`
 * :c:func:`HPyListBuilder_New`
@@ -131,6 +133,7 @@ HPy Core API Function Index
 * :c:func:`HPy_GetItem`
 * :c:func:`HPy_GetItem_i`
 * :c:func:`HPy_GetItem_s`
+* :c:func:`HPy_GetIter`
 * :c:func:`HPy_GetSlice`
 * :c:func:`HPy_HasAttr`
 * :c:func:`HPy_HasAttr_s`

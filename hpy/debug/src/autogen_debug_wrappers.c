@@ -1134,6 +1134,42 @@ int debug_ctx_DelSlice(HPyContext *dctx, DHPy obj, HPy_ssize_t start, HPy_ssize_
     return universal_result;
 }
 
+DHPy debug_ctx_GetIter(HPyContext *dctx, DHPy obj)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPy_GetIter(get_info(dctx)->uctx, dh_obj);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
+DHPy debug_ctx_Iter_Next(HPyContext *dctx, DHPy obj)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    HPy universal_result = HPyIter_Next(get_info(dctx)->uctx, dh_obj);
+    get_ctx_info(dctx)->is_valid = true;
+    return DHPy_open(dctx, universal_result);
+}
+
+int debug_ctx_Iter_Check(HPyContext *dctx, DHPy obj)
+{
+    if (!get_ctx_info(dctx)->is_valid) {
+        report_invalid_debug_context();
+    }
+    HPy dh_obj = DHPy_unwrap(dctx, obj);
+    get_ctx_info(dctx)->is_valid = false;
+    int universal_result = HPyIter_Check(get_info(dctx)->uctx, dh_obj);
+    get_ctx_info(dctx)->is_valid = true;
+    return universal_result;
+}
+
 DHPy debug_ctx_Type(HPyContext *dctx, DHPy obj)
 {
     if (!get_ctx_info(dctx)->is_valid) {

@@ -1240,6 +1240,45 @@ int trace_ctx_DelSlice(HPyContext *tctx, HPy obj, HPy_ssize_t start, HPy_ssize_t
     return res;
 }
 
+HPy trace_ctx_GetIter(HPyContext *tctx, HPy obj)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 269);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPy_GetIter(uctx, obj);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 269, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+HPy trace_ctx_Iter_Next(HPyContext *tctx, HPy obj)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 270);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPyIter_Next(uctx, obj);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 270, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
+int trace_ctx_Iter_Check(HPyContext *tctx, HPy obj)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 271);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    int res = HPyIter_Check(uctx, obj);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 271, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 HPy trace_ctx_Type(HPyContext *tctx, HPy obj)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 165);

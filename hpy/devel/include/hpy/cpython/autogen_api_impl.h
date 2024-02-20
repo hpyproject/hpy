@@ -369,6 +369,21 @@ HPyAPI_FUNC int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ss
     return PySequence_DelSlice(_h2py(obj), start, end);
 }
 
+HPyAPI_FUNC HPy HPy_GetIter(HPyContext *ctx, HPy obj)
+{
+    return _py2h(PyObject_GetIter(_h2py(obj)));
+}
+
+HPyAPI_FUNC HPy HPyIter_Next(HPyContext *ctx, HPy obj)
+{
+    return _py2h(PyIter_Next(_h2py(obj)));
+}
+
+HPyAPI_FUNC int HPyIter_Check(HPyContext *ctx, HPy obj)
+{
+    return PyIter_Check(_h2py(obj));
+}
+
 HPyAPI_FUNC HPy HPy_Repr(HPyContext *ctx, HPy obj)
 {
     return _py2h(PyObject_Repr(_h2py(obj)));

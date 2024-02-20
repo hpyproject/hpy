@@ -390,6 +390,18 @@ HPyAPI_FUNC int HPy_DelSlice(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ss
      return ctx->ctx_DelSlice ( ctx, obj, start, end ); 
 }
 
+HPyAPI_FUNC HPy HPy_GetIter(HPyContext *ctx, HPy obj) {
+     return ctx->ctx_GetIter ( ctx, obj ); 
+}
+
+HPyAPI_FUNC HPy HPyIter_Next(HPyContext *ctx, HPy obj) {
+     return ctx->ctx_Iter_Next ( ctx, obj ); 
+}
+
+HPyAPI_FUNC int HPyIter_Check(HPyContext *ctx, HPy obj) {
+     return ctx->ctx_Iter_Check ( ctx, obj ); 
+}
+
 HPyAPI_FUNC HPy HPy_Type(HPyContext *ctx, HPy obj) {
      return ctx->ctx_Type ( ctx, obj ); 
 }
