@@ -331,8 +331,7 @@ HPy HPy_GetIter(HPyContext *ctx, HPy obj);
  *     The execution context.
  * :param obj:
  *     An iterator Python object (must not be ``HPy_NULL``). This can be 
- *     verified with ``HPy_IterCheck``. Otherwise, the behavior is undefined
- *     (verification of the argument is only done in debug mode).
+ *     verified with ``HPy_IterCheck``. Otherwise, the behavior is undefined.
  *
  * :returns:
  *     The new value in iterator ``obj``, or ``HPy_NULL`` on failure. If the
