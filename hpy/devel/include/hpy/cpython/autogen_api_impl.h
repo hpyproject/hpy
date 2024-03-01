@@ -240,6 +240,21 @@ HPyAPI_FUNC int HPyCallable_Check(HPyContext *ctx, HPy h)
     return PyCallable_Check(_h2py(h));
 }
 
+HPyAPI_FUNC HPy HPy_GetIter(HPyContext *ctx, HPy obj)
+{
+    return _py2h(PyObject_GetIter(_h2py(obj)));
+}
+
+HPyAPI_FUNC HPy HPyIter_Next(HPyContext *ctx, HPy obj)
+{
+    return _py2h(PyIter_Next(_h2py(obj)));
+}
+
+HPyAPI_FUNC int HPyIter_Check(HPyContext *ctx, HPy obj)
+{
+    return PyIter_Check(_h2py(obj));
+}
+
 HPyAPI_FUNC HPy HPyErr_SetString(HPyContext *ctx, HPy h_type, const char *utf8_message)
 {
     PyErr_SetString(_h2py(h_type), utf8_message);

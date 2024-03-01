@@ -283,4 +283,7 @@ struct _HPyContext_s {
     HPy (*ctx_GetSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
     int (*ctx_SetSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end, HPy value);
     int (*ctx_DelSlice)(HPyContext *ctx, HPy obj, HPy_ssize_t start, HPy_ssize_t end);
+    HPy (*ctx_GetIter)(HPyContext *ctx, HPy obj);
+    HPy (*ctx_Iter_Next)(HPyContext *ctx, HPy obj);
+    int (*ctx_Iter_Check)(HPyContext *ctx, HPy obj);
 };

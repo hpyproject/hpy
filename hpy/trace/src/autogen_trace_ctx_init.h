@@ -71,6 +71,9 @@ int trace_ctx_Callable_Check(HPyContext *tctx, HPy h);
 HPy trace_ctx_CallTupleDict(HPyContext *tctx, HPy callable, HPy args, HPy kw);
 HPy trace_ctx_Call(HPyContext *tctx, HPy callable, const HPy *args, size_t nargs, HPy kwnames);
 HPy trace_ctx_CallMethod(HPyContext *tctx, HPy name, const HPy *args, size_t nargs, HPy kwnames);
+HPy trace_ctx_GetIter(HPyContext *tctx, HPy obj);
+HPy trace_ctx_Iter_Next(HPyContext *tctx, HPy obj);
+int trace_ctx_Iter_Check(HPyContext *tctx, HPy obj);
 void trace_ctx_Err_SetString(HPyContext *tctx, HPy h_type, const char *utf8_message);
 void trace_ctx_Err_SetObject(HPyContext *tctx, HPy h_type, HPy h_value);
 HPy trace_ctx_Err_SetFromErrnoWithFilename(HPyContext *tctx, HPy h_type, const char *filename_fsencoded);
@@ -198,8 +201,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(269, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(269, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(272, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(272, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -360,6 +363,9 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_CallTupleDict = &trace_ctx_CallTupleDict;
     tctx->ctx_Call = &trace_ctx_Call;
     tctx->ctx_CallMethod = &trace_ctx_CallMethod;
+    tctx->ctx_GetIter = &trace_ctx_GetIter;
+    tctx->ctx_Iter_Next = &trace_ctx_Iter_Next;
+    tctx->ctx_Iter_Check = &trace_ctx_Iter_Check;
     tctx->ctx_FatalError = uctx->ctx_FatalError;
     tctx->ctx_Err_SetString = &trace_ctx_Err_SetString;
     tctx->ctx_Err_SetObject = &trace_ctx_Err_SetObject;

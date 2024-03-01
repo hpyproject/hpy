@@ -905,6 +905,64 @@ class TestObject(HPyTest):
         import pytest
         with pytest.raises(TypeError):
             mod.f(Dummy(), 42)
+    
+    def test_getiter(self):
+        mod = self.make_module("""
+            HPyDef_METH(f, "f", HPyFunc_O)
+            static HPy f_impl(HPyContext *ctx, HPy self, HPy arg)
+            {
+                HPy iterator;
+                iterator = HPy_GetIter(ctx, arg);
+                if HPy_IsNull(iterator)
+                    return HPy_NULL;
+                return iterator;
+            }
+            @EXPORT(f)
+            @INIT
+        """)
+
+        def test_for_loop(iterator):
+            results = []
+            for obj in iterator:
+                results.append(obj)
+            return results
+
+        class WithIter:
+            def __iter__(self):
+                return (1, 2, 3).__iter__()
+
+        class WithoutIter:
+            pass
+
+        case = [1, 2, 3]
+        result = mod.f(case)
+        assert result
+        assert test_for_loop(result) == [1, 2, 3]
+
+        case = iter([1, 2, 3])
+        result = mod.f(case)
+        assert result
+        assert test_for_loop(result) == [1, 2, 3]
+
+        case = zip((1, 2, 3), [4, 5, 6])
+        result = mod.f(case)
+        assert result
+        assert test_for_loop(result) == [(1, 4), (2, 5), (3, 6)]
+
+        case = range(10)
+        result = mod.f(case)
+        assert result
+        assert test_for_loop(result) == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        case = WithIter()
+        result = mod.f(case)
+        assert result
+        assert test_for_loop(result) == [1, 2, 3]
+
+        import pytest
+        with pytest.raises(TypeError):
+            assert mod.f(WithoutIter())
+
 
     def test_dump(self):
         # _HPy_Dump is supposed to be used e.g. inside a gdb session: it
