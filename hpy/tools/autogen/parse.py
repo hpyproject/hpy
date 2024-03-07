@@ -4,6 +4,7 @@ import attr
 import re
 import py
 import pycparser
+import shutil
 from pycparser import c_ast
 from pycparser.c_generator import CGenerator
 from sysconfig import get_config_var
@@ -202,15 +203,26 @@ class HPyAPI:
                             re.DOTALL | re.MULTILINE)
 
     def __init__(self, filename):
-        cpp_cmd = get_config_var('CC').split(' ')
+        cpp_cmd = get_config_var('CC')
+        if cpp_cmd:
+            cpp_cmd = cpp_cmd.split(' ')
+        elif sys.platform == 'win32':
+            cpp_cmd = [shutil.which("cl.exe")]
         if sys.platform == 'win32':
             cpp_cmd += ['/E', '/I%s' % CURRENT_DIR]
         else:
             cpp_cmd += ['-E', '-I%s' % CURRENT_DIR]
 
+        msvc = "cl.exe" in cpp_cmd[0].casefold()
+
         csource = pycparser.preprocess_file(filename,
                                   cpp_path=str(cpp_cmd[0]),
                                   cpp_args=cpp_cmd[1:])
+
+        # MSVC preprocesses _Pragma(foo) to __pragma(foo),
+        # but cparser needs to see a #pragma, not __pragma.
+        if msvc:
+            csource = re.sub(r'__pragma\(([^)]+)\)', r'#pragma \1\n', csource)
 
         # Remove comments.  NOTE: this assumes that comments are never inside
         # string literals, but there shouldn't be any here.
