@@ -135,7 +135,7 @@ extern "C" {
  *
  * * In Universal-ABI mode, they always resolve to an indirect call
  *   through ``HPyContext *``, i.e. ``ctx->ctx_Add(...)``, which on CPython
- *   dispaches to ``ctx_Add``.
+ *   dispatches to ``ctx_Add``.
  */
 #define HPyAPI_FUNC   _HPy_UNUSED static inline
 

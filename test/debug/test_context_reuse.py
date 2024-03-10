@@ -31,7 +31,7 @@ def test_reuse_context_from_global_variable(compiler, python_subprocess):
                 return HPy_Dup(ctx, ctx->h_None);
             }
             HPy_Close(ctx, t);
-            fprintf(stdout, "Heavy Marmelade\\n");
+            fprintf(stdout, "Heavy Marmalade\\n");
             fflush(stdout);
             // Here we wrongly use "keep" instead of "ctx"
             return HPy_Dup(keep, ctx->h_None);
@@ -65,13 +65,13 @@ def test_reuse_context_from_global_variable(compiler, python_subprocess):
     result = python_subprocess.run(mod, code)
     assert result.returncode != 0
     assert b"Error: Wrong HPy Context!" in result.stderr
-    assert result.stdout == b"Heavy Marmelade\n"
+    assert result.stdout == b"Heavy Marmalade\n"
 
     code = "mod.f(); mod.bounce(lambda: mod.g())"
     result = python_subprocess.run(mod, code)
     assert result.returncode != 0
     assert b"Error: Wrong HPy Context!" in result.stderr
-    assert result.stdout == b"Bouncing...\nHeavy Marmelade\n"
+    assert result.stdout == b"Bouncing...\nHeavy Marmalade\n"
 
     # checks the situation when the context cache runs out,
     # and we start reusing cached contexts
@@ -91,7 +91,7 @@ def test_reuse_context_from_global_variable(compiler, python_subprocess):
     HPY_DEBUG_CTX_CACHE_SIZE = 16
     for size in range(HPY_DEBUG_CTX_CACHE_SIZE-1, HPY_DEBUG_CTX_CACHE_SIZE+2):
         result = python_subprocess.run(mod, code.format(size))
-        assert result.stdout == (b"Bouncing...\n" * size) + b"Heavy Marmelade\n"
+        assert result.stdout == (b"Bouncing...\n" * size) + b"Heavy Marmalade\n"
         if result.returncode != 0:
             assert b"Error: Wrong HPy Context!" in result.stderr
 
@@ -99,4 +99,4 @@ def test_reuse_context_from_global_variable(compiler, python_subprocess):
     result = python_subprocess.run(mod, code)
     assert result.returncode != 0
     assert b"Error: Wrong HPy Context!" in result.stderr
-    assert result.stdout == b"Bouncing differently...\n" + b"Heavy Marmelade\n"
+    assert result.stdout == b"Bouncing differently...\n" + b"Heavy Marmalade\n"

@@ -1,3 +1,6 @@
 [build-system]
 requires = [ "setuptools>=64.0", "setuptools-scm[toml]>=6.0", "wheel>=0.34.2",]
 build-backend = "setuptools.build_meta"
+
+[tool.codespell]
+ignore-words-list = "acount,crate,fo,ois,ot,seh"

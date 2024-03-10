@@ -33,7 +33,7 @@ Enable `python-gdb.py`
 ----------------------
 
 `python-gdb.py` is a GDB script to make it easier to inspect the state of a
-Python process from whitin GDB. It is documented
+Python process from within GDB. It is documented
 [in the CPython's dev guide](https://devguide.python.org/gdb/).
 
 The script add a series of GBD commands such as:
