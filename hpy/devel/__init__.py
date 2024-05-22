@@ -14,28 +14,23 @@ from pathlib import Path
 # don't care about setuptools version in that case.
 import setuptools
 import distutils
-
-if sys.version_info.major > 2 and distutils is not getattr(
-    setuptools, "_distutils", None
-):
+if (sys.version_info.major > 2 and
+    distutils is not getattr(setuptools, '_distutils', None)):
     raise Exception(
         "setuptools' monkey-patching of distutils did not work. "
         "Most likely this is caused by:\n"
         "  - a too old setuptools. Try installing setuptools>=60.2\n"
         "  - the env variable SETUPTOOLS_USE_DISTUTILS=stdlib. Try to unset it."
-    )
+        )
 from distutils import log
 from distutils.errors import DistutilsError
 import setuptools.command as cmd
-
 try:
     import setuptools.command.build
 except ImportError:
     print(
         "warning: setuptools.command.build does not exist in setuptools",
-        setuptools.__version__,
-        "on",
-        sys.version,
+        setuptools.__version__, "on", sys.version
     )
     setuptools.command.build = None
 import setuptools.command.build_ext
@@ -43,81 +38,70 @@ import setuptools.command.bdist_egg
 
 from .abitag import get_hpy_ext_suffix
 
-DEFAULT_HPY_ABI = "universal"
-if hasattr(sys, "implementation") and sys.implementation.name == "cpython":
-    DEFAULT_HPY_ABI = "cpython"
+DEFAULT_HPY_ABI = 'universal'
+if hasattr(sys, 'implementation') and sys.implementation.name == 'cpython':
+    DEFAULT_HPY_ABI = 'cpython'
 
 
 class HPyDevel:
-    """Extra sources for building HPy extensions with hpy.devel."""
+    """ Extra sources for building HPy extensions with hpy.devel. """
 
     _DEFAULT_BASE_DIR = Path(__file__).parent
 
     def __init__(self, base_dir=_DEFAULT_BASE_DIR):
         self.base_dir = Path(base_dir)
-        self.include_dir = self.base_dir.joinpath("include")
-        self.src_dir = self.base_dir.joinpath("src", "runtime")
+        self.include_dir = self.base_dir.joinpath('include')
+        self.src_dir = self.base_dir.joinpath('src', 'runtime')
         self._available_static_libs = None
 
     def get_extra_include_dirs(self):
-        """Extra include directories needed by extensions in both CPython and
-        Universal modes.
+        """ Extra include directories needed by extensions in both CPython and
+            Universal modes.
         """
-        return list(
-            map(
-                str,
-                [
-                    self.include_dir,
-                ],
-            )
-        )
+        return list(map(str, [
+            self.include_dir,
+        ]))
 
     def get_include_dir_forbid_python_h(self):
-        return self.include_dir.joinpath("hpy", "forbid_python_h")
+        return self.include_dir.joinpath('hpy', 'forbid_python_h')
 
     def get_extra_sources(self):
-        """Extra sources needed by extensions in both CPython and Universal
-        modes.
+        """ Extra sources needed by extensions in both CPython and Universal
+            modes.
         """
-        return list(
-            map(
-                str,
-                [
-                    self.src_dir.joinpath("argparse.c"),
-                    self.src_dir.joinpath("buildvalue.c"),
-                    self.src_dir.joinpath("format.c"),
-                    self.src_dir.joinpath("helpers.c"),
-                    self.src_dir.joinpath("structseq.c"),
-                ],
-            )
-        )
+        return list(map(str, [
+            self.src_dir.joinpath('argparse.c'),
+            self.src_dir.joinpath('buildvalue.c'),
+            self.src_dir.joinpath('format.c'),
+            self.src_dir.joinpath('helpers.c'),
+            self.src_dir.joinpath('structseq.c'),
+        ]))
 
     def _scan_static_lib_dir(self):
-        """Scan the static library directory and build a dict for all
-        available static libraries. The library directory contains
-        subdirectories for each ABI and the ABI folders then contain
-        the static libraries.
+        """ Scan the static library directory and build a dict for all
+            available static libraries. The library directory contains
+            subdirectories for each ABI and the ABI folders then contain
+            the static libraries.
         """
         available_libs = {}
-        lib_dir = self.base_dir.joinpath("lib")
+        lib_dir = self.base_dir.joinpath('lib')
         if lib_dir.exists():
             for abi_dir in lib_dir.iterdir():
                 if abi_dir.is_dir():
                     abi = abi_dir.name
                     # All files in '.../lib/<abi>/' are considered to be static
                     # libraries.
-                    available_libs[abi] = [
-                        str(x) for x in abi_dir.iterdir() if x.is_file()
-                    ]
+                    available_libs[abi] = \
+                        [str(x) for x in abi_dir.iterdir() if x.is_file()]
         return available_libs
 
     def get_static_libs(self, hpy_abi):
-        """The list of necessary static libraries an HPy extension needs to
-        link to or 'None' (if not available). The HPy ext needs to link to
-        all static libraries in the list otherwise some function may stay
-        unresolved. For example, there is library 'hpyextra' which contains
-        compiled HPy helper functions like 'HPyArg_Parse' and such.
-        Libraries are always specific to an ABI.
+        """ The list of necessary static libraries an HPy extension needs to
+            link to or 'None' (if not available). The HPy ext needs to link to
+            all static libraries in the list otherwise some function may stay
+            unresolved. For example, there is library 'hpyextra' which contains
+            compiled HPy helper functions like 'HPyArg_Parse' and such.
+            Libraries are always specific to an ABI.
         """
         if not self._available_static_libs:
             # lazily initialize the dict of available (=shipped) static libs
@@ -125,13 +109,14 @@ class HPyDevel:
         return self._available_static_libs.get(hpy_abi, None)
 
     def get_ctx_sources(self):
-        """Extra sources needed only in the CPython ABI mode."""
-        return list(map(str, self.src_dir.glob("ctx_*.c")))
+        """ Extra sources needed only in the CPython ABI mode.
+        """
+        return list(map(str, self.src_dir.glob('ctx_*.c')))
 
     def fix_distribution(self, dist):
-        """Override build_ext to support hpy modules.
+        """ Override build_ext to support hpy modules.
 
-        Used from both setup.py and hpy/test.
+            Used from both setup.py and hpy/test.
         """
         # ============= Distribution ==========
         dist.hpydevel = self
@@ -146,13 +131,13 @@ class HPyDevel:
         if cmd.build is not None:
             build = dist.cmdclass.get("build", cmd.build.build)
             build_hpy = make_mixin(build, build_hpy_mixin)
-            dist.cmdclass["build"] = build_hpy
+            dist.cmdclass['build'] = build_hpy
 
         # ============= build_ext ==========
         build_ext = dist.cmdclass.get("build_ext", cmd.build_ext.build_ext)
         self.build_ext_sanity_check(build_ext)
         build_ext_hpy = make_mixin(build_ext, build_ext_hpy_mixin)
-        dist.cmdclass["build_ext"] = build_ext_hpy
+        dist.cmdclass['build_ext'] = build_ext_hpy
 
         # ============= bdist_egg ==========
         @monkeypatch(setuptools.command.bdist_egg)
@@ -163,7 +148,7 @@ class HPyDevel:
             build_ext_hpy_mixin.write_stub.
             """
             ext_suffix = None
-            if dist.hpy_abi != "cpython":
+            if dist.hpy_abi != 'cpython':
                 ext_suffix = get_hpy_ext_suffix(dist.hpy_abi)
             #
             if ext_suffix and resource.endswith(ext_suffix):
@@ -174,7 +159,7 @@ class HPyDevel:
     def build_ext_sanity_check(self, build_ext):
         # check that the supplied build_ext inherits from setuptools
         if isinstance(build_ext, type):
-            assert ("setuptools.command.build_ext", "build_ext") in [
+            assert ('setuptools.command.build_ext', 'build_ext') in [
                 (c.__module__, c.__name__) for c in build_ext.__mro__
             ], (
                 "dist.cmdclass['build_ext'] does not inherit from"
@@ -186,31 +171,28 @@ class HPyDevel:
 
 
 def handle_hpy_ext_modules(dist, attr, hpy_ext_modules):
-    """Distuils hpy_ext_module setup(...) argument and --hpy-abi option.
+    """ Distuils hpy_ext_module setup(...) argument and --hpy-abi option.
 
-    See hpy's setup.py where this function is registered as an entry
-    point.
+        See hpy's setup.py where this function is registered as an entry
+        point.
     """
-    assert attr == "hpy_ext_modules"
+    assert attr == 'hpy_ext_modules'
 
     # It can happen that this hook will be called multiple times depending on
     # which command was used. So, skip patching if we already patched the
     # distribution.
-    if getattr(dist, "hpydevel", None):
+    if getattr(dist, 'hpydevel', None):
         return
 
     # add a global option --hpy-abi to setup.py
     dist.__class__.hpy_abi = DEFAULT_HPY_ABI
     dist.__class__.hpy_use_static_libs = False
     dist.__class__.global_options += [
-        ("hpy-abi=", None, "Specify the HPy ABI mode (default: %s)" % DEFAULT_HPY_ABI),
-        (
-            "hpy-use-static-libs",
-            None,
-            "Use static library containing context "
-            "and helper functions for building "
-            "extensions (default: False)",
-        ),
+        ('hpy-abi=', None, 'Specify the HPy ABI mode (default: %s)'
+                           % DEFAULT_HPY_ABI),
+        ('hpy-use-static-libs', None, 'Use static library containing context '
+                                      'and helper functions for building '
+                                      'extensions (default: False)')
     ]
     hpydevel = HPyDevel()
     hpydevel.fix_distribution(dist)
@@ -221,26 +203,14 @@ _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE = """
 # This file is automatically generated by hpy
 
 def __bootstrap__():
-    from sys import modules, version_info
-    from os import environ, path
-    from contextlib import nullcontext
-    from importlib import resources
 
+    from sys import modules
+    from os import environ
+    from pkg_resources import resource_filename
     from hpy.universal import _load_bootstrap
-
-    ext_name = {ext_file!r}
-
-    if not __package__:
-        # directly called with python -m
-        ctx = nullcontext(path.join(path.dirname(__file__), ext_name))
-    elif version_info < (3, 9):
-        ctx = resources.path(__package__, ext_name)
-    else:
-        ctx = nullcontext(resources.files(__package__).joinpath(ext_name))
-
-    with ctx as ext_filepath:
-        m = _load_bootstrap({module_name!r}, __name__, __package__, str(ext_filepath),
-                            __loader__, __spec__, environ)
+    ext_filepath = resource_filename(__name__, {ext_file!r})
+    m = _load_bootstrap({module_name!r}, __name__, __package__, ext_filepath,
+                        __loader__, __spec__, environ)
     modules[__name__] = m
 
 __bootstrap__()
@@ -248,15 +218,15 @@ __bootstrap__()
 
 
 class HPyExtensionName(str):
-    """Wrapper around str to allow HPy extension modules to be identified.
+    """ Wrapper around str to allow HPy extension modules to be identified.
 
-    The following build_ext command methods are passed only the *name*
-    of the extension and not the full extension object. The
-    build_ext_hpy_mixin class needs to detect when HPy are extensions
-    passed to these methods and override the default behaviour.
+        The following build_ext command methods are passed only the *name*
+        of the extension and not the full extension object. The
+        build_ext_hpy_mixin class needs to detect when HPy are extensions
+        passed to these methods and override the default behaviour.
 
-    This str sub-class allows HPy extensions to be detected, while
-    still allowing the extension name to be used as an ordinary string.
+        This str sub-class allows HPy extensions to be detected, while
+        still allowing the extension name to be used as an ordinary string.
     """
 
     def split(self, *args, **kw):
@@ -269,15 +239,14 @@ class HPyExtensionName(str):
 
 
 def is_hpy_extension(ext_name):
-    """Return True if the extension name is for an HPy extension."""
+    """ Return True if the extension name is for an HPy extension. """
     return isinstance(ext_name, HPyExtensionName)
 
 
 def remember_hpy_extension(f):
-    """Decorator for remembering whether an extension name belongs to an
-    HPy extension.
+    """ Decorator for remembering whether an extension name belongs to an
+        HPy extension.
     """
-
     @functools.wraps(f)
     def wrapper(self, ext_name):
         if self._only_hpy_extensions:
@@ -292,7 +261,6 @@ def remember_hpy_extension(f):
         if is_hpy_extension(ext_name):
             result = HPyExtensionName(result)
         return result
-
     return wrapper
 
 
@@ -300,49 +268,43 @@ def remember_hpy_extension(f):
 # Augmented setuptools commands and monkeypatching
 # ==================================================
 
-
 def make_mixin(base, mixin):
     """
     Create a new class which inherits from both mixin and base, so that the
     methods of mixin effectively override the ones of base
     """
-
     class NewClass(mixin, base, object):
         _mixin_super = base
-
-    NewClass.__name__ = base.__name__ + "_hpy"
+    NewClass.__name__ = base.__name__ + '_hpy'
     return NewClass
-
 
 def monkeypatch(target):
     """
     Decorator to monkey patch a function in a module. The original function
     will be available as new_function.super()
     """
-
     def decorator(fn):
         name = fn.__name__
         fn.super = getattr(target, name)
         setattr(target, name, fn)
         return fn
-
     return decorator
 
 
 class build_hpy_mixin:
-    """A mixin class to override setuptools.commands.build"""
+    """ A mixin class to override setuptools.commands.build """
 
     def finalize_options(self):
         self._mixin_super.finalize_options(self)
-        if self.distribution.hpy_abi != "cpython":
-            suffix = "-hpy-%s" % self.distribution.hpy_abi
+        if self.distribution.hpy_abi != 'cpython':
+            suffix = '-hpy-%s' % self.distribution.hpy_abi
             self.build_platlib += suffix
             self.build_lib += suffix
             self.build_temp += suffix
 
 
 class build_ext_hpy_mixin:
-    """A mixin class to override setuptools.commands.build_ext"""
+    """ A mixin class to override setuptools.commands.build_ext """
 
     # Ideally we would have simply added the HPy extensions to .extensions
     # at the end of .initialize_options() but the setuptools build_ext
@@ -378,10 +340,9 @@ class build_ext_hpy_mixin:
         if static_libs:
             static_libs = self.hpydevel.get_static_libs(ext.hpy_abi)
             if static_libs is None or len(static_libs) != 1:
-                raise DistutilsError(
-                    "Expected exactly one static library for "
-                    'ABI "%s" but got: %r' % (ext.hpy_abi, static_libs)
-                )
+                raise DistutilsError('Expected exactly one static library for '
+                                     'ABI "%s" but got: %r' %
+                                     (ext.hpy_abi, static_libs))
 
         if static_libs:
             ext.extra_objects += static_libs
@@ -390,27 +351,25 @@ class build_ext_hpy_mixin:
             # not available, we just add the sources of the helpers to the
             # extension. They are then compiler with the extension.
             ext.sources += self.hpydevel.get_extra_sources()
-        ext.define_macros.append(("HPY", None))
-        if ext.hpy_abi == "cpython":
+        ext.define_macros.append(('HPY', None))
+        if ext.hpy_abi == 'cpython':
             # If the user disabled using static libs, we need to add the
             # context sources in this case.
             if not static_libs:
                 ext.sources += self.hpydevel.get_ctx_sources()
-            ext.define_macros.append(("HPY_ABI_CPYTHON", None))
+            ext.define_macros.append(('HPY_ABI_CPYTHON', None))
             ext._hpy_needs_stub = False
-        elif ext.hpy_abi == "hybrid":
-            ext.define_macros.append(("HPY_ABI_HYBRID", None))
+        elif ext.hpy_abi == 'hybrid':
+            ext.define_macros.append(('HPY_ABI_HYBRID', None))
             ext._hpy_needs_stub = True
-        elif ext.hpy_abi == "universal":
-            ext.define_macros.append(("HPY_ABI_UNIVERSAL", None))
+        elif ext.hpy_abi == 'universal':
+            ext.define_macros.append(('HPY_ABI_UNIVERSAL', None))
             ext._hpy_needs_stub = True
             forbid_python_h = self.hpydevel.get_include_dir_forbid_python_h()
             ext.include_dirs.insert(0, forbid_python_h)
         else:
-            raise DistutilsError(
-                "Unknown HPy ABI: %s. Valid values are: "
-                "cpython, hybrid, universal" % ext.hpy_abi
-            )
+            raise DistutilsError('Unknown HPy ABI: %s. Valid values are: '
+                                 'cpython, hybrid, universal' % ext.hpy_abi)
 
     def finalize_options(self):
         self._extensions = self.distribution.ext_modules or []
@@ -437,23 +396,22 @@ class build_ext_hpy_mixin:
     @remember_hpy_extension
     def get_ext_filename(self, ext_name):
         hpy_abi = self.distribution.hpy_abi
-        if not is_hpy_extension(ext_name) or hpy_abi == "cpython":
+        if not is_hpy_extension(ext_name) or hpy_abi == 'cpython':
             return self._mixin_super.get_ext_filename(self, ext_name)
         else:
             assert is_hpy_extension(ext_name)
-            assert hpy_abi in ("universal", "hybrid")
-            ext_path = ext_name.split(".")
+            assert hpy_abi in ('universal', 'hybrid')
+            ext_path = ext_name.split('.')
             ext_suffix = get_hpy_ext_suffix(hpy_abi)
             ext_filename = os.path.join(*ext_path) + ext_suffix
             return ext_filename
 
     def write_stub(self, output_dir, ext, compile=False):
-        if not hasattr(ext, "hpy_abi") or self.distribution.hpy_abi not in (
-            "universal",
-            "hybrid",
-        ):
-            return self._mixin_super.write_stub(self, output_dir, ext, compile=compile)
-        pkgs = ext._full_name.split(".")
+        if (not hasattr(ext, "hpy_abi") or
+                self.distribution.hpy_abi not in ('universal', 'hybrid')):
+            return self._mixin_super.write_stub(
+                self, output_dir, ext, compile=compile)
+        pkgs = ext._full_name.split('.')
         if compile:
             # compile is true when .write_stub is called while copying
             # extensions to the source folder as part of build_ext --inplace.
@@ -462,24 +420,22 @@ class build_ext_hpy_mixin:
             # output_dir does not include those folders (and is just the
             # build_lib folder).
             pkgs = [pkgs[-1]]
-        stub_file = os.path.join(output_dir, *pkgs) + ".py"
+        stub_file = os.path.join(output_dir, *pkgs) + '.py'
         log.info(
-            "writing hpy universal stub loader for %s to %s", ext._full_name, stub_file
-        )
+            "writing hpy universal stub loader for %s to %s",
+            ext._full_name, stub_file)
 
         ext_file = os.path.basename(ext._file_name)
         module_name = ext_file.split(".")[0]
         if not self.dry_run:
-            with open(stub_file, "w", encoding="utf-8") as f:
-                f.write(
-                    _HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
-                        ext_file=ext_file, module_name=module_name
-                    )
+            with open(stub_file, 'w', encoding='utf-8') as f:
+                f.write(_HPY_UNIVERSAL_MODULE_STUB_TEMPLATE.format(
+                    ext_file=ext_file, module_name=module_name)
                 )
 
     def copy_extensions_to_source(self):
         """Override from setuptools 64.0.0 to copy our stub instead of recreating it."""
-        build_py = self.get_finalized_command("build_py")
+        build_py = self.get_finalized_command('build_py')
         build_lib = build_py.build_lib
         for ext in self.extensions:
             inplace_file, regular_file = self._get_inplace_equivalent(build_py, ext)
@@ -491,20 +447,18 @@ class build_ext_hpy_mixin:
                 self.copy_file(regular_file, inplace_file, level=self.verbose)
 
             if ext._needs_stub:
-                source_stub = (
-                    os.path.join(build_lib, *ext._full_name.split(".")) + ".py"
-                )
+                source_stub = os.path.join(build_lib, *ext._full_name.split('.')) + '.py'
                 inplace_stub = self._get_equivalent_stub(ext, inplace_file)
                 self.copy_file(source_stub, inplace_stub, level=self.verbose)
 
     def get_export_symbols(self, ext):
-        """Override .get_export_symbols to replace "PyInit_<module_name>"
-        with "HPyInit_<module_name>.
+        """ Override .get_export_symbols to replace "PyInit_<module_name>"
+            with "HPyInit_<module_name>.
 
-        Only relevant on Windows, where the .pyd file (DLL) must export the
-        module "HPyInit_" function.
+            Only relevant on Windows, where the .pyd file (DLL) must export the
+            module "HPyInit_" function.
         """
         exports = self._mixin_super.get_export_symbols(self, ext)
-        if hasattr(ext, "hpy_abi") and ext.hpy_abi in ("universal", "hybrid"):
+        if hasattr(ext, "hpy_abi") and ext.hpy_abi in ('universal', 'hybrid'):
             exports = [re.sub(r"^PyInit_", "HPyInit_", name) for name in exports]
         return exports
