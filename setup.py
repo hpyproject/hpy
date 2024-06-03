@@ -264,6 +264,9 @@ setup(
     cmdclass={"build_clib": build_clib_hpy},
     use_scm_version=get_scm_config,
     setup_requires=['setuptools_scm'],
-    install_requires=['setuptools>=64.0'],
+    install_requires=[
+        'setuptools>=64.0',
+        'importlib_resources; python_version<"3.10"',
+    ],
     python_requires='>=3.8',
 )
