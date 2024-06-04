@@ -266,7 +266,7 @@ setup(
     setup_requires=['setuptools_scm'],
     install_requires=[
         'setuptools>=64.0',
-        'importlib_resources; python_version<"3.10"',
+        'importlib_resources>=5.0; python_version<"3.10"',
     ],
     python_requires='>=3.8',
 )
