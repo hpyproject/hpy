@@ -286,4 +286,5 @@ struct _HPyContext_s {
     HPy (*ctx_GetIter)(HPyContext *ctx, HPy obj);
     HPy (*ctx_Iter_Next)(HPyContext *ctx, HPy obj);
     int (*ctx_Iter_Check)(HPyContext *ctx, HPy obj);
+    HPy (*ctx_Slice_New)(HPyContext *ctx, HPy start, HPy stop, HPy step);
 };

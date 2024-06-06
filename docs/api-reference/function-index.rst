@@ -75,6 +75,7 @@ HPy Core API Function Index
 * :c:func:`HPyLong_FromUInt32_t`
 * :c:func:`HPyLong_FromUInt64_t`
 * :c:func:`HPyNumber_Check`
+* :c:func:`HPySlice_New`
 * :c:func:`HPySlice_Unpack`
 * :c:func:`HPyTracker_Add`
 * :c:func:`HPyTracker_Close`
