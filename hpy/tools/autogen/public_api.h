@@ -965,13 +965,11 @@ HPy HPyTuple_FromArray(HPyContext *ctx, const HPy items[], HPy_ssize_t n);
  *     The execution context.
  * 
  * :param start:
- *     A pointer to a variable where to write the unpacked slice start. Must not
- *     be ``NULL``.
+ *     A handle to an object to be used as the slice start value.
  * :param end:
- *     A pointer to a variable where to write the unpacked slice end. Must not
+ *     A handle to an object to be used as the slice end value.
  * :param step:
- *     A pointer to a variable where to write the unpacked slice step. Must not
- *     be ``NULL``.
+ *     A handle to an object to be used as the slice step value.
  *
  * :returns:
  *     A handle to the new and empty Python slice object or ``HPy_NULL`` in case

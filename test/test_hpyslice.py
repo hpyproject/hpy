@@ -126,8 +126,7 @@ class TestSlice(HPyTest):
                         &start, &stop, &step) < 0) {
                     return HPy_NULL;
                 }
-                HPy length = HPySlice_New(ctx, start, stop, step);
-                return length;
+                return HPySlice_New(ctx, start, stop, step);
             }
             @EXPORT(f)
             @INIT
