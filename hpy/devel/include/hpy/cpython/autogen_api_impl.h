@@ -569,6 +569,11 @@ HPyAPI_FUNC int HPyTuple_Check(HPyContext *ctx, HPy h)
     return PyTuple_Check(_h2py(h));
 }
 
+HPyAPI_FUNC HPy HPySlice_New(HPyContext *ctx, HPy start, HPy stop, HPy step)
+{
+    return _py2h(PySlice_New(_h2py(start), _h2py(stop), _h2py(step)));
+}
+
 HPyAPI_FUNC int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step)
 {
     return PySlice_Unpack(_h2py(slice), start, stop, step);

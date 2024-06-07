@@ -163,6 +163,7 @@ HPy trace_ctx_Dict_Keys(HPyContext *tctx, HPy h);
 HPy trace_ctx_Dict_Copy(HPyContext *tctx, HPy h);
 int trace_ctx_Tuple_Check(HPyContext *tctx, HPy h);
 HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, const HPy items[], HPy_ssize_t n);
+HPy trace_ctx_Slice_New(HPyContext *tctx, HPy start, HPy stop, HPy step);
 int trace_ctx_Slice_Unpack(HPyContext *tctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 HPy trace_ctx_Import_ImportModule(HPyContext *tctx, const char *utf8_name);
 HPy trace_ctx_Capsule_New(HPyContext *tctx, void *pointer, const char *utf8_name, HPyCapsule_Destructor *destructor);
@@ -201,8 +202,8 @@ static inline void trace_ctx_init_info(HPyTraceInfo *info, HPyContext *uctx)
 {
     info->magic_number = HPY_TRACE_MAGIC;
     info->uctx = uctx;
-    info->call_counts = (uint64_t *)calloc(272, sizeof(uint64_t));
-    info->durations = (_HPyTime_t *)calloc(272, sizeof(_HPyTime_t));
+    info->call_counts = (uint64_t *)calloc(273, sizeof(uint64_t));
+    info->durations = (_HPyTime_t *)calloc(273, sizeof(_HPyTime_t));
     info->on_enter_func = HPy_NULL;
     info->on_exit_func = HPy_NULL;
 }
@@ -456,6 +457,7 @@ static inline void trace_ctx_init_fields(HPyContext *tctx, HPyContext *uctx)
     tctx->ctx_Dict_Copy = &trace_ctx_Dict_Copy;
     tctx->ctx_Tuple_Check = &trace_ctx_Tuple_Check;
     tctx->ctx_Tuple_FromArray = &trace_ctx_Tuple_FromArray;
+    tctx->ctx_Slice_New = &trace_ctx_Slice_New;
     tctx->ctx_Slice_Unpack = &trace_ctx_Slice_Unpack;
     tctx->ctx_Import_ImportModule = &trace_ctx_Import_ImportModule;
     tctx->ctx_Capsule_New = &trace_ctx_Capsule_New;

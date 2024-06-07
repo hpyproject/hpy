@@ -959,6 +959,26 @@ HPy HPyTuple_FromArray(HPyContext *ctx, const HPy items[], HPy_ssize_t n);
 /* sliceobject.h */
 
 /**
+ * Creates a new empty Python slice object.
+ *
+ * :param ctx:
+ *     The execution context.
+ * 
+ * :param start:
+ *     A handle to an object to be used as the slice start value.
+ * :param end:
+ *     A handle to an object to be used as the slice end value.
+ * :param step:
+ *     A handle to an object to be used as the slice step value.
+ *
+ * :returns:
+ *     A handle to the new and empty Python slice object or ``HPy_NULL`` in case
+ *     of an error.
+ */
+HPy_ID(272)
+HPy HPySlice_New(HPyContext *ctx, HPy start, HPy stop, HPy step);
+
+/**
  * Extract the start, stop and step data members from a slice object as C
  * integers.
  *
@@ -987,6 +1007,7 @@ HPy HPyTuple_FromArray(HPyContext *ctx, const HPy items[], HPy_ssize_t n);
  * :returns:
  *     ``-1`` on error, ``0`` on success
  */
+
 HPy_ID(259)
 int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step);
 

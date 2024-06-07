@@ -618,6 +618,10 @@ HPyAPI_FUNC HPy HPyTuple_FromArray(HPyContext *ctx, const HPy items[], HPy_ssize
      return ctx->ctx_Tuple_FromArray ( ctx, items, n ); 
 }
 
+HPyAPI_FUNC HPy HPySlice_New(HPyContext *ctx, HPy start, HPy stop, HPy step) {
+     return ctx->ctx_Slice_New ( ctx, start, stop, step ); 
+}
+
 HPyAPI_FUNC int HPySlice_Unpack(HPyContext *ctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step) {
      return ctx->ctx_Slice_Unpack ( ctx, slice, start, stop, step ); 
 }

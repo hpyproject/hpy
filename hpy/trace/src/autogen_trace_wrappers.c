@@ -1994,6 +1994,19 @@ HPy trace_ctx_Tuple_FromArray(HPyContext *tctx, const HPy items[], HPy_ssize_t n
     return res;
 }
 
+HPy trace_ctx_Slice_New(HPyContext *tctx, HPy start, HPy stop, HPy step)
+{
+    HPyTraceInfo *info = hpy_trace_on_enter(tctx, 272);
+    HPyContext *uctx = info->uctx;
+    _HPyTime_t _ts_start, _ts_end;
+    _HPyClockStatus_t r0, r1;
+    r0 = get_monotonic_clock(&_ts_start);
+    HPy res = HPySlice_New(uctx, start, stop, step);
+    r1 = get_monotonic_clock(&_ts_end);
+    hpy_trace_on_exit(info, 272, r0, r1, &_ts_start, &_ts_end);
+    return res;
+}
+
 int trace_ctx_Slice_Unpack(HPyContext *tctx, HPy slice, HPy_ssize_t *start, HPy_ssize_t *stop, HPy_ssize_t *step)
 {
     HPyTraceInfo *info = hpy_trace_on_enter(tctx, 259);

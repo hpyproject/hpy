@@ -276,6 +276,7 @@ with the code for the :term:`CPython ABI` mode, so it is guaranteed to be correc
     `PySequence_GetSlice <https://docs.python.org/3/c-api/sequence.html#c.PySequence_GetSlice>`_                                       :c:func:`HPy_GetSlice`
     `PySequence_SetSlice <https://docs.python.org/3/c-api/sequence.html#c.PySequence_SetSlice>`_                                       :c:func:`HPy_SetSlice`
     `PySlice_AdjustIndices <https://docs.python.org/3/c-api/slice.html#c.PySlice_AdjustIndices>`_                                      :c:func:`HPySlice_AdjustIndices`
+    `PySlice_New <https://docs.python.org/3/c-api/slice.html#c.PySlice_New>`_                                                          :c:func:`HPySlice_New`
     `PySlice_Unpack <https://docs.python.org/3/c-api/slice.html#c.PySlice_Unpack>`_                                                    :c:func:`HPySlice_Unpack`
     `PyTuple_Check <https://docs.python.org/3/c-api/tuple.html#c.PyTuple_Check>`_                                                      :c:func:`HPyTuple_Check`
     `PyType_IsSubtype <https://docs.python.org/3/c-api/type.html#c.PyType_IsSubtype>`_                                                 :c:func:`HPyType_IsSubtype`
