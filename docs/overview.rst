@@ -177,6 +177,8 @@ different ABIs:
 
       The resulting filename is e.g. ``simple.hpy0.so``.
 
+      require backport ``importlib_resources>=5.0`` on ``CPython<3.10``.
+
     HPy Hybrid ABI
 
       The HPy Hybrid ABI is essentially the same as the Universal ABI, with
@@ -324,7 +326,7 @@ of features. As on April 2023, the following milestones have been reached:
     CPython.
 
   - it is possible to load HPy Universal extensions on CPython, thanks to the
-    ``hpy.universal`` package.
+    ``hpy.universal`` package (require ``importlib_resources>=5.0`` on ``CPython<3.10``).
 
   - it is possible to load HPy Universal extensions on
     PyPy (using the PyPy `hpy branch <https://foss.heptapod.net/pypy/pypy/tree/branch/hpy>`_).
