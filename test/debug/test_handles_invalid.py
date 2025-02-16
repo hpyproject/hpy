@@ -1,4 +1,5 @@
 import pytest
+import sys
 from hpy.debug.leakdetector import LeakDetector
 from ..support import SUPPORTS_SYS_EXECUTABLE, IS_PYTHON_DEBUG_BUILD
 from ..conftest import IS_VALGRIND_RUN
