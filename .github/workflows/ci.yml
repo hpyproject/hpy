@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python from deadsnakes
-        uses: deadsnakes/action@v3.2
+        uses: deadsnakes/action@v3.2.0
         with:
           python-version: ${{ matrix.python-version }}
           debug: true
