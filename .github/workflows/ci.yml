@@ -254,7 +254,7 @@ jobs:
       # - template: azure-templates/python.yml
 
       - name: Install / Upgrade system requirements
-        run: sudo apt update && sudo apt install -y libclang-11-dev
+        run: sudo apt update && sudo apt install -y libclang-17-dev
 
       - name: Install / Upgrade Python requirements
         run: |
