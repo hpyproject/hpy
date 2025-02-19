@@ -64,7 +64,8 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.12', '3.11', '3.10', '3.9', '3.8']
+        # Cannot install 3.12 on ubuntu-latest
+        python-version: ['3.11', '3.10', '3.9', '3.8']
 
     steps:
       - uses: actions/checkout@v4
