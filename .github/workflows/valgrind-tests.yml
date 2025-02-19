@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: 3.11
 
-       - name: Install / Upgrade Python dependencies
+      - name: Install / Upgrade Python dependencies
         run: python -m pip install --upgrade pip wheel
 
       - name: Build
