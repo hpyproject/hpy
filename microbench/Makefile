@@ -27,11 +27,17 @@ create_venv_graalpy:
 	# cannot use --upgrade-deps because pip is patched for GraalPy
 	$(shell uv python find graalpy) -m venv .venv_graalpy
 
-print_other_vs_cpy:
-	@$(PYTHON) print_other_vs_cpy.py
+print_pypy_vs_cpy:
+	@$(PYTHON) print_other_vs_cpy.py PyPy
+
+print_graalpy_vs_cpy:
+	@$(PYTHON) print_other_vs_cpy.py GraalPy
 
 print_cpy:
 	@tail tmp_results_cpython.txt -n 30
 
 print_pypy:
 	@tail tmp_results_pypy.txt -n 30
+
+print_graalpy:
+	@tail tmp_results_graalpy.txt -n 30

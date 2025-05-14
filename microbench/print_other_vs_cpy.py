@@ -1,7 +1,14 @@
+import sys
+
 from pathlib import Path
 
+try:
+    other = sys.argv[1]
+except IndexError:
+    other = "PyPy"
+
 path_result_cpy = Path("tmp_results_cpython.txt")
-path_result_other = Path("tmp_results_pypy.txt")
+path_result_other = Path(f"tmp_results_{other.lower()}.txt")
 
 assert path_result_cpy.exists()
 assert path_result_other.exists()
@@ -31,7 +38,7 @@ names, times_other = data_from_path(path_result_other, 3)
 max_length_name = 45
 fmt_name = f"{{:{max_length_name}s}}"
 
-print("# PyPy HPy univ / CPy native (time ratio, smaller is better)")
+print(f"# {other} HPy univ / CPy native (time ratio, smaller is better)")
 
 for index, t_other in enumerate(times_other):
     ratio = t_other / times_cpy[index]
