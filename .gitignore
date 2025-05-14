@@ -90,3 +90,7 @@ docs/_build/
 
 # vscode
 .vscode
+
+microbench/pixi.lock
+microbench/.venv_*
+microbench/tmp_*

@@ -1,0 +1,22 @@
+[project]
+name = "hpy.microbench"
+authors = [
+    {name = "The HPy team", email = "hpy-dev@python.org"},
+]
+version = "0.1.0"
+description = "HPy microbenchmarks."
+readme = "README.md"
+keywords = ["hpy"]
+requires-python = ">=3.8"
+dependencies = [
+    "hpy>=0.9.0; implementation_name == 'cpython'",
+    "pytest",
+    "cffi; implementation_name == 'cpython'",
+    ]
+
+[build-system]
+requires = [
+    "setuptools>=64.0",
+    "hpy>=0.9.0; implementation_name == 'cpython'",
+    "cffi",
+]
