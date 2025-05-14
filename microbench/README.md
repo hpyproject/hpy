@@ -1,7 +1,7 @@
 To run the microbenchmarks
 --------------------------
 
-1. You need to have `hpy` installed in your virtuanenv. The easiest way
+1. You need to have `hpy` installed in your virtualenv. The easiest way
    to do it is:
 
        $ cd /path/to/hpy
