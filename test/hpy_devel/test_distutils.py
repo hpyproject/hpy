@@ -182,16 +182,27 @@ class TestDistutils:
             HPy_MODINIT(hpymod_legacy, moduledef)
         """)
 
+    def _gen_file(self, fname, preamble, src):
+        """Generate a file inside hpy_test_project"""
+        src = textwrap.dedent(preamble) + textwrap.dedent(src)
+        self.hpy_test_project.join(fname).write(src)
+
     def gen_setup_py(self, src):
-        preamble = textwrap.dedent("""
+        preamble = """
             from setuptools import setup, Extension
             cpymod = Extension("cpymod", ["cpymod.c"])
             hpymod = Extension("hpymod", ["hpymod.c"])
             hpymod_legacy = Extension("hpymod_legacy", ["hpymod_legacy.c"])
-        """)
-        src = preamble + textwrap.dedent(src)
-        f = self.hpy_test_project.join('setup.py')
-        f.write(src)
+        """
+        self._gen_file('setup.py', preamble, src)
+
+    def gen_pyproject_toml(self, src="[project]\nname = 'hpy_test_project'\nversion = '0.0.0'\n"):
+        preamble = """
+            [build-system]
+            requires = ["setuptools>=64.0", "hpy; implementation_name == 'cpython'"]
+            build-backend = "setuptools.build_meta"
+        """
+        self._gen_file('pyproject.toml', preamble, src)
 
     def get_docstring(self, modname):
         cmd = f'import {modname}; print({modname}.__doc__)'
@@ -297,13 +308,11 @@ class TestDistutils:
         """
         # make sure that the build dirs for cpython and universal ABIs are
         # distinct
-        self.gen_setup_py("""
-            setup(name = "hpy_test_project",
-                  hpy_ext_modules = [hpymod],
-                  install_requires = [],
-            )
-        """)
-        self.python('setup.py', 'install')
+        self.gen_setup_py("setup(hpy_ext_modules = [hpymod])")
+        self.gen_pyproject_toml()
+
+        command = ['-m', 'pip', 'install', '.', '-v', '--no-build-isolation']
+        self.python(*command)
         # in the build/ dir, we should have 2 directories: temp and lib
         build = self.hpy_test_project.join('build')
         temps = build.listdir('temp*')
@@ -315,7 +324,8 @@ class TestDistutils:
         assert doc == 'hpymod with HPy ABI: cpython'
 
         # now recompile with universal *without* cleaning the build
-        self.python('setup.py', '--hpy-abi=universal', 'install')
+        command.append('--config-settings=--global-option=--hpy-abi=universal')
+        self.python(*command)
         # in the build/ dir, we should have 4 directories: 2 temp*, and 2 lib*
         build = self.hpy_test_project.join('build')
         temps = build.listdir('temp*')
