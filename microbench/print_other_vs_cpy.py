@@ -14,12 +14,21 @@ assert path_result_cpy.exists()
 assert path_result_other.exists()
 
 
-def data_from_path(path, index_time):
+def data_from_path(path):
     txt = path.read_text()
     _, txt = txt.split(
         "================================== BENCHMARKS =================================="
     )
     lines = txt.splitlines()[3:-2]
+
+    if "cpy" in path.name:
+        index_time = 1
+    else:
+        parts = lines[0].split()
+        if len(parts) == 3:
+            index_time = 1
+        else:
+            index_time = 3
 
     names = []
     times = []
@@ -32,8 +41,8 @@ def data_from_path(path, index_time):
     return names, times
 
 
-names, times_cpy = data_from_path(path_result_cpy, 1)
-names, times_other = data_from_path(path_result_other, 3)
+names, times_cpy = data_from_path(path_result_cpy)
+names, times_other = data_from_path(path_result_other)
 
 max_length_name = 45
 fmt_name = f"{{:{max_length_name}s}}"
