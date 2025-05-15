@@ -42,7 +42,7 @@ jobs:
           allow-prereleases: true
 
       - name: Install/Upgrade Python dependencies
-        run: python -m pip install --upgrade pip wheel 'setuptools>=60.2'
+        run: python -m pip install --upgrade pip wheel 'setuptools>=60.2' 'setuptools-scm[toml]>=6.0'
 
       - name: Build
         run: |
@@ -80,7 +80,7 @@ jobs:
         run: python -c "import sys; print(hasattr(sys, 'gettotalrefcount'))"
 
       - name: Install/Upgrade Python dependencies
-        run: python -m pip install --upgrade pip wheel
+        run: python -m pip install --upgrade pip wheel 'setuptools>=60.2' 'setuptools-scm[toml]>=6.0'
 
       - name: Build
         run: |
