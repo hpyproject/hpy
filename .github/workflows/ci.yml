@@ -423,5 +423,5 @@ jobs:
       - name: Run microbenchmarks
         run: |
           cd microbench
-          python setup.py build_ext -i
+          python -m pip install . --no-build-isolation --no-deps
           python -m pytest -v
