@@ -39,13 +39,16 @@ create_venv_graalpy:
 	$(shell uv python find graalpy) -m venv .venv_graalpy
 
 print_cpy:
-	@tail tmp_results_cpython.txt -n 30
+	@echo =================================== CPython ====================================
+	@tail tmp_results_cpython.txt -n 29
 
 print_pypy:
-	@tail tmp_results_pypy.txt -n 30
+	@echo ==================================== PyPy ======================================
+	@tail tmp_results_pypy.txt -n 29
 
 print_graalpy:
-	@tail tmp_results_graalpy.txt -n 30
+	@echo =================================== GraalPy ====================================
+	@tail tmp_results_graalpy.txt -n 29
 
 print_pypy_vs_cpy:
 	@$(PYTHON) print_other_vs_cpy.py PyPy

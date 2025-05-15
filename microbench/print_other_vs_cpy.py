@@ -47,7 +47,11 @@ names, times_other = data_from_path(path_result_other)
 max_length_name = 45
 fmt_name = f"{{:{max_length_name}s}}"
 
-print(f"# {other} HPy univ / CPy native (time ratio, smaller is better)")
+out = f" {other} HPy univ / CPy native (time ratio, smaller is better) "
+num_chars = 81
+num_equals = (num_chars - len(out)) // 2
+
+print("\n" + num_equals * "=" + out + num_equals * "=")
 
 for index, t_other in enumerate(times_other):
     ratio = t_other / times_cpy[index]
