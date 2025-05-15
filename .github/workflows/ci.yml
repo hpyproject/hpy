@@ -425,3 +425,9 @@ jobs:
           cd microbench
           python -m pip install . --no-build-isolation --no-deps
           python -m pytest -v
+
+      - name: Run microbenchmarks universal ABI
+        run: |
+          python -m pip uninstall hpy.microbench --yes
+          python -m pip install -e . --no-build-isolation --no-deps --config-settings="--global-option=--hpy-abi=universal"
+          python -m pytest -v -m hpy
