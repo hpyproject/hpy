@@ -412,16 +412,32 @@ jobs:
 
       - name: Install / Upgrade Python requirements
         run: |
-          python -m pip install --upgrade pip wheel 'setuptools>=60.2'
-          python -m pip install pytest cffi
+          pip install --upgrade pip wheel 'setuptools>=60.2' setuptools-scm
+          pip install pytest cffi
 
       - name: Build and install HPy
         run: |
           make
-          python -m pip install .
+          pip install .
+
+      - name: Build and install hpy.microbench
+        run: |
+          pip install ./microbench --no-build-isolation --no-deps
 
       - name: Run microbenchmarks
         run: |
           cd microbench
-          python setup.py build_ext -i
-          python -m pytest -v
+          pytest -v
+
+      - name: Uninstall hpy.microbench
+        run: |
+          pip uninstall hpy.microbench --yes
+
+      - name: Build and install hpy.microbench universal ABI
+        run: |
+          pip install -e ./microbench --no-build-isolation --no-deps --config-settings="--global-option=--hpy-abi=universal"
+
+      - name: Run microbenchmarks universal ABI
+        run: |
+          cd microbench
+          pytest -v -m hpy

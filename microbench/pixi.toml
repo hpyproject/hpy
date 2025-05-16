@@ -1,0 +1,13 @@
+[workspace]
+authors = ["The HPy team <hpy-dev@python.org>"]
+channels = ["conda-forge"]
+name = "hpy.microbench"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+gcc = ">=15.1.0,<15.2"
+valgrind = ">=3.25.0,<4"
+libffi = ">=3.4.6,<4"
