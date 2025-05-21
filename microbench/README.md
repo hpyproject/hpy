@@ -111,6 +111,10 @@ make print_graalpy
 
 make print_pypy_vs_cpy
 make print_graalpy_vs_cpy
+
+# example comparison on only one test
+.venv_cpy/bin/python -m pytest test_microbench.py::TestType::test_allocate_obj[cpy]
+.venv_pypy/bin/python -m pytest test_microbench.py::TestType::test_allocate_obj[hpy]
 ```
 
 [Pixi]: https://pixi.sh
