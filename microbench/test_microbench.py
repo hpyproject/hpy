@@ -98,7 +98,7 @@ class TestType:
         The type is named `simple.Foo` in both cases.
     """
 
-    def test_allocate_obj(self, simple, timer, N):
+    def test_allocate_and_collect(self, simple, timer, N):
         import gc
         Foo = simple.Foo
         objs = [None] * N
@@ -108,6 +108,17 @@ class TestType:
                 objs[i] = Foo()
             del objs
             gc.collect()
+
+    def test_allocate_obj(self, simple, timer, N):
+        import gc
+        Foo = simple.Foo
+        objs = [None] * N
+        gc.collect()
+        with timer:
+            for i in range(N):
+                objs[i] = Foo()
+        del objs
+        gc.collect()
 
     def test_method_lookup(self, simple, timer, N):
         obj = simple.Foo()
