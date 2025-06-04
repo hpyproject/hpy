@@ -3,13 +3,19 @@ These are not real tests, but microbenchmarks. The machinery to record the
 timing and display the results is inside conftest.py
 """
 
+import sys
+
 import pytest
 import _valgrind
 
 API_PARAMS = [
     pytest.param('cpy', marks=pytest.mark.cpy),
-    pytest.param('hpy', marks=pytest.mark.hpy)
+    pytest.param('hpy', marks=pytest.mark.hpy),
     ]
+
+if any(arg.endswith("purepy") for arg in sys.argv):
+    API_PARAMS.append(pytest.param('purepy', marks=pytest.mark.purepy))
+
 
 @pytest.fixture(params=API_PARAMS)
 def api(request):
@@ -23,6 +29,9 @@ def simple(request, api):
     elif api == 'hpy':
         import hpy_simple
         return hpy_simple
+    elif api == 'purepy':
+        import purepy_simple
+        return purepy_simple
     else:
         assert False, 'Unkown param: %s' % request.param
 
