@@ -21,39 +21,57 @@ def data_from_path(path):
     )
     lines = txt.splitlines()[3:-2]
 
-    if "cpy" in path.name:
-        index_time = 1
-    else:
-        parts = lines[0].split()
-        if len(parts) == 3:
-            index_time = 1
+    index_time_cpy = 1
+    index_time_hpy = 3
+
+    parts = lines[0].split()
+    if len(parts) == 1:
+        if "cpy" in path.name:
+            index_time_hpy = None
         else:
-            index_time = 3
+            index_time_cpy = None
+            index_time_hpy = 1
 
     names = []
-    times = []
+    times_cpy = []
+    times_hpy = []
 
     for line in lines:
         parts = line.split()
         names.append(parts[0])
-        times.append(float(parts[index_time]))
+        if index_time_cpy is not None:
+            times_cpy.append(float(parts[index_time_cpy]))
+        if index_time_hpy is not None:
+            times_hpy.append(float(parts[index_time_hpy]))
 
-    return names, times
+    return names, times_cpy, times_hpy
 
 
-names, times_cpy = data_from_path(path_result_cpy)
-names, times_other = data_from_path(path_result_other)
+names, times_cpy_cpy, times_cpy_hpy = data_from_path(path_result_cpy)
+names, times_other_cpyext, times_other_hpy = data_from_path(path_result_other)
 
 max_length_name = 45
 fmt_name = f"{{:{max_length_name}s}}"
 
-out = f" {other} HPy univ / CPy native (time ratio, smaller is better) "
+out = f" {other} / CPy native (time ratio, smaller is better) "
 num_chars = 81
 num_equals = (num_chars - len(out)) // 2
 
 print("\n" + num_equals * "=" + out + num_equals * "=")
 
-for index, t_other in enumerate(times_other):
-    ratio = t_other / times_cpy[index]
+if times_other_cpyext:
+    print(max_length_name * " " + "cpyext    HPy univ")
+else:
+    print(max_length_name * " " + "HPy univ")
+
+for index, t_other_hpy in enumerate(times_other_hpy):
+    norm = times_cpy_cpy[index]
     name = fmt_name.format(names[index])
-    print(f"{name} {ratio:.2f}")
+
+    ratio = t_other_hpy / norm
+
+    if times_other_cpyext:
+        ratio_cpyext = times_other_cpyext[index] / norm
+        print(f"{name} {ratio_cpyext:5.2f}      {ratio:5.2f}")
+    else:
+        print(f"{name} {ratio:.2f}")
