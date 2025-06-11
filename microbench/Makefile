@@ -12,7 +12,7 @@ uninstall:
 	$(PYTHON) -m pip uninstall hpy.microbench --yes
 
 test:
-	$(PYTHON) -m pytest -v | tee tmp_results_$(shell $(PYTHON) -c "import sys; print(sys.implementation.name)").txt
+	$(PYTHON) -m pytest -v --purepy | tee tmp_results_$(shell $(PYTHON) -c "import sys; print(sys.implementation.name)").txt
 
 bench: test
 
