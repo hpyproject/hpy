@@ -180,7 +180,7 @@ class TestHeapType:
         The type is named `simple.HTFoo` and is a heap type in all cases.
     """
 
-    def test_allocate_obj_and_survive(self, simple, timer, N):
+    def test_allocate_and_collect(self, simple, timer, N):
         import gc
         HTFoo = simple.HTFoo
         objs = [None] * N
