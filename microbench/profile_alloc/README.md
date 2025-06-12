@@ -5,6 +5,11 @@ pip install vmprof
 sudo apt install libunwind-dev
 python -m vmprof -o tmp_output.log profile_alloc.py
 vmprofshow tmp_output.log tree
+# for PyPy
+pip install vmprof-firefox-converter@git+https://github.com/paugier/vmprof-firefox-converter@packaging
+vmprofconvert -run profile_alloc.py cpy
+# or
+vmprofconvert -run profile_alloc.py
 ```
 
 Example of (truncated) output (/path/to/pypy was /home/me/.local/share/uv/python/pypy-3.11.11-linux-x86_64-gnu):
