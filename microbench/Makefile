@@ -40,15 +40,15 @@ create_venv_graalpy:
 
 print_cpy:
 	@echo =================================== CPython ====================================
-	@tail tmp_results_cpython.txt -n 30
+	@tail tmp_results_cpython.txt -n 32
 
 print_pypy:
 	@echo ==================================== PyPy ======================================
-	@tail tmp_results_pypy.txt -n 30
+	@tail tmp_results_pypy.txt -n 32
 
 print_graalpy:
 	@echo =================================== GraalPy ====================================
-	@tail tmp_results_graalpy.txt -n 30
+	@tail tmp_results_graalpy.txt -n 32
 
 print_pypy_vs_cpy:
 	@$(PYTHON) print_other_vs_cpy.py PyPy

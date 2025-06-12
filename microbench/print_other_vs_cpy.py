@@ -57,7 +57,7 @@ out = f" {other} / CPy native (time ratio, smaller is better) "
 num_chars = 81
 num_equals = (num_chars - len(out)) // 2
 
-print("\n" + num_equals * "=" + out + num_equals * "=")
+print(num_equals * "=" + out + num_equals * "=")
 
 if times_other_cpyext:
     print(max_length_name * " " + "cpyext    HPy univ")
