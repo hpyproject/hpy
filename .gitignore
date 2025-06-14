@@ -94,3 +94,5 @@ docs/_build/
 microbench/pixi.lock
 microbench/.venv_*
 microbench/tmp_*
+microbench/profile_alloc/log
+microbench/profile_alloc/*.prof*

@@ -1,14 +1,21 @@
+#!/usr/bin/env python3
 import sys
 
 from pathlib import Path
 
-try:
-    other = sys.argv[1]
-except IndexError:
-    other = "PyPy"
+from util import capitalize_implementation, info_from_path, print_sep
 
-path_result_cpy = Path("tmp_results_cpython.txt")
-path_result_other = Path(f"tmp_results_{other.lower()}.txt")
+try:
+    arg = sys.argv[1]
+except IndexError:
+    arg = "pypy"
+
+path_result_cpy = Path("tmp_results_cpy.txt")
+
+path_result_other = Path(arg)
+
+if not path_result_other.exists():
+    path_result_other = Path(f"tmp_results_{arg}.txt")
 
 assert path_result_cpy.exists()
 assert path_result_other.exists()
@@ -47,17 +54,24 @@ def data_from_path(path):
     return names, times_cpy, times_hpy
 
 
-names, times_cpy_cpy, times_cpy_hpy = data_from_path(path_result_cpy)
+info = info_from_path(path_result_other)
+
+implementation = info["implementation"]
+
+names_cpy, times_cpy_cpy, times_cpy_hpy = data_from_path(path_result_cpy)
 names, times_other_cpyext, times_other_hpy = data_from_path(path_result_other)
+
+assert names_cpy == names
 
 max_length_name = 45
 fmt_name = f"{{:{max_length_name}s}}"
 
-out = f" {other} / CPy native (time ratio, smaller is better) "
-num_chars = 81
-num_equals = (num_chars - len(out)) // 2
+print_sep(
+    f"{capitalize_implementation(implementation)} / CPy native (time ratio, smaller is better)"
+)
 
-print(num_equals * "=" + out + num_equals * "=")
+if info["short prefix"] != implementation:
+    print(f"short prefix: {info['short prefix']}")
 
 if times_other_cpyext:
     print(max_length_name * " " + "cpyext    HPy univ")

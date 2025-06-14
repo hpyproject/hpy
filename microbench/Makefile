@@ -12,12 +12,12 @@ uninstall:
 	$(PYTHON) -m pip uninstall hpy.microbench --yes
 
 test:
-	$(PYTHON) -m pytest -v --purepy | tee tmp_results_$(shell $(PYTHON) -c "import sys; print(sys.implementation.name)").txt
+	$(PYTHON) -m pytest -v --purepy | tee $(shell $(PYTHON) -c 'import util as u; u.print_file_name_results()')
 
 bench: test
 
 bench_hpy:
-	$(PYTHON) -m pytest -v -m hpy | tee tmp_results_$(shell $(PYTHON) -c "import sys; print(sys.implementation.name)").txt
+	$(PYTHON) -m pytest -v -m hpy | tee $(shell $(PYTHON) get_file_name_results.py)
 
 clean:
 	rm -f src/*.so src/hpy_simple.py
@@ -39,19 +39,16 @@ create_venv_graalpy:
 	$(shell uv python find graalpy) -m venv .venv_graalpy
 
 print_cpy:
-	@echo =================================== CPython ====================================
-	@tail tmp_results_cpython.txt -n 32
+	@$(PYTHON) print_tmp_results.py cpy
 
 print_pypy:
-	@echo ==================================== PyPy ======================================
-	@tail tmp_results_pypy.txt -n 32
+	@$(PYTHON) print_tmp_results.py pypy
 
 print_graalpy:
-	@echo =================================== GraalPy ====================================
-	@tail tmp_results_graalpy.txt -n 32
+	@$(PYTHON) print_tmp_results.py graalpy
 
 print_pypy_vs_cpy:
-	@$(PYTHON) print_other_vs_cpy.py PyPy
+	@$(PYTHON) print_other_vs_cpy.py pypy
 
 print_graalpy_vs_cpy:
-	@$(PYTHON) print_other_vs_cpy.py GraalPy
+	@$(PYTHON) print_other_vs_cpy.py graalpy

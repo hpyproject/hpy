@@ -1,8 +1,11 @@
 import re
 import time
+import sys
 from collections import defaultdict
 import pytest
 import _valgrind
+
+from util import get_short_prefix
 
 class Timer:
 
@@ -72,6 +75,9 @@ class TimerSession:
     def display_summary(self, tr):
         w = tr.write_line
         w('')
+        tr.write_sep('=', "INFO", cyan=True)
+        w(f"implementation: {sys.implementation.name}")
+        w(f"short prefix: {get_short_prefix()}")
         tr.write_sep('=', 'BENCHMARKS', cyan=True)
         line = ' '*40 + '             cpy                    hpy'
         if 'purepy' in self.apis:
