@@ -1,8 +1,4 @@
-
-import gc
 import sys
-
-from time import perf_counter as time
 
 if "purepy" in sys.argv:
     import purepy_simple as simple
@@ -17,18 +13,12 @@ else:
 print(simple)
 
 cls = simple.HTFoo
+
 N = 10000000
 if sys.implementation.name == "cpython":
     N *= 10
+elif sys.implementation.name == "pypy" and "cpy" in sys.argv:
+    N *= 4
 
-def main():
-    objs = [None] * N
-    for i in range(N):
-        objs[i] = cls()
-    return objs
-
-gc.collect()
-
-t_start = time()
-main()
-print(f"time per allocation: {(time() - t_start)/N:.1e} s")
+if "--short" in sys.argv:
+    N //= 100
