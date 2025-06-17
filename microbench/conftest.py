@@ -1,8 +1,11 @@
 import re
 import time
+import sys
 from collections import defaultdict
 import pytest
 import _valgrind
+
+from util import get_short_prefix
 
 class Timer:
 
@@ -72,16 +75,31 @@ class TimerSession:
     def display_summary(self, tr):
         w = tr.write_line
         w('')
+        tr.write_sep('=', "INFO", cyan=True)
+        w(f"implementation: {sys.implementation.name}")
+        w(f"short prefix: {get_short_prefix()}")
         tr.write_sep('=', 'BENCHMARKS', cyan=True)
-        w(' '*40 + '             cpy                    hpy')
-        w(' '*40 + '----------------    -------------------')
+        line = ' '*40 + '             cpy                    hpy'
+        if 'purepy' in self.apis:
+            line += '                 purepy'
+        w(line)
+        line = ' '*40 + '----------------    -------------------'
+        if 'purepy' in self.apis:
+            line += '    -------------------'
+        w(line)
         for shortid, timings in self.table.items():
             cpy = timings.get('cpy')
             hpy = timings.get('hpy')
+            purepy = timings.get('purepy')
             hpy_ratio = self.format_ratio(cpy, hpy)
+            purepy_ratio = self.format_ratio(cpy, purepy)
             cpy = cpy or ''
             hpy = hpy or ''
-            w(f'{shortid:<40} {cpy!s:>15} {hpy!s:>15} {hpy_ratio}')
+            purepy = purepy or ''
+            w(
+                f'{shortid:<40} {cpy!s:>15} {hpy!s:>15} {hpy_ratio} '
+                f'{purepy!s:>15} {purepy_ratio}'
+            )
         w('')
 
 
@@ -95,6 +113,7 @@ def pytest_configure(config):
     config._timersession = TimerSession()
     config.addinivalue_line("markers", "hpy: mark modules using the HPy API")
     config.addinivalue_line("markers", "cpy: mark modules using the old Python/C API")
+    config.addinivalue_line("markers", "purepy: mark modules using pure Python")
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -103,7 +122,9 @@ def pytest_addoption(parser):
     parser.addoption(
         "--slow", action="store_true", default=False, help="run microbench slower"
     )
-
+    parser.addoption(
+        "--purepy", action="store_true", default=False, help="run pure Python microbenchmarks"
+    )
 
 VERBOSE_TEST_NAME_LENGTH = 90
 
