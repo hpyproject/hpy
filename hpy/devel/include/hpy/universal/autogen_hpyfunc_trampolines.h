@@ -15,8 +15,12 @@ typedef struct {
     cpy_PyObject * result;
 } _HPyFunc_args_NOARGS;
 
+/* NOTE: METH_NOARGS requires 2 parameters per CPython C API docs:
+   "The function must have 2 parameters. Since the second parameter is unused,
+   Py_UNUSED can be used to prevent a compiler warning."
+   The second parameter is always NULL but must be present in the signature. */
 #define _HPyFunc_TRAMPOLINE_HPyFunc_NOARGS(SYM, IMPL) \
-    static cpy_PyObject *SYM(cpy_PyObject *self) \
+    static cpy_PyObject *SYM(cpy_PyObject *self, cpy_PyObject *_HPy_UNUSED_ARG(ignored)) \
     { \
         _HPyFunc_args_NOARGS a = { self }; \
         _HPy_CallRealFunctionFromTrampoline( \

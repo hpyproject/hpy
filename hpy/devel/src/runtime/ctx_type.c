@@ -208,8 +208,39 @@ static int _decref_visitor(HPyField *pf, void *arg)
     return 0;
 }
 
-static void hpytype_clear(PyObject *self)
+/* Python 3.13+ requires proper handling of Py_TPFLAGS_MANAGED_DICT.
+ * Types that inherit from object get this flag, and must call
+ * PyObject_VisitManagedDict in tp_traverse and PyObject_ClearManagedDict
+ * in tp_clear/tp_dealloc. Without this, attribute lookup crashes.
+ */
+#if PY_VERSION_HEX >= 0x030D0000
+#define HPY_HAS_MANAGED_DICT 1
+#else
+#define HPY_HAS_MANAGED_DICT 0
+#endif
+
+#if HPY_HAS_MANAGED_DICT
+/* Generic tp_traverse for HPy types that don't define their own HPy_tp_traverse.
+ * This is needed on Python 3.13+ because we need to visit the managed dict.
+ * For types WITH a user-defined traverse, the trampoline calls
+ * call_traverseproc_from_trampoline which handles managed dict. */
+static int hpytype_traverse(PyObject *self, cpy_visitproc visit, void *arg)
 {
+    /* On Python 3.13+, we must visit the managed dict */
+    PyObject_VisitManagedDict(self, visit, arg);
+    /* Visit the type object (required for heap types) */
+    Py_VISIT(Py_TYPE(self));
+    return 0;
+}
+#endif /* HPY_HAS_MANAGED_DICT */
+
+static int hpytype_clear(PyObject *self)
+{
+#if HPY_HAS_MANAGED_DICT
+    /* On Python 3.13+, we must clear the managed dict */
+    PyObject_ClearManagedDict(self);
+#endif
+
     // call tp_traverse on all the HPy types of the hierarchy
     PyTypeObject *tp = Py_TYPE(self);
     PyTypeObject *base = tp;
@@ -223,6 +254,7 @@ static void hpytype_clear(PyObject *self)
         }
         base = base->tp_base;
     }
+    return 0;
 }
 
 /* this is a generic tp_dealloc which we use for all the user-defined HPy
@@ -242,6 +274,13 @@ static void hpytype_dealloc(PyObject *self)
 
     // decref and clear all the HPyFields
     hpytype_clear(self);
+
+#if HPY_HAS_MANAGED_DICT
+    /* On Python 3.13+, ensure managed dict is cleared before dealloc.
+     * Note: hpytype_clear already calls PyObject_ClearManagedDict, but
+     * calling it again is safe and ensures proper cleanup. */
+    PyObject_ClearManagedDict(self);
+#endif
 
     // call tp_destroy on all the HPy types of the hierarchy
     PyTypeObject *base = tp;
@@ -668,8 +707,18 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
     hpyslot_count++;        // Py_tp_getset
     if (needs_dealloc)
         hpyslot_count++;        // Py_tp_dealloc
+#if HPY_HAS_MANAGED_DICT
+    /* On Python 3.13+, we always need tp_traverse and tp_clear to handle
+     * the managed dict properly, even for types without user-defined traverse.
+     * If user provides HPy_tp_traverse, their trampoline handles managed dict.
+     * If not, we add hpytype_traverse. Either way, we add hpytype_clear. */
+    if (!has_tp_traverse(hpyspec))
+        hpyslot_count++;    // Py_tp_traverse (only if user didn't provide one)
+    hpyslot_count++;    // Py_tp_clear (always needed on 3.13+)
+#else
     if (has_tp_traverse(hpyspec))
         hpyslot_count++;    // Py_tp_clear
+#endif
 
     // allocate the result PyType_Slot array
     HPy_ssize_t total_slot_count = hpyslot_count + legacy_slot_count;
@@ -824,10 +873,29 @@ create_slot_defs(HPyType_Spec *hpyspec, HPyType_Extra_t *extra,
         result[dst_idx++] = (PyType_Slot){Py_tp_dealloc, (void*)hpytype_dealloc};
     }
 
+#if HPY_HAS_MANAGED_DICT
+    /* On Python 3.13+, we always need tp_traverse and tp_clear to handle
+     * the managed dict properly. Unlike what the Python docs suggest,
+     * Py_TPFLAGS_MANAGED_DICT is NOT automatically inherited from object
+     * when using PyType_FromSpec - we must set it explicitly.
+     * 
+     * Setting MANAGED_DICT requires calling PyObject_VisitManagedDict/ClearManagedDict
+     * in traverse/clear, which we do in hpytype_traverse and hpytype_clear.
+     * If user provides HPy_tp_traverse, their trampoline handles managed dict
+     * via call_traverseproc_from_trampoline. Otherwise, add hpytype_traverse.
+     *
+     * IMPORTANT: Py_TPFLAGS_MANAGED_DICT requires Py_TPFLAGS_HAVE_GC to be set. */
+    *flags |= Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_MANAGED_DICT;
+    if (!has_tp_traverse(hpyspec)) {
+        result[dst_idx++] = (PyType_Slot){Py_tp_traverse, (void*)hpytype_traverse};
+    }
+    result[dst_idx++] = (PyType_Slot){Py_tp_clear, (void*)hpytype_clear};
+#else
     // add a tp_clear, if the user provided a tp_traverse
     if (has_tp_traverse(hpyspec)) {
         result[dst_idx++] = (PyType_Slot){Py_tp_clear, (void*)hpytype_clear};
     }
+#endif
 
     // add the NULL sentinel at the end
     result[dst_idx++] = (PyType_Slot){0, NULL};
@@ -956,6 +1024,13 @@ static bool has_tp_traverse(HPyType_Spec *hpyspec)
 
 static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec)
 {
+#if HPY_HAS_MANAGED_DICT
+    /* On Python 3.13+, we always need hpytype_dealloc because we set
+     * Py_TPFLAGS_HAVE_GC for proper managed dict handling. The dealloc
+     * must call PyObject_GC_UnTrack and PyObject_ClearManagedDict. */
+    (void)hpyspec;  /* unused */
+    return true;
+#else
     if (hpyspec->defines != NULL)
         for (int i = 0; hpyspec->defines[i] != NULL; i++) {
             HPyDef *def = hpyspec->defines[i];
@@ -964,6 +1039,7 @@ static bool needs_hpytype_dealloc(HPyType_Spec *hpyspec)
                 return true;
         }
     return false;
+#endif
 }
 
 static int check_have_gc_and_tp_traverse(HPyContext *ctx, HPyType_Spec *hpyspec)
@@ -1404,15 +1480,18 @@ ctx_New(HPyContext *ctx, HPy h_type, void **data)
     }
 
     PyObject *result;
-    if (PyType_IS_GC(tp))
+    int is_gc = PyType_IS_GC(tp);
+    if (is_gc) {
         result = PyObject_GC_New(PyObject, tp);
-    else
+    } else {
         result = PyObject_New(PyObject, tp);
+    }
 
     // HPy_New guarantees that the memory is zeroed, but PyObject_{GC}_New
     // doesn't. But we need to make sure to NOT overwrite ob_refcnt and
     // ob_type. See test_HPy_New_initialize_to_zero
     const HPyType_BuiltinShape shape = _HPyType_Get_Shape(tp);
+    
     HPy_ssize_t payload_size;
     void *payload;
     if (shape != HPyType_BuiltinShape_Legacy) {
@@ -1585,6 +1664,26 @@ _HPy_HIDDEN int call_traverseproc_from_trampoline(HPyFunc_traverseproc tp_traver
                                                   cpy_visitproc cpy_visit,
                                                   void *cpy_arg)
 {
+    /* Visit the type object (required for heap types on Python 3.9+) */
+#if PY_VERSION_HEX >= 0x03090000
+    {
+        PyObject *_py_type = (PyObject*)Py_TYPE(self);
+        int res = cpy_visit(_py_type, cpy_arg);
+        if (res)
+            return res;
+    }
+#endif
+
+#if HPY_HAS_MANAGED_DICT
+    /* On Python 3.13+, we must visit the managed dict */
+    {
+        int res = PyObject_VisitManagedDict(self, cpy_visit, cpy_arg);
+        if (res)
+            return res;
+    }
+#endif
+
+    /* Now call the user's traverse implementation */
     hpy2cpy_visit_args_t args = { cpy_visit, cpy_arg };
     return tp_traverse(_pyobj_as_struct(self), hpy2cpy_visit, &args);
 }
