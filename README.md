@@ -8,6 +8,33 @@
 **Community**: [HPy Discord server](https://discord.gg/xSzxUbPkTQ) \
 **Mailing list**: [hpy-dev@python.org](https://mail.python.org/mailman3/lists/hpy-dev.python.org/)
 
+## Project status
+
+HPy is no longer actively maintained. We consider the project a successful
+demonstration of an abstract, JIT- and alternative-Python-friendly C API for
+Python extensions, and of a possible path for evolving CPython without
+exposing implementation details.
+
+Several of the ideas explored by HPy have since become part of CPython's C
+API evolution, whether directly inspired by HPy or developed in parallel:
+opaque interpreter and type structures, getter/setter APIs instead of direct
+field access, converting macros to functions, and avoiding borrowed references
+in new APIs. See [PEP 620](https://peps.python.org/pep-0620/), [PEP
+670](https://peps.python.org/pep-0670/), and [PEP
+674](https://peps.python.org/pep-0674/) for some of this work. HPy's
+perspective was also presented at the [CPython core developer sprint and C API
+Summit in Brno in 2023](https://hpyproject.org/blog/posts/2023/10/hpy-meetup-2023/),
+along with the [presentation slides](https://hpyproject.org/talks/2023/10/things_to_learn_from_hpy.pdf).
+
+Ideas that require a substantially new API are being explored by the
+[PyNI PEP work](https://github.com/py-ni/peps/blob/main/peps/pep-08xx.rst).
+That work is progressing gradually as community time and support become
+available. Contributions are welcome from people seriously interested in
+moving this work forward; experience with CPython development and C extensions
+is helpful,
+and we are happy to help onboard new contributors alongside the existing
+maintainers and authors.
+
 ## Summary
 
 HPy is a better API for extending Python
@@ -74,8 +101,3 @@ by Victor Stinner.
 
 The "H" in `HPy` stands for "handle": one of the key idea of the new API is to
 use fully opaque handles to represent and pass around Python objects.
-
-
-## Donate to HPy
-
-Become a financial contributor and help us sustain the HPy community: [Contribute to HPy](https://opencollective.com/hpy/contribute).
