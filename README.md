@@ -29,7 +29,7 @@ along with the [presentation slides](https://hpyproject.org/talks/2023/10/things
 Ideas that require a substantially new API are being explored by the
 [PyNI PEP work](https://github.com/py-ni/peps/blob/main/peps/pep-08xx.rst).
 That work is progressing gradually as community time and support become
-available. Contributions are welcome from people seriously interested in
+Contributions are welcome from people seriously interested in
 moving this work forward; experience with CPython development and C extensions
 is helpful,
 and we are happy to help onboard new contributors alongside the existing
